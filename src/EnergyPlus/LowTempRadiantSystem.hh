@@ -183,26 +183,24 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        LowTempRadiantControlTypes processRadiantSystemControlInput(EnergyPlusData &state,
-                                                                    std::string const& controlInput,
+        LowTempRadiantControlTypes processRadiantSystemControlInput(std::string const& controlInput,
                                                                     std::string const& controlInputField,
                                                                     LowTempRadiantSystem::SystemType const& typeOfRadiantSystem
         );
 
-        LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(EnergyPlusData &state,
-                                                                      std::string const& controlInput,
+        LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(std::string const& controlInput,
                                                                       std::string const& controlInputField
         );
 
-        void errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound);
+        void errorCheckZonesAndConstructions(bool &errorsFound);
 
         Real64 setRadiantSystemControlTemperature();
 
         Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
 
-        virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet) = 0;
+        virtual void calculateLowTemperatureRadiantSystem(Real64 &LoadMet) = 0;
 
-        Real64 setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, int const scheduleIndex, Real64 const throttlingRange);
+        Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
 
         void updateLowTemperatureRadiantSystemSurfaces();
 
@@ -276,21 +274,20 @@ namespace LowTempRadiantSystem {
 
         void setOperatingModeBasedOnChangeoverDelay();
 
-        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const userInput);
+        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
 
-        Real64 calculateHXEffectivenessTerm(EnergyPlusData &state,
-                                            int const SurfNum,          // Surface Number
+        Real64 calculateHXEffectivenessTerm(int const SurfNum,          // Surface Number
                                             Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                             Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
                                             Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
                                             Real64 const NumCircs      // Number of fluid circuits in this surface
         );
 
-        Real64 calculateUFromISOStandard(EnergyPlusData &state, int const SurfNum, Real64 const WaterMassFlow);
+        Real64 calculateUFromISOStandard(int const SurfNum, Real64 const WaterMassFlow);
 
         Real64 sizeRadiantSystemTubeLength();
 
-        void checkForOutOfRangeTemperatureResult(EnergyPlusData &state, Real64 const outletTemp, Real64 const inletTemp);
+        void checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp);
 
     };
 
@@ -325,9 +322,9 @@ namespace LowTempRadiantSystem {
             {
             }
 
-        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
 
-        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystemComponents(Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
 
@@ -396,16 +393,16 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
 
-        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+        void calculateLowTemperatureRadiantSystemComponents(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
 
-        void calculateRunningMeanAverageTemperature(EnergyPlusData& state);
+        void calculateRunningMeanAverageTemperature();
 
-        Real64 calculateCurrentDailyAverageODB(EnergyPlusData& state);
+        Real64 calculateCurrentDailyAverageODB();
 
         void updateLowTemperatureRadiantSystem();
 
@@ -436,7 +433,7 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
 
@@ -492,20 +489,20 @@ namespace LowTempRadiantSystem {
 
     void clear_state();
 
-    void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
+    void SimLowTempRadiantSystem(std::string const &CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex);
 
     void GetLowTempRadiantSystem();
 
-    void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitLowTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int const RadSysNum,  // Index for the low temperature radiant system under consideration within the derived types
                                   LowTempRadiantSystem::SystemType const SystemType, // Type of radiant system: hydronic, constant flow, or electric
                                   bool &InitErrorFound  // Set to true when a severe or worse error is discovered during initialization
     );
 
-    void SizeLowTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void SizeLowTempRadiantSystem(int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                   LowTempRadiantSystem::SystemType const SystemType // Type of radiant system: hydronic, constant flow, or electric
     );
 

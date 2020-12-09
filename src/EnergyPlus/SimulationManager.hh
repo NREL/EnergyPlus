@@ -64,7 +64,7 @@ namespace SimulationManager {
 
     void GetProjectData();
 
-    void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue);
+    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 
@@ -72,15 +72,15 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting();
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
+    std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName);
 
     void OpenOutputFiles();
 
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
+    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles();
 
-    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
+    void SetupSimulation(bool &ErrorsFound);
 
     void ReportNodeConnections();
 
@@ -108,8 +108,7 @@ struct SimulationManagerData : BaseGlobalStruct {
 };
 
 
-void Resimulate(EnergyPlusData &state,
-                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );

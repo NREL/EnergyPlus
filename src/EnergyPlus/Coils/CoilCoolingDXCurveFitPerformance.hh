@@ -81,9 +81,8 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
-    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
-    void simulate(EnergyPlusData &state,
-                  const DataLoopNode::NodeData &inletNode,
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
+    void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   int useAlternateMode,
                   Real64 &PLR,
@@ -94,8 +93,7 @@ struct CoilCoolingDXCurveFitPerformance
                   DataLoopNode::NodeData &condOutletNode,
                   Real64 LoadSHR = 0.0);
 
-    void calculate(EnergyPlusData &state,
-                   CoilCoolingDXCurveFitOperatingMode &currentMode,
+    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
                    Real64 &PLR,
@@ -104,13 +102,13 @@ struct CoilCoolingDXCurveFitPerformance
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-    void calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
-    Real64 calcIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
+    void calcStandardRatings(int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
+    Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
-    explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
+    explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
     void size();
-    void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
+    void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;

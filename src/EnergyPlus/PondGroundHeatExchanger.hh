@@ -121,23 +121,22 @@ namespace PondGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
+        void InitPondGroundHeatExchanger(bool FirstHVACIteration);
 
         void setupOutputVars();
 
         void CalcPondGroundHeatExchanger();
 
-        Real64 CalcTotalFLux(EnergyPlusData &state, Real64 PondBulkTemp // pond temp for this flux calculation
+        Real64 CalcTotalFLux(Real64 PondBulkTemp // pond temp for this flux calculation
         );
 
-        Real64 CalcEffectiveness(EnergyPlusData &state,
-                                 Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
+        Real64 CalcEffectiveness(Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                  Real64 PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
@@ -146,7 +145,7 @@ namespace PondGroundHeatExchanger {
 
         void UpdatePondGroundHeatExchanger();
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
     };
 

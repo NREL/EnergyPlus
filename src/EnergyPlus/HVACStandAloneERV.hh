@@ -179,7 +179,7 @@ namespace HVACStandAloneERV {
 
     void clear_state();
 
-    void SimStandAloneERV(EnergyPlusData &state, std::string const &CompName,   // name of the Stand Alone ERV unit
+    void SimStandAloneERV(std::string const &CompName,   // name of the Stand Alone ERV unit
                           int const ZoneNum,             // number of zone being served unused1208
                           bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                           Real64 &SensLoadMet,           // net sensible load supplied by the ERV unit to the zone (W)
@@ -189,47 +189,45 @@ namespace HVACStandAloneERV {
 
     void GetStandAloneERV();
 
-    void InitStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
+    void InitStandAloneERV(int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
                            int const ZoneNum,            // number of zone being served unused1208
                            bool const FirstHVACIteration // TRUE if first HVAC iteration
     );
 
-    void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum);
+    void SizeStandAloneERV(int const StandAloneERVNum);
 
-    void CalcStandAloneERV(EnergyPlusData &state,
-                           int const StandAloneERVNum,    // Unit index in ERV data structure
+    void CalcStandAloneERV(int const StandAloneERVNum,    // Unit index in ERV data structure
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            Real64 &SensLoadMet,           // sensible zone load met by unit (W)
                            Real64 &LatentMassLoadMet      // latent zone load met by unit (kg/s), dehumid = negative
     );
 
-    void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum); // number of the current Stand Alone ERV being simulated
+    void ReportStandAloneERV(int const StandAloneERVNum); // number of the current Stand Alone ERV being simulated
 
     //        End of Reporting subroutines for the Module
 
     //        Utility subroutines/functions for the HeatingCoil Module
 
-    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
-                                std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    Real64 GetSupplyAirFlowRate(std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                 std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                 bool &ErrorsFound               // set to true if problem
     );
 
-    int GetSupplyAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetSupplyAirInletNode(std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                               std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                               bool &ErrorsFound               // set to true if problem
     );
 
-    int GetExhaustAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetExhaustAirInletNode(std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                bool &ErrorsFound               // set to true if problem
     );
 
-    int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVOutAirNode(int const StandAloneERVNum);
 
-    int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVZoneInletAirNode(int const StandAloneERVNum);
 
-    int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum);
+    int GetStandAloneERVReturnAirNode(int const StandAloneERVNum);
 
 } // namespace HVACStandAloneERV
 

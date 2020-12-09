@@ -88,8 +88,9 @@ namespace GroundTemperatureManager {
 
     //******************************************************************************
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &objectType_str, std::string const &objectName)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
         //       DATE WRITTEN   Summer 2015
@@ -122,7 +123,7 @@ namespace GroundTemperatureManager {
             objectType = objectType_XingGroundTemp;
         } else {
             // Error out if no ground temperature object types recognized
-            ShowFatalError(state, "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
+            ShowFatalError("GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
         }
 
         int numGTMs = groundTempModels.size();
@@ -139,19 +140,19 @@ namespace GroundTemperatureManager {
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
-            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectType, objectName);
+            return KusudaGroundTempsModel::KusudaGTMFactory(objectType, objectName);
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
-            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(objectType, objectName);
         } else if (objectType == objectType_SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(state, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
-            return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
+            return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
         } else {
             // Error
             return nullptr;

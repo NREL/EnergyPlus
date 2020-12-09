@@ -105,14 +105,13 @@ namespace ZoneContaminantPredictorCorrector {
     using ScheduleManager::GetCurrentScheduleValue;
     using ZoneTempPredictorCorrector::DownInterpolate4HistoryValues;
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -126,8 +125,8 @@ namespace ZoneContaminantPredictorCorrector {
         // ZoneTempPredictorCorrector module.
 
         if (state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag) {
-            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) GetZoneContaminanInputs(state);
-            GetZoneContaminanSetPoints(state);
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) GetZoneContaminanInputs();
+            GetZoneContaminanSetPoints();
             state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag = false;
         }
 
@@ -137,29 +136,29 @@ namespace ZoneContaminantPredictorCorrector {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                InitZoneContSetPoints(state);
+                InitZoneContSetPoints();
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
-                CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                CorrectZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
-                RevertZoneTimestepHistories(state);
+                RevertZoneTimestepHistories();
 
             } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
-                PushZoneTimestepHistories(state);
+                PushZoneTimestepHistories();
 
             } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
-                PushSystemTimestepHistories(state);
+                PushSystemTimestepHistories();
             }
         }
     }
 
-    void GetZoneContaminanInputs(EnergyPlusData &state)
+    void GetZoneContaminanInputs()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Dec. 2011
@@ -208,31 +207,31 @@ namespace ZoneContaminantPredictorCorrector {
         MaxAlpha = -100;
         MaxNumber = -100;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         IHGNumbers.allocate(MaxNumber);
@@ -241,14 +240,13 @@ namespace ZoneContaminantPredictorCorrector {
         AlphaName = "";
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericConstant.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenConstant);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -259,40 +257,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -301,29 +299,29 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRate = IHGNumbers(1);
             state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoef = IHGNumbers(2);
 
-            state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr = GetScheduleIndex(state, AlphaName(4));
+            state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr = GetScheduleIndex(AlphaName(4));
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                     " entered=" + AlphaName(4));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -332,7 +330,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum <= 0) continue; // Error, will be caught and terminated later
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Constant Source Generation Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Constant Source Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenRate,
                                 "Zone",
@@ -343,14 +341,14 @@ namespace ZoneContaminantPredictorCorrector {
             ZonePtr = state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -364,14 +362,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericPDriven.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -382,49 +379,49 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum =
                 UtilityRoutines::FindItemInList(AlphaName(2), AirflowNetwork::MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
-                ShowContinueError(state, "which is not listed in AirflowNetwork:MultiZone:Surface.");
+                ShowContinueError("which is not listed in AirflowNetwork:MultiZone:Surface.");
                 ErrorsFound = true;
             }
             // Ensure external surface
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0 &&
                 Surface(AirflowNetwork::MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).ExtBoundCond != ExternalEnvironment) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
                                 ") is not an exterior surface");
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -432,28 +429,28 @@ namespace ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef = IHGNumbers(1);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCExpo = IHGNumbers(2);
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative or zero value is not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(RoutineName + "Negative or zero value is not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) > 1.0) {
-                ShowSevereError(state, RoutineName + "The value greater than 1.0 is not allowed for " + cNumericFieldNames(2) + " in " +
+                ShowSevereError(RoutineName + "The value greater than 1.0 is not allowed for " + cNumericFieldNames(2) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Pressure Driven Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRate,
                                 "Zone",
@@ -468,7 +465,7 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (ZonePtr > 0 && RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
@@ -476,7 +473,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     Zone(ZonePtr).Name);
             }
             if (ZonePtr > 0)
-                SetupZoneInternalGain(state, ZonePtr,
+                SetupZoneInternalGain(ZonePtr,
                                       "ZoneContaminantSourceAndSink:GenericContaminant",
                                       state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name,
                                       IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -490,14 +487,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericCutoff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -508,40 +504,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -551,20 +547,20 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCCutoffValue = IHGNumbers(2);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Cutoff Model Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenRate,
                                 "Zone",
@@ -575,14 +571,14 @@ namespace ZoneContaminantPredictorCorrector {
             ZonePtr = state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -596,14 +592,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDecay.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenDecay);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -614,40 +609,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -657,26 +652,26 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCDelayTime = IHGNumbers(2);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Decay Model Generation Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCGenRate,
                                 "Zone",
                                 "Average",
                                 state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name);
-            SetupOutputVariable(state, "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time",
+            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time",
                                 OutputProcessor::Unit::s,
                                 state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCTime,
                                 "Zone",
@@ -687,14 +682,14 @@ namespace ZoneContaminantPredictorCorrector {
             ZonePtr = state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -708,14 +703,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericBLDiff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCBLDiff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -726,40 +720,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), Surface);
             if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -768,27 +762,27 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoef = IHGNumbers(1);
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCHenryCoef = IHGNumbers(2);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
+                ShowSevereError(RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCGenRate,
                                 "Zone",
                                 "Average",
                                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name);
             if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum > 0) {
-                SetupOutputVariable(state, "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
+                SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
                                     OutputProcessor::Unit::ppm,
                                     Surface(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum).GenericContam,
                                     "Zone",
@@ -800,14 +794,14 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -821,14 +815,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDVS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDVS = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDVS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDVS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -839,40 +832,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), Surface);
             if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -880,14 +873,14 @@ namespace ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVelo = IHGNumbers(1);
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCGenRate,
                                 "Zone",
@@ -898,14 +891,14 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -919,14 +912,13 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDRS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDRS = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         state.dataContaminantBalance->ZoneContamGenericDRS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDRS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -937,40 +929,40 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ZoneName = AlphaName(2);
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
+                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(2) +
                                 " entered=" + AlphaName(2));
                 ErrorsFound = true;
             }
 
-            state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr = GetScheduleIndex(state, AlphaName(3));
+            state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr = GetScheduleIndex(AlphaName(3));
             if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
                 } else {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                     " entered=" + AlphaName(3));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
-                SchMax = GetScheduleMaxValue(state, state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                SchMin = GetScheduleMinValue(state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                SchMax = GetScheduleMaxValue(state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                        ShowContinueError(format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                        ShowContinueError(format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -979,14 +971,14 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRate = IHGNumbers(1);
 
             if (IHGNumbers(1) < 0.0) {
-                ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
+                ShowSevereError(RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
+                ShowContinueError(format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
             // Object report variables
-            SetupOutputVariable(state, "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate",
+            SetupOutputVariable("Generic Air Contaminant Deposition Rate Removal Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCGenRate,
                                 "Zone",
@@ -997,14 +989,14 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(state, ZonePtr,
+            SetupZoneInternalGain(ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -1022,13 +1014,13 @@ namespace ZoneContaminantPredictorCorrector {
         AlphaName.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors getting Zone Contaminant Sources and Sinks input data.  Preceding condition(s) cause termination.");
+            ShowFatalError("Errors getting Zone Contaminant Sources and Sinks input data.  Preceding condition(s) cause termination.");
         }
     }
 
-    void GetZoneContaminanSetPoints(EnergyPlusData &state)
+    void GetZoneContaminanSetPoints()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1083,15 +1075,14 @@ namespace ZoneContaminantPredictorCorrector {
         };
 
         cCurrentModuleObject = "ZoneControl:ContaminantController";
-        state.dataContaminantBalance->NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataContaminantBalance->NumContControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (state.dataContaminantBalance->NumContControlledZones > 0) {
             state.dataContaminantBalance->ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
         }
 
         for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
+            inputProcessor->getObjectItem(cCurrentModuleObject,
                                           ContControlledZoneNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1102,13 +1093,13 @@ namespace ZoneContaminantPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).Name = cAlphaArgs(1);
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneName = cAlphaArgs(2);
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
@@ -1119,18 +1110,18 @@ namespace ZoneContaminantPredictorCorrector {
             if (lAlphaFieldBlanks(3)) {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // (Returns 1.0)
             } else {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(3));
                 if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Check validity of control types.
-                    ValidScheduleType = CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr, ">=", 0.0, "<=", 1.0);
+                    ValidScheduleType = CheckScheduleValueMinMax(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                     if (!ValidScheduleType) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
                                         cAlphaArgs(3) + "\"");
-                        ShowContinueError(state, "..contains values outside of range [0,1].");
+                        ShowContinueError("..contains values outside of range [0,1].");
                         ErrorsFound = true;
                     } else {
                         Zone(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum).ZoneContamControllerSchedIndex =
@@ -1140,32 +1131,32 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SetPointSchedName = cAlphaArgs(4);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex = GetScheduleIndex(cAlphaArgs(4));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 // Check validity of control types.
-                ValidScheduleType = CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex, ">=", 0.0, "<=", 2000.0);
+                ValidScheduleType = CheckScheduleValueMinMax(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                     "\"");
-                    ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
+                    ShowContinueError("..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
                 }
             }
 
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedName = cAlphaArgs(5);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex = GetScheduleIndex(state, cAlphaArgs(5));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex = GetScheduleIndex(cAlphaArgs(5));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
-                    CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
+                    CheckScheduleValueMinMax(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
                                     "\"");
-                    ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
+                    ShowContinueError("..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
                 } else {
                     Zone(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum).ZoneMinCO2SchedIndex =
@@ -1174,15 +1165,15 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedName = cAlphaArgs(6);
-            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex = GetScheduleIndex(state, cAlphaArgs(6));
+            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex = GetScheduleIndex(cAlphaArgs(6));
             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
-                    CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
+                    CheckScheduleValueMinMax(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) +
                                     "\"");
-                    ShowContinueError(state, "..contains values outside of range [0,2000 ppm].");
+                    ShowContinueError("..contains values outside of range [0,2000 ppm].");
                     ErrorsFound = true;
                 } else {
                     Zone(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum).ZoneMaxCO2SchedIndex =
@@ -1195,31 +1186,31 @@ namespace ZoneContaminantPredictorCorrector {
                 if (lAlphaFieldBlanks(7)) {
                     state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(cAlphaArgs(7));
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(7) +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(7) +
                                         "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Check validity of control types.
                         ValidScheduleType =
-                            CheckScheduleValueMinMax(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0);
+                            CheckScheduleValueMinMax(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                         if (!ValidScheduleType) {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
                                             cAlphaArgs(7) + "\"");
-                            ShowContinueError(state, "..contains values outside of range [0,1].");
+                            ShowContinueError("..contains values outside of range [0,1].");
                             ErrorsFound = true;
                         }
                     }
                 }
                 if (lAlphaFieldBlanks(8)) {
-                    ShowSevereError(state, cCurrentModuleObject + " \"" + cAlphaArgs(8) + "\" is required, but blank.");
+                    ShowSevereError(cCurrentModuleObject + " \"" + cAlphaArgs(8) + "\" is required, but blank.");
                     ErrorsFound = true;
                 } else {
                     state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSetPointSchedName = cAlphaArgs(8);
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex = GetScheduleIndex(state, cAlphaArgs(8));
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex = GetScheduleIndex(cAlphaArgs(8));
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCSPSchedIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1229,13 +1220,13 @@ namespace ZoneContaminantPredictorCorrector {
         } // ContControlledZoneNum
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination.");
+            ShowFatalError("Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination.");
         }
     }
 
-    void InitZoneContSetPoints(EnergyPlusData &state)
+    void InitZoneContSetPoints()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1271,11 +1262,11 @@ namespace ZoneContaminantPredictorCorrector {
         bool ErrorsFound(false);
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
         }
 
         if (state.dataZoneContaminantPredictorCorrector->MyOneTimeFlag) {
@@ -1316,21 +1307,20 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // Zone CO2
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    SetupOutputVariable(state,
-                        "Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, state.dataContaminantBalance->ZoneAirCO2(Loop), "System", "Average", Zone(Loop).Name);
-                    SetupOutputVariable(state, "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
+                    SetupOutputVariable("Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, state.dataContaminantBalance->ZoneAirCO2(Loop), "System", "Average", Zone(Loop).Name);
+                    SetupOutputVariable("Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         state.dataContaminantBalance->CO2PredictedRate(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable(state, "Zone Air CO2 Setpoint Concentration",
+                    SetupOutputVariable("Zone Air CO2 Setpoint Concentration",
                                         OutputProcessor::Unit::ppm,
                                         state.dataContaminantBalance->ZoneCO2SetPoint(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable(state, "Zone Air CO2 Internal Gain Volume Flow Rate",
+                    SetupOutputVariable("Zone Air CO2 Internal Gain Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         state.dataContaminantBalance->ZoneCO2Gain(Loop),
                                         "System",
@@ -1375,19 +1365,19 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // Zone CO2
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    SetupOutputVariable(state, "Zone Air Generic Air Contaminant Concentration",
+                    SetupOutputVariable("Zone Air Generic Air Contaminant Concentration",
                                         OutputProcessor::Unit::ppm,
                                         state.dataContaminantBalance->ZoneAirGC(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable(state, "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate",
+                    SetupOutputVariable("Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         state.dataContaminantBalance->GCPredictedRate(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable(state, "Zone Generic Air Contaminant Setpoint Concentration",
+                    SetupOutputVariable("Zone Generic Air Contaminant Setpoint Concentration",
                                         OutputProcessor::Unit::ppm,
                                         state.dataContaminantBalance->ZoneGCSetPoint(Loop),
                                         "System",
@@ -1494,7 +1484,7 @@ namespace ZoneContaminantPredictorCorrector {
                             }
                         }
                     } else {
-                        ShowSevereError(state, "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" +
+                        ShowSevereError("ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" +
                                         Zone(ZoneNum).Name);
                         ErrorsFound = true;
                     }
@@ -1502,18 +1492,18 @@ namespace ZoneContaminantPredictorCorrector {
             }
             state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag = false;
             if (ErrorsFound) {
-                ShowFatalError(state, "ZoneControl:ContaminantController: Program terminates for preceding reason(s).");
+                ShowFatalError("ZoneControl:ContaminantController: Program terminates for preceding reason(s).");
             }
         }
 
         for (Loop = 1; Loop <= state.dataContaminantBalance->NumContControlledZones; ++Loop) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(Loop).ActualZoneNum;
-                state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(Loop).SPSchedIndex);
+                state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(Loop).SPSchedIndex);
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(Loop).ActualZoneNum;
-                state.dataContaminantBalance->ZoneGCSetPoint(ZoneNum) = GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(Loop).GCSPSchedIndex);
+                state.dataContaminantBalance->ZoneGCSetPoint(ZoneNum) = GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(Loop).GCSPSchedIndex);
             }
         }
 
@@ -1535,8 +1525,8 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
                 ZoneNum = state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum;
                 GCGain =
-                    state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRate * GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr) -
-                    state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoef * GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr) *
+                    state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRate * GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr) -
+                    state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoef * GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr) *
                         state.dataContaminantBalance->ZoneAirGC(ZoneNum) * 1.0e-6;
                 state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenRate = GCGain;
             }
@@ -1549,7 +1539,7 @@ namespace ZoneContaminantPredictorCorrector {
                     Pj = AirflowNetwork::AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
                     if (Pj >= Pi) {
                         GCGain = state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoef *
-                                 GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *
+                                 GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *
                                  std::pow(Pj - Pi, state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCExpo);
                     } else {
                         GCGain = 0.0;
@@ -1563,7 +1553,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneNum = state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum;
                 if (state.dataContaminantBalance->ZoneAirGC(ZoneNum) < state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCCutoffValue) {
                     GCGain = state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRate *
-                             GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr) *
+                             GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr) *
                              (1.0 - state.dataContaminantBalance->ZoneAirGC(ZoneNum) / state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCCutoffValue);
                 } else {
                     GCGain = 0.0;
@@ -1573,7 +1563,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             // From decay model
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
-                Sch = GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                Sch = GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 ZoneNum = state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum;
                 if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
                     state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCTime = 0.0;
@@ -1590,7 +1580,7 @@ namespace ZoneContaminantPredictorCorrector {
                 SurfNum = state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum;
                 ZoneNum = Surface(SurfNum).Zone;
                 Cs = Surface(SurfNum).GenericContam;
-                Sch = GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                Sch = GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
                 GCGain = state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoef * Sch * Surface(SurfNum).Area * Surface(SurfNum).Multiplier *
                          (Cs / state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCHenryCoef - state.dataContaminantBalance->ZoneAirGC(ZoneNum)) * 1.0e-6;
                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCGenRate = GCGain;
@@ -1602,7 +1592,7 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
                 SurfNum = state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum;
                 ZoneNum = Surface(SurfNum).Zone;
-                Sch = GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                Sch = GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
                 GCGain =
                     -state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVelo * Surface(SurfNum).Area * Sch * state.dataContaminantBalance->ZoneAirGC(ZoneNum) * Surface(SurfNum).Multiplier * 1.0e-6;
                 state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCGenRate = GCGain;
@@ -1611,20 +1601,19 @@ namespace ZoneContaminantPredictorCorrector {
             // From deposition rate sink model
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
                 ZoneNum = state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum;
-                Sch = GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                Sch = GetCurrentScheduleValue(state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr);
                 GCGain = -state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRate * Zone(ZoneNum).Volume * Sch * state.dataContaminantBalance->ZoneAirGC(ZoneNum) * 1.0e-6;
                 state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCGenRate = GCGain;
             }
         }
     }
 
-    void PredictZoneContaminants(EnergyPlusData &state,
-                                 bool const ShortenTimeStepSys,
+    void PredictZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1771,7 +1760,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check all the controlled zones to see if it matches the zone simulated
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
-                        if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
@@ -1783,7 +1772,7 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 if (!ControlledCO2ZoneFlag) {
                     for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
-                        if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
@@ -1808,7 +1797,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledCO2ZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate Co2 from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -1878,7 +1867,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check all the controlled zones to see if it matches the zone simulated
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
-                        if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = state.dataContaminantBalance->ZoneGCSetPoint(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirGCSetPoint = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
@@ -1890,7 +1879,7 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 if (!ControlledGCZoneFlag) {
                     for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
-                        if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = state.dataContaminantBalance->ZoneGCSetPoint(state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirGCSetPoint = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
@@ -1915,7 +1904,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledGCZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate generic contaminant from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -1976,9 +1965,9 @@ namespace ZoneContaminantPredictorCorrector {
         }
     }
 
-    void PushZoneTimestepHistories(EnergyPlusData &state)
+    void PushZoneTimestepHistories()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2022,9 +2011,9 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
     }
 
-    void PushSystemTimestepHistories(EnergyPlusData &state)
+    void PushSystemTimestepHistories()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2068,9 +2057,9 @@ namespace ZoneContaminantPredictorCorrector {
         }
     }
 
-    void RevertZoneTimestepHistories(EnergyPlusData &state)
+    void RevertZoneTimestepHistories()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2099,7 +2088,7 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
     }
 
-    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
+    void InverseModelCO2(int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -2107,6 +2096,7 @@ namespace ZoneContaminantPredictorCorrector {
                          Real64 &RhoAir               // Air density
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Han Li
         //       DATE WRITTEN   February 2019
@@ -2139,7 +2129,7 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 SysTimeStepInSeconds(0.0);
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
-        Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
+        Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
         if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
@@ -2150,9 +2140,9 @@ namespace ZoneContaminantPredictorCorrector {
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
@@ -2174,7 +2164,7 @@ namespace ZoneContaminantPredictorCorrector {
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
                 CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
+                AirDensity = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == state.dataContaminantBalance->OutdoorCO2) {
                     M_inf = 0.0;
@@ -2191,9 +2181,9 @@ namespace ZoneContaminantPredictorCorrector {
 
             // Hybrid Model calculate people count
             if (HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
-                Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                ActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                CO2GenRate = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
+                Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                ActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                CO2GenRate = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
 
                 if (ActivityLevel <= 0.0) {
                     ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
@@ -2206,9 +2196,9 @@ namespace ZoneContaminantPredictorCorrector {
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
@@ -2249,13 +2239,12 @@ namespace ZoneContaminantPredictorCorrector {
         state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
     }
 
-    void CorrectZoneContaminants(EnergyPlusData &state,
-                                 bool const ShortenTimeStepSys,
+    void CorrectZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2492,7 +2481,7 @@ namespace ZoneContaminantPredictorCorrector {
             // CO2 balance.  There are 2 cases that should be considered, system
             // operating and system shutdown.
 
-            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+            RhoAir = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
             //    RhoAir = state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum)
 
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;
@@ -2556,7 +2545,7 @@ namespace ZoneContaminantPredictorCorrector {
                 state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
 
                 if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
-                    InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+                    InverseModelCO2(ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
                 ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;

@@ -250,15 +250,15 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(int objectType, std::string const &objectName);
 
         void setupOutputVars();
 
         void getSizingFactor(Real64 &_SizFac) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler();
 
@@ -274,11 +274,11 @@ namespace EvaporativeFluidCoolers {
 
         void CalcTwoSpeedEvapFluidCooler();
 
-        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, Array1D<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
 
-        void SimSimpleEvapFluidCooler(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+        void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
     };
 
     // Object Data

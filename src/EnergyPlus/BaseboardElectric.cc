@@ -86,7 +86,7 @@ namespace BaseboardElectric {
     void SimElectricBaseboard(
         std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -102,7 +102,7 @@ namespace BaseboardElectric {
         Real64 QZnReq;    // zone load not yet satisfied
 
         if (state.dataBaseboardElectric->getInputFlag) {
-            GetBaseboardInput(state);
+            GetBaseboardInput();
             state.dataBaseboardElectric->getInputFlag = false;
         }
 
@@ -112,22 +112,20 @@ namespace BaseboardElectric {
         if (CompIndex == 0) {
             BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->Baseboard, &BaseboardParams::EquipName);
             if (BaseboardNum == 0) {
-                ShowFatalError(state, "SimElectricBaseboard: Unit not found=" + EquipName);
+                ShowFatalError("SimElectricBaseboard: Unit not found=" + EquipName);
             }
             CompIndex = BaseboardNum;
         } else {
             BaseboardNum = CompIndex;
             if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
-                ShowFatalError(state,
-                               format("SimElectricBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                ShowFatalError(format("SimElectricBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       BaseboardNum,
                                       baseboard->NumBaseboards,
                                       EquipName));
             }
             if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != baseboard->Baseboard(BaseboardNum).EquipName) {
-                    ShowFatalError(state,
-                                   format("SimElectricBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                    ShowFatalError(format("SimElectricBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
                                           BaseboardNum,
                                           EquipName,
                                           baseboard->Baseboard(BaseboardNum).EquipName));
@@ -136,12 +134,12 @@ namespace BaseboardElectric {
             }
         }
 
-        InitBaseboard(state, BaseboardNum, ControlledZoneNum);
+        InitBaseboard(BaseboardNum, ControlledZoneNum);
 
         QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
-        SimElectricConvective(state, BaseboardNum, QZnReq);
+        SimElectricConvective(BaseboardNum, QZnReq);
 
         PowerMet = baseboard->Baseboard(BaseboardNum).Power;
 
@@ -151,7 +149,7 @@ namespace BaseboardElectric {
 
     void GetBaseboardInput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -198,7 +196,7 @@ namespace BaseboardElectric {
 
         cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-        NumConvElecBaseboards = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumConvElecBaseboards = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         // Calculate total number of baseboard units
         baseboard->NumBaseboards = NumConvElecBaseboards;
@@ -210,8 +208,7 @@ namespace BaseboardElectric {
             BaseboardNum = 0;
             for (ConvElecBBNum = 1; ConvElecBBNum <= NumConvElecBaseboards; ++ConvElecBBNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               ConvElecBBNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -227,12 +224,12 @@ namespace BaseboardElectric {
                 baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = "";
                 baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = cNumericFieldNames;
 
-                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                VerifyUniqueBaseboardName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 ++BaseboardNum;
                 auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
@@ -242,9 +239,9 @@ namespace BaseboardElectric {
                 if (lAlphaFieldBlanks(2)) {
                     thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    thisBaseboard.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                    thisBaseboard.SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
+                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
@@ -258,17 +255,16 @@ namespace BaseboardElectric {
                     if (!lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0 && thisBaseboard.ScaledHeatingCapacity != AutoSize) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
+                            ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                            ShowContinueError(format("Illegal {} = {:.7T}",
                                                      cNumericFieldNames(iHeatDesignCapacityNumericNum),
                                                      rNumericArgs(iHeatDesignCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                        ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                        ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -276,23 +272,22 @@ namespace BaseboardElectric {
                     if (!lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity <= 0.0) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
+                            ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                            ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                            ShowContinueError(format("Illegal {} = {:.7T}",
                                                      cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                      rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (thisBaseboard.ScaledHeatingCapacity == AutoSize) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                            ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                            ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                            ShowContinueError("Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                        ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                        ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -300,22 +295,21 @@ namespace BaseboardElectric {
                     if (!lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
+                            ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                            ShowContinueError(format("Illegal {} = {:.7T}",
                                                      cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
                                                      rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                        ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                        ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                    ShowContinueError(state, "Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowSevereError(cCurrentModuleObject + " = " + thisBaseboard.EquipName);
+                    ShowContinueError("Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
                     ErrorsFound = true;
                 }
 
@@ -330,7 +324,7 @@ namespace BaseboardElectric {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination.");
+                ShowFatalError(RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination.");
             }
         }
 
@@ -340,7 +334,7 @@ namespace BaseboardElectric {
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
 
             auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
-            SetupOutputVariable(state, "Baseboard Total Heating Energy",
+            SetupOutputVariable("Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.Energy,
                                 "System",
@@ -352,10 +346,9 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(state,
-                "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, "System", "Average", thisBaseboard.EquipName);
+            SetupOutputVariable("Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, "System", "Average", thisBaseboard.EquipName);
 
-            SetupOutputVariable(state, "Baseboard Electricity Energy",
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
                                 "System",
@@ -367,14 +360,13 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(state,
-                "Baseboard Electricity Rate", OutputProcessor::Unit::W, thisBaseboard.ElecUseRate, "System", "Average", thisBaseboard.EquipName);
+            SetupOutputVariable("Baseboard Electricity Rate", OutputProcessor::Unit::W, thisBaseboard.ElecUseRate, "System", "Average", thisBaseboard.EquipName);
         }
     }
 
     void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -409,15 +401,15 @@ namespace BaseboardElectric {
         if (!baseboard->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             baseboard->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
-                ShowSevereError(state, "InitBaseboard: Unit=[" + baseboard->Baseboard(Loop).EquipType + ',' + baseboard->Baseboard(Loop).EquipName +
+                if (CheckZoneEquipmentList(baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
+                ShowSevereError("InitBaseboard: Unit=[" + baseboard->Baseboard(Loop).EquipType + ',' + baseboard->Baseboard(Loop).EquipName +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
         if (!state.dataGlobal->SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.
-            SizeElectricBaseboard(state, BaseboardNum);
+            SizeElectricBaseboard(BaseboardNum);
             baseboard->Baseboard(BaseboardNum).MySizeFlag = false;
         }
 
@@ -435,7 +427,7 @@ namespace BaseboardElectric {
 
     void SizeElectricBaseboard(int const BaseboardNum)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -492,7 +484,7 @@ namespace BaseboardElectric {
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(state, CompType, CompName);
+                        CheckZoneSizing(CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
@@ -504,7 +496,7 @@ namespace BaseboardElectric {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(state, CompType, CompName);
+                    CheckZoneSizing(CompType, CompName);
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -516,8 +508,8 @@ namespace BaseboardElectric {
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
+                sizerHeatingCapacity.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }
@@ -525,7 +517,7 @@ namespace BaseboardElectric {
 
     void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -564,7 +556,7 @@ namespace BaseboardElectric {
         //  thermal loss that could be accounted for with this efficiency input.
         Effic = baseboard->Baseboard(BaseboardNum).BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
+        if (GetCurrentScheduleValue(baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
             if (LoadMet > baseboard->Baseboard(BaseboardNum).NominalCapacity) {

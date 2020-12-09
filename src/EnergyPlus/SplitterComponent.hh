@@ -94,26 +94,24 @@ namespace SplitterComponent {
     };
 
     void
-    SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
+    SimAirLoopSplitter(std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
 
     void GetSplitterInput();
 
-    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    void CalcAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstCall);
+    void CalcAirLoopSplitter(int const SplitterNum, bool const FirstCall);
 
-    void UpdateSplitter(EnergyPlusData &state, int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall);
+    void UpdateSplitter(int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall);
 
     void ReportSplitter(int const SplitterNum);
 
-    int GetSplitterOutletNumber(EnergyPlusData &state,
-                                std::string const &SplitterName, // must match Splitter names for the Splitter type
+    int GetSplitterOutletNumber(std::string const &SplitterName, // must match Splitter names for the Splitter type
                                 int const SplitterNum,           // Index of Splitters
                                 bool &ErrorsFound                // set to true if problem
     );
 
-    Array1D_int GetSplitterNodeNumbers(EnergyPlusData &state,
-                                       std::string const &SplitterName, // must match Splitter names for the Splitter type
+    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
                                        int const SplitterNum,           // Index of Splitters
                                        bool &ErrorsFound                // set to true if problem
     );

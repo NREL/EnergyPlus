@@ -64,15 +64,15 @@ int main(int argc, char *argv[])
 {
     std::cout << "Using EnergyPlus as a library." << std::endl;
     EnergyPlus::EnergyPlusData state;
-    StoreMessageCallback(state, message_callback_handler);
-    StoreProgressCallback(state, progress_callback_handler);
+    StoreMessageCallback(message_callback_handler);
+    StoreProgressCallback(progress_callback_handler);
 
     int status(EXIT_FAILURE);
     if (argc < 2) {
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        status = RunEnergyPlus(state, argv[1]);
+        status = RunEnergyPlus(argv[1]);
     }
     if (!std::cin.good()) std::cin.clear();
     if (!std::cerr.good()) std::cerr.clear();

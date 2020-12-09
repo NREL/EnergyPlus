@@ -144,17 +144,16 @@ namespace EIRPlantLoopHeatPumps {
 
         EIRPlantLoopHeatPump() = default;
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state,
-                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation,
                                  [[maybe_unused]] Real64 &MaxLoad,
                                  [[maybe_unused]] Real64 &MinLoad,
                                  [[maybe_unused]] Real64 &OptLoad) override;
 
-        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
+        void doPhysics(Real64 currentLoad);
 
         void sizeLoadSide();
 
@@ -170,7 +169,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name);
+        static PlantComponent *factory(int hp_type_of_num, const std::string& hp_name);
 
         static void pairUpCompanionCoils();
 

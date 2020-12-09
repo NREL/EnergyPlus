@@ -175,8 +175,9 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
-void EnergyPlus::clearAllStates(EnergyPlusData &state)
+void EnergyPlus::clearAllStates()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // clear the passed in state
     state.clear_state();
     // then clear any other remaining global state, the number of these here will reduce over time
@@ -273,7 +274,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
     OutputProcessor::clear_state();
-    OutputReportTabular::clear_state(state);
+    OutputReportTabular::clear_state();
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();

@@ -180,7 +180,7 @@ namespace HWBaseboardRadiator {
 
     // Functions
 
-    void SimHWBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimHWBaseboard(std::string const &EquipName,
                         int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
@@ -189,15 +189,15 @@ namespace HWBaseboardRadiator {
 
     void GetHWBaseboardInput();
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitHWBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void SizeHWBaseboard(int const BaseboardNum);
 
-    void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
+    void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void UpdateHWBaseboard(int const BaseboardNum);
 
-    void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
     void DistributeBBRadGains();
 
@@ -205,8 +205,7 @@ namespace HWBaseboardRadiator {
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,       // type index
+    void UpdateHWBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
                                           std::string const &BaseboardName, // component name
                                           int const EquipFlowCtrl,          // Flow control mode for the equipment
                                           int const LoopNum,                // Plant loop index for where called from

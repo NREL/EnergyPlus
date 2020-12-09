@@ -96,7 +96,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
+    InputFile &ensure_open(const std::string &caller, bool output_to_file = true);
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
@@ -142,7 +142,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputOutputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
+    InputOutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
 
     void open(const bool forAppend = false, bool output_to_file = true);
     std::fstream::pos_type position() const noexcept;
@@ -164,10 +164,10 @@ private:
 template <typename FileType> struct IOFileName
 {
     std::string fileName;
-    FileType open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true)
+    FileType open(const std::string &caller, bool output_to_file = true)
     {
         FileType file{fileName};
-        file.ensure_open(state, caller, output_to_file);
+        file.ensure_open(caller, output_to_file);
         return file;
     }
     FileType try_open(bool output_to_file = true)

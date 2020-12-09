@@ -146,7 +146,7 @@ namespace UnitHeater {
         }
     };
 
-    void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimUnitHeater(std::string const &CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
@@ -155,21 +155,21 @@ namespace UnitHeater {
 
     void GetUnitHeaterInput();
 
-    void InitUnitHeater(EnergyPlusData &state, int const UnitHeatNum,        // index for the current unit heater
+    void InitUnitHeater(int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeUnitHeater(EnergyPlusData &state, int const UnitHeatNum);
+    void SizeUnitHeater(int const UnitHeatNum);
 
-    void CalcUnitHeater(EnergyPlusData &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
+    void CalcUnitHeater(int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitHeaterComponents(EnergyPlusData &state, int const UnitHeatNum,                   // Unit index in unit heater array
+    void CalcUnitHeaterComponents(int const UnitHeatNum,                   // Unit index in unit heater array
                                   bool const FirstHVACIteration,           // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                         // load met by unit (watts)
                                   Optional_int_const OpMode = _,           // fan operating mode
@@ -183,9 +183,9 @@ namespace UnitHeater {
 
     // END SUBROUTINE UpdateUnitHeater
 
-    void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
+    void ReportUnitHeater(int const UnitHeatNum); // Unit index in unit heater array
 
-    Real64 CalcUnitHeaterResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // heating coil part load ratio
+    Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
                                   Array1D<Real64> const &Par  // Function parameters
     );
 

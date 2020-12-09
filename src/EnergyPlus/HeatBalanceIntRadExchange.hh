@@ -83,15 +83,13 @@ namespace HeatBalanceIntRadExchange {
     // Functions
     void clear_state();
 
-    void CalcInteriorRadExchange(EnergyPlusData &state,
-                                 Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
+    void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
                                  int const SurfIterations,                // Number of iterations in calling subroutine
                                  Array1D<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
                                  std::string const &CalledFrom = "");
 
-    void UpdateMovableInsulationFlag(EnergyPlusData &state,
-                                     bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
+    void UpdateMovableInsulationFlag(bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
                                      int const SurfNum              // surface number of surface being investigated
     );
 
@@ -99,13 +97,11 @@ namespace HeatBalanceIntRadExchange {
 
     void InitSolarViewFactors();
 
-    void AlignInputViewFactors(EnergyPlusData &state,
-                               std::string const &cCurrentModuleObject, // Object type
+    void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
     );
 
-    void GetInputViewFactors(EnergyPlusData &state,
-                             std::string const &EnclosureName, // Needed to check for user input view factors.
+    void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                              const Array1D_int &SPtr,          // pointer to actual surface number
@@ -113,8 +109,7 @@ namespace HeatBalanceIntRadExchange {
                              bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
 
-    void GetInputViewFactorsbyName(EnergyPlusData &state,
-                                   std::string const &ZoneName, // Needed to check for user input view factors.
+    void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
                                    int const N,                 // NUMBER OF SURFACES
                                    Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                                    const Array1D_int &SPtr,     // pointer to actual surface number
@@ -122,8 +117,7 @@ namespace HeatBalanceIntRadExchange {
                                    bool &ErrorsFound            // True when errors are found in number of fields vs max args
     );
 
-    void CalcApproximateViewFactors(EnergyPlusData &state,
-                                    int const N,                    // NUMBER OF SURFACES
+    void CalcApproximateViewFactors(int const N,                    // NUMBER OF SURFACES
                                     const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                                     const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
                                     const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
@@ -131,8 +125,7 @@ namespace HeatBalanceIntRadExchange {
                                     const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     );
 
-    void FixViewFactors(EnergyPlusData &state,
-                        int const N,                     // NUMBER OF SURFACES
+    void FixViewFactors(int const N,                     // NUMBER OF SURFACES
                         const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
                         std::string &enclName,           // Name of Enclosure being fixed
@@ -144,16 +137,14 @@ namespace HeatBalanceIntRadExchange {
                         Real64 &RowSum                   // RowSum of Fixed
     );
 
-    void CalcScriptF(EnergyPlusData &state,
-                     int const N,             // Number of surfaces
+    void CalcScriptF(int const N,             // Number of surfaces
                      Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                      Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
                      Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     );
 
-    void CalcFMRT(EnergyPlusData &state,
-                  int const N,             // Number of surfaces
+    void CalcFMRT(int const N,             // Number of surfaces
                   Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     );
@@ -168,8 +159,7 @@ namespace HeatBalanceIntRadExchange {
                            Array2<Real64> &I  // Returned as inverse matrix
     );
 
-    int GetRadiantSystemSurface(EnergyPlusData &state,
-                                std::string const &cCurrentModuleObject, // Calling Object type
+    int GetRadiantSystemSurface(std::string const &cCurrentModuleObject, // Calling Object type
                                 std::string const &RadSysName,           // Calling Object name
                                 int const RadSysZoneNum,                 // Radiant system zone number
                                 std::string const &SurfaceName,          // Referenced surface name

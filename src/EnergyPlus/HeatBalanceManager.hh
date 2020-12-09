@@ -151,36 +151,34 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput();
 
-    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
+    void CheckUsedConstructions(bool &ErrorsFound);
 
     bool CheckValidSimulationObjects();
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
+    void GetSiteAtmosphereData(bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(bool &ErrorsFound); // set to true if errors found in input
 
-    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
+    void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String
                                    bool &ErrorsFound             // If errors found
     );
 
-    void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetConstructData(bool &ErrorsFound); // If errors found in input
 
-    void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetBuildingData(bool &ErrorsFound); // If errors found in input
 
-    void GetZoneData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetZoneData(bool &ErrorsFound); // If errors found in input
 
-    void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetZoneLocalEnvData(bool &ErrorsFound); // If errors found in input
 
-    void ProcessZoneData(EnergyPlusData &state,
-                         std::string const &cCurrentModuleObject,
+    void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
@@ -229,10 +227,9 @@ namespace HeatBalanceManager {
 
     void OpenShadingFile();
 
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
 
-    void SearchWindow5DataFile(EnergyPlusData &state,
-                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+    void SearchWindow5DataFile(std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -241,30 +238,26 @@ namespace HeatBalanceManager {
 
     void SetStormWindowControl();
 
-    void CreateFCfactorConstructions(EnergyPlusData &state,
-                                     int &ConstrNum,   // Counter for Constructions
+    void CreateFCfactorConstructions(int &ConstrNum,   // Counter for Constructions
                                      bool &ErrorsFound // If errors found in input
     );
 
-    void CreateAirBoundaryConstructions(EnergyPlusData &state,
-                                        int &ConstrNum,   // Counter for Constructions
+    void CreateAirBoundaryConstructions(int &ConstrNum,   // Counter for Constructions
                                         bool &ErrorsFound // If errors found in input
     );
 
-    void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetScheduledSurfaceGains(bool &ErrorsFound); // If errors found in input
 
-    void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed
+    void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
 
-    void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void CreateTCConstructions(bool &ErrorsFound); // If errors found in input
 
-    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum);
+    void SetupSimpleWindowGlazingSystem(int &MaterNum);
 
-    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
-                                               int &MaterNum, // num of material items thus far
+    void SetupComplexFenestrationMaterialInput(int &MaterNum, // num of material items thus far
                                                bool &ErrorsFound);
 
-    void SetupComplexFenestrationStateInput(EnergyPlusData &state,
-                                            int &ConstrNum, // num of construction items thus far
+    void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
 
     void InitConductionTransferFunctions();

@@ -64,8 +64,9 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Site:GroundTemperature:Deep factory
-std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(int objectType, std::string objectName)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -89,7 +90,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteDeepGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -97,10 +98,10 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -112,7 +113,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
         state.dataEnvrn->GroundTemp_DeepObjInput = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
 
     } else {
@@ -126,14 +127,43 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
+        ShowContinueError("Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
+    Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unused]] Real64 const _depth, Real64 const _seconds)
+    {
+    EnergyPlusData & state = getCurrentState(0);
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Matt Mitchell
+        //       DATE WRITTEN   Summer 2015
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Returns the ground temperature when input time is in seconds
+
+        // USE STATEMENTS:
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
+
+        // Convert secs to months
+        int month = ceil(_seconds / secPerMonth);
+
+        if (month >= 1 && month <= 12) {
+            timeOfSimInMonths = month;
+        } else {
+            timeOfSimInMonths = remainder(month, 12);
+        }
+
+        // Get and return ground temp
+        return getGroundTemp();
+    }
+
+Real64 SiteDeepGroundTemps::getGroundTemp()
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -149,38 +179,11 @@ Real64 SiteDeepGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Matt Mitchell
-    //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Returns the ground temperature when input time is in seconds
-
-    // USE STATEMENTS:
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
-
-    // Convert secs to months
-    int month = ceil(_seconds / secPerMonth);
-
-    if (month >= 1 && month <= 12) {
-        timeOfSimInMonths = month;
-    } else {
-        timeOfSimInMonths = remainder(month, 12);
-    }
-
-    // Get and return ground temp
-    return getGroundTemp(state);
-}
-
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -198,7 +201,7 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [
     }
 
     // Get and return ground temp
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

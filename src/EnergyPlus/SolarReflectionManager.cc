@@ -94,9 +94,9 @@ namespace SolarReflectionManager {
 
     using namespace DataVectorTypes;
 
-    void InitSolReflRecSurf(EnergyPlusData &state)
+    void InitSolReflRecSurf()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -212,8 +212,8 @@ namespace SolarReflectionManager {
         // END DO
 
         if (state.dataSolarReflectionManager->TotSolReflRecSurf == 0) {
-            ShowWarningError(state, "Calculation of solar reflected from obstructions has been requested but there");
-            ShowContinueError(state, "are no building surfaces that can receive reflected solar. Calculation will not be done.");
+            ShowWarningError("Calculation of solar reflected from obstructions has been requested but there");
+            ShowContinueError("are no building surfaces that can receive reflected solar. Calculation will not be done.");
             CalcSolRefl = false;
             return;
         }
@@ -248,8 +248,8 @@ namespace SolarReflectionManager {
                 // Warning if any receiving surface vertex is below ground level, taken to be at Z = 0 in absolute coords
                 for (loop = 1; loop <= Surface(SurfNum).Sides; ++loop) {
                     if (Surface(SurfNum).Vertex(loop).z < GroundLevelZ) {
-                        ShowWarningError(state, "Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
-                        ShowContinueError(state, "because it has one or more vertices below ground level.");
+                        ShowWarningError("Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
+                        ShowContinueError("because it has one or more vertices below ground level.");
                         break;
                     }
                 }
@@ -541,9 +541,9 @@ namespace SolarReflectionManager {
 
     //=====================================================================================================
 
-    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state)
+    void CalcBeamSolDiffuseReflFactors()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -562,25 +562,25 @@ namespace SolarReflectionManager {
 
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString("Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
-                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString("Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
             ReflFacBmToDiffSolObs = 0.0;
             ReflFacBmToDiffSolGnd = 0.0;
             for (IHr = 1; IHr <= 24; ++IHr) {
-                FigureBeamSolDiffuseReflFactors(state, IHr);
+                FigureBeamSolDiffuseReflFactors(IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
             ReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
             ReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
+            FigureBeamSolDiffuseReflFactors(state.dataGlobal->HourOfDay);
         }
     }
 
-    void FigureBeamSolDiffuseReflFactors(EnergyPlusData &state, int const iHour)
+    void FigureBeamSolDiffuseReflFactors(int const iHour)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann, derived from original CalcBeamSolDiffuseReflFactors
         //       DATE WRITTEN   September 2003
@@ -784,9 +784,9 @@ namespace SolarReflectionManager {
 
     //=================================================================================================
 
-    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state)
+    void CalcBeamSolSpecularReflFactors()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -817,25 +817,25 @@ namespace SolarReflectionManager {
         // FLOW:
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString("Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
-                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString("Updating Beam-to-Beam Exterior Solar Reflection Factors");
             }
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
             for (IHr = 1; IHr <= 24; ++IHr) {
-                FigureBeamSolSpecularReflFactors(state, IHr);
+                FigureBeamSolSpecularReflFactors(IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
             ReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
             CosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
+            FigureBeamSolSpecularReflFactors(state.dataGlobal->HourOfDay);
         }
     }
 
-    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour)
+    void FigureBeamSolSpecularReflFactors(int const iHour)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -1027,9 +1027,9 @@ namespace SolarReflectionManager {
 
     //=================================================================================================
 
-    void CalcSkySolDiffuseReflFactors(EnergyPlusData &state)
+    void CalcSkySolDiffuseReflFactors()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   October 2003
@@ -1096,7 +1096,7 @@ namespace SolarReflectionManager {
             cos_Theta.push_back(std::cos(Theta));
         }
 
-        DisplayString(state, "Calculating Sky Diffuse Exterior Solar Reflection Factors");
+        DisplayString("Calculating Sky Diffuse Exterior Solar Reflection Factors");
         ReflSkySolObs = 0.0;
         ReflSkySolGnd = 0.0;
 

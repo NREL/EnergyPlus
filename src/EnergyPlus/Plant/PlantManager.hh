@@ -77,7 +77,7 @@ namespace PlantManager {
 
     void clear_state();
 
-    void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
+    void ManagePlantLoops(bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
@@ -91,7 +91,7 @@ namespace PlantManager {
 
     void SetupReports();
 
-    void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
+    void InitializeLoops(bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration();
 
@@ -101,10 +101,10 @@ namespace PlantManager {
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
-    void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
+    void SizePlantLoop(int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
-    void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
+    void ResizePlantLoopLevelSizes(int LoopNum);
 
     void SetupInitialPlantCallingOrder();
 

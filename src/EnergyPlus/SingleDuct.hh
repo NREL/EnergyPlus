@@ -208,29 +208,29 @@ namespace SingleDuct {
         {
         }
 
-        void InitSys(EnergyPlusData &state, bool FirstHVACIteration);
+        void InitSys(bool FirstHVACIteration);
 
         void SizeSys();
 
-        void SimVAV(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
+        void SimVAV(bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
-        void CalcOAMassFlow(EnergyPlusData &state, Real64 &SAMassFlow, Real64 &AirLoopOAFrac) const;
+        void CalcOAMassFlow(Real64 &SAMassFlow, Real64 &AirLoopOAFrac) const;
 
-        void SimCBVAV(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
+        void SimCBVAV(bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
-        void SimVAVVS(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
+        void SimVAVVS(bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
-        void SimConstVol(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
+        void SimConstVol(bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
-        void CalcVAVVS(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNode, Real64 HWFlow, Real64 HCoilReq, int FanType, Real64 AirFlow, int FanOn, Real64 &LoadMet);
+        void CalcVAVVS(bool FirstHVACIteration, int ZoneNode, Real64 HWFlow, Real64 HCoilReq, int FanType, Real64 AirFlow, int FanOn, Real64 &LoadMet);
 
-        static Real64 VAVVSCoolingResidual(EnergyPlusData &state, Real64 SupplyAirMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSCoolingResidual(Real64 SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWNoFanResidual(EnergyPlusData &state, Real64 HWMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSHWNoFanResidual(Real64 HWMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWFanOnResidual(EnergyPlusData &state, Real64 SupplyAirMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSHWFanOnResidual(Real64 SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 HeatingFrac, Array1D<Real64> const &Par);
+        static Real64 VAVVSHCFanOnResidual(Real64 HeatingFrac, Array1D<Real64> const &Par);
 
         void SimConstVolNoReheat();
 
@@ -294,14 +294,14 @@ namespace SingleDuct {
         {
         }
 
-        void InitATMixer(EnergyPlusData &state, bool FirstHVACIteration);
+        void InitATMixer(bool FirstHVACIteration);
     };
 
-    void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimulateSingleDuct(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetSysInput();
 
-    void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
+    void GetHVACSingleDuctSysIndex(std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
                                    Optional_string_const ThisObjectType = _,
@@ -309,16 +309,15 @@ namespace SingleDuct {
                                    Optional_int DamperOutletNode = _ // Damper outlet node number
     );
 
-    void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool FirstHVACIteration, int &SysIndex);
+    void SimATMixer(std::string const &SysName, bool FirstHVACIteration, int &SysIndex);
 
     void GetATMixers();
 
-    void CalcATMixer(EnergyPlusData &state, int SysNum);
+    void CalcATMixer(int SysNum);
 
-    void UpdateATMixer(EnergyPlusData &state, int SysNum);
+    void UpdateATMixer(int SysNum);
 
-    void GetATMixer(EnergyPlusData &state,
-                    std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
@@ -328,11 +327,11 @@ namespace SingleDuct {
                     int const &ZoneEquipOutletNode    // zone equipment outlet node (used with inlet side mixers)
     );
 
-    void SetATMixerPriFlow(EnergyPlusData &state, int ATMixerNum,                         // Air terminal mixer index
+    void SetATMixerPriFlow(int ATMixerNum,                         // Air terminal mixer index
                            Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
-    void setATMixerSizingProperties(EnergyPlusData &state, int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                     int const &controlledZoneNum, // controlled zone number
                                     int const &curZoneEqNum       // current zone equipment being simulated
     );

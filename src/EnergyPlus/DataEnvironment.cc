@@ -70,7 +70,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutDryBulbTempAt(Real64 const Z) // Height above ground (m)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -109,9 +109,9 @@ namespace EnergyPlus::DataEnvironment {
         }
 
         if (LocalOutDryBulbTemp < -100.0) {
-            ShowSevereError(state, "OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
-            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
-            ShowFatalError(state, "Program terminates due to preceding condition(s).");
+            ShowSevereError("OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
+            ShowContinueError(format("...check heights, this height=[{:.0R}].", Z));
+            ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
         return LocalOutDryBulbTemp;
@@ -119,7 +119,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutWetBulbTempAt(Real64 const Z) // Height above ground (m)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -153,9 +153,9 @@ namespace EnergyPlus::DataEnvironment {
         }
 
         if (LocalOutWetBulbTemp < -100.0) {
-            ShowSevereError(state, "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
-            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
-            ShowFatalError(state, "Program terminates due to preceding condition(s).");
+            ShowSevereError("OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
+            ShowContinueError(format("...check heights, this height=[{:.0R}].", Z));
+            ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
         return LocalOutWetBulbTemp;
@@ -163,7 +163,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutDewPointTempAt(Real64 const Z) // Height above ground (m)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -198,9 +198,9 @@ namespace EnergyPlus::DataEnvironment {
         }
 
         if (LocalOutDewPointTemp < -100.0) {
-            ShowSevereError(state, "OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
-            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
-            ShowFatalError(state, "Program terminates due to preceding condition(s).");
+            ShowSevereError("OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
+            ShowContinueError(format("...check heights, this height=[{:.0R}].", Z));
+            ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
         return LocalOutDewPointTemp;
@@ -208,7 +208,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 WindSpeedAt(Real64 const Z) // Height above ground (m)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -245,7 +245,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutBaroPressAt(Real64 const Z) // Height above ground (m)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -275,7 +275,7 @@ namespace EnergyPlus::DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
 
-        BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv;
+        BaseTemp = OutDryBulbTempAt(Z) + DataGlobalConstants::KelvinConv;
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;
@@ -291,22 +291,22 @@ namespace EnergyPlus::DataEnvironment {
 
     void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Using/Aliasing
 
-        ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
-        ShowContinueError(state, format("...check {} Heights - Maximum {} Height=[{:.0R}].", Settings, Settings, max_height));
+        ShowSevereError("SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
+        ShowContinueError(format("...check {} Heights - Maximum {} Height=[{:.0R}].", Settings, Settings, max_height));
         if (max_height >= 20000.0) {
-            ShowContinueError(state, "...according to your maximum Z height, your building is somewhere in the Stratosphere.");
-            ShowContinueError(state, "...look at " + Settings + " Name= " + SettingsName);
+            ShowContinueError("...according to your maximum Z height, your building is somewhere in the Stratosphere.");
+            ShowContinueError("...look at " + Settings + " Name= " + SettingsName);
         }
-        ShowFatalError(state, "Program terminates due to preceding condition(s).");
+        ShowFatalError("Program terminates due to preceding condition(s).");
     }
 
     void
     SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie

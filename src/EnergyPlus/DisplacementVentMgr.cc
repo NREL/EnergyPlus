@@ -133,7 +133,7 @@ namespace DisplacementVentMgr {
 
     void ManageUCSDDVModel(int const ZoneNum) // index number for the specified zone
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -171,17 +171,17 @@ namespace DisplacementVentMgr {
         // FLOW:
 
         // initialize Displacement Ventilation model
-        InitUCSDDV(state, ZoneNum);
+        InitUCSDDV(ZoneNum);
 
         // perform Displacement Ventilation model calculations
-        CalcUCSDDV(state, ZoneNum);
+        CalcUCSDDV(ZoneNum);
     }
 
     //**************************************************************************************************
 
     void InitUCSDDV(int const ZoneNum)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -254,7 +254,7 @@ namespace DisplacementVentMgr {
 
     void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -309,7 +309,7 @@ namespace DisplacementVentMgr {
                 // The Wall surface is in the upper subzone
                 if (ZInfSurf > LayH) {
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
                     HA_MX += Surface(SurfNum).Area * HWall(Ctd);
@@ -318,7 +318,7 @@ namespace DisplacementVentMgr {
                 // The Wall surface is in the lower subzone
                 if (ZSupSurf < LayH) {
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HWall(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
                     HA_OC += Surface(SurfNum).Area * HWall(Ctd);
@@ -327,10 +327,10 @@ namespace DisplacementVentMgr {
                 // The Wall surface is partially in upper and partially in lower subzone
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -358,7 +358,7 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf > LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                         HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                         HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
@@ -366,7 +366,7 @@ namespace DisplacementVentMgr {
 
                     if (ZSupSurf < LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                         HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                         HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
@@ -374,10 +374,10 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
                         TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                         HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -391,7 +391,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                     HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
@@ -399,7 +399,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt >= 170.0) { // Window Floor
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HWindow(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                     HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
@@ -422,7 +422,7 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf > LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                         HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                         HA_MX += Surface(SurfNum).Area * HDoor(Ctd);
@@ -430,7 +430,7 @@ namespace DisplacementVentMgr {
 
                     if (ZSupSurf < LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                         HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                         HA_OC += Surface(SurfNum).Area * HDoor(Ctd);
@@ -438,10 +438,10 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
                         TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                         HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
                         TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                         HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -455,7 +455,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt <= 10.0) { // Door Ceiling
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                     HA_MX += Surface(SurfNum).Area * HDoor(Ctd);
@@ -463,7 +463,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt >= 170.0) { // Door Floor
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HDoor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                     HA_OC += Surface(SurfNum).Area * HDoor(Ctd);
@@ -484,7 +484,7 @@ namespace DisplacementVentMgr {
 
                 if (ZSupSurf < LayH) {
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HInternal(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HInternal(Ctd);
                     HA_OC += Surface(SurfNum).Area * HInternal(Ctd);
@@ -492,10 +492,10 @@ namespace DisplacementVentMgr {
 
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HLU = state.dataRoomAirMod->DVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                     HLD = state.dataRoomAirMod->DVHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -515,7 +515,7 @@ namespace DisplacementVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                 HCeiling(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                 HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HCeiling(Ctd);
                 HA_MX += Surface(SurfNum).Area * HCeiling(Ctd);
@@ -528,7 +528,7 @@ namespace DisplacementVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
-                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
+                CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, state.dataRoomAirMod->DVHcIn);
                 HFloor(Ctd) = state.dataRoomAirMod->DVHcIn(SurfNum);
                 HAT_FLOOR += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HFloor(Ctd);
                 HA_FLOOR += Surface(SurfNum).Area * HFloor(Ctd);
@@ -557,7 +557,7 @@ namespace DisplacementVentMgr {
 
     void CalcUCSDDV(int const ZoneNum) // Which Zonenum
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -696,7 +696,7 @@ namespace DisplacementVentMgr {
 
         for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDDV; ++Ctd) {
             if (ZoneNum == state.dataRoomAirMod->ZoneUCSDDV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDDV(Ctd).SchedGainsPtr);
+                GainsFrac = GetCurrentScheduleValue(state.dataRoomAirMod->ZoneUCSDDV(Ctd).SchedGainsPtr);
                 NumPLPP = state.dataRoomAirMod->ZoneUCSDDV(Ctd).NumPlumesPerOcc;
                 HeightThermostat = state.dataRoomAirMod->ZoneUCSDDV(Ctd).ThermostatHeight;
                 HeightComfort = state.dataRoomAirMod->ZoneUCSDDV(Ctd).ComfortHeight;
@@ -755,7 +755,7 @@ namespace DisplacementVentMgr {
             NumberOfPlumes = 0.0;
             for (Ctd = 1; Ctd <= TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
-                    NumberOfOccupants += People(Ctd).NumberOfPeople; // *GetCurrentScheduleValue(state, People(Ctd)%NumberOfPeoplePtr)
+                    NumberOfOccupants += People(Ctd).NumberOfPeople; // *GetCurrentScheduleValue(People(Ctd)%NumberOfPeoplePtr)
                     NumberOfPlumes = NumberOfOccupants * NumPLPP;
                 }
             }
@@ -851,20 +851,20 @@ namespace DisplacementVentMgr {
             Real64 const plume_fac(NumberOfPlumes * std::pow(PowerPerPlume, OneThird));
             HeightFrac = min(24.55 * std::pow(MCp_Total * 0.000833 / plume_fac, 0.6) / CeilingHeight, 1.0);
             for (Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUCSDDV(state, ZoneNum, HeightFrac);
+                HcUCSDDV(ZoneNum, HeightFrac);
                 // HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) /
                 // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
                 // MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
                 state.dataRoomAirMod->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
                 state.dataRoomAirMod->AIRRATFloor(ZoneNum) = Zone(ZoneNum).Volume * min(state.dataRoomAirMod->HeightTransition(ZoneNum), HeightFloorSubzoneTop) / CeilingHeight *
                                        Zone(ZoneNum).ZoneVolCapMultpSens *
-                                       PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATFloor(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                       PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATFloor(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                        PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataRoomAirMod->AIRRATOC(ZoneNum) = Zone(ZoneNum).Volume * (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
-                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataRoomAirMod->AIRRATMX(ZoneNum) = Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
-                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
@@ -1008,7 +1008,7 @@ namespace DisplacementVentMgr {
                 state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTMX(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTFloor(ZoneNum) = ZTAveraged;
-                HcUCSDDV(state, ZoneNum, HeightFrac);
+                HcUCSDDV(ZoneNum, HeightFrac);
                 TempDepCoef = HA_MX + HA_OC + HA_FLOOR + MCp_Total;
                 TempIndCoef = ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total;
                 {
@@ -1047,7 +1047,7 @@ namespace DisplacementVentMgr {
             state.dataRoomAirMod->TCMF(ZoneNum) = ZTAveraged;
         } else {
             if (HeightComfort >= 0.0 && HeightComfort < HeightFloorSubzoneAve) {
-                ShowWarningError(state, "Displacement ventilation comfort height is in floor subzone in Zone: " + Zone(ZoneNum).Name);
+                ShowWarningError("Displacement ventilation comfort height is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 state.dataRoomAirMod->TCMF(ZoneNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
             } else if (HeightComfort >= HeightFloorSubzoneAve && HeightComfort < HeightOccupiedSubzoneAve) {
                 state.dataRoomAirMod->TCMF(ZoneNum) =
@@ -1063,7 +1063,7 @@ namespace DisplacementVentMgr {
             } else if (HeightComfort >= HeightMixedSubzoneAve && HeightComfort <= CeilingHeight) {
                 state.dataRoomAirMod->TCMF(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
-                ShowFatalError(state, "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
+                ShowFatalError("Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 
@@ -1073,7 +1073,7 @@ namespace DisplacementVentMgr {
             TempTstatAir(ZoneNum) = ZTAveraged;
         } else {
             if (HeightThermostat >= 0.0 && HeightThermostat < HeightFloorSubzoneAve) {
-                ShowWarningError(state, "Displacement thermostat is in floor subzone in Zone: " + Zone(ZoneNum).Name);
+                ShowWarningError("Displacement thermostat is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
             } else if (HeightThermostat >= HeightFloorSubzoneAve && HeightThermostat < HeightOccupiedSubzoneAve) {
                 TempTstatAir(ZoneNum) =
@@ -1089,7 +1089,7 @@ namespace DisplacementVentMgr {
             } else if (HeightThermostat >= HeightMixedSubzoneAve && HeightThermostat <= CeilingHeight) {
                 TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
-                ShowFatalError(state, "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
+                ShowFatalError("Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 

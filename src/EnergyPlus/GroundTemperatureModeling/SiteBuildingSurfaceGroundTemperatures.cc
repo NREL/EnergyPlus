@@ -65,8 +65,9 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(int objectType, std::string objectName)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -91,7 +92,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     std::shared_ptr<SiteBuildingSurfaceGroundTemps> thisModel(new SiteBuildingSurfaceGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteBuildingSurfaceGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -99,10 +100,10 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -115,12 +116,12 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
         state.dataEnvrn->GroundTempObjInput = true;
 
         if (genErrorMessage) {
-            ShowWarningError(state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
-            ShowContinueError(state, "These values may be inappropriate.  Please consult the Input Output Reference for more details.");
+            ShowWarningError(cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
+            ShowContinueError("These values may be inappropriate.  Please consult the Input Output Reference for more details.");
         }
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
     } else {
         thisModel->buildingSurfaceGroundTemps = 18.0;
@@ -133,14 +134,14 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
+        ShowContinueError("Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,8 +158,9 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlus
 //******************************************************************************
 
 Real64
-SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
+SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -182,13 +184,14 @@ SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &sta
     }
 
     // Get and return ground temp
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -206,7 +209,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusDat
     }
 
     // Get and return ground temp
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

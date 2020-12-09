@@ -553,4 +553,13 @@ namespace EnergyPlus {
         this->files.ssz.close();
         this->files.zsz.close();
     }
+
+    std::vector<EnergyPlusData*> stateVector;
+    EnergyPlusData & getCurrentState(unsigned int i) {
+        return *stateVector[i];
+    }
+    void createNewStateVector() {
+        stateVector.push_back(new EnergyPlusData);
+    }
+
 }

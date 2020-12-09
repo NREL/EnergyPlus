@@ -51,12 +51,13 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
 
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -80,7 +81,7 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
                     desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
                 this->autoSizedValue =
-                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state, desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                                 this->zoneEqSizing(this->curZoneEqNum),
                                                                 this->finalZoneSizing(this->curZoneEqNum));
             }
@@ -113,8 +114,8 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
     }
-    this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

@@ -309,13 +309,13 @@ namespace HVACUnitaryBypassVAV {
 
     void clear_state();
 
-    void SimUnitaryBypassVAV(EnergyPlusData &state, std::string const &CompName,   // Name of the CBVAV system
+    void SimUnitaryBypassVAV(std::string const &CompName,   // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                              int const AirLoopNum,          // air loop index
                              int &CompIndex                 // Index to changeover-bypass VAV system
     );
 
-    void SimCBVAV(EnergyPlusData &state, int const CBVAVNum,            // Index of the current CBVAV system being simulated
+    void SimCBVAV(int const CBVAVNum,            // Index of the current CBVAV system being simulated
                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                   Real64 &QSensUnitOut,          // Sensible delivered capacity [W]
                   Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -324,24 +324,23 @@ namespace HVACUnitaryBypassVAV {
 
     void GetCBVAV();
 
-    void InitCBVAV(EnergyPlusData &state, int const CBVAVNum,            // Index of the current CBVAV unit being simulated
+    void InitCBVAV(int const CBVAVNum,            // Index of the current CBVAV unit being simulated
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration
                    int const AirLoopNum,          // air loop index
                    Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to average airflow over timestep
                    bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void SizeCBVAV(EnergyPlusData &state, int const CBVAVNum); // Index to CBVAV system
+    void SizeCBVAV(int const CBVAVNum); // Index to CBVAV system
 
-    void ControlCBVAVOutput(EnergyPlusData &state,
-                            int const CBVAVNum,            // Index to CBVAV system
+    void ControlCBVAVOutput(int const CBVAVNum,            // Index to CBVAV system
                             bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                             Real64 &PartLoadFrac,          // Unit part load fraction
                             Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
                             bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void CalcCBVAV(EnergyPlusData &state, int const CBVAVNum,            // Unit index in fan coil array
+    void CalcCBVAV(int const CBVAVNum,            // Unit index in fan coil array
                    bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                    Real64 &PartLoadFrac,          // Compressor part load fraction
                    Real64 &LoadMet,               // Load met by unit (W)
@@ -349,48 +348,41 @@ namespace HVACUnitaryBypassVAV {
                    bool const HXUnitOn            // flag to enable heat exchanger
     );
 
-    void GetZoneLoads(EnergyPlusData &state, int const CBVAVNum // Index to CBVAV unit being simulated
+    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
     Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system
 
-    Real64 DOE2DXCoilResidual(EnergyPlusData &state,
-                              Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DOE2DXCoilResidual(Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                               Array1D<Real64> const &Par // Par(1) = DX coil number
     );
 
-    Real64 HXAssistDXCoilResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistDXCoilResidual(Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                   Array1D<Real64> const &Par // Par(1) = DX coil number
     );
 
-    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DXHeatingCoilResidual(Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par // Par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilResidual(EnergyPlusData &state,
-                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par  // Par(1) = DX coil number
     );
 
-    void SetAverageAirFlow(EnergyPlusData &state,
-                           int const CBVAVNum,           // Index to CBVAV system
+    void SetAverageAirFlow(int const CBVAVNum,           // Index to CBVAV system
                            Real64 &OnOffAirFlowRatio    // Ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void ReportCBVAV(EnergyPlusData &state, int const CBVAVNum); // Index of the current CBVAV unit being simulated
+    void ReportCBVAV(int const CBVAVNum); // Index of the current CBVAV unit being simulated
 
-    void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int const CBVAVNum,            // Changeover bypass VAV unit index
+    void CalcNonDXHeatingCoils(int const CBVAVNum,            // Changeover bypass VAV unit index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 &HeatCoilLoad,          // heating coil load to be met (Watts)
                                int const FanMode,             // fan operation mode
                                Real64 &HeatCoilLoadmet        // coil heating load met
     );
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 

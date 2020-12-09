@@ -66,7 +66,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration,
+    void ManageNonZoneEquipment(bool FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     );
 

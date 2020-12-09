@@ -158,8 +158,7 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(EnergyPlusData &state,
-                         std::string const &CompName,   // component name
+    void SimWatertoAirHP(std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -176,8 +175,7 @@ namespace WaterToAirHeatPump {
 
     void GetWatertoAirHPInput();
 
-    void InitWatertoAirHP(EnergyPlusData &state,
-                          int const HPNum, // index to main heat pump data structure
+    void InitWatertoAirHP(int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
@@ -187,7 +185,7 @@ namespace WaterToAirHeatPump {
                           Real64 const DesignAirFlow,
                           Real64 const PartLoadRatio);
 
-    void CalcWatertoAirHPCooling(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPCooling(int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
@@ -196,12 +194,11 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
-                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
+    Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
                                        Array1D<Real64> const &Par    // Function parameters
     );
 
-    void CalcWatertoAirHPHeating(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPHeating(int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
@@ -210,9 +207,9 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);
+    void UpdateWatertoAirHP(int const HPNum);
 
-    Real64 CalcEffectiveSHR(EnergyPlusData &state, int const HPNum,         // Index number for cooling coil
+    Real64 CalcEffectiveSHR(int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             int const CyclingScheme, // fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
@@ -222,27 +219,27 @@ namespace WaterToAirHeatPump {
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     );
 
-    Real64 DegradF(EnergyPlusData &state, std::string &FluidName, // Name of glycol used in source side
+    Real64 DegradF(std::string &FluidName, // Name of glycol used in source side
                    Real64 &Temp,           // Temperature of the fluid
                    int &FluidIndex         // Index number for the fluid
     );
 
-    int GetCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndex(std::string const &CoilType, // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type
                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );

@@ -233,10 +233,9 @@ namespace SystemReports {
 
     void InitEnergyReports();
 
-    void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
-    void UpdateZoneCompPtrArray(EnergyPlusData &state,
-                                int &Idx,
+    void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
                                 int const AirDistUnitNum,
                                 int const PlantLoopType,
@@ -244,8 +243,7 @@ namespace SystemReports {
                                 int const PlantBranch,
                                 int const PlantComp);
 
-    void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
-                                   int &Idx,
+    void UpdateZoneSubCompPtrArray(int &Idx,
                                    int const ListNum,
                                    int const AirDistUnitNum,
                                    int const SubCompNum,
@@ -254,8 +252,7 @@ namespace SystemReports {
                                    int const PlantBranch,
                                    int const PlantComp);
 
-    void UpdateZoneSubSubCompPtrArray(EnergyPlusData &state,
-                                      int &Idx,
+    void UpdateZoneSubSubCompPtrArray(int &Idx,
                                       int const ListNum,
                                       int const AirDistUnitNum,
                                       int const SubCompNum,
@@ -265,8 +262,7 @@ namespace SystemReports {
                                       int const PlantBranch,
                                       int const PlantComp);
 
-    void UpdateAirSysCompPtrArray(EnergyPlusData &state,
-                                  int &Idx,
+    void UpdateAirSysCompPtrArray(int &Idx,
                                   int const AirLoopNum,
                                   int const BranchNum,
                                   int const CompNum,
@@ -275,8 +271,7 @@ namespace SystemReports {
                                   int const PlantBranch,
                                   int const PlantComp);
 
-    void UpdateAirSysSubCompPtrArray(EnergyPlusData &state,
-                                     int &Idx,
+    void UpdateAirSysSubCompPtrArray(int &Idx,
                                      int const AirLoopNum,
                                      int const BranchNum,
                                      int const CompNum,
@@ -286,8 +281,7 @@ namespace SystemReports {
                                      int const PlantBranch,
                                      int const PlantComp);
 
-    void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
-                                        int &Idx,
+    void UpdateAirSysSubSubCompPtrArray(int &Idx,
                                         int const AirLoopNum,
                                         int const BranchNum,
                                         int const CompNum,
@@ -310,8 +304,7 @@ namespace SystemReports {
 
     void ReportSystemEnergyUse();
 
-    void CalcSystemEnergyUse(EnergyPlusData &state,
-                             bool const CompLoadFlag,
+    void CalcSystemEnergyUse(bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,
@@ -320,8 +313,7 @@ namespace SystemReports {
 
     void ReportMaxVentilationLoads();
 
-    void MatchPlantSys(EnergyPlusData &state,
-                       int const AirLoopNum, // counter for zone air distribution inlets
+    void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
     );
 

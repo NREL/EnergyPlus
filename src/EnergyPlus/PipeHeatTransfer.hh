@@ -241,27 +241,25 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(int objectType, std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(EnergyPlusData &state,
-                    Real64 const z       // Current Depth
+        Real64 TBND(Real64 const z       // Current Depth
         );
 
         void CalcBuriedPipeSoil();
 
-        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef();
 
-        Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
-                                     Real64 const Temperature,  // Temperature of water entering the surface, in C
+        Real64 CalcPipeHeatTransCoef(Real64 const Temperature,  // Temperature of water entering the surface, in C
                                      Real64 const MassFlowRate, // Mass flow rate, in kg/s
                                      Real64 const Diameter      // Pipe diameter, m
         );
@@ -270,8 +268,7 @@ namespace PipeHeatTransfer {
 
         void UpdatePipesHeatTransfer();
 
-        void ValidatePipeConstruction(EnergyPlusData &state,
-                                      std::string const &PipeType,         // module object of pipe (error messages)
+        void ValidatePipeConstruction(std::string const &PipeType,         // module object of pipe (error messages)
                                       std::string const &ConstructionName, // construction name of pipe (error messages)
                                       std::string const &FieldName,        // fieldname of pipe (error messages)
                                       int const ConstructionNum,           // pointer into construction data

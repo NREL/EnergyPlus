@@ -109,9 +109,9 @@ namespace RoomAirModelUserTempPattern {
         MyOneTimeFlag2 = true;
     }
 
-    void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   January 2004/Aug 2005
@@ -125,22 +125,22 @@ namespace RoomAirModelUserTempPattern {
         // calls subroutines
 
         // transfer data from surface domain to air domain for the specified zone
-        InitTempDistModel(state, ZoneNum);
+        InitTempDistModel(ZoneNum);
 
-        GetSurfHBDataForTempDistModel(state, ZoneNum);
+        GetSurfHBDataForTempDistModel(ZoneNum);
 
         // perform TempDist model calculations
-        CalcTempDistModel(state, ZoneNum);
+        CalcTempDistModel(ZoneNum);
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForTempDistModel(state, ZoneNum);
+        SetSurfHBDataForTempDistModel(ZoneNum);
     }
 
     //****************************************************
 
-    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void InitTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -196,9 +196,9 @@ namespace RoomAirModelUserTempPattern {
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
     }
 
-    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2005
@@ -231,9 +231,9 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-    void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void CalcTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2005
@@ -256,7 +256,7 @@ namespace RoomAirModelUserTempPattern {
         int CurPatrnID;
 
         // first determine availability
-        AvailTest = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID);
+        AvailTest = GetCurrentScheduleValue(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID);
 
         if ((AvailTest != 1.0) || (!state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed)) {
             // model not to be used. Use complete mixing method
@@ -271,13 +271,13 @@ namespace RoomAirModelUserTempPattern {
 
         } else { // choose pattern and call subroutine
 
-            CurntPatternKey = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
+            CurntPatternKey = GetCurrentScheduleValue(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
 
             CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePatternStruct::PatrnID);
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
+                ShowFatalError(format("User defined room air pattern index not found: {}", CurntPatternKey));
                 return;
             }
 
@@ -286,19 +286,19 @@ namespace RoomAirModelUserTempPattern {
 
                 if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
 
-                    FigureConstGradPattern(state, CurPatrnID, ZoneNum);
+                    FigureConstGradPattern(CurPatrnID, ZoneNum);
 
                 } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
 
-                    FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
+                    FigureTwoGradInterpPattern(CurPatrnID, ZoneNum);
 
                 } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
 
-                    FigureHeightPattern(state, CurPatrnID, ZoneNum);
+                    FigureHeightPattern(CurPatrnID, ZoneNum);
 
                 } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
 
-                    FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
+                    FigureSurfMapPattern(CurPatrnID, ZoneNum);
 
                 } else {
                     // should not come here
@@ -308,9 +308,9 @@ namespace RoomAirModelUserTempPattern {
         } // availability control construct
     }
 
-    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
+    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -351,9 +351,9 @@ namespace RoomAirModelUserTempPattern {
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
-    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
+    void FigureHeightPattern(int const PattrnID, int const ZoneNum)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -416,9 +416,9 @@ namespace RoomAirModelUserTempPattern {
         state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataRoomAirMod->RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
-    void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
+    void FigureTwoGradInterpPattern(int const PattrnID, int const ZoneNum)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2005
@@ -474,7 +474,7 @@ namespace RoomAirModelUserTempPattern {
         }
 
         if (SetupOutputFlag(ZoneNum)) {
-            SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
+            SetupOutputVariable("Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
                                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
                                 "HVAC",
@@ -640,9 +640,9 @@ namespace RoomAirModelUserTempPattern {
         return Grad;
     }
 
-    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
+    void FigureConstGradPattern(int const PattrnID, int const ZoneNum)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2005
@@ -676,8 +676,9 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
+    Real64 FigureNDheightInZone(int const thisHBsurf) // index in main Surface array
     {
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith
         //       DATE WRITTEN   aug 2005, Jan2004
@@ -765,10 +766,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
             if (state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
-                ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
+                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError("too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
+                ShowContinueError(format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
                 ++state.dataErrTracking->TotalRoomAirPatternTooLow;
             }
@@ -776,10 +777,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
             if (state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
-                ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
+                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(" too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
+                ShowContinueError(format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
                 ++state.dataErrTracking->TotalRoomAirPatternTooHigh;
             }
@@ -800,9 +801,9 @@ namespace RoomAirModelUserTempPattern {
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2005,Feb. 2004
@@ -903,7 +904,7 @@ namespace RoomAirModelUserTempPattern {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                      DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -955,7 +956,7 @@ namespace RoomAirModelUserTempPattern {
             Node(ReturnNode).Press = Node(ZoneNode).Press;
 
             H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio

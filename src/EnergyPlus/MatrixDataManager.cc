@@ -105,9 +105,9 @@ namespace MatrixDataManager {
 
     // Functions
 
-    void GetMatrixInput(EnergyPlusData &state)
+    void GetMatrixInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2010
@@ -133,7 +133,7 @@ namespace MatrixDataManager {
         int NumElements;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
-        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         NumMats = NumTwoDimMatrix;
 
@@ -141,8 +141,7 @@ namespace MatrixDataManager {
 
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
+            inputProcessor->getObjectItem(cCurrentModuleObject,
                                           MatIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -154,7 +153,7 @@ namespace MatrixDataManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++MatNum;
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MatData(MatNum).Name = cAlphaArgs(1);
             NumRows = std::floor(rNumericArgs(1));
@@ -163,14 +162,14 @@ namespace MatrixDataManager {
 
             // test
             if (NumElements < 1) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
+                ShowSevereError("GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
+                ShowContinueError("Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
                                   " total number of elements in matrix must be 1 or more");
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
+                ShowSevereError("GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
+                ShowContinueError("Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
                                   cNumericFieldNames(2));
                 ErrorsFound = true;
             }
@@ -187,13 +186,13 @@ namespace MatrixDataManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
+            ShowFatalError("GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
         }
     }
 
-    int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName)
+    int MatrixIndex(std::string const &MatrixName)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2010
@@ -214,7 +213,7 @@ namespace MatrixDataManager {
         static bool GetInputFlag(true); // First time, input is "gotten"
 
         if (GetInputFlag) {
-            GetMatrixInput(state);
+            GetMatrixInput();
             GetInputFlag = false;
         }
 

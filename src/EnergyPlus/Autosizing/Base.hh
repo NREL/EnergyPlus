@@ -258,13 +258,12 @@ struct BaseSizer
 
     // public methods
 
-    virtual void initializeWithinEP(EnergyPlusData &state,
-                                    std::string const &_compType,
+    virtual void initializeWithinEP(std::string const &_compType,
                                     std::string const &_compName,
                                     bool const &_printWarningFlag,
                                     std::string const &_callingRoutine);
 
-    virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
+    virtual Real64 size(Real64 originalValue, bool &errorsFound) = 0;
 
     std::string getLastErrorMessages();
 
@@ -275,32 +274,31 @@ protected:
 
     void addErrorMessage(std::string const &s);
 
-    void initializeFromAPI(EnergyPlusData &state, Real64 elevation); // don't accidentally call this direct component from outside
+    void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
 
-    void preSize(EnergyPlusData &state, Real64 originalValue);
+    void preSize(Real64 originalValue);
 
-    void selectSizerOutput(EnergyPlusData &state, bool &errorsFound);
+    void selectSizerOutput(bool &errorsFound);
 
-    void select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &errorsFound);
+    void select2StgDXHumCtrlSizerOutput(bool &errorsFound);
 
     bool isValidCoilType(std::string const &compType);
 
     bool isValidFanType(std::string const &compType);
 
-    bool checkInitialized(EnergyPlusData &state, bool &errorsFound);
+    bool checkInitialized(bool &errorsFound);
 
     void clearState();
 
 public:
-    static void reportSizerOutput(EnergyPlusData &state,
-                                  std::string const &CompType,
+    static void reportSizerOutput(std::string const &CompType,
                                   std::string const &CompName,
                                   std::string const &VarDesc,
                                   Real64 VarValue,
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
     Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);

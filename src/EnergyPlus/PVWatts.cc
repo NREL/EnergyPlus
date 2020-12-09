@@ -70,8 +70,7 @@ namespace PVWatts {
 
     std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator::PVWattsGenerator(EnergyPlusData &state,
-                                       const std::string &name,
+    PVWattsGenerator::PVWattsGenerator(const std::string &name,
                                        const Real64 dcSystemCapacity,
                                        ModuleType moduleType,
                                        ArrayType arrayType,
@@ -84,17 +83,17 @@ namespace PVWatts {
         : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0),
           m_outputDCPower(1000.0)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         bool errorsFound(false);
 
         if (name.empty()) {
-            ShowSevereError(state, "PVWatts: name cannot be blank.");
+            ShowSevereError("PVWatts: name cannot be blank.");
             errorsFound = true;
         }
         m_name = name;
 
         if (dcSystemCapacity <= 0) {
-            ShowSevereError(state, "PVWatts: DC system capacity must be greater than zero.");
+            ShowSevereError("PVWatts: DC system capacity must be greater than zero.");
             errorsFound = true;
         }
         m_dcSystemCapacity = dcSystemCapacity;
@@ -145,7 +144,7 @@ namespace PVWatts {
         }
 
         if (systemLosses > 1.0 || systemLosses < 0.0) {
-            ShowSevereError(state, format("PVWatts: Invalid system loss value {:.2R}", systemLosses));
+            ShowSevereError(format("PVWatts: Invalid system loss value {:.2R}", systemLosses));
             errorsFound = true;
         }
         m_systemLosses = systemLosses;
@@ -154,17 +153,17 @@ namespace PVWatts {
 
         if (m_geometryType == GeometryType::TILT_AZIMUTH) {
             if (tilt < 0 || tilt > 90) {
-                ShowSevereError(state, format("PVWatts: Invalid tilt: {:.2R}", tilt));
+                ShowSevereError(format("PVWatts: Invalid tilt: {:.2R}", tilt));
                 errorsFound = true;
             }
             m_tilt = tilt;
             if (azimuth < 0 || azimuth >= 360) {
-                ShowSevereError(state, format("PVWatts: Invalid azimuth: {:.2R}", azimuth));
+                ShowSevereError(format("PVWatts: Invalid azimuth: {:.2R}", azimuth));
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
             if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
-                ShowSevereError(state, format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
+                ShowSevereError(format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
@@ -177,13 +176,13 @@ namespace PVWatts {
         }
 
         if (groundCoverageRatio > 1.0 || groundCoverageRatio < 0.0) {
-            ShowSevereError(state, format("PVWatts: Invalid ground coverage ratio: {:.2R}", groundCoverageRatio));
+            ShowSevereError(format("PVWatts: Invalid ground coverage ratio: {:.2R}", groundCoverageRatio));
             errorsFound = true;
         }
         m_groundCoverageRatio = groundCoverageRatio;
 
         if (errorsFound) {
-            ShowFatalError(state, "Errors found in getting PVWatts input");
+            ShowFatalError("Errors found in getting PVWatts input");
         }
 
         // Set up the pvwatts cell temperature member
@@ -191,11 +190,11 @@ namespace PVWatts {
         m_tccalc = std::unique_ptr<pvwatts_celltemp>(new pvwatts_celltemp(m_inoct + 273.15, pvwatts_height, state.dataGlobal->TimeStepZone));
     }
 
-    void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
+    void PVWattsGenerator::setupOutputVariables()
     {
         // Set up output variables
-        SetupOutputVariable(state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
-        SetupOutputVariable(state, "Generator Produced DC Electricity Energy",
+        SetupOutputVariable("Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+        SetupOutputVariable("Generator Produced DC Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_outputDCEnergy,
                             "System",
@@ -206,12 +205,13 @@ namespace PVWatts {
                             "Photovoltaics",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
-        SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
+        SetupOutputVariable("Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
+        SetupOutputVariable("Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
     }
 
-    PVWattsGenerator PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)
+    PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
     {
+        EnergyPlusData & state = getCurrentState(0);
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -231,8 +231,7 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        inputProcessor->getObjectItem(state,
-                                      "Generator:PVWatts",
+        inputProcessor->getObjectItem("Generator:PVWatts",
                                       objNum,
                                       cAlphaArgs,
                                       NumAlphas,
@@ -251,7 +250,7 @@ namespace PVWatts {
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+            ShowSevereError("PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
             errorsFound = true;
         } else {
             moduleType = moduleTypeIt->second;
@@ -265,7 +264,7 @@ namespace PVWatts {
         ArrayType arrayType;
         auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
         if (arrayTypeIt == arrayTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+            ShowSevereError("PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
             errorsFound = true;
         } else {
             arrayType = arrayTypeIt->second;
@@ -276,7 +275,7 @@ namespace PVWatts {
         GeometryType geometryType;
         auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
         if (geometryTypeIt == geometryTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+            ShowSevereError("PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
             errorsFound = true;
         } else {
             geometryType = geometryTypeIt->second;
@@ -292,16 +291,15 @@ namespace PVWatts {
         }
 
         if (errorsFound) {
-            ShowFatalError(state, "Errors found in getting PVWatts input");
+            ShowFatalError("Errors found in getting PVWatts input");
         }
 
         if (NumNums < NumFields::GROUND_COVERAGE_RATIO) {
-            return PVWattsGenerator(state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
+            return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(state,
-            name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
+        PVWattsGenerator pvwattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
         return pvwattsGenerator;
     }
 
@@ -370,8 +368,9 @@ namespace PVWatts {
         m_planeOfArrayIrradiance = poa;
     }
 
-    void PVWattsGenerator::calc(EnergyPlusData& state)
+    void PVWattsGenerator::calc()
     {
+        EnergyPlusData & state = getCurrentState(0);
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
@@ -392,8 +391,7 @@ namespace PVWatts {
         }
 
         // process_irradiance
-        IrradianceOutput irr_st = processIrradiance(state,
-                                                    state.dataEnvrn->Year,
+        IrradianceOutput irr_st = processIrradiance(state.dataEnvrn->Year,
                                                     state.dataEnvrn->Month,
                                                     state.dataEnvrn->DayOfMonth,
                                                     state.dataGlobal->HourOfDay - 1,
@@ -412,7 +410,7 @@ namespace PVWatts {
             shad_beam = DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum);
         }
         DCPowerOutput pwr_st =
-            powerout(state, shad_beam, 1.0, state.dataEnvrn->BeamSolarRad, albedo, state.dataEnvrn->WindSpeed, state.dataEnvrn->OutDryBulbTemp, irr_st);
+            powerout(shad_beam, 1.0, state.dataEnvrn->BeamSolarRad, albedo, state.dataEnvrn->WindSpeed, state.dataEnvrn->OutDryBulbTemp, irr_st);
 
         // Report out
         m_cellTemperature = pwr_st.pvt;
@@ -429,7 +427,7 @@ namespace PVWatts {
         ThermalEnergy = 0.0;
     }
 
-    IrradianceOutput PVWattsGenerator::processIrradiance(EnergyPlusData &state,
+    IrradianceOutput PVWattsGenerator::processIrradiance(
         int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb)
     {
         IrradianceOutput out;
@@ -444,7 +442,7 @@ namespace PVWatts {
         int irrRetCode = irr.calc();
 
         if (irrRetCode != 0) {
-            ShowFatalError(state, "PVWatts: Failed to calculate plane of array irradiance with given input parameters.");
+            ShowFatalError("PVWatts: Failed to calculate plane of array irradiance with given input parameters.");
         }
 
         irr.get_sun(&out.solazi, &out.solzen, &out.solalt, 0, 0, 0, &out.sunup, 0, 0, 0);
@@ -455,9 +453,9 @@ namespace PVWatts {
     }
 
     DCPowerOutput
-    PVWattsGenerator::powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
+    PVWattsGenerator::powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         const Real64 &gcr = m_groundCoverageRatio;
 
         Real64 poa, tpoa, pvt, dc;
@@ -498,13 +496,13 @@ namespace PVWatts {
                         irr_st.iskydiff *= Fskydiff;
                     else
                         ShowWarningError(
-                            state, format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
+                            format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
 
                     if (Fgnddiff >= 0 && Fgnddiff <= 1)
                         irr_st.ignddiff *= Fgnddiff;
                     else
                         ShowWarningError(
-                            state, format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
+                            format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
                 }
             }
 
@@ -548,20 +546,21 @@ namespace PVWatts {
         return pwrOutput;
     }
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName)
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // Find the generator, and create a new one if it hasn't been loaded yet.
-        int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
+        int ObjNum = inputProcessor->getObjectItemNum("Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
-            ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
+            ShowFatalError("Cannot find Generator:PVWatts " + GeneratorName);
         }
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {
             // It's not in the map, add it.
-            PVWattsGenerators.insert(std::make_pair(ObjNum, PVWattsGenerator::createFromIdfObj(state, ObjNum)));
+            PVWattsGenerators.insert(std::make_pair(ObjNum, PVWattsGenerator::createFromIdfObj(ObjNum)));
             PVWattsGenerator &pvw(PVWattsGenerators.find(ObjNum)->second);
-            pvw.setupOutputVariables(state);
+            pvw.setupOutputVariables();
             return pvw;
         } else {
             return it->second;

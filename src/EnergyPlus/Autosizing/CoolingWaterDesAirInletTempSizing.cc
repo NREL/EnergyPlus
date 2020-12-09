@@ -52,12 +52,13 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -67,7 +68,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
             } else if (this->zoneEqFanCoil) {
                 Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
                 this->autoSizedValue =
-                    this->setCoolCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setCoolCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
             } else {
@@ -126,10 +127,10 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_inlet_air_temperature [C]";
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {
-            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
         }
     }
     return this->autoSizedValue;

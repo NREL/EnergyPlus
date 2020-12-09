@@ -316,14 +316,14 @@ namespace UtilityRoutines {
         return ResultString;
     }
 
-    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
+    void VerifyName(std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000
@@ -342,13 +342,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + ", cannot be blank");
+            ShowSevereError(StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -356,14 +356,14 @@ namespace UtilityRoutines {
         }
     }
 
-    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
+    void VerifyName(std::string const &NameToVerify,
                     Array1S_string const NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000
@@ -382,13 +382,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + ", cannot be blank");
+            ShowSevereError(StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -396,10 +396,10 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
+    bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + " Name, cannot be blank");
+            ShowSevereError(StringToDisplay + " Name, cannot be blank");
             ErrorFound = true;
             NameToVerify = "xxxxx";
             return true;
@@ -418,11 +418,12 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
     {
+        EnergyPlusData & state = getCurrentState(0);
         // the following was added for unit testing to clear the static strings
         if (colHeader == "RESET" && colValue == "RESET") {
             state.dataUtilityRoutines->appendPerfLog_headerRow = "";
@@ -440,7 +441,7 @@ namespace UtilityRoutines {
                 if (state.files.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
@@ -449,7 +450,7 @@ namespace UtilityRoutines {
                 if (state.files.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -458,8 +459,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
-                          std::string const &FuelTypeInput,
+    bool ValidateFuelType(std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
                           bool const &AllowSteamAndDistrict)
@@ -585,9 +585,9 @@ namespace UtilityRoutines {
 
     } // namespace UtilityRoutines
 
-    int AbortEnergyPlus(EnergyPlusData &state)
+    int AbortEnergyPlus()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -644,41 +644,41 @@ namespace UtilityRoutines {
         if (state.dataErrTracking->AskForConnectionsReport) {
             state.dataErrTracking->AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
-            ShowMessage(state, "Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state);
+            ShowMessage("Fatal error -- final processing.  More error messages may appear.");
+            SetupNodeVarsForReporting();
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state, ErrFound);
+            TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, ErrFound);
+            TestAirPathIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckMarkedNodes(state, ErrFound);
+            CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckNodeConnections(state, ErrFound);
+            CheckNodeConnections(ErrFound);
             if (ErrFound) TerminalError = true;
-            TestCompSetInletOutletNodes(state, ErrFound);
+            TestCompSetInletOutletNodes(ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state);
-                ReportLoopConnections(state);
+                ReportAirLoopConnections();
+                ReportLoopConnections();
             }
 
         } else if (!state.dataErrTracking->ExitDuringSimulations) {
-            ShowMessage(state, "Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
-            ShowMessage(state, "Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
+            ShowMessage("Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
+            ShowMessage("Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
         }
 
         if (state.dataErrTracking->AskForSurfacesReport) {
-            ReportSurfaces(state);
+            ReportSurfaces();
         }
 
-        ReportSurfaceErrors(state);
-        CheckPlantOnAbort(state);
-        ShowRecurringErrors(state);
-        SummarizeErrors(state);
-        CloseMiscOpenFiles(state);
+        ReportSurfaceErrors();
+        CheckPlantOnAbort();
+        ShowRecurringErrors();
+        SummarizeErrors();
+        CloseMiscOpenFiles();
         NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
         NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
@@ -707,19 +707,19 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-        ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
-        ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
-        ShowMessage(state, "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
+        ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
+        DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
-                DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl,
                   "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
@@ -729,9 +729,9 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -744,9 +744,9 @@ namespace UtilityRoutines {
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(EnergyPlusData &state)
+    void CloseMiscOpenFiles()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -769,8 +769,8 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(state);
-        CloseDFSFile(state);
+        CloseReportIllumMaps();
+        CloseDFSFile();
 
         if (DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
             state.files.debug.close();
@@ -779,9 +779,9 @@ namespace UtilityRoutines {
         }
     }
 
-    int EndEnergyPlus(EnergyPlusData &state)
+    int EndEnergyPlus()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -819,10 +819,10 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
-        ReportSurfaceErrors(state);
-        ShowRecurringErrors(state);
-        SummarizeErrors(state);
-        CloseMiscOpenFiles(state);
+        ReportSurfaceErrors();
+        ShowRecurringErrors();
+        SummarizeErrors();
+        CloseMiscOpenFiles();
         NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
@@ -840,7 +840,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
+            UtilityRoutines::appendPerfLog("Run Time [seconds]", format("{:.2R}", Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -859,29 +859,29 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
-        ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
-        ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
-        ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
+        ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+        DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
             if (!tempfl.good()) {
-                DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -1015,9 +1015,9 @@ namespace UtilityRoutines {
         return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
     }
 
-    void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1036,12 +1036,12 @@ namespace UtilityRoutines {
 
         using namespace DataErrorTracking;
 
-        ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
-        DisplayString(state, "**FATAL:" + ErrorMessage);
+        ShowErrorMessage(" **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        DisplayString("**FATAL:" + ErrorMessage);
 
-        ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
-        ShowErrorMessage(state, format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
-        ShowErrorMessage(state, " ..... Last severe error=" + state.dataErrTracking->LastSevereError, OutUnit1, OutUnit2);
+        ShowErrorMessage(" ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
+        ShowErrorMessage(format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
+        ShowErrorMessage(" ..... Last severe error=" + state.dataErrTracking->LastSevereError, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
@@ -1052,9 +1052,9 @@ namespace UtilityRoutines {
         throw FatalError(ErrorMessage);
     }
 
-    void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1079,7 +1079,7 @@ namespace UtilityRoutines {
         ++state.dataErrTracking->TotalSevereErrors;
         if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataErrTracking->AbortProcessing) ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
         if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalSevereErrorsDuringSizing;
-        ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         state.dataErrTracking->LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
@@ -1092,9 +1092,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowSevereMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 2009
@@ -1119,7 +1119,7 @@ namespace UtilityRoutines {
             if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
-        ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         state.dataErrTracking->LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
@@ -1132,9 +1132,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 2001
@@ -1147,7 +1147,7 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        ShowErrorMessage(state, " **   ~~~   ** " + Message, OutUnit1, OutUnit2);
+        ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
         }
@@ -1156,9 +1156,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -1192,8 +1192,8 @@ namespace UtilityRoutines {
 
         if (len(Message) < 50) {
             const auto m = Message + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(state);
-            ShowErrorMessage(state, " **   ~~~   ** " + m,
+                                 CreateSysTimeIntervalString();
+            ShowErrorMessage(" **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
@@ -1205,9 +1205,9 @@ namespace UtilityRoutines {
         } else {
             const auto m = " **   ~~~   ** " + Message;
             const auto postfix = " **   ~~~   ** " + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy + ' ' +
-                CreateSysTimeIntervalString(state);
-            ShowErrorMessage(state, m);
-            ShowErrorMessage(state, postfix,
+                CreateSysTimeIntervalString();
+            ShowErrorMessage(m);
+            ShowErrorMessage(postfix,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
@@ -1220,9 +1220,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1236,9 +1236,9 @@ namespace UtilityRoutines {
         // Calls ShowErrorMessage utility routine.
 
         if (Message.empty()) {
-            ShowErrorMessage(state, " *************", OutUnit1, OutUnit2);
+            ShowErrorMessage(" *************", OutUnit1, OutUnit2);
         } else {
-            ShowErrorMessage(state, " ************* " + Message, OutUnit1, OutUnit2);
+            ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
             }
@@ -1248,9 +1248,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1275,7 +1275,7 @@ namespace UtilityRoutines {
         ++state.dataErrTracking->TotalWarningErrors;
         if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataErrTracking->AbortProcessing) ++state.dataErrTracking->TotalWarningErrorsDuringWarmup;
         if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalWarningErrorsDuringSizing;
-        ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
@@ -1285,9 +1285,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 2009
@@ -1309,7 +1309,7 @@ namespace UtilityRoutines {
             if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
-        ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
         }
@@ -1318,8 +1318,7 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
-                                       std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                        int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                        Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                        Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1329,7 +1328,7 @@ namespace UtilityRoutines {
                                        std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1369,12 +1368,10 @@ namespace UtilityRoutines {
         }
 
         ++state.dataErrTracking->TotalSevereErrors;
-        StoreRecurringErrorMessage(state,
-            " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        StoreRecurringErrorMessage(" ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
-                                        std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                         int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                         Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                         Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1384,7 +1381,7 @@ namespace UtilityRoutines {
                                         std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1424,12 +1421,10 @@ namespace UtilityRoutines {
         }
 
         ++state.dataErrTracking->TotalWarningErrors;
-        StoreRecurringErrorMessage(state,
-            " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        StoreRecurringErrorMessage(" ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
-                                         std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                          int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                          Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                          Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1439,7 +1434,7 @@ namespace UtilityRoutines {
                                          std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1478,12 +1473,10 @@ namespace UtilityRoutines {
             MsgIndex = 0;
         }
 
-        StoreRecurringErrorMessage(state,
-            " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        StoreRecurringErrorMessage(" **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void StoreRecurringErrorMessage(EnergyPlusData &state,
-                                    std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
+    void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
                                     int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                     Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
                                     Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
@@ -1493,7 +1486,7 @@ namespace UtilityRoutines {
                                     std::string const &ErrorReportSumUnits   // Units for "sum" reporting
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1563,9 +1556,9 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -1618,9 +1611,9 @@ namespace UtilityRoutines {
         // if (state.dataGlobal->errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
-    void SummarizeErrors(EnergyPlusData &state)
+    void SummarizeErrors()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2003
@@ -1637,18 +1630,18 @@ namespace UtilityRoutines {
         std::string::size_type EndC;
 
         if (any_gt(state.dataErrTracking->MatchCounts, 0)) {
-            ShowMessage(state, "");
-            ShowMessage(state, "===== Final Error Summary =====");
-            ShowMessage(state, "The following error categories occurred.  Consider correcting or noting.");
+            ShowMessage("");
+            ShowMessage("===== Final Error Summary =====");
+            ShowMessage("The following error categories occurred.  Consider correcting or noting.");
             for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
                 if (state.dataErrTracking->MatchCounts(Loop) > 0) {
-                    ShowMessage(state, Summaries(Loop));
+                    ShowMessage(Summaries(Loop));
                     if (MoreDetails(Loop) != "") {
                         StartC = 0;
                         EndC = len(MoreDetails(Loop)) - 1;
                         while (EndC != std::string::npos) {
                             EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
-                            ShowMessage(state, ".." + MoreDetails(Loop).substr(StartC, EndC));
+                            ShowMessage(".." + MoreDetails(Loop).substr(StartC, EndC));
                             if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
                             StartC += EndC + 4;
                             EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
@@ -1656,13 +1649,13 @@ namespace UtilityRoutines {
                     }
                 }
             }
-            ShowMessage(state, "");
+            ShowMessage("");
         }
     }
 
-    void ShowRecurringErrors(EnergyPlusData &state)
+    void ShowRecurringErrors()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2003
@@ -1687,14 +1680,14 @@ namespace UtilityRoutines {
         std::string SumOut;
 
         if (state.dataErrTracking->NumRecurringErrors > 0) {
-            ShowMessage(state, "");
-            ShowMessage(state, "===== Recurring Error Summary =====");
-            ShowMessage(state, "The following recurring error messages occurred.");
+            ShowMessage("");
+            ShowMessage("===== Recurring Error Summary =====");
+            ShowMessage("The following recurring error messages occurred.");
             for (Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
                 auto const &error(state.dataErrTracking->RecurringErrors(Loop));
                 // Suppress reporting the count if it is a continue error
                 if (has_prefix(error.Message, " **   ~~~   ** ")) {
-                    ShowMessage(state, error.Message);
+                    ShowMessage(error.Message);
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
@@ -1705,11 +1698,11 @@ namespace UtilityRoutines {
                     const auto warning = has_prefix(error.Message, " ** Warning ** ");
                     const auto severe = has_prefix(error.Message, " ** Severe  ** ");
 
-                    ShowMessage(state, "");
-                    ShowMessage(state, error.Message);
-                    ShowMessage(state, format("{}  This error occurred {} total times;", StatMessageStart, error.Count));
-                    ShowMessage(state, format("{}  during Warmup {} times;", StatMessageStart, error.WarmupCount));
-                    ShowMessage(state, format("{}  during Sizing {} times.", StatMessageStart, error.SizingCount));
+                    ShowMessage("");
+                    ShowMessage(error.Message);
+                    ShowMessage(format("{}  This error occurred {} total times;", StatMessageStart, error.Count));
+                    ShowMessage(format("{}  during Warmup {} times;", StatMessageStart, error.WarmupCount));
+                    ShowMessage(format("{}  during Sizing {} times.", StatMessageStart, error.SizingCount));
                     if (sqlite) {
                         if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
@@ -1746,10 +1739,10 @@ namespace UtilityRoutines {
                     if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
                 }
                 if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                    ShowMessage(state, StatMessageStart + StatMessage);
+                    ShowMessage(StatMessageStart + StatMessage);
                 }
             }
-            ShowMessage(state, "");
+            ShowMessage("");
         }
     }
 

@@ -124,7 +124,7 @@ namespace ThermalChimney {
 
     void ManageThermalChimney();
 
-    void GetThermalChimney(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetThermalChimney(bool &ErrorsFound); // If errors found in input
 
     void CalcThermalChimney();
 

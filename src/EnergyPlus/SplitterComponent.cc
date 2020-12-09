@@ -77,9 +77,9 @@ namespace SplitterComponent {
     using namespace DataLoopNode;
 
     void
-    SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex)
+    SimAirLoopSplitter(std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   March 2000
@@ -96,29 +96,27 @@ namespace SplitterComponent {
 
         // Obtains and Allocates Splitter related parameters from input file
         if (state.dataSplitterComponent->GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput(state);
+            GetSplitterInput();
         }
 
         // Find the correct SplitterNumber
         if (CompIndex == 0) {
             SplitterNum = UtilityRoutines::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
             if (SplitterNum == 0) {
-                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + CompName);
+                ShowFatalError("SimAirLoopSplitter: Splitter not found=" + CompName);
             }
             CompIndex = SplitterNum;
         } else {
             SplitterNum = CompIndex;
             if (SplitterNum > state.dataSplitterComponent->NumSplitters || SplitterNum < 1) {
-                ShowFatalError(state,
-                               format("SimAirLoopSplitter: Invalid CompIndex passed={}, Number of Splitters={}, Splitter name={}",
+                ShowFatalError(format("SimAirLoopSplitter: Invalid CompIndex passed={}, Number of Splitters={}, Splitter name={}",
                                       SplitterNum,
                                       state.dataSplitterComponent->NumSplitters,
                                       CompName));
             }
             if (state.dataSplitterComponent->CheckEquipName(SplitterNum)) {
                 if (CompName != state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName) {
-                    ShowFatalError(state,
-                                   format("SimAirLoopSplitter: Invalid CompIndex passed={}, Splitter name={}, stored Splitter Name for that index={}",
+                    ShowFatalError(format("SimAirLoopSplitter: Invalid CompIndex passed={}, Splitter name={}, stored Splitter Name for that index={}",
                                           SplitterNum,
                                           CompName,
                                           state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName));
@@ -127,12 +125,12 @@ namespace SplitterComponent {
             }
         }
 
-        InitAirLoopSplitter(state, SplitterNum, FirstHVACIteration, FirstCall); // Initialize all Splitter related parameters
+        InitAirLoopSplitter(SplitterNum, FirstHVACIteration, FirstCall); // Initialize all Splitter related parameters
 
-        CalcAirLoopSplitter(state, SplitterNum, FirstCall);
+        CalcAirLoopSplitter(SplitterNum, FirstCall);
 
         // Update the current Splitter to the outlet nodes
-        UpdateSplitter(state, SplitterNum, SplitterInletChanged, FirstCall);
+        UpdateSplitter(SplitterNum, SplitterInletChanged, FirstCall);
 
         // Report the current Splitter
         ReportSplitter(SplitterNum);
@@ -143,9 +141,9 @@ namespace SplitterComponent {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetSplitterInput(EnergyPlusData &state)
+    void GetSplitterInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -189,12 +187,12 @@ namespace SplitterComponent {
 
         // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-        state.dataSplitterComponent->NumSplitters = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataSplitterComponent->NumSplitters = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (state.dataSplitterComponent->NumSplitters > 0) state.dataSplitterComponent->SplitterCond.allocate(state.dataSplitterComponent->NumSplitters);
         state.dataSplitterComponent->CheckEquipName.dimension(state.dataSplitterComponent->NumSplitters, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);
@@ -203,8 +201,7 @@ namespace SplitterComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (SplitterNum = 1; SplitterNum <= state.dataSplitterComponent->NumSplitters; ++SplitterNum) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           SplitterNum,
                                           AlphArray,
                                           NumAlphas,
@@ -215,11 +212,10 @@ namespace SplitterComponent {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
-            state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(state,
-                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode.allocate(state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes);
@@ -237,7 +233,7 @@ namespace SplitterComponent {
 
             for (NodeNum = 1; NodeNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++NodeNum) {
 
-                state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(2 + NodeNum),
+                state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum),
                                                                                   ErrorsFound,
                                                                                   CurrentModuleObject,
                                                                                   AlphArray(1),
@@ -246,7 +242,7 @@ namespace SplitterComponent {
                                                                                   1,
                                                                                   ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
-                    ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowSevereError(cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -258,19 +254,19 @@ namespace SplitterComponent {
             NodeNum = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
                 if (NodeNum != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1)) continue;
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
+                ShowSevereError(CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                 " specifies an outlet node name the same as the inlet node.");
-                ShowContinueError(state, ".." + cAlphaFields(2) + '=' + NodeID(NodeNum));
-                ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum1));
+                ShowContinueError(".." + cAlphaFields(2) + '=' + NodeID(NodeNum));
+                ShowContinueError(format("..Outlet Node #{} is duplicate.", OutNodeNum1));
                 ErrorsFound = true;
             }
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
                 for (OutNodeNum2 = OutNodeNum1 + 1; OutNodeNum2 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum2) {
                     if (state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1) != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum2)) continue;
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
+                    ShowSevereError(CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                     " specifies duplicate outlet nodes in its outlet node list.");
-                    ShowContinueError(state, format("..Outlet Node #{} Name={}", OutNodeNum1, NodeID(OutNodeNum1)));
-                    ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum2));
+                    ShowContinueError(format("..Outlet Node #{} Name={}", OutNodeNum1, NodeID(OutNodeNum1)));
+                    ShowContinueError(format("..Outlet Node #{} is duplicate.", OutNodeNum2));
                     ErrorsFound = true;
                 }
             }
@@ -284,12 +280,13 @@ namespace SplitterComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowFatalError(RoutineName + "Errors found in getting input.");
         }
     }
 
-    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall)
+    void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall)
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -406,9 +403,9 @@ namespace SplitterComponent {
         } // For FirstCall
     }
 
-    void CalcAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstCall)
+    void CalcAirLoopSplitter(int const SplitterNum, bool const FirstCall)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -471,8 +468,9 @@ namespace SplitterComponent {
     // Beginning of Update subroutines for the Splitter Module
     // *****************************************************************************
 
-    void UpdateSplitter(EnergyPlusData &state, int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall)
+    void UpdateSplitter(int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -537,13 +535,12 @@ namespace SplitterComponent {
         // Write(*,*)=SplitterCond(SplitterNum)%SplitterPower    Still needs to report the Splitter power from this component
     }
 
-    int GetSplitterOutletNumber(EnergyPlusData &state,
-                                std::string const &SplitterName, // must match Splitter names for the Splitter type
+    int GetSplitterOutletNumber(std::string const &SplitterName, // must match Splitter names for the Splitter type
                                 int const SplitterNum,           // Index of Splitters
                                 bool &ErrorsFound                // set to true if problem
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb 2013
@@ -563,7 +560,7 @@ namespace SplitterComponent {
 
         // Obtains and Allocates AirLoopHVAC:ZoneSplitter related parameters from input file
         if (state.dataSplitterComponent->GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput(state);
+            GetSplitterInput();
             state.dataSplitterComponent->GetSplitterInputFlag = false;
         }
 
@@ -578,7 +575,7 @@ namespace SplitterComponent {
         }
 
         if (WhichSplitter == 0) {
-            ShowSevereError(state, "GetSplitterOuletNumber: Could not find Splitter = \"" + SplitterName + "\"");
+            ShowSevereError("GetSplitterOuletNumber: Could not find Splitter = \"" + SplitterName + "\"");
             ErrorsFound = true;
             SplitterOutletNumber = 0;
         }
@@ -586,13 +583,12 @@ namespace SplitterComponent {
         return SplitterOutletNumber;
     }
 
-    Array1D_int GetSplitterNodeNumbers(EnergyPlusData &state,
-                                       std::string const &SplitterName, // must match Splitter names for the Splitter type
+    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
                                        int const SplitterNum,           // Index of Splitters
                                        bool &ErrorsFound                // set to true if problem
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb 2013
@@ -613,7 +609,7 @@ namespace SplitterComponent {
 
         // Obtains and Allocates AirLoopHVAC:ZoneSplitter related parameters from input file
         if (state.dataSplitterComponent->GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput(state);
+            GetSplitterInput();
             state.dataSplitterComponent->GetSplitterInputFlag = false;
         }
 
@@ -633,7 +629,7 @@ namespace SplitterComponent {
         }
 
         if (WhichSplitter == 0) {
-            ShowSevereError(state, "GetSplitterNodeNumbers: Could not find Splitter = \"" + SplitterName + "\"");
+            ShowSevereError("GetSplitterNodeNumbers: Could not find Splitter = \"" + SplitterName + "\"");
             ErrorsFound = true;
         }
 

@@ -153,21 +153,21 @@ namespace ICEngineElectricGenerator {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitICEngineGenerators(EnergyPlusData &state, bool RunFlag, bool FirstHVACIteration);
+        void InitICEngineGenerators(bool RunFlag, bool FirstHVACIteration);
 
-        void CalcICEngineGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
+        void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
 
-        void CalcICEngineGenHeatRecovery(EnergyPlusData &state, Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
+        void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
         void update();
 
         void setupOutputVars();
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines

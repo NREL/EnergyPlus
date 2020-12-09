@@ -117,19 +117,18 @@ namespace CurveManager {
         const std::string message,
         void *contextPtr
     ) {
-        std::pair<EnergyPlusData*, std::string> contextPair = *(std::pair<EnergyPlusData*, std::string>*) contextPtr;
-        std::string fullMessage = contextPair.second + ": " + message;
+        std::string fullMessage = *(std::string*)contextPtr + ": " + message;
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError(*contextPair.first, fullMessage);
-            ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
+            ShowSevereError(fullMessage);
+            ShowFatalError("Btwxt: Errors discovered, program terminates.");
         } else {
             if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
                 if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    ShowWarningError(*contextPair.first, fullMessage);
+                    ShowWarningError(fullMessage);
                 } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
-                    ShowMessage(*contextPair.first, fullMessage);
+                    ShowMessage(fullMessage);
                 } else {
-                    ShowMessage(*contextPair.first, fullMessage);
+                    ShowMessage(fullMessage);
                 }
             }
         }
@@ -137,7 +136,7 @@ namespace CurveManager {
 
     void ResetPerformanceCurveOutput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -168,7 +167,7 @@ namespace CurveManager {
                       Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -186,7 +185,7 @@ namespace CurveManager {
         // need to be careful on where and how resetting curve outputs to some "iactive value" is done
         // EMS can intercept curves and modify output
         if (state.dataGlobal->BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
-            ResetPerformanceCurveOutput(state);
+            ResetPerformanceCurveOutput();
             state.dataCurveManager->CurveValueMyBeginTimeStepFlag = false;
         }
 
@@ -195,17 +194,17 @@ namespace CurveManager {
         }
 
         if ((CurveIndex <= 0) || (CurveIndex > state.dataCurveManager->NumCurves)) {
-            ShowFatalError(state, "CurveValue: Invalid curve passed.");
+            ShowFatalError("CurveValue: Invalid curve passed.");
         }
 
         {
             auto const SELECT_CASE_var(state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType);
             if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
-                CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3);
+                CurveValue = PerformanceCurveObject(CurveIndex, Var1, Var2, Var3);
             } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
-                CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
+                CurveValue = BtwxtTableInterpolation(CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             } else {
-                ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
+                ShowFatalError("CurveValue: Invalid Interpolation Type");
             }
         }
 
@@ -224,21 +223,21 @@ namespace CurveManager {
 
     void GetCurveInput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
         bool GetInputErrorsFound = false;
 
-        GetCurveInputData(state,GetInputErrorsFound);
+        GetCurveInputData(GetInputErrorsFound);
         state.dataCurveManager->GetCurvesInputFlag = false;
 
         if (GetInputErrorsFound) {
-            ShowFatalError(state, "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination.");
+            ShowFatalError("GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination.");
         }
     }
 
     void GetCurveInputData(bool &ErrorsFound)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -301,28 +300,28 @@ namespace CurveManager {
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-        NumBiQuad = inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
-        NumCubic = inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
-        NumQuartic = inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
-        NumQuad = inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
-        NumQLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
-        NumQuadLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
-        NumCubicLinear = inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
-        NumLinear = inputProcessor->getNumObjectsFound(state, "Curve:Linear");
-        NumBicubic = inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
-        NumTriQuad = inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
-        NumExponent = inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
-        NumTableLookup = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
-        NumFanPressRise = inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
-        NumExpSkewNorm = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
-        NumSigmoid = inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
-        NumRectHyper1 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
-        NumRectHyper2 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
-        NumExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
-        NumDoubleExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
-        NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
+        NumBiQuad = inputProcessor->getNumObjectsFound("Curve:Biquadratic");
+        NumCubic = inputProcessor->getNumObjectsFound("Curve:Cubic");
+        NumQuartic = inputProcessor->getNumObjectsFound("Curve:Quartic");
+        NumQuad = inputProcessor->getNumObjectsFound("Curve:Quadratic");
+        NumQLinear = inputProcessor->getNumObjectsFound("Curve:QuadLinear");
+        NumQuadLinear = inputProcessor->getNumObjectsFound("Curve:QuadraticLinear");
+        NumCubicLinear = inputProcessor->getNumObjectsFound("Curve:CubicLinear");
+        NumLinear = inputProcessor->getNumObjectsFound("Curve:Linear");
+        NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
+        NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
+        NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
+        NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
+        NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");
+        NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");
+        NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");
+        NumRectHyper1 = inputProcessor->getNumObjectsFound("Curve:RectangularHyperbola1");
+        NumRectHyper2 = inputProcessor->getNumObjectsFound("Curve:RectangularHyperbola2");
+        NumExpDecay = inputProcessor->getNumObjectsFound("Curve:ExponentialDecay");
+        NumDoubleExpDecay = inputProcessor->getNumObjectsFound("Curve:DoubleExponentialDecay");
+        NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound("Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
-        NumWPCValTab = inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
+        NumWPCValTab = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
         state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
                     NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -337,8 +336,7 @@ namespace CurveManager {
         // Loop over biquadratic curves and load data
         CurrentModuleObject = "Curve:Biquadratic";
         for (CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -349,7 +347,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
 
             // could add checks for blank numeric fields, and use field names for errors.
@@ -378,28 +376,28 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -407,8 +405,7 @@ namespace CurveManager {
         // Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
         CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
         for (CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -419,7 +416,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
 
@@ -459,22 +456,22 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the OInput Unit Type for Z is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the OInput Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -482,8 +479,7 @@ namespace CurveManager {
         // Loop over cubic curves and load data
         CurrentModuleObject = "Curve:Cubic";
         for (CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -495,7 +491,7 @@ namespace CurveManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++CurveNum;
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
@@ -517,18 +513,18 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -536,8 +532,7 @@ namespace CurveManager {
         // Loop over quadrinomial curves and load data
         CurrentModuleObject = "Curve:Quartic";
         for (CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -548,7 +543,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
@@ -572,18 +567,18 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -591,8 +586,7 @@ namespace CurveManager {
         // Loop over quadratic curves and load data
         CurrentModuleObject = "Curve:Quadratic";
         for (CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -603,7 +597,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
@@ -625,18 +619,18 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -644,8 +638,7 @@ namespace CurveManager {
         // Loop over quadratic-linear curves and load data
         CurrentModuleObject = "Curve:QuadraticLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -656,7 +649,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
@@ -683,28 +676,28 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -712,8 +705,7 @@ namespace CurveManager {
         // Loop over cubic-linear curves and load data
         CurrentModuleObject = "Curve:CubicLinear";
         for (CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -724,7 +716,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
@@ -751,28 +743,28 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -780,8 +772,7 @@ namespace CurveManager {
         // Loop over linear curves and load data
         CurrentModuleObject = "Curve:Linear";
         for (CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -792,7 +783,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
@@ -813,18 +804,18 @@ namespace CurveManager {
             }
 
             if (Numbers(3) > Numbers(4)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(3), Numbers(3), cNumericFieldNames(4), Numbers(4)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(3), Numbers(3), cNumericFieldNames(4), Numbers(4)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -832,8 +823,7 @@ namespace CurveManager {
         // Loop over bicubic curves and load data
         CurrentModuleObject = "Curve:Bicubic";
         for (CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -844,7 +834,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
@@ -875,30 +865,28 @@ namespace CurveManager {
             }
 
             if (Numbers(11) > Numbers(12)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(11), Numbers(11), cNumericFieldNames(12), Numbers(12)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(11), Numbers(11), cNumericFieldNames(12), Numbers(12)));
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(13), Numbers(13), cNumericFieldNames(14), Numbers(14)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(13), Numbers(13), cNumericFieldNames(14), Numbers(14)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -906,8 +894,7 @@ namespace CurveManager {
         // Loop over Triquadratic curves and load data
         CurrentModuleObject = "Curve:Triquadratic";
         for (CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -918,7 +905,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
@@ -971,41 +958,38 @@ namespace CurveManager {
             }
 
             if (Numbers(28) > Numbers(29)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(28), Numbers(28), cNumericFieldNames(29), Numbers(29)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(28), Numbers(28), cNumericFieldNames(29), Numbers(29)));
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(30), Numbers(30), cNumericFieldNames(31), Numbers(31)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(30), Numbers(30), cNumericFieldNames(31), Numbers(31)));
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(32), Numbers(32), cNumericFieldNames(33), Numbers(33)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(32), Numbers(32), cNumericFieldNames(33), Numbers(33)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -1013,8 +997,7 @@ namespace CurveManager {
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
         for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1025,7 +1008,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
@@ -1056,59 +1039,56 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
             if (Numbers(8) > Numbers(9)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(8), Numbers(8), cNumericFieldNames(9), Numbers(9)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(8), Numbers(8), cNumericFieldNames(9), Numbers(9)));
                 ErrorsFound = true;
             }
             if (Numbers(10) > Numbers(11)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(10), Numbers(10), cNumericFieldNames(11), Numbers(11)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(10), Numbers(10), cNumericFieldNames(11), Numbers(11)));
                 ErrorsFound = true;
             }
             if (Numbers(12) > Numbers(13)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(12), Numbers(12), cNumericFieldNames(13), Numbers(13)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(12), Numbers(12), cNumericFieldNames(13), Numbers(13)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for W is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for W is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveInputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 6) {
                 if (!IsCurveOutputTypeValid(Alphas(6))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
         // Loop over Exponent curves and load data
         CurrentModuleObject = "Curve:Exponent";
         for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1119,7 +1099,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
@@ -1141,12 +1121,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -1154,8 +1134,7 @@ namespace CurveManager {
         // Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1166,7 +1145,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
@@ -1192,13 +1171,13 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
 
@@ -1207,8 +1186,7 @@ namespace CurveManager {
         // Loop over Exponential Skew Normal curves and load data
         CurrentModuleObject = "Curve:ExponentialSkewNormal";
         for (CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1219,7 +1197,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
@@ -1243,19 +1221,19 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Skew Normal
@@ -1263,8 +1241,7 @@ namespace CurveManager {
         // Loop over Sigmoid curves and load data
         CurrentModuleObject = "Curve:Sigmoid";
         for (CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1275,7 +1252,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
@@ -1300,19 +1277,19 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Sigmoid
@@ -1320,8 +1297,7 @@ namespace CurveManager {
         // Loop over Rectangular Hyperbola Type 1 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola1";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1332,7 +1308,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
@@ -1355,19 +1331,19 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Rectangular Hyperbola Type 1
@@ -1375,8 +1351,7 @@ namespace CurveManager {
         // Loop over Rectangular Hyperbola Type 2 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola2";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1387,7 +1362,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
@@ -1410,19 +1385,19 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Rectangular Hyperbola Type 2
@@ -1430,8 +1405,7 @@ namespace CurveManager {
         // Loop over Exponential Decay curves and load data
         CurrentModuleObject = "Curve:ExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1442,7 +1416,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
@@ -1465,19 +1439,19 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
+                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowContinueError(format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Decay
@@ -1485,8 +1459,7 @@ namespace CurveManager {
         // ykt July,2011 Loop over DoubleExponential Decay curves and load data
         CurrentModuleObject = "Curve:DoubleExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CurveIndex,
                                           Alphas,
                                           NumAlphas,
@@ -1497,7 +1470,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
@@ -1523,12 +1496,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Decay
@@ -1537,15 +1510,14 @@ namespace CurveManager {
         if (NumWPCValTab > 0) {
             // Get the angle values
             CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-            int numOfCPArray = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            int numOfCPArray = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
             if (numOfCPArray != 1) {
-                ShowSevereError(state, "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
+                ShowSevereError("GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
                                 " object per simulation is required when using the AirflowNetwork model.");
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               1,
                                               Alphas,
                                               NumAlphas,
@@ -1569,13 +1541,12 @@ namespace CurveManager {
                     dirMax = std::max(dirMax, Numbers(j));
                     if (j > 1) {
                         if (windDirs[j - 2] >= windDirs[j - 1]) {
-                            ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                            ShowContinueError(state, "has either the same values for two consecutive wind directions, or a lower wind direction value after "
+                            ShowSevereError("GetCurveInput: An " + CurrentModuleObject + " object ");
+                            ShowContinueError("has either the same values for two consecutive wind directions, or a lower wind direction value after "
                                               "a higher wind direction value.");
-                            ShowContinueError(state, "Wind direction values must be entered in ascending order.");
+                            ShowContinueError("Wind direction values must be entered in ascending order.");
                             ShowContinueError(
-                                state,
-                                format(
+                                    format(
                                     "{} = {:.2R} {} = {:.2R}", cNumericFieldNames(j), windDirs[j - 2], cNumericFieldNames[j + 1], windDirs[j - 1]));
                             ErrorsFound = true;
                         }
@@ -1583,17 +1554,16 @@ namespace CurveManager {
                 }
                 // Check that the first table value is zero
                 if (dirMin != 0.0) {
-                    ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                    ShowContinueError(state, format("has a nonzero minimum value of {:.2R}", dirMin));
-                    ShowContinueError(state, "Wind direction values must begin at zero.");
+                    ShowSevereError("GetCurveInput: An " + CurrentModuleObject + " object ");
+                    ShowContinueError(format("has a nonzero minimum value of {:.2R}", dirMin));
+                    ShowContinueError("Wind direction values must begin at zero.");
                     ErrorsFound = true;
                 }
 
                 // Now that we have the directions, we can read the tables themselves
                 CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
                 for (int index = 1; index <= NumWPCValTab; ++index) {
-                    inputProcessor->getObjectItem(state,
-                                                  CurrentModuleObject,
+                    inputProcessor->getObjectItem(CurrentModuleObject,
                                                   index,
                                                   Alphas,
                                                   NumAlphas,
@@ -1605,13 +1575,13 @@ namespace CurveManager {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                     ++CurveNum;
-                    GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                    GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
-                        ShowSevereError(state, "GetCurveInput: Invalid " + cAlphaFieldNames(2) + " = " + Alphas(2) + " in " + CurrentModuleObject + " = " +
+                        ShowSevereError("GetCurveInput: Invalid " + cAlphaFieldNames(2) + " = " + Alphas(2) + " in " + CurrentModuleObject + " = " +
                                         Alphas(1));
-                        ShowContinueError(state, "The valid name is " + wpcName);
+                        ShowContinueError("The valid name is " + wpcName);
                         ErrorsFound = true;
                     }
 
@@ -1638,9 +1608,8 @@ namespace CurveManager {
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
-                        ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                        ShowContinueError(state,
-                                          format("The number of data entries must match the number of wind directions given in the wind pressure "
+                        ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowContinueError(format("The number of data entries must match the number of wind directions given in the wind pressure "
                                                  "coefficient array. Number of data entries = {}",
                                                  NumNumbers));
                         ErrorsFound = true;
@@ -1669,7 +1638,7 @@ namespace CurveManager {
         }
 
         // Create case insensitive references to independent variable input data
-        int numIndVars = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariable");
+        int numIndVars = inputProcessor->getNumObjectsFound("Table:IndependentVariable");
         if (numIndVars > 0) {
             // Set Btwxt Message Callback
             auto const &indVarInstances = inputProcessor->getObjectInstances("Table:IndependentVariable");
@@ -1682,7 +1651,7 @@ namespace CurveManager {
         }
 
         // Create GridSpaces from Independent Variable List
-        int numIndVarLists = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariableList");
+        int numIndVarLists = inputProcessor->getNumObjectsFound("Table:IndependentVariableList");
         std::map<std::string, std::vector<std::pair<double, double>>>
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         std::map<std::string, std::vector<double>> varListNormalizeTargets;
@@ -1713,7 +1682,7 @@ namespace CurveManager {
                         if (indVarInstance.count("unit_type")) {
                             std::string unitType = indVarInstance.at("unit_type");
                             if (!IsCurveOutputTypeValid(unitType)) {
-                                ShowSevereError(state, contextString + ": Unit Type [" + unitType + "] is invalid");
+                                ShowSevereError(contextString + ": Unit Type [" + unitType + "] is invalid");
                             }
                         }
 
@@ -1722,11 +1691,11 @@ namespace CurveManager {
                         if (indVarInstance.count("external_file_name")) {
                             std::string filePath = indVarInstance.at("external_file_name");
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
-                                ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
                                 ErrorsFound = true;
                             }
 
@@ -1735,13 +1704,13 @@ namespace CurveManager {
 
                             if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
                                 TableFile tableFile;
-                                ErrorsFound |= tableFile.load(state, filePath);
+                                ErrorsFound |= tableFile.load(filePath);
                                 state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                             }
 
                             if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
-                            axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
+                            axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                             // remove NANs
                             axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return std::isnan(x);}), axis.end());
@@ -1757,7 +1726,7 @@ namespace CurveManager {
                                 axis.push_back(value.at("value"));
                             }
                         } else {
-                            ShowSevereError(state, contextString + ": No values defined.");
+                            ShowSevereError(contextString + ": No values defined.");
                             ErrorsFound = true;
                         }
 
@@ -1770,7 +1739,7 @@ namespace CurveManager {
 
                         if (indVarInstance.count("extrapolation_method")) {
                             if (indVarInstance.at("extrapolation_method") == "Unavailable") {
-                                ShowSevereError(state, contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
+                                ShowSevereError(contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
                                 ErrorsFound = true;
                             }
                             extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
@@ -1813,7 +1782,7 @@ namespace CurveManager {
 
                     } else {
                         // Independent variable does not exist
-                        ShowSevereError(state, contextString + ": No Table:IndependentVariable found.");
+                        ShowSevereError(contextString + ": No Table:IndependentVariable found.");
                         ErrorsFound = true;
                     }
 
@@ -1823,7 +1792,7 @@ namespace CurveManager {
             }
         }
 
-        int numTblLookups = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
+        int numTblLookups = inputProcessor->getNumObjectsFound("Table:Lookup");
         if (numTblLookups > 0) {
             auto const lookupInstances = inputProcessor->getObjectInstances("Table:Lookup");
             for (auto &instance : lookupInstances.items()) {
@@ -1847,11 +1816,11 @@ namespace CurveManager {
                 if (fields.count("output_unit_type")) {
                     std::string unitType = fields.at("output_unit_type");
                     if (!IsCurveOutputTypeValid(unitType)) {
-                        ShowSevereError(state, contextString + ": Output Unit Type [" + unitType + "] is invalid");
+                        ShowSevereError(contextString + ": Output Unit Type [" + unitType + "] is invalid");
                     }
                 }
 
-                int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(state, indVarListName, ErrorsFound);
+                int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(indVarListName, ErrorsFound);
                 state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
                 int numDims = state.dataCurveManager->btwxtManager.getNumGridDims(gridIndex);
                 state.dataCurveManager->PerfCurve(CurveNum).NumDims = numDims;
@@ -1917,11 +1886,11 @@ namespace CurveManager {
                     std::string filePath = fields.at("external_file_name");
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
                         ErrorsFound = true;
                     }
 
@@ -1931,13 +1900,13 @@ namespace CurveManager {
 
                     if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
                         TableFile tableFile;
-                        ErrorsFound |= tableFile.load(state, filePath);
+                        ErrorsFound |= tableFile.load(filePath);
                         state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                     }
 
                     if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
-                    lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
+                    lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                     // remove NANs
                     lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return std::isnan(x);}), lookupValues.end());
@@ -1947,7 +1916,7 @@ namespace CurveManager {
                         lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
-                    ShowSevereError(state, contextString + ": No values defined.");
+                    ShowSevereError(contextString + ": No values defined.");
                     ErrorsFound = true;
                 }
 
@@ -1966,12 +1935,11 @@ namespace CurveManager {
                         }
                     }
                     if (pointsSpecified && pointsUnspecified) {
-                        ShowSevereError(state,
-                            contextString +
+                        ShowSevereError(contextString +
                             ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables define a normalization reference value. Make sure either:");
-                        ShowContinueError(state, "  Make sure either:");
-                        ShowContinueError(state, "    a) a normalization reference value is defined for each independent variable, or");
-                        ShowContinueError(state, "    b) no normalization reference values are defined.");
+                        ShowContinueError("  Make sure either:");
+                        ShowContinueError("    a) a normalization reference value is defined for each independent variable, or");
+                        ShowContinueError("    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
                         // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
@@ -1994,13 +1962,13 @@ namespace CurveManager {
     }
 
     int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
         } else {
             // Independent variable list does not exist
-            ShowSevereError(state, "Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
+            ShowSevereError("Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
             ErrorsFound = true;
         }
         return gridIndex;
@@ -2036,12 +2004,12 @@ namespace CurveManager {
 
     bool TableFile::load(std::string path)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         filePath = path;
         bool fileFound;
         std::string fullPath;
         std::string contextString = "CurveManager::TableFile::load: ";
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
+        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath, contextString);
         if(!fileFound){
             return true;
         }
@@ -2081,19 +2049,17 @@ namespace CurveManager {
     }
 
     std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
             std::size_t row = colAndRow.second;  // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
+                ShowFatalError(format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
             }
             if (row >= numRows) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
+                ShowFatalError(format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
@@ -2119,7 +2085,7 @@ namespace CurveManager {
 
     void InitCurveReporting()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -2141,7 +2107,7 @@ namespace CurveManager {
                 // TODO: Make CurveInput an Array for better looping here...
                 switch (dim) {
                 case 1:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
                                         "HVAC",
@@ -2149,7 +2115,7 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
                                         "HVAC",
@@ -2157,7 +2123,7 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
                                         "HVAC",
@@ -2165,7 +2131,7 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
                                         "HVAC",
@@ -2173,7 +2139,7 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
                                         "HVAC",
@@ -2181,7 +2147,7 @@ namespace CurveManager {
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
-                    SetupOutputVariable(state, "Performance Curve Input Variable " + numStr + " Value",
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
                                         "HVAC",
@@ -2194,7 +2160,7 @@ namespace CurveManager {
                 }
             }
             // set the output up last so it shows up after the input in the csv file
-            SetupOutputVariable(state, "Performance Curve Output Value",
+            SetupOutputVariable("Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
                                 "HVAC",
@@ -2203,25 +2169,25 @@ namespace CurveManager {
         }
 
         for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-            SetupOutputVariable(state, "Performance Curve Input Variable 1 Value",
+            SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Input Variable 2 Value",
+            SetupOutputVariable("Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Input Variable 3 Value",
+            SetupOutputVariable("Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
                                 "HVAC",
                                 "Average",
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
-            SetupOutputVariable(state, "Performance Curve Output Value",
+            SetupOutputVariable("Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
                                 "HVAC",
@@ -2231,7 +2197,7 @@ namespace CurveManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-                SetupEMSActuator(state, "Curve",
+                SetupEMSActuator("Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2241,7 +2207,7 @@ namespace CurveManager {
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-                SetupEMSActuator(state, "Curve",
+                SetupEMSActuator("Curve",
                                  state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2258,7 +2224,7 @@ namespace CurveManager {
                                   Optional<Real64 const> Var4  // 4th independent variable
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2379,7 +2345,7 @@ namespace CurveManager {
                                    Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
       // TODO: Generalize for N-dims
       Real64 var = Var1;
       var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
@@ -2500,7 +2466,7 @@ namespace CurveManager {
                         std::string objectName,
                         std::string curveFieldText)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
         if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
@@ -2508,8 +2474,8 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(state, routineName + objectType + "=\"" + objectName + "\"");
-            ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
+            ShowSevereError(routineName + objectType + "=\"" + objectName + "\"");
+            ShowContinueError("...Invalid curve for " + curveFieldText + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);
@@ -2517,15 +2483,15 @@ namespace CurveManager {
             std::string plural1 = curveDim > 1 ? "s" : "";
             std::string plural2 = validDims[validDims.size()-1] > 1 ? "s" : "";
             ShowContinueError(
-                state, format("...Input curve=\"{}\" has {} dimension{}.", state.dataCurveManager->PerfCurve(CurveIndex).Name, curveDim, plural1));
-            ShowContinueError(state, "...Curve type must have " + validString + " dimension" + plural2 + ".");
+                format("...Input curve=\"{}\" has {} dimension{}.", state.dataCurveManager->PerfCurve(CurveIndex).Name, curveDim, plural1));
+            ShowContinueError("...Curve type must have " + validString + " dimension" + plural2 + ".");
             return true;
         }
     }
 
     std::string GetCurveName(int const CurveIndex) // index of curve in curve array
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   May 2010
@@ -2548,7 +2514,7 @@ namespace CurveManager {
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2567,8 +2533,8 @@ namespace CurveManager {
 
         // First time GetCurveIndex is called, get the input for all the performance curves
         if (state.dataCurveManager->GetCurvesInputFlag) {
-            GetCurveInput(state);
-            GetPressureSystemInput(state);
+            GetCurveInput();
+            GetPressureSystemInput();
             state.dataCurveManager->GetCurvesInputFlag = false;
         }
 
@@ -2589,7 +2555,7 @@ namespace CurveManager {
                       std::string const &ObjName // parent object of curve
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2604,9 +2570,9 @@ namespace CurveManager {
         // Return value
         int GetCurveCheckOut;
 
-        GetCurveCheckOut = GetCurveIndex(state, alph); // convert curve name to pointer
+        GetCurveCheckOut = GetCurveIndex(alph); // convert curve name to pointer
         if (GetCurveCheckOut == 0) {
-            ShowSevereError(state, "Curve Not Found for Object=\"" + ObjName + "\" :: " + alph);
+            ShowSevereError("Curve Not Found for Object=\"" + ObjName + "\" :: " + alph);
             errFlag = true;
         }
         return GetCurveCheckOut;
@@ -2621,7 +2587,7 @@ namespace CurveManager {
                               Optional<Real64> Var3Max  // Maximum values of 2nd independent variable
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2006
@@ -2646,7 +2612,7 @@ namespace CurveManager {
                                     Optional<Real64 const> CurveMax  // Maximum values of curve output
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -2675,7 +2641,6 @@ namespace CurveManager {
         } else {
 
             ShowSevereError(
-                state,
                 format("SetCurveOutputMinMaxValues: CurveIndex=[{}] not in range of curves=[1:{}].", CurveIndex, state.dataCurveManager->NumCurves));
             ErrorsFound = true;
         }
@@ -2683,7 +2648,7 @@ namespace CurveManager {
 
     void GetPressureSystemInput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2713,11 +2678,10 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
         state.dataBranchAirLoopPlant->PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
-            inputProcessor->getObjectItem(state,
-                                          CurveObjectName,
+            inputProcessor->getObjectItem(CurveObjectName,
                                           CurveNum,
                                           Alphas,
                                           NumAlphas,
@@ -2728,7 +2692,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).Name = Alphas(1);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             state.dataBranchAirLoopPlant->PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
@@ -2745,7 +2709,7 @@ namespace CurveManager {
         state.dataBranchAirLoopPlant->NumPressureCurves = NumPressure;
 
         if (ErrsFound) {
-            ShowFatalError(state, "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");
+            ShowFatalError("GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -2753,7 +2717,7 @@ namespace CurveManager {
                                       DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -2776,8 +2740,8 @@ namespace CurveManager {
 
         // If input is not gotten, go ahead and get it now
         if (state.dataCurveManager->GetCurvesInputFlag) {
-            GetCurveInput(state);
-            GetPressureSystemInput(state);
+            GetCurveInput();
+            GetPressureSystemInput();
             state.dataCurveManager->GetCurvesInputFlag = false;
         }
 
@@ -2786,7 +2750,7 @@ namespace CurveManager {
         PressureCurveIndex = 0;
 
         // Try to retrieve a curve manager object
-        TempCurveIndex = GetCurveIndex(state, PressureCurveName);
+        TempCurveIndex = GetCurveIndex(PressureCurveName);
 
         // See if it is valid
         if (TempCurveIndex > 0) {
@@ -2797,11 +2761,11 @@ namespace CurveManager {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
-                    ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
-                    ShowContinueError(state, "Curve type detected: " + GenericCurveType);
-                    ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
-                    ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
-                    ShowFatalError(state, "Errors in pressure simulation input cause program termination");
+                    ShowSevereError("Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
+                    ShowContinueError("Curve type detected: " + GenericCurveType);
+                    ShowContinueError("Generic curves should be single independent variable such that DeltaP = f(mdot)");
+                    ShowContinueError(" Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
+                    ShowFatalError("Errors in pressure simulation input cause program termination");
                 }
             }
             return;
@@ -2840,7 +2804,7 @@ namespace CurveManager {
                               Real64 const Density,
                               Real64 const Viscosity)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2899,7 +2863,7 @@ namespace CurveManager {
         if (IsConstFPresent) { // use the constant value
             FrictionFactor = ConstantF;
         } else { // must calculate f
-            FrictionFactor = CalculateMoodyFrictionFactor(state, ReynoldsNumber, RoughnessRatio);
+            FrictionFactor = CalculateMoodyFrictionFactor(ReynoldsNumber, RoughnessRatio);
         }
 
         // Pressure drop calculation
@@ -2917,7 +2881,7 @@ namespace CurveManager {
 
     Real64 CalculateMoodyFrictionFactor(Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2968,11 +2932,11 @@ namespace CurveManager {
             if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
                 RR = format("{:.7R}", RoughnessRatio);
                 Re = format("{:.1R}", ReynoldsNumber);
-                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
-                ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
-                ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
-                ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
+                ShowSevereError("Plant Pressure System: Error in moody friction factor calculation");
+                ShowContinueError("Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
+                ShowContinueError("These conditions resulted in an unhandled numeric issue.");
+                ShowContinueError("Please contact EnergyPlus support/development team to raise an alert about this issue");
+                ShowContinueError("This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
                 state.dataCurveManager->FrictionFactorErrorHasOccurred = true;
             }
             CalculateMoodyFrictionFactor = 0.04;
@@ -2993,7 +2957,7 @@ namespace CurveManager {
                                      Optional<Real64 const> Var5          // 5th independent variable
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   May 2017
@@ -3005,11 +2969,11 @@ namespace CurveManager {
         Real64 CurveVal;
 
         if (curveIndex > 0) {
-            CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5);
+            CurveVal = CurveValue(curveIndex, Var1, Var2, Var3, Var4, Var5);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, callingRoutineObj + "=\"" + objectName + "\" curve values");
-                ShowContinueError(state, "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                ShowContinueError(state, format("... Curve output at rated conditions = {:.3T}", CurveVal));
+                ShowWarningError(callingRoutineObj + "=\"" + objectName + "\" curve values");
+                ShowContinueError("... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                ShowContinueError(format("... Curve output at rated conditions = {:.3T}", CurveVal));
             }
         }
     }

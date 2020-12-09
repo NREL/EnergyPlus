@@ -147,8 +147,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         LoadEquipListOneTimeFlag = true;
     }
 
-    void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     int const LoopNum,     // PlantLoop data structure loop counter
+    void ManagePlantLoadDistribution(int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
                                      int const CompNum,     // PlantLoop data structure component counter
@@ -158,6 +157,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
                                      bool &LoadDistributionWasPerformed)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1999
@@ -233,7 +233,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         auto &this_component(loop_side.Branch(BranchNum).Comp(CompNum));
 
         // Implement EMS control commands
-        ActivateEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, LoopShutDownFlag);
+        ActivateEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, LoopShutDownFlag);
 
         // Schedules are checked and CurOpScheme updated on FirstHVACIteration in InitLoadDistribution
         // Here we just load CurOpScheme to a local variable
@@ -252,12 +252,12 @@ namespace EnergyPlus::PlantCondLoopOperation {
         if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
             // No RangeVariable specified for these types
         } else if (CurSchemeType == EMSOpSchemeType) {
-            InitLoadDistribution(state, FirstHVACIteration);
+            InitLoadDistribution(FirstHVACIteration);
             // No RangeVariable specified for these types
         } else if (CurSchemeType == HeatingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand < SmallLoad) {
-                InitLoadDistribution(state, FirstHVACIteration);
+                InitLoadDistribution(FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -266,7 +266,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         } else if (CurSchemeType == CoolingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand > (-1.0 * SmallLoad)) {
-                InitLoadDistribution(state, FirstHVACIteration);
+                InitLoadDistribution(FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -282,10 +282,10 @@ namespace EnergyPlus::PlantCondLoopOperation {
             RangeVariable = state.dataEnvrn->OutDewPointTemp;
         } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) ||
                    (CurSchemeType == DewPointTDBOpSchemeType)) {
-            RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
+            RangeVariable = FindRangeVariable(LoopNum, CurSchemePtr, CurSchemeType);
         } else {
             // No controls specified.  This is a fatal error
-            ShowFatalError(state, "Invalid Operation Scheme Type Requested=" + PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
+            ShowFatalError("Invalid Operation Scheme Type Requested=" + PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
                            ", in ManagePlantLoadDistribution");
         }
 
@@ -299,11 +299,11 @@ namespace EnergyPlus::PlantCondLoopOperation {
         } else if (CurSchemeType == CompSetPtBasedSchemeType) {
             // check for EMS Control
             TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
-            FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
+            FindCompSPLoad(LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
         } else if (CurSchemeType == EMSOpSchemeType) {
             TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
             DistributeUserDefinedPlantLoad(
-                state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
+                LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         } else { // it's a range based control type with multiple equipment lists
             CurListNum = 0;
             for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -343,7 +343,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
                 }
                 if (this_op_scheme.EquipList(ListPtr).NumComps > 0) {
                     TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
-                    DistributePlantLoad(state, LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
+                    DistributePlantLoad(LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
                     LoadDistributionWasPerformed = true;
                 }
             }
@@ -354,8 +354,9 @@ namespace EnergyPlus::PlantCondLoopOperation {
     // Beginning of GetInput subroutines for the Module
     //******************************************************************************
 
-    void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
+    void GetPlantOperationInput(bool &GetInputOK)
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -404,17 +405,17 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
         // get number of operation schemes
         CurrentModuleObject = "PlantEquipmentOperationSchemes";
-        NumPlantOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumPlantOpSchemes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+            inputProcessor->getObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
         }
 
         CurrentModuleObject = "CondenserEquipmentOperationSchemes";
-        NumCondOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumCondOpSchemes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum) {
-            inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+            inputProcessor->getObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
         }
 
         // Load the Plant data structure
@@ -427,11 +428,9 @@ namespace EnergyPlus::PlantCondLoopOperation {
                 CurrentModuleObject = "CondenserEquipmentOperationSchemes";
                 PlantLoopObject = "CondenserLoop";
             }
-            OpNum = inputProcessor->getObjectItemNum(state,
-CurrentModuleObject, PlantOpSchemeName);
+            OpNum = inputProcessor->getObjectItemNum(CurrentModuleObject, PlantOpSchemeName);
             if (OpNum > 0) {
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               OpNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -480,7 +479,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
                                 PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = UncontrolledOpSchemeType;
                             } else { // invalid op scheme type for plant loop
-                                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 - 1) + '=' + cAlphaArgs(Num * 3 - 1) +
+                                ShowSevereError(RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 - 1) + '=' + cAlphaArgs(Num * 3 - 1) +
                                                 ", entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
                                 ErrorsFound = true;
                             }
@@ -488,33 +487,33 @@ CurrentModuleObject, PlantOpSchemeName);
 
                         PlantLoop(LoopNum).OpScheme(Num).Name = cAlphaArgs(Num * 3);
                         PlantLoop(LoopNum).OpScheme(Num).Sched = cAlphaArgs(Num * 3 + 1);
-                        PlantLoop(LoopNum).OpScheme(Num).SchedPtr = GetScheduleIndex(state, PlantLoop(LoopNum).OpScheme(Num).Sched);
+                        PlantLoop(LoopNum).OpScheme(Num).SchedPtr = GetScheduleIndex(PlantLoop(LoopNum).OpScheme(Num).Sched);
                         if (PlantLoop(LoopNum).OpScheme(Num).SchedPtr == 0) {
-                            ShowSevereError(state, RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 + 1) + " = \"" + cAlphaArgs(Num * 3 + 1) +
+                            ShowSevereError(RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 + 1) + " = \"" + cAlphaArgs(Num * 3 + 1) +
                                             "\", entered in " + CurrentModuleObject + "= \"" + cAlphaArgs(1) + "\".");
                             ErrorsFound = true;
                         }
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", requires at least " + cAlphaFieldNames(2) + ", " +
+                    ShowSevereError(CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", requires at least " + cAlphaFieldNames(2) + ", " +
                                     cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + " to be specified.");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, RoutineName + PlantLoopObject + '=' + PlantLoop(LoopNum).Name + " is expecting");
-                ShowContinueError(state, CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
+                ShowSevereError(RoutineName + PlantLoopObject + '=' + PlantLoop(LoopNum).Name + " is expecting");
+                ShowContinueError(CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
+            ShowFatalError(RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
         }
     }
 
-    void GetOperationSchemeInput(EnergyPlusData &state)
+    void GetOperationSchemeInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   October 1998
@@ -572,22 +571,22 @@ CurrentModuleObject, PlantOpSchemeName);
         ErrorsFound = false; // DSU CS
 
         //**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
-        CLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:CoolingLoad");
-        HLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:HeatingLoad");
-        DBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulb");
-        WBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulb");
-        DPRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpoint");
-        RHRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorRelativeHumidity");
-        CSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
-        NumUserDefOpSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:UserDefined");
-        DBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulbDifference");
-        WBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
-        DPTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpointDifference");
-        TESSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ThermalEnergyStorage");
+        CLRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:CoolingLoad");
+        HLRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:HeatingLoad");
+        DBRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDryBulb");
+        WBRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorWetBulb");
+        DPRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDewpoint");
+        RHRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorRelativeHumidity");
+        CSPBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
+        NumUserDefOpSchemes = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:UserDefined");
+        DBTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDryBulbDifference");
+        WBTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorWetBulbDifference");
+        DPTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDewpointDifference");
+        TESSPBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:ThermalEnergyStorage");
         NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
-        NumUncontrolledSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:Uncontrolled");
+        NumUncontrolledSchemes = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:Uncontrolled");
         if ((NumSchemes + NumUncontrolledSchemes) <= 0) {
-            ShowFatalError(state, "No PlantEquipmentOperation:* objects specified. Stop simulation.");
+            ShowFatalError("No PlantEquipmentOperation:* objects specified. Stop simulation.");
         }
 
         // test for blank or duplicates -- this section just determines if there are any duplicate operation scheme names
@@ -640,18 +639,18 @@ CurrentModuleObject, PlantOpSchemeName);
                 Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes -
                         NumUserDefOpSchemes;
             } else {
-                ShowFatalError(state, "Error in control scheme identification");
+                ShowFatalError("Error in control scheme identification");
             }
 
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            inputProcessor->getObjectItem(CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            if (GlobalNames::VerifyUniqueInterObjectName(UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
         }
 
         //**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
-        PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
-        CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
+        PELists = inputProcessor->getNumObjectsFound("PlantEquipmentList");
+        CELists = inputProcessor->getNumObjectsFound("CondenserEquipmentList");
         NumSchemeLists = PELists + CELists;
         UniqueNames.clear();
         UniqueNames.reserve(NumSchemeLists);
@@ -664,8 +663,8 @@ CurrentModuleObject, PlantOpSchemeName);
                 CurrentModuleObject = "CondenserEquipmentList";
                 Count = Num - PELists;
             }
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            inputProcessor->getObjectItem(CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            if (GlobalNames::VerifyUniqueInterObjectName(UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
         }
@@ -682,59 +681,59 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD") {
                         CurrentModuleObject = "PlantEquipmentOperation:CoolingLoad";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, CLRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, CLRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD") {
                         CurrentModuleObject = "PlantEquipmentOperation:HeatingLoad";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, HLRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, HLRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") { //* Temp Based Control
                         CurrentModuleObject = "PlantEquipmentOperation:ComponentSetPoint";
-                        FindCompSPInput(state, CurrentModuleObject, CSPBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindCompSPInput(CurrentModuleObject, CSPBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED") {
                         CurrentModuleObject = "PlantEquipmentOperation:UserDefined";
-                        GetUserDefinedOpSchemeInput(state, CurrentModuleObject, NumUserDefOpSchemes, LoopNum, SchemeNum, ErrorsFound);
+                        GetUserDefinedOpSchemeInput(CurrentModuleObject, NumUserDefOpSchemes, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorDryBulb";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, DBRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, DBRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorWetBulb";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, WBRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, WBRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorDewPoint";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, DPRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, DPRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorrelativeHumidity";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, RHRBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, RHRBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorDryBulbDifference";
-                        FindDeltaTempRangeInput(state, CurrentModuleObject, DBTDBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindDeltaTempRangeInput(CurrentModuleObject, DBTDBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorWetBulbDifference";
-                        FindDeltaTempRangeInput(state, CurrentModuleObject, WBTDBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindDeltaTempRangeInput(CurrentModuleObject, WBTDBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") {
                         CurrentModuleObject = "PlantEquipmentOperation:OutdoorDewPointDifference";
-                        FindDeltaTempRangeInput(state, CurrentModuleObject, DPTDBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindDeltaTempRangeInput(CurrentModuleObject, DPTDBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
                         CurrentModuleObject = "PlantEquipmentOperation:Uncontrolled";
-                        FindRangeBasedOrUncontrolledInput(state, CurrentModuleObject, NumUncontrolledSchemes, LoopNum, SchemeNum, ErrorsFound);
+                        FindRangeBasedOrUncontrolledInput(CurrentModuleObject, NumUncontrolledSchemes, LoopNum, SchemeNum, ErrorsFound);
 
                     } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE") { //* Temp Based Control
                         CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
-                        FindCompSPInput(state, CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
+                        FindCompSPInput(CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else { // invalid op scheme type for plant loop
                         // DSU?  Seems like the alpha args below is incorrect....
-                        ShowSevereError(state, "Invalid operation scheme type = \"" + cAlphaArgs(Num * 3 - 1) + "\", entered in " + CurrentModuleObject +
+                        ShowSevereError("Invalid operation scheme type = \"" + cAlphaArgs(Num * 3 - 1) + "\", entered in " + CurrentModuleObject +
                                         '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
@@ -751,18 +750,18 @@ CurrentModuleObject, PlantOpSchemeName);
 
         // Validate that component names/types in each list correspond to a valid component in input file
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
+            ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
         }
     }
 
-    void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
-                                           std::string &CurrentModuleObject, // for ease in renaming
+    void FindRangeBasedOrUncontrolledInput(std::string &CurrentModuleObject, // for ease in renaming
                                            int const NumSchemes,             // May be set here and passed on
                                            int const LoopNum,                // May be set here and passed on
                                            int const SchemeNum,              // May be set here and passed on
                                            bool &ErrorsFound                 // May be set here and passed on
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -810,7 +809,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -827,10 +826,10 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                inputProcessor->getObjectItem(CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
                 if (Num == NumSchemes) {
-                    ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
+                    ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
                                     " = \"" + PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                     ErrorsFound = true;
                     SchemeNameFound = false;
@@ -839,7 +838,7 @@ CurrentModuleObject, PlantOpSchemeName);
             if (SchemeNameFound) {
                 PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists = (NumAlphas - 1);
                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists <= 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\", specified without equipment list.");
+                    ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\", specified without equipment list.");
                     ErrorsFound = true;
                 } else {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
@@ -847,14 +846,14 @@ CurrentModuleObject, PlantOpSchemeName);
                     if (NumNums <= 0) {          // Uncontrolled OpScheme type
                         ListNum = NumEquipLists; // NumEquipLists is always 1 for Uncontrolled OpScheme type
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name = AlphArray(2);
-                        LoadEquipList(state, LoopNum, SchemeNum, ListNum, ErrorsFound);
+                        LoadEquipList(LoopNum, SchemeNum, ListNum, ErrorsFound);
                     } else { // Range based OpScheme type
                         for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit = NumArray(ListNum * 2 - 1);
                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit = NumArray(ListNum * 2);
                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name = AlphArray(ListNum + 1);
                             if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit < 0.0) {
-                                ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                 "\", found a negative value for an upper limit in " + CurrentModuleObject + " = \"" +
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                                 ErrorsFound = true;
@@ -868,7 +867,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     plantLoopOperation == "PlantEquipmentOperation:OutdoorrelativeHumidity") {
                                     // these should not be less than zero
                                     if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit < 0.0) {
-                                        ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                        ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                         "\", found a negative value for a lower limit in " + CurrentModuleObject + " = \"" +
                                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                                         ErrorsFound = true;
@@ -876,7 +875,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 } else {
                                     // others should not be less than -70
                                     if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit < -70.0) {
-                                        ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                        ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                         "\", found too low of a value for a lower limit in " + CurrentModuleObject + " = \"" +
                                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                                         ErrorsFound = true;
@@ -886,13 +885,13 @@ CurrentModuleObject, PlantOpSchemeName);
 
                             if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit >
                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit) {
-                                ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                 "\", found a lower limit that is higher than an upper limit in " + CurrentModuleObject + " = \"" +
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                                 ErrorsFound = true;
                             }
 
-                            LoadEquipList(state, LoopNum, SchemeNum, ListNum, ErrorsFound);
+                            LoadEquipList(LoopNum, SchemeNum, ListNum, ErrorsFound);
                         }
                         // now run through lists again and check that range limits do not overlap each other
                         for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -904,31 +903,29 @@ CurrentModuleObject, PlantOpSchemeName);
                                 InnerListNumUpperLimit = PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(InnerListNum).RangeUpperLimit;
                                 // Check if inner list has a lower limit that is between an outer's lower and upper limit
                                 if (InnerListNumLowerLimit > OuterListNumLowerLimit && InnerListNumLowerLimit < OuterListNumUpperLimit) {
-                                    ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                    ShowWarningError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state,
-                                                      format("Range # {} Lower limit = {:.1R} lies within the Range # {} ({:.1R} to {:.1R}).",
+                                    ShowContinueError(format("Range # {} Lower limit = {:.1R} lies within the Range # {} ({:.1R} to {:.1R}).",
                                                              InnerListNum,
                                                              InnerListNumLowerLimit,
                                                              ListNum,
                                                              OuterListNumLowerLimit,
                                                              OuterListNumUpperLimit));
-                                    ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
+                                    ShowContinueError("Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                                 // Check if inner list has an upper limit that is between an outer's lower and upper limit
                                 if (InnerListNumUpperLimit > OuterListNumLowerLimit && InnerListNumUpperLimit < OuterListNumUpperLimit) {
-                                    ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                                    ShowWarningError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state,
-                                                      format("Range # {} Upper limit = {:.1R} lies within Range # {} ({:.1R} to {:.1R}).",
+                                    ShowContinueError(format("Range # {} Upper limit = {:.1R} lies within Range # {} ({:.1R} to {:.1R}).",
                                                              InnerListNum,
                                                              InnerListNumUpperLimit,
                                                              ListNum,
                                                              OuterListNumLowerLimit,
                                                              OuterListNumUpperLimit));
-                                    ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
+                                    ShowContinueError("Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                             }
                         }
@@ -936,7 +933,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
             }
         } else {
-            ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
+            ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
                             PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
             ErrorsFound = true;
         }
@@ -949,14 +946,14 @@ CurrentModuleObject, PlantOpSchemeName);
         lNumericBlanks.deallocate();
     }
 
-    void FindDeltaTempRangeInput(EnergyPlusData &state,
-                                 std::string &CurrentModuleObject, // for ease in renaming
+    void FindDeltaTempRangeInput(std::string &CurrentModuleObject, // for ease in renaming
                                  int const NumSchemes,             // May be set here and passed on
                                  int const LoopNum,                // May be set here and passed on
                                  int const SchemeNum,              // May be set here and passed on
                                  bool &ErrorsFound                 // May be set here and passed on
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   August 2010
@@ -1002,7 +999,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -1019,10 +1016,10 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                inputProcessor->getObjectItem(CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
                 if (Num == NumSchemes) {
-                    ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
+                    ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
                                     " = \"" + PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                     ErrorsFound = true;
                     SchemeNameFound = false;
@@ -1031,14 +1028,13 @@ CurrentModuleObject, PlantOpSchemeName);
             if (SchemeNameFound) {
                 PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists = (NumAlphas - 2);
                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists <= 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\", specified without equipment list.");
+                    ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\", specified without equipment list.");
                     ErrorsFound = true;
                 } else {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
                     NumEquipLists = PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeName = AlphArray(2);
-                    PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeNumber = GetOnlySingleNode(state,
-                                                                                                   AlphArray(2),
+                    PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeNumber = GetOnlySingleNode(AlphArray(2),
                                                                                                    ErrorsFound,
                                                                                                    CurrentModuleObject,
                                                                                                    AlphArray(1),
@@ -1053,17 +1049,17 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name = AlphArray(ListNum + 2);
                         if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit >
                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit) {
-                            ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
+                            ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                             "\", found a lower limit that is higher than an upper limit in " + CurrentModuleObject + " = \"" +
                                             PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                             ErrorsFound = true;
                         }
-                        LoadEquipList(state, LoopNum, SchemeNum, ListNum, ErrorsFound);
+                        LoadEquipList(LoopNum, SchemeNum, ListNum, ErrorsFound);
                     }
                 }
             }
         } else {
-            ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
+            ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
                             PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
             ErrorsFound = true;
         }
@@ -1076,13 +1072,13 @@ CurrentModuleObject, PlantOpSchemeName);
         lNumericBlanks.deallocate();
     }
 
-    void LoadEquipList(EnergyPlusData &state,
-                       int const LoopNum,   // May be set here and passed on
+    void LoadEquipList(int const LoopNum,   // May be set here and passed on
                        int const SchemeNum, // May be set here and passed on
                        int const ListNum,   // May be set here and passed on
                        bool &ErrorsFound    // May be set here and passed on
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -1121,8 +1117,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (LoadEquipListOneTimeFlag) {
             // assemble mapping between list names and indices one time
-            PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
-            CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
+            PELists = inputProcessor->getNumObjectsFound("PlantEquipmentList");
+            CELists = inputProcessor->getNumObjectsFound("CondenserEquipmentList");
             TotNumLists = PELists + CELists;
             if (TotNumLists > 0) {
                 EquipListsNameList.allocate(TotNumLists);
@@ -1134,8 +1130,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     CurrentModuleObject = "PlantEquipmentList";
                     for (Num = 1; Num <= PELists; ++Num) {
                         iIndex = Num;
-                        inputProcessor->getObjectItem(state,
-                                                      CurrentModuleObject,
+                        inputProcessor->getObjectItem(CurrentModuleObject,
                                                       Num,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1154,22 +1149,22 @@ CurrentModuleObject, PlantOpSchemeName);
                             firstblank = false;
                             if (lAlphaFieldBlanks(MachineNum) || lAlphaFieldBlanks(MachineNum + 1)) {
                                 if (lAlphaFieldBlanks(MachineNum)) {
-                                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
-                                    ShowContinueError(state, cAlphaFieldNames(MachineNum) + " is blank.");
+                                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
+                                    ShowContinueError(cAlphaFieldNames(MachineNum) + " is blank.");
                                     firstblank = true;
                                     ErrorsFound = true;
                                 }
                                 if (lAlphaFieldBlanks(MachineNum + 1)) {
                                     if (!firstblank) {
-                                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
+                                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
                                     }
-                                    ShowContinueError(state, cAlphaFieldNames(MachineNum + 1) + " is blank.");
+                                    ShowContinueError(cAlphaFieldNames(MachineNum + 1) + " is blank.");
                                     ErrorsFound = true;
                                 }
                             } else {
-                                ValidateComponent(state, cAlphaArgs(MachineNum), cAlphaArgs(MachineNum + 1), IsNotOK, CurrentModuleObject);
+                                ValidateComponent(cAlphaArgs(MachineNum), cAlphaArgs(MachineNum + 1), IsNotOK, CurrentModuleObject);
                                 if (IsNotOK) {
-                                    ShowContinueError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Input Error.");
+                                    ShowContinueError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Input Error.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1181,8 +1176,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     CurrentModuleObject = "CondenserEquipmentList";
                     for (Num = 1; Num <= CELists; ++Num) {
                         iIndex = Num + PELists;
-                        inputProcessor->getObjectItem(state,
-                                                      CurrentModuleObject,
+                        inputProcessor->getObjectItem(CurrentModuleObject,
                                                       Num,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1201,22 +1195,22 @@ CurrentModuleObject, PlantOpSchemeName);
                             firstblank = false;
                             if (lAlphaFieldBlanks(MachineNum) || lAlphaFieldBlanks(MachineNum + 1)) {
                                 if (lAlphaFieldBlanks(MachineNum)) {
-                                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
-                                    ShowContinueError(state, cAlphaFieldNames(MachineNum) + " is blank.");
+                                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
+                                    ShowContinueError(cAlphaFieldNames(MachineNum) + " is blank.");
                                     firstblank = true;
                                     ErrorsFound = true;
                                 }
                                 if (lAlphaFieldBlanks(MachineNum + 1)) {
                                     if (!firstblank) {
-                                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
+                                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid component specification.");
                                     }
-                                    ShowContinueError(state, cAlphaFieldNames(MachineNum + 1) + " is blank.");
+                                    ShowContinueError(cAlphaFieldNames(MachineNum + 1) + " is blank.");
                                     ErrorsFound = true;
                                 }
                             } else {
-                                ValidateComponent(state, cAlphaArgs(MachineNum), cAlphaArgs(MachineNum + 1), IsNotOK, CurrentModuleObject);
+                                ValidateComponent(cAlphaArgs(MachineNum), cAlphaArgs(MachineNum + 1), IsNotOK, CurrentModuleObject);
                                 if (IsNotOK) {
-                                    ShowContinueError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Input Error.");
+                                    ShowContinueError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Input Error.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1226,7 +1220,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
             }
             if (ErrorsFound) {
-                ShowFatalError(state, "LoadEquipList/GetEquipmentLists: Failed due to preceding errors.");
+                ShowFatalError("LoadEquipList/GetEquipmentLists: Failed due to preceding errors.");
             }
             LoadEquipListOneTimeFlag = false;
         }
@@ -1245,8 +1239,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         CurrentModuleObject = "CondenserEquipmentList";
                     }
                 }
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               EquipListsIndexList(Num),
                                               cAlphaArgs,
                                               NumAlphas,
@@ -1270,20 +1263,20 @@ CurrentModuleObject, PlantOpSchemeName);
         }
 
         if (!FoundIntendedList) {
-            ShowSevereError(state, "LoadEquipList: Failed to find PlantEquipmentList or CondenserEquipmentList object named = " +
+            ShowSevereError("LoadEquipList: Failed to find PlantEquipmentList or CondenserEquipmentList object named = " +
                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name);
             ErrorsFound = true;
         }
     }
 
-    void FindCompSPInput(EnergyPlusData &state,
-                         std::string &CurrentModuleObject, // for ease in renaming
+    void FindCompSPInput(std::string &CurrentModuleObject, // for ease in renaming
                          int const NumSchemes,             // May be set here and passed on
                          int const LoopNum,                // May be set here and passed on
                          int const SchemeNum,              // May be set here and passed on
                          bool &ErrorsFound                 // May be set here and passed on
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -1340,10 +1333,10 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (NumSchemes > 0) {
             for (int Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state, CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+                inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, cAlphaArgs(1))) break;
                 if (Num == NumSchemes) {
-                    ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
+                    ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
                                     " = \"" + PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                     ErrorsFound = true;
                     SchemeNameFound = false;
@@ -1358,16 +1351,16 @@ CurrentModuleObject, PlantOpSchemeName);
                 if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                     // Read all of the additional parameters for ice storage control scheme and error check various parameters
                     OnPeakSchedName = cAlphaArgs(2);
-                    OnPeakSchedPtr = GetScheduleIndex(state, OnPeakSchedName);
+                    OnPeakSchedPtr = GetScheduleIndex(OnPeakSchedName);
                     if (OnPeakSchedPtr == 0) {
-                        ShowSevereError(state, "Could not find On Peak Schedule " + OnPeakSchedName + " in " + CurrentModuleObject +
+                        ShowSevereError("Could not find On Peak Schedule " + OnPeakSchedName + " in " + CurrentModuleObject +
                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                         ErrorsFound = true;
                     }
                     ChargeSchedName = cAlphaArgs(3);
-                    ChargeSchedPtr = GetScheduleIndex(state, ChargeSchedName);
+                    ChargeSchedPtr = GetScheduleIndex(ChargeSchedName);
                     if (ChargeSchedPtr == 0) {
-                        ShowSevereError(state, "Could not find Charging Availability Schedule " + ChargeSchedName + " in " + CurrentModuleObject +
+                        ShowSevereError("Could not find Charging Availability Schedule " + ChargeSchedName + " in " + CurrentModuleObject +
                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                         ErrorsFound = true;
                     }
@@ -1388,7 +1381,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).TypeOf = cAlphaArgs(CompNumA - 3);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name = cAlphaArgs(CompNumA - 2);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeName = cAlphaArgs(CompNumA - 1);
-                        PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum = GetOnlySingleNode(state, cAlphaArgs(CompNumA - 1),
+                        PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum = GetOnlySingleNode(cAlphaArgs(CompNumA - 1),
                                                                                                                             ErrorsFound,
                                                                                                                             CurrentModuleObject,
                                                                                                                             cAlphaArgs(1),
@@ -1398,7 +1391,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                                             ObjectIsNotParent);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName = cAlphaArgs(CompNumA);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum =
-                            GetOnlySingleNode(state, cAlphaArgs(CompNumA),
+                            GetOnlySingleNode(cAlphaArgs(CompNumA),
                                               ErrorsFound,
                                               CurrentModuleObject,
                                               cAlphaArgs(1),
@@ -1419,8 +1412,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            BaseSizer::reportSizerOutput(state,
-                                                         CurrentModuleObject,
+                            BaseSizer::reportSizerOutput(CurrentModuleObject,
                                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                                          format("Design Water Flow Rate [m3/s] Equipment # {}", Num),
                                                          CompFlowRate);
@@ -1432,7 +1424,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = CoolingOp;
                             } else if (controlType == "HEATING") {
                                 if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
-                                    ShowSevereError(state, "Equipment Operation Mode cannot be HEATING for any equipment found in " + cAlphaArgs(1) +
+                                    ShowSevereError("Equipment Operation Mode cannot be HEATING for any equipment found in " + cAlphaArgs(1) +
                                                     " in thermal energy storage control");
                                     ErrorsFound = true;
                                 }
@@ -1444,7 +1436,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                         if ((cAlphaArgs(CompNumA + 1) != "COOLING") && (cAlphaArgs(CompNumA + 1) != "HEATING") &&
                             (cAlphaArgs(CompNumA + 1) != "DUAL")) {
-                            ShowSevereError(state, "Equipment Operation Mode should be either HEATING or COOLING or DUAL mode, for " + CurrentModuleObject +
+                            ShowSevereError("Equipment Operation Mode should be either HEATING or COOLING or DUAL mode, for " + CurrentModuleObject +
                                             '=' + cAlphaArgs(1));
                         }
 
@@ -1455,9 +1447,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                  (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED")) &&
                                 (cAlphaArgs(CompNumA + 1) != "DUAL")) {
 
-                                ShowWarningError(state, "Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) + "' in " +
+                                ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) + "' in " +
                                                  CurrentModuleObject + "='" + cAlphaArgs(1) + "'.");
-                                ShowContinueError(state, "Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3) + " objects.");
+                                ShowContinueError("Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3) + " objects.");
 
                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = DualOp;
                             }
@@ -1468,8 +1460,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                             // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
                             // detailed input that is necessary to get thermal energy storage to work from the simpler input.
-                            SetUpNewScheduledTESSetPtMgr(state,
-                                                         OnPeakSchedPtr,
+                            SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr,
                                                          ChargeSchedPtr,
                                                          NonChargCHWTemp,
                                                          OffPeakCHWTemp,
@@ -1484,34 +1475,32 @@ CurrentModuleObject, PlantOpSchemeName);
                                 if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
                                     SensedNodeFlagValue) {
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                        ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
-                                        ShowContinueError(state, "A temperature setpoint is needed at the node named " +
+                                        ShowSevereError("Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
+                                        ShowContinueError("A temperature setpoint is needed at the node named " +
                                                           PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                            ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                            ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                               "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
                                         } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                         }
-                                        ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                                        ShowContinueError(" Use a setpoint manager to place a single temperature setpoint on the node");
                                         ErrorsFound = true;
                                     } else {
                                         // need call to EMS to check node
                                         NodeEMSSetPointMissing = false;
-                                        CheckIfNodeSetPointManagedByEMS(state,
-                                            PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                        CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                                         EMSManager::SPControlType::iTemperatureSetPoint,
                                             NodeEMSSetPointMissing);
                                         if (NodeEMSSetPointMissing) {
-                                            ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
-                                            ShowContinueError(state, "A temperature setpoint is needed at the node named " +
+                                            ShowSevereError("Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
+                                            ShowContinueError("A temperature setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
                                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
-                                            ShowContinueError(state,
-                                                " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
+                                            ShowContinueError(" Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
                                             ErrorsFound = true;
                                         }
                                     }
@@ -1521,36 +1510,34 @@ CurrentModuleObject, PlantOpSchemeName);
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                         SensedNodeFlagValue) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                            ShowSevereError(state, "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
+                                            ShowSevereError("Missing temperature high setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
-                                            ShowContinueError(state, "A temperature high setpoint is needed at the node named " +
+                                            ShowContinueError("A temperature high setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
-                                            ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                                            ShowContinueError(" Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(state,
-                                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                            CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                                             EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
-                                                ShowSevereError(state, "Missing high temperature setpoint for " + CurrentModuleObject + " named " +
+                                                ShowSevereError("Missing high temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
-                                                ShowContinueError(state, "A high temperature setpoint is needed at the node named " +
+                                                ShowContinueError("A high temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                                 if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                    ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                    ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state,
-                                                    " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
+                                                ShowContinueError(" Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -1559,40 +1546,37 @@ CurrentModuleObject, PlantOpSchemeName);
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                         SensedNodeFlagValue) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                            ShowSevereError(state, "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
+                                            ShowSevereError("Missing temperature low setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
-                                            ShowContinueError(state, "A temperature low setpoint is needed at the node named " +
+                                            ShowContinueError("A temperature low setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
-                                            ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                                            ShowContinueError(" Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(state,
-                                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                            CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                                             EMSManager::SPControlType::iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
-                                            CheckIfNodeSetPointManagedByEMS(state,
-                                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                            CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                                             EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
-                                                ShowSevereError(state, "Missing low temperature setpoint for " + CurrentModuleObject + " named " +
+                                                ShowSevereError("Missing low temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
-                                                ShowContinueError(state, "A low temperature setpoint is needed at the node named " +
+                                                ShowContinueError("A low temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                                 if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                    ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                    ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state,
-                                                    " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
+                                                ShowContinueError(" Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -1603,36 +1587,34 @@ CurrentModuleObject, PlantOpSchemeName);
                                         (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                          SensedNodeFlagValue)) {
                                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                            ShowSevereError(state, "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
+                                            ShowSevereError("Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
-                                            ShowContinueError(state, "A dual temperaturesetpoint is needed at the node named " +
+                                            ShowContinueError("A dual temperaturesetpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
-                                            ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                                            ShowContinueError(" Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(state,
-                                                PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                            CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                                             EMSManager::SPControlType::iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
-                                                ShowSevereError(state, "Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
+                                                ShowSevereError("Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
-                                                ShowContinueError(state, "A dual temperature setpoint is needed at the node named " +
+                                                ShowContinueError("A dual temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                                 if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                    ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
+                                                    ShowContinueError("PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state,
-                                                    " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
+                                                ShowContinueError(" Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -1642,26 +1624,25 @@ CurrentModuleObject, PlantOpSchemeName);
                         }
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", specified without any machines.");
+                    ShowSevereError(CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", specified without any machines.");
                     ErrorsFound = true;
                 }
             }
         } else {
-            ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
+            ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
                             PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
             ErrorsFound = true;
         }
     }
 
-    void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
-                                     std::string &CurrentModuleObject, // for ease in renaming
+    void GetUserDefinedOpSchemeInput(std::string &CurrentModuleObject, // for ease in renaming
                                      int const NumSchemes,             // May be set here and passed on
                                      int const LoopNum,                // May be set here and passed on
                                      int const SchemeNum,              // May be set here and passed on
                                      bool &ErrorsFound                 // May be set here and passed on
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -1697,8 +1678,7 @@ CurrentModuleObject, PlantOpSchemeName);
         if (NumSchemes > 0) {
 
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               Num,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -1711,7 +1691,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                               cNumericFieldNames);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, cAlphaArgs(1))) break; // found the correct one
                 if (Num == NumSchemes) {                                                                            // did not find it
-                    ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
+                    ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
                                     " = \"" + PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                     ErrorsFound = true;
                     SchemeNameFound = false;
@@ -1729,7 +1709,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name = cAlphaArgs(CompNum * 2 + 3);
 
                         // Setup EMS actuators for machines' MyLoad.
-                        SetupEMSActuator(state, "Plant Equipment Operation",
+                        SetupEMSActuator("Plant Equipment Operation",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                              PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                          "Distributed Load Rate",
@@ -1737,7 +1717,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                          lDummy,
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
                         // TODO: I think this should be a sensor really
-                        SetupEMSInternalVariable(state, "Component Remaining Current Demand Rate",
+                        SetupEMSInternalVariable("Component Remaining Current Demand Rate",
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                                  "[W]",
@@ -1749,11 +1729,11 @@ CurrentModuleObject, PlantOpSchemeName);
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation =
-                        state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
+                        state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                     if (PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation == -1) {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Not found as either an EMS Program Manager or a Python Plugin instance.");
+                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError("Not found as either an EMS Program Manager or a Python Plugin instance.");
                         ErrorsFound = true;
                     }
                 }
@@ -1763,25 +1743,25 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation =
-                            state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
+                            state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
                         if (PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation == -1) {
-                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError(state, "Not found as either an EMS Program Manager or a Python Plugin instance.");
+                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Not found as either an EMS Program Manager or a Python Plugin instance.");
                             ErrorsFound = true;
                         }
                     }
                 }
 
                 // setup internal variable for Supply Side Current Demand Rate [W]
-                SetupEMSInternalVariable(state, "Supply Side Current Demand Rate",
+                SetupEMSInternalVariable("Supply Side Current Demand Rate",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                          "[W]",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EMSIntVarLoopDemandRate);
             }
 
         } else {
-            ShowSevereError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
+            ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" +
                             PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
             ErrorsFound = true;
         }
@@ -1793,8 +1773,9 @@ CurrentModuleObject, PlantOpSchemeName);
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
+    void InitLoadDistribution(bool const FirstHVACIteration)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    July 2010
@@ -1847,9 +1828,9 @@ CurrentModuleObject, PlantOpSchemeName);
         errFlag2 = false;
         // Get Input
         if (GetPlantOpInput) {
-            GetPlantOperationInput(state, GetInputOK);
+            GetPlantOperationInput(GetInputOK);
             if (GetInputOK) {
-                GetOperationSchemeInput(state);
+                GetOperationSchemeInput();
                 GetPlantOpInput = false;
             } else {
                 return;
@@ -1873,8 +1854,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                    this_equip.Name,
+                            PlantUtilities::ScanPlantLoopsForObject(this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,
                                                                     LoopSideNum,
@@ -1888,11 +1868,11 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                     LoopNum);
 
                             if (errFlag1) {
-                                ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
-                                ShowContinueError(state, "Operation Scheme name = " + this_op_scheme.Name);
-                                ShowContinueError(state, "Loop name = " + this_plant_loop.Name);
-                                ShowContinueError(state, "Component name = " + this_equip.Name);
-                                ShowFatalError(state, "InitLoadDistribution: Simulation terminated because of error in operation scheme.");
+                                ShowSevereError("InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
+                                ShowContinueError("Operation Scheme name = " + this_op_scheme.Name);
+                                ShowContinueError("Loop name = " + this_plant_loop.Name);
+                                ShowContinueError("Component name = " + this_equip.Name);
+                                ShowFatalError("InitLoadDistribution: Simulation terminated because of error in operation scheme.");
                             }
 
                             this_equip.LoopNumPtr = DummyLoopNum;
@@ -1901,23 +1881,23 @@ CurrentModuleObject, PlantOpSchemeName);
                             this_equip.CompNumPtr = CompNum;
 
                             if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
-                                ShowSevereError(state, "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
+                                ShowSevereError("InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
-                                ShowContinueError(state, "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
+                                ShowContinueError("Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Condenser Loop");
-                                ShowContinueError(state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) +
+                                ShowContinueError("Component " + ccSimPlantEquipTypes(ThisTypeOfNum) +
                                                   " not allowed as supply equipment on this type of loop.");
-                                ShowContinueError(state, "Component name = " + this_equip.Name);
+                                ShowContinueError("Component name = " + this_equip.Name);
                                 errFlag2 = true;
                             }
                             if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
-                                ShowSevereError(state, "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
+                                ShowSevereError("InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
-                                ShowContinueError(state, "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
+                                ShowContinueError("Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Plant Loop");
-                                ShowContinueError(state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) +
+                                ShowContinueError("Component " + ccSimPlantEquipTypes(ThisTypeOfNum) +
                                                   " not allowed as supply equipment on this type of loop.");
-                                ShowContinueError(state, "Component name = " + this_equip.Name);
+                                ShowContinueError("Component name = " + this_equip.Name);
                                 errFlag2 = true;
                             }
 
@@ -2003,9 +1983,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                 for (Index = 1; Index <= this_component.NumOpSchemes; ++Index) {
                                     OpSchemePtr = this_component.OpScheme(Index).OpSchemePtr;
                                     if (OpSchemePtr == 0) {
-                                        ShowSevereError(state, "InitLoadDistribution: no operation scheme index found for component on PlantLoop=" +
+                                        ShowSevereError("InitLoadDistribution: no operation scheme index found for component on PlantLoop=" +
                                                         this_plant_loop.Name);
-                                        ShowContinueError(state, "Component name = " + this_component.Name);
+                                        ShowContinueError("Component name = " + this_component.Name);
                                         errFlag2 = true;
                                     }
                                     if (Index == 1) {
@@ -2055,9 +2035,9 @@ CurrentModuleObject, PlantOpSchemeName);
                         if (state.dataGlobal->BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                             if (this_op_scheme.ErlInitProgramMngr > 0) {
                                 bool anyEMSRan;
-                                ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
+                                ManageEMS(EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
                             } else if (this_op_scheme.initPluginLocation > -1) {
-                                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this_op_scheme.initPluginLocation);
+                                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(this_op_scheme.initPluginLocation);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
@@ -2098,7 +2078,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 auto &this_loop(PlantLoop(LoopNum));
                 for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                     auto &this_op_scheme(this_loop.OpScheme(OpNum));
-                    if (GetCurrentScheduleValue(state, this_op_scheme.SchedPtr) > 0.0) {
+                    if (GetCurrentScheduleValue(this_op_scheme.SchedPtr) > 0.0) {
                         this_op_scheme.Available = true;
                         FoundScheme = true;
                         for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {
@@ -2123,9 +2103,9 @@ CurrentModuleObject, PlantOpSchemeName);
                                 if (this_loop_component.CurOpSchemeType != PumpOpSchemeType) {
                                     this_loop_component.CurOpSchemeType = this_op_scheme.OpSchemeType;
                                 } else {
-                                    ShowSevereError(state, "Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists.");
-                                    ShowContinueError(state, "Problem component name = " + this_op_scheme.EquipList(ListNum).Comp(CompNum).Name);
-                                    ShowContinueError(state, "Remove pump component and place other plant equipment on the list to correct.");
+                                    ShowSevereError("Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists.");
+                                    ShowContinueError("Problem component name = " + this_op_scheme.EquipList(ListNum).Comp(CompNum).Name);
+                                    ShowContinueError("Remove pump component and place other plant equipment on the list to correct.");
                                     errFlag2 = true;
                                 }
 
@@ -2147,7 +2127,7 @@ CurrentModuleObject, PlantOpSchemeName);
         }
 
         if (errFlag2) {
-            ShowFatalError(state, "InitLoadDistribution: Fatal error caused by previous severe error(s).");
+            ShowFatalError("InitLoadDistribution: Fatal error caused by previous severe error(s).");
         }
     }
 
@@ -2157,15 +2137,14 @@ CurrentModuleObject, PlantOpSchemeName);
     // Begin Load Calculation/Distribution Section of the Plant Loop Module
     //******************************************************************************
 
-    void DistributePlantLoad(EnergyPlusData &state,
-                             int const LoopNum,
+    void DistributePlantLoad(int const LoopNum,
                              int const LoopSideNum,
                              int const CurSchemePtr, // use as index in PlantLoop()OpScheme() data structure
                              int const ListPtr,      // use as index in PlantLoop()OpScheme() data structure
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998
@@ -2274,7 +2253,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     AdjustChangeInLoadByEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                    AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                    AdjustChangeInLoadByHowServed(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                     ChangeInLoad = max(0.0, ChangeInLoad);
                     this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2355,7 +2334,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     AdjustChangeInLoadByEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                    AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                    AdjustChangeInLoadByHowServed(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                     ChangeInLoad = max(0.0, ChangeInLoad);
                     this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2405,7 +2384,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     AdjustChangeInLoadByEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                    AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                    AdjustChangeInLoadByHowServed(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
                     ChangeInLoad = max(0.0, ChangeInLoad);
                     this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
                     RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -2456,7 +2435,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     PlantCapacity += this_component.MaxLoad;
 
                     if (this_component.MaxLoad < SmallLoad) {
-                        ShowWarningMessage(state, "Plant component " + this_component.Name + " has zero available capacity. Check component controls.");
+                        ShowWarningMessage("Plant component " + this_component.Name + " has zero available capacity. Check component controls.");
                         MinCompPLR = 0.0;
                     } else {
                         MinCompPLR = this_component.MinLoad / this_component.MaxLoad;
@@ -2495,7 +2474,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 if (PlantCapacity > 0.0) {
                     PlantPLR = min(1.0, std::abs(RemLoopDemand) / PlantCapacity);
                 } else {
-                    ShowWarningError(state, "Zero available plant capacity for Plant Loop = " + PlantLoop(LoopNum).Name);
+                    ShowWarningError("Zero available plant capacity for Plant Loop = " + PlantLoop(LoopNum).Name);
                 }
 
                 // Distribute load to each machine
@@ -2524,7 +2503,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     AdjustChangeInLoadByEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                    AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                    AdjustChangeInLoadByHowServed(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                     ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2559,7 +2538,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     PlantCapacity += this_component.MaxLoad;
 
                     if (this_component.MaxLoad < SmallLoad) {
-                        ShowWarningMessage(state, "Plant component " + this_component.Name + " has zero available capacity. Check component controls.");
+                        ShowWarningMessage("Plant component " + this_component.Name + " has zero available capacity. Check component controls.");
                         MinCompPLR = 0.0;
                     } else {
                         MinCompPLR = this_component.MinLoad / this_component.MaxLoad;
@@ -2577,7 +2556,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 if (PlantCapacity > 0.0) {
                     PlantPLR = min(1.0, std::abs(RemLoopDemand) / PlantCapacity);
                 } else {
-                    ShowWarningError(state, "Zero available plant capacity for Plant Loop = " + PlantLoop(LoopNum).Name);
+                    ShowWarningError("Zero available plant capacity for Plant Loop = " + PlantLoop(LoopNum).Name);
                 }
 
                 // Distribute load to each machine
@@ -2606,7 +2585,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     AdjustChangeInLoadByEMSControls(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                    AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                    AdjustChangeInLoadByHowServed(LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                     ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2684,15 +2663,14 @@ CurrentModuleObject, PlantOpSchemeName);
         }
     }
 
-    void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                       int const LoopNum,     // component topology
+    void AdjustChangeInLoadByHowServed(int const LoopNum,     // component topology
                                        int const LoopSideNum, // component topology
                                        int const BranchNum,   // component topology
                                        int const CompNum,     // component topology
                                        Real64 &ChangeInLoad   // positive magnitude of load change
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Nov 2011
@@ -2751,7 +2729,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
                 ToutLowLimit = this_component.MinOutletTemp;
                 Tinlet = Node(this_component.NodeNumIn).Temp;
-                CurSpecHeat = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                CurSpecHeat = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
                 //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
@@ -2819,7 +2797,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
                     ToutLowLimit = this_component.MinOutletTemp;
                     Tinlet = Node(this_component.NodeNumIn).Temp;
-                    CurSpecHeat = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                    CurSpecHeat = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
                     QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
                     //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned
@@ -2834,7 +2812,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 CurMassFlowRate = Node(this_component.NodeNumIn).MassFlowRate;
                 ToutHiLimit = this_component.MaxOutletTemp;
                 Tinlet = Node(this_component.NodeNumIn).Temp;
-                CurSpecHeat = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                CurSpecHeat = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Tinlet, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
 
                 if (CurMassFlowRate > 0.0) {
@@ -2848,15 +2826,14 @@ CurrentModuleObject, PlantOpSchemeName);
         }
     }
 
-    void FindCompSPLoad(EnergyPlusData &state,
-                        int const LoopNum,
+    void FindCompSPLoad(int const LoopNum,
                         int const LoopSideNum,
                         int const BranchNum,
                         int const CompNum,
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   Jan 2005
@@ -2917,12 +2894,12 @@ CurrentModuleObject, PlantOpSchemeName);
         DemandNode = PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
         SetPtNode = PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
         TempIn = Node(DemandNode).Temp;
-        rho = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, TempIn, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, TempIn, PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         DemandMdot = PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
         // DSU?  DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
         ActualMdot = Node(DemandNode).MassFlowRate;
-        CurSpecHeat = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, TempIn, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        CurSpecHeat = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, TempIn, PlantLoop(LoopNum).FluidIndex, RoutineName);
         if ((ActualMdot > 0.0) && (ActualMdot != DemandMdot)) {
             DemandMdot = ActualMdot;
         }
@@ -3008,8 +2985,7 @@ CurrentModuleObject, PlantOpSchemeName);
         } // valid setpoint (TempSetPt /= SensedNodeFlagValue)
     }
 
-    void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
-                                        int const LoopNum,
+    void DistributeUserDefinedPlantLoad(int const LoopNum,
                                         int const LoopSideNum,
                                         int const BranchNum,
                                         int const CompNum,
@@ -3018,7 +2994,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         Real64 const LoopDemand,
                                         [[maybe_unused]] Real64 &RemLoopDemand)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2013
@@ -3063,9 +3039,9 @@ CurrentModuleObject, PlantOpSchemeName);
         // Call EMS program(s)
         if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr > 0) {
             bool anyEMSRan;
-            ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
+            ManageEMS(EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
-            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }
 
         // move actuated value to MyLoad
@@ -3085,13 +3061,12 @@ CurrentModuleObject, PlantOpSchemeName);
 
     //********************************
 
-    Real64 FindRangeVariable(EnergyPlusData &state,
-                             int const LoopNum,      // PlantLoop data structure loop counter
+    Real64 FindRangeVariable(int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   Jan 2004
@@ -3279,9 +3254,9 @@ CurrentModuleObject, PlantOpSchemeName);
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators(EnergyPlusData &state)
+    void SetupPlantEMSActuators()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007
@@ -3309,12 +3284,12 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Plant Loop Overall";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(state, ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
+            SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
 
             ActuatorName = "Supply Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(state, ActuatorName,
+            SetupEMSActuator(ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3324,7 +3299,7 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Demand Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(state, ActuatorName,
+            SetupEMSActuator(ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3337,7 +3312,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Supply Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(state, ActuatorName,
+                        SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3347,7 +3322,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Demand Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(state, ActuatorName,
+                        SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3359,7 +3334,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                        ccSimPlantEquipTypes(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(state, ActuatorName,
+                        SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          "[fraction]",
@@ -3371,9 +3346,9 @@ CurrentModuleObject, PlantOpSchemeName);
         }
     }
 
-    void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
+    void ActivateEMSControls(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007
@@ -3469,7 +3444,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         CurMassFlowRate = Node(this_comp.NodeNumIn).MassFlowRate;
                         ToutLowLimit = this_comp.MinOutletTemp;
                         Tinlet = Node(this_comp.NodeNumIn).Temp;
-                        CurSpecHeat = GetSpecificHeatGlycol(state, this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName);
+                        CurSpecHeat = GetSpecificHeatGlycol(this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName);
                         QTemporary = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
                         //- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented

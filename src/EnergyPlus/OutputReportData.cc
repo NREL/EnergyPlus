@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -69,25 +70,26 @@ AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationK
     m_showDigits = numDigitsShown;
 }
 
-int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
-                                                        int &typeVar,
+int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(int &typeVar,
                                                         OutputProcessor::StoreType &avgSumVar,
                                                         OutputProcessor::TimeStepType &stepTypeVar,
                                                         OutputProcessor::Unit &unitsVar)
 {
+    EnergyPlusData & state = getCurrentState(0);
     int numkeys;
-    GetVariableKeyCountandType(state, m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar); // call outputprocessor routine with member variable
+    GetVariableKeyCountandType(m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar); // call outputprocessor routine with member variable
     return numkeys;
 }
 
-void AnnualFieldSet::getVariableKeysFromFldSt(EnergyPlusData &state, int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
+void AnnualFieldSet::getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // this hides the Objexx arrays and returns regular vectors
     Array1D_string tempNamesOfKeys;
     Array1D_int tempIndexesForKeyVar;
     tempNamesOfKeys.allocate(keyCount);
     tempIndexesForKeyVar.allocate(keyCount);
-    GetVariableKeys(state, m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar); // call outputprocessor routine with member variable
+    GetVariableKeys(m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar); // call outputprocessor routine with member variable
     namesOfKeys.clear();
     indexesForKeyVar.clear();
     for (int iKey = 1; iKey <= keyCount; ++iKey) {

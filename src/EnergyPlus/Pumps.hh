@@ -267,8 +267,7 @@ namespace Pumps {
     // Functions
     void clear_state();
 
-    void SimPumps(EnergyPlusData &state,
-                  std::string const &PumpName, // Name of pump to be managed
+    void SimPumps(std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
                   bool &PumpRunning,           // .TRUE. if the loop pump is actually operating
@@ -285,25 +284,25 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(EnergyPlusData &state, int const PumpNum);
+    void InitializePumps(int const PumpNum);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const PumpNum);
+    void SetupPumpMinMaxFlows(int const LoopNum, int const PumpNum);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
+    void CalcPumps(int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void SizePump(EnergyPlusData &state, int const PumpNum);
+    void SizePump(int const PumpNum);
 
     //*************************************************************************!
 
@@ -315,12 +314,11 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void PumpDataForTable(EnergyPlusData &state, int const NumPump);
+    void PumpDataForTable(int const NumPump);
 
     //*************************************************************************!
 
-    void GetRequiredMassFlowRate(EnergyPlusData &state,
-                                 int const LoopNum,
+    void GetRequiredMassFlowRate(int const LoopNum,
                                  int const PumpNum,
                                  Real64 const InletNodeMassFlowRate,
                                  Real64 &ActualFlowRate,

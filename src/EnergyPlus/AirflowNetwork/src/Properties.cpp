@@ -55,9 +55,10 @@ namespace AirflowNetwork {
     int lowerLimitErrIdx(0);
     int upperLimitErrIdx(0);
 
-    Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
+    Real64 airThermConductivity(Real64 T // Temperature in Celsius
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // Dry air thermal conductivity {W/m-K}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -71,18 +72,18 @@ namespace AirflowNetwork {
 
         if (T < LowerLimit) {
             if (lowerLimitErrIdx == 0) {
-                ShowWarningMessage(state, "Air temperature below lower limit of -20C for conductivity calculation");
+                ShowWarningMessage("Air temperature below lower limit of -20C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   LowerLimit),
                                            lowerLimitErrIdx);
             T = LowerLimit;
         } else if (T > UpperLimit) {
             if (upperLimitErrIdx == 0) {
-                ShowWarningMessage(state, "Air temperature above upper limit of 70C for conductivity calculation");
+                ShowWarningMessage("Air temperature above upper limit of 70C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   UpperLimit),
                                            upperLimitErrIdx);
@@ -98,11 +99,12 @@ namespace AirflowNetwork {
         return 1.71432e-5 + 4.828e-8 * T;
     }
 
-    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // Dry air kinematic viscosity {m2/s}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -116,14 +118,15 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airDynamicVisc(T) / AIRDENSITY(state, P, T, W);
+        return airDynamicVisc(T) / AIRDENSITY(P, T, W);
     }
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // Dry air thermal diffusivity {-}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -137,14 +140,15 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airThermConductivity(state, T) / (AIRCP(W) * AIRDENSITY(state, P, T, W));
+        return airThermConductivity(T) / (AIRCP(W) * AIRDENSITY(P, T, W));
     }
 
-    Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // Dry air Prandtl number {-}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -158,7 +162,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airKinematicVisc(state, T, W, P) / airThermalDiffusivity(state, T, W, P);
+        return airKinematicVisc(T, W, P) / airThermalDiffusivity(T, W, P);
     }
 
 } // namespace AirflowNetwork

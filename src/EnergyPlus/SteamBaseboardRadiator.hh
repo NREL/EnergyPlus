@@ -140,7 +140,7 @@ namespace SteamBaseboardRadiator {
         }
     };
 
-    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimSteamBaseboard(std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
@@ -149,23 +149,23 @@ namespace SteamBaseboardRadiator {
 
     void GetSteamBaseboardInput();
 
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void SizeSteamBaseboard(int const BaseboardNum);
 
-    void CalcSteamBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
+    void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void UpdateSteamBaseboard(int const BaseboardNum);
 
-    void UpdateBBSteamRadSourceValAvg(EnergyPlusData &state, bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBSteamRadSourceValAvg(bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
     void DistributeBBSteamRadGains();
 
-    void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void ReportSteamBaseboard(int const BaseboardNum);
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state, int const BaseboardTypeNum,       // type index
+    void UpdateSteamBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
                                              std::string const &BaseboardName, // component name
                                              int const EquipFlowCtrl,          // Flow control mode for the equipment
                                              int const LoopNum,                // Plant loop index for where called from

@@ -1749,8 +1749,7 @@ namespace General {
         }
     }
 
-    void ProcessDateString(EnergyPlusData &state,
-                           std::string const &String,
+    void ProcessDateString(std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
@@ -1758,7 +1757,7 @@ namespace General {
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 1999
@@ -1788,7 +1787,7 @@ namespace General {
                 PDay = 0;
                 DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
-                ShowSevereError(state, "Invalid Julian date Entered=" + String);
+                ShowSevereError("Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -1797,10 +1796,10 @@ namespace General {
         } else {
             // Error when processing as number, try x/x
             if (!present(PYear)) {
-                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
             } else {
                 int TokenYear = 0;
-                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
             if (DateType == WeatherManager::DateType::MonthDay) {
@@ -1815,8 +1814,7 @@ namespace General {
         }
     }
 
-    void DetermineDateTokens(EnergyPlusData &state,
-                             std::string const &String,
+    void DetermineDateTokens(std::string const &String,
                              int &NumTokens,        // Number of tokens found in string
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -1826,7 +1824,7 @@ namespace General {
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -1893,7 +1891,7 @@ namespace General {
 
         strip(CurrentString);
         if (CurrentString == BlankString) {
-            ShowSevereError(state, "Invalid date field=" + String);
+            ShowSevereError("Invalid date field=" + String);
             ErrorsFound = true;
         } else {
             Loop = 0;
@@ -1907,7 +1905,7 @@ namespace General {
                 strip(CurrentString);
             }
             if (not_blank(CurrentString)) {
-                ShowSevereError(state, "Invalid date field=" + String);
+                ShowSevereError("Invalid date field=" + String);
                 ErrorsFound = true;
             } else if (Loop == 2) {
                 // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -1917,13 +1915,13 @@ namespace General {
                     // Month day, but first field is not numeric, 2nd must be
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     if (errFlag) {
-                        ShowSevereError(state, "Invalid date field=" + String);
+                        ShowSevereError("Invalid date field=" + String);
                         InternalError = true;
                     } else {
                         TokenDay = NumField2;
                     }
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
-                    ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
+                    ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = WeatherManager::DateType::MonthDay;
                     } else {
@@ -1935,7 +1933,7 @@ namespace General {
                     if (!errFlag) {
                         TokenMonth = NumField1;
                         TokenDay = NumField2;
-                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                         } else {
@@ -1944,7 +1942,7 @@ namespace General {
                     } else { // 2nd field was not numeric.  Must be Month
                         TokenDay = NumField1;
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
@@ -1985,7 +1983,7 @@ namespace General {
                                 if (TokenMonth == 0) InternalError = true;
                             }
                         } else { // error....
-                            ShowSevereError(state, "First date field not numeric, field=" + String);
+                            ShowSevereError("First date field not numeric, field=" + String);
                         }
                     }
                 } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -2010,7 +2008,7 @@ namespace General {
                 }
             } else {
                 // Not enough or too many fields
-                ShowSevereError(state, "Invalid date field=" + String);
+                ShowSevereError("Invalid date field=" + String);
                 ErrorsFound = true;
             }
         }
@@ -2021,13 +2019,12 @@ namespace General {
         }
     }
 
-    void ValidateMonthDay(EnergyPlusData &state,
-                          std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -2050,7 +2047,7 @@ namespace General {
             if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
         }
         if (InternalError) {
-            ShowSevereError(state, "Invalid Month Day date format=" + String);
+            ShowSevereError("Invalid Month Day date format=" + String);
             ErrorsFound = true;
         } else {
             ErrorsFound = false;
@@ -2235,9 +2232,9 @@ namespace General {
         return BetweenDates;
     }
 
-    std::string CreateSysTimeIntervalString(EnergyPlusData &state)
+    std::string CreateSysTimeIntervalString()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 2003
@@ -2309,12 +2306,12 @@ namespace General {
     }
 
     // returns the Julian date for the first, second, etc. day of week for a given month
-    int nthDayOfWeekOfMonth(EnergyPlusData &state,
-                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     )
     {
+        EnergyPlusData & state = getCurrentState(0);
         // J. Glazer - August 2017
         int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
         int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
@@ -2417,12 +2414,11 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(EnergyPlusData &state,
-                          Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   August 1976
@@ -2464,7 +2460,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError(state, "Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
         }
 
         // Compute Inverse
@@ -2680,9 +2676,9 @@ namespace General {
         Minute = mod(TmpItem, DecHr);
     }
 
-    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -2833,8 +2829,9 @@ namespace General {
         return LogicalToInteger;
     }
 
-    Real64 GetCurrentHVACTime(EnergyPlusData &state)
+    Real64 GetCurrentHVACTime()
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   November 2004
@@ -2883,8 +2880,9 @@ namespace General {
         return GetCurrentHVACTime;
     }
 
-    Real64 GetPreviousHVACTime(EnergyPlusData &state)
+    Real64 GetPreviousHVACTime()
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   November 2004
@@ -2930,9 +2928,9 @@ namespace General {
         return GetPreviousHVACTime;
     }
 
-    std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
+    std::string CreateHVACTimeIntervalString()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2005
@@ -2969,7 +2967,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
+        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(), GetCurrentHVACTime());
 
         return OutputString;
     }
@@ -3148,9 +3146,9 @@ namespace General {
     }
 
     void
-    ScanForReports(EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
+    ScanForReports(std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2009
@@ -3189,10 +3187,9 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3233,24 +3230,21 @@ namespace General {
                         state.dataGlobal->ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(state,
-                            " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
+                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(" Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
 
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state,
-                            " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
+                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(" Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
                     }
                 }
             }
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3281,12 +3275,12 @@ namespace General {
                         VRMLOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
 
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
                     }
                 }
             }
@@ -3300,10 +3294,9 @@ namespace General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3320,10 +3313,9 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3349,10 +3341,9 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(state,
-                                              cCurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3380,13 +3371,13 @@ namespace General {
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
                         state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     }
@@ -3405,13 +3396,13 @@ namespace General {
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
                         state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     }
@@ -3430,13 +3421,13 @@ namespace General {
                         state.dataRuntimeLang->OutputFullEMSTrace = true;
                         state.dataRuntimeLang->OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else {
-                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         state.dataRuntimeLang->OutputEMSErrors = false;
                         state.dataRuntimeLang->OutputFullEMSTrace = false;
                     }
@@ -3502,8 +3493,7 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                  std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -3514,7 +3504,7 @@ namespace General {
                                   bool &errFlag                                   // Error flag set to true if error found here.
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2012
@@ -3555,27 +3545,24 @@ namespace General {
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
         if (ItemLength > DataGlobalConstants::MaxNameLength) {
-            ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
-            ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
-            ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError(state,
-                              format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
+            ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+            ShowContinueError("Object Name=\"" + ItemName + "\".");
+            ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
+            ShowContinueError(format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
                                      ItemLength,
                                      DataGlobalConstants::MaxNameLength));
-            ShowContinueError(state,
-                              format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
+            ShowContinueError(format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
                                      MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
-            ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+            ShowContinueError("name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
 
         int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
         if (FoundItem != 0) {
-            ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError(state,
-                              format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
-            if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
+            ShowSevereError(calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+            ShowContinueError(format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
+            if (TooLong) ShowContinueError("Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;
         }

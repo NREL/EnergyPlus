@@ -79,7 +79,7 @@ namespace DataRuntimeLanguage {
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2012
@@ -113,32 +113,32 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '.')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if ((cFieldValue.length() > 0) && (has_any_of(cFieldValue[0], InvalidStartCharacters))) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
             errFlag = true;
             ErrorsFound = true;
         }
@@ -152,7 +152,7 @@ namespace DataRuntimeLanguage {
                                 bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2012
@@ -187,27 +187,27 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
+            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         //  pos=SCAN(cFieldValue(1:1),InvalidStartCharacters)
         //  IF (pos > 0) THEN
-        //    CALL ShowSevereError(state, TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
-        //    CALL ShowContinueError(state, '...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
+        //    CALL ShowSevereError(TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
+        //    CALL ShowContinueError('...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
         //    errFlag=.TRUE.
         //    ErrorsFound = .TRUE.
         //  ENDIF

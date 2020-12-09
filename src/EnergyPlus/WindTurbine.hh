@@ -142,16 +142,14 @@ namespace WindTurbine {
         }
     };
 
-    void SimWindTurbine(EnergyPlusData &state,
-                        GeneratorType GeneratorType,          // Type of Generator
+    void SimWindTurbine(GeneratorType GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
                         bool RunFlag,               // ON or OFF
                         Real64 WTLoad               // Electrical load on WT (not used)
     );
 
-    void GetWTGeneratorResults(EnergyPlusData &state,
-                               GeneratorType GeneratorType,  // Type of Generator
+    void GetWTGeneratorResults(GeneratorType GeneratorType,  // Type of Generator
                                int GeneratorIndex, // Generator number
                                Real64 &GeneratorPower,   // Electrical power
                                Real64 &GeneratorEnergy,  // Electrical energy
@@ -160,14 +158,13 @@ namespace WindTurbine {
 
     void GetWindTurbineInput();
 
-    void InitWindTurbine(EnergyPlusData &state, int WindTurbineNum);
+    void InitWindTurbine(int WindTurbineNum);
 
-    void CalcWindTurbine(EnergyPlusData &state,
-                         int WindTurbineNum, // System is on
+    void CalcWindTurbine(int WindTurbineNum, // System is on
                          bool RunFlag        // System is on
     );
 
-    void ReportWindTurbine(EnergyPlusData &state, int WindTurbineNum);
+    void ReportWindTurbine(int WindTurbineNum);
 
     //*****************************************************************************************
 

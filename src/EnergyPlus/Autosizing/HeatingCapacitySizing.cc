@@ -60,12 +60,13 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
     Real64 DesVolFlow = 0.0;
@@ -125,11 +126,11 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                         }
                         CoilInTemp =
-                            this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                            this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
                                                                       zoneEqSizing(this->curZoneEqNum),
                                                                       finalZoneSizing(this->curZoneEqNum));
                         CoilInHumRat =
-                            this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                            this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
                                                                         zoneEqSizing(this->curZoneEqNum),
                                                                         finalZoneSizing(this->curZoneEqNum));
                     } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
@@ -145,11 +146,11 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                         }
                         CoilInTemp =
-                            this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                            this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
                                                                       zoneEqSizing(this->curZoneEqNum),
                                                                       finalZoneSizing(this->curZoneEqNum));
                         CoilInHumRat =
-                            this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
+                            this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
                                                                         zoneEqSizing(this->curZoneEqNum),
                                                                         finalZoneSizing(this->curZoneEqNum));
                     }
@@ -192,19 +193,18 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     this->autoSizedValue = NominalCapacityDes * this->dataHeatSizeRatio * this->dataFracOfAutosizedHeatingCapacity;
                 }
                 if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
-                    ShowContinueError(state, format("...Rated Total Heating Capacity = {:.2T} [W]", this->autoSizedValue));
+                    ShowWarningMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowContinueError(format("...Rated Total Heating Capacity = {:.2T} [W]", this->autoSizedValue));
                     if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity ||
                         (this->dataCoolCoilCap > 0.0 && this->dataFlowUsedForSizing > 0.0)) {
-                        ShowContinueError(state,
-                                          format("...Capacity passed by parent object to size child component = {:.2T} [W]", NominalCapacityDes));
+                        ShowContinueError(format("...Capacity passed by parent object to size child component = {:.2T} [W]", NominalCapacityDes));
                     } else {
                         if (CoilOutTemp > -999.0) {
-                            ShowContinueError(state, format("...Air flow rate used for sizing = {:.5T} [m3/s]", DesVolFlow));
-                            ShowContinueError(state, format("...Coil inlet air temperature used for sizing = {:.2T} [C]", CoilInTemp));
-                            ShowContinueError(state, format("...Coil outlet air temperature used for sizing = {:.2T} [C]", CoilOutTemp));
+                            ShowContinueError(format("...Air flow rate used for sizing = {:.5T} [m3/s]", DesVolFlow));
+                            ShowContinueError(format("...Coil inlet air temperature used for sizing = {:.2T} [C]", CoilInTemp));
+                            ShowContinueError(format("...Coil outlet air temperature used for sizing = {:.2T} [C]", CoilOutTemp));
                         } else {
-                            ShowContinueError(state, "...Capacity used to size child component set to 0 [W]");
+                            ShowContinueError("...Capacity used to size child component set to 0 [W]");
                         }
                     }
                 }
@@ -286,7 +286,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
                             SimAirServingZones::Fan_System_Object) {
                         int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                        Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
+                        Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise();
                         CoilInTemp += DeltaT;
                     }
                 } else {
@@ -365,15 +365,15 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 }
                 this->autoSizedValue = NominalCapacityDes * this->dataHeatSizeRatio * this->dataFracOfAutosizedHeatingCapacity;
                 if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
-                    ShowContinueError(state, format("...Rated Total Heating Capacity = {:.2T} [W]", this->autoSizedValue));
+                    ShowWarningMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowContinueError(format("...Rated Total Heating Capacity = {:.2T} [W]", this->autoSizedValue));
                     if (CoilOutTemp > -999.0) {
-                        ShowContinueError(state, format("...Air flow rate used for sizing = {:.5T} [m3/s]", DesVolFlow));
-                        ShowContinueError(state, format("...Outdoor air fraction used for sizing = {:.2T}", OutAirFrac));
-                        ShowContinueError(state, format("...Coil inlet air temperature used for sizing = {:.2T} [C]", CoilInTemp));
-                        ShowContinueError(state, format("...Coil outlet air temperature used for sizing = {:.2T} [C]", CoilOutTemp));
+                        ShowContinueError(format("...Air flow rate used for sizing = {:.5T} [m3/s]", DesVolFlow));
+                        ShowContinueError(format("...Outdoor air fraction used for sizing = {:.2T}", OutAirFrac));
+                        ShowContinueError(format("...Coil inlet air temperature used for sizing = {:.2T} [C]", CoilInTemp));
+                        ShowContinueError(format("...Coil outlet air temperature used for sizing = {:.2T} [C]", CoilOutTemp));
                     } else {
-                        ShowContinueError(state, format("...Capacity passed by parent object to size child component = {:.2T} [W]", DesCoilLoad));
+                        ShowContinueError(format("...Capacity passed by parent object to size child component = {:.2T} [W]", DesCoilLoad));
                     }
                 }
             }
@@ -383,10 +383,10 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-            ShowSevereError(state, msg);
+            ShowSevereError(msg);
             this->addErrorMessage(msg);
             msg = format("SizingString = {}, SizingResult = {:.1T}", this->sizingString, this->autoSizedValue);
-            ShowContinueError(state, msg);
+            ShowContinueError(msg);
             this->addErrorMessage(msg);
             errorsFound = true;
         }
@@ -407,14 +407,13 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 }
                 if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
-                        ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                        ShowContinueError(state, "..." + this->sizingString +
+                        ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
+                        ShowContinueError("..." + this->sizingString +
                                           " will be limited by the minimum rated volume flow per rated total capacity ratio.");
-                        ShowContinueError(state, format("...DX coil volume flow rate (m3/s ) = {:.6T}", DesVolFlow));
-                        ShowContinueError(state, format("...Requested capacity (W ) = {:.3T}", this->autoSizedValue));
-                        ShowContinueError(state, format("...Requested flow/capacity ratio (m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
-                        ShowContinueError(state,
-                                          format("...Minimum flow/capacity ratio (m3/s/W ) = {:.3T}",
+                        ShowContinueError(format("...DX coil volume flow rate (m3/s ) = {:.6T}", DesVolFlow));
+                        ShowContinueError(format("...Requested capacity (W ) = {:.3T}", this->autoSizedValue));
+                        ShowContinueError(format("...Requested flow/capacity ratio (m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
+                        ShowContinueError(format("...Minimum flow/capacity ratio (m3/s/W ) = {:.3T}",
                                                  DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)));
                     }
 
@@ -423,18 +422,17 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     this->autoSizedValue = DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
-                        ShowContinueError(state, format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));
+                        ShowContinueError(format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));
                     }
                 } else if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
-                        ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                        ShowContinueError(state, "..." + this->sizingString +
+                        ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
+                        ShowContinueError("..." + this->sizingString +
                                           " will be limited by the maximum rated volume flow per rated total capacity ratio.");
-                        ShowContinueError(state, format("...DX coil volume flow rate ( m3/s ) = {:.6T}", DesVolFlow));
-                        ShowContinueError(state, format("...Requested capacity ( W ) = {:.3T}", this->autoSizedValue));
-                        ShowContinueError(state, format("...Requested flow/capacity ratio ( m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
-                        ShowContinueError(state,
-                                          format("...Maximum flow/capacity ratio ( m3/s/W ) = {:.3T}",
+                        ShowContinueError(format("...DX coil volume flow rate ( m3/s ) = {:.6T}", DesVolFlow));
+                        ShowContinueError(format("...Requested capacity ( W ) = {:.3T}", this->autoSizedValue));
+                        ShowContinueError(format("...Requested flow/capacity ratio ( m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
+                        ShowContinueError(format("...Maximum flow/capacity ratio ( m3/s/W ) = {:.3T}",
                                                  DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)));
                     }
 
@@ -443,7 +441,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     this->autoSizedValue = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
-                        ShowContinueError(state, format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));
+                        ShowContinueError(format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));
                     }
                 }
             }
@@ -464,19 +462,18 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         }
     }
 
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
 
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
-            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
-            coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, CoilInHumRat);
+            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
+            coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, CoilInHumRat);
         }
         if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
-            coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
-            coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
+            coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, CoilOutTemp);
+            coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, CoilOutHumRat);
         }
-        coilSelectionReportObj->setCoilHeatingCapacity(state,
-                                                       this->compName,
+        coilSelectionReportObj->setCoilHeatingCapacity(this->compName,
                                                        this->compType,
                                                        this->autoSizedValue,
                                                        this->wasAutoSized,

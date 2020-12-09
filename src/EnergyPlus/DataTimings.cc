@@ -197,7 +197,7 @@ namespace DataTimings {
         }
 
         if (found == 0) {
-            ShowFatalError(state, "epStopTime: No element=" + ctimingElementstring);
+            ShowFatalError("epStopTime: No element=" + ctimingElementstring);
         }
 
         TSTOP(stoptime);
@@ -308,7 +308,7 @@ namespace DataTimings {
 
     Real64 epGetTimeUsed(std::string const &ctimingElementstring)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -333,9 +333,9 @@ namespace DataTimings {
         }
 
         if (found == 0 && !state.dataErrTracking->AbortProcessing) {
-            ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowFatalError("epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowSevereError("epGetTimeUsed: No element=" + ctimingElementstring);
         }
 
         totalTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum;
@@ -345,7 +345,7 @@ namespace DataTimings {
 
     Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -370,9 +370,9 @@ namespace DataTimings {
         }
 
         if (found == 0) {
-            ShowFatalError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowFatalError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowSevereError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
         }
 
         if (state.dataTimingsData->Timing(found).calls > 0) {
@@ -386,7 +386,7 @@ namespace DataTimings {
 
     Real64 eptime()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie

@@ -65,8 +65,9 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
 {
+    EnergyPlusData & state = getCurrentState(0);
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -77,8 +78,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->ratedWasteHeatFractionOfPowerInput = input_data.rated_waste_heat_fraction_of_power_input;
     this->ratedCOP = input_data.gross_rated_cooling_COP;
-    errorsFound |= this->processCurve(state,
-                                      input_data.total_cooling_capacity_function_of_temperature_curve_name,
+    errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
                                       {1, 2},
                                       routineName,
@@ -86,16 +86,14 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                       RatedInletWetBulbTemp,
                                       RatedOutdoorAirTemp);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name,
+    errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name,
                                       this->indexCapFFF,
                                       {1},
                                       routineName,
                                       "Total Cooling Capacity Function of Air Flow Fraction Curve Name",
                                       1.0);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.energy_input_ratio_function_of_temperature_curve_name,
+    errorsFound |= this->processCurve(input_data.energy_input_ratio_function_of_temperature_curve_name,
                                       this->indexEIRFT,
                                       {1, 2},
                                       routineName,
@@ -103,16 +101,14 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                       RatedInletWetBulbTemp,
                                       RatedOutdoorAirTemp);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name,
+    errorsFound |= this->processCurve(input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name,
                                       this->indexEIRFFF,
                                       {1},
                                       routineName,
                                       "Energy Input Ratio Function of Air Flow Fraction Curve Name",
                                       1.0);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.sensible_heat_ratio_modifier_function_of_temperature_curve_name,
+    errorsFound |= this->processCurve(input_data.sensible_heat_ratio_modifier_function_of_temperature_curve_name,
                                       this->indexSHRFT,
                                       {2}, // Only allow bivariate functions since curve inputs are different from other f(Temp) functions
                                       routineName,
@@ -120,16 +116,14 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                       RatedInletWetBulbTemp,
                                       RatedOutdoorAirTemp);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name,
+    errorsFound |= this->processCurve(input_data.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name,
                                       this->indexSHRFFF,
                                       {1},
                                       routineName,
                                       "Sensible Heat Ratio Modifier Function of Air Flow Fraction Curve Name",
                                       1.0);
 
-    errorsFound |= this->processCurve(state,
-                                      input_data.waste_heat_function_of_temperature_curve_name,
+    errorsFound |= this->processCurve(input_data.waste_heat_function_of_temperature_curve_name,
                                       this->indexWHFT,
                                       {2},
                                       routineName,
@@ -138,20 +132,18 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                       RatedInletAirTemp);
 
     if (!errorsFound && !input_data.waste_heat_function_of_temperature_curve_name.empty()) {
-        Real64 CurveVal = CurveManager::CurveValue(state, this->indexWHFT, RatedOutdoorAirTemp, RatedInletAirTemp);
+        Real64 CurveVal = CurveManager::CurveValue(this->indexWHFT, RatedOutdoorAirTemp, RatedInletAirTemp);
         if (CurveVal > 1.10 || CurveVal < 0.90) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", curve values");
-            ShowContinueError(state, "Waste Heat Modifier Function of Temperature Curve Name = " + input_data.waste_heat_function_of_temperature_curve_name);
-            ShowContinueError(state,
-                "...Waste Heat Modifier Function of Temperature Curve Name output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-            ShowContinueError(state, format("...Curve output at rated conditions = {:.3T}", CurveVal));
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", curve values");
+            ShowContinueError("Waste Heat Modifier Function of Temperature Curve Name = " + input_data.waste_heat_function_of_temperature_curve_name);
+            ShowContinueError("...Waste Heat Modifier Function of Temperature Curve Name output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+            ShowContinueError(format("...Curve output at rated conditions = {:.3T}", CurveVal));
         }
     }
 
     std::string fieldName("Part Load Fraction Correlation Curve Name");
     std::string curveName(input_data.part_load_fraction_correlation_curve_name);
-    errorsFound |= this->processCurve(state,
-        input_data.part_load_fraction_correlation_curve_name, this->indexPLRFPLF, {1}, routineName, "Part Load Fraction Correlation Curve Name", 1.0);
+    errorsFound |= this->processCurve(input_data.part_load_fraction_correlation_curve_name, this->indexPLRFPLF, {1}, routineName, "Part Load Fraction Correlation Curve Name", 1.0);
 
     if (!errorsFound) {
         //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -160,7 +152,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
         Real64 CurveInput = 0.0;
         Real64 MinCurvePLR = 0.0, MaxCurvePLR = 0.0;
         while (CurveInput <= 1.0) {
-            Real64 CurveVal = CurveManager::CurveValue(state, this->indexPLRFPLF, CurveInput);
+            Real64 CurveVal = CurveManager::CurveValue(this->indexPLRFPLF, CurveInput);
             if (CurveVal < MinCurveVal) {
                 MinCurveVal = CurveVal;
                 MinCurvePLR = CurveInput;
@@ -172,29 +164,28 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             CurveInput += 0.01;
         }
         if (MinCurveVal < 0.7) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "..." + fieldName + "=\"" + curveName + "\" has out of range values.");
-            ShowContinueError(state, format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
-            ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
-            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, 0.7, _);
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("..." + fieldName + "=\"" + curveName + "\" has out of range values.");
+            ShowContinueError(format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
+            ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
+            CurveManager::SetCurveOutputMinMaxValues(this->indexPLRFPLF, errorsFound, 0.7, _);
         }
 
         if (MaxCurveVal > 1.0) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "..." + fieldName + " = " + curveName + " has out of range value.");
-            ShowContinueError(state, format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
-            ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
-            CurveManager::SetCurveOutputMinMaxValues(state, this->indexPLRFPLF, errorsFound, _, 1.0);
+            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("..." + fieldName + " = " + curveName + " has out of range value.");
+            ShowContinueError(format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
+            ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
+            CurveManager::SetCurveOutputMinMaxValues(this->indexPLRFPLF, errorsFound, _, 1.0);
         }
     }
 
     if (errorsFound) {
-        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
-bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
-                                              const std::string& curveName,
+bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
                                               const std::string &routineName,
@@ -205,33 +196,32 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                               Optional<Real64 const> Var4, // 4th independent variable
                                               Optional<Real64 const> Var5) // 5th independent variable
 {
+    EnergyPlusData & state = getCurrentState(0);
     if (curveName.empty()) {
         return false;
     } else {
-        curveIndex = CurveManager::GetCurveIndex(state, curveName);
+        curveIndex = CurveManager::GetCurveIndex(curveName);
         if (curveIndex == 0) {
-            ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "...not found " + fieldName + "=\"" + curveName + "\".");
+            ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowContinueError("...not found " + fieldName + "=\"" + curveName + "\".");
             return true;
         } else {
             // Verify Curve Object dimensions
-            bool errorFound = CurveManager::CheckCurveDims(state,
-                                                           curveIndex,        // Curve index
+            bool errorFound = CurveManager::CheckCurveDims(curveIndex,        // Curve index
                                                            std::move(validDims),         // Valid dimensions
                                                            routineName,       // Routine name
                                                            this->object_name, // Object Type
                                                            this->name,        // Object Name
                                                            fieldName);        // Field Name
             if (!errorFound) {
-                CurveManager::checkCurveIsNormalizedToOne(state,
-                    routineName + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
+                CurveManager::checkCurveIsNormalizedToOne(routineName + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
             }
             return errorFound;
         }
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_to_find)
     :
       // model inputs
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
@@ -277,7 +267,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
-    int numSpeeds = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitSpeed::object_name);
+    EnergyPlusData & state = getCurrentState(0);
+    int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
         // error
     }
@@ -286,7 +277,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(state, CoilCoolingDXCurveFitSpeed::object_name, speedNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitSpeed::object_name, speedNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -314,17 +305,18 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
         input_specs.sensible_heat_ratio_modifier_function_of_temperature_curve_name = cAlphaArgs(8);
         input_specs.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name = cAlphaArgs(9);
 
-        this->instantiateFromInputSpec(state, input_specs);
+        this->instantiateFromInputSpec(input_specs);
         break;
     }
 
     if (!found_it) {
-        ShowFatalError(state, "Could not find Coil:Cooling:DX:CurveFit:Speed object with name: " + name_to_find);
+        ShowFatalError("Could not find Coil:Cooling:DX:CurveFit:Speed object with name: " + name_to_find);
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDXCurveFitSpeed::size()
 {
+    EnergyPlusData & state = getCurrentState(0);
 
     std::string RoutineName = "sizeSpeed";
 
@@ -333,11 +325,10 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->parentModeRatedCondAirFlowRate;
     this->grossRatedSHR = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
-    this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                                state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+    this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
     this->RatedCondAirMassFlowRate =
         this->condenser_air_flow_rate *
-        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
     bool errorsFound = false;
@@ -348,14 +339,14 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     std::string stringOverride = "Rated Air Flow Rate [m3/s]";
     if (state.dataGlobal->isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
+    sizingCoolingAirFlow.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = sizingCoolingAirFlow.size(this->evap_air_flow_rate, errorsFound);
 
     std::string SizingString = "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+    this->rated_total_capacity = sizerCoolingCapacity.size(this->rated_total_capacity, errorsFound);
 
     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
@@ -363,15 +354,15 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
     bool errorFound = false;
     CoolingSHRSizer sizerCoolingSHR;
-    sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    sizerCoolingSHR.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
         DataSizing::DataSizingFraction = 0.667;
-        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
     } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
         DataSizing::DataSizingFraction = 0.333;
-        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
     } else {
-        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
     }
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
@@ -383,8 +374,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
         this->RatedCBF = 0.001;
     } else {
 
-    this->RatedCBF = CalcBypassFactor(state,
-                                          RatedInletAirTemp,
+    this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                           RatedInletAirHumRat,
                                           Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                           DataEnvironment::StdPressureSeaLevel);
@@ -392,10 +382,10 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
     const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int &fanOpMode, const Real64 condInletTemp)
 {
-
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("CalcSpeedOutput: ");
 
@@ -417,7 +407,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
         // This is bad - results in CBF = 1.0 which results in divide by zero below: hADP = inletState.h - hDelta / (1.0 - CBF)
-        ShowFatalError(state, format("{}Rated CBF={:.6R} is <= 0.0 for {}={}", RoutineName, RatedCBF, object_name, name));
+        ShowFatalError(format("{}Rated CBF={:.6R} is <= 0.0 for {}={}", RoutineName, RatedCBF, object_name, name));
         A0 = 0.0;
     }
     Real64 ADiff = -A0 / AirMassFlow;
@@ -427,7 +417,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         CBF = 0.0;
     }
 
-    Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, inletNode.Temp, inletNode.HumRat, ambPressure);
+    Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletNode.Temp, inletNode.HumRat, ambPressure);
     Real64 inletw = inletNode.HumRat;
 
     int Counter = 0;              // iteration counter for dry coil condition
@@ -441,14 +431,14 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
             if (state.dataCurveManager->PerfCurve(indexCapFT).NumDims == 2) {
-                TotCapTempModFac = CurveManager::CurveValue(state, indexCapFT, inletWetBulb, condInletTemp);
+                TotCapTempModFac = CurveManager::CurveValue(indexCapFT, inletWetBulb, condInletTemp);
             } else {
-                TotCapTempModFac = CurveManager::CurveValue(state, indexCapFT, condInletTemp);
+                TotCapTempModFac = CurveManager::CurveValue(indexCapFT, condInletTemp);
             }
         }
         Real64 TotCapFlowModFac = 1.0;
         if (indexCapFFF > 0) {
-            TotCapFlowModFac = CurveManager::CurveValue(state, indexCapFFF, AirFF);
+            TotCapFlowModFac = CurveManager::CurveValue(indexCapFFF, AirFF);
         }
 
         TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
@@ -457,12 +447,12 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         if (indexSHRFT > 0 && indexSHRFFF > 0) {
             Real64 SHRTempModFrac = 1.0;
             if (indexSHRFT > 0) {
-                SHRTempModFrac = max(CurveManager::CurveValue(state, indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
+                SHRTempModFrac = max(CurveManager::CurveValue(indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
             }
 
             Real64 SHRFlowModFrac = 1.0;
             if (indexSHRFFF > 0) {
-                SHRFlowModFrac = max(CurveManager::CurveValue(state, indexSHRFFF, AirFF), 0.0);
+                SHRFlowModFrac = max(CurveManager::CurveValue(indexSHRFFF, AirFF), 0.0);
             }
 
             SHR = this->grossRatedSHR * SHRTempModFrac * SHRFlowModFrac;
@@ -471,8 +461,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         } else {
             // Calculate apparatus dew point conditions using TotCap and CBF
             Real64 hADP = inletNode.Enthalpy - hDelta / (1.0 - CBF);
-            Real64 tADP = Psychrometrics::PsyTsatFnHPb(state, hADP, ambPressure, RoutineName);
-            Real64 wADP = Psychrometrics::PsyWFnTdbH(state, tADP, hADP, RoutineName);
+            Real64 tADP = Psychrometrics::PsyTsatFnHPb(hADP, ambPressure, RoutineName);
+            Real64 wADP = Psychrometrics::PsyWFnTdbH(tADP, hADP, RoutineName);
             Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(inletNode.Temp, wADP);
             if ((inletNode.Enthalpy - hADP) > 1.e-10) {
                 SHR = min((hTinwADP - hADP) / (inletNode.Enthalpy - hADP), 1.0);
@@ -487,7 +477,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
                 // capacity at the dry-out point to determine exiting conditions from coil. This is required
                 // since the TotCapTempModFac doesn't work properly with dry-coil conditions.
                 inletw = RF * wADP + (1.0 - RF) * inletw;
-                inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, inletNode.Temp, inletw, ambPressure);
+                inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletNode.Temp, inletw, ambPressure);
                 ++Counter;
                 if (std::abs(werror) > Tolerance) continue; // Recalculate with modified inlet conditions
                 break;
@@ -499,26 +489,26 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
     if (indexPLRFPLF > 0) {
-        PLF = CurveManager::CurveValue(state, indexPLRFPLF, _PLR); // Calculate part-load factor
+        PLF = CurveManager::CurveValue(indexPLRFPLF, _PLR); // Calculate part-load factor
     }
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
         if (state.dataCurveManager->PerfCurve(indexEIRFT).NumDims == 2) {
-            EIRTempModFac = CurveManager::CurveValue(state, indexEIRFT, inletWetBulb, condInletTemp);
+            EIRTempModFac = CurveManager::CurveValue(indexEIRFT, inletWetBulb, condInletTemp);
         } else {
-            EIRTempModFac = CurveManager::CurveValue(state, indexEIRFT, condInletTemp);
+            EIRTempModFac = CurveManager::CurveValue(indexEIRFT, condInletTemp);
         }
     }
     Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
     if (indexEIRFFF > 0) {
-        EIRFlowModFac = CurveManager::CurveValue(state, indexEIRFFF, AirFF);
+        EIRFlowModFac = CurveManager::CurveValue(indexEIRFFF, AirFF);
     }
 
     Real64 wastHeatempModFac = 1.0; // waste heat fraction as a function of temperature curve result
     if (indexWHFT > 0) {
-        wastHeatempModFac = CurveManager::CurveValue(state, indexWHFT, condInletTemp, inletNode.Temp);
+        wastHeatempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
@@ -528,40 +518,40 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);
-    outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, inletNode.Temp, hTinwout);
+    outletNode.HumRat = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout);
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &state, Real64 tdb, Real64 w, Real64 h, Real64 p)
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p)
 {
-
+    EnergyPlusData & state = getCurrentState(0);
     static std::string const RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF;
 
-    Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(state, p, tdb, w);
+    Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(p, tdb, w);
     Real64 deltaH = rated_total_capacity / airMassFlowRate;
     Real64 outp = p;
     Real64 outh = h - deltaH;
-    Real64 outw = Psychrometrics::PsyWFnTdbH(state, tdb, h - (1.0 - this->grossRatedSHR) * deltaH); // enthalpy at Tdb,in and Wout
+    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->grossRatedSHR) * deltaH); // enthalpy at Tdb,in and Wout
     Real64 outtdb = Psychrometrics::PsyTdbFnHW(outh, outw);
-    Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(state, outtdb, outw, outp);
+    Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(outtdb, outw, outp);
 
     if (outrh >= 1.0) {
-        Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(state, outh, outp, RoutineName);
+        Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(outh, outp, RoutineName);
         if (outtdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
             outtdb = outletAirTempSat + 0.005;
-            outw = Psychrometrics::PsyWFnTdbH(state, outtdb, outh, RoutineName);
+            outw = Psychrometrics::PsyWFnTdbH(outtdb, outh, RoutineName);
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
-            ShowWarningError(state, RoutineName + object_name + " \"" + name +
+            ShowWarningError(RoutineName + object_name + " \"" + name +
                              "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
-            ShowContinueError(state, format("Initial SHR = {:.5R}", this->grossRatedSHR));
-            ShowContinueError(state, format("Adjusted SHR = {:.5R}", adjustedSHR));
+            ShowContinueError(format("Initial SHR = {:.5R}", this->grossRatedSHR));
+            ShowContinueError(format("Adjusted SHR = {:.5R}", adjustedSHR));
         }
     }
 
     // ADP conditions
-    Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(state, outw, outp);
+    Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(outw, outp);
 
     std::size_t iter = 0;
     const std::size_t maxIter(50);
@@ -576,12 +566,12 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
     if (slopeAtConds <= 0.0) {
         // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
-        ShowSevereError(state, RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
-        ShowContinueError(state, format("deltaT = {:.3R} and deltaHumRat = {:.3R}", deltaT, deltaHumRat));
-        ShowFatalError(state, "Errors found in calculating coil bypass factors");
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
+        ShowContinueError(format("deltaT = {:.3R} and deltaHumRat = {:.3R}", deltaT, deltaHumRat));
+        ShowFatalError("Errors found in calculating coil bypass factors");
     }
 
-    Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(state, adp_tdb, DataEnvironment::StdPressureSeaLevel));
+    Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
 
     while ((iter <= maxIter) && (tolerance > 0.001)) {
 
@@ -589,7 +579,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
         if (iter > 0) adp_tdb += deltaADPTemp;
         ++iter;
         //  Find new slope using guessed Tadp
-        adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(state, adp_tdb, DataEnvironment::StdPressureSeaLevel));
+        adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
         Real64 slope = (w - adp_w) / max(0.001, (tdb - adp_tdb));
         //  check for convergence (slopes are equal to within error tolerance)
         Real64 error = (slope - slopeAtConds) / slopeAtConds;
@@ -609,27 +599,27 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     calcCBF = min(1.0, (outh - adp_h) / (h - adp_h));
 
     if (iter > maxIter) {
-        ShowSevereError(state, RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
-        ShowContinueError(state, format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR));
-        ShowContinueError(state, "may be causing this. The line defined by the coil rated inlet air conditions");
-        ShowContinueError(state, "(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
-        ShowContinueError(state, "the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this");
-        ShowContinueError(state, "intersection may not occur and the coil bypass factor calculation will not converge.");
-        ShowContinueError(state, "If autosizing the SHR, recheck the design supply air humidity ratio and design supply air");
-        ShowContinueError(state, "temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures");
-        ShowContinueError(state, "and humidity ratios specified in these two objects should be the same for each system");
-        ShowContinueError(state, "and the zones that it serves.");
-        ShowContinueErrorTimeStamp(state, "");
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
+        ShowContinueError(format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR));
+        ShowContinueError("may be causing this. The line defined by the coil rated inlet air conditions");
+        ShowContinueError("(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
+        ShowContinueError("the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this");
+        ShowContinueError("intersection may not occur and the coil bypass factor calculation will not converge.");
+        ShowContinueError("If autosizing the SHR, recheck the design supply air humidity ratio and design supply air");
+        ShowContinueError("temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures");
+        ShowContinueError("and humidity ratios specified in these two objects should be the same for each system");
+        ShowContinueError("and the zones that it serves.");
+        ShowContinueErrorTimeStamp("");
         cbfErrors = true; // Didn't converge within MaxIter iterations
     }
     if (calcCBF < 0.0) {
-        ShowSevereError(state, RoutineName + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
-        ShowContinueErrorTimeStamp(state, "");
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
+        ShowContinueErrorTimeStamp("");
         cbfErrors = true; // Negative CBF not valid
     }
     // Show fatal error for specific coil that caused a CBF error
     if (cbfErrors) {
-        ShowFatalError(state, RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
+        ShowFatalError(RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
     }
     return calcCBF;
 }

@@ -131,7 +131,7 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
 
     void getWeatherData();
 
@@ -139,15 +139,15 @@ public:
 
     void developMesh();
 
-    void performSimulation(EnergyPlusData& state);
+    void performSimulation();
 
     void updateSurfaceCellTemperature();
 
-    void updateGeneralDomainCellTemperature(int const cell);
+    void updateGeneralDomainCellTemperature(int cell);
 
     void updateBottomCellTemperature();
 
-    void initDomain(EnergyPlusData& state);
+    void initDomain();
 
     bool checkFinalTemperatureConvergence();
 
@@ -159,15 +159,15 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp(EnergyPlusData& state) override;
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(Real64 depth, Real64 timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(Real64 depth, int monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
-    Real64 interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low);
+    Real64 interpolate(Real64 x, Real64 x_hi, Real64 x_low, Real64 y_hi, Real64 y_low);
 
     Array2D<Real64> groundTemps;
 

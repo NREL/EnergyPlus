@@ -78,8 +78,9 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(int objectType, std::string objectName)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -106,11 +107,11 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
     // Search through finite diff models here
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (objectName == cAlphaArgs(1)) {
             // Read input into object here
@@ -133,20 +134,21 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         groundTempModels.push_back(thisModel);
 
         // Simulate
-        thisModel->initAndSim(state);
+        thisModel->initAndSim();
 
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
+void FiniteDiffGroundTempsModel::initAndSim()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -156,17 +158,18 @@ void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes and simulated finite difference ground temps model
 
-    FiniteDiffGroundTempsModel::getWeatherData(state);
+    FiniteDiffGroundTempsModel::getWeatherData();
 
     FiniteDiffGroundTempsModel::developMesh();
 
-    FiniteDiffGroundTempsModel::performSimulation(state);
+    FiniteDiffGroundTempsModel::performSimulation();
 }
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
+void FiniteDiffGroundTempsModel::getWeatherData()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -211,9 +214,9 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool EndHourFlag_reset = state.dataGlobal->EndHourFlag;
 
     if (!state.dataWeatherManager->WeatherFileExists) {
-        ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
-        ShowContinueError(state, "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
-        ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
+        ShowSevereError("Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
+        ShowContinueError("Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+        ShowFatalError("Simulation halted due to input error in ground temperature model.");
     }
 
     // We add a new period to force running all weather data
@@ -228,20 +231,20 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     // RunPeriod is initialized to be one year of simulation
     //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
-    WeatherManager::SetupEnvironmentTypes(state);
+    WeatherManager::SetupEnvironmentTypes();
 
     // We reset the counter to the original number of run periods, so that GetNextEnvironment will fetch the one we added
     state.dataWeatherManager->Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+    WeatherManager::GetNextEnvironment(Available, ErrorsFound);
     if (ErrorsFound) {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
+        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
     if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
+        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
     weatherDataArray.dimension(state.dataWeatherManager->NumDaysInYear);
@@ -299,7 +302,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                     }
                 }
 
-                WeatherManager::ManageWeather(state);
+                WeatherManager::ManageWeather();
 
                 outDryBulbTemp_num += state.dataEnvrn->OutDryBulbTemp;
                 airDensity_num += state.dataEnvrn->OutAirDensity;
@@ -455,8 +458,9 @@ void FiniteDiffGroundTempsModel::developMesh()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
+void FiniteDiffGroundTempsModel::performSimulation()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -471,7 +475,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     timeStepInSeconds = DataGlobalConstants::SecsInDay;
     bool convergedFinal = false;
 
-    initDomain(state);
+    initDomain();
 
     // Loop until converged
     do {
@@ -816,8 +820,9 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
+void FiniteDiffGroundTempsModel::initDomain()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -852,7 +857,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
 
         // Initialize temperatures
         if (tempModel) {
-            thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds(state, depth, 0.0); // Initialized at first day of year
+            thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds(depth, 0.0); // Initialized at first day of year
         }
         thisCell.temperature_finalConvergence = thisCell.temperature;
         thisCell.temperature_prevIteration = thisCell.temperature;
@@ -945,8 +950,9 @@ Real64 FiniteDiffGroundTempsModel::interpolate(Real64 const x, Real64 const x_hi
 
 //******************************************************************************
 
-Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
+Real64 FiniteDiffGroundTempsModel::getGroundTemp()
 {
+    EnergyPlusData & state = getCurrentState(0);
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -1065,8 +1071,9 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 
 //******************************************************************************
 
-Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const _depth, Real64 const seconds)
+Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth, Real64 const seconds)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -1087,13 +1094,14 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
     }
 
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
 
-Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const _depth, int const month)
+Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, int const month)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -1116,7 +1124,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

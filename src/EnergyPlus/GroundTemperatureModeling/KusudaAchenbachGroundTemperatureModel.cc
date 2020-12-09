@@ -64,8 +64,9 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Kusuda model factory
-std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory(int objectType, std::string objectName)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -91,11 +92,11 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (objectName == cAlphaArgs(1)) {
 
@@ -124,10 +125,10 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
                 std::shared_ptr<BaseGroundTempsModel> shallowObj =
-                    GetGroundTempModelAndInit(state, CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
+                    GetGroundTempModelAndInit(CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
-                    Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);
+                    Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(0.0, monthIndex);
 
                     // Calculate Average Ground Temperature for all 12 months of the year:
                     averageGroundTemp += currMonthTemp;
@@ -164,15 +165,16 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
+        ShowFatalError("Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
+Real64 KusudaGroundTempsModel::getGroundTemp()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // AUTHOR         Matt Mitchell
     // DATE WRITTEN   June 2015
     // MODIFIED       na
@@ -203,8 +205,9 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const _depth, Real64 const _seconds)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth, Real64 const _seconds)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -227,13 +230,14 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& stat
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const _depth, int const _month)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, int const _month)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -257,7 +261,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData& state
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

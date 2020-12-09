@@ -64,8 +64,9 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Site:GroundTemperature:Shallow factory
-std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactory(int objectType, std::string objectName)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -89,7 +90,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -97,10 +98,10 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -112,7 +113,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
         state.dataEnvrn->GroundTemp_SurfaceObjInput = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
     } else {
         thisModel->surfaceGroundTemps = 13.0;
@@ -125,14 +126,14 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
+        ShowContinueError("Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
+Real64 SiteShallowGroundTemps::getGroundTemp()
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -148,8 +149,9 @@ Real64 SiteShallowGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &st
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -173,13 +175,14 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     }
 
     // Get and return ground temp
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
+    EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -197,7 +200,7 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state
     }
 
     // Get and return ground temp
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

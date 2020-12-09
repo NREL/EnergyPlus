@@ -61,22 +61,21 @@ struct EnergyPlusData;
 
 void ReportSurfaces();
 
-void LinesOut(EnergyPlusData &state, std::string const &option);
+void LinesOut(std::string const &option);
 
-void DXFOut(EnergyPlusData &state,
-            std::string const &PolygonAction,
+void DXFOut(std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 );
 
-void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme);
+void DXFOutLines(std::string const &ColorScheme);
 
-void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme);
+void DXFOutWireFrame(std::string const &ColorScheme);
 
-void DetailsForSurfaces(EnergyPlusData &state, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
 
 void CostInfoOut();
 
-void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std::string &ColorScheme);
+void VRMLOut(const std::string &PolygonAction, const std::string &ColorScheme);
 
 } // namespace EnergyPlus
 

@@ -252,8 +252,9 @@ void SizingLog::ProcessRunningAverage()
     }
 }
 
-ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
+ZoneTimestepObject SizingLog::GetLogVariableDataMax()
 {
+    EnergyPlusData & state = getCurrentState(0);
     Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;
     MaxVal = 0.0;
@@ -267,7 +268,7 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
         } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Unassigned) { // null timestamp, problem to fix
-            ShowWarningMessage(state, "GetLogVariableDataMax: null timestamp in log");
+            ShowWarningMessage("GetLogVariableDataMax: null timestamp in log");
         }
     }
     return tmpztStepStamp;
@@ -296,8 +297,9 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
     newEnvrnToSeedEnvrnMap[newEnvrnNum] = seedEnvrnNum;
 }
 
-int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage)
+int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage)
 {
+    EnergyPlusData & state = getCurrentState(0);
     int VectorLength(0);
     int const HoursPerDay(24);
 
@@ -350,8 +352,9 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
     return NumOfLogs - 1;
 }
 
-void SizingLoggerFramework::SetupSizingLogsNewEnvironment(EnergyPlusData& state)
+void SizingLoggerFramework::SetupSizingLogsNewEnvironment()
 {
+    EnergyPlusData & state = getCurrentState(0);
     using namespace WeatherManager;
 
     for (auto &l : logObjs) {
@@ -359,8 +362,9 @@ void SizingLoggerFramework::SetupSizingLogsNewEnvironment(EnergyPlusData& state)
     }
 }
 
-ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusData& state)
+ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
 {
+    EnergyPlusData & state = getCurrentState(0);
     // prepare current timing data once and then pass into fill routines
     // function used by both zone and system frequency log updates
 
@@ -384,24 +388,26 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
     return tmpztStepStamp;
 }
 
-void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(EnergyPlusData& state)
+void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 {
+    EnergyPlusData & state = getCurrentState(0);
     ZoneTimestepObject tmpztStepStamp;
 
-    tmpztStepStamp = PrepareZoneTimestepStamp(state);
+    tmpztStepStamp = PrepareZoneTimestepStamp();
 
     for (auto &l : logObjs) {
         l.FillZoneStep(tmpztStepStamp);
     }
 }
 
-void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData& state)
+void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 {
+    EnergyPlusData & state = getCurrentState(0);
     Real64 const MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;
 
-    tmpztStepStamp = PrepareZoneTimestepStamp(state);
+    tmpztStepStamp = PrepareZoneTimestepStamp();
 
     // pepare system timestep stamp
     tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute;
@@ -435,8 +441,9 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCount)
 {
+    EnergyPlusData & state = getCurrentState(0);
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalHeatingSizingFactorMode;
@@ -576,43 +583,38 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
 
     // report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPrevVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizMeasVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCalcVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
+    PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPrevVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
+    PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizMeasVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
+    PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizCalcVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
 
     if (setNewSizes) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
+        PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
     } else {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
+        PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
     }
 
     if (!nullStampProblem) {
         if (!changedByDemand && !CheckTimeStampForNull(newFoundMassFlowRateTimeStamp)) { // bug fix #5665
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
+                PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPkTimeMin,
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeMin,
                              PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                              newFoundMassFlowRateTimeStamp.stepStartMinute,
                              0);
         } else if (changedByDemand && !CheckTimeStampForNull(NewFoundMaxDemandTimeStamp)) { // bug fix #5665
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
+                PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
         }
     }
 }

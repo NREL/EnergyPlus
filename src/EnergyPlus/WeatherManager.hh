@@ -512,14 +512,14 @@ namespace WeatherManager {
     };
 
     // Functions
-    void ManageWeather(EnergyPlusData& state);
+    void ManageWeather();
 
     void ResetEnvironmentCounter();
 
-    bool GetNextEnvironment(EnergyPlusData &state, bool &Available, bool &ErrorsFound);
+    bool GetNextEnvironment(bool &Available, bool &ErrorsFound);
 
     void
-    AddDesignSetToEnvironmentStruct(EnergyPlusData &state, int HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
+    AddDesignSetToEnvironmentStruct(int HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
     );
 
     bool CheckIfAnyUnderwaterBoundaries();
@@ -532,9 +532,9 @@ namespace WeatherManager {
 
     void UpdateLocationAndOrientation();
 
-    void SetupWeekDaysByMonth(EnergyPlusData &state, int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
+    void SetupWeekDaysByMonth(int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
 
-    void ResetWeekDaysByMonth(EnergyPlusData &state, Array1D_int &WeekDays,
+    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
                               int AddLeapYear,
                               int StartMonth,
                               int StartMonthDay,
@@ -543,29 +543,27 @@ namespace WeatherManager {
                               bool Rollover,
                               bool MidSimReset = false);
 
-    void SetDSTDateRanges(EnergyPlusData &state, Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
+    void SetDSTDateRanges(Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
                           Array1D_int &DSTIdx,           // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon = _,
                           Optional_int DSTActStDay = _,
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(EnergyPlusData &state, Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 
-    void InitializeWeather(EnergyPlusData &state, bool &printEnvrnStamp); // Set to true when the environment header should be printed
+    void InitializeWeather(bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void UpdateWeatherData();
 
     void SetCurrentWeather();
 
-    void ReadWeatherForDay(EnergyPlusData &state,
-                           int DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(int DayToRead,          // =1 when starting out, otherwise signifies next day
                            int Environ,            // Environment being simulated
                            bool BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(EnergyPlusData &state,
-                                int DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(int DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int Environ,            // Environment being simulated
                                 bool BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
@@ -576,9 +574,9 @@ namespace WeatherManager {
                                    int &currentDayOfWeek // Current Day of Week
     );
 
-    void ErrorInterpretWeatherDataLine(EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
 
-    void InterpretWeatherDataLine(EnergyPlusData &state, std::string &Line,
+    void InterpretWeatherDataLine(std::string &Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
@@ -615,14 +613,14 @@ namespace WeatherManager {
                                   Real64 &LiquidPrecip       // LiquidPrecip
     );
 
-    void SetUpDesignDay(EnergyPlusData &state, int EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(int EnvrnNum); // Environment number passed into the routine
 
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
-    void ASHRAETauModel([[maybe_unused]] EnergyPlusData &state, DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel(DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
                         Real64 CosZen,                    // COS( solar zenith angle), 0 - 1
                         Real64 TauB,                      // beam tau factor
@@ -634,8 +632,7 @@ namespace WeatherManager {
 
     void AllocateWeatherData();
 
-    void CalculateDailySolarCoeffs(EnergyPlusData &state,
-                                   int DayOfYear,                 // Day of year (1 - 366)
+    void CalculateDailySolarCoeffs(int DayOfYear,                 // Day of year (1 - 366)
                                    Real64 &A,                     // ASHRAE "A" - Apparent solar irradiation at air mass = 0 [W/M**2]
                                    Real64 &B,                     // ASHRAE "B" - Atmospheric extinction coefficient
                                    Real64 &C,                     // ASHRAE "C" - Diffuse radiation factor
@@ -645,25 +642,23 @@ namespace WeatherManager {
                                    Real64 &CosineSolarDeclination // Cosine of Solar Declination
     );
 
-    void CalculateSunDirectionCosines(EnergyPlusData &state,
-                                      Real64 TimeValue,    // Current Time of Day
+    void CalculateSunDirectionCosines(Real64 TimeValue,    // Current Time of Day
                                       Real64 EqOfTime,     // Equation of Time
                                       Real64 SinSolDeclin, // Sine of Solar Declination
                                       Real64 CosSolDeclin, // Cosine of Solar Declination
                                       Array1D<Real64> &SUNCOS);
 
-    void DetermineSunUpDown(EnergyPlusData &state, Array1D<Real64> &SunDirectionCosines);
+    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines);
 
-    void OpenWeatherFile(EnergyPlusData &state, bool &ErrorsFound);
+    void OpenWeatherFile(bool &ErrorsFound);
 
-    void OpenEPlusWeatherFile(EnergyPlusData &state,
-                              bool &ErrorsFound, // Will be set to true if errors found
+    void OpenEPlusWeatherFile(bool &ErrorsFound, // Will be set to true if errors found
                               bool ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
     void CloseWeatherFile();
 
-    void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
@@ -671,56 +666,53 @@ namespace WeatherManager {
 
     void ReportOutputFileHeaders();
 
-    void ReportWeatherAndTimeInformation(EnergyPlusData &state,
-                                         bool &printEnvrnStamp); // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput();
 
-    void GetRunPeriodData(EnergyPlusData &state, int &nRunPeriods, // Total number of Run Periods requested
+    void GetRunPeriodData(int &nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound);
 
-    void GetRunPeriodDesignData(EnergyPlusData &state, bool &ErrorsFound);
+    void GetRunPeriodDesignData(bool &ErrorsFound);
 
-    void GetSpecialDayPeriodData(EnergyPlusData &state, bool &ErrorsFound); // will be set to true if severe errors are found in inputs
+    void GetSpecialDayPeriodData(bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
     void CalcSpecialDayTypes();
 
-    void GetDSTData(EnergyPlusData &state, bool &ErrorsFound); // will be set to true if severe errors are found in inputs
+    void GetDSTData(bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
-    void GetDesignDayData(EnergyPlusData &state, int &TotDesDays, // Total number of Design days to Setup
+    void GetDesignDayData(int &TotDesDays, // Total number of Design days to Setup
                           bool &ErrorsFound);
 
-    void GetLocationInfo(EnergyPlusData &state, bool &ErrorsFound);
+    void GetLocationInfo(bool &ErrorsFound);
 
-    void GetWeatherProperties(EnergyPlusData &state, bool &ErrorsFound);
+    void GetWeatherProperties(bool &ErrorsFound);
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
+    void GetGroundTemps(bool &ErrorsFound);
 
-    void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound);
+    void GetGroundReflectances(bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(EnergyPlusData &state, bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(bool &ErrorsFound);
 
-    void GetWaterMainsTemperatures(EnergyPlusData &state, bool &ErrorsFound);
+    void GetWaterMainsTemperatures(bool &ErrorsFound);
 
     void CalcWaterMainsTemp();
 
-    Real64 WaterMainsTempFromCorrelation(EnergyPlusData &state,
-                                         Real64 AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
+    Real64 WaterMainsTempFromCorrelation(Real64 AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
                                          Real64 MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
+    void GetWeatherStation(bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 
-    void DayltgLuminousEfficacy(EnergyPlusData &state,
-                                Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
+    void DayltgLuminousEfficacy(Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
                                 Real64 &DirLumEff   // Luminous efficacy of beam solar radiation (lum/W)
     );
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
     void SkipEPlusWFHeader();
 
@@ -749,7 +741,7 @@ namespace WeatherManager {
 
     GregorianDate computeGregorianDate(int jdate);
 
-    WeekDay calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
+    WeekDay calculateDayOfWeek(int year, int month, int day);
 
     int calculateDayOfYear(int Month, int Day, bool leapYear = false);
 
@@ -776,7 +768,7 @@ namespace WeatherManager {
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
     void ReportWaterMainsTempParameters();
-    void calcSky(EnergyPlusData &state, Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
+    void calcSky(Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager
 

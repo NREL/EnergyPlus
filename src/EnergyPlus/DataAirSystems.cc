@@ -94,18 +94,18 @@ namespace DataAirSystems {
 
     Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 
         if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
 
         switch (dataFanEnumType) {
         case DataAirSystems::structArrayLegacyFanModels: {
-            fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
+            fanDesHeatLoad = Fans::FanDesHeatGain(dataFanIndex, desVolFlow);
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
-            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
+            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(desVolFlow);
             break;
         }
         case DataAirSystems::fanModelTypeNotYetSet: {

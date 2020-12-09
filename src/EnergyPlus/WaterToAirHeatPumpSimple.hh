@@ -184,7 +184,7 @@ namespace WaterToAirHeatPumpSimple {
         }
     };
 
-    void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimWatertoAirHPSimple(std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -207,7 +207,7 @@ namespace WaterToAirHeatPumpSimple {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum,                    // Current HPNum under simulation
+    void InitSimpleWatertoAirHP(int const HPNum,                    // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                                 Real64 const HPTimeConstant,        // Heat pump time constant [s]
                                 Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
@@ -218,9 +218,9 @@ namespace WaterToAirHeatPumpSimple {
                                 bool const FirstHVACIteration       // Iteration flag
     );
 
-    void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum);
+    void SizeHVACWaterToAir(int const HPNum);
 
-    void CalcHPCoolingSimple(EnergyPlusData &state, int const HPNum,               // Heat Pump Number
+    void CalcHPCoolingSimple(int const HPNum,               // Heat Pump Number
                              int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
                              Real64 const RuntimeFrac,      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                              Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
@@ -230,7 +230,7 @@ namespace WaterToAirHeatPumpSimple {
                              Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     );
 
-    void CalcHPHeatingSimple(EnergyPlusData &state, int const HPNum,               // Heat Pump Number
+    void CalcHPHeatingSimple(int const HPNum,               // Heat Pump Number
                              int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
                              Real64 const RuntimeFrac,      // Runtime Fraction of compressor
                              Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
@@ -239,12 +239,12 @@ namespace WaterToAirHeatPumpSimple {
                              Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     );
 
-    void UpdateSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum);
+    void UpdateSimpleWatertoAirHP(int const HPNum);
 
     //        End of Update subroutines for the WatertoAirHP Module
     // *****************************************************************************
 
-    Real64 CalcEffectiveSHR(EnergyPlusData &state, int const HPNum,         // Index number for cooling coil
+    Real64 CalcEffectiveSHR(int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             int const CyclingScheme, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
@@ -254,32 +254,32 @@ namespace WaterToAirHeatPumpSimple {
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     );
 
-    int GetCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndex(std::string const &CoilType, // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type
                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilAirFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilAirFlowRate(std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void SetSimpleWSHPData(EnergyPlusData &state, int const SimpleWSHPNum,                  // Number of OA Controller
+    void SetSimpleWSHPData(int const SimpleWSHPNum,                  // Number of OA Controller
                            bool &ErrorsFound,                        // Set to true if certain errors found
                            int const WaterCyclingMode,               // the coil water flow mode (cycling, constant or constantondemand)
                            Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum

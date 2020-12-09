@@ -152,33 +152,32 @@ namespace TranspiredCollector {
         }
     };
 
-    void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
+    void SimTranspiredCollector(std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     );
 
     void GetTranspiredCollectorInput();
 
-    void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
+    void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
+    void CalcActiveTranspiredCollector(int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
+    void CalcPassiveTranspiredCollector(int const UTSCNum);
 
-    void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
+    void UpdateTranspiredCollector(int const UTSCNum);
 
-    void SetUTSCQdotSource(EnergyPlusData &state, int const UTSCNum,
+    void SetUTSCQdotSource(int const UTSCNum,
                            Real64 const QSource // source term in Watts
     );
 
-    void GetTranspiredCollectorIndex(EnergyPlusData &state, int const SurfacePtr, int &UTSCIndex);
+    void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex);
 
-    void GetUTSCTsColl(EnergyPlusData &state, int const UTSCNum, Real64 &TsColl);
+    void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
+    int GetAirInletNodeNum(std::string const &UTSCName, bool &ErrorsFound
     );
 
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
+    int GetAirOutletNodeNum(std::string const &UTSCName, bool &ErrorsFound
     );
 
 } // namespace TranspiredCollector

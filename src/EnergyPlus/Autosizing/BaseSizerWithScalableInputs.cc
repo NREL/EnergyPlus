@@ -55,13 +55,12 @@
 
 namespace EnergyPlus {
 
-void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
-                                                     const std::string &_compType,
+void BaseSizerWithScalableInputs::initializeWithinEP(const std::string &_compType,
                                                      const std::string &_compName,
                                                      const bool &_printWarningFlag,
                                                      const std::string &_callingRoutine)
 {
-    BaseSizerWithFanHeatInputs::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    BaseSizerWithFanHeatInputs::initializeWithinEP(_compType, _compName, _printWarningFlag, _callingRoutine);
 
     this->dataScalableSizingON = DataSizing::DataScalableSizingON;
     this->dataScalableCapSizingON = DataSizing::DataScalableCapSizingON;
@@ -100,8 +99,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
             if (SupFanNum > 0) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                             this->compName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(this->compName,
                                                              this->compType,
                                                              Fans::Fan(SupFanNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
@@ -111,8 +109,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
             if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                             this->compName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(this->compName,
                                                              this->compType,
                                                              HVACFan::fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
                                                              DataAirSystems::objectVectorOOFanSystemModel,

@@ -563,5 +563,8 @@ struct EnergyPlusData : BaseGlobalStruct {
 
 };
 
+EnergyPlusData & getCurrentState(unsigned int i);
+void createNewStateVector();
+
 }
 #endif

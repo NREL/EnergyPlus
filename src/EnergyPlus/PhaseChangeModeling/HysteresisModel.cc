@@ -63,10 +63,11 @@ namespace HysteresisPhaseChange {
     int numHysteresisModels = 0;
     std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-    HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
+    HysteresisPhaseChange *HysteresisPhaseChange::factory(const std::string &objectName)
     {
+        EnergyPlusData & state = getCurrentState(0);
         if (getHysteresisModels) {
-            readAllHysteresisModels(state);
+            readAllHysteresisModels();
             getHysteresisModels = false;
         }
         for (auto &hm : hysteresisPhaseChangeModels) {
@@ -318,12 +319,13 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void readAllHysteresisModels(EnergyPlusData &state)
+    void readAllHysteresisModels()
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // convenience variables
         DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
+        numHysteresisModels = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum) {
@@ -334,8 +336,7 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(state,
-                                          DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           hmNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           numAlphas,
@@ -351,13 +352,13 @@ namespace HysteresisPhaseChange {
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
             if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
             for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
                 if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }

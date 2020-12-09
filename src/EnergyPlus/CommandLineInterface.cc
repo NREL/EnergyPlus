@@ -68,7 +68,7 @@ namespace CommandLineInterface {
 
     int ProcessArgs(int argc, const char *argv[])
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         typedef std::string::size_type size_type;
 
         // Expand long-name options using "=" sign into two arguments
@@ -115,7 +115,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -192,12 +192,12 @@ namespace CommandLineInterface {
 
         // Process standard arguments
         if (opt.isSet("-h")) {
-            DisplayString(state, usage);
+            DisplayString(usage);
             exit(EXIT_SUCCESS);
         }
 
         if (opt.isSet("-v")) {
-            DisplayString(state, VerString);
+            DisplayString(VerString);
             exit(EXIT_SUCCESS);
         }
 
@@ -222,19 +222,19 @@ namespace CommandLineInterface {
                 std::string const &arg(*opt.lastArgs[i]);
                 if (arg.substr(0, 1) == "-") {
                     invalidOptionFound = true;
-                    DisplayString(state, "ERROR: Invalid option: " + arg);
+                    DisplayString("ERROR: Invalid option: " + arg);
                 }
             }
             if (invalidOptionFound) {
-                DisplayString(state, errorFollowUp);
+                DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             } else {
-                DisplayString(state, "ERROR: Multiple input files specified:");
+                DisplayString("ERROR: Multiple input files specified:");
                 for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
                     std::string const &arg(*opt.lastArgs[i]);
-                    DisplayString(state, format("  Input file #{}: {}", i + 1, arg));
+                    DisplayString(format("  Input file #{}: {}", i + 1, arg));
                 }
-                DisplayString(state, errorFollowUp);
+                DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             }
         }
@@ -253,21 +253,21 @@ namespace CommandLineInterface {
         } else if (inputFileExt == "CBOR") {
             state.dataGlobal->isEpJSON = true;
             state.dataGlobal->isCBOR = true;
-            DisplayString(state, "CBOR input format is experimental and unsupported.");
+            DisplayString("CBOR input format is experimental and unsupported.");
         } else if (inputFileExt == "MSGPACK") {
             state.dataGlobal->isEpJSON = true;
             state.dataGlobal->isMsgPack = true;
-            DisplayString(state, "MsgPack input format is experimental and unsupported.");
+            DisplayString("MsgPack input format is experimental and unsupported.");
         } else if (inputFileExt == "UBJSON") {
             state.dataGlobal->isEpJSON = true;
             state.dataGlobal->isUBJSON = true;
-            DisplayString(state, "UBJSON input format is experimental and unsupported.");
+            DisplayString("UBJSON input format is experimental and unsupported.");
         } else if (inputFileExt == "BSON") {
             state.dataGlobal->isEpJSON = true;
             state.dataGlobal->isBSON = true;
-            DisplayString(state, "BSON input format is experimental and unsupported.");
+            DisplayString("BSON input format is experimental and unsupported.");
         } else {
-            DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
+            DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
             exit(EXIT_FAILURE);
         }
 
@@ -363,8 +363,8 @@ namespace CommandLineInterface {
             shdSuffix = "Shading";
 
         } else {
-            DisplayString(state, "ERROR: Unrecognized argument for output suffix style: " + suffixType);
-            DisplayString(state, errorFollowUp);
+            DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
@@ -464,38 +464,38 @@ namespace CommandLineInterface {
         // Handle bad options
         if (!opt.gotExpected(badOptions)) {
             for (size_type i = 0; i < badOptions.size(); ++i) {
-                DisplayString(state, "ERROR: Unexpected number of arguments for option " + badOptions[i]);
+                DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i]);
             }
-            DisplayString(state, errorFollowUp);
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         // This is a place holder in case there are required options in the future
         if (!opt.gotRequired(badOptions)) {
             for (size_type i = 0; i < badOptions.size(); ++i) {
-                DisplayString(state, "ERROR: Missing required option " + badOptions[i]);
+                DisplayString("ERROR: Missing required option " + badOptions[i]);
             }
-            DisplayString(state, errorFollowUp);
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         if (opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0) {
             for (size_type i = 1; i < opt.firstArgs.size(); ++i) {
                 std::string const &arg(*opt.firstArgs[i]);
-                DisplayString(state, "ERROR: Invalid option: " + arg);
+                DisplayString("ERROR: Invalid option: " + arg);
             }
             for (size_type i = 0; i < opt.unknownArgs.size(); ++i) {
                 std::string const &arg(*opt.unknownArgs[i]);
-                DisplayString(state, "ERROR: Invalid option: " + arg);
+                DisplayString("ERROR: Invalid option: " + arg);
             }
-            DisplayString(state, errorFollowUp);
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         // Error for cases where both design-day and annual simulation switches are set
         if (state.dataGlobal->DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
-            DisplayString(state, "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
-            DisplayString(state, errorFollowUp);
+            DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
@@ -505,7 +505,7 @@ namespace CommandLineInterface {
         if (fileExists(state.files.iniFile.fileName)) {
             auto iniFile = state.files.iniFile.try_open();
             if (!iniFile.good()) {
-                DisplayString(state, "ERROR: Could not open file " + iniFile.fileName + " for input (read).");
+                DisplayString("ERROR: Could not open file " + iniFile.fileName + " for input (read).");
                 exit(EXIT_FAILURE);
             }
             CurrentWorkingFolder = iniFile.fileName;
@@ -524,15 +524,15 @@ namespace CommandLineInterface {
 
         // Check if specified files exist
         if (!fileExists(inputFileName)) {
-            DisplayString(state, "ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + ".");
-            DisplayString(state, errorFollowUp);
+            DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + ".");
+            DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!fileExists(state.files.inputWeatherFileName.fileName)) {
-                DisplayString(state, "ERROR: Could not find weather file: " + getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
-                DisplayString(state, errorFollowUp);
+                DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
+                DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             }
         }
@@ -543,14 +543,14 @@ namespace CommandLineInterface {
         if (runEPMacro) {
             std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
             if (!fileExists(epMacroPath)) {
-                DisplayString(state, "ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + ".");
+                DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + ".");
                 exit(EXIT_FAILURE);
             }
             std::string epMacroCommand = "\"" + epMacroPath + "\"";
             bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
 
             if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.imf");
-            DisplayString(state, "Running EPMacro...");
+            DisplayString("Running EPMacro...");
             systemCall(epMacroCommand);
             if (!inputFileNamedIn) removeFile("in.imf");
             moveFile("audit.out", outputEpmdetFileName);
@@ -561,7 +561,7 @@ namespace CommandLineInterface {
         if (runExpandObjects) {
             std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
             if (!fileExists(expandObjectsPath)) {
-                DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + ".");
+                DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + ".");
                 exit(EXIT_FAILURE);
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
@@ -569,8 +569,8 @@ namespace CommandLineInterface {
 
             // check if IDD actually exists since ExpandObjects still requires it
             if (!fileExists(inputIddFileName)) {
-                DisplayString(state, "ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
-                DisplayString(state, errorFollowUp);
+                DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
+                DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             }
 
@@ -731,13 +731,13 @@ namespace CommandLineInterface {
 
     int runReadVarsESO()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 
         if (!fileExists(readVarsPath)) {
             readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
             if (!fileExists(readVarsPath)) {
-                DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
+                DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
                 return EXIT_FAILURE;
             }
         }
@@ -749,7 +749,7 @@ namespace CommandLineInterface {
         if (!rviFileExists) {
             std::ofstream ofs{RVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << state.files.eso.fileName << '\n';
                 ofs << state.files.csv.fileName << '\n';
@@ -760,7 +760,7 @@ namespace CommandLineInterface {
         if (!mviFileExists) {
             std::ofstream ofs{MVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << state.files.mtr.fileName << '\n';
                 ofs << state.files.mtr_csv.fileName << '\n';

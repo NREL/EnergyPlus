@@ -122,11 +122,11 @@ namespace PlantLoadProfile {
         }
 
         // Functions
-        static PlantComponent *factory(EnergyPlusData &state, std::string objectName);
+        static PlantComponent *factory(std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void InitPlantProfile();
 

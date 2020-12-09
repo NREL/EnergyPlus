@@ -118,13 +118,12 @@ namespace HVACDuct {
 
     // Functions
 
-    void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,                    // name of the duct component
+    void SimDuct(std::string const &CompName,                    // name of the duct component
                  [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                                  // index of duct component
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005
@@ -140,7 +139,7 @@ namespace HVACDuct {
         int DuctNum;                    // index of duct being simulated
 
         if (GetInputFlag) {
-            GetDuctInput(state);
+            GetDuctInput();
             GetInputFlag = false;
         }
 
@@ -148,20 +147,18 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
             if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + CompName);
+                ShowFatalError("SimDuct: Component not found=" + CompName);
             }
             CompIndex = DuctNum;
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
                 ShowFatalError(
-                    state,
                     format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, NumDucts, CompName));
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError(state,
-                                   format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
+                    ShowFatalError(format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
                                           DuctNum,
                                           CompName,
                                           Duct(DuctNum).Name));
@@ -170,18 +167,18 @@ namespace HVACDuct {
             }
         }
 
-        InitDuct(state, DuctNum);
+        InitDuct(DuctNum);
 
         CalcDuct(DuctNum);
 
-        UpdateDuct(state, DuctNum);
+        UpdateDuct(DuctNum);
 
         ReportDuct(DuctNum);
     }
 
-    void GetDuctInput(EnergyPlusData &state)
+    void GetDuctInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005
@@ -208,13 +205,12 @@ namespace HVACDuct {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         cCurrentModuleObject = "Duct";
-        NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumDucts = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         Duct.allocate(NumDucts);
         CheckEquipName.dimension(NumDucts, true);
 
         for (DuctNum = 1; DuctNum <= NumDucts; ++DuctNum) {
-            inputProcessor->getObjectItem(state,
-                                          cCurrentModuleObject,
+            inputProcessor->getObjectItem(cCurrentModuleObject,
                                           DuctNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -225,25 +221,24 @@ namespace HVACDuct {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Duct(DuctNum).Name = cAlphaArgs(1);
-            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
         }
 
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + " Errors found in input");
+            ShowFatalError(RoutineName + " Errors found in input");
         }
     }
 
-    void InitDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
+    void InitDuct(int const DuctNum) // number of the current duct being simulated
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -335,9 +330,9 @@ namespace HVACDuct {
         // na
     }
 
-    void UpdateDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
+    void UpdateDuct(int const DuctNum) // number of the current duct being simulated
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005

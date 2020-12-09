@@ -84,35 +84,35 @@ namespace RoomAirModelUserTempPattern {
 
     void clear_state();
 
-    void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void ManageUserDefinedPatterns(int const ZoneNum); // index number for the specified zone
 
     //****************************************************
 
-    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void InitTempDistModel(int const ZoneNum); // index number for the specified zone
 
-    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcTempDistModel(int const ZoneNum); // index number for the specified zone
 
-    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
+    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum);
 
-    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
+    void FigureHeightPattern(int const PattrnID, int const ZoneNum);
 
-    void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
+    void FigureTwoGradInterpPattern(int const PattrnID, int const ZoneNum);
 
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, Real64 UpperBound, Real64 HiGradient, Real64 LowerBound, Real64 LowGradient);
 
-    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
+    void FigureConstGradPattern(int const PattrnID, int const ZoneNum);
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf); // index in main Surface array
+    Real64 FigureNDheightInZone(int const thisHBsurf); // index in main Surface array
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 

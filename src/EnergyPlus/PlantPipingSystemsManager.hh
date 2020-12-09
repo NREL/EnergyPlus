@@ -584,7 +584,7 @@ namespace PlantPipingSystemsManager {
             return this->Name == a;
         }
 
-        static Segment *factory(EnergyPlusData &state, std::string segmentName);
+        static Segment *factory(std::string segmentName);
     };
 
     struct Circuit : public PlantComponent {
@@ -640,16 +640,16 @@ namespace PlantPipingSystemsManager {
 
         void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-        static PlantComponent *factory(EnergyPlusData &state, int, std::string objectName);
+        static PlantComponent *factory(int, std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
         bool operator==(std::string const & a) {
             return this->Name == a;
         }
 
-        static Circuit *factory(EnergyPlusData &state, std::string circuit, bool & errorsFound);
+        static Circuit *factory(std::string circuit, bool & errorsFound);
     };
 
     struct ZoneCoupledSurfaceData {
@@ -805,7 +805,7 @@ namespace PlantPipingSystemsManager {
 
         void createPartitionCenterList();
 
-        std::vector<GridRegion> createPartitionRegionList(EnergyPlusData &state, std::vector<MeshPartition> const &ThesePartitionCenters,
+        std::vector<GridRegion> createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
                                                           bool PartitionsExist,
                                                           Real64 DirExtentMax);
 
@@ -855,7 +855,7 @@ namespace PlantPipingSystemsManager {
 
         void UpdateZoneSurfaceTemperatures();
 
-        Real64 GetAverageTempByType(EnergyPlusData &state, CellType cellType);
+        Real64 GetAverageTempByType(CellType cellType);
 
         void InitializeSoilMoistureCalcs();
 
@@ -877,19 +877,19 @@ namespace PlantPipingSystemsManager {
 
         void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
 
-        void DoEndOfIterationOperations(EnergyPlusData &state, bool &Finished);
+        void DoEndOfIterationOperations(bool &Finished);
 
-        void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
+        void DoOneTimeInitializations(Circuit * thisCircuit);
 
         void DoStartOfTimeStepInitializations();
 
-        void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
+        void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
 
-        Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
+        Real64 GetFarfieldTemp(CartesianCell const &cell);
 
         void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
-        void PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit * thisCircuit);
+        void PerformPipeCircuitSimulation(Circuit * thisCircuit);
 
         void
         PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
@@ -900,22 +900,22 @@ namespace PlantPipingSystemsManager {
 
         Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
 
-        Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
+        Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
 
         Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
 
         Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
-        Real64 EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell);
+        Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
 
-        void EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+        void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                              Real64 &resistance, Real64 &adiabaticMultiplier);
 
         void PerformIterationLoop();
 
-        void PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit);
+        void PerformIterationLoop(Circuit * thisCircuit);
 
-        void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
+        void InitPipingSystems(Circuit * thisCircuit);
 
         void UpdatePipingSystems(Circuit * thisCircuit);
 
@@ -930,7 +930,7 @@ namespace PlantPipingSystemsManager {
 
     void clear_state();
 
-    void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
+    void SimulateGroundDomains(bool initOnly);
 
     void CheckIfAnySlabs();
 
@@ -938,31 +938,30 @@ namespace PlantPipingSystemsManager {
 
     void GetPipingSystemsAndGroundDomainsInput();
 
-    void ReadGeneralDomainInputs(EnergyPlusData &state, const int IndexStart, const int NumGeneralizedDomains, bool &ErrorsFound);
+    void ReadGeneralDomainInputs(const int IndexStart, const int NumGeneralizedDomains, bool &ErrorsFound);
 
-    void ReadZoneCoupledDomainInputs(EnergyPlusData &state, const int StartingDomainNumForZone, const int NumZoneCoupledDomains, bool &ErrorsFound);
+    void ReadZoneCoupledDomainInputs(const int StartingDomainNumForZone, const int NumZoneCoupledDomains, bool &ErrorsFound);
 
-    void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
+    void ReadBasementInputs(const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
 
-    bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
+    bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                         int const MaterialNum);
 
-    void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
+    void SiteGroundDomainNoMassMatError(std::string const &FieldName,
                                         std::string const &UserInputField,
                                         std::string const &ObjectName);
 
-    void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound);
+    void ReadPipeCircuitInputs(bool &ErrorsFound);
 
-    void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound);
+    void ReadPipeSegmentInputs(bool &ErrorsFound);
 
-    void ReadHorizontalTrenchInputs(EnergyPlusData &state,
-                                    const int StartingDomainNumForHorizontal,
+    void ReadHorizontalTrenchInputs(const int StartingDomainNumForHorizontal,
                                     const int StartingCircuitNumForHorizontal,
                                     bool &ErrorsFound);
 
     void SetupPipingSystemOutputVariables();
 
-    void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,
@@ -970,7 +969,7 @@ namespace PlantPipingSystemsManager {
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
-    void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
+    void IssueSevereInputFieldError(std::string const &RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,

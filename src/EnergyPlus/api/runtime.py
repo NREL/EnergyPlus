@@ -100,7 +100,7 @@ class Runtime:
 
         An example call:
         state = api.state_manager.new_state()
-        run_energyplus(state, ['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
+        run_energyplus(['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
@@ -129,7 +129,7 @@ class Runtime:
         # it wouldn't be a callable item.  cli_arg_type is actually a callable type, so I'm muting this warning.
         # noinspection PyCallingNonCallable
         cli_args = cli_arg_type(*args_with_program_name)
-        return self.api.energyplus(state, len(args_with_program_name), cli_args)
+        return self.api.energyplus(len(args_with_program_name), cli_args)
 
     # def stop_simulation(self, state: c_void_p) -> None:
     #     pass
@@ -151,7 +151,7 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueWarning(state, message)
+        self.api.issueWarning(message)
 
     def issue_severe(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
@@ -174,7 +174,7 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueSevere(state, message)
+        self.api.issueSevere(message)
 
     def issue_text(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
@@ -194,7 +194,7 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueText(state, message)
+        self.api.issueText(message)
 
     def callback_progress(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -208,7 +208,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_progress')
         cb_ptr = self.py_progress_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.registerProgressCallback(state, cb_ptr)
+        self.api.registerProgressCallback(cb_ptr)
 
     def callback_message(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -224,7 +224,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_message')
         cb_ptr = self.py_message_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.registerStdOutCallback(state, cb_ptr)
+        self.api.registerStdOutCallback(cb_ptr)
 
     def callback_begin_new_environment(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -238,7 +238,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_begin_new_environment')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginNewEnvironment(state, cb_ptr)
+        self.api.callbackBeginNewEnvironment(cb_ptr)
 
     def callback_after_new_environment_warmup_complete(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -252,7 +252,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_after_new_environment_warmup_complete')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterNewEnvironmentWarmupComplete(state, cb_ptr)
+        self.api.callbackAfterNewEnvironmentWarmupComplete(cb_ptr)
 
     def callback_begin_zone_timestep_before_init_heat_balance(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -266,7 +266,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_begin_zone_timestep_before_init_heat_balance')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance(state, cb_ptr)
+        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance(cb_ptr)
 
     def callback_begin_zone_timestep_after_init_heat_balance(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -280,7 +280,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_begin_zone_timestep_after_init_heat_balance')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance(state, cb_ptr)
+        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance(cb_ptr)
 
     def callback_begin_system_timestep_before_predictor(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -294,7 +294,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_begin_system_timestep_before_predictor')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginTimeStepBeforePredictor(state, cb_ptr)
+        self.api.callbackBeginTimeStepBeforePredictor(cb_ptr)
 
     def callback_begin_zone_timestep_before_set_current_weather(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -308,7 +308,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_begin_zone_timestep_before_set_current_weather')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather(state, cb_ptr)
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather(cb_ptr)
 
     def callback_after_predictor_before_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -322,7 +322,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_after_predictor_before_hvac_managers')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterPredictorBeforeHVACManagers(state, cb_ptr)
+        self.api.callbackAfterPredictorBeforeHVACManagers(cb_ptr)
 
     def callback_after_predictor_after_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -336,7 +336,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_after_predictor_after_hvac_managers')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterPredictorAfterHVACManagers(state, cb_ptr)
+        self.api.callbackAfterPredictorAfterHVACManagers(cb_ptr)
 
     def callback_inside_system_iteration_loop(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -350,7 +350,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_inside_system_iteration_loop')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackInsideSystemIterationLoop(state, cb_ptr)
+        self.api.callbackInsideSystemIterationLoop(cb_ptr)
 
     def callback_end_zone_timestep_before_zone_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -364,7 +364,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_zone_timestep_before_zone_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting(state, cb_ptr)
+        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting(cb_ptr)
 
     def callback_end_zone_timestep_after_zone_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -378,7 +378,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_zone_timestep_after_zone_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneTimeStepAfterZoneReporting(state, cb_ptr)
+        self.api.callbackEndOfZoneTimeStepAfterZoneReporting(cb_ptr)
 
     def callback_end_system_timestep_before_hvac_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -392,7 +392,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_system_timestep_before_hvac_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting(state, cb_ptr)
+        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting(cb_ptr)
 
     def callback_end_system_timestep_after_hvac_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -406,7 +406,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_system_timestep_after_hvac_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemTimeStepAfterHVACReporting(state, cb_ptr)
+        self.api.callbackEndOfSystemTimeStepAfterHVACReporting(cb_ptr)
 
     def callback_end_zone_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -420,7 +420,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_zone_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneSizing(state, cb_ptr)
+        self.api.callbackEndOfZoneSizing(cb_ptr)
 
     def callback_end_system_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -434,7 +434,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_end_system_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemSizing(state, cb_ptr)
+        self.api.callbackEndOfSystemSizing(cb_ptr)
 
     def callback_after_component_get_input(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -448,7 +448,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_after_component_get_input')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfAfterComponentGetInput(state, cb_ptr)
+        self.api.callbackEndOfAfterComponentGetInput(cb_ptr)
 
     # user defined component callbacks are not allowed, they are coupled directly to a specific EMS manager/PythonPlugin
     # def callback_user_defined_component_model(self, f: FunctionType) -> None:
@@ -464,7 +464,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_unitary_system_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackUnitarySystemSizing(state, cb_ptr)
+        self.api.callbackUnitarySystemSizing(cb_ptr)
 
     def callback_register_external_hvac_manager(self, state: c_void_p, f: FunctionType) -> None:
         """
@@ -480,7 +480,7 @@ class Runtime:
         self._check_callback_args(f, 1, 'callback_register_external_hvac_manager')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.registerExternalHVACManager(state, cb_ptr)
+        self.api.registerExternalHVACManager(cb_ptr)
 
     @staticmethod
     def clear_callbacks() -> None:

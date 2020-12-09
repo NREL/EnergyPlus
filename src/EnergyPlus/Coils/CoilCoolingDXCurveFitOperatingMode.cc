@@ -61,8 +61,9 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
+void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
+    EnergyPlusData & state = getCurrentState(0);
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
@@ -80,9 +81,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     // Must all be greater than zero to use the latent capacity degradation model
     if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
         (this->maxCyclingRate <= 0.0 || this->evapRateRatio <= 0.0 || this->latentTimeConst <= 0.0 || this->timeForCondensateRemoval <= 0.0)) {
-        ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\":");
-        ShowContinueError(state, "...At least one of the four input parameters for the latent capacity degradation model");
-        ShowContinueError(state, "...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
+        ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\":");
+        ShowContinueError("...At least one of the four input parameters for the latent capacity degradation model");
+        ShowContinueError("...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
     }
 
     if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
@@ -90,23 +91,24 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = EVAPCOOLED;
     } else {
-        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
-        ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Condenser Type=\"" + input_data.condenser_type + "\":");
+        ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
         errorsFound = true;
     }
     for (auto &speed_name : input_data.speed_data_names) {
-        this->speeds.emplace_back(state, speed_name);
+        this->speeds.emplace_back(speed_name);
     }
 
     if (errorsFound) {
-        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find)
 {
-    int numModes = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitOperatingMode::object_name);
+    EnergyPlusData & state = getCurrentState(0);
+    int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
         // error
     }
@@ -116,7 +118,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            state, CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -143,18 +145,18 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
             input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
         }
 
-        this->instantiateFromInputSpec(state, input_specs);
+        this->instantiateFromInputSpec(input_specs);
         break;
     }
 
     if (!found_it) {
-        ShowFatalError(state, "Could not find Coil:Cooling:DX:CurveFit:OperatingMode object with name: " + name_to_find);
+        ShowFatalError("Could not find Coil:Cooling:DX:CurveFit:OperatingMode object with name: " + name_to_find);
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDXCurveFitOperatingMode::size()
 {
-
+EnergyPlusData & state = getCurrentState(0);
     std::string RoutineName = "sizeOperatingMode";
     std::string CompType = this->object_name;
     std::string CompName = this->name;
@@ -166,22 +168,22 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
     if (state.dataGlobal->isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+    sizingCoolingAirFlow.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
 
     Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate =
         this->ratedEvapAirFlowRate *
-        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedGrossTotalCap = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+    this->ratedGrossTotalCap = sizerCoolingCapacity.size(TempSize, errorsFound);
 
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
@@ -192,8 +194,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     stringOverride = "Rated Condenser Air Flow Rate [m3/s]";
     if (state.dataGlobal->isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
-    sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
+    sizerCondAirFlow.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+    this->ratedCondAirFlowRate = sizerCondAirFlow.size(TempSize, errorsFound);
 
 
     if (this->condenserType != AIRCOOLED) {
@@ -204,20 +206,19 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
         stringOverride = "Nominal Evaporative Condenser Pump Power [W]";
         sizerCondEvapPumpPower.overrideSizingString(stringOverride);
         TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
-        sizerCondEvapPumpPower.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-        this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(state, TempSize, errorsFound);
+        sizerCondEvapPumpPower.initializeWithinEP(CompType, CompName, PrintFlag, RoutineName);
+        this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(TempSize, errorsFound);
     }
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
         curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
-        curSpeed.size(state);
+        curSpeed.size();
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlusData &state,
-                                                           const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
                                                            DataLoopNode::NodeData &outletNode,
                                                            Real64 &PLR,
                                                            int &speedNum,
@@ -226,15 +227,14 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            DataLoopNode::NodeData &condInletNode,
                                                            [[maybe_unused]] DataLoopNode::NodeData &condOutletNode)
 {
-
+    EnergyPlusData & state = getCurrentState(0);
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
     if (this->condenserType == CondenserType::AIRCOOLED) {
         this->condInletTemp = condInletNode.Temp;
     } else if (this->condenserType == CondenserType::EVAPCOOLED) {
-        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(state,
-            condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
+        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
     // thisspeed.ambPressure = inletNode.Press;
     thisspeed.ambPressure = state.dataEnvrn->OutBaroPress;
@@ -261,7 +261,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         plr1 = speedRatio;
     }
 
-    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
+    thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
 
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
@@ -282,7 +282,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
         lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow;
 
-        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
+        lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
         outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;

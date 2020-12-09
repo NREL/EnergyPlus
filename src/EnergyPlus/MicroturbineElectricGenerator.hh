@@ -199,21 +199,18 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state,
-                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation,
                                  [[maybe_unused]] Real64 &MaxLoad,
                                  [[maybe_unused]] Real64 &MinLoad,
                                  [[maybe_unused]] Real64 &OptLoad) override;
 
-        void InitMTGenerators(EnergyPlusData &state,
-                              bool RunFlag,
+        void InitMTGenerators(bool RunFlag,
                               Real64 MyLoad, // electrical load in W
                               bool FirstHVACIteration);
 
-        void CalcMTGeneratorModel(EnergyPlusData &state,
-                                  bool RunFlag, // TRUE when generator is being asked to operate
+        void CalcMTGeneratorModel(bool RunFlag, // TRUE when generator is being asked to operate
                                   Real64 MyLoad // Generator demand (W)
         );
 
@@ -221,7 +218,7 @@ namespace MicroturbineElectricGenerator {
 
         void setupOutputVars();
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators

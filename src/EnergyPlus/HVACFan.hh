@@ -68,16 +68,16 @@ struct EnergyPlusData;
 
 namespace HVACFan {
 
-    int getFanObjectVectorIndex(EnergyPlusData &state, std::string const &objectName, bool const CheckFlag = true);
+    int getFanObjectVectorIndex(std::string const &objectName, bool const CheckFlag = true);
 
-    bool checkIfFanNameIsAFanSystem(EnergyPlusData &state, std::string const &objectName);
+    bool checkIfFanNameIsAFanSystem(std::string const &objectName);
 
     class FanSystem
     {
 
     public: // Methods
         // Constructor
-        FanSystem(EnergyPlusData &state, std::string const &objectName);
+        FanSystem(std::string const &objectName);
 
         // Destructor
         ~FanSystem()
@@ -87,7 +87,7 @@ namespace HVACFan {
         // Copy Constructor
         FanSystem(FanSystem const &) = default;
 
-        void simulate(EnergyPlusData &state,
+        void simulate(
             //		bool const firstHVACIteration,
             Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
             Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
@@ -108,10 +108,10 @@ namespace HVACFan {
 
         Real64 getFanDesignTemperatureRise() const;
 
-        Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
+        Real64 getFanDesignHeatGain(Real64 const FanVolFlow);
 
         void
-        FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
+        FanInputsForDesignHeatGain(Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
         // void
         // fanIsSecondaryDriver();
@@ -146,15 +146,14 @@ namespace HVACFan {
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
 
     private: // methods
         void init();
 
         void set_size();
 
-        void calcSimpleSystemFan(EnergyPlusData &state,
-                                 Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+        void calcSimpleSystemFan(Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
                                  Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
                                  Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
                                  Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1

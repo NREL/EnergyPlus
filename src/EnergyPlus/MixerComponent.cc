@@ -127,9 +127,9 @@ namespace MixerComponent {
         MixerCond.deallocate();
     }
 
-    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+    void SimAirMixer(std::string const &CompName, int &CompIndex)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -151,7 +151,7 @@ namespace MixerComponent {
 
         // Obtains and Allocates Mixer related parameters from input file
         if (SimAirMixerInputFlag) { // First time subroutine has been entered
-            GetMixerInput(state);
+            GetMixerInput();
             SimAirMixerInputFlag = false;
         }
 
@@ -159,19 +159,18 @@ namespace MixerComponent {
         if (CompIndex == 0) {
             MixerNum = UtilityRoutines::FindItemInList(CompName, MixerCond, &MixerConditions::MixerName);
             if (MixerNum == 0) {
-                ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + CompName);
+                ShowFatalError("SimAirLoopMixer: Mixer not found=" + CompName);
             }
             CompIndex = MixerNum;
         } else {
             MixerNum = CompIndex;
             if (MixerNum > NumMixers || MixerNum < 1) {
                 ShowFatalError(
-                    state, format("SimAirLoopMixer: Invalid CompIndex passed={}, Number of Mixers={}, Mixer name={}", MixerNum, NumMixers, CompName));
+                    format("SimAirLoopMixer: Invalid CompIndex passed={}, Number of Mixers={}, Mixer name={}", MixerNum, NumMixers, CompName));
             }
             if (CheckEquipName(MixerNum)) {
                 if (CompName != MixerCond(MixerNum).MixerName) {
-                    ShowFatalError(state,
-                                   format("SimAirLoopMixer: Invalid CompIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
+                    ShowFatalError(format("SimAirLoopMixer: Invalid CompIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
                                           MixerNum,
                                           CompName,
                                           MixerCond(MixerNum).MixerName));
@@ -186,7 +185,7 @@ namespace MixerComponent {
         CalcAirMixer(MixerNum);
 
         // Update the current Mixer to the outlet nodes
-        UpdateAirMixer(state, MixerNum);
+        UpdateAirMixer(MixerNum);
 
         // Report the current Mixer
         ReportMixer(MixerNum);
@@ -195,9 +194,9 @@ namespace MixerComponent {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetMixerInput(EnergyPlusData &state)
+    void GetMixerInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -236,12 +235,12 @@ namespace MixerComponent {
 
         // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-        NumMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumMixers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (NumMixers > 0) MixerCond.allocate(NumMixers);
         CheckEquipName.dimension(NumMixers, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);
@@ -250,8 +249,7 @@ namespace MixerComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (MixerNum = 1; MixerNum <= NumMixers; ++MixerNum) {
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           MixerNum,
                                           AlphArray,
                                           NumAlphas,
@@ -262,12 +260,11 @@ namespace MixerComponent {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             MixerCond(MixerNum).MixerName = AlphArray(1);
 
-            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(state,
-                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
             for (auto &e : MixerCond)
@@ -300,7 +297,7 @@ namespace MixerComponent {
 
             for (NodeNum = 1; NodeNum <= MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
 
-                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(2 + NodeNum),
+                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum),
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphArray(1),
@@ -309,7 +306,7 @@ namespace MixerComponent {
                                                                            1,
                                                                            ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
-                    ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowSevereError(cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -321,19 +318,19 @@ namespace MixerComponent {
             NodeNum = MixerCond(MixerNum).OutletNode;
             for (InNodeNum1 = 1; InNodeNum1 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
                 if (NodeNum != MixerCond(MixerNum).InletNode(InNodeNum1)) continue;
-                ShowSevereError(state, CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
+                ShowSevereError(CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
                                 " specifies an inlet node name the same as the outlet node.");
-                ShowContinueError(state, ".." + cAlphaFields(2) + " = " + NodeID(NodeNum));
-                ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum1));
+                ShowContinueError(".." + cAlphaFields(2) + " = " + NodeID(NodeNum));
+                ShowContinueError(format("..Inlet Node #{} is duplicate.", InNodeNum1));
                 ErrorsFound = true;
             }
             for (InNodeNum1 = 1; InNodeNum1 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
                 for (InNodeNum2 = InNodeNum1 + 1; InNodeNum2 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum2) {
                     if (MixerCond(MixerNum).InletNode(InNodeNum1) != MixerCond(MixerNum).InletNode(InNodeNum2)) continue;
-                    ShowSevereError(state, CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
+                    ShowSevereError(CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
                                     " specifies duplicate inlet nodes in its inlet node list.");
-                    ShowContinueError(state, format("..Inlet Node #{} Name={}", InNodeNum1, NodeID(InNodeNum1)));
-                    ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum2));
+                    ShowContinueError(format("..Inlet Node #{} Name={}", InNodeNum1, NodeID(InNodeNum1)));
+                    ShowContinueError(format("..Inlet Node #{} is duplicate.", InNodeNum2));
                     ErrorsFound = true;
                 }
             }
@@ -347,7 +344,7 @@ namespace MixerComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowFatalError(RoutineName + "Errors found in getting input.");
         }
     }
 
@@ -517,9 +514,9 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum)
+    void UpdateAirMixer(int const MixerNum)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -622,9 +619,9 @@ namespace MixerComponent {
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
 
-    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
+    void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2015
@@ -636,31 +633,31 @@ namespace MixerComponent {
         // is not legal mixer.
 
         if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
-            GetMixerInput(state);
+            GetMixerInput();
             GetZoneMixerIndexInputFlag = false;
         }
 
         MixerIndex = UtilityRoutines::FindItemInList(MixerName, MixerCond, &MixerConditions::MixerName);
         if (MixerIndex == 0) {
             if (!ThisObjectType.empty()) {
-                ShowSevereError(state, ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+                ShowSevereError(ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
             } else {
-                ShowSevereError(state, "GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+                ShowSevereError("GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
             }
             ErrorsFound = true;
         }
     }
 
-    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+    int getZoneMixerIndexFromInletNode(int const &InNodeNum)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MixerNum;  // loop counter
         int InNodeCtr; // loop counter
         int thisMixer;
 
         if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
-            GetMixerInput(state);
+            GetMixerInput();
             GetZoneMixerIndexInputFlag = false;
         }
 

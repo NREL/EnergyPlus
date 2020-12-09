@@ -62,7 +62,7 @@ struct EnergyPlusData;
 
 namespace ZoneAirLoopEquipmentManager {
 
-    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -73,11 +73,11 @@ namespace ZoneAirLoopEquipmentManager {
 
     void GetZoneAirLoopEquipment();
 
-    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
+    void InitZoneAirLoopEquipment(int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitZoneAirLoopEquipmentTimeStep(EnergyPlusData &state, int const AirDistUnitNum);
+    void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
-    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative

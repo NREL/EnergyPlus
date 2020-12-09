@@ -527,7 +527,7 @@ namespace HeatRecovery {
 
     void clear_state();
 
-    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -542,21 +542,19 @@ namespace HeatRecovery {
 
     void GetHeatRecoveryInput();
 
-    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
-    void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum);
+    void SizeHeatRecovery(int const ExchNum);
 
-    void CalcAirToAirPlateHeatExch(EnergyPlusData &state,
-                                   int const ExNum,                        // number of the current heat exchanger being simulated
+    void CalcAirToAirPlateHeatExch(int const ExNum,                        // number of the current heat exchanger being simulated
                                    bool const HXUnitOn,                    // flag to simulate heat exchager heat recovery
                                    Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
                                    Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys
     );
 
-    void CalcAirToAirGenericHeatExch(EnergyPlusData &state,
-                                     int const ExNum,                           // number of the current heat exchanger being simulated
+    void CalcAirToAirGenericHeatExch(int const ExNum,                           // number of the current heat exchanger being simulated
                                      bool const HXUnitOn,                       // flag to simulate heat exchanger heat recovery
                                      bool const FirstHVACIteration,             // first HVAC iteration flag
                                      int const FanOpMode,                       // Supply air fan operating mode (1=cycling, 2=constant)
@@ -565,8 +563,7 @@ namespace HeatRecovery {
                                      Optional<Real64 const> HXPartLoadRatio = _ //
     );
 
-    void CalcDesiccantBalancedHeatExch(EnergyPlusData &state,
-                                       int const ExNum,               // number of the current heat exchanger being simulated
+    void CalcDesiccantBalancedHeatExch(int const ExNum,               // number of the current heat exchanger being simulated
                                        bool const HXUnitOn,           // flag to simulate heat exchager heat recovery
                                        bool const FirstHVACIteration, // First HVAC iteration flag
                                        int const FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
@@ -577,31 +574,28 @@ namespace HeatRecovery {
                                        Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys
     );
 
-    void FrostControl(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
+    void FrostControl(int const ExNum); // number of the current heat exchanger being simulated
 
-    void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
+    void UpdateHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
 
     void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
 
     Real64 SafeDiv(Real64 const a, Real64 const b);
 
-    void CalculateEpsFromNTUandZ(EnergyPlusData &state,
-                                 Real64 const NTU,  // number of transfer units
+    void CalculateEpsFromNTUandZ(Real64 const NTU,  // number of transfer units
                                  Real64 const Z,    // capacity rate ratio
                                  int const FlowArr, // flow arrangement
                                  Real64 &Eps        // heat exchanger effectiveness
     );
 
-    void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
-                                 Real64 &NTU,       // number of transfer units
+    void CalculateNTUfromEpsAndZ(Real64 &NTU,       // number of transfer units
                                  int &Err,          // error indicator
                                  Real64 const Z,    // capacity rate ratio
                                  int const FlowArr, // flow arrangement
                                  Real64 const Eps   // heat exchanger effectiveness
     );
 
-    Real64 GetNTUforCrossFlowBothUnmixed(EnergyPlusData &state,
-                                         Real64 const Eps, // heat exchanger effectiveness
+    Real64 GetNTUforCrossFlowBothUnmixed(Real64 const Eps, // heat exchanger effectiveness
                                          Real64 const Z    // capacity rate ratio
     );
 
@@ -609,8 +603,7 @@ namespace HeatRecovery {
                                         Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
     );
 
-    void CheckModelBoundsTempEq(EnergyPlusData &state,
-                                int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsTempEq(int const ExchNum,            // number of the current heat exchanger being simulated
                                 Real64 &T_RegenInTemp,        // current regen inlet temperature (C) for regen outlet temp eqn
                                 Real64 &T_RegenInHumRat,      // current regen inlet hum rat for regen outlet temp eqn
                                 Real64 &T_ProcInTemp,         // current process inlet temperature (C) for regen outlet temp eqn
@@ -619,8 +612,7 @@ namespace HeatRecovery {
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundsHumRatEq(EnergyPlusData &state,
-                                  int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsHumRatEq(int const ExchNum,            // number of the current heat exchanger being simulated
                                   Real64 &H_RegenInTemp,        // current regen inlet temperature (C) for regen outlet hum rat eqn
                                   Real64 &H_RegenInHumRat,      // current regen inlet hum rat for regen outlet hum rat eqn
                                   Real64 &H_ProcInTemp,         // current process inlet temperature (C) for regen outlet hum rat eqn
@@ -629,22 +621,19 @@ namespace HeatRecovery {
                                   bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundOutput_Temp(EnergyPlusData &state,
-                                    int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundOutput_Temp(int const ExchNum,            // number of the current heat exchanger being simulated
                                     Real64 const RegenInTemp,     // current regen inlet temp passed to eqn
                                     Real64 &RegenOutTemp,         // current regen outlet temp from eqn
                                     bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundOutput_HumRat(EnergyPlusData &state,
-                                      int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundOutput_HumRat(int const ExchNum,            // number of the current heat exchanger being simulated
                                       Real64 const RegenInHumRat,   // current regen inlet hum rat passed to eqn
                                       Real64 &RegenOutHumRat,       // current regen outlet hum rat from eqn
                                       bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundsRH_TempEq(EnergyPlusData &state,
-                                   int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsRH_TempEq(int const ExchNum,            // number of the current heat exchanger being simulated
                                    Real64 const T_RegenInTemp,   // current regen inlet temperature passed to eqn
                                    Real64 const T_RegenInHumRat, // current regen inlet hum rat passed to eqn
                                    Real64 const T_ProcInTemp,    // current process inlet temperature passed to eqn
@@ -652,8 +641,7 @@ namespace HeatRecovery {
                                    bool const FirstHVACIteration // first HVAC iteration flag
     );
 
-    void CheckModelBoundsRH_HumRatEq(EnergyPlusData &state,
-                                     int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsRH_HumRatEq(int const ExchNum,            // number of the current heat exchanger being simulated
                                      Real64 const H_RegenInTemp,   // current regen inlet temperature passed to eqn
                                      Real64 const H_RegenInHumRat, // current regen inlet hum rat passed to eqn
                                      Real64 const H_ProcInTemp,    // current process inlet temperature passed to eqn
@@ -661,45 +649,37 @@ namespace HeatRecovery {
                                      bool const FirstHVACIteration // first HVAC iteration flag
     );
 
-    void CheckForBalancedFlow(EnergyPlusData &state,
-                              int const ExchNum,              // number of the current heat exchanger being simulated
+    void CheckForBalancedFlow(int const ExchNum,              // number of the current heat exchanger being simulated
                               Real64 const ProcessInMassFlow, // current process inlet air mass flow rate (m3/s)
                               Real64 const RegenInMassFlow,   // current regeneration inlet air mass flow rate (m3/s)
                               bool const FirstHVACIteration   // first HVAC iteration flag
     );
 
-    int GetSupplyInletNode(EnergyPlusData &state,
-                           std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyInletNode(std::string const &HXName, // must match HX names for the ExchCond type
                            bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSupplyOutletNode(EnergyPlusData &state,
-                            std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
                             bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryInletNode(EnergyPlusData &state,
-                              std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryInletNode(std::string const &HXName, // must match HX names for the ExchCond type
                               bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryOutletNode(EnergyPlusData &state,
-                               std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
                                bool &ErrorsFound          // set to true if problem
     );
 
-    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
-                                std::string const &HXName, // must match HX names for the ExchCond type
+    Real64 GetSupplyAirFlowRate(std::string const &HXName, // must match HX names for the ExchCond type
                                 bool &ErrorsFound          // set to true if problem
     );
 
-    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
-                                      std::string const &HXName, // must match HX names for the ExchCond type
+    int GetHeatExchangerObjectTypeNum(std::string const &HXName, // must match HX names for the ExchCond type
                                       bool &ErrorsFound          // set to true if problem
     );
 
-    void SetHeatExchangerData(EnergyPlusData &state,
-                              int const HXNum,                         // Index of HX
+    void SetHeatExchangerData(int const HXNum,                         // Index of HX
                               bool &ErrorsFound,                       // Set to true if certain errors found
                               std::string const &HXName,               // Name of HX
                               Optional<Real64> SupplyAirVolFlow = _,   // HX supply air flow rate    [m3/s]

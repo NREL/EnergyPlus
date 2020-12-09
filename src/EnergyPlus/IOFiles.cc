@@ -60,13 +60,14 @@
 
 namespace EnergyPlus {
 
-InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file)
+InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
+    EnergyPlusData & state = getCurrentState(0);
     if (!good()) {
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+        ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
     }
     return *this;
 }
@@ -175,13 +176,14 @@ void InputFile::backspace() noexcept
     }
 }
 
-InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file)
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
+    EnergyPlusData & state = getCurrentState(0);
     if (!good()) {
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
+        ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
     }
     return *this;
 }
@@ -285,8 +287,9 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
-void IOFiles::OutputControl::getInput(EnergyPlusData &state)
+void IOFiles::OutputControl::getInput()
 {
+    EnergyPlusData & state = getCurrentState(0);
     auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
     if (instances != inputProcessor->epJSON.end()) {
 
@@ -297,7 +300,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
+                inputProcessor->getDefaultValue("OutputControl:Files", field_name, input);
             }
             return input;
         };
@@ -308,7 +311,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             } else if (input == "NO") {
                 return false;
             }
-            ShowFatalError(state, "Invalid boolean Yes/No choice input");
+            ShowFatalError("Invalid boolean Yes/No choice input");
             return true;
         };
 

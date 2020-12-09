@@ -64,7 +64,7 @@ struct WaterHeatingCoilUASizer : BaseSizer
     }
     ~WaterHeatingCoilUASizer() = default;
 
-    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

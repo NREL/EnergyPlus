@@ -78,8 +78,7 @@ namespace SizingManager {
 
     void ManageSizing();
 
-    bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
-                                     bool isPulseZoneSizing,
+    bool CalcdoLoadComponentPulseNow(bool isPulseZoneSizing,
                                      bool WarmupFlag,
                                      int HourOfDay,
                                      int TimeStep,
@@ -93,8 +92,7 @@ namespace SizingManager {
 
     void GetOARequirements();
 
-    void ProcessInputOARequirements(EnergyPlusData &state,
-                                    std::string const &cCurrentModuleObject,
+    void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
                                     int OAIndex,
                                     Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
@@ -118,16 +116,15 @@ namespace SizingManager {
     void GetZoneSizingInput();
 
     void
-    GetZoneAndZoneListNames(EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
+    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
     void GetSystemSizingInput();
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
+    void SetupZoneSizing(bool &ErrorsFound);
 
-    void ReportZoneSizing(EnergyPlusData &state,
-                          std::string const &ZoneName,   // the name of the zone
+    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 CalcDesLoad,      // the value from the sizing calculation [W]
                           Real64 UserDesLoad,      // the value from the sizing calculation modified by user input [W]
@@ -143,8 +140,7 @@ namespace SizingManager {
                           Real64 DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(EnergyPlusData &state,
-                         std::string const &SysName,      // the name of the zone
+    void ReportSysSizing(std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
                          Real64 const &UserDesCap,        // User  Design Capacity
@@ -155,9 +151,9 @@ namespace SizingManager {
                          int const &TimeStepIndex         // time step of the peak
     );
 
-    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
+    std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
+    void UpdateFacilitySizing(DataGlobalConstants::CallIndicator CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

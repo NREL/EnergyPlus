@@ -196,20 +196,19 @@ namespace HeatPumpWaterToWaterSimple {
 
         virtual ~GshpSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
+        static PlantComponent *factory(int wwhp_type, std::string eir_wwhp_name);
 
         static void clear_state();
 
         static void GetWatertoWaterHPInput();
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
-        void InitWatertoWaterHP(EnergyPlusData &state,
-                                int const GSHPTypeNum,       // Type of GSHP
+        void InitWatertoWaterHP(int const GSHPTypeNum,       // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
                                 bool const FirstHVACIteration,
                                 Real64 const MyLoad // Demand Load
@@ -219,13 +218,13 @@ namespace HeatPumpWaterToWaterSimple {
 
         void sizeHeatingWaterToWaterHP();
 
-        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPCooling(Real64 const MyLoad); // Operating Load
 
-        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPHeating(Real64 const MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
     };
 
     // Object Data

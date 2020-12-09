@@ -92,13 +92,12 @@ namespace PlantValves {
 
         virtual ~TemperValveData() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string objectName);
+        static PlantComponent *factory(std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &calledFromLocation,
+        void getDesignCapacities(const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;

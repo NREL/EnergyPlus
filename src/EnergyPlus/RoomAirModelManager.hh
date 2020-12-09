@@ -64,32 +64,32 @@ namespace RoomAirModelManager {
 
     void clear_state();
 
-    void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
+    void ManageAirModel(int &ZoneNum);
 
     void GetAirModelDatas();
 
-    void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUserDefinedPatternData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetAirNodeData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetMundtData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetDisplacementVentData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetCrossVentData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUFADZoneData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum);
+    void SharedDVCVUFDataInit(int &ZoneNum);
 
-    void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
+    void GetRoomAirflowNetworkData(bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetRAFNNodeNum(EnergyPlusData &state, std::string const &RAFNNodeName,
+    void GetRAFNNodeNum(std::string const &RAFNNodeName,
                         int &ZoneNum,
                         int &RAFNNodeNum,
                         bool &Errorfound); // find zone number and node number based on the node name
 
-    bool CheckEquipName(EnergyPlusData &state, std::string const &EquipType, // Equipment type
+    bool CheckEquipName(std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name

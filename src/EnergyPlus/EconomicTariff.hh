@@ -605,36 +605,35 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, int const fromTariff);
+    void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
     void initializeMonetaryUnit();
 
-    int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::string const &nameOfReferingObj);
+    int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
-    int FindTariffIndex(EnergyPlusData &state, std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj);
+    int FindTariffIndex(std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj);
 
-    void warnIfNativeVarname(EnergyPlusData &state, std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName);
+    void warnIfNativeVarname(std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName);
 
-    int AssignVariablePt(EnergyPlusData &state,
-                         std::string const &stringIn,
+    int AssignVariablePt(std::string const &stringIn,
                          bool const flagIfNotNumeric,
                          int const useOfVar,
                          int const varSpecific,
@@ -646,7 +645,7 @@ namespace EconomicTariff {
 
     void incrementSteps();
 
-    std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn);
+    std::string RemoveSpaces(std::string const &StringIn);
 
     void CreateCategoryNativeVariables();
 
@@ -662,9 +661,9 @@ namespace EconomicTariff {
 
     void CreateDefaultComputation();
 
-    void addOperand(EnergyPlusData &state, int varMe, int varOperand);
+    void addOperand(int varMe, int varOperand);
 
-    void addChargesToOperand(EnergyPlusData &state, int curTariff, int curPointer);
+    void addChargesToOperand(int curTariff, int curPointer);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -676,7 +675,7 @@ namespace EconomicTariff {
 
     void GatherForEconomics();
 
-    bool isWithinRange(EnergyPlusData &state, int const testVal, int const minThreshold, int const maxThreshold);
+    bool isWithinRange(int const testVal, int const minThreshold, int const maxThreshold);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -688,21 +687,21 @@ namespace EconomicTariff {
 
     void ComputeTariff();
 
-    void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int const variablePointer);
+    void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
 
-    void popStack(EnergyPlusData &state, Array1A<Real64> monthlyArray, int &variablePointer);
+    void popStack(Array1A<Real64> monthlyArray, int &variablePointer);
 
-    void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable);
+    void evaluateChargeSimple(int const usingVariable);
 
-    void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable);
+    void evaluateChargeBlock(int const usingVariable);
 
-    void evaluateRatchet(EnergyPlusData &state, int const usingVariable);
+    void evaluateRatchet(int const usingVariable);
 
-    void evaluateQualify(EnergyPlusData &state, int const usingVariable);
+    void evaluateQualify(int const usingVariable);
 
-    void addMonthlyCharge(EnergyPlusData &state, int const usingVariable);
+    void addMonthlyCharge(int const usingVariable);
 
-    void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff);
+    void checkMinimumMonthlyCharge(int const curTariff);
 
     void setNativeVariables();
 
@@ -712,14 +711,14 @@ namespace EconomicTariff {
 
     void showWarningsBasedOnTotal();
 
-    void getMaxAndSum(EnergyPlusData &state, int const varPointer, Real64 &sumResult, Real64 &maxResult);
+    void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
-    ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
+    ReportEconomicVariable(std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
     void selectTariff();
 
-    void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
+    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
 
 } // namespace EconomicTariff
 

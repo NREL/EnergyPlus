@@ -201,7 +201,7 @@ namespace SystemAvailabilityManager {
         {
         }
 
-        void SetOptStartFlag(EnergyPlusData &state, int const AirLoopNum);
+        void SetOptStartFlag(int const AirLoopNum);
     };
 
     struct DefineASHRAEAdaptiveOptimumStartCoeffs // Derived type for Differential Thermostat Sys Avail Managers
@@ -363,30 +363,26 @@ namespace SystemAvailabilityManager {
 
     void GetSysAvailManagerListInputs();
 
-    void GetPlantAvailabilityManager(EnergyPlusData &state,
-                                     std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
+    void GetPlantAvailabilityManager(std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                      int const Loop,                          // which loop this is
                                      int const NumPlantLoops,                 // Total number of plant loops
                                      bool &ErrorsFound                        // true if certain errors are detected here
     );
 
-    void GetAirLoopAvailabilityManager(EnergyPlusData &state,
-                                       std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
+    void GetAirLoopAvailabilityManager(std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                        int const Loop,                          // which loop this is
                                        int const NumAirLoops,                   // Total number of air loops
                                        bool &ErrorsFound                        // true if certain errors are detected here
     );
 
-    void GetZoneEqAvailabilityManager(EnergyPlusData &state,
-                                      int const ZoneEquipType, // Type of ZoneHVAC:* component
+    void GetZoneEqAvailabilityManager(int const ZoneEquipType, // Type of ZoneHVAC:* component
                                       int const CompNum,       // Index of a particular ZoneHVAC:* component
                                       bool &ErrorsFound        // true if certain errors are detected here
     );
 
     void InitSysAvailManagers();
 
-    void SimSysAvailManager(EnergyPlusData &state,
-                            int const SysAvailType,
+    void SimSysAvailManager(int const SysAvailType,
                             std::string const &SysAvailName,
                             int &SysAvailNum,
                             int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
@@ -396,20 +392,19 @@ namespace SystemAvailabilityManager {
                             Optional_int_const CompNum = _        // Index of ZoneHVAC:* equipment component
     );
 
-    void CalcSchedSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled system availability manager
+    void CalcSchedSysAvailMgr(int const SysAvailNum, // number of the current scheduled system availability manager
                               int &AvailStatus       // System status indicator
     );
 
-    void CalcSchedOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled on system availability manager
+    void CalcSchedOnSysAvailMgr(int const SysAvailNum, // number of the current scheduled on system availability manager
                                 int &AvailStatus       // System status indicator
     );
 
-    void CalcSchedOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled off system availability manager
+    void CalcSchedOffSysAvailMgr(int const SysAvailNum, // number of the current scheduled off system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
-    void CalcNCycSysAvailMgr(EnergyPlusData &state,
-                             int const SysAvailNum,                // number of the current scheduled system availability manager
+    void CalcNCycSysAvailMgr(int const SysAvailNum,                // number of the current scheduled system availability manager
                              int const PriAirSysNum,               // number of the primary air system affected by this Avail. Manager
                              int &AvailStatus,                     // System status indicator
                              Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
@@ -426,43 +421,41 @@ namespace SystemAvailabilityManager {
                                    Real64 const TempTolerance     // temperature tolerance
     );
 
-    void CalcOptStartSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum,                // number of the current scheduled system availability manager
+    void CalcOptStartSysAvailMgr(int const SysAvailNum,                // number of the current scheduled system availability manager
                                  int const PriAirSysNum,               // number of the primary air system affected by this Avail. Manager
                                  int &AvailStatus,                     // System status indicator
                                  Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
                                  Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
-    void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,               // number of the current scheduled system availability manager
+    void CalcNVentSysAvailMgr(int const SysAvailNum,               // number of the current scheduled system availability manager
                               int const PriAirSysNum,              // number of the primary air system affected by this Avail. Manager
                               int &AvailStatus,                    // System status indicator
                               Optional_int_const ZoneEquipType = _ // Type of zone equipment component
     );
 
-    void CalcDiffTSysAvailMgr(EnergyPlusData &state, int const SysAvailNum,    // Number of the current scheduled system availability manager
+    void CalcDiffTSysAvailMgr(int const SysAvailNum,    // Number of the current scheduled system availability manager
                               int const PreviousStatus, // System status for the previous timestep
                               int &AvailStatus          // System status indicator
     );
 
-    void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcHiTurnOffSysAvailMgr(int const SysAvailNum, // Number of the current scheduled system availability manager
                                   int &AvailStatus       // System status indicator
     );
 
-    void CalcHiTurnOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcHiTurnOnSysAvailMgr(int const SysAvailNum, // Number of the current scheduled system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
-    void CalcLoTurnOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcLoTurnOffSysAvailMgr(int const SysAvailNum, // Number of the current scheduled system availability manager
                                   int &AvailStatus       // System status indicator
     );
 
-    void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcLoTurnOnSysAvailMgr(int const SysAvailNum, // Number of the current scheduled system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
-    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName); // name to validate
+    int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
     void ManageHybridVentilation();
 
@@ -470,12 +463,11 @@ namespace SystemAvailabilityManager {
 
     void InitHybridVentSysAvailMgr();
 
-    void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
-                                   int const SysAvailNum,              // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(int const SysAvailNum,              // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 
-    bool GetHybridVentilationControlStatus(EnergyPlusData &state, int const ZoneNum); // Index of zone
+    bool GetHybridVentilationControlStatus(int const ZoneNum); // Index of zone
 
 } // namespace SystemAvailabilityManager
 

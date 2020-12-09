@@ -79,7 +79,7 @@ namespace OutputReportTabularAnnual {
 
     void checkAggregationOrderForAnnual();
 
-    void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
+    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
@@ -87,7 +87,7 @@ namespace OutputReportTabularAnnual {
 
     void AddAnnualTableOfContents(std::ostream &);
 
-    AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::string inString);
+    AnnualFieldSet::AggregationKind stringToAggKind(std::string inString);
 
     void clear_state(); // for unit tests
 
@@ -98,13 +98,13 @@ namespace OutputReportTabularAnnual {
         AnnualTable() : m_name(""), m_filter(""), m_scheduleName(""), m_scheduleNum(0){};
 
         // Member Constructor
-        AnnualTable(EnergyPlusData &state, std::string name, std::string filter, std::string scheduleName)
+        AnnualTable(std::string name, std::string filter, std::string scheduleName)
         {
             m_name = name;
             m_filter = filter;
             m_scheduleName = scheduleName;
             if (!m_scheduleName.empty()) {
-                m_scheduleNum = ScheduleManager::GetScheduleIndex(state, m_scheduleName); // index to the period schedule
+                m_scheduleNum = ScheduleManager::GetScheduleIndex(m_scheduleName); // index to the period schedule
             } else {
                 m_scheduleNum = 0;
             }
@@ -118,11 +118,11 @@ namespace OutputReportTabularAnnual {
 
         bool invalidAggregationOrder();
 
-        void gatherForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
+        void gatherForTimestep(OutputProcessor::TimeStepType kindOfTypeStep);
 
         void resetGathering();
 
-        void writeTable(EnergyPlusData &state, int unitsStyle);
+        void writeTable(int unitsStyle);
 
         void addTableOfContents(std::ostream &);
 
@@ -145,9 +145,9 @@ namespace OutputReportTabularAnnual {
         std::vector<std::string> m_objectNames;     // for each row of annual table
         std::vector<AnnualFieldSet> m_annualFields; // for each column
 
-        Real64 getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
+        Real64 getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep);
 
-        Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
+        Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
 
         void computeBinColumns();
 
@@ -163,7 +163,7 @@ namespace OutputReportTabularAnnual {
 
         bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-        void convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
+        void convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
 
         std::vector<Real64> calculateBins(int const numberOfBins,
                                           std::vector<Real64> const valuesToBin,

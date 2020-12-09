@@ -56,11 +56,10 @@
 namespace EnergyPlus::DataPlant {
 
     void PlantLoopData::UpdateLoopSideReportVars(
-        EnergyPlusData &state,
         Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
         Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
     ) {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998
@@ -86,12 +85,12 @@ namespace EnergyPlus::DataPlant {
             this->DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
         }
 
-        this->CalcUnmetPlantDemand(state);
+        this->CalcUnmetPlantDemand();
     }
 
 
-    void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state) {
-
+    void PlantLoopData::CalcUnmetPlantDemand() {
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   June 2011
@@ -143,7 +142,7 @@ namespace EnergyPlus::DataPlant {
 
         if (this->FluidType == NodeType_Water) {
 
-            Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
@@ -189,7 +188,7 @@ namespace EnergyPlus::DataPlant {
 
         } else if (this->FluidType == NodeType_Steam) {
 
-            Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
@@ -202,9 +201,9 @@ namespace EnergyPlus::DataPlant {
                     // Calculate the delta temperature
                     DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
-                    EnthalpySteamSatVapor = GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 1.0,
+                    EnthalpySteamSatVapor = GetSatEnthalpyRefrig(this->FluidName, LoopSetPointTemperature, 1.0,
                                                                  this->FluidIndex, RoutineNameAlt);
-                    EnthalpySteamSatLiquid = GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 0.0,
+                    EnthalpySteamSatLiquid = GetSatEnthalpyRefrig(this->FluidName, LoopSetPointTemperature, 0.0,
                                                                   this->FluidIndex, RoutineNameAlt);
 
                     LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
@@ -223,8 +222,8 @@ namespace EnergyPlus::DataPlant {
         this->UnmetDemand = LoadToLoopSetPoint;
     }
 
-    void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVACIteration) {
-
+    void PlantLoopData::CheckLoopExitNode(bool const FirstHVACIteration) {
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   October 1998
@@ -258,14 +257,14 @@ namespace EnergyPlus::DataPlant {
         if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
             if (std::abs(Node(LoopOutlet).MassFlowRate - Node(LoopInlet).MassFlowRate) > DataBranchAirLoopPlant::MassFlowTolerance) {
                 if (this->MFErrIndex == 0) {
-                    ShowWarningError(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
+                    ShowWarningError("PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
-                    ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, format("Loop inlet node={}, flowrate={:.4R} kg/s", NodeID(LoopInlet), Node(LoopInlet).MassFlowRate));
-                    ShowContinueError(state, format("Loop outlet node={}, flowrate={:.4R} kg/s", NodeID(LoopOutlet), Node(LoopOutlet).MassFlowRate));
-                    ShowContinueError(state, "This loop might be helped by a bypass.");
+                    ShowContinueErrorTimeStamp("");
+                    ShowContinueError(format("Loop inlet node={}, flowrate={:.4R} kg/s", NodeID(LoopInlet), Node(LoopInlet).MassFlowRate));
+                    ShowContinueError(format("Loop outlet node={}, flowrate={:.4R} kg/s", NodeID(LoopOutlet), Node(LoopOutlet).MassFlowRate));
+                    ShowContinueError("This loop might be helped by a bypass.");
                 }
-                ShowRecurringWarningErrorAtEnd(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd("PlantSupplySide: PlantLoop=\"" + this->Name +
                                                "\", Error -- Mass Flow Rate Calculation -- continues ** ",
                                                this->MFErrIndex);
             }

@@ -158,7 +158,7 @@ namespace ZonePlenum {
 
     // Functions
 
-    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
+    void SimAirZonePlenum(std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
@@ -168,23 +168,23 @@ namespace ZonePlenum {
 
     void GetZonePlenumInput();
 
-    void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void InitAirZoneReturnPlenum(int const ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void CalcAirZoneReturnPlenum(int const ZonePlenumNum);
 
-    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
+    void CalcAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstCall);
 
-    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void UpdateAirZoneReturnPlenum(int const ZonePlenumNum);
 
-    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
+    void UpdateAirZoneSupplyPlenum(int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
-    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
+    int GetReturnPlenumIndex(int const &ExNodeNum);
 
-    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+    void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum);
 
 } // namespace ZonePlenum
 

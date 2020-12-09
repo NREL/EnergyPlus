@@ -22,7 +22,7 @@ class Glycol:
     def __init__(self, state: c_void_p, api: cdll, glycol_name: bytes):
         """
         Creates a new Glycol instance, should almost certainly always be called from the API's Functional class, not
-        directly from user code.  To get a Glycol instance from client code, call api.functional.glycol(state, "name"),
+        directly from user code.  To get a Glycol instance from client code, call api.functional.glycol("name"),
         where state is an active EnergyPlus state returned from a call to `api.state_manager.new_state()`.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`
@@ -42,7 +42,7 @@ class Glycol:
         self.api.glycolConductivity.restype = RealEP
         self.api.glycolViscosity.argtypes = [c_void_p, c_void_p, RealEP]
         self.api.glycolViscosity.restype = RealEP
-        self.instance = self.api.glycolNew(state, glycol_name)
+        self.instance = self.api.glycolNew(glycol_name)
 
     def delete(self, state: c_void_p) -> None:
         """
@@ -51,7 +51,7 @@ class Glycol:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Nothing
         """
-        self.api.glycolDelete(state, self.instance)
+        self.api.glycolDelete(self.instance)
 
     def specific_heat(self, state: c_void_p, temperature: float) -> float:
         """
@@ -61,7 +61,7 @@ class Glycol:
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The specific heat of the fluid, in J/kg-K
         """
-        return self.api.glycolSpecificHeat(state, self.instance, temperature)
+        return self.api.glycolSpecificHeat(self.instance, temperature)
 
     def density(self, state: c_void_p, temperature: float) -> float:
         """
@@ -71,7 +71,7 @@ class Glycol:
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The density of the fluid, in kg/m3
         """
-        return self.api.glycolDensity(state, self.instance, temperature)
+        return self.api.glycolDensity(self.instance, temperature)
 
     def conductivity(self, state: c_void_p, temperature: float) -> float:
         """
@@ -81,7 +81,7 @@ class Glycol:
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The conductivity of the fluid, in W/m-K
         """
-        return self.api.glycolConductivity(state, self.instance, temperature)
+        return self.api.glycolConductivity(self.instance, temperature)
 
     def viscosity(self, state: c_void_p, temperature: float) -> float:
         """
@@ -91,7 +91,7 @@ class Glycol:
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The dynamic viscosity of the fluid, in Pa-s (or kg/m-s)
         """
-        return self.api.glycolViscosity(state, self.instance, temperature)
+        return self.api.glycolViscosity(self.instance, temperature)
 
 
 class Refrigerant:
@@ -107,7 +107,7 @@ class Refrigerant:
         """
         Creates a new Refrigerant instance, should almost certainly always be called from the API's functional class,
         not directly from user code.  To get a Refrigerant instance from client code, call
-        api.functional.refrigerant(state, "name"), where state is an active EnergyPlus state returned from a call to
+        api.functional.refrigerant("name"), where state is an active EnergyPlus state returned from a call to
         `api.state_manager.new_state()`.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`
@@ -130,7 +130,7 @@ class Refrigerant:
         self.api.refrigerantSaturatedDensity.restype = RealEP
         self.api.refrigerantSaturatedSpecificHeat.argtypes = [c_void_p, c_void_p, RealEP, RealEP]
         self.api.refrigerantSaturatedSpecificHeat.restype = RealEP
-        self.instance = self.api.refrigerantNew(state, refrigerant_name)
+        self.instance = self.api.refrigerantNew(refrigerant_name)
 
     def delete(self, state: c_void_p):
         """
@@ -139,7 +139,7 @@ class Refrigerant:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Nothing
         """
-        self.api.refrigerantDelete(state, self.instance)
+        self.api.refrigerantDelete(self.instance)
 
     def saturation_pressure(self, state: c_void_p, temperature: float) -> float:
         """
@@ -149,7 +149,7 @@ class Refrigerant:
         :param temperature: Refrigerant temperature, in Celsius.
         :return: Refrigerant saturation pressure, in Pa
         """
-        return self.api.refrigerantSaturationPressure(state, self.instance, temperature)
+        return self.api.refrigerantSaturationPressure(self.instance, temperature)
 
     def saturation_temperature(self, state: c_void_p, pressure: float) -> float:
         """
@@ -159,7 +159,7 @@ class Refrigerant:
         :param pressure: Refrigerant pressure, in Pa
         :return: Refrigerant saturation temperature, in Celsius
         """
-        return self.api.refrigerantSaturationTemperature(state, self.instance, pressure)
+        return self.api.refrigerantSaturationTemperature(self.instance, pressure)
 
     def saturated_enthalpy(self, state: c_void_p, temperature: float, quality: float) -> float:
         """
@@ -170,7 +170,7 @@ class Refrigerant:
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated enthalpy, in J/kg
         """
-        return self.api.refrigerantSaturatedEnthalpy(state, self.instance, temperature, quality)
+        return self.api.refrigerantSaturatedEnthalpy(self.instance, temperature, quality)
 
     def saturated_density(self, state: c_void_p, temperature: float, quality: float) -> float:
         """
@@ -181,7 +181,7 @@ class Refrigerant:
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated density, in kg/m3
         """
-        return self.api.refrigerantSaturatedDensity(state, self.instance, temperature, quality)
+        return self.api.refrigerantSaturatedDensity(self.instance, temperature, quality)
 
     def saturated_specific_heat(self, state: c_void_p, temperature: float, quality: float) -> float:
         """
@@ -192,7 +192,7 @@ class Refrigerant:
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated specific heat, in J/kg-K
         """
-        return self.api.refrigerantSaturatedSpecificHeat(state, self.instance, temperature, quality)
+        return self.api.refrigerantSaturatedSpecificHeat(self.instance, temperature, quality)
 
 
 class Psychrometrics:
@@ -206,7 +206,7 @@ class Psychrometrics:
         """
         Creates a new Psychrometrics instance, should almost certainly always be called from the API's functional class,
         not directly from user code.  To get a Psychrometrics instance from client code, call
-        api.functional.psychrometrics(state), where state is an active EnergyPlus state returned from a call to
+        api.functional.psychrometrics(), where state is an active EnergyPlus state returned from a call to
         `api.state_manager.new_state()`.
 
         :param api: An active CTYPES CDLL instance
@@ -265,7 +265,7 @@ class Psychrometrics:
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
         """
-        return self.api.psyRhoFnPbTdbW(state, barometric_pressure, dry_bulb_temp, humidity_ratio)
+        return self.api.psyRhoFnPbTdbW(barometric_pressure, dry_bulb_temp, humidity_ratio)
 
     def latent_energy_of_air(self, state: c_void_p, dry_bulb_temp: float) -> float:
         """
@@ -275,7 +275,7 @@ class Psychrometrics:
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
-        return self.api.psyHfgAirFnWTdb(state, dry_bulb_temp)
+        return self.api.psyHfgAirFnWTdb(dry_bulb_temp)
 
     def latent_energy_of_moisture_in_air(self, state: c_void_p, dry_bulb_temp: float) -> float:
         """
@@ -285,7 +285,7 @@ class Psychrometrics:
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
-        return self.api.psyHgAirFnWTdb(state, dry_bulb_temp)
+        return self.api.psyHgAirFnWTdb(dry_bulb_temp)
 
     def enthalpy(self, state: c_void_p, dry_bulb_temp: float, humidity_ratio: float) -> float:
         """
@@ -296,7 +296,7 @@ class Psychrometrics:
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
         """
-        return self.api.psyHFnTdbW(state, dry_bulb_temp, humidity_ratio)
+        return self.api.psyHFnTdbW(dry_bulb_temp, humidity_ratio)
 
     def enthalpy_b(self, state: c_void_p, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
         """
@@ -308,7 +308,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyHFnTdbRhPb(state, dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
+        return self.api.psyHFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
     def specific_heat(self, state: c_void_p, humidity_ratio: float) -> float:
         """
@@ -318,7 +318,7 @@ class Psychrometrics:
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
         """
-        return self.api.psyCpAirFnW(state, humidity_ratio)
+        return self.api.psyCpAirFnW(humidity_ratio)
 
     def dry_bulb(self, state: c_void_p, enthalpy: float, humidity_ratio: float) -> float:
         """
@@ -329,7 +329,7 @@ class Psychrometrics:
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
         """
-        return self.api.psyTdbFnHW(state, enthalpy, humidity_ratio)
+        return self.api.psyTdbFnHW(enthalpy, humidity_ratio)
 
     def vapor_density(self, state: c_void_p, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
         """
@@ -341,7 +341,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyRhovFnTdbWPb(state, dry_bulb_temp, humidity_ratio, barometric_pressure)
+        return self.api.psyRhovFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def relative_humidity(self, state: c_void_p, dry_bulb_temp: float, vapor_density: float) -> float:
         """
@@ -352,7 +352,7 @@ class Psychrometrics:
         :param vapor_density: Psychrometric vapor density, in kg/m3
         :return:
         """
-        return self.api.psyRhFnTdbRhov(state, dry_bulb_temp, vapor_density)
+        return self.api.psyRhFnTdbRhov(dry_bulb_temp, vapor_density)
 
     def relative_humidity_b(self, state: c_void_p, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
         """
@@ -364,7 +364,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyRhFnTdbWPb(state, dry_bulb_temp, humidity_ratio, barometric_pressure)
+        return self.api.psyRhFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def wet_bulb(self, state: c_void_p, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
         """
@@ -376,7 +376,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyTwbFnTdbWPb(state, dry_bulb_temp, humidity_ratio, barometric_pressure)
+        return self.api.psyTwbFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def specific_volume(self, state: c_void_p, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
         """
@@ -388,7 +388,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyVFnTdbWPb(state, dry_bulb_temp, humidity_ratio, barometric_pressure)
+        return self.api.psyVFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def saturation_pressure(self, state: c_void_p, dry_bulb_temp: float) -> float:
         """
@@ -398,7 +398,7 @@ class Psychrometrics:
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
-        return self.api.psyPsatFnTemp(state, dry_bulb_temp)
+        return self.api.psyPsatFnTemp(dry_bulb_temp)
 
     def saturation_temperature(self, state: c_void_p, enthalpy: float, barometric_pressure: float) -> float:
         """
@@ -409,7 +409,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyTsatFnHPb(state, enthalpy, barometric_pressure)
+        return self.api.psyTsatFnHPb(enthalpy, barometric_pressure)
 
     def vapor_density_b(self, state: c_void_p, dry_bulb_temp: float, relative_humidity_fraction: float) -> float:
         """
@@ -420,7 +420,7 @@ class Psychrometrics:
         :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
         :return:
         """
-        return self.api.psyRhovFnTdbRh(state, dry_bulb_temp, relative_humidity_fraction)
+        return self.api.psyRhovFnTdbRh(dry_bulb_temp, relative_humidity_fraction)
 
     def humidity_ratio(self, state: c_void_p, dry_bulb_temp: float, enthalpy: float) -> float:
         """
@@ -431,7 +431,7 @@ class Psychrometrics:
         :param enthalpy: Psychrometric enthalpy, in J/kg
         :return:
         """
-        return self.api.psyWFnTdbH(state, dry_bulb_temp, enthalpy)
+        return self.api.psyWFnTdbH(dry_bulb_temp, enthalpy)
 
     def humidity_ratio_b(self, state: c_void_p, dew_point_temp: float, barometric_pressure: float) -> float:
         """
@@ -442,7 +442,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyWFnTdpPb(state, dew_point_temp, barometric_pressure)
+        return self.api.psyWFnTdpPb(dew_point_temp, barometric_pressure)
 
     def humidity_ratio_c(self, state: c_void_p, dry_bulb_temp: float, relative_humidity_fraction: float,
                          barometric_pressure: float) -> float:
@@ -455,7 +455,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyWFnTdbRhPb(state, dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
+        return self.api.psyWFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
     def humidity_ratio_d(self, state: c_void_p, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
         """
@@ -467,7 +467,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyWFnTdbTwbPb(state, dry_bulb_temp, wet_bulb_temp, barometric_pressure)
+        return self.api.psyWFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
 
     def dew_point(self, state: c_void_p, humidity_ratio: float, barometric_pressure: float) -> float:
         """
@@ -478,7 +478,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyTdpFnWPb(state, humidity_ratio, barometric_pressure)
+        return self.api.psyTdpFnWPb(humidity_ratio, barometric_pressure)
 
     def dew_point_b(self, state: c_void_p, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
         """
@@ -490,7 +490,7 @@ class Psychrometrics:
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
         """
-        return self.api.psyTdpFnTdbTwbPb(state, dry_bulb_temp, wet_bulb_temp, barometric_pressure)
+        return self.api.psyTdpFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
 
 
 class EnergyPlusVersion:
@@ -540,7 +540,7 @@ class Functional:
 
     def initialize(self, state: c_void_p) -> None:
         if not self.initialized and not self.plugin_mode:
-            self.api.initializeFunctionalAPI(state)
+            self.api.initializeFunctionalAPI()
             self.initialized = True
 
     def glycol(self, state: c_void_p, glycol_name: str) -> Glycol:
@@ -551,10 +551,10 @@ class Functional:
         :param glycol_name: Name of the Glycol, for now only water is allowed
         :return: An instantiated Glycol structure
         """
-        self.initialize(state)
+        self.initialize()
         if isinstance(glycol_name, str):
             glycol_name = glycol_name.encode('utf-8')
-        return Glycol(state, self.api, glycol_name)
+        return Glycol(self.api, glycol_name)
 
     def refrigerant(self, state: c_void_p, refrigerant_name: str) -> Refrigerant:
         """
@@ -564,10 +564,10 @@ class Functional:
         :param refrigerant_name: Name of the Refrigerant, for now only steam is allowed
         :return: An instantiated Refrigerant structure
         """
-        self.initialize(state)
+        self.initialize()
         if isinstance(refrigerant_name, str):
             refrigerant_name = refrigerant_name.encode('utf-8')
-        return Refrigerant(state, self.api, refrigerant_name)
+        return Refrigerant(self.api, refrigerant_name)
 
     def psychrometrics(self, state: c_void_p) -> Psychrometrics:
         """
@@ -576,7 +576,7 @@ class Functional:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An instantiated Psychrometric structure
         """
-        self.initialize(state)
+        self.initialize()
         return Psychrometrics(self.api)
 
     @staticmethod
@@ -595,7 +595,7 @@ class Functional:
         """
         cb_ptr = self.py_error_callback_type(f)
         error_callbacks.append(cb_ptr)
-        self.api.registerErrorCallback(state, cb_ptr)
+        self.api.registerErrorCallback(cb_ptr)
 
     @staticmethod
     def clear_callbacks() -> None:

@@ -167,28 +167,28 @@ namespace OutputReportPredefined {
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+    void PreDefTableEntry(int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
+    void PreDefTableEntry(int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, int const tableEntryInt);
+    void PreDefTableEntry(int const columnIndex, std::string const &objName, int const tableEntryInt);
 
-    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName);
+    std::string RetrievePreDefTableEntry(int const columnIndex, std::string const &objName);
 
     void incrementTableEntry();
 
     void
-    AddCompSizeTableEntry(EnergyPlusData &state, std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);
+    AddCompSizeTableEntry(std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);
 
-    void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind);
+    void AddShadowRelateTableEntry(int const castingField, int const receivingField, int const receivingKind);
 
-    int newPreDefReport(EnergyPlusData &state, std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces);
+    int newPreDefReport(std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces);
 
-    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string const &subTableName);
+    int newPreDefSubTable(int const reportIndex, std::string const &subTableName);
 
-    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string const &footnoteText);
+    void addFootNoteSubTable(int const subTableIndex, std::string const &footnoteText);
 
-    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string const &columnHeading);
+    int newPreDefColumn(int const subTableIndex, std::string const &columnHeading);
 
 } // namespace OutputReportPredefined
 

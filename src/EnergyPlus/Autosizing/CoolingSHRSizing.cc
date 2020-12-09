@@ -49,18 +49,20 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
-Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
 {
+    EnergyPlusData & state = getCurrentState(0);
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
-    if (!this->checkInitialized(state, errorsFound)) {
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
 
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
@@ -99,8 +101,7 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool 
                     }
 
                     // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                    this->autoSizedValue = DXCoils::ValidateADP(state,
-                                                                this->compType,
+                    this->autoSizedValue = DXCoils::ValidateADP(this->compType,
                                                                 this->compName,
                                                                 RatedInletAirTemp,
                                                                 RatedInletAirHumRat,
@@ -125,7 +126,7 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool 
         }
     }
     this->updateSizingString();
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 

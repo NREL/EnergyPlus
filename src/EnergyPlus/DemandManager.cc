@@ -86,7 +86,7 @@ namespace EnergyPlus::DemandManager {
 
     void ManageDemand()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -105,8 +105,8 @@ namespace EnergyPlus::DemandManager {
 
         // FLOW:
         if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
-            GetDemandManagerInput(state);
-            GetDemandManagerListInput(state);
+            GetDemandManagerInput();
+            GetDemandManagerListInput();
             state.dataDemandManager->GetInput = false;
         }
 
@@ -158,28 +158,28 @@ namespace EnergyPlus::DemandManager {
                 while (firstTime || ResimExt || ResimHB || ResimHVAC) {
                     firstTime = false;
 
-                    Resimulate(state, ResimExt, ResimHB, ResimHVAC);
+                    Resimulate(ResimExt, ResimHB, ResimHVAC);
                     ResimExt = false;
                     ResimHB = false;
                     ResimHVAC = false;
 
-                    SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
+                    SurveyDemandManagers(); // Determines which Demand Managers can reduce demand
 
                     for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
-                        SimulateDemandManagerList(state, ListNum, ResimExt, ResimHB, ResimHVAC);
+                        SimulateDemandManagerList(ListNum, ResimExt, ResimHB, ResimHVAC);
                     } // ListNum
 
-                    ActivateDemandManagers(state); // Sets limits on loads
+                    ActivateDemandManagers(); // Sets limits on loads
 
                     if (state.dataDemandManager->DemandManagerExtIterations + state.dataDemandManager->DemandManagerHBIterations + state.dataDemandManager->DemandManagerHVACIterations > 500) {
                         // This error can only happen if there is a bug in the code
-                        ShowFatalError(state, "Too many DemandManager iterations. (>500)");
+                        ShowFatalError("Too many DemandManager iterations. (>500)");
                         break;
                     }
                 }
 
                 for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
-                    ReportDemandManagerList(state, ListNum);
+                    ReportDemandManagerList(ListNum);
                 } // ListNum
             }
         }
@@ -191,7 +191,7 @@ namespace EnergyPlus::DemandManager {
                                    bool &ResimHVAC // Flag to resimulate the HVAC simulation
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -213,7 +213,7 @@ namespace EnergyPlus::DemandManager {
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
         // FLOW:
-        DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
+        DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
         DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
@@ -226,7 +226,7 @@ namespace EnergyPlus::DemandManager {
         if (DemandManagerList(ListNum).PeakSchedule == 0) {
             OnPeak = true;
         } else {
-            if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
+            if (GetCurrentScheduleValue(DemandManagerList(ListNum).PeakSchedule) == 1) {
                 OnPeak = true;
             } else {
                 OnPeak = false;
@@ -301,7 +301,7 @@ namespace EnergyPlus::DemandManager {
 
     void GetDemandManagerListInput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -333,12 +333,12 @@ namespace EnergyPlus::DemandManager {
 
         // FLOW:
         CurrentModuleObject = "DemandManagerAssignmentList";
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        state.dataDemandManager->NumDemandManagerList = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataDemandManager->NumDemandManagerList = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (state.dataDemandManager->NumDemandManagerList > 0) {
             AlphArray.dimension(NumAlphas, std::string());
@@ -348,8 +348,7 @@ namespace EnergyPlus::DemandManager {
 
             for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               ListNum,
                                               AlphArray,
                                               NumAlphas,
@@ -360,15 +359,15 @@ namespace EnergyPlus::DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 DemandManagerList(ListNum).Name = AlphArray(1);
 
                 DemandManagerList(ListNum).Meter = GetMeterIndex(AlphArray(2));
 
                 if (DemandManagerList(ListNum).Meter == 0) {
-                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));
-                    ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));
+                    ShowContinueError("Entered in " + CurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
 
                 } else {
@@ -378,9 +377,9 @@ namespace EnergyPlus::DemandManager {
                             Units = "[W]"; // For setup of report variables
 
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(2) + "=\"" +
+                            ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(2) + "=\"" +
                                             AlphArray(2) + "\".");
-                            ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
+                            ShowContinueError("Only Electricity and ElectricityNet meters are currently allowed.");
                             ErrorsFound = true;
                         }
                     }
@@ -389,10 +388,10 @@ namespace EnergyPlus::DemandManager {
                 // Further checking for conflicting DEMAND MANAGER LISTs
 
                 if (!lAlphaFieldBlanks(3)) {
-                    DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
+                    DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(AlphArray(3));
 
                     if (DemandManagerList(ListNum).LimitSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -401,20 +400,20 @@ namespace EnergyPlus::DemandManager {
                 DemandManagerList(ListNum).SafetyFraction = NumArray(1);
 
                 if (!lAlphaFieldBlanks(4)) {
-                    DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
+                    DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(AlphArray(4));
 
                     if (DemandManagerList(ListNum).BillingSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + AlphArray(4) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + AlphArray(4) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
                 }
 
                 if (!lAlphaFieldBlanks(5)) {
-                    DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
+                    DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(AlphArray(5));
 
                     if (DemandManagerList(ListNum).PeakSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + "=\"" + AlphArray(5) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + "=\"" + AlphArray(5) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -439,7 +438,7 @@ namespace EnergyPlus::DemandManager {
                         DemandManagerList(ListNum).ManagerPriority = ManagePriorityType::ManagerPriorityAll;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(6) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(6) + "=\"" +
                                         AlphArray(6) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -463,13 +462,13 @@ namespace EnergyPlus::DemandManager {
                                 DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
 
                                 if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
-                                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(MgrNum * 2 + 6) +
+                                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(MgrNum * 2 + 6) +
                                                     "=\"" + AlphArray(MgrNum * 2 + 6) + "\" not found.");
                                     ErrorsFound = true;
                                 }
 
                             } else {
-                                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(MgrNum * 2 + 5) +
+                                ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value " + cAlphaFieldNames(MgrNum * 2 + 5) +
                                                 "=\"" + AlphArray(MgrNum * 2 + 5) + "\".");
                                 ErrorsFound = true;
                             }
@@ -481,49 +480,49 @@ namespace EnergyPlus::DemandManager {
                 }
 
                 // Setup report variables
-                SetupOutputVariable(state, "Demand Manager Meter Demand Power",
+                SetupOutputVariable("Demand Manager Meter Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).MeterDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Average Demand Power",
+                SetupOutputVariable("Demand Manager Average Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).AverageDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Peak Demand Power",
+                SetupOutputVariable("Demand Manager Peak Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).PeakDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Scheduled Limit Power",
+                SetupOutputVariable("Demand Manager Scheduled Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).ScheduledLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Demand Limit Power",
+                SetupOutputVariable("Demand Manager Demand Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).DemandLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Over Limit Power",
+                SetupOutputVariable("Demand Manager Over Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).OverLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable(state, "Demand Manager Over Limit Time",
+                SetupOutputVariable("Demand Manager Over Limit Time",
                                     OutputProcessor::Unit::hr,
                                     DemandManagerList(ListNum).OverLimitDuration,
                                     "Zone",
@@ -531,7 +530,7 @@ namespace EnergyPlus::DemandManager {
                                     DemandManagerList(ListNum).Name);
 
                 if (ErrorsFound) {
-                    ShowFatalError(state, "Errors found in processing input for " + CurrentModuleObject);
+                    ShowFatalError("Errors found in processing input for " + CurrentModuleObject);
                 }
 
             } // ListNum
@@ -540,24 +539,22 @@ namespace EnergyPlus::DemandManager {
             NumArray.deallocate();
 
             // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
-            SetupOutputVariable(state, "Demand Manager Exterior Energy Iteration Count",
+            SetupOutputVariable("Demand Manager Exterior Energy Iteration Count",
                                 OutputProcessor::Unit::None,
                                 state.dataDemandManager->DemandManagerExtIterations,
                                 "Zone",
                                 "Sum",
                                 "ManageDemand");
 
-            SetupOutputVariable(state,
-                "Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, state.dataDemandManager->DemandManagerHBIterations, "Zone", "Sum", "ManageDemand");
+            SetupOutputVariable("Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, state.dataDemandManager->DemandManagerHBIterations, "Zone", "Sum", "ManageDemand");
 
-            SetupOutputVariable(state,
-                "Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, state.dataDemandManager->DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand");
+            SetupOutputVariable("Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, state.dataDemandManager->DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand");
         }
     }
 
     void GetDemandManagerInput()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -610,37 +607,37 @@ namespace EnergyPlus::DemandManager {
         MaxAlphas = 0;
         MaxNums = 0;
         CurrentModuleObject = "DemandManager:ExteriorLights";
-        NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrExtLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Lights";
-        NumDemandMgrLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:ElectricEquipment";
-        NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrElecEquip > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Thermostats";
-        NumDemandMgrThermostats = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrThermostats = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrThermostats > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Ventilation";
-        NumDemandMgrVentilation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDemandMgrVentilation = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrVentilation > 0) {
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
@@ -664,8 +661,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -676,16 +672,16 @@ namespace EnergyPlus::DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::ManagerTypeExtLights;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -706,9 +702,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).LimitControl = Limit::ManagerLimitVariable;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
                                         AlphArray(3) + "\".");
-                        ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                        ShowContinueError("...value must be one of Off, Fixed, or Variable.");
                         ErrorsFound = true;
                     }
                 }
@@ -733,9 +729,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).SelectionControl = Selection::ManagerSelectionMany;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
                                         AlphArray(4) + "\".");
-                        ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                        ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
                         ErrorsFound = true;
                     }
                 }
@@ -757,14 +753,14 @@ namespace EnergyPlus::DemandManager {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
 
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
+                            ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
                                             AlphArray(LoadNum + 4) + "\" not found.");
                             ErrorsFound = true;
                         }
                     } // LoadNum
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
-                    ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
 
@@ -778,8 +774,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -790,16 +785,16 @@ namespace EnergyPlus::DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::ManagerTypeLights;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -820,9 +815,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).LimitControl = Limit::ManagerLimitVariable;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
                                         AlphArray(3) + "\".");
-                        ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                        ShowContinueError("...value must be one of Off, Fixed, or Variable.");
                         ErrorsFound = true;
                     }
                 }
@@ -847,9 +842,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).SelectionControl = Selection::ManagerSelectionMany;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
                                         AlphArray(4) + "\".");
-                        ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                        ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
                         ErrorsFound = true;
                     }
                 }
@@ -870,7 +865,7 @@ namespace EnergyPlus::DemandManager {
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
+                            ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
                                             AlphArray(LoadNum + 4) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -898,8 +893,8 @@ namespace EnergyPlus::DemandManager {
                         }
                     } // LoadNum
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
-                    ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
 
@@ -913,8 +908,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -925,16 +919,16 @@ namespace EnergyPlus::DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerType::ManagerTypeElecEquip;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -955,9 +949,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).LimitControl = Limit::ManagerLimitVariable;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
                                         AlphArray(3) + "\".");
-                        ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                        ShowContinueError("...value must be one of Off, Fixed, or Variable.");
                         ErrorsFound = true;
                     }
                 }
@@ -982,9 +976,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).SelectionControl = Selection::ManagerSelectionMany;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
                                         AlphArray(4) + "\".");
-                        ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                        ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
                         ErrorsFound = true;
                     }
                 }
@@ -1005,7 +999,7 @@ namespace EnergyPlus::DemandManager {
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
+                            ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
                                             AlphArray(LoadNum + 4) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -1033,8 +1027,8 @@ namespace EnergyPlus::DemandManager {
                         }
                     } // LoadNum
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
-                    ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
 
@@ -1048,8 +1042,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -1061,16 +1054,16 @@ namespace EnergyPlus::DemandManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::ManagerTypeThermostats;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1091,9 +1084,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).LimitControl = Limit::ManagerLimitVariable;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
                                         AlphArray(3) + "\".");
-                        ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                        ShowContinueError("...value must be one of Off, Fixed, or Variable.");
                         ErrorsFound = true;
                     }
                 }
@@ -1107,10 +1100,9 @@ namespace EnergyPlus::DemandManager {
                 DemandMgr(MgrNum).UpperLimit = NumArray(3);
 
                 if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
-                    ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
-                    ShowContinueError(state,
-                                      format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(2), NumArray(2), cNumericFieldNames(3), NumArray(3)));
-                    ShowContinueError(state, cNumericFieldNames(2) + " cannot be greater than " + cNumericFieldNames(3));
+                    ShowSevereError("Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(2), NumArray(2), cNumericFieldNames(3), NumArray(3)));
+                    ShowContinueError(cNumericFieldNames(2) + " cannot be greater than " + cNumericFieldNames(3));
                     ErrorsFound = true;
                 }
 
@@ -1127,9 +1119,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).SelectionControl = Selection::ManagerSelectionMany;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
                                         AlphArray(4) + "\".");
-                        ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                        ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
                         ErrorsFound = true;
                     }
                 }
@@ -1150,7 +1142,7 @@ namespace EnergyPlus::DemandManager {
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
+                            ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + 4) + "=\"" +
                                             AlphArray(LoadNum + 4) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -1176,8 +1168,8 @@ namespace EnergyPlus::DemandManager {
                         }
                     } // LoadNum
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
-                    ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
 
@@ -1191,8 +1183,7 @@ namespace EnergyPlus::DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                inputProcessor->getObjectItem(CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -1204,16 +1195,16 @@ namespace EnergyPlus::DemandManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                GlobalNames::VerifyUniqueInterObjectName(state, state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state.dataDemandManager->UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::ManagerTypeVentilation;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1234,9 +1225,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).LimitControl = Limit::ManagerLimitReductionRatio;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(3) + "=\"" +
                                         AlphArray(3) + "\".");
-                        ShowContinueError(state, "...value must be one of Off, FixedRate, or ReductionRatio.");
+                        ShowContinueError("...value must be one of Off, FixedRate, or ReductionRatio.");
                         ErrorsFound = true;
                     }
                 }
@@ -1264,9 +1255,9 @@ namespace EnergyPlus::DemandManager {
                         DemandMgr(MgrNum).SelectionControl = Selection::ManagerSelectionMany;
 
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value" + cAlphaFieldNames(4) + "=\"" +
                                         AlphArray(4) + "\".");
-                        ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                        ShowContinueError("...value must be one of All, RotateOne, or RotateMany.");
                         ErrorsFound = true;
                     }
                 }
@@ -1287,7 +1278,7 @@ namespace EnergyPlus::DemandManager {
                     if (LoadPtr > 0) {
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" +
+                        ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" +
                                         AlphArray(LoadNum + AlphaShift) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1302,8 +1293,8 @@ namespace EnergyPlus::DemandManager {
                         }
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
-                    ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
             } // MgrNum
@@ -1313,13 +1304,13 @@ namespace EnergyPlus::DemandManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for demand managers. Preceding condition causes termination.");
+            ShowFatalError("Errors found in processing input for demand managers. Preceding condition causes termination.");
         }
     }
 
     void SurveyDemandManagers()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1353,7 +1344,7 @@ namespace EnergyPlus::DemandManager {
 
                 // Check if this load can reduce demand
                 // Assume FIXED control action for now, needs more sophisticated check for VARIABLE control
-                LoadInterface(state, DemandAction::CheckCanReduce, MgrNum, LoadPtr, CanReduceDemand);
+                LoadInterface(DemandAction::CheckCanReduce, MgrNum, LoadPtr, CanReduceDemand);
 
                 if (CanReduceDemand) {
                     DemandMgr(MgrNum).CanReduceDemand = true;
@@ -1367,7 +1358,7 @@ namespace EnergyPlus::DemandManager {
 
     void ActivateDemandManagers()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1404,7 +1395,7 @@ namespace EnergyPlus::DemandManager {
                         // Turn ON limiting on all loads
                         for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                             LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } // LoadNum
 
                     } else if (SELECT_CASE_var == Selection::ManagerSelectionMany) { // All loads are limited except for one
@@ -1413,7 +1404,7 @@ namespace EnergyPlus::DemandManager {
                             // Turn ON limiting on all loads
                             for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                                 LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                                LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                             } // LoadNum
 
                             // Set next rotated load (from last time it was active)
@@ -1424,11 +1415,11 @@ namespace EnergyPlus::DemandManager {
 
                             // Turn OFF limiting for the new rotated load
                             LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                            LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } else {
                             // Turn ON limiting for the one and only load
                             LoadPtr = DemandMgr(MgrNum).Load(1);
-                            LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         }
 
                     } else if (SELECT_CASE_var == Selection::ManagerSelectionOne) { // Only one load is limited
@@ -1436,7 +1427,7 @@ namespace EnergyPlus::DemandManager {
                             // Turn OFF limiting on all loads
                             for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                                 LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                                LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                             } // LoadNum
 
                             // Set next rotated load (from last time it was active)
@@ -1447,11 +1438,11 @@ namespace EnergyPlus::DemandManager {
 
                             // Turn ON limiting for the new rotated load
                             LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                            LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } else {
                             // Turn ON limiting for the one and only load
                             LoadPtr = DemandMgr(MgrNum).Load(1);
-                            LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         }
                     }
                 }
@@ -1462,7 +1453,7 @@ namespace EnergyPlus::DemandManager {
 
     void UpdateDemandManagers()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1499,7 +1490,7 @@ namespace EnergyPlus::DemandManager {
             //    IF (DemandMgr(MgrNum)%AvailSchedule .EQ. 0) THEN
             //      Available = .TRUE.  ! No schedule defaults to available
             //    ELSE
-            if (GetCurrentScheduleValue(state, DemandMgr(MgrNum).AvailSchedule) > 0.0) {
+            if (GetCurrentScheduleValue(DemandMgr(MgrNum).AvailSchedule) > 0.0) {
                 Available = true;
             } else {
                 Available = false;
@@ -1524,7 +1515,7 @@ namespace EnergyPlus::DemandManager {
                         // Demand Manager is not available, remove demand limits from all loads
                         for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                             LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } // LoadNum
 
                     } else {
@@ -1544,7 +1535,7 @@ namespace EnergyPlus::DemandManager {
                                         // Turn ON limiting for the old rotated load
                                         RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                         // Set next rotated load
                                         ++RotatedLoadNum;
@@ -1553,7 +1544,7 @@ namespace EnergyPlus::DemandManager {
 
                                         // Turn OFF limiting for the new rotated load
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                                     }
                                 }
 
@@ -1567,7 +1558,7 @@ namespace EnergyPlus::DemandManager {
                                         // Turn OFF limiting for the old rotated load
                                         RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                         // Set next rotated load
                                         ++RotatedLoadNum;
@@ -1576,7 +1567,7 @@ namespace EnergyPlus::DemandManager {
 
                                         // Turn ON limiting for the new rotated load
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                                     }
                                 }
                             }
@@ -1590,7 +1581,7 @@ namespace EnergyPlus::DemandManager {
                 // Demand Manager is not available, remove demand limits from all loads
                 for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                     LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                    LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                    LoadInterface(DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                 } // LoadNum
             }
 
@@ -1599,7 +1590,7 @@ namespace EnergyPlus::DemandManager {
 
     void ReportDemandManagerList(int const ListNum)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1631,7 +1622,7 @@ namespace EnergyPlus::DemandManager {
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
             BillingPeriod = state.dataEnvrn->Month;
         } else {
-            BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
+            BillingPeriod = GetCurrentScheduleValue(DemandManagerList(ListNum).BillingSchedule);
         }
 
         if (DemandManagerList(ListNum).BillingPeriod != BillingPeriod) {
@@ -1658,7 +1649,7 @@ namespace EnergyPlus::DemandManager {
         if (DemandManagerList(ListNum).PeakSchedule == 0) {
             OnPeak = true;
         } else {
-            if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
+            if (GetCurrentScheduleValue(DemandManagerList(ListNum).PeakSchedule) == 1) {
                 OnPeak = true;
             } else {
                 OnPeak = false;
@@ -1683,7 +1674,7 @@ namespace EnergyPlus::DemandManager {
 
     void LoadInterface(DemandAction const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2005
@@ -1785,17 +1776,17 @@ namespace EnergyPlus::DemandManager {
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeVentilation) {
                 Real64 FlowRate(0);
-                FlowRate = OAGetFlowRate(state, LoadPtr);
+                FlowRate = OAGetFlowRate(LoadPtr);
                 if (Action == DemandAction::CheckCanReduce) {
                     CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, true);
                     if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitFixed) {
-                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
+                        OASetDemandManagerVentilationFlow(LoadPtr, DemandMgr(MgrNum).FixedRate);
                     } else if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitReductionRatio) {
                         Real64 DemandRate(0);
                         DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
+                        OASetDemandManagerVentilationFlow(LoadPtr, DemandRate);
                     }
                 } else if (Action == DemandAction::ClearLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, false);
@@ -1806,7 +1797,7 @@ namespace EnergyPlus::DemandManager {
 
     void InitDemandManagers()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2010
@@ -1818,8 +1809,8 @@ namespace EnergyPlus::DemandManager {
         // appropriate initializations.
 
         if (state.dataDemandManager->GetInput) {
-            GetDemandManagerInput(state);
-            GetDemandManagerListInput(state);
+            GetDemandManagerInput();
+            GetDemandManagerListInput();
             state.dataDemandManager->GetInput = false;
         }
     }

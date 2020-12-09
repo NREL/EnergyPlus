@@ -54,8 +54,7 @@ using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int main(int argc, const char *argv[])
 {
-    EnergyPlus::EnergyPlusData state;
-
-    ProcessArgs(state, argc, argv);
-    return EnergyPlusPgm(state);
+    EnergyPlus::createNewStateVector();
+    ProcessArgs(argc, argv);
+    return EnergyPlusPgm();
 }

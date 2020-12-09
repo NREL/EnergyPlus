@@ -270,7 +270,7 @@ namespace VentilatedSlab {
 
     // Functions
 
-    void SimVentilatedSlab(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -279,41 +279,41 @@ namespace VentilatedSlab {
 
     void GetVentilatedSlabInput();
 
-    void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
+    void InitVentilatedSlab(int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeVentilatedSlab(EnergyPlusData &state, int const Item);
+    void SizeVentilatedSlab(int const Item);
 
-    void CalcVentilatedSlab(EnergyPlusData &state, int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabComps(EnergyPlusData &state, int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     );
 
-    void CalcVentilatedSlabCoilOutput(EnergyPlusData &state, int const Item,           // system index in ventilated slab array
+    void CalcVentilatedSlabCoilOutput(int const Item,           // system index in ventilated slab array
                                       Real64 &PowerMet,         // power supplied (W)
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(EnergyPlusData &state, int const Item,               // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
 
-    void SimVentSlabOAMixer(EnergyPlusData &state, int const Item); // System index in Ventilated Slab array
+    void SimVentSlabOAMixer(int const Item); // System index in Ventilated Slab array
 
-    void UpdateVentilatedSlab(EnergyPlusData &state, int const Item,               // Index for the ventilated slab under consideration within the derived types
+    void UpdateVentilatedSlab(int const Item,               // Index for the ventilated slab under consideration within the derived types
                               bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     );
 
-    Real64 CalcVentSlabHXEffectTerm(EnergyPlusData &state, int const Item,            // Index number of radiant system under consideration
+    Real64 CalcVentSlabHXEffectTerm(int const Item,            // Index number of radiant system under consideration
                                     Real64 const Temperature,  // Temperature of air entering the radiant system, in C
                                     Real64 const AirMassFlow,  // Mass flow rate of water in the radiant system, in kg/s
                                     Real64 const FlowFraction, // Mass flow rate fraction for this surface in the radiant system
@@ -323,7 +323,7 @@ namespace VentilatedSlab {
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-    void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
+    void ReportVentilatedSlab(int const Item); // Index for the ventilated slab under consideration within the derived types
 
     //*****************************************************************************************
 

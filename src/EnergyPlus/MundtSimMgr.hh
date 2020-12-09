@@ -159,7 +159,7 @@ namespace MundtSimMgr {
 
     // Functions
 
-    void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void ManageMundtModel(int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
@@ -167,18 +167,17 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForMundtModel(int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetupMundtModel(EnergyPlusData &state,
-                         int ZoneNum, // index number for the specified zone
+    void SetupMundtModel(int ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
     );
 
     //*****************************************************************************************
 
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcMundtModel(int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
@@ -194,7 +193,7 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForMundtModel(int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 

@@ -225,13 +225,13 @@ namespace WaterUse {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitConnections();
 
-        void CalcConnectionsFlowRates(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcConnectionsFlowRates(bool FirstHVACIteration);
 
         void CalcConnectionsDrainTemp();
 
@@ -241,10 +241,10 @@ namespace WaterUse {
 
         void ReportWaterUse();
 
-        void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
+        void setupOutputVars();
     };
 
-    void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
+    void SimulateWaterUse(bool FirstHVACIteration);
 
     void GetWaterUseInput();
 

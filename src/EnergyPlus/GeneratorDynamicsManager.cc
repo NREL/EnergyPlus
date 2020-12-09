@@ -88,8 +88,9 @@ namespace GeneratorDynamicsManager {
     //   models requiring calculations across timesteps
 
     using namespace DataGenerators;
-    void SetupGeneratorControlStateManager(EnergyPlusData &state, int const GenNum) // index of generator to setup
+    void SetupGeneratorControlStateManager(int const GenNum) // index of generator to setup
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
@@ -144,8 +145,7 @@ namespace GeneratorDynamicsManager {
         MicroCHPElectricGenerator::MicroCHP(GenNum).DynamicsControlID = GenNum;
     }
 
-    void ManageGeneratorControlState(EnergyPlusData &state,
-                                     GeneratorType const GeneratorType,                 // type of Generator
+    void ManageGeneratorControlState(GeneratorType const GeneratorType,                 // type of Generator
                                      [[maybe_unused]] std::string const &GeneratorName, // user specified name of Generator
                                      int const GeneratorNum,                            // Generator number
                                      bool const RunFlagElectCenter,                 // TRUE when Generator operating per electric load center request
@@ -159,7 +159,7 @@ namespace GeneratorDynamicsManager {
                                      [[maybe_unused]] bool const FirstHVACIteration // True is this is first HVAC iteration
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   February-March 2007  (replaced July 2006 attempt)
@@ -306,13 +306,13 @@ namespace GeneratorDynamicsManager {
         }
 
         // check availability schedule
-        SchedVal = GetCurrentScheduleValue(state, state.dataGenerator->GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
+        SchedVal = GetCurrentScheduleValue(state.dataGenerator->GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
 
         Pel = PelInput;
 
         // get data to check if sufficient flow available from Plant
         if (InternalFlowControl && (SchedVal > 0.0)) {
-            TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, TcwIn);
+            TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(GeneratorNum, Pel, TcwIn);
         } else {
             TrialMdotcw = Node(InletCWnode).MassFlowRate;
         }
@@ -740,8 +740,7 @@ namespace GeneratorDynamicsManager {
         OperatingMode = newOpMode;
     }
 
-    void ManageGeneratorFuelFlow(EnergyPlusData &state,
-                                 GeneratorType const GeneratorType,                 // type of Generator
+    void ManageGeneratorFuelFlow(GeneratorType const GeneratorType,                 // type of Generator
                                  [[maybe_unused]] std::string const &GeneratorName, // user specified name of Generator
                                  int const GeneratorNum,                            // Generator number
                                  [[maybe_unused]] bool const RunFlag,               // TRUE when Generator operating
@@ -751,7 +750,7 @@ namespace GeneratorDynamicsManager {
                                  bool &ConstrainedDecreasingMdot                    // true if request was altered because of fuel rate of change down
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
@@ -805,13 +804,12 @@ namespace GeneratorDynamicsManager {
         FuelFlowProvided = MdotFuel;
     }
 
-    Real64 FuncDetermineCWMdotForInternalFlowControl(EnergyPlusData &state,
-                                                     int const GeneratorNum, // ID of generator
+    Real64 FuncDetermineCWMdotForInternalFlowControl(int const GeneratorNum, // ID of generator
                                                      Real64 const Pnetss,    // power net steady state
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2009
@@ -856,14 +854,14 @@ namespace GeneratorDynamicsManager {
         OutletNode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantOutletNodeID;
 
         // first evaluate curve
-        MdotCW = CurveValue(state, MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
+        MdotCW = CurveValue(MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
 
         // now apply constraints
         MdotCW = max(0.0, MdotCW);
 
         // make sure plant can provide, utility call may change flow
         if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
-            SetComponentFlowRate(state, MdotCW,
+            SetComponentFlowRate(MdotCW,
                                  InletNode,
                                  OutletNode,
                                  MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum,

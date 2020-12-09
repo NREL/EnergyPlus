@@ -109,26 +109,26 @@ namespace SimAirServingZones {
 
     void clear_state();
 
-    void ManageAirLoops(EnergyPlusData &state, bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+    void ManageAirLoops(bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,                  // TRUE means air loops must be (re)simulated
                         bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
     );
 
     void GetAirPathData();
 
-    void InitAirLoops(EnergyPlusData &state, bool FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(bool FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
     void ConnectReturnNodes();
 
-    void SimAirLoops(EnergyPlusData &state, bool FirstHVACIteration, bool &SimZoneEquipment);
+    void SimAirLoops(bool FirstHVACIteration, bool &SimZoneEquipment);
 
-    void SimAirLoop(EnergyPlusData &state,
+    void SimAirLoop(
         bool FirstHVACIteration, int AirLoopNum, int AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls);
 
-    void SolveAirLoopControllers(EnergyPlusData &state,
+    void SolveAirLoopControllers(
         bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-    void SolveWaterCoilController(EnergyPlusData &state, bool FirstHVACIteration,
+    void SolveWaterCoilController(bool FirstHVACIteration,
                                   int AirLoopNum,
                                   std::string const &CompName,
                                   int &CompIndex,
@@ -136,61 +136,60 @@ namespace SimAirServingZones {
                                   int ControllerIndex,
                                   bool HXAssistedWaterCoil);
 
-    void ReSolveAirLoopControllers(EnergyPlusData &state,
+    void ReSolveAirLoopControllers(
         bool FirstHVACIteration, int AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-    void SimAirLoopComponents(EnergyPlusData &state, int AirLoopNum,         // Index of the air loop being currently simulated
+    void SimAirLoopComponents(int AirLoopNum,         // Index of the air loop being currently simulated
                               bool FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
     );
 
-    void SimAirLoopComponent(EnergyPlusData &state, std::string const &CompName,   // the component Name
+    void SimAirLoopComponent(std::string const &CompName,   // the component Name
                              int CompType_Num,        // numeric equivalent for component type
                              bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                              int AirLoopNum,          // Primary air loop number
                              int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer);
 
-    void UpdateBranchConnections(EnergyPlusData &state,
+    void UpdateBranchConnections(
                                  int AirLoopNum, // primary air system number
                                  int BranchNum,  // branch reference number
                                  int Update      // 1=BeforeBranchSim; 2=AfterBranchSim
     );
 
-    void ResolveSysFlow(EnergyPlusData &state,
+    void ResolveSysFlow(
                         int SysNum, // the primary air system number
                         bool &SysReSim    // Set to TRUE if mass balance fails and re-simulation is needed
     );
 
     void SizeAirLoops();
 
-    void SizeAirLoopBranches(EnergyPlusData &state, int AirLoopNum, int BranchNum);
+    void SizeAirLoopBranches(int AirLoopNum, int BranchNum);
 
     void SetUpSysSizingArrays();
 
     void SizeSysOutdoorAir();
 
-    void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
+    void UpdateSysSizing(DataGlobalConstants::CallIndicator CallIndicator);
 
-    void UpdateSysSizingForScalableInputs(EnergyPlusData &state, int AirLoopNum);
+    void UpdateSysSizingForScalableInputs(int AirLoopNum);
 
-    Real64 GetHeatingSATempForSizing(EnergyPlusData &state, int IndexAirLoop);
+    Real64 GetHeatingSATempForSizing(int IndexAirLoop);
 
-    Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int IndexAirLoop);
+    Real64 GetHeatingSATempHumRatForSizing(int IndexAirLoop);
 
-    void LimitZoneVentEff(EnergyPlusData &state,
-                          Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+    void LimitZoneVentEff(Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
                           Real64 Voz,             // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
                           int CtrlZoneNum,        // controlled zone number
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string CompType, std::string CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(int CoilTypeNum, std::string CompType, std::string CompName, bool &WaterCoilOnAirLoop);
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(int CoilTypeNum, std::string CompName);
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnOASystem(int CoilTypeNum, std::string CompName);
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(int CoilTypeNum, std::string CompName);
 
 } // namespace SimAirServingZones
 

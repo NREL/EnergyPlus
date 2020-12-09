@@ -80,11 +80,11 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -116,15 +116,15 @@ namespace NonZoneEquipmentManager {
 
         // FLOW:
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
+            NumOfWaterHeater = inputProcessor->getNumObjectsFound("WaterHeater:Mixed") + inputProcessor->getNumObjectsFound("WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 
-        SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
+        SimulateWaterUse(FirstHVACIteration); // simulate non-plant loop water use.
 
         if (!state.dataGlobal->ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
-                SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
+                SimulateWaterHeaterStandAlone(WaterHeaterNum, FirstHVACIteration);
             }
         }
 

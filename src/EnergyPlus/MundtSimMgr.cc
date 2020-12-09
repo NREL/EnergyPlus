@@ -133,9 +133,9 @@ namespace MundtSimMgr {
     Array2D<DefineSurfaceSettings> MundtAirSurf; // surfaces
     Array1D<DefineSurfaceSettings> FloorSurf;    // floor
 
-    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void ManageMundtModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   July 2003
@@ -150,7 +150,7 @@ namespace MundtSimMgr {
 
         // initialize Mundt model data
         if (FirstTimeFlag) {
-            InitMundtModel(state);
+            InitMundtModel();
             FirstTimeFlag = false;
         }
 
@@ -158,29 +158,29 @@ namespace MundtSimMgr {
         MundtZoneNum = ZoneData(ZoneNum).MundtZoneIndex;
 
         // transfer data from surface domain to air domain for the specified zone
-        GetSurfHBDataForMundtModel(state, ZoneNum);
+        GetSurfHBDataForMundtModel(ZoneNum);
 
         // use the Mundt model only for cooling case
         if ((SupplyAirVolumeRate > 0.0001) && (QsysCoolTot > 0.0001)) {
 
             // setup Mundt model
             ErrorsFound = false;
-            SetupMundtModel(state, ZoneNum, ErrorsFound);
-            if (ErrorsFound) ShowFatalError(state, "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
+            SetupMundtModel(ZoneNum, ErrorsFound);
+            if (ErrorsFound) ShowFatalError("ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
 
             // perform Mundt model calculations
-            CalcMundtModel(state, ZoneNum);
+            CalcMundtModel(ZoneNum);
         }
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForMundtModel(state, ZoneNum);
+        SetSurfHBDataForMundtModel(ZoneNum);
     }
 
     //*****************************************************************************************
 
-    void InitMundtModel(EnergyPlusData &state)
+    void InitMundtModel()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   February 2004
@@ -295,7 +295,7 @@ namespace MundtSimMgr {
 
                         // error check for debugging
                         if (AirNodeBeginNum > state.dataRoomAirMod->TotNumOfAirNodes) {
-                            ShowFatalError(state, "An array bound exceeded. Error in InitMundtModel subroutine of MundtSimMgr.");
+                            ShowFatalError("An array bound exceeded. Error in InitMundtModel subroutine of MundtSimMgr.");
                         }
 
                         AirNodeFoundFlag = false;
@@ -305,7 +305,7 @@ namespace MundtSimMgr {
                                 LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAirMod->AirNode(AirNodeNum).Name;
                                 LineNode(NodeNum, MundtZoneIndex).Height = state.dataRoomAirMod->AirNode(AirNodeNum).Height;
                                 LineNode(NodeNum, MundtZoneIndex).SurfMask = state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask;
-                                SetupOutputVariable(state, "Room Air Node Air Temperature",
+                                SetupOutputVariable("Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
                                                     LineNode(NodeNum, MundtZoneIndex).Temp,
                                                     "HVAC",
@@ -321,7 +321,7 @@ namespace MundtSimMgr {
 
                         // error check for debugging
                         if (!AirNodeFoundFlag) {
-                            ShowSevereError(state, "InitMundtModel: Air Node in Zone=\"" + Zone(ZoneIndex).Name + "\" is not found.");
+                            ShowSevereError("InitMundtModel: Air Node in Zone=\"" + Zone(ZoneIndex).Name + "\" is not found.");
                             ErrorsFound = true;
                             continue;
                         }
@@ -345,7 +345,7 @@ namespace MundtSimMgr {
             MaxNumOfFloorSurfs = max(MaxNumOfFloorSurfs, FloorSurfCount);
         }
 
-        if (ErrorsFound) ShowFatalError(state, "InitMundtModel: Preceding condition(s) cause termination.");
+        if (ErrorsFound) ShowFatalError("InitMundtModel: Preceding condition(s) cause termination.");
 
         // allocate arrays
         RoomNodeIDs.allocate(MaxNumOfRoomNodes);
@@ -355,9 +355,9 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void GetSurfHBDataForMundtModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Weixiu Kong
         //       DATE WRITTEN   April 2003
@@ -427,7 +427,7 @@ namespace MundtSimMgr {
         ZoneEquipConfigNum = ZoneNum;
         // check whether this zone is a controlled zone or not
         if (!Zone(ZoneNum).IsControlled) {
-            ShowFatalError(state, "Zones must be controlled for Mundt air model. No system serves zone " + Zone(ZoneNum).Name);
+            ShowFatalError("Zones must be controlled for Mundt air model. No system serves zone " + Zone(ZoneNum).Name);
             return;
         }
 
@@ -438,7 +438,7 @@ namespace MundtSimMgr {
 
         // supply air flowrate is the same as zone air flowrate
         ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        ZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(state, MAT(ZoneNum), state.dataEnvrn->OutBaroPress));
+        ZoneAirDensity = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(MAT(ZoneNum), state.dataEnvrn->OutBaroPress));
         ZoneMassFlowRate = Node(ZoneNode).MassFlowRate;
         SupplyAirVolumeRate = ZoneMassFlowRate / ZoneAirDensity;
         if (ZoneMassFlowRate <= 0.0001) {
@@ -488,12 +488,11 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void SetupMundtModel(EnergyPlusData &state,
-                         int const ZoneNum, // index number for the specified zone
+    void SetupMundtModel(int const ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Febraury 2002
@@ -552,7 +551,7 @@ namespace MundtSimMgr {
                 } else if (SELECT_CASE_var == ReturnAirNode) { // return
                     ReturnNodeID = NodeNum;
                 } else {
-                    ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
+                    ShowSevereError("SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
                     ErrorsFound = true;
                 }
             }
@@ -575,16 +574,16 @@ namespace MundtSimMgr {
                 FloorSurf(SurfNum).Area = MundtAirSurf(FloorSurfSetIDs(SurfNum), MundtZoneNum).Area;
             }
         } else {
-            ShowSevereError(state, "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone(ZoneNum).Name);
+            ShowSevereError("SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone(ZoneNum).Name);
             ErrorsFound = true;
         }
     }
 
     //*****************************************************************************************
 
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void CalcMundtModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   September 2001
@@ -756,9 +755,9 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForMundtModel(int const ZoneNum) // index number for the specified zone
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   July 2003

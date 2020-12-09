@@ -86,11 +86,11 @@ public:
 
     static std::unique_ptr<InputProcessor> factory();
 
-    template <typename T> T *objectFactory(EnergyPlusData &state, std::string const &objectName)
+    template <typename T> T *objectFactory(std::string const &objectName)
     {
         T *p = data->objectFactory<T>(objectName);
         if (p != nullptr) return p;
-        auto const &fields = getFields(state, T::canonicalObjectType(), objectName);
+        auto const &fields = getFields(T::canonicalObjectType(), objectName);
         p = data->addObject<T>(objectName, fields);
         return p;
     }
@@ -99,7 +99,7 @@ public:
     {
         T *p = data->objectFactory<T>();
         if (p != nullptr) return p;
-        auto const &fields = getFields(state, T::canonicalObjectType());
+        auto const &fields = getFields(T::canonicalObjectType());
         p = data->addObject<T>(fields);
         return p;
     }
@@ -114,20 +114,19 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord);
+    int getNumObjectsFound(std::string const &ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
 
-    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, Real64 &value);
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
 
-    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value);
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
-    void getObjectItem(EnergyPlusData &state,
-                       std::string const &Object,
+    void getObjectItem(std::string const &Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
@@ -139,23 +138,20 @@ public:
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
-    int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
+    int getIDFObjNum(std::string const &Object, int const Number);
 
-    int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
+    int getJSONObjNum(std::string const &Object, int const Number);
 
-    int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType, // Object Type (ref: IDD Objects)
+    int getObjectItemNum(std::string const &ObjType, // Object Type (ref: IDD Objects)
                          std::string const &ObjName  // Name of the object type
     );
 
-    int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType,     // Object Type (ref: IDD Objects)
+    int getObjectItemNum(std::string const &ObjType,     // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
     );
 
-    void rangeCheck(EnergyPlusData &state,
-                    bool &ErrorsFound,                           // Set to true if error detected
+    void rangeCheck(bool &ErrorsFound,                           // Set to true if error detected
                     std::string const &WhatFieldString,          // Descriptive field for string
                     std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
                     std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
@@ -169,14 +165,13 @@ public:
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
-    void getObjectDefMaxArgs(EnergyPlusData &state,
-                             std::string const &ObjectWord, // Object for definition
+    void getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
                              int &NumArgs,                  // How many arguments (max) this Object can have
                              int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
                              int &NumNumeric                // How many Numeric arguments (max) this Object can have
     );
 
-    void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
+    void preProcessorCheck(bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
     void preScanReportingVariables();
 
@@ -242,10 +237,9 @@ private:
         std::size_t max_extensible_fields = 0;
     };
 
-    MaxFields findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd);
+    MaxFields findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd);
 
-    void setObjectItemValue(EnergyPlusData &state,
-                            json const &ep_object,
+    void setObjectItemValue(json const &ep_object,
                             json const &ep_schema_object,
                             std::string const &field,
                             json const &legacy_field_info,
@@ -261,9 +255,9 @@ private:
                             Optional<Array1D_string> AlphaFieldNames = _,
                             Optional<Array1D_string> NumericFieldNames = _);
 
-    void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
+    void addVariablesForMonthlyReport(std::string const &reportName);
 
-    void addRecordToOutputVariableStructure(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
+    void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
 
     std::vector<std::string> const &validationErrors();
 
@@ -273,11 +267,11 @@ private:
 
     bool processErrors();
 
-    json const &getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName);
+    json const &getFields(std::string const &objectType, std::string const &objectName);
 
-    json const &getFields(EnergyPlusData &state, std::string const &objectType);
+    json const &getFields(std::string const &objectType);
 
-    json const &getPatternProperties(EnergyPlusData &state, json const &schema_obj);
+    json const &getPatternProperties(json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {

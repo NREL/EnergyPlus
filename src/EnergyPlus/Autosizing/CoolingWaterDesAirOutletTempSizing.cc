@@ -55,24 +55,23 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitIU) {
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
-                Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
                                                                DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
@@ -101,20 +100,20 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(state, msg);
+                ShowWarningError(msg);
                 msg = format("    Tair,out  =  {:.3R}", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("    Twater,in = {:.3R}", this->dataDesInletWaterTemp);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("    Tair,out = {:.3R}", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -158,16 +157,16 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(state, msg);
+                ShowWarningError(msg);
                 msg = format("    Tair,out  =  {:.3R}", this->autoSizedValue);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("    Twater,in = {:.3R}", this->dataDesInletWaterTemp);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("    Tair,out = {:.3R}", this->autoSizedValue);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     }
@@ -175,9 +174,9 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
-        coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, this->autoSizedValue);
+        coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
     }
     return this->autoSizedValue;
 }

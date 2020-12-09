@@ -146,7 +146,7 @@ namespace SteamCoils {
         }
     };
 
-    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateSteamCoilComponents(std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -156,110 +156,95 @@ namespace SteamCoils {
 
     void GetSteamCoilInput();
 
-    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
+    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration);
 
-    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum);
+    void SizeSteamCoil(int const CoilNum);
 
-    void CalcSteamAirCoil(EnergyPlusData &state,
-                          int const CoilNum,
+    void CalcSteamAirCoil(int const CoilNum,
                           Real64 const QCoilRequested, // requested coil load
                           Real64 &QCoilActual,         // coil load actually delivered
                           int const FanOpMode,         // fan operating mode
                           Real64 const PartLoadRatio   // part-load ratio of heating coil
     );
 
-    void UpdateSteamCoil(EnergyPlusData &state, int const CoilNum);
+    void UpdateSteamCoil(int const CoilNum);
 
-    void ReportSteamCoil(EnergyPlusData &state, int const CoilNum);
+    void ReportSteamCoil(int const CoilNum);
 
-    int GetSteamCoilIndex(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+    int GetSteamCoilIndex(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex);
+    void CheckSteamCoilSchedule(std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex);
 
-    Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
-                                   std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilMaxSteamFlowRate(EnergyPlusData &state,
-                                   int const CoilIndex, // must match coil types in this module
+    Real64 GetCoilMaxSteamFlowRate(int const CoilIndex, // must match coil types in this module
                                    bool &ErrorsFound    // set to true if problem
     );
 
-    int GetCoilAirInletNode(EnergyPlusData &state,
-                            int const CoilIndex,         // must match coil types in this module
+    int GetCoilAirInletNode(int const CoilIndex,         // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilAirOutletNode(EnergyPlusData &state,
-                             int const CoilIndex,         // must match coil types in this module
+    int GetCoilAirOutletNode(int const CoilIndex,         // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilAirOutletNode(EnergyPlusData &state,
-                             std::string const &CoilType, // must match coil types in this module
+    int GetCoilAirOutletNode(std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilSteamInletNode(EnergyPlusData &state,
-                              int const CoilIndex,         // must match coil types in this module
+    int GetCoilSteamInletNode(int const CoilIndex,         // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilSteamInletNode(EnergyPlusData &state,
-                              std::string const &CoilType, // must match coil types in this module
+    int GetCoilSteamInletNode(std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilSteamOutletNode(EnergyPlusData &state,
-                               int const CoilIndex,         // must match coil types in this module
+    int GetCoilSteamOutletNode(int const CoilIndex,         // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilSteamOutletNode(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+    int GetCoilSteamOutletNode(std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity([[maybe_unused]] EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity([[maybe_unused]] std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetTypeOfCoil(EnergyPlusData &state,
-                      int const CoilIndex,         // must match coil types in this module
+    int GetTypeOfCoil(int const CoilIndex,         // must match coil types in this module
                       std::string const &CoilName, // must match coil names for the coil type
                       bool &ErrorsFound            // set to true if problem
     );
 
-    int GetSteamCoilControlNodeNum(EnergyPlusData &state,
-                                   std::string const &CoilType, // must match coil types in this module
+    int GetSteamCoilControlNodeNum(std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorFlag              // set to true if problem
     );
 
-    int GetSteamCoilAvailScheduleIndex(EnergyPlusData &state,
-                                       std::string const &CoilType, // must match coil types in this module
+    int GetSteamCoilAvailScheduleIndex(std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     );
 
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
-    void SetSteamCoilData(EnergyPlusData &state,
-                          int const CoilNum,                           // index of hot steam heating Coil
+    void SetSteamCoilData(int const CoilNum,                           // index of hot steam heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
                           Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used

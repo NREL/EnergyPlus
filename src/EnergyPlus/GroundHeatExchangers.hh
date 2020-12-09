@@ -288,12 +288,11 @@ namespace GroundHeatExchangers {
 
         virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
-                      bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int const objectType, std::string objectName);
+        static PlantComponent *factory(int const objectType, std::string objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 

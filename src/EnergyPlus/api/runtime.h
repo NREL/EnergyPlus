@@ -115,9 +115,9 @@ extern "C" {
 ///   }
 ///   int main(int argc, const char * argv[]) {
 ///     EnergyPlusState state = stateNew();
-///     registerProgressCallback(state, progressCallback);
-///     energyplus(state, argc, argv);
-///     stateDelete(state);
+///     registerProgressCallback(progressCallback);
+///     energyplus(argc, argv);
+///     stateDelete();
 ///   }
 /// \endcode
 /// \remark If this function is called multiple times in the same thread, the client must call `stateReset` in

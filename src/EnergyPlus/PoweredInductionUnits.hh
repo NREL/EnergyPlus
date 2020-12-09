@@ -177,7 +177,7 @@ namespace PoweredInductionUnits {
 
     void clear_state();
 
-    void SimPIU(EnergyPlusData &state, std::string const &CompName,   // name of the PIU
+    void SimPIU(std::string const &CompName,   // name of the PIU
                 bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                 int const ZoneNum,             // index of zone served by PIU
                 int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -186,32 +186,31 @@ namespace PoweredInductionUnits {
 
     void GetPIUs();
 
-    void InitPIU(EnergyPlusData &state,
-                 int const PIUNum,             // number of the current fan coil unit being simulated
+    void InitPIU(int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 
-    void SizePIU(EnergyPlusData &state, int const PIUNum);
+    void SizePIU(int const PIUNum);
 
-    void CalcSeriesPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
+    void CalcSeriesPIU(int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served
                        int const ZoneNode,           // zone node number
                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void CalcParallelPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
+    void CalcParallelPIU(int const PIUNum,             // number of the current PIU being simulated
                          int const ZoneNum,            // number of zone being served
                          int const ZoneNode,           // zone node number
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void ReportPIU(EnergyPlusData &state, int const PIUNum); // number of the current fan coil unit being simulated
+    void ReportPIU(int const PIUNum); // number of the current fan coil unit being simulated
 
     // ===================== Utilities =====================================
 
-    bool PIUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
+    bool PIUnitHasMixer(std::string const &CompName); // component (mixer) name
 
-    void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum); // induced air node number
+    void PIUInducesPlenumAir(int const NodeNum); // induced air node number
 
 } // namespace PoweredInductionUnits
 

@@ -88,8 +88,8 @@ struct CoilCoolingDXCurveFitSpeed
     std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
 
     CoilCoolingDXCurveFitSpeed() = default;
-    explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string& name);
-    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
+    explicit CoilCoolingDXCurveFitSpeed(const std::string& name);
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
 
@@ -145,14 +145,13 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    void CalcSpeedOutput(EnergyPlusData &state,
+    void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
     void size();
-    Real64 CalcBypassFactor(EnergyPlusData &state, Real64 tdb, Real64 w, Real64 h, Real64 p);
+    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:
-    bool processCurve(EnergyPlusData &state,
-                      const std::string& curveName,
+    bool processCurve(const std::string& curveName,
                       int &curveIndex,
                       std::vector<int> validDims,
                       const std::string& routineName,

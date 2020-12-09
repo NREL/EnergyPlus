@@ -173,15 +173,15 @@ namespace SurfaceGroundHeatExchanger {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(int objectType, std::string objectName);
 
         void InitSurfaceGroundHeatExchanger();
 
         //==============================================================================
 
-        void CalcSurfaceGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+        void CalcSurfaceGroundHeatExchanger(bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
 
         //==============================================================================
@@ -216,8 +216,7 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        Real64 CalcHXEffectTerm(EnergyPlusData &state,
-                                Real64 Temperature,  // Temperature of water entering the surface, in C
+        Real64 CalcHXEffectTerm(Real64 Temperature,  // Temperature of water entering the surface, in C
                                 Real64 WaterMassFlow // Mass flow rate, in kg/s
         );
 

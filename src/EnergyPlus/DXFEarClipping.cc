@@ -183,7 +183,7 @@ namespace DXFEarClipping {
                     DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005
@@ -302,23 +302,23 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
-                ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
                 if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                    ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
+                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
+                    ShowMessage(format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
+                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
                     }
                 }
                 break; // while loop
@@ -520,7 +520,7 @@ namespace DXFEarClipping {
                        Array1D_int &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005

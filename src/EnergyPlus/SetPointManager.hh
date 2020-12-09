@@ -916,7 +916,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineReturnWaterHWSetPointManager : SPBase // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
@@ -942,7 +942,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineScheduledTESSetPointManager : SPBase // Derived type for Scheduled TES Setpoint Manager data
@@ -972,9 +972,9 @@ namespace SetPointManager {
 
     void GetSetPointManagerInputs(); // wrapper for GetInput to accomodate unit testing
 
-    void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
+    void GetSetPointManagerInputData(bool &ErrorsFound);
 
-    void VerifySetPointManagers(EnergyPlusData &state, bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
     void InitSetPointManagers();
 
@@ -986,24 +986,24 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints();
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType);
+    bool IsNodeOnSetPtManager(int NodeNum, iCtrlVarType SetPtType);
 
-    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int NodeNum, iCtrlVarType iCtrlVarType);
+    bool NodeHasSPMCtrlVarType(int NodeNum, iCtrlVarType iCtrlVarType);
 
-    void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int NodeNum);
+    void ResetHumidityRatioCtrlVarType(int NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint();
 
-    iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
+    iCtrlVarType GetHumidityRatioVariableType(int CntrlNodeNum);
 
-    void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
+    void SetUpNewScheduledTESSetPtMgr(
         int SchedPtr, int SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int CompOpType, int ControlNodeNum);
 
-    bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);
+    bool GetCoilFreezingCheckFlag(int MixedAirSPMNum);
 
-    int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int MixedAirNode);
+    int GetMixedAirNumWithCoilFreezingCheck(int MixedAirNode);
 
 } // namespace SetPointManager
 

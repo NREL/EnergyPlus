@@ -109,6 +109,7 @@ struct EnergyPlusData;
                 case CurrentObject::EqList:
                     return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
             }
+            return "";
         }
 
         struct OAEquipList {
@@ -240,7 +241,7 @@ struct EnergyPlusData;
             }
         };
 
-        void SimOutdoorAirUnit(EnergyPlusData &state, std::string const &CompName,   // name of the outdoor air unit
+        void SimOutdoorAirUnit(std::string const &CompName,   // name of the outdoor air unit
                                int ZoneNum,             // number of zone being served
                                bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                Real64 &PowerMet,              // Sensible power supplied (W)
@@ -249,24 +250,23 @@ struct EnergyPlusData;
 
         void GetOutdoorAirUnitInputs();
 
-        void InitOutdoorAirUnit(EnergyPlusData &state, int OAUnitNum,          // index for the current outdoor air unit
+        void InitOutdoorAirUnit(int OAUnitNum,          // index for the current outdoor air unit
                                 int ZoneNum,            // number of zone being served
                                 bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
 
-        void SizeOutdoorAirUnit(EnergyPlusData &state, int OAUnitNum);
+        void SizeOutdoorAirUnit(int OAUnitNum);
 
-        void CalcOutdoorAirUnit(EnergyPlusData &state,
-                                int &OAUnitNum,                // number of the current unit being simulated
+        void CalcOutdoorAirUnit(int &OAUnitNum,                // number of the current unit being simulated
                                 int ZoneNum,             // number of zone being served
                                 bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                 Real64 &PowerMet,              // power supplied
                                 Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
         );
 
-        void SimZoneOutAirUnitComps(EnergyPlusData &state, int OAUnitNum, bool FirstHVACIteration);
+        void SimZoneOutAirUnitComps(int OAUnitNum, bool FirstHVACIteration);
 
-        void SimOutdoorAirEquipComps(EnergyPlusData &state, int OAUnitNum,          // actual outdoor air unit num
+        void SimOutdoorAirEquipComps(int OAUnitNum,          // actual outdoor air unit num
                                      std::string const &EquipType, // the component type
                                      std::string const &EquipName, // the component Name
                                      int EquipNum,
@@ -276,19 +276,18 @@ struct EnergyPlusData;
                                      bool Sim // if TRUE, simulate component
         );
 
-        void CalcOAUnitCoilComps(EnergyPlusData &state, int CompNum, // actual outdoor air unit num
+        void CalcOAUnitCoilComps(int CompNum, // actual outdoor air unit num
                                  bool FirstHVACIteration,
                                  int EquipIndex, // Component Type -- Integerized for this module
                                  Real64 &LoadMet);
 
-        void ReportOutdoorAirUnit(EnergyPlusData &state,
-                                  int OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
+        void ReportOutdoorAirUnit(int OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
 
-        int GetOutdoorAirUnitOutAirNode(EnergyPlusData &state, int OAUnitNum);
+        int GetOutdoorAirUnitOutAirNode(int OAUnitNum);
 
-        int GetOutdoorAirUnitZoneInletNode(EnergyPlusData &state, int OAUnitNum);
+        int GetOutdoorAirUnitZoneInletNode(int OAUnitNum);
 
-        int GetOutdoorAirUnitReturnAirNode(EnergyPlusData &state, int OAUnitNum);
+        int GetOutdoorAirUnitReturnAirNode(int OAUnitNum);
     }
 
     struct OutdoorAirUnitData : BaseGlobalStruct {

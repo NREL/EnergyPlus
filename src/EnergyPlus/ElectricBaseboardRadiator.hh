@@ -148,7 +148,7 @@ namespace ElectricBaseboardRadiator {
     // Functions
     void clear_state();
 
-    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimElecBaseboard(std::string const &EquipName,
                           int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -157,11 +157,11 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput();
 
-    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitElectricBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void SizeElectricBaseboard(int const BaseboardNum);
 
-    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,
@@ -174,9 +174,9 @@ namespace ElectricBaseboardRadiator {
     void UpdateElectricBaseboardOn(
         Real64 &AirOutletTemp, Real64 &ElecUseRate, Real64 const AirInletTemp, Real64 const QBBCap, Real64 const CapacitanceAir, Real64 const Effic);
 
-    void UpdateElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void UpdateElectricBaseboard(int const BaseboardNum);
 
-    void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
     void DistributeBBElecRadGains();
 

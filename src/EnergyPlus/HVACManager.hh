@@ -81,7 +81,7 @@ namespace HVACManager {
 
     void SimHVAC();
 
-    void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -93,7 +93,7 @@ namespace HVACManager {
 
     void ResolveAirLoopFlowLimits();
 
-    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(bool &SimAir); // TRUE means air loops must be (re)simulated
 
     void ResetHVACControl();
 

@@ -67,11 +67,11 @@ template <typename T> class EnumParser
 public:
     EnumParser(){};
 
-    T StringToEnum(EnergyPlusData &state, const std::string &value)
+    T StringToEnum(const std::string &value)
     {
         auto iValue = m_Map.find(value);
         if (iValue == m_Map.end()) {
-            ShowFatalError(state, "Incorrect enumerator assigned.");
+            ShowFatalError("Incorrect enumerator assigned.");
         }
         return iValue->second;
     }
@@ -92,7 +92,7 @@ namespace WindowManager {
     public:
         CWindowModel();
 
-        static std::unique_ptr<CWindowModel> WindowModelFactory(EnergyPlusData &state, std::string const &objectName);
+        static std::unique_ptr<CWindowModel> WindowModelFactory(std::string const &objectName);
 
         WindowsModel getWindowsModel() const;
         bool isExternalLibraryModel() const;

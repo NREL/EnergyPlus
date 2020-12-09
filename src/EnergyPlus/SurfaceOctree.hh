@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1.fwd.hh>
@@ -562,23 +563,24 @@ public: // Methods
 
     // Process Surfaces in Cube that Ray Intersects Stopping if Predicate Satisfied
     template <typename Predicate>
-    bool processSomeSurfaceRayIntersectsCube(EnergyPlusData &state, Vertex const &a, Vertex const &dir, Vertex const &dir_inv, Predicate const &predicate) const
+    bool processSomeSurfaceRayIntersectsCube(Vertex const &a, Vertex const &dir, Vertex const &dir_inv, Predicate const &predicate) const
     {
+        EnergyPlusData & state = getCurrentState(0);
         if (rayIntersectsCube(a, dir, dir_inv)) {
             for (auto const *surface_p : surfaces_) {   // Process this cube's surfaces
                 if (predicate(*surface_p)) return true; // Don't need to process more surfaces
             }
             for (std::uint8_t i = 0; i < n_; ++i) {                                                          // Recurse
-                if (cubes_[i]->processSomeSurfaceRayIntersectsCube(state, a, dir, dir_inv, predicate)) return true; // Don't need to process more surfaces
+                if (cubes_[i]->processSomeSurfaceRayIntersectsCube(a, dir, dir_inv, predicate)) return true; // Don't need to process more surfaces
             }
         }
         return false;
     }
 
     // Process Surfaces in Cube that Ray Intersects Stopping if Predicate Satisfied
-    template <typename Predicate> bool processSomeSurfaceRayIntersectsCube(EnergyPlusData &state, Vertex const &a, Vertex const &dir, Predicate const &predicate) const
+    template <typename Predicate> bool processSomeSurfaceRayIntersectsCube(Vertex const &a, Vertex const &dir, Predicate const &predicate) const
     {
-        return processSomeSurfaceRayIntersectsCube(state, a, dir, safe_inverse(dir), predicate); // Inefficient if called in loop with same dir
+        return processSomeSurfaceRayIntersectsCube(a, dir, safe_inverse(dir), predicate); // Inefficient if called in loop with same dir
     }
 
 public: // Static Methods

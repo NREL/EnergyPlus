@@ -114,10 +114,10 @@ namespace WindowManager {
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
     std::pair<Real64, Real64>
-    getWCECoordinates(EnergyPlusData &state, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    getWCECoordinates(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
-    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties
@@ -145,8 +145,7 @@ namespace WindowManager {
                        int const t_ConstrNum,
                        std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(EnergyPlusData &state,
-                                                                                   FenestrationCommon::WavelengthRange const t_Range,
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
                                                                                    int const t_ConstrNum);
 
         static void clearState();
@@ -154,7 +153,7 @@ namespace WindowManager {
     private:
         CWindowConstructionsSimplified();
 
-        IGU_Layers getLayers(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
+        IGU_Layers getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
 
         static std::unique_ptr<CWindowConstructionsSimplified> p_inst;
 

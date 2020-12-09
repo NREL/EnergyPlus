@@ -81,13 +81,14 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
+std::unique_ptr<SQLite> CreateSQLiteDatabase()
 {
+    EnergyPlusData & state = getCurrentState(0);
     if (!state.files.outputControl.sqlite) {
         return nullptr;
     }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
+        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 
@@ -101,7 +102,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             int numNumbers;
             int status;
 
-            inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
+            inputProcessor->getObjectItem("Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
@@ -120,13 +121,14 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
-        ShowFatalError(state, error.what());
+        ShowFatalError(error.what());
         return nullptr;
     }
 }
 
-void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
+void CreateSQLiteZoneExtendedOutput()
 {
+    EnergyPlusData & state = getCurrentState(0);
     if (sqlite && sqlite->writeOutputToSQLite()) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addZoneData(zoneNum, DataHeatBalance::Zone(zoneNum));
@@ -140,10 +142,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
-                                    ScheduleManager::GetScheduleName(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleType(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
+                                    ScheduleManager::GetScheduleName(scheduleNumber),
+                                    ScheduleManager::GetScheduleType(scheduleNumber),
+                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
+                                    ScheduleManager::GetScheduleMaxValue(scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
             auto const &surface = DataSurfaces::Surface(surfaceNumber);

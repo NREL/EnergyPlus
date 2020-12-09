@@ -94,7 +94,7 @@ class EnergyPlusAPI:
         return "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"
 
     def verify_api_version_match(self, state: c_void_p) -> None:
-        api_version_from_ep = float(self.api.apiVersionFromEPlus(state))
+        api_version_from_ep = float(self.api.apiVersionFromEPlus())
         api_version_defined_here = float(self.api_version())
         if api_version_defined_here != api_version_from_ep:
             raise Exception("API version does not match, this API version: %s; E+ is expecting version: %s" % (

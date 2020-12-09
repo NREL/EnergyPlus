@@ -59,7 +59,7 @@ namespace EnergyPlus {
 namespace Construction {
 
     void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1990
@@ -228,22 +228,19 @@ namespace Construction {
                         DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
                         if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
-                            ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
+                            ShowSevereError("InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                             "material name = " +
                                             state.dataMaterial->Material(CurrentLayer).Name);
-                            ShowContinueError(state,
-                                              format("High conductivity Material layers are not well supported for internal source constructions, "
+                            ShowContinueError(format("High conductivity Material layers are not well supported for internal source constructions, "
                                                      "material conductivity = {:.3R} [W/m-K]",
                                                      state.dataMaterial->Material(CurrentLayer).Conductivity));
-                            ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
+                            ShowContinueError(format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                             ShowContinueError(
-                                state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
+                                format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                             if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
-                                ShowContinueError(state,
-                                                  format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
+                                ShowContinueError(format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
                                                          state.dataMaterial->Material(CurrentLayer).Thickness));
-                                ShowContinueError(state,
-                                                  format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
+                                ShowContinueError(format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                          DataHeatBalance::ThinMaterialLayerThreshold));
                             }
                             state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity = true;
@@ -252,8 +249,8 @@ namespace Construction {
                 }
             }
             if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
-                ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-                ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
+                ShowSevereError("InitConductionTransferFunctions: Material too thick for CTF calculation");
+                ShowContinueError("material name = " + state.dataMaterial->Material(CurrentLayer).Name);
                 ErrorsFound = true;
             }
 
@@ -275,9 +272,9 @@ namespace Construction {
                     // parameters to calculate CTFs for a building element
                     // containing this layer.
 
-                    ShowSevereError(state, "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
+                    ShowSevereError("InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
                                     "R Value below lowest allowed value");
-                    ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
+                    ShowContinueError(format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                     ErrorsFound = true;
 
                 } else { // A valid user defined R-value is available.
@@ -360,8 +357,8 @@ namespace Construction {
                         --this->TempAfterLayer;
                     }
                 } else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-                    ShowFatalError(state, "Combining resistance layers failed for " + this->Name);
-                    ShowContinueError(state, "This should never happen.  Contact EnergyPlus Support for further assistance.");
+                    ShowFatalError("Combining resistance layers failed for " + this->Name);
+                    ShowContinueError("This should never happen.  Contact EnergyPlus Support for further assistance.");
                 }
             }
         }
@@ -862,7 +859,7 @@ namespace Construction {
                     // determine the CTFs.  The Gammas are an intermediate
                     // calculations which are necessary before the CTFs can
                     // be computed in TransFuncCoeffs.
-                    DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
+                    DisplayString("Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                     this->calculateExponentialMatrix(); // Compute exponential of AMat
@@ -920,7 +917,7 @@ namespace Construction {
                                 CTFConvrg = false;
                             }
                         } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-                            ShowFatalError(state, "Illegal construction definition, no CTFs calculated for " + this->Name);
+                            ShowFatalError("Illegal construction definition, no CTFs calculated for " + this->Name);
                         }
                     }
 
@@ -930,34 +927,33 @@ namespace Construction {
                     // Thus, if the time step reaches a certain point, error out and let the
                     // user know that something needs to be checked in the input file.
                     if (this->CTFTimeStep >= MaxAllowedTimeStep) {
-                        ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
-                        ShowContinueError(state, "...with Materials (outside layer to inside)");
-                        ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
+                        ShowSevereError("CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
+                        ShowContinueError("...with Materials (outside layer to inside)");
+                        ShowContinueError("(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
                         for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                             if (Layer != this->TotLayers) {
-                                ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError("(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             } else {
-                                ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError("(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             }
                         }
-                        ShowContinueError(state,
-                                "The Construction report will be produced. This will show more details on Constructions and their materials.");
-                        ShowContinueError(state, "Attempts will be made to complete the CTF process but the report may be incomplete.");
-                        ShowContinueError(state, "Constructs reported after this construction may appear to have all 0 CTFs.");
-                        ShowContinueError(state, "The potential causes of this problem are related to the input for the construction");
-                        ShowContinueError(state, "listed in the severe error above.  The CTF calculate routine is unable to come up");
-                        ShowContinueError(state, "with a series of CTF terms that have a reasonable time step and this indicates an");
-                        ShowContinueError(state, "error.  Check the definition of this construction and the materials that make up");
-                        ShowContinueError(state, "the this->  Very thin, highly conductive materials may cause problems.");
-                        ShowContinueError(state, "This may be avoided by ignoring the presence of those materials since they probably");
-                        ShowContinueError(state, "do not effect the heat transfer characteristics of the this->  Highly");
-                        ShowContinueError(state, "conductive or highly resistive layers that are alternated with high mass layers");
-                        ShowContinueError(state, "may also result in problems.  After confirming that the input is correct and");
-                        ShowContinueError(state, "realistic, the user should contact the EnergyPlus support team.");
+                        ShowContinueError("The Construction report will be produced. This will show more details on Constructions and their materials.");
+                        ShowContinueError("Attempts will be made to complete the CTF process but the report may be incomplete.");
+                        ShowContinueError("Constructs reported after this construction may appear to have all 0 CTFs.");
+                        ShowContinueError("The potential causes of this problem are related to the input for the construction");
+                        ShowContinueError("listed in the severe error above.  The CTF calculate routine is unable to come up");
+                        ShowContinueError("with a series of CTF terms that have a reasonable time step and this indicates an");
+                        ShowContinueError("error.  Check the definition of this construction and the materials that make up");
+                        ShowContinueError("the this->  Very thin, highly conductive materials may cause problems.");
+                        ShowContinueError("This may be avoided by ignoring the presence of those materials since they probably");
+                        ShowContinueError("do not effect the heat transfer characteristics of the this->  Highly");
+                        ShowContinueError("conductive or highly resistive layers that are alternated with high mass layers");
+                        ShowContinueError("may also result in problems.  After confirming that the input is correct and");
+                        ShowContinueError("realistic, the user should contact the EnergyPlus support team.");
                         DoCTFErrorReport = true;
                         ErrorsFound = true;
                         break;
-                        //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
+                        //            CALL ShowFatalError('Program terminated for reasons listed (InitConductionTransferFunctions) ')
                     }
 
                 } // ... end of CTF calculation loop.
@@ -990,7 +986,7 @@ namespace Construction {
             this->e(1) = 0.0;       // zero.
 
             if (this->SourceSinkPresent) {
-                ShowSevereError(state, "Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
+                ShowSevereError("Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
                 ErrorsFound = true;
             }
 
@@ -1897,7 +1893,7 @@ namespace Construction {
     }
 
     void ConstructionProps::reportTransferFunction(int const cCounter) {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
         print(state.files.eio,
               Format_700,
@@ -1988,7 +1984,7 @@ namespace Construction {
 
     bool ConstructionProps::isGlazingConstruction() const
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -2008,14 +2004,14 @@ namespace Construction {
 
     Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(Real64 userValue)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         if (userValue < 0.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
-            ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
+            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
+            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
             return 0.0;
         } else if (userValue > 1.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
-            ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
+            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
+            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
             return 1.0;
         } else {    // Valid value between 0 and 1
             return userValue;

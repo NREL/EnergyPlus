@@ -71,23 +71,20 @@ namespace HybridUnitaryAirConditioners {
     void clear_state();
 
     // MODULE PARAMETER DEFINITIONS
-    void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                             std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneHybridUnitaryAirConditioners(std::string const &CompName,    // name of the packaged terminal heat pump
                                              int const ZoneNum,              // number of zone being served
                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                              Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                              int &CompIndex                  // index to zone hvac unit
     );
 
-    void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors);
+    void GetInputZoneHybridUnitaryAirConditioners(bool &Errors);
 
-    void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int const UnitNum, // unit number
+    void InitZoneHybridUnitaryAirConditioners(int const UnitNum, // unit number
                                               int const ZoneNum  // number of zone being served
     );
 
-    void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int const UnitNum,              // unit number
+    void CalcZoneHybridUnitaryAirConditioners(int const UnitNum,              // unit number
                                               int const ZoneNum,              // number of zone being served
                                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                               Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
@@ -95,11 +92,11 @@ namespace HybridUnitaryAirConditioners {
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 
-    int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACOutAirNode(int const UnitNum);
 
-    int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACZoneInletNode(int const UnitNum);
 
-    int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACReturnAirNode(int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
 

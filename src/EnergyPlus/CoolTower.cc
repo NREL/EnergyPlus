@@ -90,7 +90,7 @@ namespace CoolTower {
 
     void ManageCoolTower()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -106,22 +106,22 @@ namespace CoolTower {
 
         // Obtains and allocates heat balance related parameters from input
         if (state.dataCoolTower->GetInputFlag) {
-            GetCoolTower(state);
+            GetCoolTower();
             state.dataCoolTower->GetInputFlag = false;
         }
 
         if (state.dataCoolTower->NumCoolTowers == 0) return;
 
-        CalcCoolTower(state);
+        CalcCoolTower();
 
-        UpdateCoolTower(state);
+        UpdateCoolTower();
 
-        ReportCoolTower(state);
+        ReportCoolTower();
     }
 
     void GetCoolTower()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -164,7 +164,7 @@ namespace CoolTower {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
         // Initializations and allocations
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -172,15 +172,14 @@ namespace CoolTower {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        state.dataCoolTower->NumCoolTowers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataCoolTower->NumCoolTowers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
 
         // Obtain inputs
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
+            inputProcessor->getObjectItem(CurrentModuleObject,
                                           CoolTowerNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -191,16 +190,16 @@ namespace CoolTower {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, "Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) + "\".");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                    ShowContinueError("Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -209,10 +208,10 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) +
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + cAlphaArgs(3) +
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + cAlphaArgs(3) +
                                     "\" not found.");
                 }
                 ErrorsFound = true;
@@ -222,7 +221,7 @@ namespace CoolTower {
             if (lAlphaBlanks(4)) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode =  WaterSupplyMode::FromMains;
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                SetupTankDemandComponent(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
+                SetupTankDemandComponent(state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name,
                                          CurrentModuleObject,
                                          state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
                                          ErrorsFound,
@@ -237,18 +236,18 @@ namespace CoolTower {
                 } else if ((SELECT_CASE_var == "WINDDRIVENFLOW") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrlEnum::WindDriven;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" + cAlphaArgs(5) + "\".");
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
             }
 
-            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(cAlphaArgs(6));
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) +
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) + "=\"" + cAlphaArgs(6) +
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) + "=\"" + cAlphaArgs(6) +
                                     "\" not found.");
                 }
                 ErrorsFound = true;
@@ -257,99 +256,85 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate = rNumericArgs(1); // Maximum limit of water supply
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate > MaximumWaterFlowRate) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate = MaximumWaterFlowRate;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(1), rNumericArgs(1)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaximumWaterFlowRate));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(1), rNumericArgs(1)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaximumWaterFlowRate));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate < MinimumWaterFlowRate) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate = MinimumWaterFlowRate;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(1), rNumericArgs(1)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinimumWaterFlowRate));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(1), rNumericArgs(1)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinimumWaterFlowRate));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight = rNumericArgs(2); // Get effctive tower height
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight > MaxHeight) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight = MaxHeight;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(2), rNumericArgs(2)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxHeight));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(2), rNumericArgs(2)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxHeight));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight < MinHeight) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight = MinHeight;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(2), rNumericArgs(2)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinHeight));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(2), rNumericArgs(2)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinHeight));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea = rNumericArgs(3); // Get outlet area
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea > MaxValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea = MaxValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(3), rNumericArgs(3)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(3), rNumericArgs(3)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxValue));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea < MinValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea = MinValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(3), rNumericArgs(3)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(3), rNumericArgs(3)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinValue));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate = rNumericArgs(4); // Maximum limit of air flow to the space
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate > MaxValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate = MaxValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(4), rNumericArgs(4)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(4), rNumericArgs(4)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxValue));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate < MinValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate = MinValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(4), rNumericArgs(4)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(4), rNumericArgs(4)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinValue));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp = rNumericArgs(5); // Get minimum temp limit which gets this cooltower off
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp > MaxValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp = MaxValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(5), rNumericArgs(5)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(5), rNumericArgs(5)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxValue));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp < MinValue) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp = MinValue;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(5), rNumericArgs(5)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinValue));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(5), rNumericArgs(5)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinValue));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracWaterLoss = rNumericArgs(6); // Fraction of water loss
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracWaterLoss > MaxFrac) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracWaterLoss = MaxFrac;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(6), rNumericArgs(6)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxFrac));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(6), rNumericArgs(6)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxFrac));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracWaterLoss < MinFrac) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracWaterLoss = MinFrac;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(6), rNumericArgs(6)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinFrac));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(6), rNumericArgs(6)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinFrac));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracFlowSched = rNumericArgs(7); // Fraction of loss of air flow
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracFlowSched > MaxFrac) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracFlowSched = MaxFrac;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(7), rNumericArgs(7)));
-                ShowContinueError(state, format("...Maximum Allowable=[{:.2R}].", MaxFrac));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(7), rNumericArgs(7)));
+                ShowContinueError(format("...Maximum Allowable=[{:.2R}].", MaxFrac));
             }
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracFlowSched < MinFrac) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FracFlowSched = MinFrac;
-                ShowWarningError(state,
-                                 format("{}=\"{}\" invalid {}=[{:.5R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(7), rNumericArgs(7)));
-                ShowContinueError(state, format("...Minimum Allowable=[{:.2R}].", MinFrac));
+                ShowWarningError(format("{}=\"{}\" invalid {}=[{:.5R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(7), rNumericArgs(7)));
+                ShowContinueError(format("...Minimum Allowable=[{:.2R}].", MinFrac));
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).RatedPumpPower = rNumericArgs(8); // Get rated pump power
@@ -362,94 +347,94 @@ namespace CoolTower {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
+        if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
-            SetupOutputVariable(state, "Zone Cooltower Sensible Heat Loss Energy",
+            SetupOutputVariable("Zone Cooltower Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatLoss,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Sensible Heat Loss Rate",
+            SetupOutputVariable("Zone Cooltower Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Latent Heat Loss Energy",
+            SetupOutputVariable("Zone Cooltower Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatLoss,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Latent Heat Loss Rate",
+            SetupOutputVariable("Zone Cooltower Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Volume",
+            SetupOutputVariable("Zone Cooltower Air Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirVol,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Current Density Air Volume Flow Rate",
+            SetupOutputVariable("Zone Cooltower Current Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Standard Density Air Volume Flow Rate",
+            SetupOutputVariable("Zone Cooltower Standard Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Mass",
+            SetupOutputVariable("Zone Cooltower Air Mass",
                                 OutputProcessor::Unit::kg,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirMass,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Mass Flow Rate",
+            SetupOutputVariable("Zone Cooltower Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Inlet Temperature",
+            SetupOutputVariable("Zone Cooltower Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Inlet Humidity Ratio",
+            SetupOutputVariable("Zone Cooltower Air Inlet Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Outlet Temperature",
+            SetupOutputVariable("Zone Cooltower Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Air Outlet Humidity Ratio",
+            SetupOutputVariable("Zone Cooltower Air Outlet Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Pump Electricity Rate",
+            SetupOutputVariable("Zone Cooltower Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable(state, "Zone Cooltower Pump Electricity Energy",
+            SetupOutputVariable("Zone Cooltower Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecConsump,
                                 "System",
@@ -461,13 +446,13 @@ namespace CoolTower {
                                 _,
                                 "System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
-                SetupOutputVariable(state, "Zone Cooltower Water Volume",
+                SetupOutputVariable("Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable(state, "Zone Cooltower Mains Water Volume",
+                SetupOutputVariable("Zone Cooltower Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
@@ -479,19 +464,19 @@ namespace CoolTower {
                                     _,
                                     "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                SetupOutputVariable(state, "Zone Cooltower Water Volume",
+                SetupOutputVariable("Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable(state, "Zone Cooltower Storage Tank Water Volume",
+                SetupOutputVariable("Zone Cooltower Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable(state, "Zone Cooltower Starved Mains Water Volume",
+                SetupOutputVariable("Zone Cooltower Starved Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeup,
                                     "System",
@@ -508,7 +493,7 @@ namespace CoolTower {
 
     void CalcCoolTower()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -562,7 +547,7 @@ namespace CoolTower {
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
 
-            if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
                 if (MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
@@ -594,8 +579,8 @@ namespace CoolTower {
                 }
 
                 if (OutletTemp < state.dataEnvrn->OutWetBulbTemp) {
-                    ShowSevereError(state, "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values");
-                    ShowContinueError(state, "Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
+                    ShowSevereError("Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values");
+                    ShowContinueError("Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
                 }
 
                 WaterFlowRate /= UCFactor;
@@ -614,24 +599,24 @@ namespace CoolTower {
                 }
 
                 // Determine pump power
-                if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
-                    PumpPartLoadRat = GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
+                if (GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
+                    PumpPartLoadRat = GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
                 } else {
                     PumpPartLoadRat = 1.0;
                 }
 
                 // Determine air mass flow rate and volume flow rate
-                InletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
+                InletHumRat = PsyWFnTdbTwbPb(state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
                 // Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-                IntHumRat = PsyWFnTdbH(state, OutletTemp, state.dataEnvrn->OutEnthalpy); // Initialized humidity ratio
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
+                IntHumRat = PsyWFnTdbH(OutletTemp, state.dataEnvrn->OutEnthalpy); // Initialized humidity ratio
+                AirDensity = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
                 AirMassFlowRate = AirDensity * state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate;
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
                 RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
                 AirSpecHeat = PsyCpAirFnW(OutletHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
-                CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
+                AirDensity = PsyRhoAirFnPbTdbW(state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
+                CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
                 MCPTC(ZoneNum) = MCPC(ZoneNum) * OutletTemp;
                 CTMFL(ZoneNum) = MCPC(ZoneNum) / AirSpecHeat;
@@ -668,7 +653,7 @@ namespace CoolTower {
 
     void UpdateCoolTower()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -704,7 +689,7 @@ namespace CoolTower {
 
     void ReportCoolTower()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang

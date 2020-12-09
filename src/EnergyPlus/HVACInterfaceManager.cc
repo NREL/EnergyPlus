@@ -119,15 +119,14 @@ namespace HVACInterfaceManager {
 
     // Functions
 
-    void UpdateHVACInterface(EnergyPlusData &state,
-                             int const AirLoopNum, // airloop number for which air loop this is
+    void UpdateHVACInterface(int const AirLoopNum, // airloop number for which air loop this is
                              DataConvergParams::iCalledFrom const CalledFrom,
                              int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                              int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 1998
@@ -392,15 +391,14 @@ namespace HVACInterfaceManager {
         }
     }
 
-    void UpdatePlantLoopInterface(EnergyPlusData &state,
-                                  int const LoopNum,                // The 'inlet/outlet node' loop number
+    void UpdatePlantLoopInterface(int const LoopNum,                // The 'inlet/outlet node' loop number
                                   int const ThisLoopSideNum,        // The 'outlet node' LoopSide number
                                   int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                                   bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
                                   int const CommonPipeType)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 1998
@@ -468,7 +466,7 @@ namespace HVACInterfaceManager {
         OldTankOutletTemp = Node(OtherLoopSideInletNode).Temp;
 
         // calculate the specific heat
-        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, OldTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, OldTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         // update the enthalpy
         Node(OtherLoopSideInletNode).Enthalpy = Cp * Node(OtherLoopSideInletNode).Temp;
@@ -478,7 +476,7 @@ namespace HVACInterfaceManager {
         auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
         if (CommonPipeType == 1 || CommonPipeType == 2) {
             // update the temperature
-            UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
+            UpdateCommonPipe(LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
             Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
             TankOutletTemp = MixedOutletTemp;
             if (ThisLoopSideNum == DemandSide) {
@@ -501,7 +499,7 @@ namespace HVACInterfaceManager {
             Node(ThisLoopSideInletNode).MassFlowRateMaxAvail = Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
 
         } else { // no common pipe
-            UpdateHalfLoopInletTemp(state, LoopNum, ThisLoopSideNum, TankOutletTemp);
+            UpdateHalfLoopInletTemp(LoopNum, ThisLoopSideNum, TankOutletTemp);
             // update the temperature
             Node(OtherLoopSideInletNode).Temp = TankOutletTemp;
             // Set the flow tolerance array
@@ -566,9 +564,9 @@ namespace HVACInterfaceManager {
 
     //***************
 
-    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
+    void UpdateHalfLoopInletTemp(int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2001
@@ -652,7 +650,7 @@ namespace HVACInterfaceManager {
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
         // calculate the specific heat for the capacitance calculation
-        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
         // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
         // calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
@@ -726,9 +724,9 @@ namespace HVACInterfaceManager {
         TankOutletTemp = TankAverageTemp;
     }
 
-    void UpdateCommonPipe(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
+    void UpdateCommonPipe(int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2001
@@ -824,7 +822,7 @@ namespace HVACInterfaceManager {
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
         // calculate the specific heat for the capacitance calculation
-        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
@@ -869,11 +867,11 @@ namespace HVACInterfaceManager {
         }
         // Common Pipe Simulation
         if (CommonPipeType == CommonPipe_Single) {
-            ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
+            ManageSingleCommonPipe(LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
             // 2-way (controlled) common pipe simulation
         } else if (CommonPipeType == CommonPipe_TwoWay) {
 
-            ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
+            ManageTwoWayCommonPipe(LoopNum, TankOutletLoopSide, TankAverageTemp);
             MixedOutletTemp = Node(TankOutletNode).Temp;
         }
 
@@ -882,14 +880,13 @@ namespace HVACInterfaceManager {
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TankTemp = TankAverageTemp;
     }
 
-    void ManageSingleCommonPipe(EnergyPlusData &state,
-                                int const LoopNum,           // plant loop number
+    void ManageSingleCommonPipe(int const LoopNum,           // plant loop number
                                 int const LoopSide,          // plant loop side number
                                 Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
                                 Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   November 2006
@@ -937,7 +934,7 @@ namespace HVACInterfaceManager {
 
         // One time call to set up report variables and set common pipe 'type' flag
         if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
+            if (!CommonPipeSetupFinished) SetupCommonPipes();
             MyEnvrnFlag.dimension(TotNumLoops, true);
             OneTimeData = false;
         }
@@ -1025,9 +1022,9 @@ namespace HVACInterfaceManager {
         }
     }
 
-    void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
+    void ManageTwoWayCommonPipe(int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2011
@@ -1098,7 +1095,7 @@ namespace HVACInterfaceManager {
 
         // one time setups
         if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
+            if (!CommonPipeSetupFinished) SetupCommonPipes();
             MyEnvrnFlag.dimension(TotNumLoops, true);
             OneTimeData = false;
         }
@@ -1210,7 +1207,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 2
@@ -1250,7 +1247,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 4
@@ -1283,9 +1280,9 @@ namespace HVACInterfaceManager {
         Node(NodeNumPriIn).Temp = TempPriInlet;
     }
 
-    void SetupCommonPipes(EnergyPlusData &state)
+    void SetupCommonPipes()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2010
@@ -1335,19 +1332,19 @@ namespace HVACInterfaceManager {
 
                 } else if (SELECT_CASE_var == CommonPipe_Single) { // Uncontrolled ('single') common pipe
                     PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_Single;
-                    SetupOutputVariable(state, "Plant Common Pipe Mass Flow Rate",
+                    SetupOutputVariable("Plant Common Pipe Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).Flow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable(state, "Plant Common Pipe Temperature",
+                    SetupOutputVariable("Plant Common Pipe Temperature",
                                         OutputProcessor::Unit::C,
                                         PlantCommonPipe(CurLoopNum).Temp,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable(state, "Plant Common Pipe Flow Direction Status",
+                    SetupOutputVariable("Plant Common Pipe Flow Direction Status",
                                         OutputProcessor::Unit::None,
                                         PlantCommonPipe(CurLoopNum).FlowDir,
                                         "System",
@@ -1356,33 +1353,33 @@ namespace HVACInterfaceManager {
 
                     if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
                         // If/when the model supports variable-pumping primary, this can be removed.
-                        ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                        ShowContinueError(state, "Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
-                        ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                        ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+                        ShowWarningError("SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
+                        ShowContinueError("Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
+                        ShowContinueError("The common pipe model does not support varying the flow rate on the primary/supply side");
+                        ShowContinueError("The primary/supply side will operate as if constant speed, and the simulation continues");
                     }
 
                 } else if (SELECT_CASE_var == CommonPipe_TwoWay) { // Controlled ('two-way') common pipe
                     PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_TwoWay;
-                    SetupOutputVariable(state, "Plant Common Pipe Primary Mass Flow Rate",
+                    SetupOutputVariable("Plant Common Pipe Primary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).PriCPLegFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable(state, "Plant Common Pipe Secondary Mass Flow Rate",
+                    SetupOutputVariable("Plant Common Pipe Secondary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).SecCPLegFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable(state, "Plant Common Pipe Primary to Secondary Mass Flow Rate",
+                    SetupOutputVariable("Plant Common Pipe Primary to Secondary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).PriToSecFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable(state, "Plant Common Pipe Secondary to Primary Mass Flow Rate",
+                    SetupOutputVariable("Plant Common Pipe Secondary to Primary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).SecToPriFlow,
                                         "System",
@@ -1395,10 +1392,10 @@ namespace HVACInterfaceManager {
                     } else if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
                         PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = VariableFlow;
                         // If/when the model supports variable-pumping primary, this can be removed.
-                        ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                        ShowContinueError(state, "Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
-                        ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                        ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+                        ShowWarningError("SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
+                        ShowContinueError("Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
+                        ShowContinueError("The common pipe model does not support varying the flow rate on the primary/supply side");
+                        ShowContinueError("The primary/supply side will operate as if constant speed, and the simulation continues");
                     }
                     // check type of pump on demand side inlet
                     if (first_demand_component_typenum == TypeOf_PumpConstantSpeed) {

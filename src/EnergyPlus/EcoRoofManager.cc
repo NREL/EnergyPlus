@@ -126,7 +126,7 @@ namespace EcoRoofManager {
                      Real64 &TempExt    // Exterior temperature boundary condition
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor and Toan Pham
         //     DATE WRITTEN    January 2007
@@ -291,7 +291,7 @@ namespace EcoRoofManager {
         //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
         int unit(0); // not actually used in the function it is passed into
 
-        Ws = DataEnvironment::WindSpeedAt(state, Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
+        Ws = DataEnvironment::WindSpeedAt(Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) {                                // Later we need to adjust for building roof height...
             Ws = 2.0;                                  // Set minimum possible wind speed outside vegetation to 2.0 m/s
                                                        // consistent with FASST TR-04-25 p. x (W' = 2.0)
@@ -303,8 +303,7 @@ namespace EcoRoofManager {
         HMovInsul = 0.0;
 
         if (Surface(SurfNum).ExtWind) {
-            InitExteriorConvectionCoeff(state,
-                                        SurfNum,
+            InitExteriorConvectionCoeff(SurfNum,
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
@@ -323,8 +322,7 @@ namespace EcoRoofManager {
         if (EcoRoofbeginFlag) {
             EcoRoofbeginFlag = false;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF)
-                ShowSevereError(state,
-                                "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
+                ShowSevereError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
             // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
             Zf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
@@ -356,30 +354,25 @@ namespace EcoRoofManager {
 
             // DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-            SetupOutputVariable(state, "Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment");
-            SetupOutputVariable(state,
-                "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment");
-            SetupOutputVariable(state,
-                "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
-            SetupOutputVariable(state,
-                "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment");
-            SetupOutputVariable(state,
-                "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment");
+            SetupOutputVariable("Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment");
 
-            SetupOutputVariable(state, "Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state,
-                "Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment");
-            SetupOutputVariable(state, "Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable("Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment");
 
             // DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
 
@@ -397,8 +390,8 @@ namespace EcoRoofManager {
         // DJS July 2007
 
         if (state.dataGlobal->BeginEnvrnFlag && CalcEcoRoofMyEnvrnFlag) {
-            Tgold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
-            Tfold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
+            Tgold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
+            Tfold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tg = 10.0;
             Tf = 10.0;
             Vfluxf = 0.0;
@@ -421,9 +414,9 @@ namespace EcoRoofManager {
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture
         if (SurfNum == FirstEcoSurf) {
             UpdateSoilProps(
-                state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
+                Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
 
-            Ta = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
+            Ta = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             Tg = Tgold;
             Tf = Tfold;
 
@@ -675,7 +668,7 @@ namespace EcoRoofManager {
                          [[maybe_unused]] Real64 const Qsoil // unused1208
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor
         //     DATE WRITTEN    Jan 2007
@@ -794,25 +787,22 @@ namespace EcoRoofManager {
                     if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
                 }
                 if (index1 > 1) {
-                    ShowWarningError(state,
-                                     "CalcEcoRoof: Too few time steps per hour for stability.");
+                    ShowWarningError("CalcEcoRoof: Too few time steps per hour for stability.");
                     if (ceil(60 * index1 / state.dataGlobal->MinutesPerTimeStep) <= 60) {
                         ShowContinueError(
-                            state,
                             format("...Entered Timesteps per hour=[{}], Change to some value greater than or equal to [{}] for assured stability.",
                                    state.dataGlobal->NumOfTimeStepInHour,
                                    60 * index1 / state.dataGlobal->MinutesPerTimeStep));
-                        ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
-                        ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                        ShowContinueError("...Note that EnergyPlus has a maximum of 60 timesteps per hour");
+                        ShowContinueError("...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     } else {
-                        ShowContinueError(state,
-                                          format("...Entered Timesteps per hour=[{}], however the required frequency for stability [{}] is over the "
+                        ShowContinueError(format("...Entered Timesteps per hour=[{}], however the required frequency for stability [{}] is over the "
                                                  "EnergyPlus maximum of 60.",
                                                  state.dataGlobal->NumOfTimeStepInHour,
                                                  60 * index1 / state.dataGlobal->MinutesPerTimeStep));
-                        ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
-                        ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                        ShowContinueError("...Consider using the simple moisture diffusion calculation method for this application");
+                        ShowContinueError("...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     }
                 }
@@ -948,13 +938,12 @@ namespace EcoRoofManager {
             RelativeSoilSaturationTop = (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
             if (RelativeSoilSaturationTop < 0.0001) {
                 if (ErrIndex == 0) {
-                    ShowWarningMessage(state,
-                                       format("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[{:.5R}].",
+                    ShowWarningMessage(format("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[{:.5R}].",
                                               RelativeSoilSaturationTop));
-                    ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
-                    ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
+                    ShowContinueError("Value is set to 0.0001 and simulation continues.");
+                    ShowContinueError("You may wish to increase the number of timesteps to attempt to alleviate the problem.");
                 }
-                ShowRecurringWarningErrorAtEnd(state, "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
+                ShowRecurringWarningErrorAtEnd("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
                                                ErrIndex,
                                                RelativeSoilSaturationTop,
                                                RelativeSoilSaturationTop);

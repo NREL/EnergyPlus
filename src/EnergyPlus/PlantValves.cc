@@ -84,10 +84,11 @@ namespace PlantValves {
 
     using namespace DataLoopNode;
 
-    PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName) {
+    PlantComponent *TemperValveData::factory(std::string objectName) {
+        EnergyPlusData & state = getCurrentState(0);
         // Process the input data for valves if it hasn't been done already
         if (state.dataPlantValves->GetTemperingValves) {
-            GetPlantValvesInput(state);
+            GetPlantValvesInput();
             state.dataPlantValves->GetTemperingValves = false;
         }
         // Now look for this particular pipe in the list
@@ -97,25 +98,23 @@ namespace PlantValves {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state,
-                "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError("TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void TemperValveData::simulate(EnergyPlusData &state,
-                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void TemperValveData::simulate([[maybe_unused]] const PlantLocation &calledFromLocation,
                                    [[maybe_unused]] bool FirstHVACIteration,
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
-        this->initialize(state);
-        this->calculate(state);
+        EnergyPlusData & state = getCurrentState(0);
+        this->initialize();
+        this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 mdot,
+            PlantUtilities::SetComponentFlowRate(mdot,
                                                  this->PltInletNodeNum,
                                                  this->PltOutletNodeNum,
                                                  this->LoopNum,
@@ -126,8 +125,7 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void TemperValveData::getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation,
                                               Real64 &MaxLoad,
                                               Real64 &MinLoad,
                                               Real64 &OptLoad)
@@ -137,9 +135,9 @@ namespace PlantValves {
         OptLoad = 0.0;
     }
 
-    void GetPlantValvesInput(EnergyPlusData &state)
+    void GetPlantValvesInput()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Jan. 2006
@@ -168,41 +166,41 @@ namespace PlantValves {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
-        state.dataPlantValves->NumTemperingValves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPlantValves->NumTemperingValves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         state.dataPlantValves->TemperValve.allocate(state.dataPlantValves->NumTemperingValves);
 
         for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
-            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
             //  <process, noting errors>
             state.dataPlantValves->TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
             state.dataPlantValves->TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
-                state, Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             // Get Plant Outlet Node
             state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
-                state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // Get Stream 2 Source Node
             state.dataPlantValves->TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
-                state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             // Get Mixed water Setpoint
             state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
-                state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
 
             // Get Pump outlet
             state.dataPlantValves->TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
-                state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
+            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
         }
 
         for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
-            SetupOutputVariable(state, "Tempering Valve Flow Fraction",
+            SetupOutputVariable("Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
                                 "System",
@@ -211,12 +209,13 @@ namespace PlantValves {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
+            ShowFatalError("GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
         }
     }
 
-    void TemperValveData::initialize(EnergyPlusData &state)
+    void TemperValveData::initialize()
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, NREL
@@ -253,8 +252,7 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                         DataPlant::TypeOf_ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,
@@ -268,7 +266,7 @@ namespace PlantValves {
                                                         _);
 
                 if (errFlag) {
-                    ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");
+                    ShowFatalError("InitPlantValves: Program terminated due to previous condition(s).");
                 }
                 // init logical flags
                 ErrorsFound = false;
@@ -347,37 +345,37 @@ namespace PlantValves {
                 }             // Plant loops
 
                 if (!IsBranchActive) {
-                    ShowSevereError(state, "TemperingValve object needs to be on an ACTIVE branch");
+                    ShowSevereError("TemperingValve object needs to be on an ACTIVE branch");
                     ErrorsFound = true;
                 }
 
                 if (!InNodeOnSplitter) {
-                    ShowSevereError(state, "TemperingValve object needs to be between a Splitter and Mixer");
+                    ShowSevereError("TemperingValve object needs to be between a Splitter and Mixer");
                     ErrorsFound = true;
                 }
 
                 if (!PumpOutNodeOkay) {
-                    ShowSevereError(state, "TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
+                    ShowSevereError("TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
                     ErrorsFound = true;
                 }
 
                 if (!TwoBranchesBetwn) {
-                    ShowSevereError(state, "TemperingValve object needs exactly two branches between a Splitter and Mixer");
+                    ShowSevereError("TemperingValve object needs exactly two branches between a Splitter and Mixer");
                     ErrorsFound = true;
                 }
 
                 if (!SetPointNodeOkay) {
-                    ShowSevereError(state, "TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
+                    ShowSevereError("TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
                     ErrorsFound = true;
                 }
 
                 if (!Stream2NodeOkay) {
-                    ShowSevereError(state, "TemperingValve object stream 2 source node not valid.");
-                    ShowContinueError(state, "Check that node is a component outlet, enters a mixer, and on the other branch");
+                    ShowSevereError("TemperingValve object stream 2 source node not valid.");
+                    ShowContinueError("Check that node is a component outlet, enters a mixer, and on the other branch");
                     ErrorsFound = true;
                 }
                 if (ErrorsFound) {
-                    ShowFatalError(state, "Errors found in input, TemperingValve object " + this->Name);
+                    ShowFatalError("Errors found in input, TemperingValve object " + this->Name);
                 }
                 this->compDelayedInitFlag = false;
             } // my two time flag for input checking
@@ -423,8 +421,9 @@ namespace PlantValves {
 
     }
 
-    void TemperValveData::calculate(EnergyPlusData &state)
+    void TemperValveData::calculate()
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, NREL

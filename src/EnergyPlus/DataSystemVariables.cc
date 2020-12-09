@@ -205,7 +205,7 @@ namespace DataSystemVariables {
                                 const std::string contextString           //
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2011
@@ -227,7 +227,7 @@ namespace DataSystemVariables {
         std::string::size_type pos;
 
         if (firstTime) {
-            state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
+            state.files.audit.ensure_open("CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -278,10 +278,10 @@ namespace DataSystemVariables {
             }
         }
         if (!FileFound) {
-            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found.");
-            ShowContinueError(state, "  Paths searched:");
+            ShowSevereError(contextString+ "\"" + originalInputFileName + "\" not found.");
+            ShowContinueError("  Paths searched:");
             for(auto path: pathsChecked){
-                ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
+                ShowContinueError("    " + path.second +": \"" + path.first +"\"");
             }
         }
     }
@@ -331,7 +331,7 @@ namespace DataSystemVariables {
     }
 
     void processEnvironmentVariables() {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         static std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);

@@ -99,19 +99,18 @@ namespace HVACDuct {
 
     void clear_state();
 
-    void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,   // name of the duct component
+    void SimDuct(std::string const &CompName,   // name of the duct component
                  bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                 // index of duct component
     );
 
     void GetDuctInput();
 
-    void InitDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated
+    void InitDuct(int DuctNum); // number of the current duct being simulated
 
     void CalcDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
-    void UpdateDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated
+    void UpdateDuct(int DuctNum); // number of the current duct being simulated
 
     void ReportDuct(int DuctNum); // number of the current duct being simulated !unused1208
 

@@ -160,16 +160,15 @@ namespace SwimmingPool {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
-                                        std::string const Alpha1,
+        void ErrorCheckSetupPoolSurface(std::string const Alpha1,
                                         std::string const Alpha2,
                                         std::string const cAlphaField2,
                                         bool &ErrorsFound
         );
 
-        void initialize(EnergyPlusData &state, bool FirstHVACIteration // true during the first HVAC iteration
+        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
         );
 
         void setupOutputVars();
@@ -181,7 +180,7 @@ namespace SwimmingPool {
 
         void calculate();
 
-        void calcSwimmingPoolEvap(EnergyPlusData &state, Real64 &EvapRate, // Evaporation rate
+        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio
@@ -192,9 +191,9 @@ namespace SwimmingPool {
 
     void GetSwimmingPool();
 
-    void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
+    void SimSwimmingPool(bool FirstHVACIteration);
 
-    void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
+    void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 

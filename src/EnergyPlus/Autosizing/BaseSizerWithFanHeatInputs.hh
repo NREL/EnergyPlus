@@ -70,8 +70,7 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
     Real64 fanShaftPow = 0.0;
     Real64 motInPower = 0.0;
 
-    void getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                    int const &fanEnumType,
+    void getFanInputsForDesHeatGain(int const &fanEnumType,
                                     int const &fanIndex,
                                     Real64 &deltaP,
                                     Real64 &motEff,
@@ -83,8 +82,7 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
 
     Real64 calcFanDesHeatGain(Real64 &airVolFlow);
 
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
+    void initializeWithinEP(std::string const &_compType,
                             std::string const &_compName,
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;

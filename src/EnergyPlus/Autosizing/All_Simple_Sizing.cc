@@ -54,27 +54,29 @@
 
 namespace EnergyPlus {
 
-Real64 AutoCalculateSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 AutoCalculateSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
     } else {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 MaxHeaterOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -88,16 +90,17 @@ Real64 MaxHeaterOutletTempSizer::size(EnergyPlusData &state, Real64 _originalVal
             this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatSupTemp;
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 ZoneCoolingLoadSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 ZoneCoolingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -116,16 +119,17 @@ Real64 ZoneCoolingLoadSizer::size(EnergyPlusData &state, Real64 _originalValue, 
             this->addErrorMessage(msg);
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 ZoneHeatingLoadSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 ZoneHeatingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -144,16 +148,17 @@ Real64 ZoneHeatingLoadSizer::size(EnergyPlusData &state, Real64 _originalValue, 
             this->addErrorMessage(msg);
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -168,13 +173,13 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalVal
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(state, msg);
+                ShowSevereError(msg);
                 msg = format("SizingString = {}, DataCapacityUsedForSizing = {:.1T}", this->sizingString, this->dataCapacityUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataFlowUsedForSizing = {:.1T}", this->sizingString, this->dataFlowUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -191,28 +196,29 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalVal
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(state, msg);
+                ShowSevereError(msg);
                 msg = format("SizingString = {}, DataCapacityUsedForSizing = {:.1T}", this->sizingString, this->dataCapacityUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataFlowUsedForSizing = {:.1T}", this->sizingString, this->dataFlowUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataZoneUsedForSizing = {:.0T}", this->sizingString, Real64(this->dataZoneUsedForSizing));
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -227,13 +233,13 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalVal
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(state, msg);
+                ShowSevereError(msg);
                 msg = format("SizingString = {}, DataCapacityUsedForSizing = {:.1T}", this->sizingString, this->dataCapacityUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataFlowUsedForSizing = {:.1T}", this->sizingString, this->dataFlowUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -250,28 +256,29 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalVal
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(state, msg);
+                ShowSevereError(msg);
                 msg = format("SizingString = {}, DataCapacityUsedForSizing = {:.1T}", this->sizingString, this->dataCapacityUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataFlowUsedForSizing = {:.1T}", this->sizingString, this->dataFlowUsedForSizing);
                 this->addErrorMessage(msg);
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
                 msg = format("SizingString = {}, DataZoneUsedForSizing = {:.0T}", this->sizingString, Real64(this->dataZoneUsedForSizing));
-                ShowContinueError(state, msg);
+                ShowContinueError(msg);
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
     } else {
@@ -279,16 +286,17 @@ Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(EnergyPlusData &st
         this->autoSizedValue = min(6.0, this->autoSizedValue);
     }
     if (this->isEpJSON) this->sizingString = "nominal_air_face_velocity [m/s]";
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -314,17 +322,18 @@ Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _orig
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+    this->selectSizerOutput(errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -346,17 +355,18 @@ Real64 HeatingCoilDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _ori
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -382,8 +392,8 @@ Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _or
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

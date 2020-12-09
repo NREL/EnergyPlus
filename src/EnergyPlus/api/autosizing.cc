@@ -75,13 +75,13 @@ void sizerHeatingAirflowUAInitializeForZone(
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (zoneConfig) {
     case HeatingAirflowUAZoneTerminal:
-        s->initializeForSingleDuctZoneTerminal(state, elevation, representativeFlowRate);
+        s->initializeForSingleDuctZoneTerminal(elevation, representativeFlowRate);
         break;
     case HeatingAirflowUAZoneInductionUnit:
-        s->initializeForZoneInductionUnit(state, elevation, representativeFlowRate, reheatMultiplier);
+        s->initializeForZoneInductionUnit(elevation, representativeFlowRate, reheatMultiplier);
         break;
     case HeatingAirflowUAZoneFanCoil:
-        s->initializeForZoneFanCoil(state, elevation, representativeFlowRate);
+        s->initializeForZoneFanCoil(elevation, representativeFlowRate);
         break;
     }
 }
@@ -96,25 +96,25 @@ void sizerHeatingAirflowUAInitializeForSystem(EnergyPlusState,
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (sysConfig) {
     case HeatingAirflowUASystemConfigTypeOutdoorAir:
-        s->initializeForSystemOutdoorAir(state, elevation, representativeFlowRate, DOAS == 1);
+        s->initializeForSystemOutdoorAir(elevation, representativeFlowRate, DOAS == 1);
         break;
     case HeatingAirflowUASystemConfigTypeMainDuct:
-        s->initializeForSystemMainDuct(state, elevation, representativeFlowRate, minFlowRateRatio);
+        s->initializeForSystemMainDuct(elevation, representativeFlowRate, minFlowRateRatio);
         break;
     case HeatingAirflowUASystemConfigTypeCoolingDuct:
-        s->initializeForSystemCoolingDuct(state, elevation);
+        s->initializeForSystemCoolingDuct(elevation);
         break;
     case HeatingAirflowUASystemConfigTypeHeatingDuct:
-        s->initializeForSystemHeatingDuct(state, elevation);
+        s->initializeForSystemHeatingDuct(elevation);
         break;
     case HeatingAirflowUASystemConfigTypeOtherDuct:
-        s->initializeForSystemOtherDuct(state, elevation);
+        s->initializeForSystemOtherDuct(elevation);
         break;
     }
 }
 int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    auto st = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto st = reinterpret_cast<EnergyPlus::EnergyPlusData *>();
     bool errorsFound = false;
     s->size(*st, EnergyPlus::DataSizing::AutoSize, errorsFound);
     if (errorsFound) {

@@ -119,8 +119,9 @@ namespace ReturnAirPathManager {
         ErrorsFound = false;
     }
 
-    void SimReturnAirPath(EnergyPlusData &state)
+    void SimReturnAirPath()
     {
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
@@ -142,18 +143,19 @@ namespace ReturnAirPathManager {
 
         // Obtains and Allocates Mixer related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetReturnAirPathInput(state);
+            GetReturnAirPathInput();
             GetInputFlag = false;
         }
 
         for (ReturnAirPathNum = 1; ReturnAirPathNum <= NumReturnAirPaths; ++ReturnAirPathNum) {
 
-            CalcReturnAirPath(state, ReturnAirPathNum);
+            CalcReturnAirPath(ReturnAirPathNum);
         }
     }
 
-    void GetReturnAirPathInput(EnergyPlusData &state)
+    void GetReturnAirPathInput()
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
         //       DATE WRITTEN:    Nov 1997
@@ -181,7 +183,7 @@ namespace ReturnAirPathManager {
             return;
         }
         cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-        NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReturnAirPaths = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (NumReturnAirPaths > 0) {
 
@@ -189,14 +191,13 @@ namespace ReturnAirPathManager {
 
             for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
 
-                inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                inputProcessor->getObjectItem(cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ReturnAirPath(PathNum).Name = cAlphaArgs(1);
                 ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
-                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
                 ReturnAirPath(PathNum).ComponentType.allocate(ReturnAirPath(PathNum).NumOfComponents);
                 ReturnAirPath(PathNum).ComponentType = "";
@@ -215,12 +216,12 @@ namespace ReturnAirPathManager {
 
                         ReturnAirPath(PathNum).ComponentType(CompNum) = cAlphaArgs(Counter);
                         ReturnAirPath(PathNum).ComponentName(CompNum) = cAlphaArgs(Counter + 1);
-                        ValidateComponent(state, ReturnAirPath(PathNum).ComponentType(CompNum),
+                        ValidateComponent(ReturnAirPath(PathNum).ComponentType(CompNum),
                                           ReturnAirPath(PathNum).ComponentName(CompNum),
                                           IsNotOK,
                                           "AirLoopHVAC:ReturnPath");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
+                            ShowContinueError("In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
                             ErrorsFound = true;
                         }
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer"))
@@ -228,9 +229,9 @@ namespace ReturnAirPathManager {
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))
                             ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
                     } else {
-                        ShowSevereError(state, "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs(Counter));
-                        ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath(PathNum).Name);
-                        ShowContinueError(state, "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
+                        ShowSevereError("Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs(Counter));
+                        ShowContinueError("Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath(PathNum).Name);
+                        ShowContinueError("Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
                         ErrorsFound = true;
                     }
 
@@ -240,7 +241,7 @@ namespace ReturnAirPathManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
+            ShowFatalError("Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
         }
     }
 
@@ -259,8 +260,9 @@ namespace ReturnAirPathManager {
         // USE STATEMENTS:
     }
 
-    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
+    void CalcReturnAirPath(int &ReturnAirPathNum)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
         //       DATE WRITTEN:    Nov 1997
@@ -289,20 +291,20 @@ namespace ReturnAirPathManager {
 
                     if (!(AirflowNetwork::AirflowNetworkFanActivated &&
                           AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                        SimAirMixer(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                     ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                     }
 
                 } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
 
-                    SimAirZonePlenum(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                    SimAirZonePlenum(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                      ZoneReturnPlenum_Type,
                                      ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
                 } else {
-                    ShowSevereError(state, "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath(ReturnAirPathNum).Name);
-                    ShowFatalError(state, "Preceding condition causes termination.");
+                    ShowSevereError("Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                    ShowContinueError("Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath(ReturnAirPathNum).Name);
+                    ShowFatalError("Preceding condition causes termination.");
                 }
             }
         }

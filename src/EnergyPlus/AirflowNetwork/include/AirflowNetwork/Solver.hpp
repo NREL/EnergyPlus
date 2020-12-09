@@ -86,13 +86,12 @@ namespace AirflowNetwork {
         Solver() : PB(0.0)
         {}
 
-        void allocate(EnergyPlusData &state);
+        void allocate();
         void initialize();
         void setsky();
-        void airmov(EnergyPlusData &state);
-        void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations
-        void filjac(EnergyPlusData &state,
-                    int const NNZE,  // number of nonzero entries in the "AU" array.
+        void airmov();
+        void solvzp(int &ITER);  // number of iterations
+        void filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
         );
 
@@ -181,7 +180,7 @@ namespace AirflowNetwork {
 
     // Functions
 
-    int GenericCrack(EnergyPlusData &state, Real64 &coef,               // Flow coefficient
+    int GenericCrack(Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
@@ -201,7 +200,7 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(EnergyPlusData &state, Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
                 const Array1D_int &IK, // pointer to the top of column/row "K"
@@ -253,7 +252,7 @@ namespace AirflowNetwork {
                      Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     );
 
-    void PStack(EnergyPlusData &state);
+    void PStack();
 
     Real64 psz(Real64 const Pz0,  // Pressure at altitude z0 [Pa]
                Real64 const Rho0, // density at altitude z0 [kg/m3]
@@ -263,7 +262,7 @@ namespace AirflowNetwork {
                Real64 const g     // gravity field strength [N/kg]
     );
 
-    void LClimb(EnergyPlusData &state, Real64 const G,   // gravity field strength [N/kg]
+    void LClimb(Real64 const G,   // gravity field strength [N/kg]
                 Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
                 Real64 const Z,   // Height of the link above the zone reference [m]
                 Real64 &T,        // temperature at link level [C]

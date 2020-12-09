@@ -54,8 +54,7 @@
 
 namespace EnergyPlus {
 
-void SetupZoneInternalGain(EnergyPlusData &state,
-                           int ZoneNum,
+void SetupZoneInternalGain(int ZoneNum,
                            std::string const &cComponentObject, // object class name for device contributing internal gain
                            std::string const &cComponentName,   // user unique name for device
                            int IntGainComp_TypeOfNum,

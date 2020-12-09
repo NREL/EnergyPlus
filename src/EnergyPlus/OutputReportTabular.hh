@@ -705,9 +705,9 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
+    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
 
-    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -729,7 +729,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularTimeBins();
 
-    bool warningAboutKeyNotFound(EnergyPlusData &state, int foundIndex, int inObjIndex, std::string const &moduleName);
+    bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
     void GetInputTabularStyle();
 
@@ -769,19 +769,19 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
+    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
 
     void CalcHeatEmissionReport();
 
@@ -831,13 +831,11 @@ namespace OutputReportTabular {
 
     void WriteVisualResilienceTables();
 
-    void WriteResilienceBinsTable(EnergyPlusData &state,
-                                  int const columnNum,
+    void WriteResilienceBinsTable(int const columnNum,
                                   std::vector<int> const &columnHead,
                                   Array1D<std::vector<Real64>> const &ZoneBins);
 
-    void WriteSETHoursTable(EnergyPlusData &state,
-                            int const columnNum,
+    void WriteSETHoursTable(int const columnNum,
                             std::vector<std::string> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins);
 
@@ -851,7 +849,7 @@ namespace OutputReportTabular {
 
     void WriteEioTables();
 
-    int unitsFromHeading(EnergyPlusData &state, std::string &heading);
+    int unitsFromHeading(std::string &heading);
 
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
@@ -869,8 +867,7 @@ namespace OutputReportTabular {
 
     void WriteLoadComponentSummaryTables();
 
-    void GetDelaySequences(EnergyPlusData &state,
-                           int const &desDaySelected,
+    void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
@@ -884,8 +881,7 @@ namespace OutputReportTabular {
 
     Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
 
-    void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
-                                        Array2D<Real64> &resultCells,
+    void ComputeTableBodyUsingMovingAvg(Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,
                                         int const &desDaySelected,
                                         int const &timeOfMax,
@@ -899,12 +895,12 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(EnergyPlusData &state,
+    void CollectPeakZoneConditions(
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas);
 
     void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
 
@@ -914,12 +910,11 @@ namespace OutputReportTabular {
 
     void ComputePeakDifference(CompLoadTablesType &compLoad);
 
-    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
+    void LoadSummaryUnitConversion(CompLoadTablesType &compLoadTotal);
 
-    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
+    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
-    void OutputCompLoadSummary(EnergyPlusData &state,
-                               int const &kind, // zone=1, airloop=2, facility=3
+    void OutputCompLoadSummary(int const &kind, // zone=1, airloop=2, facility=3
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex);
@@ -930,8 +925,7 @@ namespace OutputReportTabular {
 
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
-    void WriteTable(EnergyPlusData &state,
-                    Array2S_string const body, // row,column
+    void WriteTable(Array2S_string const body, // row,column
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
                     Array1D_int &widthColumn,
@@ -940,8 +934,7 @@ namespace OutputReportTabular {
 
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
-    std::string InsertCurrencySymbol(EnergyPlusData &state,
-                                     std::string const &inString, // Input String
+    std::string InsertCurrencySymbol(std::string const &inString, // Input String
                                      bool const isHTML            // True if an HTML string
     );
 
@@ -1029,7 +1022,7 @@ namespace OutputReportTabular {
 
     std::string GetUnitSubString(std::string const &inString); // Input String
 
-    void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
+    void LookupSItoIP(std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
 
     void LookupJtokWH(std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
 
@@ -1039,9 +1032,9 @@ namespace OutputReportTabular {
 
     void GetUnitConversion(int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
 
-    Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitMultiplier(std::string const &SIunit, std::string const &IPunit);
 
-    Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitDivider(std::string const &SIunit, std::string const &IPunit);
 
     Real64 getSpecificUnitIndex(std::string const &SIunit, std::string const &IPunit);
 

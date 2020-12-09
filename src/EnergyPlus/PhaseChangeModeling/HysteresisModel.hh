@@ -118,7 +118,7 @@ namespace HysteresisPhaseChange {
         Real64 specHeatTransition;
 
         // the factory for this class
-        static HysteresisPhaseChange *factory(EnergyPlusData &state, const std::string &objectName);
+        static HysteresisPhaseChange *factory(const std::string &objectName);
 
         // the Cp calculation function for this class
         Real64 getCurrentSpecificHeat(

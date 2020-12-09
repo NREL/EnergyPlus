@@ -559,13 +559,13 @@ namespace RefrigeratedCase {
 
         void CalcRackSystem();
 
-        void ReportRackSystem(EnergyPlusData &state, int RackNum);
+        void ReportRackSystem(int RackNum);
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigSystemData
@@ -721,9 +721,9 @@ namespace RefrigeratedCase {
             TotHiStageCompCoolingEnergy = 0.0;
         }
 
-        void CalcDetailedSystem(EnergyPlusData &state, int SysNum);
+        void CalcDetailedSystem(int SysNum);
 
-        void CalculateCondensers(EnergyPlusData &state, int SysNum);
+        void CalculateCondensers(int SysNum);
 
         void CalculateCompressors();
 
@@ -872,9 +872,9 @@ namespace RefrigeratedCase {
             TotCompCoolingEnergy = 0.0;
         }
 
-        void CalcDetailedTransSystem(EnergyPlusData &state, int SysNum);
+        void CalcDetailedTransSystem(int SysNum);
 
-        void CalcGasCooler(EnergyPlusData &state, int SysNum);
+        void CalcGasCooler(int SysNum);
 
         void CalculateTransCompressors();
     };
@@ -1058,11 +1058,11 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigGasCoolerData
@@ -1309,7 +1309,7 @@ namespace RefrigeratedCase {
             DistPipeZoneHeatGain = 0.0;
         }
 
-        void CalculateSecondary(EnergyPlusData &state, int SecondaryNum);
+        void CalculateSecondary(int SecondaryNum);
     };
 
     struct TransferLoadListDef // Derived Type for Transfer Load (Secondary and Cascade) Lists
@@ -1620,7 +1620,7 @@ namespace RefrigeratedCase {
             ReportHeatingCreditEnergy = 0.0;
         }
 
-        void CalculateCoil(EnergyPlusData &state, Real64 QZnReq);
+        void CalculateCoil(Real64 QZnReq);
     };
 
     struct AirChillerSetData
@@ -1711,7 +1711,7 @@ namespace RefrigeratedCase {
 
     void SimulateDetailedTransRefrigSystems();
 
-    void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
+    void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,
                                   int SysType,
                                   bool &ErrorsFound,
@@ -1724,8 +1724,7 @@ namespace RefrigeratedCase {
 
     void CheckRefrigerationInput();
 
-    void SimAirChillerSet(EnergyPlusData &state,
-                          std::string const &AirChillerSetName,
+    void SimAirChillerSet(std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1733,8 +1732,7 @@ namespace RefrigeratedCase {
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    void FinalRateCoils(EnergyPlusData &state,
-                        bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+    void FinalRateCoils(bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         iSourceType SystemSourceType,     // SecondarySystem or DetailedSystem
                         int SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]

@@ -39,7 +39,7 @@ class StateManager:
 
         :return: Nothing
         """
-        self.api.stateReset(state)
+        self.api.stateReset()
 
     def delete_state(self, state: c_void_p) -> None:
         """
@@ -47,4 +47,4 @@ class StateManager:
 
         :return: Nothing
         """
-        self.api.stateDelete(state)
+        self.api.stateDelete()

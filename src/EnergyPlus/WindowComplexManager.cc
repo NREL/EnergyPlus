@@ -104,9 +104,9 @@ namespace WindowComplexManager {
 
     // Functions
 
-    void InitBSDFWindows(EnergyPlusData &state)
+    void InitBSDFWindows()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -155,13 +155,13 @@ namespace WindowComplexManager {
             state.dataWindowComplexManager->MatrixNo = state.dataConstruction->Construct(IConst).BSDFInput.BasisMatIndex;
             if (state.dataWindowComplexManager->NumBasis == 0) {
                 state.dataWindowComplexManager->NumBasis = 1;
-                ConstructBasis(state, IConst, state.dataWindowComplexManager->BasisList(1));
+                ConstructBasis(IConst, state.dataWindowComplexManager->BasisList(1));
             } else {
                 for (int IBasis = 1; IBasis <= state.dataWindowComplexManager->NumBasis; ++IBasis) {
                     if (state.dataWindowComplexManager->MatrixNo == state.dataWindowComplexManager->BasisList(IBasis).BasisMatIndex) goto BsLoop_loop;
                 }
                 ++state.dataWindowComplexManager->NumBasis;
-                ConstructBasis(state, IConst, state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->NumBasis));
+                ConstructBasis(IConst, state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->NumBasis));
             }
         BsLoop_loop:;
         }
@@ -205,7 +205,7 @@ namespace WindowComplexManager {
                 }
             }
             if (state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx <= 0) {
-                ShowFatalError(state, "Complex Window Init: Window Basis not in BasisList.");
+                ShowFatalError("Complex Window Init: Window Basis not in BasisList.");
             }
         }
         //  Should now have a WindowList with dataWindowComplexManager. NumComplexWind entries containing all the complex fenestrations
@@ -307,8 +307,7 @@ namespace WindowComplexManager {
                         state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->WindowStateList(IState, IWind).IncBasisIndx); // Put in the basis structure from the state.dataWindowComplexManager->BasisList
                     state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn = state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->WindowStateList(IState, IWind).TrnBasisIndx);
 
-                    SetupComplexWindowStateGeometry(state,
-                        ISurf, IState, IConst, state.dataBSDFWindow->ComplexWind(ISurf), state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
+                    SetupComplexWindowStateGeometry(ISurf, IState, IConst, state.dataBSDFWindow->ComplexWind(ISurf), state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
                     // Note--setting up the state geometry will include constructing outgoing basis/surface
                     //  maps and those incoming maps that will not depend on shading.
                 } else {
@@ -326,17 +325,16 @@ namespace WindowComplexManager {
             int ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
             NumStates = state.dataWindowComplexManager->WindowList(IWind).NumStates;
             for (int IState = 1; IState <= NumStates; ++IState) {
-                AllocateCFSStateHourlyData(state, ISurf, IState);
+                AllocateCFSStateHourlyData(ISurf, IState);
             } // State loop
         }     // Complex Window loop
     }
 
-    void AllocateCFSStateHourlyData(EnergyPlusData &state,
-                                    int const iSurf, // Surface number
+    void AllocateCFSStateHourlyData(int const iSurf, // Surface number
                                     int const iState // Complex fenestration state number
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -371,12 +369,11 @@ namespace WindowComplexManager {
         }
     }
 
-    void ExpandComplexState(EnergyPlusData &state,
-                            int const iSurf, // Surface number
+    void ExpandComplexState(int const iSurf, // Surface number
                             int const iConst // Construction number
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -410,26 +407,25 @@ namespace WindowComplexManager {
         SurfaceWindow(iSurf).ComplexFen.State(NumOfStates).Konst = iConst;
 
         // load basis and setup window state geometry
-        ConstructBasis(state, iConst, state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates).Inc);
-        ConstructBasis(state, iConst, state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates).Trn);
+        ConstructBasis(iConst, state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates).Inc);
+        ConstructBasis(iConst, state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates).Trn);
 
-        SetupComplexWindowStateGeometry(state,
-            iSurf, NumOfStates, iConst, state.dataBSDFWindow->ComplexWind(iSurf), state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
+        SetupComplexWindowStateGeometry(iSurf, NumOfStates, iConst, state.dataBSDFWindow->ComplexWind(iSurf), state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
 
         // allocation of memory for hourly data can be performed only after window state geometry has been setup
-        AllocateCFSStateHourlyData(state, iSurf, NumOfStates);
+        AllocateCFSStateHourlyData(iSurf, NumOfStates);
 
         // calculate static properties for complex fenestration
         CalcWindowStaticProperties(
-            state, iSurf, NumOfStates, state.dataBSDFWindow->ComplexWind(iSurf), state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
+            iSurf, NumOfStates, state.dataBSDFWindow->ComplexWind(iSurf), state.dataBSDFWindow->ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
 
         // calculate hourly data from complex fenestration
-        CFSShadeAndBeamInitialization(state, iSurf, NumOfStates);
+        CFSShadeAndBeamInitialization(iSurf, NumOfStates);
     }
 
-    void CheckCFSStates(EnergyPlusData &state, int const iSurf) // Surface number
+    void CheckCFSStates(int const iSurf) // Surface number
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -466,15 +462,15 @@ namespace WindowComplexManager {
 
         // If new state is not found in the list of current states, then create new one, initialize and make it active
         if (!StateFound) {
-            ExpandComplexState(state, iSurf, Surface(iSurf).Construction);
+            ExpandComplexState(iSurf, Surface(iSurf).Construction);
             CurrentCFSState = SurfaceWindow(iSurf).ComplexFen.NumStates;
             SurfaceWindow(iSurf).ComplexFen.CurrentState = CurrentCFSState;
         }
     }
 
-    void InitComplexWindows(EnergyPlusData &state)
+    void InitComplexWindows()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2012
@@ -487,14 +483,14 @@ namespace WindowComplexManager {
         // One-time initialization
         if (state.dataWindowComplexManager->InitComplexWindowsOnce) {
             state.dataWindowComplexManager->InitComplexWindowsOnce = false;
-            InitBSDFWindows(state);
-            CalcStaticProperties(state);
+            InitBSDFWindows();
+            CalcStaticProperties();
         }
     }
 
-    void UpdateComplexWindows(EnergyPlusData &state)
+    void UpdateComplexWindows()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -524,17 +520,16 @@ namespace WindowComplexManager {
             ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
             NumStates = state.dataBSDFWindow->ComplexWind(ISurf).NumStates;
             for (IState = 1; IState <= NumStates; ++IState) {
-                CFSShadeAndBeamInitialization(state, ISurf, IState);
+                CFSShadeAndBeamInitialization(ISurf, IState);
             } // State loop
         }     // window loop
     }
 
-    void CFSShadeAndBeamInitialization(EnergyPlusData &state,
-                                       int const iSurf, // Window surface number
+    void CFSShadeAndBeamInitialization(int const iSurf, // Window surface number
                                        int const iState // Window state number
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -572,7 +567,7 @@ namespace WindowComplexManager {
                     Theta = 0.0;
                     Phi = 0.0;
                     if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > DataEnvironment::SunIsUpValue) {
-                        IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                        IncRay = FindInBasis(SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
                     } else {
@@ -611,7 +606,7 @@ namespace WindowComplexManager {
                     } // Gnd pt loop
 
                     // update window beam properties
-                    CalculateWindowBeamProperties(state, iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, Hour, TS);
+                    CalculateWindowBeamProperties(iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, Hour, TS);
                 }                                                                        // Timestep loop
             }                                                                            // Hour loop
         } else {                                                                         // detailed timestep integration
@@ -620,7 +615,7 @@ namespace WindowComplexManager {
             Theta = 0.0;
             Phi = 0.0;
             if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > DataEnvironment::SunIsUpValue) {
-                IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                IncRay = FindInBasis(SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
             } else {
@@ -661,12 +656,11 @@ namespace WindowComplexManager {
             } // Gnd pt loop
 
             // Update window beam properties
-            CalculateWindowBeamProperties(state, iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
+            CalculateWindowBeamProperties(iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
         } // solar calculation mode, average over days or detailed
     }
 
-    void CalculateWindowBeamProperties(EnergyPlusData &state,
-                                       int const ISurf,                   // Window surface number
+    void CalculateWindowBeamProperties(int const ISurf,                   // Window surface number
                                        int const IState,                  // Window state number
                                        BSDFWindowGeomDescr const &Window, // Window Geometry
                                        BSDFGeomDescr const &Geom,         // State Geometry
@@ -675,7 +669,7 @@ namespace WindowComplexManager {
                                        int const TS                       // Timestep number
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -809,7 +803,7 @@ namespace WindowComplexManager {
         if (RegWindFnd) {
             Absorb.allocate(State.NLayers);
             SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
-            BkIncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Back_Incident, ISurf, IState, state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn, Theta, Phi);
+            BkIncRay = FindInBasis(SunDir, state.dataWindowComplexManager->Back_Incident, ISurf, IState, state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn, Theta, Phi);
             if (BkIncRay > 0) {
                 // Here calculate the back incidence properties for the solar ray
                 // this does not say whether or not the ray can pass through the
@@ -841,9 +835,9 @@ namespace WindowComplexManager {
         RegWinIndex.deallocate();
     }
 
-    void CalcStaticProperties(EnergyPlusData &state)
+    void CalcStaticProperties()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   <date_written>
@@ -869,18 +863,17 @@ namespace WindowComplexManager {
                 // IConst = WindowStateList ( IWind , IState )%Konst
                 SurfaceWindow(ISurf).ComplexFen.State(IState).Konst = state.dataWindowComplexManager->WindowStateList(IState, IWind).Konst;
                 CalcWindowStaticProperties(
-                    state, ISurf, IState, state.dataBSDFWindow->ComplexWind(ISurf), state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
+                    ISurf, IState, state.dataBSDFWindow->ComplexWind(ISurf), state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
             }
         }
     }
 
-    void CalculateBasisLength(EnergyPlusData &state,
-                              BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
+    void CalculateBasisLength(BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
                               int const IConst,                   // Construction number of input
                               int &NBasis                         // Calculated Basis length
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -902,9 +895,9 @@ namespace WindowComplexManager {
         }
     }
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state)
+    void DetermineMaxBackSurfaces()
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   September 2011
@@ -930,10 +923,10 @@ namespace WindowComplexManager {
         }
     }
 
-    void ConstructBasis(EnergyPlusData &state,
-                        int const IConst, // Index for accessing Construct array
+    void ConstructBasis(int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis)
     {
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN  June 2011
@@ -989,7 +982,7 @@ namespace WindowComplexManager {
                 for (I = 2; I <= NThetas; ++I) {
                     Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians;
                     NPhis(I) = std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
-                    if (NPhis(I) <= 0) ShowFatalError(state, "WindowComplexManager: incorrect input, no. phis must be positive.");
+                    if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
                 }
                 MaxNPhis = maxval(NPhis({1, NThetas}));
@@ -998,7 +991,7 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
@@ -1041,7 +1034,7 @@ namespace WindowComplexManager {
                         Phi = (J - 1) * DPhi;
                         Basis.Phis(I, J) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                         //  be searched as a one-dimensional table
-                        FillBasisElement(state, Theta,
+                        FillBasisElement(Theta,
                                          Phi,
                                          ElemNo,
                                          Basis.Grid(ElemNo),
@@ -1069,7 +1062,7 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
@@ -1110,7 +1103,7 @@ namespace WindowComplexManager {
                     Phi = 0.0;
                     Basis.Phis(I, 1) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                     //  be searched as a one-dimensional table
-                    FillBasisElement(state, Theta,
+                    FillBasisElement(Theta,
                                      Phi,
                                      ElemNo,
                                      Basis.Grid(ElemNo),
@@ -1123,13 +1116,13 @@ namespace WindowComplexManager {
                 }
             }    // BST
         } else { // BTW
-            ShowFatalError(state, "WindowComplexManager: Non-Window6 basis type not yet implemented.");
+            ShowFatalError("WindowComplexManager: Non-Window6 basis type not yet implemented.");
         } // BTW
         Thetas.deallocate();
         NPhis.deallocate();
     }
 
-    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
@@ -1139,7 +1132,7 @@ namespace WindowComplexManager {
                           int const InputType      // Basis type
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2010
@@ -1174,12 +1167,11 @@ namespace WindowComplexManager {
         } else {
             // Non-WINDOW6 Type Basis
             // Currently not implemented
-            ShowFatalError(state, "WindowComplexManager: Custom basis type not yet implemented.");
+            ShowFatalError("WindowComplexManager: Custom basis type not yet implemented.");
         }
     }
 
-    void SetupComplexWindowStateGeometry(EnergyPlusData &state,
-                                         int const ISurf,                       // Surface number of the complex fenestration
+    void SetupComplexWindowStateGeometry(int const ISurf,                       // Surface number of the complex fenestration
                                          int const IState,                      // State number of the complex fenestration state
                                          int const IConst,                      // Pointer to construction for this state
                                          BSDFWindowGeomDescr &Window,           // Window Geometry
@@ -1187,7 +1179,7 @@ namespace WindowComplexManager {
                                          [[maybe_unused]] BSDFStateDescr &State // State Description
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         J. Klems
         //       DATE WRITTEN   June 2011
@@ -1284,7 +1276,7 @@ namespace WindowComplexManager {
             Phi = Geom.Inc.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sInc(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Incident, Tilt, Azimuth);
+            Geom.sInc(ElemNo) = WorldVectFromW6(Theta, Phi, state.dataWindowComplexManager->Front_Incident, Tilt, Azimuth);
             Geom.pInc(ElemNo) = DaylghtAltAndAzimuth(Geom.sInc(ElemNo));
 
             Geom.CosInc(ElemNo) = std::cos(Geom.Inc.Grid(ElemNo).Theta);
@@ -1302,7 +1294,7 @@ namespace WindowComplexManager {
             Phi = Geom.Trn.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sTrn(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Transmitted, Tilt, Azimuth);
+            Geom.sTrn(ElemNo) = WorldVectFromW6(Theta, Phi, state.dataWindowComplexManager->Front_Transmitted, Tilt, Azimuth);
             Geom.pTrn(ElemNo) = DaylghtAltAndAzimuth(Geom.sTrn(ElemNo));
         }
         //  Incident Basis:
@@ -1551,7 +1543,7 @@ namespace WindowComplexManager {
                 }
             }                   // back surf loop
             if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError(state, 'BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
+                //    CALL ShowWarningError('BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
             } else {
                 KBkSurf = BSHit.KBkSurf;
                 JSurf = BSHit.HitSurf;
@@ -1575,15 +1567,14 @@ namespace WindowComplexManager {
         TmpSjdotN.deallocate();
     }
 
-    void CalcWindowStaticProperties(EnergyPlusData &state,
-                                    int const ISurf,             // Surface number of the complex fenestration
+    void CalcWindowStaticProperties(int const ISurf,             // Surface number of the complex fenestration
                                     int const IState,            // State number of the complex fenestration state
                                     BSDFWindowGeomDescr &Window, // Window Geometry
                                     BSDFGeomDescr &Geom,         // State Geometry
                                     BSDFStateDescr &State        // State Description
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   <date_written>
@@ -1626,7 +1617,7 @@ namespace WindowComplexManager {
             State.WinDiffTrans = Sum1 / Sum2;
         } else {
             State.WinDiffTrans = 0.0;
-            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
         }
 
         // Calculate the hemispherical-hemispherical transmittance for visible spetrum
@@ -1643,7 +1634,7 @@ namespace WindowComplexManager {
             State.WinDiffVisTrans = Sum1 / Sum2;
         } else {
             State.WinDiffVisTrans = 0.0;
-            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
         }
 
         // Set the nominal diffuse transmittance so the surface isn't mistaken as opaque
@@ -2057,15 +2048,14 @@ namespace WindowComplexManager {
         return DayPos;
     }
 
-    Vector WorldVectFromW6(EnergyPlusData &state,
-                           Real64 const Theta, // Polar angle in W6 Coords
+    Vector WorldVectFromW6(Real64 const Theta, // Polar angle in W6 Coords
                            Real64 const Phi,   // Azimuthal angle in W6 Coords
                            int const RadType,  // Type of radiation: Front_Incident, etc.
                            Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   Aug 2010
@@ -2139,8 +2129,7 @@ namespace WindowComplexManager {
         return UnitVect;
     }
 
-    int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,           // Ray vector direction in world CS
+    int FindInBasis(Vector const &RayToFind,           // Ray vector direction in world CS
                     int const RadType,                 // Type of radiation: Front_Incident, etc.
                     int const ISurf,                   // Window Surface number
                     [[maybe_unused]] int const IState, // Complex Fenestration state number
@@ -2149,7 +2138,7 @@ namespace WindowComplexManager {
                     Real64 &Phi                        // Phi value for ray
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN August 2011
@@ -2187,7 +2176,7 @@ namespace WindowComplexManager {
         Gamma = DataGlobalConstants::DegToRadians * Surface(ISurf).Tilt;
         Alpha = DataGlobalConstants::DegToRadians * Surface(ISurf).Azimuth;
         // get the corresponding local Theta, Phi for ray
-        W6CoordsFromWorldVect(state, RayToFind, RadType, Gamma, Alpha, Theta, Phi);
+        W6CoordsFromWorldVect(RayToFind, RadType, Gamma, Alpha, Theta, Phi);
 
         if (Theta >= 0.5 * DataGlobalConstants::Pi) { // Ray was in not in correct hemisphere
             RayIndex = 0;
@@ -2260,8 +2249,7 @@ namespace WindowComplexManager {
         return RayIndex;
     }
 
-    void W6CoordsFromWorldVect(EnergyPlusData &state,
-                               Vector const &RayVect, // Ray vector direction in world CS
+    void W6CoordsFromWorldVect(Vector const &RayVect, // Ray vector direction in world CS
                                int const RadType,     // Type of radiation: Front_Incident, etc.
                                Real64 const Gamma,    // Surface tilt angle, world coordinate system
                                Real64 const Alpha,    // Surface azimuth, world coordinate system
@@ -2269,7 +2257,7 @@ namespace WindowComplexManager {
                                Real64 &Phi            // Azimuthal angle in W6 Coords
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -2392,8 +2380,7 @@ namespace WindowComplexManager {
         if (Cost < 0.0) Theta = DataGlobalConstants::Pi - Theta; // This signals ray out of hemisphere
     }
 
-    void CalcComplexWindowThermal(EnergyPlusData &state,
-                                  int const SurfNum,          // Surface number
+    void CalcComplexWindowThermal(int const SurfNum,          // Surface number
                                   int &ConstrNum,             // Construction number
                                   Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
@@ -2402,7 +2389,7 @@ namespace WindowComplexManager {
                                   int const CalcCondition // Calucation condition (summer, winter or no condition)
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   October 2009
@@ -2765,7 +2752,7 @@ namespace WindowComplexManager {
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2809,7 +2796,7 @@ namespace WindowComplexManager {
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(ZoneNum).IsControlled) {
-                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(ZoneNum).Name);
                             return;
                         }
@@ -2861,7 +2848,7 @@ namespace WindowComplexManager {
                         for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+                                GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
                             OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
@@ -3025,12 +3012,12 @@ namespace WindowComplexManager {
                     } // IF feedData THEN
                 }
             } else {
-                ShowContinueError(state, "Illegal layer type in Construction:ComplexFenestrationState.");
-                ShowContinueError(state, "Allowed object are:");
-                ShowContinueError(state, "   - WindowMaterial:Glazing");
-                ShowContinueError(state, "   - WindowMaterial:ComplexShade");
-                ShowContinueError(state, "   - WindowMaterial:Gap");
-                ShowFatalError(state, "halting because of error in layer definition for Construction:ComplexFenestrationState");
+                ShowContinueError("Illegal layer type in Construction:ComplexFenestrationState.");
+                ShowContinueError("Allowed object are:");
+                ShowContinueError("   - WindowMaterial:Glazing");
+                ShowContinueError("   - WindowMaterial:ComplexShade");
+                ShowContinueError("   - WindowMaterial:Gap");
+                ShowFatalError("halting because of error in layer definition for Construction:ComplexFenestrationState");
             }
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
@@ -3250,14 +3237,14 @@ namespace WindowComplexManager {
         // process results from TARCOG
         if ((nperr > 0) && (nperr < 1000)) { // process error signal from tarcog
 
-            ShowSevereError(state, "Window tarcog returned an error");
+            ShowSevereError("Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
-            ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
+            ShowContinueErrorTimeStamp(tarcogErrorMessage);
             if (CalcCondition == DataBSDFWindow::noCondition) {
-                ShowContinueError(state, "surface name = " + Surface(SurfNum).Name);
+                ShowContinueError("surface name = " + Surface(SurfNum).Name);
             }
-            ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
-            ShowFatalError(state, "halting because of error in tarcog");
+            ShowContinueError("construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowFatalError("halting because of error in tarcog");
         } else if (CalcCondition == DataBSDFWindow::winterCondition) {
             NominalU(ConstrNum) = ufactor;
         } else if (CalcCondition == DataBSDFWindow::summerCondition) {
@@ -3277,7 +3264,7 @@ namespace WindowComplexManager {
             //  tempReal = Sum1/Sum2
             // else
             //  tempReal = 0.0d0
-            //  CALL ShowWarningError(state, 'BSDF--Inc basis has zero projected solid angle')
+            //  CALL ShowWarningError('BSDF--Inc basis has zero projected solid angle')
             // endif
 
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;

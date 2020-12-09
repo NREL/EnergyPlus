@@ -397,24 +397,23 @@ namespace PlantCentralGSHP {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars();
 
-        void initialize(EnergyPlusData &state,
-                        Real64 MyLoad, // Demand Load
+        void initialize(Real64 MyLoad, // Demand Load
                         int LoopNum    // Loop Number Index
         );
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void SizeWrapper();
 
-        void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
+        void CalcWrapperModel(Real64 &MyLoad, int LoopNum);
 
         void CalcChillerModel();
 
@@ -424,7 +423,7 @@ namespace PlantCentralGSHP {
 
         void UpdateChillerRecords();
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
     };
 

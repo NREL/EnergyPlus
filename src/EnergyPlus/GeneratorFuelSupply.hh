@@ -81,7 +81,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
 

@@ -85,7 +85,7 @@ namespace EnergyPlus::BranchNodeConnections {
                                 Optional_string_const InputFieldName // Input Field Name
     )
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -107,8 +107,8 @@ namespace EnergyPlus::BranchNodeConnections {
 
         ErrorsFoundHere = false;
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
+            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
         }
 
@@ -120,8 +120,8 @@ namespace EnergyPlus::BranchNodeConnections {
             if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ConnectionType, ConnectionType)) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Count).FluidStream != FluidStream) continue;
             if ((state.dataBranchNodeConnections->NodeConnections(Count).ObjectIsParent && !IsParent) || (!state.dataBranchNodeConnections->NodeConnections(Count).ObjectIsParent && IsParent)) {
-                ShowSevereError(state, format("{}{}", RoutineName,  "Node registered for both Parent and \"not\" Parent"));
-                ShowContinueError(state, format("{}{}{}{}{}{}", "Occurs for Node=", NodeName, ", ObjectType=", ObjectType, ", ObjectName=", ObjectName));
+                ShowSevereError(format("{}{}", RoutineName,  "Node registered for both Parent and \"not\" Parent"));
+                ShowContinueError(format("{}{}{}{}{}{}", "Occurs for Node=", NodeName, ", ObjectType=", ObjectType, ", ObjectName=", ObjectName));
                 ErrorsFoundHere = true;
             }
             MakeNew = false;
@@ -158,12 +158,12 @@ namespace EnergyPlus::BranchNodeConnections {
                 Found =
                     UtilityRoutines::FindItemInList(NodeName, state.dataBranchNodeConnections->AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
-                    ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
-                    ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
-                    ShowContinueError(state, "In Field=" + InputFieldName());
-                    ShowContinueError(state, "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
+                    ShowSevereError(RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
+                    ShowContinueError("NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
+                    ShowContinueError("In Field=" + InputFieldName());
+                    ShowContinueError("Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
                                       state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName + "\".");
-                    ShowContinueError(state, " as type=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ConnectionType +
+                    ShowContinueError(" as type=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ConnectionType +
                                       ", In Field=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).InputFieldName);
                     ErrorsFoundHere = true;
                 } else {
@@ -174,8 +174,8 @@ namespace EnergyPlus::BranchNodeConnections {
                     state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
-                ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
-                ShowContinueError(state, "Node names not checked for duplication.");
+                ShowSevereError(RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
+                ShowContinueError("Node names not checked for duplication.");
             }
         }
 
@@ -194,7 +194,7 @@ namespace EnergyPlus::BranchNodeConnections {
                                     bool &errFlag                      // Will be True if errors already detected or if errors found here
     )
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. J. Witte
         //       DATE WRITTEN   June 2016
@@ -207,8 +207,8 @@ namespace EnergyPlus::BranchNodeConnections {
         constexpr auto RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
+            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
 
@@ -226,8 +226,8 @@ namespace EnergyPlus::BranchNodeConnections {
         if (Found > 0) {
             state.dataBranchNodeConnections->NodeConnections(Found).ConnectionType = ConnectionType;
         } else {
-            ShowSevereError(state, format("{}{}", RoutineName, "Existing node connection not found."));
-            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(format("{}{}", RoutineName, "Existing node connection not found."));
+            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
     }
@@ -262,7 +262,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void CheckNodeConnections(bool &ErrorsFound)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2004
@@ -330,9 +330,9 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Sensor node did not find a matching node of appropriate type (other than Actuator or Sensor).");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -350,9 +350,9 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Actuator node did not find a matching node of appropriate type (other than Actuator, Sensor, OutsideAir).");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -375,17 +375,17 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Setpoint node did not find a matching node of appropriate type (other than Setpoint, OutsideAir).");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
             if (!IsInlet && !IsOutlet) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Setpoint node did not find a matching node of type Inlet or Outlet.");
-                ShowContinueError(state, "It appears this node is not part of the HVAC system.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("It appears this node is not part of the HVAC system.");
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -404,9 +404,9 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", ZoneInlet node did not find an outlet node.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -423,9 +423,9 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", ZoneExhaust node did not find a matching inlet node.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -442,9 +442,9 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Return plenum induced air outlet node did not find a matching inlet node.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -482,10 +482,10 @@ namespace EnergyPlus::BranchNodeConnections {
                 IsValid = false;
             }
             if (!IsValid && !MatchedAtLeastOne) {
-                ShowSevereError(state, format("{}{}{}", "Node Connection Error, Node=\"", state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName,
+                ShowSevereError(format("{}{}{}", "Node Connection Error, Node=\"", state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName,
                                 R"(", Inlet node did not find an appropriate matching "outlet" node.)"));
-                ShowContinueError(state, "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -501,10 +501,10 @@ namespace EnergyPlus::BranchNodeConnections {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber == state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
-                    ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                    ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Inlet node more than once.");
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     //        ErrorsFound=.TRUE.
                     break;
@@ -524,10 +524,10 @@ namespace EnergyPlus::BranchNodeConnections {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber == state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
                     // Skip if one of the
-                    ShowSevereError(state, "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                    ShowSevereError("Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Outlet node more than once.");
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     //        ErrorsFound=.TRUE.
                     break;
@@ -547,10 +547,10 @@ namespace EnergyPlus::BranchNodeConnections {
                 break;
             }
             if (!IsValid) {
-                ShowSevereError(state, format("{}{}{}", "Node Connection Error, Node=\"", state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName,
+                ShowSevereError(format("{}{}{}", "Node Connection Error, Node=\"", state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName,
                                 "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node."));
-                ShowContinueError(state, "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
-                ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError("This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
+                ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -610,11 +610,11 @@ namespace EnergyPlus::BranchNodeConnections {
                     }
                 }
                 if (!IsValid) {
-                    ShowSevereError(state, "(Developer) Node Connection Error, Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ':' +
+                    ShowSevereError("(Developer) Node Connection Error, Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ':' +
                                     state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
-                    ShowContinueError(state, "Object has multiple connections on both inlet and outlet fluid streams.");
+                    ShowContinueError("Object has multiple connections on both inlet and outlet fluid streams.");
                     for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
-                        if (FluidStreamCounts(Loop2)) ShowContinueError(state, format("...occurs in Fluid Stream [{}].", Loop2));
+                        if (FluidStreamCounts(Loop2)) ShowContinueError(format("...occurs in Fluid Stream [{}].", Loop2));
                     }
                     ++ErrorCounter;
                     ErrorsFound = true;
@@ -636,10 +636,10 @@ namespace EnergyPlus::BranchNodeConnections {
                     if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
                     if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
                     if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
-                    ShowSevereError(state, "Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
+                    ShowSevereError("Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same zone node appears more than once.");
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
-                    ShowContinueError(state, "Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                    ShowContinueError("Reference Object=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     ErrorsFound = true;
                 }
@@ -651,7 +651,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -680,7 +680,7 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
         if (!IsParent) {
-            IsParent = IsParentObjectCompSet(state, ComponentType, ComponentName);
+            IsParent = IsParentObjectCompSet(ComponentType, ComponentName);
         }
 
         return IsParent;
@@ -688,7 +688,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -724,7 +724,7 @@ namespace EnergyPlus::BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -747,15 +747,15 @@ namespace EnergyPlus::BranchNodeConnections {
         OutletNodeNum = 0;
         ErrInObject = false;
 
-        Which = WhichParentSet(state, ComponentType, ComponentName);
+        Which = WhichParentSet(ComponentType, ComponentName);
         if (Which != 0) {
             InletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).InletNodeName;
             OutletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).OutletNodeName;
             // Get Node Numbers
             InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-        } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
-            Which = WhichCompSet(state, ComponentType, ComponentName);
+        } else if (IsParentObjectCompSet(ComponentType, ComponentName)) {
+            Which = WhichCompSet(ComponentType, ComponentName);
             if (Which != 0) {
                 InletNodeName = state.dataBranchNodeConnections->CompSets(Which).InletNodeName;
                 OutletNodeName = state.dataBranchNodeConnections->CompSets(Which).OutletNodeName;
@@ -763,11 +763,11 @@ namespace EnergyPlus::BranchNodeConnections {
                 OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             } else {
                 ErrInObject = true;
-                ShowWarningError(state, "GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+                ShowWarningError("GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
             }
         } else {
             ErrInObject = true;
-            ShowWarningError(state, "GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+            ShowWarningError("GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
         }
 
         if (ErrInObject) ErrorsFound = true;
@@ -775,7 +775,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -807,7 +807,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -840,7 +840,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -860,7 +860,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Loop;
 
         NumChildren = 0;
-        if (IsParentObject(state, ComponentType, ComponentName)) {
+        if (IsParentObject(ComponentType, ComponentName)) {
             for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
                 if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType && state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
                     ++NumChildren;
@@ -885,7 +885,7 @@ namespace EnergyPlus::BranchNodeConnections {
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
     )
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -955,7 +955,7 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
         if (ErrInObject) {
-            ShowWarningError(state, "GetComponentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+            ShowWarningError("GetComponentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
         }
 
         if (ErrInObject) ErrorsFound = true;
@@ -972,7 +972,7 @@ namespace EnergyPlus::BranchNodeConnections {
                          Array1D_int &OutletNodeNum,
                          bool &ErrorsFound)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -1011,13 +1011,12 @@ namespace EnergyPlus::BranchNodeConnections {
         OutletNodeNum = 0;
         ErrInObject = false;
 
-        if (IsParentObject(state, ComponentType, ComponentName)) {
-            NumChildren = GetNumChildren(state, ComponentType, ComponentName);
+        if (IsParentObject(ComponentType, ComponentName)) {
+            NumChildren = GetNumChildren(ComponentType, ComponentName);
             if (NumChildren == 0) {
-                ShowWarningError(state, "GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
+                ShowWarningError("GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
             } else {
-                GetParentData(state,
-                    ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
+                GetParentData(ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
                 ChildInNodeName.allocate(NumChildren);
@@ -1044,7 +1043,7 @@ namespace EnergyPlus::BranchNodeConnections {
                     }
                 }
                 if (CountNum != NumChildren) {
-                    ShowSevereError(state, "GetChildrenData: Counted nodes not equal to GetNumChildren count");
+                    ShowSevereError("GetChildrenData: Counted nodes not equal to GetNumChildren count");
                     ErrInObject = true;
                 } else {
                     // Children arrays built.  Now "sort" for flow connection order(?)
@@ -1096,7 +1095,7 @@ namespace EnergyPlus::BranchNodeConnections {
                 }
             }
         } else {
-            ShowSevereError(state, "GetChildrenData: Requested Children Data for non Parent Node=" + ComponentType + ':' + ComponentName);
+            ShowSevereError("GetChildrenData: Requested Children Data for non Parent Node=" + ComponentType + ':' + ComponentName);
             ErrInObject = true;
         }
 
@@ -1112,7 +1111,7 @@ namespace EnergyPlus::BranchNodeConnections {
                        Optional_string_const Description // Description
     )
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001
@@ -1200,11 +1199,11 @@ namespace EnergyPlus::BranchNodeConnections {
                             if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) && (CompName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName)) Found2 = 1;
                         }
                         if (Found2 == 0) {
-                            ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
-                            ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                            ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                            ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
-                            ShowContinueError(state, format("{}{}{}", "  as inlet for: ", CompTypeUC + ", name=", CompName));
+                            ShowWarningError("Node used as an inlet more than once: " + InletNode);
+                            ShowContinueError("  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                            ShowContinueError("  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                            ShowContinueError(format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
+                            ShowContinueError(format("{}{}{}", "  as inlet for: ", CompTypeUC + ", name=", CompName));
                         }
                     }
                 }
@@ -1233,11 +1232,11 @@ namespace EnergyPlus::BranchNodeConnections {
                         // This rule is violated by dual duct units, so let it pass
                         if ((Found2 == 0) && (!has_prefixi(state.dataBranchNodeConnections->CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
                             (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
-                            ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
-                            ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                            ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                            ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
-                            ShowContinueError(state, format("{}{}{}", "  as outlet for: ", CompTypeUC + ", name=", CompName));
+                            ShowWarningError("Node used as an outlet more than once: " + OutletNode);
+                            ShowContinueError("  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                            ShowContinueError("  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                            ShowContinueError(format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
+                            ShowContinueError(format("{}{}{}", "  as outlet for: ", CompTypeUC + ", name=", CompName));
                         }
                     }
                 }
@@ -1265,7 +1264,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void TestInletOutletNodes([[maybe_unused]] bool &ErrorsFound)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001
@@ -1292,11 +1291,11 @@ namespace EnergyPlus::BranchNodeConnections {
                 if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Other).CType || state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
                     state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Other).OutletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError(state, "Node used as an inlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
-                    ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                    ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                    ShowContinueError(state, "  and  by     : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
-                    ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
+                    ShowWarningError("Node used as an inlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                    ShowContinueError("  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                    ShowContinueError("  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                    ShowContinueError("  and  by     : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
+                    ShowContinueError("  as inlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1312,11 +1311,11 @@ namespace EnergyPlus::BranchNodeConnections {
                 if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Other).CType || state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
                     state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Other).InletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError(state, "Node used as an outlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
-                    ShowContinueError(state, "  Used by      : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                    ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                    ShowContinueError(state, "  and  by      : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
-                    ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
+                    ShowWarningError("Node used as an outlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                    ShowContinueError("  Used by      : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                    ShowContinueError("  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                    ShowContinueError("  and  by      : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
+                    ShowContinueError("  as outlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1332,7 +1331,7 @@ namespace EnergyPlus::BranchNodeConnections {
                      std::string const &Description // Description of Node Pair (for warning message)
     )
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2001
@@ -1377,7 +1376,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
 
         if (Found == 0) {
-            SetUpCompSets(state, "UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description);
+            SetUpCompSets("UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description);
         } else {
             // Fill in node names and component type for previously undefined values:
             //   If the parent object did not specify a component type or inlet or outlet node, then that value
@@ -1392,7 +1391,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(bool &ErrorsFound)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1423,11 +1422,11 @@ namespace EnergyPlus::BranchNodeConnections {
                 if (AlreadyNoted(Count)) continue;
                 //  All other values must match
                 AlreadyNoted(Other) = true;
-                ShowSevereError(state, "Same component name and type has differing Node Names.");
-                ShowContinueError(state, "   Component:    " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                ShowContinueError(state, "   Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
-                ShowContinueError(state, " & Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Other).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Other).OutletNodeName);
-                ShowContinueError(state, "   Node Types:   " + state.dataBranchNodeConnections->CompSets(Count).Description + " & " + state.dataBranchNodeConnections->CompSets(Other).Description);
+                ShowSevereError("Same component name and type has differing Node Names.");
+                ShowContinueError("   Component:    " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError("   Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                ShowContinueError(" & Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Other).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Other).OutletNodeName);
+                ShowContinueError("   Node Types:   " + state.dataBranchNodeConnections->CompSets(Count).Description + " & " + state.dataBranchNodeConnections->CompSets(Other).Description);
                 ErrorsFound = true;
             }
         }
@@ -1437,7 +1436,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
     {
-
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Jan 2007
@@ -1465,9 +1464,9 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         } else {
             if (NodeNumber > 0) {
-                ShowWarningError(state, "Node not found = " + NodeID(NodeNumber) + '.');
+                ShowWarningError("Node not found = " + NodeID(NodeNumber) + '.');
             } else {
-                ShowWarningError(state, "Invalid node number passed = 0.");
+                ShowWarningError("Invalid node number passed = 0.");
             }
             errFlag = true;
         }

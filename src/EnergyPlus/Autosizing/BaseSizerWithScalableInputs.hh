@@ -89,8 +89,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
     int zoneHVACSizingIndex = 0;
     Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
 
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
+    void initializeWithinEP(std::string const &_compType,
                             std::string const &_compName,
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;

@@ -96,22 +96,21 @@ namespace OutsideEnergySources {
 
         virtual ~OutsideEnergySourceSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(int objectType, std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &calledFromLocation,
+        void getDesignCapacities(const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(EnergyPlusData &state, Real64 curLoad);
+        void initialize(Real64 curLoad);
 
-        void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
+        void calculate(bool runFlag, Real64 curLoad);
 
         void size();
 

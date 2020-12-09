@@ -75,14 +75,13 @@ namespace HeatBalanceMovableInsulation {
     using DataSurfaces::Surface;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    void EvalOutsideMovableInsulation(EnergyPlusData &state,
-                                      int const SurfNum,       // DO loop counter for surfaces
+    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
                                       Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
                                       int &RoughIndexMovInsul, // Roughness index of movable insulation
                                       Real64 &AbsExt           // Absorptivity of outer most layer
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   March 1998
@@ -103,7 +102,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulExt);
+        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulExt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulExt);
@@ -120,7 +119,7 @@ namespace HeatBalanceMovableInsulation {
                         state.dataMaterial->Material(MaterialIndex).Resistance =
                             state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
                     } else {
-                        ShowFatalError(state, "EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
+                        ShowFatalError("EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
                                        state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulExt).Name);
                     }
                 }
@@ -139,13 +138,12 @@ namespace HeatBalanceMovableInsulation {
         }
     }
 
-    void EvalInsideMovableInsulation(EnergyPlusData &state,
-                                     int const SurfNum, // DO loop counter for surfaces
+    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
                                      Real64 &HMovInsul, // Resistance or "h" value of movable insulation
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     )
     {
-
+EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   March 1998
@@ -168,7 +166,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt);
+        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulInt);
@@ -186,7 +184,7 @@ namespace HeatBalanceMovableInsulation {
                     if (state.dataMaterial->Material(thisMovableInt).Conductivity > 0.0 && state.dataMaterial->Material(thisMovableInt).Thickness > 0.0) {
                         state.dataMaterial->Material(thisMovableInt).Resistance = state.dataMaterial->Material(thisMovableInt).Thickness / state.dataMaterial->Material(thisMovableInt).Conductivity;
                     } else {
-                        ShowFatalError(state, "EvalInsideMovableInsulation: No resistance found for material " + state.dataMaterial->Material(MaterialIndex).Name);
+                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + state.dataMaterial->Material(MaterialIndex).Name);
                     }
                 }
 

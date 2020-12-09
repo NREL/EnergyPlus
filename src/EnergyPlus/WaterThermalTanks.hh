@@ -385,13 +385,13 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterThermalTankData : PlantComponent
@@ -636,7 +636,7 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
         void setupOutputVars();
 
@@ -646,17 +646,17 @@ namespace WaterThermalTanks {
 
         void setupWaterHeaterOutputVars();
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        Real64 PartLoadFactor(EnergyPlusData &state, Real64 PartLoadRatio_loc);
+        Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
         void CalcNodeMassFlows(InletModeEnum inletMode);
 
         void SetupStratifiedNodes();
 
-        void initialize(EnergyPlusData &state, bool FirstHVACIteration);
+        void initialize(bool FirstHVACIteration);
 
-        bool SourceHeatNeed(EnergyPlusData &state, Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
+        bool SourceHeatNeed(Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
 
         void SizeDemandSidePlantConnections();
 
@@ -666,7 +666,7 @@ namespace WaterThermalTanks {
 
         void MinePlantStructForInfo();
 
-        void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
+        void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _);
 
         void CalcWaterThermalTank();
 
@@ -686,11 +686,11 @@ namespace WaterThermalTanks {
 
         Real64 GetHPWHSensedTankTemp();
 
-        Real64 FindStratifiedTankSensedTemp(EnergyPlusData &state, bool UseAverage = false);
+        Real64 FindStratifiedTankSensedTemp(bool UseAverage = false);
 
         Real64 getDeadBandTemp();
 
-        Real64 PlantMassFlowRatesFunc(EnergyPlusData &state, int InNodeNum,
+        Real64 PlantMassFlowRatesFunc(int InNodeNum,
                                       bool FirstHVACIteration,
                                       SideEnum WaterThermalTankSide,
                                       int PlantLoopSide,
@@ -750,18 +750,17 @@ namespace WaterThermalTanks {
                                                             Real64 &Qsource // steady state heat transfer rate from a constant source side flow
         );
 
-        void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state,
-                                           Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                            Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
-        void CalcHeatPumpWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcHeatPumpWaterHeater(bool FirstHVACIteration);
 
-        void ConvergeSingleSpeedHPWHCoilAndTank(EnergyPlusData &state, Real64 partLoadRatio);
+        void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
 
-        void SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH,
+        void SetVSHPWHFlowRates(HeatPumpWaterHeaterData &HPWH,
                                 int SpeedNum,
                                 Real64 SpeedRatio,
                                 Real64 WaterDens,
@@ -769,17 +768,17 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
 
-        Real64 PLRResidualIterSpeed(EnergyPlusData &state, Real64 SpeedRatio,        // speed ratio between two speed levels
+        Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1D<Real64> const &Par
         );
 
-        static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
+        static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
 
-        void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterHeaterDesuperheaterData
@@ -864,9 +863,9 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int WaterHeaterNum, bool FirstHVACIteration);
+    void SimulateWaterHeaterStandAlone(int WaterHeaterNum, bool FirstHVACIteration);
 
-    void SimHeatPumpWaterHeater(EnergyPlusData &state, std::string const &CompName,
+    void SimHeatPumpWaterHeater(std::string const &CompName,
                                 bool FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -888,9 +887,9 @@ namespace WaterThermalTanks {
 
     void CalcWaterThermalTankZoneGains();
 
-    int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    int getTankIDX(std::string const &CompName, int &CompIndex);
 
-    int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    int getHPTankIDX(std::string const &CompName, int &CompIndex);
 
 } // namespace WaterThermalTanks
 

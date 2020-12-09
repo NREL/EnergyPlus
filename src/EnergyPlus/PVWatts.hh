@@ -167,10 +167,9 @@ namespace PVWatts {
         Real64 m_outputDCEnergy;
 
     public:
-        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
+        static PVWattsGenerator createFromIdfObj(int objNum);
 
-        PVWattsGenerator(EnergyPlusData &state,
-                         const std::string &name,
+        PVWattsGenerator(const std::string &name,
                          const Real64 dcSystemCapacity,
                          ModuleType moduleType,
                          ArrayType arrayType,
@@ -202,8 +201,7 @@ namespace PVWatts {
 
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-        IrradianceOutput processIrradiance(EnergyPlusData &state,
-                                           int year,
+        IrradianceOutput processIrradiance(int year,
                                            int month,
                                            int day,
                                            int hour,
@@ -216,12 +214,12 @@ namespace PVWatts {
                                            Real64 df,
                                            Real64 alb);
 
-        DCPowerOutput powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
+        DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
     };
 
     extern std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
 
     void clear_state();
 

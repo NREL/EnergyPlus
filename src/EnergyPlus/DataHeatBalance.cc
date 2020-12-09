@@ -1114,7 +1114,7 @@ namespace DataHeatBalance {
 
     void ZoneData::SetOutBulbTempAt()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -1145,7 +1145,7 @@ namespace DataHeatBalance {
 
     void ZoneData::SetWindSpeedAt(Real64 const fac)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2013
@@ -1177,37 +1177,37 @@ namespace DataHeatBalance {
 
     void SetZoneOutBulbTempAt()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         for (auto &zone : Zone) {
-            zone.SetOutBulbTempAt(state);
+            zone.SetOutBulbTempAt();
         }
     }
 
     void CheckZoneOutBulbTempAt()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
         Real64 minBulb = 0.0;
         for (auto &zone : Zone) {
             minBulb = min(minBulb, zone.OutDryBulbTemp, zone.OutWetBulbTemp);
-            if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Zone", zone.Centroid.z, zone.Name);
+            if (minBulb < -100.0) SetOutBulbTempAt_error("Zone", zone.Centroid.z, zone.Name);
         }
     }
 
     void SetZoneWindSpeedAt()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &zone : Zone) {
-            zone.SetWindSpeedAt(state, fac);
+            zone.SetWindSpeedAt(fac);
         }
     }
 
     void SetZoneWindDirAt()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // Using/Aliasing
         Real64 const fac(state.dataEnvrn->WindDir);
         for (auto &zone : Zone) {
@@ -1219,7 +1219,7 @@ namespace DataHeatBalance {
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1338,13 +1338,13 @@ namespace DataHeatBalance {
             }
 
             if (WrongMaterialsMix) { // Illegal material for a window construction
-                ShowSevereError(state, "Error: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
+                ShowSevereError("Error: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                                 " has materials other than glass, gas, shade, screen, blind, complex shading, complex gap, or simple system.");
                 ErrorsFound = true;
                 // Do not check number of layers for BSDF type of window since that can be handled
             } else if ((TotLayers > 8) && (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) &&
                        (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL)) { // Too many layers for a window construction
-                ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
+                ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                                 " has too many layers (max of 8 allowed -- 4 glass + 3 gap + 1 shading device).");
                 ErrorsFound = true;
 
@@ -1356,8 +1356,7 @@ namespace DataHeatBalance {
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == Screen ||
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowShade ||
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowGap) {
-                    ShowSevereError(state,
-                        "CheckAndSetConstructionProperties: The single-layer window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
+                    ShowSevereError("CheckAndSetConstructionProperties: The single-layer window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                         " has a gas, complex gap, shade, complex shade, screen or blind material; it should be glass of simple glazing system.");
                     ErrorsFound = true;
                 }
@@ -1416,8 +1415,8 @@ namespace DataHeatBalance {
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
                 if (state.dataMaterial->Material(MaterNum).SolarDiffusing && TotShadeLayers > 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
-                    ShowContinueError(state, "has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " and a shade, screen or blind layer.");
+                    ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                    ShowContinueError("has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " and a shade, screen or blind layer.");
                     break;
                 }
             }
@@ -1432,8 +1431,8 @@ namespace DataHeatBalance {
                         ++GlassLayNum;
                         if (GlassLayNum < TotGlassLayers && state.dataMaterial->Material(MaterNum).SolarDiffusing) {
                             ErrorsFound = true;
-                            ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
-                            ShowContinueError(state, "has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " that is not the innermost glass layer.");
+                            ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                            ShowContinueError("has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " that is not the innermost glass layer.");
                         }
                     }
                 }
@@ -1517,9 +1516,9 @@ namespace DataHeatBalance {
                                 if (BlNum > 0) {
                                     if ((state.dataMaterial->Material(MatGapL).Thickness + state.dataMaterial->Material(MatGapR).Thickness) < Blind(BlNum).SlatWidth) {
                                         ErrorsFound = true;
-                                        ShowSevereError(state, "CheckAndSetConstructionProperties: For window construction " + state.dataConstruction->Construct(ConstrNum).Name);
-                                        ShowContinueError(state, "the slat width of the between-glass blind is greater than");
-                                        ShowContinueError(state, "the sum of the widths of the gas layers adjacent to the blind.");
+                                        ShowSevereError("CheckAndSetConstructionProperties: For window construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                                        ShowContinueError("the slat width of the between-glass blind is greater than");
+                                        ShowContinueError("the sum of the widths of the gas layers adjacent to the blind.");
                                     }
                                 } // End of check if BlNum > 0
                             }     // End of check if material is window blind
@@ -1537,36 +1536,36 @@ namespace DataHeatBalance {
                         if (MaterNum == 0) continue; // error -- has been caught will stop program later
                         if (state.dataMaterial->Material(MaterNum).Group == WindowGlass) {
                             ErrorsFound = true;
-                            ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
-                            ShowContinueError(state, "For simple window constructions, no other glazing layers are allowed.");
+                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                            ShowContinueError("For simple window constructions, no other glazing layers are allowed.");
                         }
                         if (state.dataMaterial->Material(MaterNum).Group == WindowGas) {
                             ErrorsFound = true;
-                            ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
-                            ShowContinueError(state, "For simple window constructions, no other gas layers are allowed.");
+                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                            ShowContinueError("For simple window constructions, no other gas layers are allowed.");
                         }
                     }
                 }
             }
 
             if (WrongWindowLayering) {
-                ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
-                ShowContinueError(state, "  For multi-layer window constructions the following rules apply:");
-                ShowContinueError(state, "    --The first and last layer must be a solid layer (glass or shade/screen/blind),");
-                ShowContinueError(state, "    --Adjacent glass layers must be separated by one and only one gas layer,");
-                ShowContinueError(state, "    --Adjacent layers must not be of the same type,");
-                ShowContinueError(state, "    --Only one shade/screen/blind layer is allowed,");
-                ShowContinueError(state, "    --An exterior shade/screen/blind must be the first layer,");
-                ShowContinueError(state, "    --An interior shade/blind must be the last layer,");
-                ShowContinueError(state, "    --An interior screen is not allowed,");
-                ShowContinueError(state, "    --For an exterior shade/screen/blind or interior shade/blind, there should not be a gas layer");
-                ShowContinueError(state, "    ----between the shade/screen/blind and adjacent glass,");
-                ShowContinueError(state, "    --A between-glass screen is not allowed,");
-                ShowContinueError(state, "    --A between-glass shade/blind is allowed only for double and triple glazing,");
-                ShowContinueError(state, "    --A between-glass shade/blind must have adjacent gas layers of the same type and width,");
-                ShowContinueError(state, "    --For triple glazing the between-glass shade/blind must be between the two inner glass layers,");
-                ShowContinueError(state, "    --The slat width of a between-glass blind must be less than the sum of the widths");
-                ShowContinueError(state, "    ----of the gas layers adjacent to the blind.");
+                ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                ShowContinueError("  For multi-layer window constructions the following rules apply:");
+                ShowContinueError("    --The first and last layer must be a solid layer (glass or shade/screen/blind),");
+                ShowContinueError("    --Adjacent glass layers must be separated by one and only one gas layer,");
+                ShowContinueError("    --Adjacent layers must not be of the same type,");
+                ShowContinueError("    --Only one shade/screen/blind layer is allowed,");
+                ShowContinueError("    --An exterior shade/screen/blind must be the first layer,");
+                ShowContinueError("    --An interior shade/blind must be the last layer,");
+                ShowContinueError("    --An interior screen is not allowed,");
+                ShowContinueError("    --For an exterior shade/screen/blind or interior shade/blind, there should not be a gas layer");
+                ShowContinueError("    ----between the shade/screen/blind and adjacent glass,");
+                ShowContinueError("    --A between-glass screen is not allowed,");
+                ShowContinueError("    --A between-glass shade/blind is allowed only for double and triple glazing,");
+                ShowContinueError("    --A between-glass shade/blind must have adjacent gas layers of the same type and width,");
+                ShowContinueError("    --For triple glazing the between-glass shade/blind must be between the two inner glass layers,");
+                ShowContinueError("    --The slat width of a between-glass blind must be less than the sum of the widths");
+                ShowContinueError("    ----of the gas layers adjacent to the blind.");
                 ErrorsFound = true;
             }
 
@@ -1604,14 +1603,14 @@ namespace DataHeatBalance {
         state.dataConstruction->Construct(ConstrNum).OutsideRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
 
         if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == Air) {
-            ShowSevereError(state, "CheckAndSetConstructionProperties: Outside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
-            ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
+            ShowSevereError("CheckAndSetConstructionProperties: Outside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowContinueError("  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
             ErrorsFound = true;
         }
         if (InsideLayer > 0) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Air) {
-                ShowSevereError(state, "CheckAndSetConstructionProperties: Inside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
-                ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
+                ShowSevereError("CheckAndSetConstructionProperties: Inside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                ShowContinueError("  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
                 ErrorsFound = true;
             }
         }
@@ -1621,8 +1620,8 @@ namespace DataHeatBalance {
             // need to check EcoRoof is not non-outside layer
             for (Layer = 2; Layer <= TotLayers; ++Layer) {
                 if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == EcoRoof) {
-                    ShowSevereError(state, "CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + state.dataConstruction->Construct(ConstrNum).Name);
-                    ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
+                    ShowSevereError("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                    ShowContinueError("  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
                     ErrorsFound = true;
                 }
             }
@@ -1631,9 +1630,9 @@ namespace DataHeatBalance {
         if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == IRTMaterial) {
             state.dataConstruction->Construct(ConstrNum).TypeIsIRT = true;
             if (state.dataConstruction->Construct(ConstrNum).TotLayers != 1) {
-                ShowSevereError(state, "CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " +
+                ShowSevereError("CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " +
                                 state.dataConstruction->Construct(ConstrNum).Name);
-                ShowContinueError(state, "  Too many layers in referenced construction.");
+                ShowContinueError("  Too many layers in referenced construction.");
                 ErrorsFound = true;
             }
         }
@@ -1642,7 +1641,7 @@ namespace DataHeatBalance {
     int AssignReverseConstructionNumber(int const ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound)
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2006
@@ -1742,7 +1741,7 @@ namespace DataHeatBalance {
                 NominalU(TotConstructs) = 1.0 / NominalRforNominalUCalculation(TotConstructs);
             }
 
-            CheckAndSetConstructionProperties(state, TotConstructs, ErrorsFound);
+            CheckAndSetConstructionProperties(TotConstructs, ErrorsFound);
         }
 
         return NewConstrNum;
@@ -1753,7 +1752,7 @@ namespace DataHeatBalance {
                               bool &errFlag            // error flag should one be needed
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2009
@@ -1817,9 +1816,8 @@ namespace DataHeatBalance {
 
             if (Blind(TotBlinds).MaxSlatAngle < Blind(TotBlinds).MinSlatAngle) {
                 errFlag = true;
-                ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError(state,
-                                  format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
+                ShowSevereError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
                                          Blind(TotBlinds).MinSlatAngle,
                                          Blind(TotBlinds).MaxSlatAngle));
             }
@@ -1829,9 +1827,8 @@ namespace DataHeatBalance {
             if (Blind(TotBlinds).MaxSlatAngle > Blind(TotBlinds).MinSlatAngle &&
                 (Blind(TotBlinds).SlatAngle < Blind(TotBlinds).MinSlatAngle || Blind(TotBlinds).SlatAngle > Blind(TotBlinds).MaxSlatAngle)) {
                 errFlag = true;
-                ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError(state,
-                                  format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
+                ShowSevereError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
                                          Blind(TotBlinds).SlatAngle,
                                          Blind(TotBlinds).MinSlatAngle,
                                          Blind(TotBlinds).MaxSlatAngle));
@@ -1840,26 +1837,24 @@ namespace DataHeatBalance {
             // Warning if input minimum slat angle is less than that allowed by slat geometry
 
             if (Blind(TotBlinds).MinSlatAngle < MinSlatAngGeom) {
-                ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowWarningError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
-                    state,
                     format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
                            Blind(TotBlinds).MinSlatAngle,
                            MinSlatAngGeom));
-                ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
+                ShowContinueError(format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
                 Blind(TotBlinds).MinSlatAngle = MinSlatAngGeom;
             }
 
             // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
             if (Blind(TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
-                ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowWarningError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
-                    state,
                     format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
                            Blind(TotBlinds).MaxSlatAngle,
                            MaxSlatAngGeom));
-                ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
+                ShowContinueError(format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
                 Blind(TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
             }
         } else {
@@ -1873,7 +1868,7 @@ namespace DataHeatBalance {
                                  Optional_int_const ScreenNumber // Optional screen number
     )
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006
@@ -1972,7 +1967,7 @@ namespace DataHeatBalance {
         if (present(ScreenNumber)) {
             ScNum = ScreenNumber;
             if (!present(Theta) || !present(Phi)) {
-                ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
+                ShowFatalError("Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
             }
         } else {
             ScNum = DataSurfaces::SurfWinScreenNumber(SurfaceNum);
@@ -2358,7 +2353,7 @@ namespace DataHeatBalance {
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
-        GET_STATE_HERE
+        EnergyPlusData & state = getCurrentState(0);
 
         // PURPOSE OF THIS SUBROUTINE:
         // check fenestrations with shading control and set a flag to true if its construction has

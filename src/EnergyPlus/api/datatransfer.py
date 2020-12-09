@@ -197,7 +197,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a raw bytes CSV representation of the available API data
         """
-        return self.api.listAllAPIDataCSV(state)
+        return self.api.listAllAPIDataCSV()
 
     def api_data_fully_ready(self, state: c_void_p) -> bool:
         """
@@ -207,7 +207,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
-        success = self.api.apiDataFullyReady(state)
+        success = self.api.apiDataFullyReady()
         if success == 0:
             return True
         return False
@@ -221,7 +221,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns true if the error flag was activated during prior calculations.
         """
-        if self.api.apiErrorFlag(state) == 1:
+        if self.api.apiErrorFlag() == 1:
             return True
         return False
 
@@ -233,7 +233,7 @@ class DataExchange:
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         """
-        self.api.resetErrorFlag(state)
+        self.api.resetErrorFlag()
 
     def request_variable(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
@@ -265,7 +265,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(variable_key))
-        self.api.requestVariable(state, variable_name, variable_key)
+        self.api.requestVariable(variable_name, variable_key)
 
     def get_variable_handle(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
@@ -295,7 +295,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(variable_key))
-        return self.api.getVariableHandle(state, variable_name, variable_key)
+        return self.api.getVariableHandle(variable_name, variable_key)
 
     def get_meter_handle(self, state: c_void_p, meter_name: Union[str, bytes]) -> int:
         """
@@ -318,7 +318,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_meter_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(meter_name))
-        return self.api.getMeterHandle(state, meter_name)
+        return self.api.getMeterHandle(meter_name)
 
     def get_actuator_handle(
             self,
@@ -360,7 +360,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(actuator_key))
-        return self.api.getActuatorHandle(state, component_type, control_type, actuator_key)
+        return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
     def get_variable_value(self, state: c_void_p, variable_handle: int) -> float:
         """
@@ -377,7 +377,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_variable_value` expects `variable_handle` as an `int`, not "
                 "'{}'".format(variable_handle))
-        return self.api.getVariableValue(state, variable_handle)
+        return self.api.getVariableValue(variable_handle)
 
     def get_meter_value(self, state: c_void_p, meter_handle: int) -> float:
         """
@@ -397,7 +397,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_meter_value` expects `meter_handle` as an `int`, not "
                 "'{}'".format(meter_handle))
-        return self.api.getMeterValue(state, meter_handle)
+        return self.api.getMeterValue(meter_handle)
 
     def set_actuator_value(self, state: c_void_p, actuator_handle: int, actuator_value: float) -> None:
         """
@@ -424,7 +424,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`set_actuator_value` expects `actuator_value` as a `float`, not "
                 "'{}'".format(actuator_value))
-        self.api.setActuatorValue(state, actuator_handle, actuator_value)
+        self.api.setActuatorValue(actuator_handle, actuator_value)
 
     def reset_actuator(self, state: c_void_p, actuator_handle: int) -> None:
         """
@@ -439,7 +439,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`reset_actuator` expects `actuator_handle` as an `int`, not "
                 "'{}'".format(actuator_handle))
-        self.api.resetActuator(state, actuator_handle)
+        self.api.resetActuator(actuator_handle)
 
     def get_actuator_value(self, state: c_void_p, actuator_handle: int) -> float:
         """
@@ -456,7 +456,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_actuator_value` expects `actuator_handle` as an `int`, not "
                 "'{}'".format(actuator_handle))
-        return self.api.getActuatorValue(state, actuator_handle)
+        return self.api.getActuatorValue(actuator_handle)
 
     def get_internal_variable_handle(self, state: c_void_p, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
@@ -485,7 +485,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_internal_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(variable_key))
-        return self.api.getInternalVariableHandle(state, variable_type, variable_key)
+        return self.api.getInternalVariableHandle(variable_type, variable_key)
 
     def get_internal_variable_value(self, state: c_void_p, variable_handle: int) -> float:
         """
@@ -502,7 +502,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_internal_variable_value` expects `variable_handle` as an `int`, not "
                 "'{}'".format(variable_handle))
-        return self.api.getInternalVariableValue(state, variable_handle)
+        return self.api.getInternalVariableValue(variable_handle)
 
     def get_construction_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
         """
@@ -529,7 +529,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_construction_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(var_name))
-        return self.api.getConstructionHandle(state, var_name)
+        return self.api.getConstructionHandle(var_name)
 
     def get_global_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
         """
@@ -560,7 +560,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_global_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(var_name))
-        return self.api.getPluginGlobalVariableHandle(state, var_name)
+        return self.api.getPluginGlobalVariableHandle(var_name)
 
     def get_global_value(self, state: c_void_p, handle: int) -> float:
         """
@@ -589,7 +589,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_global_value` expects `handle` as an `int`, not "
                 "'{}'".format(handle))
-        return self.api.getPluginGlobalVariableValue(state, handle)
+        return self.api.getPluginGlobalVariableValue(handle)
 
     def set_global_value(self, state: c_void_p, handle: int, value: float) -> None:
         """
@@ -616,7 +616,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_global_value` expects `value` as a `float`, not "
                 "'{}'".format(value))
-        self.api.setPluginGlobalVariableValue(state, handle, value)
+        self.api.setPluginGlobalVariableValue(handle, value)
 
     def get_trend_handle(self, state: c_void_p, trend_var_name: Union[str, bytes]) -> int:
         """
@@ -646,7 +646,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
                 "'{}'".format(trend_var_name))
-        return self.api.getPluginTrendVariableHandle(state, trend_var_name)
+        return self.api.getPluginTrendVariableHandle(trend_var_name)
 
     def get_trend_value(self, state: c_void_p, trend_handle: int, time_index: int) -> float:
         """
@@ -676,7 +676,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_value` expects `time_index` as an `int`, not "
                 "'{}'".format(time_index))
-        return self.api.getPluginTrendVariableValue(state, trend_handle, time_index)
+        return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
     def get_trend_average(self, state: c_void_p, trend_handle: int, count: int) -> float:
         """
@@ -706,7 +706,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_average` expects `count` as an `int`, not "
                 "'{}'".format(count))
-        return self.api.getPluginTrendVariableAverage(state, trend_handle, count)
+        return self.api.getPluginTrendVariableAverage(trend_handle, count)
 
     def get_trend_min(self, state: c_void_p, trend_handle: int, count: int) -> float:
         """
@@ -736,7 +736,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_min` expects `count` as an `int`, not "
                 "'{}'".format(count))
-        return self.api.getPluginTrendVariableMin(state, trend_handle, count)
+        return self.api.getPluginTrendVariableMin(trend_handle, count)
 
     def get_trend_max(self, state: c_void_p, trend_handle: int, count: int) -> float:
         """
@@ -766,7 +766,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_max` expects `count` as an `int`, not "
                 "'{}'".format(count))
-        return self.api.getPluginTrendVariableMax(state, trend_handle, count)
+        return self.api.getPluginTrendVariableMax(trend_handle, count)
 
     def get_trend_sum(self, state: c_void_p, trend_handle: int, count: int) -> float:
         """
@@ -796,7 +796,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_sum` expects `count` as an `int`, not "
                 "'{}'".format(count))
-        return self.api.getPluginTrendVariableSum(state, trend_handle, count)
+        return self.api.getPluginTrendVariableSum(trend_handle, count)
 
     def get_trend_direction(self, state: c_void_p, trend_handle: int, count: int) -> float:
         """
@@ -828,7 +828,7 @@ class DataExchange:
             raise EnergyPlusException(
                 "`get_trend_direction` expects `count` as an `int`, not "
                 "'{}'".format(count))
-        return self.api.getPluginTrendVariableDirection(state, trend_handle, count)
+        return self.api.getPluginTrendVariableDirection(trend_handle, count)
 
     def year(self, state: c_void_p) -> int:
         """
@@ -838,7 +838,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer year (2020, for example)
         """
-        return self.api.year(state)
+        return self.api.year()
 
     def month(self, state: c_void_p) -> int:
         """
@@ -847,7 +847,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer month (1-12)
         """
-        return self.api.month(state)
+        return self.api.month()
 
     def day_of_month(self, state: c_void_p) -> int:
         """
@@ -856,7 +856,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer day of the month (1-31)
         """
-        return self.api.dayOfMonth(state)
+        return self.api.dayOfMonth()
 
     def hour(self, state: c_void_p) -> int:
         """
@@ -865,7 +865,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer hour of the day (0-23)
         """
-        return self.api.hour(state)
+        return self.api.hour()
 
     def current_time(self, state: c_void_p) -> float:
         """
@@ -874,7 +874,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: A floating point representation of the current time in hours
         """
-        return self.api.currentTime(state)
+        return self.api.currentTime()
 
     def minutes(self, state: c_void_p) -> int:
         """
@@ -883,7 +883,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer number of minutes into the current hour (1-60)
         """
-        return self.api.minutes(state)
+        return self.api.minutes()
 
     def num_time_steps_in_hour(self, state: c_void_p) -> int:
         """
@@ -892,7 +892,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer representation of the number of time steps in an hour
         """
-        return self.api.numTimeStepsInHour(state)
+        return self.api.numTimeStepsInHour()
 
     def zone_time_step_number(self, state: c_void_p) -> int:
         """
@@ -901,7 +901,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The integer index of the current time step
         """
-        return self.api.zoneTimeStepNum(state)
+        return self.api.zoneTimeStepNum()
 
     def day_of_week(self, state: c_void_p) -> int:
         """
@@ -910,7 +910,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer day of week (1-7)
         """
-        return self.api.dayOfWeek(state)
+        return self.api.dayOfWeek()
 
     def day_of_year(self, state: c_void_p) -> int:
         """
@@ -919,7 +919,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer day of the year (1-366)
         """
-        return self.api.dayOfYear(state)
+        return self.api.dayOfYear()
 
     def daylight_savings_time_indicator(self, state: c_void_p) -> bool:
         """
@@ -929,7 +929,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: A boolean DST indicator for the current time.
         """
-        return self.api.daylightSavingsTimeIndicator(state) == 1
+        return self.api.daylightSavingsTimeIndicator() == 1
 
     def holiday_index(self, state: c_void_p) -> int:
         """
@@ -938,7 +938,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer indicator for current day holiday type.
         """
-        return self.api.holidayIndex(state)
+        return self.api.holidayIndex()
 
     def sun_is_up(self, state: c_void_p) -> bool:
         """
@@ -948,7 +948,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: A boolean indicating whether the sun is currently up.
         """
-        return self.api.sunIsUp(state) == 1
+        return self.api.sunIsUp() == 1
 
     def is_raining(self, state: c_void_p) -> bool:
         """
@@ -958,7 +958,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: A boolean indicating whether it is currently raining.
         """
-        return self.api.isRaining(state) == 1
+        return self.api.isRaining() == 1
 
     def warmup_flag(self, state: c_void_p) -> bool:
         """
@@ -969,7 +969,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: A boolean indicating whether the warmup flag is on.
         """
-        return self.api.warmupFlag(state) == 1
+        return self.api.warmupFlag() == 1
 
     def zone_time_step(self, state: c_void_p) -> float:
         """
@@ -979,7 +979,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current zone time step in fractional hours.
         """
-        return self.api.systemTimeStep(state)
+        return self.api.systemTimeStep()
 
     def system_time_step(self, state: c_void_p) -> float:
         """
@@ -989,7 +989,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current system time step in fractional hours.
         """
-        return self.api.systemTimeStep(state)
+        return self.api.systemTimeStep()
 
     def current_environment_num(self, state: c_void_p) -> int:
         """
@@ -1000,7 +1000,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current environment number.
         """
-        return self.api.currentEnvironmentNum(state)
+        return self.api.currentEnvironmentNum()
 
     def actual_time(self, state: c_void_p) -> int:
         """
@@ -1009,7 +1009,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Integer value of time portion of the date/time function.
         """
-        return self.api.actualTime(state)
+        return self.api.actualTime()
 
     def actual_date_time(self, state: c_void_p) -> int:
         """
@@ -1018,7 +1018,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Integer value of the date/time function.
         """
-        return self.api.actualDateTime(state)
+        return self.api.actualDateTime()
 
     def kind_of_sim(self, state: c_void_p) -> int:
         """
@@ -1027,7 +1027,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Integer value of current environment.
         """
-        return self.api.kindOfSim(state)
+        return self.api.kindOfSim()
 
     def today_weather_is_raining_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
         """
@@ -1038,7 +1038,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: A true/false for whether the weather condition is active at the specified time
         """
-        return self.api.todayWeatherIsRainAtTime(state, hour, time_step_number) == 1
+        return self.api.todayWeatherIsRainAtTime(hour, time_step_number) == 1
 
     def today_weather_is_snowing_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
         """
@@ -1049,7 +1049,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: A true/false for whether the weather condition is active at the specified time
         """
-        return self.api.todayWeatherIsSnowAtTime(state, hour, time_step_number) == 1
+        return self.api.todayWeatherIsSnowAtTime(hour, time_step_number) == 1
 
     def today_weather_outdoor_dry_bulb_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1060,7 +1060,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherOutDryBulbAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherOutDryBulbAtTime(hour, time_step_number)
 
     def today_weather_outdoor_dew_point_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1071,7 +1071,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherOutDewPointAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherOutDewPointAtTime(hour, time_step_number)
 
     def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1082,7 +1082,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherOutBarometricPressureAtTime(hour, time_step_number)
 
     def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1093,7 +1093,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherOutRelativeHumidityAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherOutRelativeHumidityAtTime(hour, time_step_number)
 
     def today_weather_wind_speed_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1104,7 +1104,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherWindSpeedAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherWindSpeedAtTime(hour, time_step_number)
 
     def today_weather_wind_direction_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1115,7 +1115,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherWindDirectionAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherWindDirectionAtTime(hour, time_step_number)
 
     def today_weather_sky_temperature_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1126,7 +1126,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherSkyTemperatureAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherSkyTemperatureAtTime(hour, time_step_number)
 
     def today_weather_horizontal_ir_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1137,7 +1137,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherHorizontalIRSkyAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherHorizontalIRSkyAtTime(hour, time_step_number)
 
     def today_weather_beam_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1148,7 +1148,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherBeamSolarRadiationAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherBeamSolarRadiationAtTime(hour, time_step_number)
 
     def today_weather_diffuse_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1159,7 +1159,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherDiffuseSolarRadiationAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherDiffuseSolarRadiationAtTime(hour, time_step_number)
 
     def today_weather_albedo_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1170,7 +1170,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherAlbedoAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherAlbedoAtTime(hour, time_step_number)
 
     def today_weather_liquid_precipitation_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1181,7 +1181,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.todayWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)
+        return self.api.todayWeatherLiquidPrecipitationAtTime(hour, time_step_number)
 
     def tomorrow_weather_is_raining_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
         """
@@ -1192,7 +1192,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: A true/false for whether the weather condition is active at the specified time
         """
-        return self.api.tomorrowWeatherIsRainAtTime(state, hour, time_step_number) == 1
+        return self.api.tomorrowWeatherIsRainAtTime(hour, time_step_number) == 1
 
     def tomorrow_weather_is_snowing_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
         """
@@ -1203,7 +1203,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: A true/false for whether the weather condition is active at the specified time
         """
-        return self.api.tomorrowWeatherIsSnowAtTime(state, hour, time_step_number) == 1
+        return self.api.tomorrowWeatherIsSnowAtTime(hour, time_step_number) == 1
 
     def tomorrow_weather_outdoor_dry_bulb_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1214,7 +1214,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherOutDryBulbAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherOutDryBulbAtTime(hour, time_step_number)
 
     def tomorrow_weather_outdoor_dew_point_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1225,7 +1225,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherOutDewPointAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherOutDewPointAtTime(hour, time_step_number)
 
     def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1236,7 +1236,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherOutBarometricPressureAtTime(hour, time_step_number)
 
     def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1247,7 +1247,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherOutRelativeHumidityAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherOutRelativeHumidityAtTime(hour, time_step_number)
 
     def tomorrow_weather_wind_speed_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1258,7 +1258,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherWindSpeedAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherWindSpeedAtTime(hour, time_step_number)
 
     def tomorrow_weather_wind_direction_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1269,7 +1269,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherWindDirectionAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherWindDirectionAtTime(hour, time_step_number)
 
     def tomorrow_weather_sky_temperature_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1280,7 +1280,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherSkyTemperatureAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherSkyTemperatureAtTime(hour, time_step_number)
 
     def tomorrow_weather_horizontal_ir_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1291,7 +1291,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherHorizontalIRSkyAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherHorizontalIRSkyAtTime(hour, time_step_number)
 
     def tomorrow_weather_beam_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1302,7 +1302,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherBeamSolarRadiationAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherBeamSolarRadiationAtTime(hour, time_step_number)
 
     def tomorrow_weather_diffuse_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1313,7 +1313,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherDiffuseSolarRadiationAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherDiffuseSolarRadiationAtTime(hour, time_step_number)
 
     def tomorrow_weather_albedo_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1324,7 +1324,7 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherAlbedoAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherAlbedoAtTime(hour, time_step_number)
 
     def tomorrow_weather_liquid_precipitation_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
         """
@@ -1335,4 +1335,4 @@ class DataExchange:
         :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
         :return: Value of the weather condition at the specified time
         """
-        return self.api.tomorrowWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)
+        return self.api.tomorrowWeatherLiquidPrecipitationAtTime(hour, time_step_number)

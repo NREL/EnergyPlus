@@ -60,8 +60,7 @@ struct EnergyPlusData;
 
 namespace ZoneContaminantPredictorCorrector {
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
@@ -73,8 +72,7 @@ namespace ZoneContaminantPredictorCorrector {
 
     void InitZoneContSetPoints();
 
-    void PredictZoneContaminants(EnergyPlusData &state,
-                                 bool const ShortenTimeStepSys,
+    void PredictZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
@@ -85,7 +83,7 @@ namespace ZoneContaminantPredictorCorrector {
 
     void RevertZoneTimestepHistories();
 
-    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
+    void InverseModelCO2(int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -93,8 +91,7 @@ namespace ZoneContaminantPredictorCorrector {
                          Real64 &RhoAir               // Air density
     );
 
-    void CorrectZoneContaminants(EnergyPlusData &state,
-                                 bool const ShortenTimeStepSys,
+    void CorrectZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );

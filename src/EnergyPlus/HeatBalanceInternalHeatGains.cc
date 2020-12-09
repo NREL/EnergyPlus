@@ -56,8 +56,7 @@
 
 namespace EnergyPlus {
 
-void SetupZoneInternalGain(EnergyPlusData &state,
-                           int const ZoneNum,
+void SetupZoneInternalGain(int const ZoneNum,
                            std::string const &cComponentObject, // object class name for device contributing internal gain
                            std::string const &cComponentName,   // user unique name for device
                            int const IntGainComp_TypeOfNum,
@@ -71,7 +70,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            int RetNodeNum // for return air heat gains
 )
 {
-
+EnergyPlusData & state = getCurrentState(0);
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2011
@@ -108,9 +107,9 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 
     // Check if IntGainComp_TypeOfNum and cComponentObject are consistent
     if (!UtilityRoutines::SameString(UpperCaseObjectType, ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum))) {
-        ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
-        ShowContinueError(state, "Object type character = " + cComponentObject);
-        ShowContinueError(state, "Type of Num object name = " + ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum));
+        ShowSevereError("SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
+        ShowContinueError("Object type character = " + cComponentObject);
+        ShowContinueError("Type of Num object name = " + ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum));
         return;
     }
 
@@ -126,10 +125,10 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     }
 
     if (FoundDuplicate) {
-        ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain");
-        ShowContinueError(state, "The duplicate object user name =" + cComponentName);
-        ShowContinueError(state, "The duplicate object type = " + cComponentObject);
-        ShowContinueError(state, "This internal gain will not be modeled, and the simulation continues");
+        ShowSevereError("SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain");
+        ShowContinueError("The duplicate object user name =" + cComponentName);
+        ShowContinueError("The duplicate object type = " + cComponentObject);
+        ShowContinueError("This internal gain will not be modeled, and the simulation continues");
         return;
     }
 

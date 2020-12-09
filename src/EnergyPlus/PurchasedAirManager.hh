@@ -317,7 +317,7 @@ namespace PurchasedAirManager {
 
     // Object Data
 
-    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
+    void SimPurchasedAir(std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool  FirstHVACIteration,
@@ -327,28 +327,25 @@ namespace PurchasedAirManager {
 
     void GetPurchasedAir();
 
-    void InitPurchasedAir(EnergyPlusData &state, int PurchAirNum,
+    void InitPurchasedAir(int PurchAirNum,
                           bool FirstHVACIteration, // unused1208
                           int ControlledZoneNum,
                           int ActualZoneNum);
 
-    void SizePurchasedAir(EnergyPlusData &state, int PurchAirNum);
+    void SizePurchasedAir(int PurchAirNum);
 
-    void CalcPurchAirLoads(EnergyPlusData &state,
-                           int PurchAirNum,
+    void CalcPurchAirLoads(int PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
                            int ControlledZoneNum,
                            int ActualZoneNum);
 
-    void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                                   int PurchAirNum,   // index to ideal loads unit
+    void CalcPurchAirMinOAMassFlow(int PurchAirNum,   // index to ideal loads unit
                                    int ActualZoneNum, // index to actual zone number
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     );
 
-    void CalcPurchAirMixedAir(EnergyPlusData &state,
-                              int PurchAirNum,           // index to ideal loads unit
+    void CalcPurchAirMixedAir(int PurchAirNum,           // index to ideal loads unit
                               Real64 OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
@@ -357,23 +354,23 @@ namespace PurchasedAirManager {
                               OpMode OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     );
 
-    void UpdatePurchasedAir(EnergyPlusData &state, int PurchAirNum, bool FirstHVACIteration);
+    void UpdatePurchasedAir(int PurchAirNum, bool FirstHVACIteration);
 
-    void ReportPurchasedAir(EnergyPlusData &state, int PurchAirNum);
+    void ReportPurchasedAir(int PurchAirNum);
 
-    Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int PurchAirNum);
+    Real64 GetPurchasedAirOutAirMassFlow(int PurchAirNum);
 
-    int GetPurchasedAirZoneInletAirNode(EnergyPlusData &state, int PurchAirNum);
+    int GetPurchasedAirZoneInletAirNode(int PurchAirNum);
 
-    int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int PurchAirNum);
+    int GetPurchasedAirReturnAirNode(int PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
+    Real64 GetPurchasedAirMixedAirTemp(int PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
+    Real64 GetPurchasedAirMixedAirHumRat(int PurchAirNum);
 
-    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
+    bool CheckPurchasedAirForReturnPlenum(int const &ReturnPlenumIndex);
 
-    void InitializePlenumArrays(EnergyPlusData &state, int PurchAirNum);
+    void InitializePlenumArrays(int PurchAirNum);
 
 } // namespace PurchasedAirManager
 

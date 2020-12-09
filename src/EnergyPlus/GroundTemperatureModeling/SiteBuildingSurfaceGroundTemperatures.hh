@@ -77,13 +77,13 @@ public:
     }
 
     static std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-    BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    BuildingSurfaceGTMFactory(int objectType, std::string objectName);
 
     Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

@@ -100,12 +100,10 @@ namespace WindowManager {
 
     void InitWCE_SimplifiedOpticalData();
 
-    std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state,
-                                                                const Material::MaterialProperties & t_Material,
+    std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(const Material::MaterialProperties & t_Material,
                                                                 const FenestrationCommon::WavelengthRange t_Range );
 
-    std::shared_ptr<SingleLayerOptics::CScatteringLayer> getScatteringLayer(EnergyPlusData &state,
-                                                                            const Material::MaterialProperties & t_Material,
+    std::shared_ptr<SingleLayerOptics::CScatteringLayer> getScatteringLayer(const Material::MaterialProperties & t_Material,
                                                                             const FenestrationCommon::WavelengthRange t_Range );
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -153,7 +151,7 @@ namespace WindowManager {
                                     const FenestrationCommon::WavelengthRange t_Range);
 
     protected:
-        void init([[maybe_unused]] EnergyPlusData &state) override;
+        void init() override;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial() = 0;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createSolarRangeMaterial() = 0;
     };

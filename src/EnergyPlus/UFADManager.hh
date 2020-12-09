@@ -59,24 +59,23 @@ struct EnergyPlusData;
 
 namespace UFADManager {
 
-    void ManageUCSDUFModels(EnergyPlusData &state,
-                            int const ZoneNum,      // index number for the specified zone
+    void ManageUCSDUFModels(int const ZoneNum,      // index number for the specified zone
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
+    void InitUCSDUF(int const ZoneNum,
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
+    void SizeUCSDUF(int const ZoneNum,
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDUF(int const ZoneNum, Real64 const FractionHeight);
 
-    void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcUCSDUI(int const ZoneNum); // index number for the specified zone
 
-    void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcUCSDUE(int const ZoneNum); // index number for the specified zone
 
 } // namespace UFADManager
 

@@ -338,8 +338,7 @@ namespace ExternalInterface {
 
     void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
-    void GetReportVariableKey(EnergyPlusData &state,
-                              const Array1D_string &varKeys,
+    void GetReportVariableKey(const Array1D_string &varKeys,
                               int const numberOfKeys,
                               const Array1D_string &varNames,
                               Array1D_int &keyVarIndexes,
@@ -353,7 +352,7 @@ namespace ExternalInterface {
 
     void ValidateRunControl();
 
-    void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string const &ObjectWord);
+    void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
 
     void CalcExternalInterfaceFMUImport();
 
@@ -361,7 +360,7 @@ namespace ExternalInterface {
 
     void InstantiateInitializeFMUImport();
 
-    void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation);
+    void TerminateResetFreeFMUImport(int fmiEndSimulation);
 
     void GetSetVariablesAndDoStepFMUImport();
 

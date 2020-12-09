@@ -92,18 +92,18 @@ public:
 
     void RedoKickOffAndResize();
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(EnergyPlusData &state, int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
 
     void UpdateSizingLogsZoneStep();
     void UpdateSizingLogsSystemStep();
 
 private:
-    void CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state, std::string const &PlantLoopName, int const PlantSizingIndex);
+    void CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex);
 };
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound);
+void ManageHVACSizingSimulation(bool &ErrorsFound);
 
 struct HVACSizingSimMgrData : BaseGlobalStruct {
 

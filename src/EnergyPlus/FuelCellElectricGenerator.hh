@@ -540,43 +540,42 @@ namespace FuelCellElectricGenerator {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        static PlantComponent *factory_exhaust(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory_exhaust(std::string const &objectName);
 
         void initialize();
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars();
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void FigureAirHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureAirEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hair);
+        void FigureAirEnthalpy(Real64 FluidTemp, Real64 &Hair);
 
-        void FigureFuelHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureFuelHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureFuelEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hfuel);
+        void FigureFuelEnthalpy(Real64 FluidTemp, Real64 &Hfuel);
 
-        void FigureProductGasesEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &HProdGases);
+        void FigureProductGasesEnthalpy(Real64 FluidTemp, Real64 &HProdGases);
 
-        void FigureProductGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureProductGasHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureAuxilHeatGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureAuxilHeatGasHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill);
+        void FigureACAncillaries(Real64 &PacAncill);
 
-        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
+        void FigurePowerConditioningLosses(Real64 Pdemand, Real64 &PpcuLosses);
 
-        void FigureTransientConstraints(EnergyPlusData &state,
-                                        Real64 &Pel,       // DC power control setting for power module
+        void FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
                                         bool &Constrained, // true if transient constraints kick in
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(EnergyPlusData &state, Real64 TprodGas, Array1D<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1D<Real64> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
@@ -588,20 +587,18 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGenHeatRecovery();
 
-        void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcFuelCellGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
 
-        void ManageElectStorInteractions(EnergyPlusData &state,
-                                         Real64 Pdemand,
+        void ManageElectStorInteractions(Real64 Pdemand,
                                          Real64 PpcuLosses,
                                          bool &Constrained, // TODO: This one is never used anywhere in the code
                                          Real64 &Pstorage,
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
-        void SimFuelCellGenerator(EnergyPlusData &state,
-                                  bool RunFlag,  // simulate Generator when TRUE
+        void SimFuelCellGenerator(bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);
 

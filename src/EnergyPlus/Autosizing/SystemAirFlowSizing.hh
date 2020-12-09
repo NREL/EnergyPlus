@@ -65,7 +65,7 @@ struct SystemAirFlowSizer : BaseSizerWithScalableInputs
     }
     ~SystemAirFlowSizer() = default;
 
-    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
 };

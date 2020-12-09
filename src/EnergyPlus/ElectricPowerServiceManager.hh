@@ -101,21 +101,21 @@ public: // Methods
     };
 
     // Constructor
-    DCtoACInverter(EnergyPlusData &state, std::string const &objectName);
+    DCtoACInverter(std::string const &objectName);
 
-    void simulate(EnergyPlusData &state, Real64 const powerIntoInverter);
+    void simulate(Real64 const powerIntoInverter);
 
     void reinitAtBeginEnvironment();
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void setPVWattsDCCapacity(EnergyPlusData &state, Real64 const dcCapacity);
+    void setPVWattsDCCapacity(Real64 const dcCapacity);
 
     Real64 pvWattsDCCapacity();
 
     Real64 thermLossRate() const;
 
-    Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfInverter);
+    Real64 getLossRateForOutputPower(Real64 const powerOutOfInverter);
 
     Real64 aCPowerOut() const;
 
@@ -170,9 +170,9 @@ class ACtoDCConverter
 
 public: // Methods
     // Constructor
-    ACtoDCConverter(EnergyPlusData &state, std::string const &objectName);
+    ACtoDCConverter(std::string const &objectName);
 
-    void simulate(EnergyPlusData &state, Real64 const powerOutFromConverter);
+    void simulate(Real64 const powerOutFromConverter);
 
     void reinitAtBeginEnvironment();
 
@@ -186,7 +186,7 @@ public: // Methods
 
     Real64 aCPowerIn() const;
 
-    Real64 getLossRateForInputPower(EnergyPlusData &state, Real64 const powerIntoConverter); // AC power going into inverter
+    Real64 getLossRateForInputPower(Real64 const powerIntoConverter); // AC power going into inverter
 
     std::string const &name() const;
 
@@ -233,12 +233,11 @@ class ElectricStorage
 
 public: // methods
     // Constructor
-    ElectricStorage(EnergyPlusData &state, std::string const &objectName);
+    ElectricStorage(std::string const &objectName);
 
     void timeCheckAndUpdate();
 
-    void simulate(EnergyPlusData &state,
-                  Real64 &powerCharge,
+    void simulate(Real64 &powerCharge,
                   Real64 &powerDischarge,
                   bool &charging,
                   bool &discharging,
@@ -263,8 +262,7 @@ public: // methods
 
     Real64 storedEnergy() const;
 
-    bool determineCurrentForBatteryDischarge(EnergyPlusData &state,
-                                             Real64 &curI0,
+    bool determineCurrentForBatteryDischarge(Real64 &curI0,
                                              Real64 &curT0,
                                              Real64 &curVolt,
                                              Real64 const Pw,
@@ -287,8 +285,7 @@ private:                            // methods
         Real64 const controlSOCMaxFracLimit,
         Real64 const controlSOCMinFracLimit);
 
-    void simulateKineticBatteryModel(EnergyPlusData &state,
-                                     Real64 &powerCharge,
+    void simulateKineticBatteryModel(Real64 &powerCharge,
                                      Real64 &powerDischarge,
                                      bool &charging,
                                      bool &discharging,
@@ -402,13 +399,13 @@ class ElectricTransformer
 
 public: // methods
     // Constructor
-    ElectricTransformer(EnergyPlusData &state, std::string const &objectName);
+    ElectricTransformer(std::string const &objectName);
 
-    Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfTransformer);
+    Real64 getLossRateForOutputPower(Real64 const powerOutOfTransformer);
 
-    Real64 getLossRateForInputPower(EnergyPlusData &state, Real64 const powerIntoTransformer);
+    Real64 getLossRateForInputPower(Real64 const powerIntoTransformer);
 
-    void manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters);
+    void manageTransformers(Real64 const surplusPowerOutFromLoadCenters);
 
     void setupMeterIndices();
 
@@ -488,14 +485,13 @@ class GeneratorController
 
 public: // Method
     // Constructor
-    GeneratorController(EnergyPlusData &state,
-                        std::string const &objectName,
+    GeneratorController(std::string const &objectName,
                         std::string const &objectType,
                         Real64 ratedElecPowerOutput,
                         std::string const &availSchedName,
                         Real64 thermalToElectRatio);
 
-    void simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,             // true if generator is on
+    void simGeneratorGetPowerOutput(bool const runFlag,             // true if generator is on
                                     Real64 const myElecLoadRequest, // target electric power production request
                                     bool const FirstHVACIteration,  //
                                     Real64 &electricPowerOutput,    // Actual generator electric power output
@@ -544,9 +540,9 @@ class ElectPowerLoadCenter
 
 public: // Methods
     // Constructor
-    ElectPowerLoadCenter(EnergyPlusData &state, int const objectNum);
+    ElectPowerLoadCenter(int const objectNum);
 
-    void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void setupLoadCenterMeterIndices();
 
@@ -561,9 +557,9 @@ public: // Methods
     void updateLoadCenterGeneratorRecords();
 
 private: // Methods
-    void dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void dispatchGenerators(bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
-    void dispatchStorage(EnergyPlusData &state, Real64 const remainingPowerDemand);
+    void dispatchStorage(Real64 const remainingPowerDemand);
 
     Real64 calcLoadCenterThermalLoad(); // returns heat rate called for from cogenerator(watts)
 
@@ -692,8 +688,7 @@ public: // Methods
     {
     }
 
-    void manageElectricPowerService(EnergyPlusData &state,
-                                    bool const FirstHVACIteration,
+    void manageElectricPowerService(bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
                                     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
     );

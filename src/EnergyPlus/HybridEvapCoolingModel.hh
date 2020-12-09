@@ -137,8 +137,7 @@ namespace HybridEvapCoolingModel {
         int MODE_BLOCK_OFFSET_Number;
         int BLOCK_HEADER_OFFSET_Number;
         bool ValidPointer(int curve_pointer);
-        bool ParseMode(EnergyPlusData &state,
-                       int ModeCounter,
+        bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
                        Real64 ScalingFactor,
                        Array1D_string Alphas,
@@ -148,7 +147,7 @@ namespace HybridEvapCoolingModel {
                        Array1D<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
-        Real64 CalculateCurveVal(EnergyPlusData &state, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
+        Real64 CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
         bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
         bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
         bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
@@ -378,24 +377,23 @@ namespace HybridEvapCoolingModel {
                                             Real64 RequestedDehumidificationLoad,
                                             Real64 RequestedMoistureLoad,
                                             Real64 LatentRoomORZone);
-        bool ParseMode(EnergyPlusData &state,
-                       Array1D_string Alphas,
+        bool ParseMode(Array1D_string Alphas,
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,
                        Array1D_string cNumericFields,
                        Array1D<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
-        void doStep(EnergyPlusData &state, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
+        void doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
         void Initialize(int ZoneNumber);
         void InitializeModelParams();
         void ResetOutputs();
-        bool MeetsSupplyAirTOC(EnergyPlusData &state, Real64 Tosa);
-        bool MeetsSupplyAirRHOC(EnergyPlusData &state, Real64 Wosa);
-        Real64 CheckVal_T(EnergyPlusData &state, Real64 T);
-        Real64 CheckVal_W(EnergyPlusData &state, Real64 W, Real64 T, Real64 P); // pascals
-        bool SetStandByMode(EnergyPlusData &state, CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra);
+        bool MeetsSupplyAirTOC(Real64 Tosa);
+        bool MeetsSupplyAirRHOC(Real64 Wosa);
+        Real64 CheckVal_T(Real64 T);
+        Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
+        bool SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra);
         Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
-        int SetOperatingSetting(EnergyPlusData &state, CStepInputs StepIns);
+        int SetOperatingSetting(CStepInputs StepIns);
         void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs &StepIns);
 
     private: // begin private section

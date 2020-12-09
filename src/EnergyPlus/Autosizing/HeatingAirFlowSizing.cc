@@ -54,12 +54,13 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(state, errorsFound)) {
+    EnergyPlusData & state = getCurrentState(0);
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
 
@@ -244,10 +245,10 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-            ShowSevereError(state, msg);
+            ShowSevereError(msg);
             this->addErrorMessage(msg);
             msg = format("SizingString = {}, SizingResult = {:.1T}", this->sizingString, this->autoSizedValue);
-            ShowContinueError(state, msg);
+            ShowContinueError(msg);
             this->addErrorMessage(msg);
             errorsFound = true;
         }
@@ -269,11 +270,11 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             }
         }
     }
-    this->selectSizerOutput(state, errorsFound);
+    this->selectSizerOutput(errorsFound);
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s
-        coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
+        coilSelectionReportObj->setCoilAirFlow(this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
     }
     if (this->isFanReportObject) {
         //  fill fan peak day and time here
@@ -281,8 +282,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             DDNameFanPeak = "Scaled size, not from any peak";
             dateTimeFanPeak = "Scaled size, not from any peak";
         }
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDesDay, this->compName, DDNameFanPeak);
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPkTime, this->compName, dateTimeFanPeak);
+        OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchFanDesDay, this->compName, DDNameFanPeak);
+        OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchFanPkTime, this->compName, dateTimeFanPeak);
     }
     return this->autoSizedValue;
 }

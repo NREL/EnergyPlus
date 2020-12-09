@@ -585,7 +585,7 @@ namespace DXCoils {
 
     // Functions
 
-    void SimDXCoil(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -597,7 +597,7 @@ namespace DXCoils {
                    Optional<Real64 const> CompCyclingRatio = _            // cycling ratio of VRF condenser connected to this TU
     );
 
-    void SimDXCoilMultiSpeed(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -607,7 +607,7 @@ namespace DXCoils {
                              Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void SimDXCoilMultiMode(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(std::string const &CompName,   // name of the fan coil unit
                             int const CompOp,              // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -618,17 +618,15 @@ namespace DXCoils {
 
     void GetDXCoils();
 
-    void InitDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current DX coil unit being simulated
+    void InitDXCoil(int const DXCoilNum); // number of the current DX coil unit being simulated
 
-    void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum);
+    void SizeDXCoil(int const DXCoilNum);
 
-    void CalcHPWHDXCoil(EnergyPlusData &state,
-                        int const DXCoilNum,       // the number of the DX coil to be simulated
+    void CalcHPWHDXCoil(int const DXCoilNum,       // the number of the DX coil to be simulated
                         Real64 const PartLoadRatio // sensible water heating load / full load sensible water heating capacity
     );
 
-    void CalcDoe2DXCoil(EnergyPlusData &state,
-                        int const DXCoilNum,                          // the number of the DX coil to be simulated
+    void CalcDoe2DXCoil(int const DXCoilNum,                          // the number of the DX coil to be simulated
                         int const CompOp,                             // compressor operation; 1=on, 0=off
                         bool const FirstHVACIteration,                // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
@@ -638,8 +636,7 @@ namespace DXCoils {
                         Optional<Real64 const> CoolingHeatingPLR = _  // used for cycling fan RH control
     );
 
-    void CalcVRFCoolingCoil(EnergyPlusData &state,
-                            int const DXCoilNum,                          // the number of the DX coil to be simulated
+    void CalcVRFCoolingCoil(int const DXCoilNum,                          // the number of the DX coil to be simulated
                             int const CompOp,                             // compressor operation; 1=on, 0=off
                             bool const FirstHVACIteration,                // true if this is the first iteration of HVAC
                             Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
@@ -650,22 +647,19 @@ namespace DXCoils {
                             Optional<Real64 const> MaxCoolCap = _         // maximum capacity of DX coil
     );
 
-    void CalcDXHeatingCoil(EnergyPlusData &state,
-                           int const DXCoilNum,                          // the number of the DX heating coil to be simulated
+    void CalcDXHeatingCoil(int const DXCoilNum,                          // the number of the DX heating coil to be simulated
                            Real64 const PartLoadRatio,                   // sensible cooling load / full load sensible cooling capacity
                            int const FanOpMode,                          // Allows parent object to control fan mode
                            Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
                            Optional<Real64 const> MaxHeatCap = _         // maximum allowed heating capacity
     );
 
-    void CalcMultiSpeedDXCoil(EnergyPlusData &state,
-                              int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoil(int const DXCoilNum,     // the number of the DX heating coil to be simulated
                               Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                               Real64 const CycRatio,   // cycling part load ratio
                               Optional_bool_const ForceOn = _);
 
-    void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
-                                                int const DXCoilNum,  // Index of coil being simulated
+    void CalcBasinHeaterPowerForMultiModeDXCoil(int const DXCoilNum,  // Index of coil being simulated
                                                 int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
     );
 
@@ -674,8 +668,7 @@ namespace DXCoils {
                      Real64 const AirMassFlowRate     // actual air mass flow rate [kg/s]
     );
 
-    Real64 CalcCBF(EnergyPlusData &state,
-                   std::string const &UnitType,
+    Real64 CalcCBF(std::string const &UnitType,
                    std::string const &UnitName,
                    Real64 const InletAirTemp,   // inlet air temperature [C]
                    Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
@@ -685,8 +678,7 @@ namespace DXCoils {
                    bool const PrintFlag = true  // flag used to print warnings if desired
     );
 
-    Real64 ValidateADP(EnergyPlusData &state,
-                       std::string const &UnitType,      // component name
+    Real64 ValidateADP(std::string const &UnitType,      // component name
                        std::string const &UnitName,      // component type
                        Real64 const RatedInletAirTemp,   // coil inlet air temperature [C]
                        Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
@@ -707,8 +699,7 @@ namespace DXCoils {
                             Optional<Real64 const> HeatingRTF = _ // Used to recalculate Toff for cycling fan systems
     );
 
-    void CalcTotCapSHR(EnergyPlusData &state,
-                       Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
+    void CalcTotCapSHR(Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
                        Real64 const InletHumRat,      // inlet air humidity ratio [kg water / kg dry air]
                        Real64 const InletEnthalpy,    // inlet air specific enthalpy [J/kg]
                        Real64 const InletWetBulb,     // inlet air wet bulb temperature [C]
@@ -725,8 +716,7 @@ namespace DXCoils {
                        Real64 &TotCapModFac           // capacity modification factor, func of temp and func of flow
     );
 
-    void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
-                                     int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoilCooling(int const DXCoilNum,     // the number of the DX heating coil to be simulated
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
@@ -735,8 +725,7 @@ namespace DXCoils {
                                      int const SingleMode     // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
-                                     int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoilHeating(int const DXCoilNum,     // the number of the DX heating coil to be simulated
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
@@ -744,121 +733,108 @@ namespace DXCoils {
                                      int const SingleMode     // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void UpdateDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
+    void UpdateDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
+    void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum);
+    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum);
 
-    void GetFanIndexForTwoSpeedCoil(EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
+    void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1D<Real64> const &Par          // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
 
-    void GetDXCoilIndex(EnergyPlusData &state, std::string const &DXCoilName,
+    void GetDXCoilIndex(std::string const &DXCoilName,
                         int &DXCoilIndex,
                         bool &ErrorsFound,
                         Optional_string_const ThisObjectType,
                         Optional_bool_const SuppressWarning);
 
     std::string
-    GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
+    GetDXCoilName(int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
 
-    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacityByIndexType(EnergyPlusData &state,
-                                      int const CoilIndex,    // must match coil index for the coil type
+    Real64 GetCoilCapacityByIndexType(int const CoilIndex,    // must match coil index for the coil type
                                       int const CoilType_Num, // must match coil types in this module
                                       bool &ErrorsFound       // set to true if problem
     );
 
-    int GetCoilTypeNum(EnergyPlusData &state,
-                       std::string const &CoilType,         // must match coil types in this module
+    int GetCoilTypeNum(std::string const &CoilType,         // must match coil types in this module
                        std::string const &CoilName,         // must match coil names for the coil type
                        bool &ErrorsFound,                   // set to true if problem
                        Optional_bool_const PrintWarning = _ // prints warning when true
     );
 
-    Real64 GetMinOATCompressor(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+    Real64 GetMinOATCompressor(std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetMinOATCompressorUsingIndex(EnergyPlusData &state,
-                                         int const CoilIndex, // index to coil
+    Real64 GetMinOATCompressorUsingIndex(int const CoilIndex, // index to coil
                                          bool &ErrorsFound    // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    int getCoilInNodeIndex(EnergyPlusData &state,
-                           int const &CoilIndex,       // coil index
+    int getCoilInNodeIndex(int const &CoilIndex,       // coil index
                            bool &ErrorsFound           // set to true if problem
     );
 
-    int getCoilOutNodeIndex(EnergyPlusData &state,
-                            int const &CoilIndex,      // coil index
+    int getCoilOutNodeIndex(int const &CoilIndex,      // coil index
                             bool &ErrorsFound          // set to true if problem
     );
 
-    int GetCoilCondenserInletNode(EnergyPlusData &state,
-                                  std::string const &CoilType, // must match coil types in this module
+    int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetDXCoilBypassedFlowFrac(EnergyPlusData &state,
-                                     std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilBypassedFlowFrac(std::string const &CoilType, // must match coil types in this module
                                      std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     );
 
-    int GetHPCoolingCoilIndex(EnergyPlusData &state,
-                              std::string const &HeatingCoilType, // Type of DX heating coil used in HP
+    int GetHPCoolingCoilIndex(std::string const &HeatingCoilType, // Type of DX heating coil used in HP
                               std::string const &HeatingCoilName, // Name of DX heating coil used in HP
                               int const HeatingCoilIndex          // Index of DX heating coil used in HP
     );
 
-    int GetDXCoilNumberOfSpeeds(EnergyPlusData &state,
-                                std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilNumberOfSpeeds(std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDXCoilAvailSchPtr(EnergyPlusData &state,
-                             std::string const &CoilType,     // must match coil types in this module
+    int GetDXCoilAvailSchPtr(std::string const &CoilType,     // must match coil types in this module
                              std::string const &CoilName,     // must match coil names for the coil type
                              bool &ErrorsFound,               // set to true if problem
                              Optional_int_const CoilIndex = _ // Coil index number
     );
 
-    Real64 GetDXCoilAirFlow(EnergyPlusData &state,
-                            std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilAirFlow(std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDXCoilCapFTCurveIndex(EnergyPlusData &state,
-                                 int const CoilIndex, // coil index pointer
+    int GetDXCoilCapFTCurveIndex(int const CoilIndex, // coil index pointer
                                  bool &ErrorsFound    // set to true if problem
     );
 
-    void SetDXCoolingCoilData(EnergyPlusData &state, int const DXCoilNum,                        // Number of DX Cooling Coil
+    void SetDXCoolingCoilData(int const DXCoilNum,                        // Number of DX Cooling Coil
                               bool &ErrorsFound,                          // Set to true if certain errors found
                               Optional_int HeatingCoilPLFCurvePTR = _,    // Parameter equivalent of heating coil PLR curve index
                               Optional_int CondenserType = _,             // Parameter equivalent of condenser type parameter
@@ -883,17 +859,14 @@ namespace DXCoils {
                               Optional_string SupplyFanName = _,
                               Optional_int SupplyFan_TypeNum = _);
 
-    void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
-                                    std::string const &CoilType, // must match coil types in this module
+    void SetCoilSystemHeatingDXFlag(std::string const &CoilType, // must match coil types in this module
                                     std::string const &CoilName  // must match coil names for the coil type
     );
 
-    void SetCoilSystemCoolingData(EnergyPlusData &state,
-                                  std::string const &CoilName, // must match coil names for the coil type
+    void SetCoilSystemCoolingData(std::string const &CoilName, // must match coil names for the coil type
                                   std::string const &CoilSystemName);
 
-    Real64 CalcSHRUserDefinedCurves(EnergyPlusData &state,
-                                    Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
+    Real64 CalcSHRUserDefinedCurves(Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
                                     Real64 const InletWetBulb,     // inlet air wet bulb temperature [C]
                                     Real64 const AirMassFlowRatio, // ratio of actual air mass flow to rated air mass flow
                                     int const SHRFTempCurveIndex,  // SHR modifier curve index
@@ -901,12 +874,11 @@ namespace DXCoils {
                                     Real64 const SHRRated          // rated sensible heat ratio, user input
     );
 
-    void SetDXCoilTypeData(EnergyPlusData &state, std::string const &CoilName); // must match coil names for the coil type
+    void SetDXCoilTypeData(std::string const &CoilName); // must match coil names for the coil type
 
-    void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum);
+    void CalcSecondaryDXCoils(int const DXCoilNum);
 
-    Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
-                                   int const DXCoilNum,
+    Real64 CalcSecondaryDXCoilsSHR(int const DXCoilNum,
                                    Real64 const EvapAirMassFlow,
                                    Real64 const TotalHeatRemovalRate,
                                    Real64 const PartLoadRatio,
@@ -922,8 +894,7 @@ namespace DXCoils {
 
     // Begin of Methods for New VRF Model: Fluid Temperature Control
     //******************************************************************************
-    void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
-                                       int const DXCoilNum,           // the number of the DX coil to be simulated
+    void CalcVRFCoolingCoil_FluidTCtrl(int const DXCoilNum,           // the number of the DX coil to be simulated
                                        int const CompOp,              // compressor operation; 1=on, 0=off
                                        bool const FirstHVACIteration, // true if this is the first iteration of HVAC
                                        Real64 const PartLoadRatio,    // sensible cooling load / full load sensible cooling capacity
@@ -933,8 +904,7 @@ namespace DXCoils {
                                        Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
     );
 
-    void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
-                                       int const CompOp,                         // compressor operation; 1=on, 0=off
+    void CalcVRFHeatingCoil_FluidTCtrl(int const CompOp,                         // compressor operation; 1=on, 0=off
                                        int const DXCoilNum,                      // the number of the DX heating coil to be simulated
                                        Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                                        int const FanOpMode,                      // Allows parent object to control fan mode
@@ -942,8 +912,7 @@ namespace DXCoils {
                                        Optional<Real64 const> MaxHeatCap         // maximum allowed heating capacity
     );
 
-    void ControlVRFIUCoil(EnergyPlusData &state,
-                          int const CoilIndex,     // index to VRFTU coil
+    void ControlVRFIUCoil(int const CoilIndex,     // index to VRFTU coil
                           Real64 const QCoil,      // coil load
                           Real64 const Tin,        // inlet air temperature
                           Real64 const Win,        // inlet air humidity ratio
@@ -967,8 +936,7 @@ namespace DXCoils {
                            Real64 &T_coil_surf      // Air temperature at coil surface
     );
 
-    void CalcVRFCoilCapModFac(EnergyPlusData &state,
-                              int const OperationMode,        // mode 0 for cooling, 1 for heating
+    void CalcVRFCoilCapModFac(int const OperationMode,        // mode 0 for cooling, 1 for heating
                               Optional<int const> CoilIndex,  // index to VRFTU cooling or heating coil
                               Optional<std::string> CoilName, // name of VRFTU cooling or heating coil
                               Real64 const Tinlet,            // dry bulb temperature of air entering the coil
@@ -990,7 +958,7 @@ namespace DXCoils {
 
     void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
 
-    void SetDXCoilAirLoopNumber(EnergyPlusData &state, std::string const &CoilName, int const AirLoopNum); // must match coil names for the coil type
+    void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum); // must match coil names for the coil type
 
     void DisableLatentDegradation(int const DXCoilNum);
 

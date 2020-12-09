@@ -80,8 +80,8 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
+    void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 
@@ -112,7 +112,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -182,30 +182,30 @@ namespace PluginManagement {
         ~PluginManager();
 
         static int numActiveCallbacks();
-        static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
+        static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static void setupOutputVariables();
 
         int maxGlobalVariableIndex = -1;
-        void addGlobalVariable(EnergyPlusData &state, const std::string& name);
-        static int getGlobalVariableHandle(EnergyPlusData &state, const std::string& name, bool suppress_warning = false);
-        static Real64 getGlobalVariableValue(EnergyPlusData &state, int handle);
-        static void setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value);
+        void addGlobalVariable(const std::string& name);
+        static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
+        static Real64 getGlobalVariableValue(int handle);
+        static void setGlobalVariableValue(int handle, Real64 value);
 
         int maxTrendVariableIndex = -1;
-        static int getTrendVariableHandle(EnergyPlusData &state, const std::string& name);
-        static Real64 getTrendVariableValue(EnergyPlusData &state, int handle, int timeIndex);
-        static size_t getTrendVariableHistorySize(EnergyPlusData &state, int handle);
-        static Real64 getTrendVariableAverage(EnergyPlusData &state, int handle, int count);
-        static Real64 getTrendVariableMin(EnergyPlusData &state, int handle, int count);
-        static Real64 getTrendVariableMax(EnergyPlusData &state, int handle, int count);
-        static Real64 getTrendVariableSum(EnergyPlusData &state, int handle, int count);
-        static Real64 getTrendVariableDirection(EnergyPlusData &state, int handle, int count);
+        static int getTrendVariableHandle(const std::string& name);
+        static Real64 getTrendVariableValue(int handle, int timeIndex);
+        static size_t getTrendVariableHistorySize(int handle);
+        static Real64 getTrendVariableAverage(int handle, int count);
+        static Real64 getTrendVariableMin(int handle, int count);
+        static Real64 getTrendVariableMax(int handle, int count);
+        static Real64 getTrendVariableSum(int handle, int count);
+        static Real64 getTrendVariableDirection(int handle, int count);
 
         static void updatePluginValues();
 
-        static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName);
-        static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
+        static int getLocationOfUserDefinedPlugin(std::string const &programName);
+        static void runSingleUserDefinedPlugin(int index);
         static bool anyUnexpectedPluginObjects();
     };
 
@@ -215,7 +215,7 @@ namespace PluginManagement {
         std::deque<Real64> values;
         std::deque<Real64> times;
         int indexOfPluginVariable;
-        PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable);
+        PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable);
         void reset() {
             this->values.clear();
             for (int i = 1; i <= this->numValues; i++) {

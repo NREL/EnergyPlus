@@ -104,21 +104,20 @@ namespace EMSManager {
 
     void CheckIfAnyEMS();
 
-    void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
     void GetEMSInput();
 
-    void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
+    void ProcessEMSInput(bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
+    void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
     void EchoOutActuatorKeyChoices();
 
@@ -131,18 +130,15 @@ namespace EMSManager {
     std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
                                                          // (eg iTemperatureSetPoint => "Temperature Setpoint")
 
-    bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
-                                    int NodeNum, // index of node being checked.
+    bool CheckIfNodeSetPointManaged(int NodeNum, // index of node being checked.
                                     SPControlType SetPointType,
                                     bool byHandle = false);
 
-    bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
-                                         int NodeNum, // index of node being checked.
+    bool CheckIfNodeSetPointManagedByEMS(int NodeNum, // index of node being checked.
                                          SPControlType SetPointType,
                                          bool &ErrorFlag);
 
-    bool CheckIfNodeMoreInfoSensedByEMS(EnergyPlusData &state,
-                                        int nodeNum, // index of node being checked.
+    bool CheckIfNodeMoreInfoSensedByEMS(int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
     void SetupPrimaryAirSystemAvailMgrAsActuators();
@@ -170,33 +166,30 @@ namespace EMSManager {
 // Moved these setup EMS actuator routines out of module to solve circular use problems between
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
-void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
+void SetupEMSActuator(std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,
                       bool &lEMSActuated,
                       Real64 &rValue);
 
-void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
+void SetupEMSActuator(std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,
                       bool &lEMSActuated,
                       int &iValue);
 
-void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
+void SetupEMSActuator(std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,
                       bool &lEMSActuated,
                       bool &lValue);
 
-void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
+void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
 
-void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
+void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
 
 struct EMSManagerData : BaseGlobalStruct {
 

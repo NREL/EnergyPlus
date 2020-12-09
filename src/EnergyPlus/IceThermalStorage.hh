@@ -154,9 +154,9 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSimpleIceStorage();
 
@@ -164,7 +164,7 @@ namespace IceThermalStorage {
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
-        void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
+        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
         void CalcQiceDischageMax(Real64 &QiceMin);
 
@@ -253,9 +253,9 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitDetailedIceStorage();
 
@@ -282,8 +282,7 @@ namespace IceThermalStorage {
                                   Real64 Tfr   // freezing temperature
     );
 
-    Real64 CalcQstar(EnergyPlusData &state,
-                     int CurveIndex,      // curve index
+    Real64 CalcQstar(int CurveIndex,      // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 FracCharged,  // fraction charged for ice storage unit
                      Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
