@@ -98,7 +98,6 @@ namespace FluidCoolers {
     // MODULE PARAMETER DEFINITIONS:
     std::string const cFluidCooler_SingleSpeed("FluidCooler:SingleSpeed");
     std::string const cFluidCooler_TwoSpeed("FluidCooler:TwoSpeed");
-    static std::string const BlankString;
 
     bool GetFluidCoolerInputFlag(true);
     int NumSimpleFluidCoolers(0); // Number of similar fluid coolers

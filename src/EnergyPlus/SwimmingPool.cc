@@ -106,8 +106,6 @@ namespace SwimmingPool {
     // 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
     //    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
-    static std::string const BlankString;
-
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     {
         // Process the input data if it hasn't been done already

@@ -212,7 +212,6 @@ namespace OutputReportTabular {
     int const numSourceTypes(12);
 
     static std::string const validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
-    static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
 

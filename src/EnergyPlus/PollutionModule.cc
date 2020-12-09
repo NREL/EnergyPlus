@@ -97,10 +97,6 @@ namespace PollutionModule {
     int const OtherFuel2PollFactor(10);
     int const PollFactorNumTypes(10);
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
     // MODULE VARIABLE DECLARATIONS:
     // Total for all of the Pollutants
     // Total Carbon Equivalent Components

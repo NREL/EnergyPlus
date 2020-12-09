@@ -143,8 +143,6 @@ namespace WaterCoils {
     using Psychrometrics::PsyWFnTdpPb;
     using namespace ScheduleManager;
 
-    static std::string const BlankString;
-
     void SimulateWaterCoilComponents(EnergyPlusData &state,
                                      std::string const &CompName,
                                      bool const FirstHVACIteration,

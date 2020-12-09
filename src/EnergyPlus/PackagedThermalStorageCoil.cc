@@ -143,12 +143,6 @@ namespace PackagedThermalStorageCoil {
     // Dehumidification control modes (DehumidControlMode)
     int const DehumidControl_CoolReheat(2);
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
     int NumTESCoils;
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag(true);

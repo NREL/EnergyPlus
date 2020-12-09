@@ -160,10 +160,6 @@ namespace HeatBalanceManager {
     using WindowComplexManager::CalculateBasisLength;
     using WindowManager::W5LsqFit;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
     Array1D_string const PassFail(2, {"Fail", "Pass"});
 
     // DERIVED TYPE DEFINITIONS

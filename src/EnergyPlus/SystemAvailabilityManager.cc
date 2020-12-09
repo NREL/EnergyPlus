@@ -112,10 +112,6 @@ namespace SystemAvailabilityManager {
     using namespace ScheduleManager;
     using DataHeatBalance::ZoneList;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
     Real64 CurrentEndTime(0.0);     // Current end time
     Real64 CurrentEndTimeLast(0.0); // last end time
     Real64 TimeStepSysLast(0.0);    // last system time step

@@ -135,8 +135,6 @@ namespace EvaporativeCoolers {
     int const ZoneCoolingLoadOnOffCycling(21);
     int const ZoneCoolingLoadVariableSpeedFan(22);
 
-    static std::string const BlankString;
-
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
         // to facilitate easier unit testing of those functions.

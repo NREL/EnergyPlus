@@ -153,11 +153,6 @@ namespace HVACUnitaryBypassVAV {
     int const UseCompressorOffFlow(2); // Set compressor OFF air flow rate equal to user defined value
 
     static std::string const fluidNameSteam("STEAM");
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumCBVAV(0);                    // Number of CBVAV systems in input file
     Real64 CompOnMassFlow(0.0);         // System air mass flow rate w/ compressor ON
