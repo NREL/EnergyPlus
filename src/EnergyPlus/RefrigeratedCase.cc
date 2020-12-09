@@ -10119,7 +10119,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                    reinterpret_cast<int &>(this->FlowType));
+                    this->NoFlowWarnIndex);
             }
                     }
         // Check outlet water temp for max value
