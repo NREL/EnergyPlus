@@ -109,6 +109,7 @@ struct EnergyPlusData;
                 case CurrentObject::EqList:
                     return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
             }
+            return "";
         }
 
         struct OAEquipList {
