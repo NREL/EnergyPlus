@@ -8517,7 +8517,8 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
-            Real64 StdDensInfilVolume = (dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp / CpAir / StdRhoAir) * ReportingConstant;  // compute volume using standard density air
+            Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
+                                        ReportingConstant; // compute volume using standard density air
             ZonePreDefRep(i).AFNInfilVolTotal += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
             if (StdDensInfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
                 ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;

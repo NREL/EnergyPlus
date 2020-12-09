@@ -1161,7 +1161,7 @@ namespace DataSizing {
         {
         }
 
-        Real64 calculateEz(int const ZoneNum);   // Zone index
+        Real64 calculateEz(EnergyPlusData &state, int const ZoneNum); // Zone index
     };
 
     // Object Data

@@ -80,7 +80,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -6523,10 +6522,10 @@ namespace OutputReportTabular {
                         int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (airLoopNumber > 0) {
                             if (airLoopName.empty()) {
-                                airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                                airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
                             }
                             else {
-                                airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                                airLoopName += "; " + state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
                             }
                         }
                     }

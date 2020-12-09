@@ -1950,7 +1950,7 @@ namespace SystemReports {
         ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
         ZoneOAVolCrntRho.allocate(state.dataGlobal->NumOfZones);
         ZoneMechACH.allocate(state.dataGlobal->NumOfZones);
-        ZoneTargetVentilationFlowVoz.allocate(NumOfZones);
+        ZoneTargetVentilationFlowVoz.allocate(state.dataGlobal->NumOfZones);
 
         SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -2418,7 +2418,7 @@ namespace SystemReports {
                                 "Average",
                                 ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Target Voz Ventilation Flow Rate",
+            SetupOutputVariable(state, "Zone Target Voz Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 ZoneTargetVentilationFlowVoz(ZoneIndex),
                                 "HVAC",
@@ -4527,11 +4527,11 @@ namespace SystemReports {
             bool UseOccSchFlag = true;
             bool UseMinOASchFlag = true;
             ZoneTargetVentilationFlowVoz = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+                state, ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
             if (ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
                 ZoneTargetVentilationFlowVoz =
                     ZoneTargetVentilationFlowVoz /
-                    DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(ActualZoneNum);
+                    DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
 

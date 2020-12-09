@@ -945,7 +945,7 @@ namespace DataSizing {
         }
     }
 
-    Real64 ZoneAirDistributionData::calculateEz(int const ZoneNum) // Zone index
+    Real64 ZoneAirDistributionData::calculateEz(EnergyPlusData &state, int const ZoneNum) // Zone index
     {
         Real64 zoneEz = 1.0;
         // Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
@@ -953,7 +953,7 @@ namespace DataSizing {
         //   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
         if (this->ZoneADEffSchPtr > 0) {
             // Get schedule value for the zone air distribution effectiveness
-            zoneEz = ScheduleManager::GetCurrentScheduleValue(this->ZoneADEffSchPtr);
+            zoneEz = ScheduleManager::GetCurrentScheduleValue(state, this->ZoneADEffSchPtr);
         } else {
             Real64 zoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
 

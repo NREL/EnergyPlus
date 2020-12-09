@@ -1279,7 +1279,7 @@ namespace ZoneEquipmentManager {
                     } else {
                         FinalZoneSizing(CtrlZoneNum).ZonePeakOccupancy = TotPeopleInZone;
                     }
-                    ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(People(PeopleNum).NumberOfPeoplePtr);
+                    ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(state, People(PeopleNum).NumberOfPeoplePtr);
                 }
             }
             FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea =
