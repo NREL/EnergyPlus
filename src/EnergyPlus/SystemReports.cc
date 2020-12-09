@@ -84,9 +84,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowAC.hh>
 
-namespace EnergyPlus {
-
-namespace SystemReports {
+namespace EnergyPlus::SystemReports {
 
     // Module containing the routines dealing with Mechanical Ventilation Loads and Energy Reporting (Outside Air)
 
@@ -99,15 +97,6 @@ namespace SystemReports {
     // PURPOSE OF THIS MODULE:
     // This module embodies the scheme(s) for reporting ventilation loads and energy use.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
@@ -115,37 +104,6 @@ namespace SystemReports {
     using namespace DataPlant;
     using namespace DataZoneEquipment;
     using namespace DataAirSystems;
-
-    bool AirLoopLoadsReportEnabled(true);
-    bool VentLoadsReportEnabled(true);
-    bool VentEnergyReportEnabled(false);
-    bool VentReportStructureCreated(false);
-    int TotalLoopConnects(0); // Total number of loop connections
-    int MaxLoopArraySize(100);
-    int MaxCompArraySize(500);
-    int DBFlag(0);
-
-    Array1D_int SetBackCounter;
-    Array1D_int HeatCoolFlag;
-    Array1D_int FirstHeatCoolFlag;
-    Array1D_int FirstHeatCoolHour;
-    Array1D_int LastHeatCoolFlag;
-    Array1D_int LastHeatCoolHour;
-    Array1D_bool AirLoopCalcDone;
-    Array1D_bool NoLoadFlag;
-    Array1D_bool UnmetLoadFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
-
-    // Reporting Initialization
-
-    // Reporting routines for module
-
-    // Object Data
-    Array1D<SummarizeLoads> Vent;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     // Functions
 
@@ -171,7 +129,7 @@ namespace SystemReports {
         using namespace DataGlobalConstants;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const EnergyTransfer(1);
+        int constexpr EnergyTransfer(1);
 
         int AirDistUnitNum;
         int MatchLoop;
@@ -217,12 +175,11 @@ namespace SystemReports {
         std::string CompType;
         std::string CompName;
         bool MatchFound;
-        static bool OneTimeFlag(true); // Flag set to make sure you initialize reports one time
         bool ConnectionFlag(false);
 
-        if (!VentReportStructureCreated) return;
+        if (!state.dataSysRpts->VentReportStructureCreated) return;
 
-        if (OneTimeFlag) {
+        if (state.dataSysRpts->OneTimeFlag_InitEnergyReports) {
 
             // ***I think we need to preprocess the main components on the branch to get them in order***
             // This needs to be done before we start in on the component loop
@@ -846,7 +803,7 @@ namespace SystemReports {
             } else {
                 NumAirSysConnectSubSubComps = 0;
             }
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_InitEnergyReports = false;
 
             ArrayCount = 0;
             for (CompNum = 1; CompNum <= NumZoneConnectComps; ++CompNum) {
@@ -968,7 +925,7 @@ namespace SystemReports {
                 }
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_InitEnergyReports = false;
         }
 
         // On every iteration, load the air loop energy data
@@ -1141,7 +1098,6 @@ namespace SystemReports {
         int DemandSideCompNum;
         int SupplySideCompNum;
         int DemandSideLoopType;
-        static bool OneTimeFlag(true); // Flag set to make sure you initialize reports one time
         bool found;
         //		int countloop;
 
@@ -1162,11 +1118,11 @@ namespace SystemReports {
 
         return; // Autodesk:? Is this routine now an intentional NOOP?
 
-        if (OneTimeFlag) {
-            LoopStack.allocate(MaxLoopArraySize);
-            state.dataAirSystemsData->DemandSideConnect.allocate(MaxCompArraySize);
+        if (state.dataSysRpts->OneTimeFlag_FindFirstLastPtr) {
+            LoopStack.allocate(state.dataSysRpts->MaxLoopArraySize);
+            state.dataAirSystemsData->DemandSideConnect.allocate(state.dataSysRpts->MaxCompArraySize);
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_FindFirstLastPtr = false;
         }
         for (auto &e : LoopStack) {
             e.LoopNum = 0;
@@ -1198,8 +1154,8 @@ namespace SystemReports {
                         if (DemandSideLoopType == 1 || DemandSideLoopType == 2) {
                             ConnectionFlag = true;
                             ++ArrayCount;
-                            if (ArrayCount > MaxCompArraySize) {
-                                state.dataAirSystemsData->DemandSideConnect.redimension(MaxCompArraySize += 100);
+                            if (ArrayCount > state.dataSysRpts->MaxCompArraySize) {
+                                state.dataAirSystemsData->DemandSideConnect.redimension(state.dataSysRpts->MaxCompArraySize += 100);
                             }
                             state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
                             state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
@@ -1218,8 +1174,8 @@ namespace SystemReports {
                                 ++LoopCount;
                                 //       write(outputfiledebug,*) '1280=lc,mxsize',loopcount,maxlooparraysize
                                 //       write(outputfiledebug,*) '1281=dsloopnum,dslooptype',DemandSideLoopNum,DemandSideLoopType
-                                if (LoopCount > MaxLoopArraySize) {
-                                    LoopStack.redimension(MaxLoopArraySize += 100);
+                                if (LoopCount > state.dataSysRpts->MaxLoopArraySize) {
+                                    LoopStack.redimension(state.dataSysRpts->MaxLoopArraySize += 100);
                                 }
                                 //               write(outputfiledebug,*)
                                 //               '1294=lcnt,dsloopnum,dslooptype',loopcount,DemandSideLoopNum,DemandSideLoopType
@@ -1244,8 +1200,8 @@ namespace SystemReports {
                         if (DemandSideLoopType == 1 || DemandSideLoopType == 2) {
                             ConnectionFlag = true;
                             ++ArrayCount;
-                            if (ArrayCount > MaxCompArraySize) {
-                                state.dataAirSystemsData->DemandSideConnect.redimension(MaxCompArraySize += 100);
+                            if (ArrayCount > state.dataSysRpts->MaxCompArraySize) {
+                                state.dataAirSystemsData->DemandSideConnect.redimension(state.dataSysRpts->MaxCompArraySize += 100);
                             }
                             state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
                             state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
@@ -1263,8 +1219,8 @@ namespace SystemReports {
                                 ++LoopCount;
                                 //       write(outputfiledebug,*) '1341=lcnt,arrsize',loopcount,maxlooparraysize
                                 //       write(outputfiledebug,*) '1342=lsloopnum,dslooptype',DemandSideLoopNum,DemandSideLoopType
-                                if (LoopCount > MaxLoopArraySize) {
-                                    LoopStack.redimension(MaxLoopArraySize += 100);
+                                if (LoopCount > state.dataSysRpts->MaxLoopArraySize) {
+                                    LoopStack.redimension(state.dataSysRpts->MaxLoopArraySize += 100);
                                 }
                                 LoopStack(LoopCount).LoopNum = DemandSideLoopNum;
                                 LoopStack(LoopCount).LoopType = DemandSideLoopType;
@@ -1304,29 +1260,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Zone Component pointers
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->ZoneCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray) {
+            state.dataAirSystemsData->ZoneCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
             for (auto &e : state.dataAirSystemsData->ZoneCompToPlant) {
                 e.ZoneEqListNum = 0;
                 e.ZoneEqCompNum = 0;
@@ -1338,13 +1273,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateZoneCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->ZoneCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray);
+            state.dataAirSystemsData->ZoneCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneCompPtrArray; ++i) {
                 auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(i));
                 zctp.ZoneEqListNum = 0;
                 zctp.ZoneEqCompNum = 0;
@@ -1357,7 +1292,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
         auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(Idx));
         zctp.ZoneEqListNum = ListNum;
         zctp.ZoneEqCompNum = AirDistUnitNum;
@@ -1365,7 +1300,7 @@ namespace SystemReports {
         zctp.PlantLoopNum = PlantLoop;
         zctp.PlantLoopBranch = PlantBranch;
         zctp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateZoneCompPtrArray;
     }
 
     void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
@@ -1387,29 +1322,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Zone Sub Component Pointer Array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->ZoneSubCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray) {
+            state.dataAirSystemsData->ZoneSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
             for (auto &e : state.dataAirSystemsData->ZoneSubCompToPlant) {
                 e.ZoneEqListNum = 0;
                 e.ZoneEqCompNum = 0;
@@ -1422,13 +1336,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateZoneSubCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->ZoneSubCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray);
+            state.dataAirSystemsData->ZoneSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubCompPtrArray; ++i) {
                 auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(i));
                 zctp.ZoneEqListNum = 0;
                 zctp.ZoneEqCompNum = 0;
@@ -1442,7 +1356,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
         auto &zctp(state.dataAirSystemsData->ZoneSubCompToPlant(Idx));
         zctp.ZoneEqListNum = ListNum;
         zctp.ZoneEqCompNum = AirDistUnitNum;
@@ -1451,7 +1365,7 @@ namespace SystemReports {
         zctp.PlantLoopNum = PlantLoop;
         zctp.PlantLoopBranch = PlantBranch;
         zctp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateZoneSubCompPtrArray;
     }
 
     void UpdateZoneSubSubCompPtrArray(EnergyPlusData &state,
@@ -1474,29 +1388,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Zone Sub Component Pointer Array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->ZoneSubSubCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray) {
+            state.dataAirSystemsData->ZoneSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
             for (auto &e : state.dataAirSystemsData->ZoneSubSubCompToPlant) {
                 e.ZoneEqListNum = 0;
                 e.ZoneEqCompNum = 0;
@@ -1510,13 +1403,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateZoneSubSubCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->ZoneSubSubCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray);
+            state.dataAirSystemsData->ZoneSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateZoneSubSubCompPtrArray; ++i) {
                 auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(i));
                 zctp.ZoneEqListNum = 0;
                 zctp.ZoneEqCompNum = 0;
@@ -1531,7 +1424,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
         auto &zctp(state.dataAirSystemsData->ZoneSubSubCompToPlant(Idx));
         zctp.ZoneEqListNum = ListNum;
         zctp.ZoneEqCompNum = AirDistUnitNum;
@@ -1541,7 +1434,7 @@ namespace SystemReports {
         zctp.PlantLoopNum = PlantLoop;
         zctp.PlantLoopBranch = PlantBranch;
         zctp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateZoneSubSubCompPtrArray;
     }
 
     void UpdateAirSysCompPtrArray(EnergyPlusData &state,
@@ -1563,29 +1456,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Air System Component Pointer Array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->AirSysCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray) {
+            state.dataAirSystemsData->AirSysCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
             for (auto &e : state.dataAirSystemsData->AirSysCompToPlant) {
                 e.AirLoopNum = 0;
                 e.AirLoopBranch = 0;
@@ -1598,13 +1470,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateAirSysCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->AirSysCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray);
+            state.dataAirSystemsData->AirSysCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysCompPtrArray; ++i) {
                 auto &actp(state.dataAirSystemsData->AirSysCompToPlant(i));
                 actp.AirLoopNum = 0;
                 actp.AirLoopBranch = 0;
@@ -1618,7 +1490,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
         auto &actp(state.dataAirSystemsData->AirSysCompToPlant(Idx));
         actp.AirLoopNum = AirLoopNum;
         actp.AirLoopBranch = BranchNum;
@@ -1627,7 +1499,7 @@ namespace SystemReports {
         actp.PlantLoopNum = PlantLoop;
         actp.PlantLoopBranch = PlantBranch;
         actp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateAirSysCompPtrArray;
     }
 
     void UpdateAirSysSubCompPtrArray(EnergyPlusData &state,
@@ -1650,29 +1522,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Air System Sub Component Pointer Array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->AirSysSubCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray) {
+            state.dataAirSystemsData->AirSysSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
             for (auto &e : state.dataAirSystemsData->AirSysSubCompToPlant) {
                 e.AirLoopNum = 0;
                 e.AirLoopBranch = 0;
@@ -1686,13 +1537,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateAirSysSubCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->AirSysSubCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray);
+            state.dataAirSystemsData->AirSysSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubCompPtrArray; ++i) {
                 auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(i));
                 actp.AirLoopNum = 0;
                 actp.AirLoopBranch = 0;
@@ -1707,7 +1558,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
         auto &actp(state.dataAirSystemsData->AirSysSubCompToPlant(Idx));
         actp.AirLoopNum = AirLoopNum;
         actp.AirLoopBranch = BranchNum;
@@ -1717,7 +1568,7 @@ namespace SystemReports {
         actp.PlantLoopNum = PlantLoop;
         actp.PlantLoopBranch = PlantBranch;
         actp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubCompPtrArray;
     }
 
     void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
@@ -1741,29 +1592,8 @@ namespace SystemReports {
         // PURPOSE OF THIS SUBROUTINE:
         // Update Air System Sub Sub Component Pointer Array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        static bool OneTimeFlag(true);
-        static int ArrayLimit(100);
-        static int ArrayCounter(1);
-
-        if (OneTimeFlag) {
-            state.dataAirSystemsData->AirSysSubSubCompToPlant.allocate(ArrayLimit);
+        if (state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray) {
+            state.dataAirSystemsData->AirSysSubSubCompToPlant.allocate(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
             for (auto &e : state.dataAirSystemsData->AirSysSubSubCompToPlant) {
                 e.AirLoopNum = 0;
                 e.AirLoopBranch = 0;
@@ -1778,13 +1608,13 @@ namespace SystemReports {
                 e.LastDemandSidePtr = 0;
             }
 
-            OneTimeFlag = false;
+            state.dataSysRpts->OneTimeFlag_UpdateAirSysSubSubCompPtrArray = false;
         }
 
-        if (ArrayCounter >= ArrayLimit) { // Redimension larger
-            int const OldArrayLimit(ArrayLimit);
-            state.dataAirSystemsData->AirSysSubSubCompToPlant.redimension(ArrayLimit *= 2);
-            for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
+        if (state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray >= state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray) { // Redimension larger
+            int const OldArrayLimit(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray);
+            state.dataAirSystemsData->AirSysSubSubCompToPlant.redimension(state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray *= 2);
+            for (int i = OldArrayLimit + 1; i <= state.dataSysRpts->ArrayLimit_UpdateAirSysSubSubCompPtrArray; ++i) {
                 auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
                 actp.AirLoopNum = 0;
                 actp.AirLoopBranch = 0;
@@ -1800,7 +1630,7 @@ namespace SystemReports {
             }
         }
 
-        Idx = ArrayCounter;
+        Idx = state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
         auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(Idx));
         actp.AirLoopNum = AirLoopNum;
         actp.AirLoopBranch = BranchNum;
@@ -1811,7 +1641,7 @@ namespace SystemReports {
         actp.PlantLoopNum = PlantLoop;
         actp.PlantLoopBranch = PlantBranch;
         actp.PlantLoopComp = PlantComp;
-        ++ArrayCounter;
+        ++state.dataSysRpts->ArrayCounter_UpdateAirSysSubSubCompPtrArray;
     }
 
     void AllocateAndSetUpVentReports(EnergyPlusData &state)
@@ -1900,23 +1730,23 @@ namespace SystemReports {
         state.dataSysRpts->SysHCCompSteam.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysDomesticH2O.allocate(NumPrimaryAirSys);
 
-        SetBackCounter.allocate(state.dataGlobal->NumOfZones);
-        HeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-        LastHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-        FirstHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-        LastHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
-        FirstHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
-        NoLoadFlag.allocate(state.dataGlobal->NumOfZones);
-        UnmetLoadFlag.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->SetBackCounter.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->HeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->LastHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->FirstHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->LastHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->FirstHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->NoLoadFlag.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->UnmetLoadFlag.allocate(state.dataGlobal->NumOfZones);
 
-        UnmetLoadFlag = false;
-        SetBackCounter = 0;
-        HeatCoolFlag = 0;
-        LastHeatCoolFlag = 0;
-        FirstHeatCoolFlag = 0;
-        LastHeatCoolHour = 0;
-        FirstHeatCoolHour = 0;
-        NoLoadFlag = false;
+        state.dataSysRpts->UnmetLoadFlag = false;
+        state.dataSysRpts->SetBackCounter = 0;
+        state.dataSysRpts->HeatCoolFlag = 0;
+        state.dataSysRpts->LastHeatCoolFlag = 0;
+        state.dataSysRpts->FirstHeatCoolFlag = 0;
+        state.dataSysRpts->LastHeatCoolHour = 0;
+        state.dataSysRpts->FirstHeatCoolHour = 0;
+        state.dataSysRpts->NoLoadFlag = false;
 
         state.dataSysRpts->MaxCoolingLoadMetByVent = 0.0;
         state.dataSysRpts->MaxCoolingLoadAddedByVent = 0.0;
@@ -1982,7 +1812,7 @@ namespace SystemReports {
         state.dataSysRpts->DesDehumidElec = 0.0;
         state.dataSysRpts->SysEvapElec = 0.0;
 
-        if (AirLoopLoadsReportEnabled) {
+        if (state.dataSysRpts->AirLoopLoadsReportEnabled) {
             for (SysIndex = 1; SysIndex <= NumPrimaryAirSys; ++SysIndex) {
 
                 // CurrentModuleObject='AirloopHVAC'
@@ -2215,7 +2045,7 @@ namespace SystemReports {
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'
-            if (VentLoadsReportEnabled) {
+            if (state.dataSysRpts->VentLoadsReportEnabled) {
                 // Cooling Loads
                 SetupOutputVariable(state, "Zone Mechanical Ventilation No Load Heat Removal Energy",
                                     OutputProcessor::Unit::J,
@@ -2411,7 +2241,7 @@ namespace SystemReports {
         // some variables for setting up the plant data structures
         int LoopSideNum;
 
-        VentReportStructureCreated = true;
+        state.dataSysRpts->VentReportStructureCreated = true;
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -3473,7 +3303,7 @@ namespace SystemReports {
         Real64 ADUHeatFlowrate;
         bool CompLoadFlag;
 
-        if (!AirLoopLoadsReportEnabled) return;
+        if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
         // SYSTEM LOADS REPORT
         state.dataSysRpts->SysTotZoneLoadHTNG = 0.0;
@@ -3954,31 +3784,9 @@ namespace SystemReports {
             {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_HEATING_VRF_FTC}};
         assert(component_map.size() == n_ComponentTypes);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int NumCompTypes(0);
         int found;
 
-        struct CompTypeError
-        {
-            // Members
-            std::string CompType;
-            int CompErrIndex;
-
-            // Default Constructor
-            CompTypeError() : CompErrIndex(0)
-            {
-            }
-        };
-
-        // Object Data
-        static Array1D<CompTypeError> CompTypeErrors(100);
-
-        if (!AirLoopLoadsReportEnabled) return;
+        if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
         // Find enum for the component type string
         ComponentTypes comp_type;
@@ -4278,15 +4086,15 @@ namespace SystemReports {
             break;
         default:
             found = 0;
-            if (NumCompTypes > 0) {
-                found = UtilityRoutines::FindItemInList(CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes);
+            if (state.dataSysRpts->NumCompTypes > 0) {
+                found = UtilityRoutines::FindItemInList(CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
             }
             if (found == 0) {
-                CompTypeErrors(++NumCompTypes).CompType = CompType;
-                found = NumCompTypes;
+                state.dataSysRpts->CompTypeErrors(++state.dataSysRpts->NumCompTypes).CompType = CompType;
+                found = state.dataSysRpts->NumCompTypes;
             }
             ShowRecurringSevereErrorAtEnd(state, "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
-                                          CompTypeErrors(found).CompErrIndex);
+                                          state.dataSysRpts->CompTypeErrors(found).CompErrIndex);
             break;
         } // switch
     }
@@ -4382,8 +4190,8 @@ namespace SystemReports {
         int thisZoneEquipNum; // loop counter
 
         //  CALL GetComponentEnergyUse
-        if (!VentReportStructureCreated) return;
-        if (!VentLoadsReportEnabled) return;
+        if (!state.dataSysRpts->VentReportStructureCreated) return;
+        if (!state.dataSysRpts->VentLoadsReportEnabled) return;
         // following inits are array assignments across all controlled zones.
         state.dataSysRpts->ZoneOAMassFlow = 0.0;
         state.dataSysRpts->ZoneOAMass = 0.0;
@@ -4419,11 +4227,6 @@ namespace SystemReports {
 
             // if system operating in deadband reset zone load
             if (DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
-            if (DeadBandOrSetback(ActualZoneNum)) {
-                DBFlag = 1;
-            } else {
-                DBFlag = 0;
-            }
 
             //  IF(AirLoopNum == 0 ) CYCLE   !orig line (BG 12-8-06 changed, zone forced air equipment seems to get excluded here...)
 
@@ -5239,7 +5042,5 @@ namespace SystemReports {
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
-
-} // namespace SystemReports
 
 } // namespace EnergyPlus

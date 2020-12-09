@@ -63,8 +63,6 @@ struct EnergyPlusData;
 
 namespace SystemReports {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     enum class iEndUseType
     {
         NoHeatNoCool,
@@ -72,33 +70,6 @@ namespace SystemReports {
         HeatingOnly,
         HeatAndCool,
     };
-
-    extern bool AirLoopLoadsReportEnabled;
-    extern bool VentLoadsReportEnabled;
-    extern bool VentEnergyReportEnabled;
-    extern bool VentReportStructureCreated;
-    extern int TotalLoopConnects; // Total number of loop connections
-    extern int MaxLoopArraySize;
-    extern int MaxCompArraySize;
-    extern int DBFlag;
-
-    extern Array1D_int SetBackCounter;
-    extern Array1D_int HeatCoolFlag;
-    extern Array1D_int FirstHeatCoolFlag;
-    extern Array1D_int FirstHeatCoolHour;
-    extern Array1D_int LastHeatCoolFlag;
-    extern Array1D_int LastHeatCoolHour;
-    extern Array1D_bool AirLoopCalcDone;
-    extern Array1D_bool NoLoadFlag;
-    extern Array1D_bool UnmetLoadFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
-
-    // Reporting Initialization
-
-    // Reporting routines for module
-
-    // Types
 
     struct Energy
     {
@@ -126,9 +97,7 @@ namespace SystemReports {
         Energy ReducedByHC; // LoadAddedByVent
 
         // Default Constructor
-        CoilType()
-        {
-        }
+        CoilType() = default;
     };
 
     struct SummarizeLoads
@@ -141,13 +110,20 @@ namespace SystemReports {
         CoilType PotentialCost;    // LoadAddedByVentHeatLost
 
         // Default Constructor
-        SummarizeLoads()
+        SummarizeLoads() = default;
+    };
+
+    struct CompTypeError
+    {
+        // Members
+        std::string CompType;
+        int CompErrIndex;
+
+        // Default Constructor
+        CompTypeError() : CompErrIndex(0)
         {
         }
     };
-
-    // Object Data
-    extern Array1D<SummarizeLoads> Vent;
 
     // Functions
 
@@ -315,13 +291,55 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D<Real64> SysHCCompSteam;
     Array1D<Real64> SysDomesticH2O;
 
-    Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
-    Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
-    Array1D<Real64> ZoneOAVolFlowStdRho;  // zone mech vent volume flow rate at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolStdRho;      // zone mech vent total volume OA at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
-    Array1D<Real64> ZoneOAVolCrntRho;     // zone mech vent total volume OA at current density {m3/s}
-    Array1D<Real64> ZoneMechACH;          // zone mech vent air changes per hour {ACH}
+    Array1D<Real64> ZoneOAMassFlow;         // zone mech vent mass flow rate {kg/s}
+    Array1D<Real64> ZoneOAMass;             // zone mech vent total mass for time {kg}
+    Array1D<Real64> ZoneOAVolFlowStdRho;    // zone mech vent volume flow rate at standard density {m3/s}
+    Array1D<Real64> ZoneOAVolStdRho;        // zone mech vent total volume OA at standard density {m3/s}
+    Array1D<Real64> ZoneOAVolFlowCrntRho;   // zone mech vent volume flow rate at current density {m3/s}
+    Array1D<Real64> ZoneOAVolCrntRho;       // zone mech vent total volume OA at current density {m3/s}
+    Array1D<Real64> ZoneMechACH;            // zone mech vent air changes per hour {ACH}
+
+    bool AirLoopLoadsReportEnabled = true;
+    bool VentLoadsReportEnabled = true;
+    bool VentEnergyReportEnabled = false;
+    bool VentReportStructureCreated = false;
+    int TotalLoopConnects = 0;              // Total number of loop connections
+    int MaxLoopArraySize = 100;
+    int MaxCompArraySize = 500;
+
+    Array1D_int SetBackCounter;
+    Array1D_int HeatCoolFlag;
+    Array1D_int FirstHeatCoolFlag;
+    Array1D_int FirstHeatCoolHour;
+    Array1D_int LastHeatCoolFlag;
+    Array1D_int LastHeatCoolHour;
+    Array1D_bool NoLoadFlag;
+    Array1D_bool UnmetLoadFlag;
+
+    Array1D<SystemReports::SummarizeLoads> Vent;
+
+    bool OneTimeFlag_FindFirstLastPtr = true;
+    bool OneTimeFlag_InitEnergyReports = true;
+    bool OneTimeFlag_UpdateZoneCompPtrArray = true;
+    int ArrayLimit_UpdateZoneCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneCompPtrArray = 1;
+    bool OneTimeFlag_UpdateZoneSubCompPtrArray = true;
+    int ArrayLimit_UpdateZoneSubCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateZoneSubSubCompPtrArray = true;
+    int ArrayLimit_UpdateZoneSubSubCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneSubSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysSubCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysSubCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysSubSubCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysSubSubCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
+    int NumCompTypes = 0;
+    Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
 
     void clear_state() override
     {
@@ -379,6 +397,44 @@ struct SystemReportsData : BaseGlobalStruct {
         this->ZoneOAVolFlowCrntRho.deallocate();
         this->ZoneOAVolCrntRho.deallocate();
         this->ZoneMechACH.deallocate();
+        this->AirLoopLoadsReportEnabled = true;
+        this->VentLoadsReportEnabled = true;
+        this->VentEnergyReportEnabled = false;
+        this->VentReportStructureCreated = false;
+        this->TotalLoopConnects = 0;
+        this->MaxLoopArraySize = 100;
+        this->MaxCompArraySize = 500;
+        this->SetBackCounter.deallocate();
+        this->HeatCoolFlag.deallocate();
+        this->FirstHeatCoolFlag.deallocate();
+        this->FirstHeatCoolHour.deallocate();
+        this->LastHeatCoolFlag.deallocate();
+        this->LastHeatCoolHour.deallocate();
+        this->NoLoadFlag.deallocate();
+        this->UnmetLoadFlag.deallocate();
+        this->Vent.deallocate();
+        this->OneTimeFlag_FindFirstLastPtr = true;
+        this->OneTimeFlag_InitEnergyReports = true;
+        this->OneTimeFlag_UpdateZoneCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneCompPtrArray = 1;
+        this->OneTimeFlag_UpdateZoneSubCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateZoneSubSubCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneSubSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneSubSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysSubCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysSubSubCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysSubSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
+        this->NumCompTypes = 0;
+        this->CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
     }
 };
 
