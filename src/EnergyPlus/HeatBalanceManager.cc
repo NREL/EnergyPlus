@@ -5229,24 +5229,6 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-//    void SetSolarParameterAt(EnergyPlusData &state)
-//    {
-//        // Pre-calculate commonly used solar arrays to avoid duplicate data reference during calculated
-//        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-//            int SurfNum2 = SurfNum;
-//            int PipeNum = DataSurfaces::SurfWinTDDPipeNum(SurfNum);
-//            if (DataSurfaces::SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
-//                SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
-//            }
-//            SurfCosIncTimestep(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-//            SurfSunlitFracTimestep(SurfNum) = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-//            ProfAngHourly(SurfNum) = 0;
-//            if (SurfWinShadingFlag(SurfNum) != ExtScreenOn && SurfWinBlindNumber(SurfNum) > 0)
-//                ProfileAngle(SurfNum, SOLCOS, Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation, ProfAngHourly(SurfNum));
-//        }
-//
-//    }
-
     void InitHeatBalance(EnergyPlusData &state)
     {
 
@@ -5386,9 +5368,6 @@ namespace HeatBalanceManager {
                 }
             }
         }
-
-        // Initialize timestep-wise solar parameters
-//        SetSolarParameterAt(state);
 
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed

@@ -771,8 +771,6 @@ namespace SolarShading {
         OverlapAreas.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, TotSurfaces, 0.0);
         CosIncAngHR.dimension(24, TotSurfaces, 0.0);
         CosIncAng.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces, 0.0);
-//        SurfCosIncTimestep.dimension(TotSurfaces, 0.0);
-//        SurfSunlitFracTimestep.dimension(TotSurfaces, 0.0);
         AnisoSkyMult.dimension(TotSurfaces, 1.0); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
         //  ALLOCATE(WithShdgIsoSky(TotSurfaces))
         //  WithShdgIsoSky=0.0
@@ -6050,7 +6048,6 @@ namespace SolarShading {
                     Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     Real64 SunLitFract = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
-//                    SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * SurfCosIncTimestep(SurfNum) * SurfSunlitFracTimestep(SurfNum);
                 }
             }
 
@@ -6803,7 +6800,6 @@ namespace SolarShading {
                     Real64 TBmBmSc = SurfWinScGlSysTsolBmBm(SurfNum);
                     Real64 TBmBmBl = SurfWinBlGlSysTsolBmBm(SurfNum);
                     Real64 TBmBm = SurfWinGlTsolBmBm(SurfNum);
-//                    Real64 CosInc = SurfCosIncTimestep(SurfNum);
 
                     Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                     int InShelfSurf = 0; // Inside daylighting shelf surface number

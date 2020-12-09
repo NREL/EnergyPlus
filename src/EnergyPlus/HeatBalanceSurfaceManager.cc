@@ -2716,11 +2716,9 @@ namespace HeatBalanceSurfaceManager {
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     SurfCosIncidenceAngle(SurfNum) = CosInc;
-//                    SurfCosIncidenceAngle(SurfNum) = SurfCosIncTimestep(SurfNum);
                     // Incident direct (unreflected) beam
                     SurfQRadSWOutIncidentBeam(SurfNum) =
                             state.dataEnvrn->BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
-//                            state.dataEnvrn->BeamSolarRad * SurfSunlitFracTimestep(SurfNum) * SurfCosIncTimestep(SurfNum);
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataEnvrn->DifSolarRad * AnisoSkyMult(SurfNum);
                     // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
@@ -2747,12 +2745,10 @@ namespace HeatBalanceSurfaceManager {
                     currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
-//                    SurfCosIncidenceAngle(SurfNum) = SurfCosIncTimestep(SurfNum);
                     // Report variables for various incident solar quantities
                     // Incident direct (unreflected) beam
                     SurfQRadSWOutIncidentBeam(SurfNum) =
                             currBeamSolar(SurfNum) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * currCosInc(SurfNum);
-//                            currBeamSolar(SurfNum) * SurfSunlitFracTimestep(SurfNum) * SurfCosIncTimestep(SurfNum);
 
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataEnvrn->DifSolarRad * AnisoSkyMult(SurfNum);
@@ -3153,8 +3149,6 @@ namespace HeatBalanceSurfaceManager {
                                         FracSunLit = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                                         BeamFaceInc =
                                                 state.dataEnvrn->BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
-//                                        FracSunLit = SurfSunlitFracTimestep(SurfNum);
-//                                        BeamFaceInc = state.dataEnvrn->BeamSolarRad * SurfSunlitFracTimestep(SurfNum) * CosInc;
                                         DifSolarFaceInc = SkySolarInc + GndSolarInc;
                                     }
                                     if (FracSunLit > 0.0) {
