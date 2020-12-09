@@ -477,8 +477,8 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     Real64 coilCapFunTempFac = 1.0;
     Real64 DXFlowPerCapMinRatio = 0.00004;
     Real64 DXFlowPerCapMaxRatio = 0.00006;
-    DataEnvironment::StdRhoAir = 1.2;
-    DataSizing::DataFlowUsedForSizing = airFlowRate / DataEnvironment::StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    DataSizing::DataFlowUsedForSizing = airFlowRate / state->dataEnvrn->StdRhoAir;
 
     // setCoilHeatingCapacity will not overwrite previously set temperature data
     coilSelectionReportObj->setCoilHeatingCapacity(*state,

@@ -221,13 +221,13 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     CalcZoneSizing(CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
     CalcZoneSizing(CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
     CalcZoneSizing(CurOverallSimDay, 2).DOASLowSetpoint = 12.2;
-    StdBaroPress = 101325.;
+    state->dataEnvrn->StdBaroPress = 101325.;
     CalcFinalZoneSizing(1).MinOA = 0.1;
     CalcFinalZoneSizing(2).MinOA = 0.11;
     CalcZoneSizing(CurOverallSimDay, 1).DOASControlStrategy = 3;
     CalcZoneSizing(CurOverallSimDay, 2).DOASControlStrategy = 3;
-    OutDryBulbTemp = 28.;
-    OutHumRat = 0.017;
+    state->dataEnvrn->OutDryBulbTemp = 28.;
+    state->dataEnvrn->OutHumRat = 0.017;
     Node(4).Temp = 22;
     Node(4).HumRat = 0.008;
     Node(9).Temp = 22.5;

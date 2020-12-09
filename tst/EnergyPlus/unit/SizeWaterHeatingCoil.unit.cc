@@ -80,7 +80,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
-using DataEnvironment::StdRhoAir;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataPlant;
@@ -108,7 +107,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -346,7 +345,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -583,7 +582,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -820,7 +819,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -1056,7 +1055,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -1226,7 +1225,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     bool ErrorsFound(false);
 
     InitializePsychRoutines();
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     std::string const idf_objects = delimited_string({
 

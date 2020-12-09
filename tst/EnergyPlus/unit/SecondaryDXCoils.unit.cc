@@ -71,7 +71,6 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataEnvironment::OutBaroPress;
 using DataHeatBalFanSys::ZT;
 using DataHeatBalFanSys::ZoneAirHumRat;
 using DataLoopNode::Node;
@@ -169,7 +168,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DXCoil(DXCoilNum).AirInNode = 2;
     Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();
@@ -250,7 +249,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     DXCoil(DXCoilNum).MSSpeedNumHS = 1;
     DXCoil(DXCoilNum).MSSpeedNumLS = 1;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DXCoil(DXCoilNum).AirInNode = 2;
     Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();

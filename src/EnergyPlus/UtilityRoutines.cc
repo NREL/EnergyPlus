@@ -1175,8 +1175,6 @@ namespace UtilityRoutines {
         // Calls ShowErrorMessage utility routine.
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using General::CreateSysTimeIntervalString;
 
         std::string cEnvHeader;
@@ -1196,7 +1194,7 @@ namespace UtilityRoutines {
         }
 
         if (len(Message) < 50) {
-            const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+            const auto m = Message + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy + ' ' +
                                  CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, " **   ~~~   ** " + m,
                              OutUnit1,
@@ -1209,7 +1207,7 @@ namespace UtilityRoutines {
             }
         } else {
             const auto m = " **   ~~~   ** " + Message;
-            const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+            const auto postfix = " **   ~~~   ** " + cEnvHeader + state.dataEnvrn->EnvironmentName + ", at Simulation time=" + state.dataEnvrn->CurMnDy + ' ' +
                 CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, m);
             ShowErrorMessage(state, postfix,

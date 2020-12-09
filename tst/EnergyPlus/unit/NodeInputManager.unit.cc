@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(1).HumRat = 0.01;
-    DataEnvironment::OutBaroPress = 100000;
+    state->dataEnvrn->OutBaroPress = 100000;
 
     NodeInputManager::CalcMoreNodeInfo(*state);
 

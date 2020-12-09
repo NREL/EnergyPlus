@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";
@@ -755,7 +755,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;

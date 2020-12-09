@@ -141,7 +141,7 @@ namespace PondGroundHeatExchanger {
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux() const;
+        Real64 CalcSolarFlux(EnergyPlusData &state) const;
 
         void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
 
