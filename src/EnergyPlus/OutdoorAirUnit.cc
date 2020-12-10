@@ -128,7 +128,7 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     std::string const cMO_OutdoorAirUnit("ZoneHVAC:OutdoorAirUnit");
 
-    int const WaterCoil_SimpleCool(1);
+    // int const WaterCoil_SimpleCool(1);
     int const WaterCoil_Cooling(2);
     int const WaterCoil_SimpleHeat(3);
     int const SteamCoil_AirHeat(4);

@@ -1056,7 +1056,7 @@ namespace RefrigeratedCase {
             TotalHeatRecoveredEnergy = 0.0;
         }
 
-        void UpdateCondenser();
+        void UpdateCondenser() const;
 
         static PlantComponent *factory(std::string const &objectName);
 
