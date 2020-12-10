@@ -1059,14 +1059,14 @@ namespace RoomAirModelAirflowNetwork {
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     SumIntGain += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn)
                     SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
@@ -1096,8 +1096,8 @@ namespace RoomAirModelAirflowNetwork {
                     HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntBlindOn) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);

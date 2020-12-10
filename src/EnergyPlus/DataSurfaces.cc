@@ -237,23 +237,6 @@ namespace DataSurfaces {
     int const InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
     int const InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
 
-    // Parameters for window shade status
-    int const NoShade(-1);
-    int const ShadeOff(0);
-    int const IntShadeOn(1); // Interior shade on
-    int const SwitchableGlazing(2);
-    int const ExtShadeOn(3);  // Exterior shade on
-    int const ExtScreenOn(4); // Exterior screen on
-    int const IntBlindOn(6);  // Interior blind on
-    int const ExtBlindOn(7);  // Exterior blind on
-    int const BGShadeOn(8);   // Between-glass shade on
-    int const BGBlindOn(9);   // Between-glass blind on
-    int const IntShadeConditionallyOff(10);
-    int const GlassConditionallyLightened(20);
-    int const ExtShadeConditionallyOff(30);
-    int const IntBlindConditionallyOff(60);
-    int const ExtBlindConditionallyOff(70);
-
     // WindowShadingControl Shading Types
     int const WSC_ST_NoShade(0);
     int const WSC_ST_InteriorShade(1);
@@ -511,13 +494,15 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    Array1D<int> SurfWinShadingFlag;                        // -1: window has no shading device
+    Array1D<WinShadingFlag> SurfWinShadingFlag;             // -1: window has no shading device
+    Array1D<bool> SurfWinShaded;                            // Window shading flag is not shadeoff or noshade
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    Array1D<int> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    Array1D<WinShadingFlag> SurfWinExtIntShadePrevTS;       // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
@@ -1325,8 +1310,10 @@ namespace DataSurfaces {
         SurfWinProfileAngVert.clear();
 
         SurfWinShadingFlag.clear();
+        SurfWinShaded.clear();
         SurfWinShadingFlagEMSOn.clear();
         SurfWinShadingFlagEMSValue.clear();
+        SurfWinGlareControlIsActive.clear();
         SurfWinStormWinFlag.clear();
         SurfWinStormWinFlagPrevDay.clear();
         SurfWinFracTimeShadingDeviceOn.clear();

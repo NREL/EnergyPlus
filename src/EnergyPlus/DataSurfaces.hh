@@ -120,6 +120,20 @@ namespace DataSurfaces {
         Count // The counter representing the total number of surface class, always stays at the bottom
     };
 
+    enum class WinShadingFlag : int {
+        NoShade = -1,
+        ShadeOff = 0,
+        IntShadeOn = 1,
+        SwitchableGlazing = 2,
+        ExtShadeOn = 3,
+        ExtScreenOn = 4,
+        IntBlindOn = 5,
+        ExtBlindOn = 6,
+        BGShadeOn = 7,
+        GlassDoor = 8,
+        BGBlindOn = 9
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -238,23 +252,6 @@ namespace DataSurfaces {
     extern int const InConvWinLoc_WindowAboveThis;         // this is a wall with window above it
     extern int const InConvWinLoc_WindowBelowThis;         // this is a wall with window below it
     extern int const InConvWinLoc_LargePartOfExteriorWall; // this is a big window taking up most of wall
-
-    // Parameters for window shade status
-    extern int const NoShade;
-    extern int const ShadeOff;
-    extern int const IntShadeOn; // Interior shade on
-    extern int const SwitchableGlazing;
-    extern int const ExtShadeOn;  // Exterior shade on
-    extern int const ExtScreenOn; // Exterior screen on
-    extern int const IntBlindOn;  // Interior blind on
-    extern int const ExtBlindOn;  // Exterior blind on
-    extern int const BGShadeOn;   // Between-glass shade on
-    extern int const BGBlindOn;   // Between-glass blind on
-    extern int const IntShadeConditionallyOff;
-    extern int const GlassConditionallyLightened;
-    extern int const ExtShadeConditionallyOff;
-    extern int const IntBlindConditionallyOff;
-    extern int const ExtBlindConditionallyOff;
 
     // WindowShadingControl Shading Types
     extern int const WSC_ST_NoShade;
@@ -518,13 +515,15 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     extern Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    extern Array1D<int> SurfWinShadingFlag;                       // -1: window has no shading device
+    extern Array1D<WinShadingFlag> SurfWinShadingFlag;                       // -1: window has no shading device
+    extern Array1D<bool> SurfWinShaded;                            // Window shading flag is not shadeoff or noshade
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     extern Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     extern Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     extern Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    extern Array1D<int> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    extern Array1D<WinShadingFlag> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     extern Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     extern Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     extern Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window

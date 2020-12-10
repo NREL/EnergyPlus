@@ -159,13 +159,15 @@ namespace SurfaceGeometry {
         SurfWinProfileAngHor.dimension(NumSurfaces, 0);
         SurfWinProfileAngVert.dimension(NumSurfaces, 0);
 
-        SurfWinShadingFlag.dimension(NumSurfaces, 0);
+        SurfWinShadingFlag.dimension(NumSurfaces, WinShadingFlag::ShadeOff);
+        SurfWinShaded.dimension(NumSurfaces, false);
         SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
         SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0);
+        SurfWinGlareControlIsActive.dimension(NumSurfaces, false);
         SurfWinStormWinFlag.dimension(NumSurfaces, 0);
         SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
         SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);
-        SurfWinExtIntShadePrevTS.dimension(NumSurfaces, 0);
+        SurfWinExtIntShadePrevTS.dimension(NumSurfaces, WinShadingFlag::ShadeOff);
         SurfWinHasShadeOrBlindLayer.dimension(NumSurfaces, 0);
         SurfWinSurfDayLightInit.dimension(NumSurfaces, 0);
         SurfWinDaylFacPoint.dimension(NumSurfaces, 0);

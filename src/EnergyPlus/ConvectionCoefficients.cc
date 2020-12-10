@@ -400,7 +400,7 @@ namespace ConvectionCoefficients {
 
         if (!Surface(SurfNum).ExtWind) {
             SurfWindSpeed = 0.0; // No wind exposure
-        } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+        } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == WinShadingFlag::ExtShadeOn) {
             SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
         } else {
             SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -4736,7 +4736,7 @@ namespace ConvectionCoefficients {
 
             if (!Surface(SurfNum).ExtWind) {
                 SurfWindSpeed = 0.0; // No wind exposure
-            } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+            } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == WinShadingFlag::ExtShadeOn) {
                 SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;

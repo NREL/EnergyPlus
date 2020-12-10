@@ -109,9 +109,9 @@ namespace WindowManager {
 
         // Interior and exterior shading layers have gas between them and IGU but that gas
         // was not part of construction so it needs to be increased by one
-        if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == ExtShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn ||
-            SurfWinShadingFlag(SurfNum) == ExtBlindOn || SurfWinShadingFlag(SurfNum) == ExtScreenOn || SurfWinShadingFlag(SurfNum) == BGShadeOn ||
-            SurfWinShadingFlag(SurfNum) == BGBlindOn) {
+        if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::ExtShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn ||
+            SurfWinShadingFlag(SurfNum) == WinShadingFlag::ExtBlindOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::ExtScreenOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::BGShadeOn ||
+            SurfWinShadingFlag(SurfNum) == WinShadingFlag::BGBlindOn) {
             ++totSolidLayers;
         }
 
@@ -140,7 +140,7 @@ namespace WindowManager {
                 ++i;
             }
             SurfInsideTemp = aTemp - DataGlobalConstants::KelvinConv();
-            if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+            if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn) {
                 auto EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
                 auto EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
                 SurfWinEffInsSurfTemp(SurfNum) =
@@ -149,7 +149,7 @@ namespace WindowManager {
         }
 
         HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
-        if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn || aFactory.isInteriorShade()) {
+        if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
@@ -247,23 +247,23 @@ namespace WindowManager {
         m_ConstructionNumber = m_Surface.Construction;
         m_ShadePosition = ShadePosition::NoShade;
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
-            ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+        if (ShadeFlag == WinShadingFlag::IntShadeOn || ShadeFlag == WinShadingFlag::ExtShadeOn || ShadeFlag == WinShadingFlag::IntBlindOn || ShadeFlag == WinShadingFlag::ExtBlindOn || ShadeFlag == WinShadingFlag::BGShadeOn ||
+            ShadeFlag == WinShadingFlag::BGBlindOn || ShadeFlag == WinShadingFlag::ExtScreenOn) {
             m_ConstructionNumber = m_Surface.activeShadedConstruction;
             if (SurfWinStormWinFlag(t_SurfNum) > 0) m_ConstructionNumber = m_Surface.activeStormWinShadedConstruction;
         }
 
         m_TotLay = getNumOfLayers(state);
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+        if (ShadeFlag == WinShadingFlag::IntShadeOn || ShadeFlag == WinShadingFlag::IntBlindOn) {
             m_ShadePosition = ShadePosition::Interior;
         }
 
-        if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+        if (ShadeFlag == WinShadingFlag::ExtShadeOn || ShadeFlag == WinShadingFlag::ExtBlindOn || ShadeFlag == WinShadingFlag::ExtScreenOn) {
             m_ShadePosition = ShadePosition::Exterior;
         }
 
-        if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+        if (ShadeFlag == WinShadingFlag::BGShadeOn || ShadeFlag == WinShadingFlag::BGBlindOn) {
             m_ShadePosition = ShadePosition::Between;
         }
     }
@@ -302,9 +302,9 @@ namespace WindowManager {
     {
         auto ConstrNum = m_Surface.Construction;
 
-        if (SurfWinShadingFlag(m_SurfNum) == IntShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == IntBlindOn ||
-            SurfWinShadingFlag(m_SurfNum) == ExtBlindOn || SurfWinShadingFlag(m_SurfNum) == BGShadeOn || SurfWinShadingFlag(m_SurfNum) == BGBlindOn ||
-            SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
+        if (SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::IntBlindOn ||
+            SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtBlindOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::BGShadeOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::BGBlindOn ||
+            SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtScreenOn) {
             ConstrNum = m_Surface.activeShadedConstruction;
             if (SurfWinStormWinFlag(m_SurfNum) > 0) ConstrNum = m_Surface.activeStormWinShadedConstruction;
         }
@@ -498,10 +498,10 @@ namespace WindowManager {
         auto aGas = getAir();
         auto thickness = 0.0;
 
-        if (SurfWinShadingFlag(m_SurfNum) == IntBlindOn || SurfWinShadingFlag(m_SurfNum) == ExtBlindOn) {
+        if (SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::IntBlindOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtBlindOn) {
             thickness = Blind(SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
-        if (SurfWinShadingFlag(m_SurfNum) == IntShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
+        if (SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == WinShadingFlag::ExtScreenOn) {
             auto material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }
