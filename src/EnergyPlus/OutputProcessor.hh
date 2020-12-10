@@ -78,42 +78,93 @@ namespace OutputProcessor {
     // in this file should obey a USE OutputProcessor, ONLY: rule.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const ReportVDD_No;  // Don't report the variable dictionaries in any form
-    extern int const ReportVDD_Yes; // Report the variable dictionaries in "report format"
-    extern int const ReportVDD_IDF; // Report the variable dictionaries in "IDF format"
+    enum class iReportVDD
+    {
+        No,               // Don't report the variable dictionaries in any form
+        Yes,              // Report the variable dictionaries in "report format"
+        IDF,              // Report the variable dictionaries in "IDF format"
+    };
 
     constexpr Real64 MinSetValue(99999999999999.0);
     constexpr Real64 MaxSetValue(-99999999999999.0);
-    extern int const IMinSetValue;
-    extern int const IMaxSetValue;
+    constexpr int IMinSetValue(999999);
+    constexpr int IMaxSetValue(-999999);
 
-    extern int const VarType_NotFound; // ref: GetVariableKeyCountandType, 0 = not found
-    extern int const VarType_Integer;  // ref: GetVariableKeyCountandType, 1 = integer
-    extern int const VarType_Real;     // ref: GetVariableKeyCountandType, 2 = real
-    extern int const VarType_Meter;    // ref: GetVariableKeyCountandType, 3 = meter
-    extern int const VarType_Schedule; // ref: GetVariableKeyCountandType, 4 = schedule
+    constexpr int VarType_NotFound(0); // ref: GetVariableKeyCountandType, 0 = not found
+    constexpr int VarType_Integer(1);  // ref: GetVariableKeyCountandType, 1 = integer
+    constexpr int VarType_Real(2);     // ref: GetVariableKeyCountandType, 2 = real
+    constexpr int VarType_Meter(3);    // ref: GetVariableKeyCountandType, 3 = meter
+    constexpr int VarType_Schedule(4); // ref: GetVariableKeyCountandType, 4 = schedule
 
-    extern int const MeterType_Normal;     // Type value for normal meters
-    extern int const MeterType_Custom;     // Type value for custom meters
-    extern int const MeterType_CustomDec;  // Type value for custom meters that decrement another meter
-    extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
+    constexpr int MeterType_Normal(0);     // Type value for normal meters
+    constexpr int MeterType_Custom(1);     // Type value for custom meters
+    constexpr int MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
+    constexpr int MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
 
-    extern Array1D_string const DayTypes;
+    constexpr const char *DayTypes(int &d)
+    {
+        switch(d) {
+        case 1:
+            return "Sunday";
+        case 2:
+            return "Monday";
+        case 3:
+            return "Tuesday";
+        case 4:
+            return "Wednesday";
+        case 5:
+            return "Thursday";
+        case 6:
+            return "Friday";
+        case 7:
+            return "Saturday";
+        case 8:
+            return "Holiday";
+        case 9:
+            return "SummerDesignDay";
+        case 10:
+            return "WinterDesignDay";
+        case 11:
+            return "CustomDay1";
+        case 12:
+            return "CustomDay2";
+        default:
+            assert(false);
+            return "";
+        }
+    }
 
-    extern int const RVarAllocInc;
-    extern int const LVarAllocInc;
-    extern int const IVarAllocInc;
+    constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
+                                                                      "COOLING",
+                                                                      "INTERIORLIGHTS",
+                                                                      "EXTERIORLIGHTS",
+                                                                      "INTERIOREQUIPMENT",
+                                                                      "EXTERIOREQUIPMENT",
+                                                                      "FANS",
+                                                                      "PUMPS",
+                                                                      "HEATREJECTION",
+                                                                      "HUMIDIFIER",
+                                                                      "HEATRECOVERY",
+                                                                      "WATERSYSTEMS",
+                                                                      "REFRIGERATION",
+                                                                      "COGENERATION"};
+
+    constexpr int RVarAllocInc(1000);
+    constexpr int LVarAllocInc(1000);
+    constexpr int IVarAllocInc(10);
 
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
-    // INTEGER, PARAMETER :: RT_IPUnits_Consumption=0
-    extern int const RT_IPUnits_Electricity;
-    extern int const RT_IPUnits_Gas;
-    extern int const RT_IPUnits_Cooling;
-    extern int const RT_IPUnits_Water;
-    extern int const RT_IPUnits_OtherKG;
-    extern int const RT_IPUnits_OtherM3;
-    extern int const RT_IPUnits_OtherL;
-    extern int const RT_IPUnits_OtherJ;
+    enum class iRT_IPUnits
+    {
+        Electricity,
+        Gas,
+        Cooling,
+        Water,
+        OtherKG,
+        OtherM3,
+        OtherL,
+        OtherJ,
+    };
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -142,7 +193,7 @@ namespace OutputProcessor {
     extern int NumOfIVariable;
     extern int MaxIVariable;
     extern bool OutputInitialized;
-    extern int ProduceReportVDD;
+    extern iReportVDD ProduceReportVDD;
     extern int NumHoursInDay;
     extern int NumHoursInMonth;
     extern int NumHoursInSim;
@@ -442,7 +493,7 @@ namespace OutputProcessor {
         std::string EndUseSub;       // End Use subcategory of the meter
         std::string Group;           // Group of the meter
         OutputProcessor::Unit Units; // Units for the Meter
-        int RT_forIPUnits;           // Resource type number for IP Units (tabular) reporting
+        iRT_IPUnits RT_forIPUnits;           // Resource type number for IP Units (tabular) reporting
         int TypeOfMeter;             // type of meter
         int SourceMeter;             // for custom decrement meters, this is the meter number for the subtraction
 
@@ -536,7 +587,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         MeterType()
-            : Units(OutputProcessor::Unit::None), RT_forIPUnits(0), TypeOfMeter(MeterType_Normal), SourceMeter(0), TSValue(0.0), CurTSValue(0.0),
+            : Units(OutputProcessor::Unit::None), RT_forIPUnits(iRT_IPUnits::OtherJ), TypeOfMeter(MeterType_Normal), SourceMeter(0), TSValue(0.0), CurTSValue(0.0),
               RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false), HRMaxVal(-99999.0), HRMaxValDate(0),
               HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0),
               DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0),
@@ -692,7 +743,8 @@ namespace OutputProcessor {
                                          Optional_string_const ZoneName = _     // ZoneName when Group=Building
     );
 
-    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state,
+                               iRT_IPUnits &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine

@@ -103,69 +103,6 @@ namespace OutputProcessor {
     // REFERENCES:
     // EnergyPlus OutputProcessor specifications.
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const ReportVDD_No(0);  // Don't report the variable dictionaries in any form
-    int const ReportVDD_Yes(1); // Report the variable dictionaries in "report format"
-    int const ReportVDD_IDF(2); // Report the variable dictionaries in "IDF format"
-
-    int const IMinSetValue(999999);
-    int const IMaxSetValue(-999999);
-
-    int const VarType_NotFound(0); // ref: GetVariableKeyCountandType, 0 = not found
-    int const VarType_Integer(1);  // ref: GetVariableKeyCountandType, 1 = integer
-    int const VarType_Real(2);     // ref: GetVariableKeyCountandType, 2 = real
-    int const VarType_Meter(3);    // ref: GetVariableKeyCountandType, 3 = meter
-    int const VarType_Schedule(4); // ref: GetVariableKeyCountandType, 4 = schedule
-
-    int const MeterType_Normal(0);     // Type value for normal meters
-    int const MeterType_Custom(1);     // Type value for custom meters
-    int const MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
-    int const MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
-
-    Array1D_string const DayTypes(12,
-                                  {"Sunday",
-                                   "Monday",
-                                   "Tuesday",
-                                   "Wednesday",
-                                   "Thursday",
-                                   "Friday",
-                                   "Saturday",
-                                   "Holiday",
-                                   "SummerDesignDay",
-                                   "WinterDesignDay",
-                                   "CustomDay1",
-                                   "CustomDay2"});
-
-    std::vector<std::string> const endUseCategoryNames = {"HEATING",
-                                                          "COOLING",
-                                                          "INTERIORLIGHTS",
-                                                          "EXTERIORLIGHTS",
-                                                          "INTERIOREQUIPMENT",
-                                                          "EXTERIOREQUIPMENT",
-                                                          "FANS",
-                                                          "PUMPS",
-                                                          "HEATREJECTION",
-                                                          "HUMIDIFIER",
-                                                          "HEATRECOVERY",
-                                                          "WATERSYSTEMS",
-                                                          "REFRIGERATION",
-                                                          "COGENERATION"};
-
-    int const RVarAllocInc(1000);
-    int const LVarAllocInc(1000);
-    int const IVarAllocInc(10);
-
-    //  For IP Units (tabular reports) certain resources will be put in sub-tables
-    // INTEGER, PARAMETER :: RT_IPUnits_Consumption=0
-    int const RT_IPUnits_Electricity(1);
-    int const RT_IPUnits_Gas(2);
-    int const RT_IPUnits_Cooling(3);
-    int const RT_IPUnits_Water(4);
-    int const RT_IPUnits_OtherKG(5);
-    int const RT_IPUnits_OtherM3(6);
-    int const RT_IPUnits_OtherL(7);
-    int const RT_IPUnits_OtherJ(0);
-
     // DERIVED TYPE DEFINITIONS:
 
     int InstMeterCacheSize(1000);    // the maximum size of the instant meter cache used in GetInstantMeterValue
@@ -193,7 +130,7 @@ namespace OutputProcessor {
     int NumOfIVariable(0);
     int MaxIVariable(0);
     bool OutputInitialized(false);
-    int ProduceReportVDD(ReportVDD_No);
+    iReportVDD ProduceReportVDD(iReportVDD::No);
     int NumHoursInDay(24);
     int NumHoursInMonth(0);
     int NumHoursInSim(0);
@@ -319,7 +256,7 @@ namespace OutputProcessor {
         MaxIVariable = 0;
         OutputInitialized = false;
         GetOutputInputFlag = true;
-        ProduceReportVDD = ReportVDD_No;
+        ProduceReportVDD = iReportVDD::No;
         NumHoursInDay = 24;
         NumHoursInMonth = 0;
         NumHoursInSim = 0;
@@ -2569,7 +2506,8 @@ namespace OutputProcessor {
         }
     }
 
-    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state,
+                               iRT_IPUnits &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine
@@ -2600,24 +2538,24 @@ namespace OutputProcessor {
         ErrorsFound = false;
         UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
 
-        CodeForIPUnits = RT_IPUnits_OtherJ;
+        CodeForIPUnits = iRT_IPUnits::OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
-            CodeForIPUnits = RT_IPUnits_Electricity;
+            CodeForIPUnits = iRT_IPUnits::Electricity;
         } else if (has(UC_ResourceType, "GAS")) {
-            CodeForIPUnits = RT_IPUnits_Gas;
+            CodeForIPUnits = iRT_IPUnits::Gas;
         } else if (has(UC_ResourceType, "COOL")) {
-            CodeForIPUnits = RT_IPUnits_Cooling;
+            CodeForIPUnits = iRT_IPUnits::Cooling;
         }
         if (MtrUnits == OutputProcessor::Unit::m3 && has(UC_ResourceType, "WATER")) {
-            CodeForIPUnits = RT_IPUnits_Water;
+            CodeForIPUnits = iRT_IPUnits::Water;
         } else if (MtrUnits == OutputProcessor::Unit::m3) {
-            CodeForIPUnits = RT_IPUnits_OtherM3;
+            CodeForIPUnits = iRT_IPUnits::OtherM3;
         }
         if (MtrUnits == OutputProcessor::Unit::kg) {
-            CodeForIPUnits = RT_IPUnits_OtherKG;
+            CodeForIPUnits = iRT_IPUnits::OtherKG;
         }
         if (MtrUnits == OutputProcessor::Unit::L) {
-            CodeForIPUnits = RT_IPUnits_OtherL;
+            CodeForIPUnits = iRT_IPUnits::OtherL;
         }
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
@@ -3658,55 +3596,58 @@ namespace OutputProcessor {
         int Loop; // Loop Control
 
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
-            int const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
-            if (RT_forIPUnits == RT_IPUnits_Electricity) {
+            auto const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
+            switch (RT_forIPUnits) {
+            case iRT_IPUnits::Electricity:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Gas) {
+            case iRT_IPUnits::Gas:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
+            case iRT_IPUnits::Cooling:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Water) {
+            case iRT_IPUnits::Water:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherKG) {
+            case iRT_IPUnits::OtherKG:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherM3) {
+            case iRT_IPUnits::OtherM3:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3annual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherL) {
+            case iRT_IPUnits::OtherL:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else {
+            case iRT_IPUnits::OtherJ:
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+            default:
+                assert(false);
             }
         }
     }
@@ -3784,6 +3725,8 @@ namespace OutputProcessor {
         case 12:
             monthName = "DEC";
             break;
+        default:
+            assert(false);
         }
 
         const std::string StringOut = format(DateFmt, Day, monthName, Hour, Minute);
@@ -8660,9 +8603,9 @@ void ProduceRDDMDD(EnergyPlusData &state)
     //  IF (.not. DoReport) RETURN
 
     if (DoReport) {
-        ProduceReportVDD = ReportVDD_Yes;
+        ProduceReportVDD = iReportVDD::Yes;
         if (VarOption1 == std::string("IDF")) {
-            ProduceReportVDD = ReportVDD_IDF;
+            ProduceReportVDD = iReportVDD::IDF;
         }
         if (!VarOption2.empty()) {
             if (UtilityRoutines::SameString(VarOption2, "Name") || UtilityRoutines::SameString(VarOption2, "AscendingName")) {
@@ -8673,13 +8616,13 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
-    if (ProduceReportVDD == ReportVDD_Yes) {
+    if (ProduceReportVDD == iReportVDD::Yes) {
         print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
         print(state.files.mdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
         print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
-    } else if (ProduceReportVDD == ReportVDD_IDF) {
+    } else if (ProduceReportVDD == iReportVDD::IDF) {
         print(state.files.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, '\n');
         print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
@@ -8701,7 +8644,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
     }
 
     for (Item = 1; Item <= NumVariablesForOutput; ++Item) {
-        if (ProduceReportVDD == ReportVDD_Yes) {
+        if (ProduceReportVDD == iReportVDD::Yes) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), '\n');
@@ -8722,7 +8665,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
-        } else if (ProduceReportVDD == ReportVDD_IDF) {
+        } else if (ProduceReportVDD == iReportVDD::IDF) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), '\n');
@@ -8764,11 +8707,11 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     for (Item = 1; Item <= NumEnergyMeters; ++Item) {
         ItemPtr = iVariableNames(Item);
-        if (ProduceReportVDD == ReportVDD_Yes) {
+        if (ProduceReportVDD == iReportVDD::Yes) {
             print(state.files.mdd, "Zone,Meter,{}{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), '\n');
             ResultsFramework::resultsFramework->MDD.push_back("Zone,Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
-        } else if (ProduceReportVDD == ReportVDD_IDF) {
+        } else if (ProduceReportVDD == iReportVDD::IDF) {
             print(state.files.mdd, "Output:Meter,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), '\n');
             ResultsFramework::resultsFramework->MDD.push_back("Output:Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
