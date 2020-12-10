@@ -212,8 +212,8 @@ struct EnvironmentData : BaseGlobalStruct {
         this->DayOfYear = 0;
         this->DayOfYear_Schedule = 0;
         this->DifSolarRad = 0.0;
-        this->EMSBeamSolarRadOverrideOn = false;
-        this->EMSBeamSolarRadOverrideValue = 0.0;
+        this->EMSDifSolarRadOverrideOn = false;
+        this->EMSDifSolarRadOverrideValue = 0.0;
         this->DSTIndicator = 0;
         this->Elevation = 0.0;
         this->EndMonthFlag = false;
