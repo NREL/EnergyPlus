@@ -737,29 +737,29 @@ namespace HeatBalanceManager {
             BuildingAzimuth = mod(BuildingNumbers(1), 360.0);
             // Terrain
             if (AlphaName(2) == "COUNTRY" || AlphaName(2) == "1") {
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = "Country";
             } else if (AlphaName(2) == "SUBURBS" || AlphaName(2) == "2" || AlphaName(2) == "SUBURB") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Suburbs";
             } else if (AlphaName(2) == "CITY" || AlphaName(2) == "3") {
-                SiteWindExp = 0.33;
-                SiteWindBLHeight = 460.0;
+                state.dataEnvrn->SiteWindExp = 0.33;
+                state.dataEnvrn->SiteWindBLHeight = 460.0;
                 AlphaName(2) = "City";
             } else if (AlphaName(2) == "OCEAN") {
-                SiteWindExp = 0.10;
-                SiteWindBLHeight = 210.0;
+                state.dataEnvrn->SiteWindExp = 0.10;
+                state.dataEnvrn->SiteWindBLHeight = 210.0;
                 AlphaName(2) = "Ocean";
             } else if (AlphaName(2) == "URBAN") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Urban";
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = AlphaName(2) + "-invalid";
                 ErrorsFound = true;
             }
@@ -1453,9 +1453,9 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (NumNums > 0) SiteWindExp = NumArray(1);
-            if (NumNums > 1) SiteWindBLHeight = NumArray(2);
-            if (NumNums > 2) SiteTempGradient = NumArray(3);
+            if (NumNums > 0) state.dataEnvrn->SiteWindExp = NumArray(1);
+            if (NumNums > 1) state.dataEnvrn->SiteWindBLHeight = NumArray(2);
+            if (NumNums > 2) state.dataEnvrn->SiteTempGradient = NumArray(3);
 
         } else if (NumObjects > 1) {
             ShowSevereError(state, "Too many " + CurrentModuleObject + " objects, only 1 allowed.");
@@ -1466,7 +1466,7 @@ namespace HeatBalanceManager {
             // be overridden by a Site Atmospheric Variation Object.
             // SiteWindExp = 0.22
             // SiteWindBLHeight = 370.0
-            SiteTempGradient = 0.0065;
+            state.dataEnvrn->SiteTempGradient = 0.0065;
         }
 
         // Write to the initialization output file
@@ -1474,7 +1474,7 @@ namespace HeatBalanceManager {
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(state.files.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(state.files.eio, Format_720, state.dataEnvrn->SiteWindExp, state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteTempGradient);
     }
 
     void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
@@ -5355,9 +5355,9 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == state.dataGlobal->NumOfTimeStepInHour) {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
@@ -5371,12 +5371,12 @@ namespace HeatBalanceManager {
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed
         // using the zone, modify the zone  Dry/Wet BulbTemps
-        SetZoneOutBulbTempAt();
+        SetZoneOutBulbTempAt(state);
         CheckZoneOutBulbTempAt(state);
 
         // set zone level wind dir to global value
-        SetZoneWindSpeedAt();
-        SetZoneWindDirAt();
+        SetZoneWindSpeedAt(state);
+        SetZoneWindDirAt(state);
 
         // Set zone data to linked air node value if defined.
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
@@ -5773,10 +5773,10 @@ namespace HeatBalanceManager {
                             ShowContinueError(state, "Warmup Convergence failing during sizing.");
                             SizingWarmupConvergenceWarning = true;
                         }
-                        if (RunPeriodEnvironment) {
-                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + EnvironmentName + "\"");
+                        if (state.dataEnvrn->RunPeriodEnvironment) {
+                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         } else {
-                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + EnvironmentName + "\"");
+                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         }
 
                         ShowContinueError(state,
@@ -5903,7 +5903,7 @@ namespace HeatBalanceManager {
             TempZoneRptStdDev = 0.0;
             LoadZoneRptStdDev = 0.0;
 
-            if (RunPeriodEnvironment) {
+            if (state.dataEnvrn->RunPeriodEnvironment) {
                 EnvHeader = "RunPeriod:";
             } else {
                 EnvHeader = "SizingPeriod:";
@@ -5932,7 +5932,7 @@ namespace HeatBalanceManager {
                 print(state.files.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
-                      EnvHeader + ' ' + EnvironmentName,
+                      EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
                       AverageZoneTemp,
                       StdDevZoneTemp,
                       PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
@@ -6008,12 +6008,12 @@ namespace HeatBalanceManager {
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
-            if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
-                PrintEnvrnStampWarmup = true;
-                PrintEnvrnStampWarmupPrinted = true;
+            if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
+                state.dataEnvrn->PrintEnvrnStampWarmup = true;
+                state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
             }
-            if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
-            if (PrintEnvrnStampWarmup) {
+            if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
+            if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
@@ -6025,21 +6025,21 @@ namespace HeatBalanceManager {
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
-                          TimeZoneNumber,
-                          Elevation);
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
+                          state.dataEnvrn->TimeZoneNumber,
+                          state.dataEnvrn->Elevation);
 
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
-                          TimeZoneNumber,
-                          Elevation);
-                    PrintEnvrnStampWarmup = false;
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
+                          state.dataEnvrn->TimeZoneNumber,
+                          state.dataEnvrn->Elevation);
+                    state.dataEnvrn->PrintEnvrnStampWarmup = false;
                 }
             }
             CalcMoreNodeInfo(state);
@@ -7179,7 +7179,7 @@ namespace HeatBalanceManager {
             DateOff = StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
-            if (BetweenDates(DayOfYear_Schedule, StormWindow(StormWinNum).DateOn, DateOff)) {
+            if (BetweenDates(state.dataEnvrn->DayOfYear_Schedule, StormWindow(StormWinNum).DateOn, DateOff)) {
                 StormWinFlag = 1;
             } else {
                 StormWinFlag = 0;

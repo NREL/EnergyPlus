@@ -77,7 +77,6 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     // Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
 
     // USE STATEMENTS:
-    using DataEnvironment::FCGroundTemps;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -112,7 +111,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
             thisModel->fcFactorGroundTemps(i) = rNumericArgs(i);
         }
 
-        FCGroundTemps = true;
+        state.dataEnvrn->FCGroundTemps = true;
         found = true;
 
     } else if (numCurrObjects > 1) {
@@ -125,7 +124,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
             thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager->GroundTempsFCFromEPWHeader(i);
         }
 
-        FCGroundTemps = true;
+        state.dataEnvrn->FCGroundTemps = true;
         found = true;
 
     } else {
@@ -134,7 +133,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    if (FCGroundTemps) {
+    if (state.dataEnvrn->FCGroundTemps) {
         write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 

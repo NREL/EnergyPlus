@@ -1887,7 +1887,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
@@ -1955,7 +1954,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
@@ -2314,7 +2313,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
@@ -2384,7 +2382,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 

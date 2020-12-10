@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);
-    EXPECT_EQ(DataEnvironment::TotDesDays, 2);
+    EXPECT_EQ(state->dataEnvrn->TotDesDays, 2);
     EXPECT_EQ(state->dataWeatherManager->TotRunPers, 1);
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // It should have reverted the added period
     EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);
-    EXPECT_EQ(DataEnvironment::TotDesDays, 2);
+    EXPECT_EQ(state->dataEnvrn->TotDesDays, 2);
     EXPECT_EQ(state->dataWeatherManager->TotRunPers, 1);
 
     // And should have populated a 365-day array of averages

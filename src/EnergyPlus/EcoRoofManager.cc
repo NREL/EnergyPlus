@@ -293,7 +293,7 @@ namespace EcoRoofManager {
         //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
         int unit(0); // not actually used in the function it is passed into
 
-        Ws = WindSpeedAt(Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
+        Ws = DataEnvironment::WindSpeedAt(state, Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) {                                // Later we need to adjust for building roof height...
             Ws = 2.0;                                  // Set minimum possible wind speed outside vegetation to 2.0 m/s
                                                        // consistent with FASST TR-04-25 p. x (W' = 2.0)
@@ -317,10 +317,10 @@ namespace EcoRoofManager {
                                         HAirExtSurf(SurfNum));
         }
 
-        RS = BeamSolarRad + AnisoSkyMult(SurfNum) * DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
-        Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(GroundTempKelvin) +
-               1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorSky * pow_4(SkyTempKelvin);
+        Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
+               1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
 
         if (EcoRoofbeginFlag) {
             EcoRoofbeginFlag = false;
@@ -442,7 +442,7 @@ namespace EcoRoofManager {
 
             Qsoilpart2 = state.dataConstruction->Construct(ConstrNum).CTFOutside(0) - F1temp * state.dataConstruction->Construct(ConstrNum).CTFCross(0);
 
-            Pa = StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
+            Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = Tg + DataGlobalConstants::KelvinConv();
             Tak = Ta + DataGlobalConstants::KelvinConv();
 
@@ -451,7 +451,7 @@ namespace EcoRoofManager {
             // Table 1 for sigmaf_max and min (0.20 to 0.9)
 
             EpsilonOne = epsilonf + epsilong - epsilong * epsilonf; // Checked (eqn. 6 in FASST Veg Models)
-            RH = OutRelHum;                                         // Get humidity in % from the DataEnvironment.cc
+            RH = state.dataEnvrn->OutRelHum;                                         // Get humidity in % from the DataEnvironment.cc
             eair = (RH / 100.0) * 611.2 * std::exp(17.67 * Ta / (Tak - 29.65));
             qa = (0.622 * eair) / (Pa - 1.000 * eair); // Mixing Ratio of air
             Rhoa = Pa / (Rair * Tak);                  // Density of air. kg/m^3

@@ -2001,7 +2001,7 @@ namespace ChillerIndirectAbsorption {
 
                     // temperature of condensed steam leaving generator (after condensate trap)
                     Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
-                        state, fluidNameSteam, DataEnvironment::OutBaroPress, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirect + this->Name);
+                        state, fluidNameSteam, state.dataEnvrn->OutBaroPress, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirect + this->Name);
 
                     // enthalpy  of condensed steam leaving generator (after condensate trap)
                     Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(

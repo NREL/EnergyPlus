@@ -59,7 +59,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     static std::string const routineName("CoolingWaterflowSizingGauntlet");
 
@@ -146,7 +146,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000149, sizedValue, 0.000001);
-    EXPECT_NEAR(1.2, DataEnvironment::StdRhoAir, 0.01);
+    EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
     Real64 previousWaterFlow = sizedValue;
     sizer.autoSizedValue = 0.0; // reset for next test
     sizedValue = 0.0;
@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_GT(sizedValue, previousWaterFlow); // water flow rate is greater with fan heat than without
 
     // test fan heat
-    Real64 desVolFlow = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolMassFlow / DataEnvironment::StdRhoAir;
+    Real64 desVolFlow = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     Real64 desFanHeat = sizer.calcFanDesHeatGain(desVolFlow);
     EXPECT_FALSE(sizer.fanCompModel); // fan is not a component model type
     EXPECT_NEAR(237.5, desFanHeat, 0.001);

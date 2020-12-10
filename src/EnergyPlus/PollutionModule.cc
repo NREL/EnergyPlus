@@ -84,19 +84,6 @@ namespace PollutionModule {
     //         STEP 3:  All energy numbers have been converted to units of MJ's or 1x10^6 Joules.
     //         STEP 4:  Environmental Impact Factors are calculated from Coefficients
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
-    using DataEnvironment::DayOfMonth;
-    using DataEnvironment::EndMonthFlag;
-    using DataEnvironment::Month;
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ElecPollFactor(1);
     int const NatGasPollFactor(2);

@@ -530,7 +530,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 12;
     state->dataGlobal->CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(*state, DataEnvironment::SOLCOS);
+    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
@@ -552,7 +552,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // check the slat angle
     EXPECT_NEAR(-71.0772, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
-    DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
+    DaylightingManager::ProfileAngle(SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
     EXPECT_NEAR(-DataGlobalConstants::RadToDeg() * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
@@ -885,7 +885,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 12;
     state->dataGlobal->CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(*state, DataEnvironment::SOLCOS);
+    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get equivalent layer window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
@@ -907,7 +907,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // check the VB slat angle
     EXPECT_NEAR(18.9228, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
-    DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
+    DaylightingManager::ProfileAngle(SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
     EXPECT_NEAR(90.0 - DataGlobalConstants::RadToDeg() * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobalConstants::RadToDeg() * ProfAngVer);
