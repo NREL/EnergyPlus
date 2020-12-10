@@ -8762,6 +8762,7 @@ namespace SolarShading {
 
                 int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
                 SurfWinShadingFlag(ISurf) = WinShadingFlag::ShadeOff; // Initialize shading flag to off
+                SurfWinShaded(ISurf) = false;
 
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
@@ -8915,7 +8916,6 @@ namespace SolarShading {
                     if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
                         SurfWinGlareControlIsActive(ISurf) = true;
-//                        SurfWinShadingFlag(ISurf) = WinShadingFlag::GlassConditionallyLightened;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
