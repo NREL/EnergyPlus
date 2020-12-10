@@ -123,7 +123,6 @@ namespace HVACDuct {
                  int &CompIndex                                  // index of duct component
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005
@@ -178,7 +177,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetDuctInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005

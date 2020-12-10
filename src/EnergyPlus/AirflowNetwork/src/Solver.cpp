@@ -153,7 +153,6 @@ namespace AirflowNetwork {
 
     void Solver::allocate()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Aug. 2003
@@ -609,7 +608,6 @@ EnergyPlusData & state = getCurrentState();
 
     void Solver::solvzp(int &ITER)  // number of iterations
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -815,7 +813,6 @@ EnergyPlusData & state = getCurrentState();
                         bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -1038,7 +1035,6 @@ EnergyPlusData & state = getCurrentState();
                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1297,7 +1293,6 @@ EnergyPlusData & state = getCurrentState();
                 int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -2305,7 +2300,6 @@ EnergyPlusData & state = getCurrentState();
                 Real64 &RhoDr     // Air density of dry air on the link level used
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005

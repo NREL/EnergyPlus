@@ -70,7 +70,6 @@ namespace WindowManager {
 
     std::unique_ptr<CWindowModel> CWindowModel::WindowModelFactory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -116,7 +115,6 @@ namespace WindowManager {
 
     std::unique_ptr<CWindowOpticalModel> CWindowOpticalModel::WindowOpticalModelFactory()
     {
-        EnergyPlusData & state = getCurrentState();
         // Process input data and counts if number of complex fenestration objects is greater
         // than zero in which case it will use BSDF window model
         std::unique_ptr<CWindowOpticalModel> aModel = std::unique_ptr<CWindowOpticalModel>(new CWindowOpticalModel());

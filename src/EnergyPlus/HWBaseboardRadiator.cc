@@ -164,7 +164,6 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1242,7 +1241,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1485,7 +1483,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1547,7 +1544,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DistributeBBRadGains()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001

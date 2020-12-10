@@ -3979,7 +3979,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SizeAirLoops()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2001
@@ -7640,7 +7639,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const CompTypeNum, std::string const CompName)
     {
-        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil whcih is part of CoilSystem:Cooling:Water:HeatExchangerAssisted
         // and that has water controller is on primary air loop branch or outdoor air system. Searches for water coilsystem

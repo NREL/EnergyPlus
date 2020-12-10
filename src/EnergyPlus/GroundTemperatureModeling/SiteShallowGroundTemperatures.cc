@@ -182,7 +182,6 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unused]] Rea
 
 Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
-    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

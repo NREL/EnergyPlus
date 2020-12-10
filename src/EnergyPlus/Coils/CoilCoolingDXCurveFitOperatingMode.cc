@@ -63,7 +63,6 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
-    EnergyPlusData & state = getCurrentState();
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
@@ -107,7 +106,6 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find)
 {
-    EnergyPlusData & state = getCurrentState();
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
         // error

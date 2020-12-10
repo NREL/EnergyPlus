@@ -139,7 +139,6 @@ namespace MoistureBalanceEMPDManager {
                                Material::MaterialProperties const &mat // material
     )
     {
-EnergyPlusData & state = getCurrentState();
         // Assume T, RH, P
         Real64 const T = 24.0; // C
         Real64 const RH = 0.45;

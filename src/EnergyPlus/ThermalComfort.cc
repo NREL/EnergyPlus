@@ -1531,7 +1531,6 @@ EnergyPlusData & state = getCurrentState();
 
     void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000

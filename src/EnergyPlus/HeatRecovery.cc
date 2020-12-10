@@ -216,7 +216,6 @@ namespace HeatRecovery {
                          Optional_int_const CompanionCoilType_Num // cooling coil type of coil
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -340,7 +339,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHeatRecoveryInput()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -1556,7 +1554,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SizeHeatRecovery(int const ExchNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -3278,7 +3275,6 @@ EnergyPlusData & state = getCurrentState();
                                  Real64 &Eps        // heat exchanger effectiveness
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3365,7 +3361,6 @@ EnergyPlusData & state = getCurrentState();
                                  Real64 const Eps   // heat exchanger effectiveness
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3470,7 +3465,6 @@ EnergyPlusData & state = getCurrentState();
                                          Real64 const Z    // capacity rate ratio
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -5085,7 +5079,6 @@ EnergyPlusData & state = getCurrentState();
                            bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5124,7 +5117,6 @@ EnergyPlusData & state = getCurrentState();
                             bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5163,7 +5155,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5202,7 +5193,6 @@ EnergyPlusData & state = getCurrentState();
                                bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5241,7 +5231,6 @@ EnergyPlusData & state = getCurrentState();
                                 bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -5281,7 +5270,6 @@ EnergyPlusData & state = getCurrentState();
                                       bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -5323,7 +5311,6 @@ EnergyPlusData & state = getCurrentState();
                               Optional<Real64> SecondaryAirVolFlow // HX secondary air flow rate [m3/s]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007

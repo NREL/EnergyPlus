@@ -5443,7 +5443,6 @@ namespace EnergyPlus::DaylightingManager {
 
     void GetLightWellData(bool &ErrorsFound) // If errors found in input
     {
-            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Apr 2004
@@ -10673,7 +10672,6 @@ namespace EnergyPlus::DaylightingManager {
 
     void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
-                            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2009

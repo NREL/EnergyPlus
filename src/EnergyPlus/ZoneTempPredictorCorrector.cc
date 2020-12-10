@@ -190,7 +190,6 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   September 1998
@@ -6636,7 +6635,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool VerifyThermostatInZone(std::string const &ZoneName) // Zone to verify
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -6826,7 +6824,6 @@ EnergyPlusData & state = getCurrentState();
 
     void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2006
@@ -7377,7 +7374,6 @@ EnergyPlusData & state = getCurrentState();
                        Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006

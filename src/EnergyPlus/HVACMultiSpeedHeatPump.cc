@@ -232,7 +232,6 @@ namespace HVACMultiSpeedHeatPump {
                        int &CompIndex                 // Index to changeover-bypass VAV system
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, Florida Solar Energy Center
         //       DATE WRITTEN   June. 2007
@@ -3753,7 +3752,6 @@ EnergyPlusData & state = getCurrentState();
                                Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -3832,7 +3830,6 @@ EnergyPlusData & state = getCurrentState();
                                 Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -4015,7 +4012,6 @@ EnergyPlusData & state = getCurrentState();
 
     void MSHPHeatRecovery(int const MSHeatPumpNum) // Number of the current electric MSHP being simulated
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu
         //       DATE WRITTEN:    June 2007
@@ -4100,7 +4096,6 @@ EnergyPlusData & state = getCurrentState();
                            Optional<Real64 const> SpeedRatio // Speed ratio
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing
         //       DATE WRITTEN   June 2007
@@ -4231,7 +4226,6 @@ EnergyPlusData & state = getCurrentState();
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
                                Optional<Real64 const> PartLoadFrac)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -4432,7 +4426,6 @@ EnergyPlusData & state = getCurrentState();
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   November 2011

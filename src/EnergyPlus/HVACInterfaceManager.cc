@@ -1282,7 +1282,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetupCommonPipes()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2010

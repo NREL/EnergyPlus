@@ -245,7 +245,6 @@ namespace AirflowNetwork {
                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -655,7 +654,6 @@ EnergyPlusData & state = getCurrentState();
                                 std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -761,7 +759,6 @@ EnergyPlusData & state = getCurrentState();
                             std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -856,7 +853,6 @@ EnergyPlusData & state = getCurrentState();
                             std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1051,7 +1047,6 @@ EnergyPlusData & state = getCurrentState();
                                std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1179,7 +1174,6 @@ EnergyPlusData & state = getCurrentState();
                                std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1599,7 +1593,6 @@ EnergyPlusData & state = getCurrentState();
                                    std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -2058,7 +2051,6 @@ EnergyPlusData & state = getCurrentState();
                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -3194,7 +3186,6 @@ EnergyPlusData & state = getCurrentState();
                                   std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -3323,7 +3314,6 @@ EnergyPlusData & state = getCurrentState();
                                   std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -3438,7 +3428,6 @@ EnergyPlusData & state = getCurrentState();
                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Apr. 2009

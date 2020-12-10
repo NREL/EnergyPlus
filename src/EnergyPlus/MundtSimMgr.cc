@@ -135,7 +135,6 @@ namespace MundtSimMgr {
 
     void ManageMundtModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   July 2003

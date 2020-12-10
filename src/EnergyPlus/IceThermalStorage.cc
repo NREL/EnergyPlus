@@ -141,7 +141,6 @@ namespace IceThermalStorage {
 
     PlantComponent *SimpleIceStorageData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (getITSInput) {
             GetIceStorageInput();
@@ -162,7 +161,6 @@ namespace IceThermalStorage {
 
     PlantComponent *DetailedIceStorageData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (getITSInput) {
             GetIceStorageInput();
@@ -1070,7 +1068,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SimpleIceStorageData::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
 
         SetupOutputVariable("Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemain, "Zone", "Average", this->Name);
@@ -1092,7 +1089,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DetailedIceStorageData::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, this->CompLoad, "System", "Average", this->Name);
 
         SetupOutputVariable("Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, this->IceFracChange, "System", "Average", this->Name);
@@ -1332,7 +1328,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SimpleIceStorageData::CalcIceStorageDormant()
     {
-        EnergyPlusData & state = getCurrentState();
         // Provide output results for ITS.
         this->ITSMassFlowRate = 0.0; //[kg/s]
 
@@ -1358,7 +1353,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SimpleIceStorageData::CalcIceStorageCharge()
     {
-        EnergyPlusData & state = getCurrentState();
         //--------------------------------------------------------
         // Initialize
         //--------------------------------------------------------
@@ -1509,7 +1503,6 @@ EnergyPlusData & state = getCurrentState();
                                                        Real64 const MaxCap  // Max possible discharge rate (positive value)
     )
     {
-        EnergyPlusData & state = getCurrentState();
         std::string const RoutineName("SimpleIceStorageData::CalcIceStorageDischarge");
 
         // Initialize processed Rate and Energy
@@ -1708,7 +1701,6 @@ EnergyPlusData & state = getCurrentState();
                      Real64 const MassFlowstar  // normalized mass flow rate through the ice storage unit
     )
     {
-EnergyPlusData & state = getCurrentState();
         Real64 CalcQstar;
 
         if (CurveIndVarType == CurveVars::FracChargedLMTD) {

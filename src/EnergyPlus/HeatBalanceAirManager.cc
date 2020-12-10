@@ -153,7 +153,6 @@ namespace HeatBalanceAirManager {
 
     void ManageAirHeatBalance()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -211,7 +210,6 @@ namespace HeatBalanceAirManager {
 
     void GetAirHeatBalanceInput()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -4277,7 +4275,6 @@ EnergyPlusData & state = getCurrentState();
     // END Algorithm Section of the Module
 
     void initializeForExternalHVACManager() {
-        EnergyPlusData & state = getCurrentState();
         // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
         // to allow an external hvac manager to play nice with E+
         EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints();

@@ -10922,7 +10922,6 @@ EnergyPlusData & state = getCurrentState();
 
     void RefrigSystemData::CalcDetailedSystem(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, Assisted by Hugh Henderson
         //       DATE WRITTEN   Spring 2008
@@ -11000,7 +10999,6 @@ EnergyPlusData & state = getCurrentState();
 
     void TransRefrigSystemData::CalcDetailedTransSystem(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brian A. Fricke, ORNL
         //       DATE WRITTEN   Fall 2011

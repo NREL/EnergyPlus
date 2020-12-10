@@ -138,7 +138,6 @@ namespace ChillerReformulatedEIR {
     void ReformulatedEIRChillerSpecs::getDesignCapacities(
         const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;
             MaxLoad = this->RefCap * this->MaxPartLoadRat;
@@ -163,7 +162,6 @@ namespace ChillerReformulatedEIR {
 
     void ReformulatedEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         bool runFlag = true;
         Real64 myLoad = 0.0;
         this->initialize(runFlag, myLoad);
@@ -175,7 +173,6 @@ namespace ChillerReformulatedEIR {
 
     void ReformulatedEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2004
@@ -1594,7 +1591,6 @@ namespace ChillerReformulatedEIR {
                                                        Real64 &QHeatRec            // Amount of heat recovered [W]
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2006
@@ -1739,7 +1735,6 @@ namespace ChillerReformulatedEIR {
 
     Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(Real64 const FalsiCondOutTemp, Array1D<Real64> const &Par)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006

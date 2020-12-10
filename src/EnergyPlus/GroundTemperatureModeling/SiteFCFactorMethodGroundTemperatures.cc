@@ -198,7 +198,6 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unuse
 
 Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
-    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

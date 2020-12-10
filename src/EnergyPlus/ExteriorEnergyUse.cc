@@ -445,7 +445,6 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2001

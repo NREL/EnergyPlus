@@ -103,7 +103,6 @@ namespace PlantLoadProfile {
 
     PlantComponent *PlantProfileData::factory(std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetPlantLoadProfileInputFlag) {
             GetPlantProfileInput();
             GetPlantLoadProfileInputFlag = false;
@@ -130,7 +129,6 @@ namespace PlantLoadProfile {
                                     [[maybe_unused]] Real64 &CurLoad,
                                     [[maybe_unused]] bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004

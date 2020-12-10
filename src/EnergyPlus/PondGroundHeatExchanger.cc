@@ -467,7 +467,6 @@ namespace PondGroundHeatExchanger {
 
     void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger()
     {
-        EnergyPlusData & state = getCurrentState();
 
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
@@ -840,7 +839,6 @@ EnergyPlusData & state = getCurrentState();
 
     void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002

@@ -133,7 +133,6 @@ namespace DisplacementVentMgr {
 
     void ManageUCSDDVModel(int const ZoneNum) // index number for the specified zone
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004

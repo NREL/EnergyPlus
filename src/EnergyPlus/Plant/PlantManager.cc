@@ -706,7 +706,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void GetPlantInput() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
             //       DATE WRITTEN   April 2005
@@ -2911,7 +2910,6 @@ EnergyPlusData & state = getCurrentState();
 
         void SizePlantLoop(int const LoopNum, // Supply side loop being simulated
                            bool const OkayToFinish) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Fred Buhl
             //       DATE WRITTEN   December 2001
@@ -3146,7 +3144,6 @@ EnergyPlusData & state = getCurrentState();
 
         void ResizePlantLoopLevelSizes(int const LoopNum // Supply side loop being simulated
         ) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Jan 2015
@@ -3353,7 +3350,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void RevisePlantCallingOrder() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   april 2011
@@ -3503,7 +3499,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void SetupBranchControlTypes() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   March 2010
@@ -4255,7 +4250,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void CheckOngoingPlantWarnings() {
-            EnergyPlusData & state = getCurrentState();
             int LoopNum;
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time

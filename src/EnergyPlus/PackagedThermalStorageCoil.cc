@@ -173,7 +173,6 @@ namespace PackagedThermalStorageCoil {
                     Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -2324,7 +2323,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcTESCoilOffMode(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4231,7 +4229,6 @@ EnergyPlusData & state = getCurrentState();
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4311,7 +4308,6 @@ EnergyPlusData & state = getCurrentState();
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4389,7 +4385,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateTEStorage(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4659,7 +4654,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateColdWeatherProtection(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2013
@@ -4705,7 +4699,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2013
@@ -4812,7 +4805,6 @@ EnergyPlusData & state = getCurrentState();
     void
     GetTESCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2013
@@ -4848,7 +4840,6 @@ EnergyPlusData & state = getCurrentState();
     void GetTESCoilAirInletNode(
         std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4886,7 +4877,6 @@ EnergyPlusData & state = getCurrentState();
     void GetTESCoilAirOutletNode(
         std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4924,7 +4914,6 @@ EnergyPlusData & state = getCurrentState();
     void GetTESCoilCoolingCapacity(
         std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4970,7 +4959,6 @@ EnergyPlusData & state = getCurrentState();
     void GetTESCoilCoolingAirFlowRate(
         std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   September 2015

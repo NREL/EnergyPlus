@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
-    EnergyPlusData & state = getCurrentState();
     if (!good()) {
         open(false, output_to_file);
     }
@@ -178,7 +177,6 @@ void InputFile::backspace() noexcept
 
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
-    EnergyPlusData & state = getCurrentState();
     if (!good()) {
         open(false, output_to_file);
     }

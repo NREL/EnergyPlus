@@ -235,7 +235,6 @@ namespace WindowManager {
 
     std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WavelengthRange const t_Range, int const t_ConstrNum)
     {
-        EnergyPlusData & state = getCurrentState();
         auto it = m_Equivalent.find(std::make_pair(t_Range, t_ConstrNum));
         if (it == m_Equivalent.end()) {
             // Layer was not requested before. Need to create it now.
@@ -261,7 +260,6 @@ namespace WindowManager {
 
     IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
     {
-        EnergyPlusData & state = getCurrentState();
         Layers_Map aMap = m_Layers.at(t_Range);
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {

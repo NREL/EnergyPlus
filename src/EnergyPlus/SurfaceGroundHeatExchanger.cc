@@ -1019,7 +1019,6 @@ EnergyPlusData & state = getCurrentState();
                                                             Real64 const WaterMassFlow // Mass flow rate, in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000

@@ -262,7 +262,6 @@ namespace LowTempRadiantSystem {
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -1562,7 +1561,6 @@ EnergyPlusData & state = getCurrentState();
 
     FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(std::string const userInput)
     {
-        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(userInput, "ConvectionOnly")) {
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
         } else if (UtilityRoutines::SameString(userInput, "ISOStandard")) {
@@ -1579,7 +1577,6 @@ EnergyPlusData & state = getCurrentState();
                                                                                        std::string const &controlInputField,
                                                                                        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
     {
-        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
         } else if (UtilityRoutines::SameString(controlInput, "MeanRadiantTemperature")) {
@@ -1608,7 +1605,6 @@ EnergyPlusData & state = getCurrentState();
     LowTempRadiantSetpointTypes RadiantSystemBaseData::processRadiantSystemSetpointInput(std::string const &controlInput,
                                                                                          std::string const &controlInputField)
     {
-        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
             return LowTempRadiantSetpointTypes::halfFlowPower;
         } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
@@ -3134,7 +3130,6 @@ EnergyPlusData & state = getCurrentState();
 
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -3785,7 +3780,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2003
@@ -4833,7 +4827,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -4970,7 +4963,6 @@ EnergyPlusData & state = getCurrentState();
 
     void VariableFlowRadiantSystemData::updateLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataLoopNode::Node;
@@ -5050,7 +5042,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ConstantFlowRadiantSystemData::updateLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataLoopNode::Node;
@@ -5127,7 +5118,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HydronicSystemBaseData::checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2013
@@ -5181,7 +5171,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature()
     {
-        EnergyPlusData & state = getCurrentState();
         switch (this->ControlType) {
         case LowTempRadiantControlTypes::MATControl:
             return DataHeatBalFanSys::MAT(this->ZonePtr);
@@ -5223,7 +5212,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 RadiantSystemBaseData::setOffTemperatureLowTemperatureRadiantSystem(const int scheduleIndex, const Real64 throttlingRange)
     {
-        EnergyPlusData & state = getCurrentState();
         Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(scheduleIndex);
         switch (this->SetpointType) {
         case LowTempRadiantSetpointTypes::halfFlowPower:
@@ -5245,7 +5233,6 @@ EnergyPlusData & state = getCurrentState();
                                                          Real64 const NumCircs       // Number of fluid circuits in this surface
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -5582,7 +5569,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ConstantFlowRadiantSystemData::reportLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;

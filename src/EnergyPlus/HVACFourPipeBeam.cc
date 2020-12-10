@@ -499,7 +499,6 @@ namespace FourPipeBeam {
                                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // initialize the unit
         this->init(FirstHVACIteration);
 
@@ -1063,7 +1062,6 @@ EnergyPlusData & state = getCurrentState();
                                    Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using PlantUtilities::SetComponentFlowRate;
@@ -1255,7 +1253,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HVACFourPipeBeam::calc()
     {
-EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
@@ -1390,7 +1387,6 @@ EnergyPlusData & state = getCurrentState();
     Real64 HVACFourPipeBeam::residualCooling(Real64 const cWFlow // cold water flow rate in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState();
         Real64 Residuum; // residual to be minimized to zero
         this->mDotHW = 0.0;
         this->mDotCW = cWFlow;
@@ -1405,7 +1401,6 @@ EnergyPlusData & state = getCurrentState();
     Real64 HVACFourPipeBeam::residualHeating(Real64 const hWFlow // hot water flow rate in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState();
         Real64 Residuum; // residual to be minimized to zero
         this->mDotHW = hWFlow;
         this->mDotCW = 0.0;

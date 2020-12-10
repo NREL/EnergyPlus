@@ -1887,7 +1887,6 @@ namespace FaultsManager {
 
     Real64 FaultProperties::CalFaultOffsetAct()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jun. 2016
@@ -1921,7 +1920,6 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesFouling::CalFoulingFactor()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov. 2016
@@ -1960,7 +1958,6 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jul. 2016
@@ -1998,7 +1995,6 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesFoulingCoil::FaultFraction()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec, EffiBEM
         //       DATE WRITTEN   Feb. 2020

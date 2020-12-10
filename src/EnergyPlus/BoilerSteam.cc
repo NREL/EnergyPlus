@@ -113,7 +113,6 @@ namespace BoilerSteam {
     void BoilerSpecs::simulate(
         [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
@@ -123,7 +122,6 @@ namespace BoilerSteam {
     void
     BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -136,7 +134,6 @@ namespace BoilerSteam {
 
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         this->autosize();
     }
@@ -424,7 +421,6 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Heating Energy",
                             OutputProcessor::Unit::J,
@@ -555,7 +551,6 @@ namespace BoilerSteam {
                                 DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004

@@ -152,7 +152,6 @@ namespace Humidifiers {
                        int &CompIndex                                  // Pointer to Humidifier Unit
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -234,7 +233,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHumidifierInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -1396,7 +1394,6 @@ EnergyPlusData & state = getCurrentState();
                            bool &ErrorsFound
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1435,7 +1432,6 @@ EnergyPlusData & state = getCurrentState();
         bool &ErrorsFound
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given humidifier and returns the air outlet node number.
         // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.

@@ -102,7 +102,6 @@ namespace HybridUnitaryAirConditioners {
                                              int &CompIndex                  // index to zone hvac unit
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
         //       DATE WRITTEN   October 2017
@@ -1218,7 +1217,6 @@ namespace HybridUnitaryAirConditioners {
     }
     int GetHybridUnitaryACOutAirNode(int const CompNum)
     {
-        EnergyPlusData & state = getCurrentState();
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
             GetInputZoneHybridUnitaryAirConditioners(errorsfound);
@@ -1236,7 +1234,6 @@ namespace HybridUnitaryAirConditioners {
 
     int GetHybridUnitaryACZoneInletNode(int const CompNum)
     {
-        EnergyPlusData & state = getCurrentState();
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
             GetInputZoneHybridUnitaryAirConditioners(errorsfound);
@@ -1254,7 +1251,6 @@ namespace HybridUnitaryAirConditioners {
 
     int GetHybridUnitaryACReturnAirNode(int const CompNum)
     {
-        EnergyPlusData & state = getCurrentState();
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
             GetInputZoneHybridUnitaryAirConditioners(errorsfound);

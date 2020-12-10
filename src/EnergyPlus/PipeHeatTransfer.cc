@@ -171,7 +171,6 @@ namespace PipeHeatTransfer {
 
     PlantComponent *PipeHTData::factory(int objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
             GetPipesHeatTransfer();
@@ -202,7 +201,6 @@ namespace PipeHeatTransfer {
                               [[maybe_unused]] Real64 &CurLoad,
                               [[maybe_unused]] bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         this->InitPipesHeatTransfer(FirstHVACIteration);
         // make the calculations
         for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
@@ -1041,7 +1039,6 @@ EnergyPlusData & state = getCurrentState();
 
     void PipeHTData::CalcPipesHeatTransfer(Optional_int_const LengthIndex)
     {
-EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007
         //       MODIFIED       na
@@ -1587,7 +1584,6 @@ EnergyPlusData & state = getCurrentState();
                                              Real64 const Diameter      // Pipe diameter, m
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007

@@ -1078,7 +1078,6 @@ namespace CoolingPanelSimple {
 
     bool CoolingPanelParams::SizeCoolingPanelUA()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
@@ -1437,7 +1436,6 @@ namespace CoolingPanelSimple {
 
     void CoolingPanelParams::SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 2016

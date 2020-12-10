@@ -1296,7 +1296,6 @@ EnergyPlusData & state = getCurrentState();
                                                int const ControlMode       // temperature or humidity control mode
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   January 2013
@@ -7277,7 +7276,6 @@ EnergyPlusData & state = getCurrentState();
     void UnitarySys::calcUnitarySuppSystemToSP(bool const FirstHVACIteration // True when first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -13880,7 +13878,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UnitarySys::unitarySystemHeatRecovery()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    May 2013
@@ -15524,7 +15521,6 @@ EnergyPlusData & state = getCurrentState();
                                              std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006

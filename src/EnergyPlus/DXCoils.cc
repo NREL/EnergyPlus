@@ -244,7 +244,6 @@ namespace DXCoils {
                    Optional<Real64 const> CompCyclingRatio            // cycling ratio of VRF condenser connected to this TU
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -370,7 +369,6 @@ namespace DXCoils {
                              Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -10870,7 +10868,6 @@ namespace DXCoils {
                                                 int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   May 2010
@@ -10958,7 +10955,6 @@ namespace DXCoils {
                    bool const PrintFlag         // flag used to print warnings if desired
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl using Don Shirey's code
@@ -11193,7 +11189,6 @@ namespace DXCoils {
                        std::string const &CallingRoutine // function name calling this routine
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   December 2015
@@ -11439,7 +11434,6 @@ namespace DXCoils {
                        Real64 &TotCapModFac           // capacity modification factor, func of temp and func of flow
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl using Don Shirey's code
@@ -14011,7 +14005,6 @@ namespace DXCoils {
                         Optional_string_const ThisObjectType,
                         Optional_bool_const SuppressWarning)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14044,7 +14037,6 @@ namespace DXCoils {
     std::string GetDXCoilName(
         int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14083,7 +14075,6 @@ namespace DXCoils {
                            bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -14147,7 +14138,6 @@ namespace DXCoils {
                                       bool &ErrorsFound       // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14200,7 +14190,6 @@ namespace DXCoils {
                        Optional_bool_const PrintWarning // prints warning when true
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
@@ -14249,7 +14238,6 @@ namespace DXCoils {
                                bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -14308,7 +14296,6 @@ namespace DXCoils {
                                          bool &ErrorsFound    // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
@@ -14347,7 +14334,6 @@ namespace DXCoils {
                          bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -14386,7 +14372,6 @@ namespace DXCoils {
                            bool &ErrorsFound     // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         int NodeNumber; // returned node number of matched coil
 
@@ -14412,7 +14397,6 @@ namespace DXCoils {
                           bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -14452,7 +14436,6 @@ namespace DXCoils {
                             bool &ErrorsFound     // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         int NodeNumber; // returned node number of matched coil
 
@@ -14478,7 +14461,6 @@ namespace DXCoils {
                                   bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
@@ -14517,7 +14499,6 @@ namespace DXCoils {
                                      bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
@@ -14655,7 +14636,6 @@ namespace DXCoils {
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         L. Gu
@@ -14695,7 +14675,6 @@ namespace DXCoils {
                              Optional_int_const CoilIndex // Coil index number
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14750,7 +14729,6 @@ namespace DXCoils {
                             bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14803,7 +14781,6 @@ namespace DXCoils {
                                  bool &ErrorsFound    // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -14876,7 +14853,6 @@ namespace DXCoils {
                               Optional_string SupplyFanName,
                               Optional_int SupplyFan_TypeNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2008
@@ -15009,7 +14985,6 @@ namespace DXCoils {
                                     std::string const &CoilName  // must match coil names for the coil type
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2012
@@ -15041,7 +15016,6 @@ namespace DXCoils {
     void SetCoilSystemCoolingData(std::string const &CoilName, // must match coil names for the coil type
                                   std::string const &CoilSystemName)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -15074,7 +15048,6 @@ namespace DXCoils {
                                     Real64 const SHRRated          // rated sensible heat ratio, user input
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
@@ -15134,7 +15107,6 @@ namespace DXCoils {
 
     void SetDXCoilTypeData(std::string const &CoilName) // must match coil names for the coil type
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse
         //       DATE WRITTEN   January 2013
@@ -16642,7 +16614,6 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
@@ -16843,7 +16814,6 @@ namespace DXCoils {
 
     void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
         //       DATE WRITTEN   March, 2018

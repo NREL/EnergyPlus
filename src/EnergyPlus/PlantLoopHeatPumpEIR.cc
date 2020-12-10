@@ -80,7 +80,6 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                         Real64 &CurLoad,
                                         bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState();
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
@@ -119,7 +118,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp() const
     {
-        EnergyPlusData & state = getCurrentState();
         auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
         auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
@@ -161,7 +159,6 @@ EnergyPlusData & state = getCurrentState();
 
     void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP()
     {
-        EnergyPlusData & state = getCurrentState();
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
@@ -241,7 +238,6 @@ EnergyPlusData & state = getCurrentState();
 
     void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP()
     {
-        EnergyPlusData & state = getCurrentState();
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
@@ -518,7 +514,6 @@ EnergyPlusData & state = getCurrentState();
 
     void EIRPlantLoopHeatPump::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->loadSideLocation.loopNum) {
             this->sizeLoadSide();
             if (this->waterSource) {

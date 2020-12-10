@@ -120,7 +120,6 @@ namespace EarthTube {
 
     void ManageEarthTube()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -514,7 +513,6 @@ namespace EarthTube {
                                 bool &ErrorsFound            // Found a problem
     )
     {
-        EnergyPlusData & state = getCurrentState();
         int Loop;
         int Loop1;
 

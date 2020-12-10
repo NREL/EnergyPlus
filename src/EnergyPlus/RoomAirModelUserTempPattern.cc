@@ -111,7 +111,6 @@ namespace RoomAirModelUserTempPattern {
 
     void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   January 2004/Aug 2005

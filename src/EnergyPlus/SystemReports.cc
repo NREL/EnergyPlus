@@ -3825,7 +3825,6 @@ EnergyPlusData & state = getCurrentState();
                              Real64 const CompLoad,
                              Real64 const CompEnergy)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Nov. 2005

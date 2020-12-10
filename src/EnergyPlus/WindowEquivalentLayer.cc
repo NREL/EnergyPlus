@@ -360,7 +360,6 @@ EnergyPlusData & state = getCurrentState();
                              Real64 &UNFRC    // NFRC U-factor, W/m2-K
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT/Chip Barnaby
         //       DATE WRITTEN   Last Modified February 2008
@@ -451,7 +450,6 @@ EnergyPlusData & state = getCurrentState();
                                          Real64 &TransNormal // transmittance at normal incidence
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   May 2013
@@ -566,7 +564,6 @@ EnergyPlusData & state = getCurrentState();
                                       Real64 const HProfA  // inc solar horizontal profile angle, radians
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         University of WaterLoo
         //       DATE WRITTEN   unknown
@@ -948,7 +945,6 @@ EnergyPlusData & state = getCurrentState();
                std::string const &WHAT // identifier for err msg
     )
     {
-        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
         //       MODIFIED       Bereket Nigusse, May 2013
@@ -982,7 +978,6 @@ EnergyPlusData & state = getCurrentState();
                   const Array1D<Real64> &F_P                                                          // parameters passed to F()
     )
     {
-        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
         //       MODIFIED       na
@@ -993,8 +988,14 @@ EnergyPlusData & state = getCurrentState();
         // METHODOLOGY EMPLOYED:
         //  Romberg Integration.
 
+#ifdef _DEBUG
         // Argument array dimensioning
+        // I had to wrap this in a debug block because
+        // in a debug build, state was delcared and used properly one time here in the array check, but
+        // but in a release build, state was unused since it got optimized away
+        EnergyPlusData & state = getCurrentState();
         EP_SIZE_CHECK(F_P, state.dataWindowEquivalentLayer->hipDIM);
+#endif
 
         static int const KMAX(8); // max steps
         static int const NPANMAX(std::pow(2, KMAX));
@@ -1134,7 +1135,6 @@ EnergyPlusData & state = getCurrentState();
                  Real64 &TAU_BD        // returned: beam-diffuse transmittance
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         John L. Wright, University of Waterloo,
         //                      Mechanical Engineering, Advanced Glazing System Laboratory
@@ -1281,7 +1281,6 @@ EnergyPlusData & state = getCurrentState();
                  Real64 &TAU_BD        // returned: beam-diffuse transmittance
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         John L. Wright, University of Waterloo,
         //                      Mechanical Engineering, Advanced Glazing System Laboratory
@@ -1466,7 +1465,6 @@ EnergyPlusData & state = getCurrentState();
                  Real64 &TAU_BD        // returned: fabric beam-diffuse transmittance
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         John L. Wright, University of Waterloo,
         //                      Mechanical Engineering, Advanced Glazing System Laboratory
@@ -1525,7 +1523,6 @@ EnergyPlusData & state = getCurrentState();
                Real64 &TAULW_PD              // returned: drape effective LW transmittance
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         John L. Wright, University of Waterloo,
         //                      Mechanical Engineering, Advanced Glazing System Laboratory
@@ -3655,7 +3652,6 @@ EnergyPlusData & state = getCurrentState();
                  Real64 &TAUVB             // returned: effective diffuse transmittance of venetian blind
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         John L. Wright, University of Waterloo,
         //                      Mechanical Engineering, Advanced Glazing System Laboratory
@@ -6371,7 +6367,6 @@ EnergyPlusData & state = getCurrentState();
                     Real64 &U           // returned: U factor, W/m2-K
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         unknown (University of WaterLoo, ASHRAE 1311-RP)
         //       DATE WRITTEN   unknown
@@ -6744,7 +6739,6 @@ EnergyPlusData & state = getCurrentState();
                                     CFSSWP &LSWP_ON       // returned: off-normal properties
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
         //                      Advanced Glazing System Laboratory
@@ -6984,7 +6978,6 @@ EnergyPlusData & state = getCurrentState();
 
     void Specular_EstimateDiffuseProps(CFSSWP &SWP) // short wave properties
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
         //                      Advanced Glazing System Laboratory
@@ -7047,7 +7040,6 @@ EnergyPlusData & state = getCurrentState();
                 Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7135,7 +7127,6 @@ EnergyPlusData & state = getCurrentState();
                 Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7191,7 +7182,6 @@ EnergyPlusData & state = getCurrentState();
 
     void Fabric_EstimateDiffuseProps(CFSSWP &SWP) // fabric short wave properties
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
         //                      Advanced Glazing System Laboratory
@@ -7221,7 +7211,6 @@ EnergyPlusData & state = getCurrentState();
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7257,7 +7246,6 @@ EnergyPlusData & state = getCurrentState();
                 Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7336,7 +7324,6 @@ EnergyPlusData & state = getCurrentState();
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7379,7 +7366,6 @@ EnergyPlusData & state = getCurrentState();
                 Optional<Real64 const> OMEGA // incident profile angle (radians)
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7837,7 +7823,6 @@ EnergyPlusData & state = getCurrentState();
 
     int CFSHasControlledShade(CFSTY const &FS)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7864,7 +7849,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckAndFixCFSLayer(CFSLAYER &Layer)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
         //       DATE WRITTEN   unknown
@@ -7881,7 +7865,6 @@ EnergyPlusData & state = getCurrentState();
                          CFSSWP &SWP        // properties to fill
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         The University of WaterLoo
         //       DATE WRITTEN   unknown
@@ -8278,7 +8261,6 @@ EnergyPlusData & state = getCurrentState();
                                      Real64 const TAirIn   // Zone Air Temperature
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   June 2013

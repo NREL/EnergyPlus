@@ -356,7 +356,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     void GetPlantOperationInput(bool &GetInputOK)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -513,7 +512,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     void GetOperationSchemeInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   October 1998
@@ -761,7 +759,6 @@ EnergyPlusData & state = getCurrentState();
                                            bool &ErrorsFound                 // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -953,7 +950,6 @@ EnergyPlusData & state = getCurrentState();
                                  bool &ErrorsFound                 // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   August 2010
@@ -1078,7 +1074,6 @@ EnergyPlusData & state = getCurrentState();
                        bool &ErrorsFound    // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -2144,7 +2139,6 @@ EnergyPlusData & state = getCurrentState();
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998
@@ -2833,7 +2827,6 @@ EnergyPlusData & state = getCurrentState();
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   Jan 2005
@@ -3256,7 +3249,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetupPlantEMSActuators()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007
@@ -3348,7 +3340,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ActivateEMSControls(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007

@@ -170,7 +170,6 @@ void BaseSizer::initializeWithinEP(const std::string &_compType,
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
 {
-    EnergyPlusData & state = getCurrentState();
     this->clearState();
     this->initialized = true;
     this->compType = "API_component_type";
@@ -196,7 +195,6 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(Real64 const _originalValue)
 {
-    EnergyPlusData & state = getCurrentState();
     if (this->sizingType == AutoSizingType::Unknown) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
@@ -319,7 +317,6 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
                                   Optional_string_const UsrDesc,
                                   Optional<Real64 const> UsrValue)
 {
-EnergyPlusData & state = getCurrentState();
     static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
     static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
@@ -589,7 +586,6 @@ bool BaseSizer::isValidFanType(std::string const &_compType)
 
 bool BaseSizer::checkInitialized(bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState();
     if (!this->initialized) {
         errorsFound = true;
         this->errorType = AutoSizingResultType::ErrorType2;

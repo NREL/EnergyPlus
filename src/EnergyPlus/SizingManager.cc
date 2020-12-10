@@ -1951,7 +1951,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetOARequirements()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
@@ -2065,7 +2064,6 @@ EnergyPlusData & state = getCurrentState();
                                     bool &ErrorsFound                                      // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   February 2010
@@ -2219,7 +2217,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetZoneAirDistribution()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         T. Hong - LBNL
         //       DATE WRITTEN   March 2012
@@ -3066,7 +3063,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2010
@@ -4030,7 +4026,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetZoneHVACSizing()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse - FSEC
         //       DATE WRITTEN   July 2014
@@ -4646,7 +4641,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetAirTerminalSizing()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   February 2017

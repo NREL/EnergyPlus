@@ -124,7 +124,6 @@ namespace CTElectricGenerator {
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -339,7 +338,6 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",

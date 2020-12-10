@@ -245,7 +245,6 @@ namespace PackagedTerminalHeatPump {
                                  int &CompIndex                 // index to Packaged Terminal Heat Pump
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -351,7 +350,6 @@ EnergyPlusData & state = getCurrentState();
                    Real64 &QLatUnitOut            // Latent delivered capacity [kg/s], dehumidification = negative
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -4646,7 +4644,6 @@ EnergyPlusData & state = getCurrentState();
                               Real64 &OnOffAirFlowRatio  // ratio of coil on to coil off air flow rate
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   November 2008
@@ -6445,7 +6442,6 @@ EnergyPlusData & state = getCurrentState();
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   January 2012
@@ -6520,7 +6516,6 @@ EnergyPlusData & state = getCurrentState();
                           Array1D<Real64> const &Par // par(1) = PTUnitNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -6576,7 +6571,6 @@ EnergyPlusData & state = getCurrentState();
                        Array1D<Real64> const &Par // par(1) = PTUnitNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -6655,7 +6649,6 @@ EnergyPlusData & state = getCurrentState();
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -6804,7 +6797,6 @@ EnergyPlusData & state = getCurrentState();
     int GetPTUnitZoneInletAirNode(int const PTUnitCompIndex, int const PTUnitType)
     {
 
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -6879,7 +6871,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetPTUnitOutAirNode(int const PTUnitCompIndex, int const PTUnitType)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -6955,7 +6946,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetPTUnitReturnAirNode(int const PTUnitCompIndex, int const PTUnitType)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -7035,7 +7025,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetPTUnitMixedAirNode(int const PTUnitCompIndex, int const PTUnitType)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -7125,7 +7114,6 @@ EnergyPlusData & state = getCurrentState();
                             bool const HXUnitOn            // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:CalcMSHeatPump
         //       DATE WRITTEN   March, 2012
@@ -7729,7 +7717,6 @@ EnergyPlusData & state = getCurrentState();
                                Array1D<Real64> const &Par // par(1) = FurnaceNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:MSHPCyclingResidual
         //       DATE WRITTEN   March, 2012
@@ -7850,7 +7837,6 @@ EnergyPlusData & state = getCurrentState();
                              Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, , based on HVACMultiSpeedHeatPump:MSHPVarSpeedgResidual
         //       DATE WRITTEN   March, 2012
@@ -8435,7 +8421,6 @@ EnergyPlusData & state = getCurrentState();
                         Optional<Real64 const> SpeedRatio   // Speed ratio
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:SetAverageAirFlow
         //       DATE WRITTEN   March, 2012
@@ -8611,7 +8596,6 @@ EnergyPlusData & state = getCurrentState();
                                     Real64 &PartLoadRatio                       // coil part-load ratio
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March 2012
@@ -8731,7 +8715,6 @@ EnergyPlusData & state = getCurrentState();
                              bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
 
@@ -8770,7 +8753,6 @@ EnergyPlusData & state = getCurrentState();
                                        Array1D<Real64> const &Par  // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2017
@@ -8934,7 +8916,6 @@ EnergyPlusData & state = getCurrentState();
                                              Array1D<Real64> const &Par  // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015

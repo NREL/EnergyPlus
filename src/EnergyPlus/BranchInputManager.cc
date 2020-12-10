@@ -233,7 +233,6 @@ namespace BranchInputManager {
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -2069,7 +2068,6 @@ namespace BranchInputManager {
                                        Real64 &FoundVolFlowRate,
                                        bool &MatchedPlantLoop)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2007
@@ -2131,7 +2129,6 @@ namespace BranchInputManager {
                                            Real64 &FoundVolFlowRate,
                                            bool &MatchedCondLoop)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2190,7 +2187,6 @@ namespace BranchInputManager {
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2243,7 +2239,6 @@ namespace BranchInputManager {
                                                  bool &MatchedLoop                  // true if found
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008

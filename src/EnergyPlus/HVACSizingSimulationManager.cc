@@ -71,7 +71,6 @@ namespace EnergyPlus {
 
 void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded()
 {
-    EnergyPlusData & state = getCurrentState();
     using DataSizing::Coincident;
     using DataSizing::NumPltSizInput;
     using DataSizing::PlantSizData;
@@ -93,7 +92,6 @@ void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded()
 
 void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex)
 {
-    EnergyPlusData & state = getCurrentState();
     using DataPlant::PlantLoop;
     using DataPlant::SupplySide;
     using DataPlant::TotNumLoops;
@@ -125,7 +123,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::st
 
 void HVACSizingSimulationManager::SetupSizingAnalyses()
 {
-    EnergyPlusData & state = getCurrentState();
     using DataLoopNode::Node;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;

@@ -898,7 +898,6 @@ void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chi
                        std::string const &CallString // Context of this pair -- for error message
 )
 {
-EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2002
@@ -942,7 +941,6 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
                        std::string const &CallString   // Context of this pair -- for error message
 )
 {
-EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2002

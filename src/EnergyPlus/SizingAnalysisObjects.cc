@@ -254,7 +254,6 @@ void SizingLog::ProcessRunningAverage()
 
 ZoneTimestepObject SizingLog::GetLogVariableDataMax()
 {
-    EnergyPlusData & state = getCurrentState();
     Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;
     MaxVal = 0.0;
@@ -390,7 +389,6 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
 
 void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 {
-    EnergyPlusData & state = getCurrentState();
     ZoneTimestepObject tmpztStepStamp;
 
     tmpztStepStamp = PrepareZoneTimestepStamp();
@@ -402,7 +400,6 @@ void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 
 void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 {
-    EnergyPlusData & state = getCurrentState();
     Real64 const MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;

@@ -86,7 +86,6 @@ namespace HVACFan {
         std::string const &objectName, // IDF name in input
         bool const ErrorCheck)
     {
-        EnergyPlusData & state = getCurrentState();
         int index = -1;
         bool found = false;
         for (std::size_t loop = 0; loop < fanObjs.size(); ++loop) {
@@ -110,7 +109,6 @@ namespace HVACFan {
     bool checkIfFanNameIsAFanSystem( // look up to see if input contains a Fan:SystemModel with the name (for use before object construction
         std::string const &objectName)
     {
-EnergyPlusData & state = getCurrentState();
         int testNum = inputProcessor->getObjectItemNum("Fan:SystemModel", objectName);
         if (testNum > 0) {
             return true;
@@ -133,7 +131,6 @@ EnergyPlusData & state = getCurrentState();
         Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
     )
     {
-EnergyPlusData & state = getCurrentState();
         m_objTurnFansOn = false;
         m_objTurnFansOff = false;
 
@@ -1097,7 +1094,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 FanSystem::getFanDesignTemperatureRise() const
     {
-        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             Real64 cpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             Real64 designDeltaT = (deltaPress / (m_rhoAirStdInit * cpAir * m_fanTotalEff)) * (m_motorEff + m_motorInAirFrac * (1.0 - m_motorEff));
@@ -1112,7 +1108,6 @@ EnergyPlusData & state = getCurrentState();
     Real64 FanSystem::getFanDesignHeatGain(Real64 const FanVolFlow // fan volume flow rate [m3/s]
     )
     {
-        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             Real64 fanPowerTot = (FanVolFlow * deltaPress) / m_fanTotalEff;
             Real64 designHeatGain = m_motorEff * fanPowerTot + (fanPowerTot - m_motorEff * fanPowerTot) * m_motorInAirFrac;
@@ -1127,7 +1122,6 @@ EnergyPlusData & state = getCurrentState();
 
     void FanSystem::FanInputsForDesignHeatGain(Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
     {
-        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             deltaP = deltaPress;
             motEff = m_motorEff;

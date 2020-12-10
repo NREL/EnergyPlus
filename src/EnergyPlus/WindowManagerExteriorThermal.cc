@@ -242,7 +242,6 @@ namespace WindowManager {
     CWCEHeatTransferFactory::CWCEHeatTransferFactory(SurfaceData const &surface, int const t_SurfNum)
         : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        EnergyPlusData & state = getCurrentState();
         m_Window = SurfaceWindow(t_SurfNum);
         auto ShadeFlag = SurfWinShadingFlag(t_SurfNum);
 
@@ -273,7 +272,6 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(Real64 const t_HextConvCoeff)
     {
-        EnergyPlusData & state = getCurrentState();
         auto Indoor = getIndoor();
         auto Outdoor = getOutdoor(t_HextConvCoeff);
         auto aIGU = getIGU();
@@ -321,7 +319,6 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getIGULayer(int const t_Index)
     {
-        EnergyPlusData & state = getCurrentState();
         std::shared_ptr<CBaseIGULayer> aLayer = nullptr;
 
         auto material = getLayerMaterial(t_Index);
@@ -492,7 +489,6 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getShadeToGlassLayer(int const t_Index) const
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   August 2016

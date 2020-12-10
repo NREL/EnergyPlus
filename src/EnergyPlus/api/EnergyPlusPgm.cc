@@ -221,7 +221,6 @@
 
 int EnergyPlusPgm(std::string const &filepath)
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     return RunEnergyPlus(filepath);
 }
 
@@ -307,7 +306,6 @@ int commonRun() {
 }
 
 int initializeEnergyPlus(std::string const & filepath) {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     using namespace EnergyPlus;
     commonInitialize();
 
@@ -337,7 +335,6 @@ int initializeEnergyPlus(std::string const & filepath) {
 }
 
 int initializeAsLibrary() {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     commonInitialize();
     return commonRun();
 }

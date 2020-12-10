@@ -106,7 +106,6 @@ namespace EvaporativeFluidCoolers {
 
     PlantComponent *EvapFluidCoolerSpecs::factory(int objectType, std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data if it hasn't been done already
         if (GetEvapFluidCoolerInputFlag) {
             GetEvapFluidCoolerInput();
@@ -822,7 +821,6 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         // Set up output variables
         // CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
         if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
@@ -958,14 +956,12 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         this->InitEvapFluidCooler();
         this->SizeEvapFluidCooler();
     }
 
     void EvapFluidCoolerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
 
             MinLoad = 0.0; // signifies non-load based model (i.e. forward)
@@ -988,7 +984,6 @@ namespace EvaporativeFluidCoolers {
                                         [[maybe_unused]] Real64 &CurLoad,
                                         bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
@@ -1836,7 +1831,6 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::CalcSingleSpeedEvapFluidCooler()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
@@ -2019,7 +2013,6 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::CalcTwoSpeedEvapFluidCooler()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
@@ -2145,7 +2138,6 @@ namespace EvaporativeFluidCoolers {
                                                         Real64 const UAdesign,
                                                         Real64 &outletWaterTemp)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   May 2009
@@ -2238,7 +2230,6 @@ namespace EvaporativeFluidCoolers {
 
     Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1D<Real64> const &Par)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   May 2009

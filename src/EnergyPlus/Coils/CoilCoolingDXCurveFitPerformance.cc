@@ -66,7 +66,6 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
-    EnergyPlusData & state = getCurrentState();
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
@@ -125,7 +124,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string &name_to_find)
 {
-    EnergyPlusData & state = getCurrentState();
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
@@ -183,7 +181,6 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 DataLoopNode::NodeData &condOutletNode,
                                                 Real64 LoadSHR)
 {
-    EnergyPlusData & state = getCurrentState();
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
     if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
@@ -905,7 +902,6 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlo
 
 void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
-    EnergyPlusData & state = getCurrentState();
     // set parent mode for each speed
     int numSpeeds;
     bool errorsFound = false;

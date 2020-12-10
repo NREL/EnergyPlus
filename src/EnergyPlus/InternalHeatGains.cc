@@ -6263,7 +6263,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GetDesignLightingLevelForZone(int const WhichZone) // name of zone
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2007; January 2008 - moved to InternalGains
@@ -7092,7 +7091,6 @@ EnergyPlusData & state = getCurrentState();
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012
@@ -7138,7 +7136,6 @@ EnergyPlusData & state = getCurrentState();
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012
@@ -7184,7 +7181,6 @@ EnergyPlusData & state = getCurrentState();
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012

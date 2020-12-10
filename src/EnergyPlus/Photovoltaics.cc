@@ -142,7 +142,6 @@ namespace Photovoltaics {
                         [[maybe_unused]] Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         David Bradley
         //       DATE WRITTEN   April 2003
@@ -790,7 +789,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcSimplePV(int const thisPV)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2004
@@ -875,7 +873,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ReportPV(int const PVnum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2004
@@ -1485,7 +1482,6 @@ EnergyPlusData & state = getCurrentState();
                Real64 &PP         // power [W]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1540,7 +1536,6 @@ EnergyPlusData & state = getCurrentState();
                 Real64 const XS,
                 Real64 const EPS)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1588,7 +1583,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1689,7 +1683,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1742,7 +1735,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1794,7 +1786,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -2637,7 +2628,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   January 2004

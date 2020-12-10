@@ -160,7 +160,6 @@ namespace EnergyPlus {
 
         PlantComponent *Circuit::factory([[maybe_unused]] int objectType, std::string objectName)
         {
-            EnergyPlusData & state = getCurrentState();
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput();
@@ -183,7 +182,6 @@ namespace EnergyPlus {
                                [[maybe_unused]] Real64 &CurLoad,
                                [[maybe_unused]] bool const RunFlag)
         {
-            EnergyPlusData & state = getCurrentState();
             // Retrieve the parent domain index for this pipe circuit
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
@@ -199,7 +197,6 @@ namespace EnergyPlus {
 
         void GetPipingSystemsAndGroundDomainsInput() {
 
-            EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -509,7 +506,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void ReadGeneralDomainInputs(int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -1487,7 +1483,6 @@ EnergyPlusData & state = getCurrentState();
 
 
         void ReadPipeCircuitInputs(bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -1710,7 +1705,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         Segment *Segment::factory(std::string segmentName) {
-            EnergyPlusData & state = getCurrentState();
             if (GetSegmentInputFlag) {
                 bool errorsFound = false;
                 ReadPipeSegmentInputs(errorsFound);
@@ -1729,7 +1723,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         Circuit *Circuit::factory(std::string circuitName, bool & errorsFound) {
-            EnergyPlusData & state = getCurrentState();
             if (GetCircuitInputFlag) {
                 ReadPipeCircuitInputs(errorsFound);
                 GetCircuitInputFlag = false;
@@ -1747,7 +1740,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void ReadPipeSegmentInputs(bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -1818,7 +1810,6 @@ EnergyPlusData & state = getCurrentState();
         void ReadHorizontalTrenchInputs(int const StartingDomainNumForHorizontal,
                                         int const StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   September 2012
@@ -1943,7 +1934,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void SetupPipingSystemOutputVariables() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   September 2012
@@ -2040,7 +2030,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::SetupZoneCoupledOutputVariables() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   August 2014
@@ -2226,7 +2215,6 @@ EnergyPlusData & state = getCurrentState();
                                         std::string const &FieldEntry,
                                         std::string const &Condition,
                                         bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -2246,7 +2234,6 @@ EnergyPlusData & state = getCurrentState();
                                         Real64 const FieldEntry,
                                         std::string const &Condition,
                                         bool &ErrorsFound) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -2597,7 +2584,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::developMesh() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -2741,7 +2727,6 @@ EnergyPlusData & state = getCurrentState();
 
         void Domain::createPartitionCenterList()
         {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -3064,7 +3049,6 @@ EnergyPlusData & state = getCurrentState();
         Domain::createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
                                           bool const PartitionsExist,
                                           Real64 const DirExtentMax) {
-EnergyPlusData & state = getCurrentState();
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4099,7 +4083,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::PerformIterationLoop() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4130,7 +4113,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::PerformIterationLoop(Circuit * thisCircuit) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4173,7 +4155,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::PerformTemperatureFieldUpdate() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4650,7 +4631,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         Real64 Domain::EvaluateFarfieldBoundaryTemperature(CartesianCell &cell) {
-EnergyPlusData & state = getCurrentState();
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4822,7 +4802,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::UpdateBasementSurfaceTemperatures() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4866,7 +4845,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::UpdateZoneSurfaceTemperatures() {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR
             //       DATE WRITTEN
@@ -4888,7 +4866,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         Real64 Domain::GetAverageTempByType(CellType const cellType) {
-EnergyPlusData & state = getCurrentState();
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4923,7 +4900,6 @@ EnergyPlusData & state = getCurrentState();
         void
         Domain::EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction const direction, Real64 &neighbortemp,
                                                 Real64 &resistance, Real64 &adiabaticMultiplier) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -4955,7 +4931,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         Real64 Domain::GetFarfieldTemp(CartesianCell const &cell) {
-EnergyPlusData & state = getCurrentState();
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -5015,7 +4990,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::PerformPipeCircuitSimulation(Circuit * thisCircuit) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -5567,7 +5541,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::DoOneTimeInitializations(Circuit * thisCircuit) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011
@@ -5745,7 +5718,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::DoStartOfTimeStepInitializations(Circuit * thisCircuit) {
-            EnergyPlusData & state = getCurrentState();
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5857,7 +5829,6 @@ EnergyPlusData & state = getCurrentState();
         }
 
         void Domain::DoEndOfIterationOperations(bool &Finished) {
-EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
             //       DATE WRITTEN   Summer 2011

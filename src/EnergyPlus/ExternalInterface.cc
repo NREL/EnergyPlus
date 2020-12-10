@@ -271,7 +271,6 @@ namespace ExternalInterface {
 
     void GetExternalInterfaceInput()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   2Dec2007
@@ -395,7 +394,6 @@ namespace ExternalInterface {
 
     void StopExternalInterfaceIfError()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   9Jan2008
@@ -508,7 +506,6 @@ namespace ExternalInterface {
 
     void InitExternalInterface()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   2Dec2007
@@ -722,7 +719,6 @@ namespace ExternalInterface {
 
     void GetSetVariablesAndDoStepFMUImport()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
         //       DATE WRITTEN   08Aug2011
@@ -948,7 +944,6 @@ namespace ExternalInterface {
 
     void InstantiateInitializeFMUImport()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
         //       DATE WRITTEN   08Aug2011
@@ -1002,7 +997,6 @@ namespace ExternalInterface {
 
     void InitializeFMU()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
         //       DATE WRITTEN   08Aug2011
@@ -1036,7 +1030,6 @@ namespace ExternalInterface {
 
     void TerminateResetFreeFMUImport(int fmiEndSimulation)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
         //       DATE WRITTEN   08Aug2011
@@ -1069,7 +1062,6 @@ namespace ExternalInterface {
 
     void InitExternalInterfaceFMUImport()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -2224,7 +2216,6 @@ namespace ExternalInterface {
 
     void ValidateRunControl()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   December 2009
@@ -2407,7 +2398,6 @@ namespace ExternalInterface {
                               Array1D_int &varTypes           // Types of variables in keyVarIndexes
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   2Dec2007
@@ -2455,7 +2445,6 @@ namespace ExternalInterface {
 
     void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   December 2009
@@ -2475,7 +2464,6 @@ namespace ExternalInterface {
 
     void VerifyExternalInterfaceObject()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   12Dec2009

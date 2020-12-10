@@ -2598,7 +2598,6 @@ EnergyPlusData & state = getCurrentState();
                                   Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2653,7 +2652,6 @@ EnergyPlusData & state = getCurrentState();
                                         Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   January 2008
@@ -2708,7 +2706,6 @@ EnergyPlusData & state = getCurrentState();
                                  Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2763,7 +2760,6 @@ EnergyPlusData & state = getCurrentState();
                                        Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2818,7 +2814,6 @@ EnergyPlusData & state = getCurrentState();
                               Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   November 2003
@@ -2876,7 +2871,6 @@ EnergyPlusData & state = getCurrentState();
                                     Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -2934,7 +2928,6 @@ EnergyPlusData & state = getCurrentState();
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         M. J. Witte, GARD Analytics, Inc.
         //       DATE WRITTEN   February 2005
@@ -2996,7 +2989,6 @@ EnergyPlusData & state = getCurrentState();
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -3121,7 +3113,6 @@ EnergyPlusData & state = getCurrentState();
                                         Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -3185,7 +3176,6 @@ EnergyPlusData & state = getCurrentState();
                            Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3265,7 +3255,6 @@ EnergyPlusData & state = getCurrentState();
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3349,7 +3338,6 @@ EnergyPlusData & state = getCurrentState();
                                    int const ControlMode       // temperature or humidity control mode
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   January 2013
@@ -3402,7 +3390,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckDXCoolingCoilInOASysExists(std::string const &DXCoilSysName)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   Feb 2013
@@ -3440,7 +3427,6 @@ EnergyPlusData & state = getCurrentState();
                                         std::string &CoolCoilName,
                                         [[maybe_unused]] bool &ErrFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Aug 2013
@@ -3779,7 +3765,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName, bool &InletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
@@ -3809,7 +3794,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName, bool &OutletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019

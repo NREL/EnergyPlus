@@ -314,7 +314,6 @@ namespace Psychrometrics {
                                  std::string const &CalledFrom // routine this function was called from (error messages) !unused1208
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         if (rhoair < 0.0) {
@@ -392,7 +391,6 @@ namespace Psychrometrics {
                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie/Amir Roth
         //       DATE WRITTEN   August 2011

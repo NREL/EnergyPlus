@@ -65,7 +65,6 @@ namespace EnergyPlus {
 // Xing model factory
 std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int objectType, std::string objectName)
 {
-    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

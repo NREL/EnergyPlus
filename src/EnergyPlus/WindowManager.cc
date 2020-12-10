@@ -4204,7 +4204,6 @@ EnergyPlusData & state = getCurrentState();
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann, adapted from Numerical Recipes
         //       DATE WRITTEN   February 2000
@@ -7225,7 +7224,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcWindowBlindProperties()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -7655,7 +7653,6 @@ EnergyPlusData & state = getCurrentState();
                             Array1A<Real64> p        // Blind properties
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -7975,7 +7972,6 @@ EnergyPlusData & state = getCurrentState();
                          Array1A<Real64> p        // Blind properties (equivalent to ST_LAY)
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -8279,7 +8275,6 @@ EnergyPlusData & state = getCurrentState();
                       int const np,      // Dimension of matrix
                       int const n)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -8322,7 +8317,6 @@ EnergyPlusData & state = getCurrentState();
                 Array1A_int INDX,
                 int &D)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann?
         //       DATE WRITTEN   <date_written>

@@ -190,7 +190,6 @@ namespace HeatBalFiniteDiffManager {
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000

@@ -513,7 +513,6 @@ namespace UtilityRoutines {
                            bool &IsBlank,
                            std::string const &StringToDisplay)
     {
-        EnergyPlusData & state = getCurrentState();
         ErrorFound = false;
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList,

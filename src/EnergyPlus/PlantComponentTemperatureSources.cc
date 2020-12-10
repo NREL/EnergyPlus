@@ -109,7 +109,6 @@ namespace PlantComponentTemperatureSources {
 
     PlantComponent *WaterSourceSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (getWaterSourceInput) {
             GetWaterSourceInput();
             getWaterSourceInput = false;
@@ -356,7 +355,6 @@ namespace PlantComponentTemperatureSources {
 
     void WaterSourceSpecs::calculate()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -419,7 +417,6 @@ namespace PlantComponentTemperatureSources {
 
     void GetWaterSourceInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Edwin Lee
         //       DATE WRITTEN:    October 2012

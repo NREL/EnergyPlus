@@ -211,7 +211,6 @@ EnergyPlusData & state = getCurrentState();
 
     PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
     {
-        EnergyPlusData & state = getCurrentState();
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -455,7 +454,6 @@ EnergyPlusData & state = getCurrentState();
     DCPowerOutput
     PVWattsGenerator::powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
-EnergyPlusData & state = getCurrentState();
         const Real64 &gcr = m_groundCoverageRatio;
 
         Real64 poa, tpoa, pvt, dc;
@@ -548,7 +546,6 @@ EnergyPlusData & state = getCurrentState();
 
     PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Find the generator, and create a new one if it hasn't been loaded yet.
         int ObjNum = inputProcessor->getObjectItemNum("Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);

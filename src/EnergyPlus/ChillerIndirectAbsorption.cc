@@ -132,7 +132,6 @@ namespace ChillerIndirectAbsorption {
 
     void IndirectAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
             this->initialize(RunFlag, CurLoad);
@@ -178,7 +177,6 @@ namespace ChillerIndirectAbsorption {
     void IndirectAbsorberSpecs::getDesignCapacities(
         const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->NomCap * this->MinPartLoadRat;
             MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -197,7 +195,6 @@ namespace ChillerIndirectAbsorption {
 
     void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         bool runFlag = true;
         Real64 myLoad = 0.0;
 

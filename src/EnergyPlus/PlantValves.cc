@@ -108,7 +108,6 @@ namespace PlantValves {
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);

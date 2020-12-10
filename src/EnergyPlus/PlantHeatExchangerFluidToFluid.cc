@@ -135,7 +135,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
     PlantComponent *HeatExchangerStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data for heat exchangers if it hasn't been done already
         if (GetInput) {
             GetFluidHeatExchangerInput();
@@ -177,7 +176,6 @@ namespace PlantHeatExchangerFluidToFluid {
                                        Real64 &CurLoad,
                                        [[maybe_unused]] bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012
@@ -540,7 +538,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HeatExchangerStruct::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, "System", "Average", this->Name);
 
         SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Energy",
@@ -1858,7 +1855,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HeatExchangerStruct::calculate(Real64 const SupSideMdot, Real64 const DmdSideMdot)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith, derived from CalcEconHeatExchanger by Sankaranarayanan K P aug. 2007
         //       DATE WRITTEN   November 2012
@@ -2267,7 +2263,6 @@ EnergyPlusData & state = getCurrentState();
                                                        Array1D<Real64> const &Par // Par(1) = HX index number
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   December 2012

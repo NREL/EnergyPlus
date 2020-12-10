@@ -115,7 +115,6 @@ namespace EnergyPlus::PlantPressureSystem {
                                Optional_int_const BranchNum    // Branch num for specific branch simulation
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -367,7 +366,6 @@ EnergyPlusData & state = getCurrentState();
                             int const BranchNum    // Branch Index on LoopSide LoopSideNum
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -457,7 +455,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdatePressureDrop(int const LoopNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -645,7 +642,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DistributePressureOnBranch(int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -826,7 +822,6 @@ EnergyPlusData & state = getCurrentState();
                                      Real64 const MaxPhi           // - Maximum allowable value of phi, requested by the pump manager from curve mgr
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Kaustubh Phalak
         //       DATE WRITTEN   Feb 2010

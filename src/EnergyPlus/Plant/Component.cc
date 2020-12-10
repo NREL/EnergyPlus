@@ -68,7 +68,6 @@ namespace DataPlant {
     }
 
     void CompData::simulate(bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998

@@ -809,7 +809,6 @@ EnergyPlusData & state = getCurrentState();
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2009

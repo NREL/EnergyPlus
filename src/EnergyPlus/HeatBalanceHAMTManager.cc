@@ -185,7 +185,6 @@ namespace HeatBalanceHAMTManager {
 
     void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1507,7 +1506,6 @@ namespace HeatBalanceHAMTManager {
 
     void UpdateHeatBalHAMT(int const sid)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
         //       DATE WRITTEN   June 2008
@@ -1649,7 +1647,6 @@ namespace HeatBalanceHAMTManager {
 
     Real64 RHtoVP(Real64 const RH, Real64 const Temperature)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Phillip Biddulph
         //       DATE WRITTEN   June 2008

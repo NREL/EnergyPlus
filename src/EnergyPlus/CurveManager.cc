@@ -1962,7 +1962,6 @@ namespace CurveManager {
     }
 
     int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
-        EnergyPlusData & state = getCurrentState();
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -2004,7 +2003,6 @@ namespace CurveManager {
 
     bool TableFile::load(std::string path)
     {
-        EnergyPlusData & state = getCurrentState();
         filePath = path;
         bool fileFound;
         std::string fullPath;
@@ -2049,7 +2047,6 @@ namespace CurveManager {
     }
 
     std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
-        EnergyPlusData & state = getCurrentState();
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
@@ -2555,7 +2552,6 @@ namespace CurveManager {
                       std::string const &ObjName // parent object of curve
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2957,7 +2953,6 @@ namespace CurveManager {
                                      Optional<Real64 const> Var5          // 5th independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   May 2017

@@ -2004,7 +2004,6 @@ namespace Construction {
 
     Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(Real64 userValue)
     {
-        EnergyPlusData & state = getCurrentState();
         if (userValue < 0.0) {
             ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
             ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");

@@ -209,7 +209,6 @@ namespace HybridEvapCoolingModel {
     }
     Real64 CMode::CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
         //       DATE WRITTEN   October 2017
@@ -413,7 +412,6 @@ namespace HybridEvapCoolingModel {
                           Array1D<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
-        EnergyPlusData & state = getCurrentState();
         CMode newMode;
         bool error = newMode.ParseMode(ModeCounter,
                                        &OperatingModes,
@@ -438,7 +436,6 @@ namespace HybridEvapCoolingModel {
                           Array1D<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
         //       DATE WRITTEN   October 2017
@@ -732,7 +729,6 @@ namespace HybridEvapCoolingModel {
 
     bool Model::MeetsSupplyAirTOC(Real64 Tsupplyair)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
         //       DATE WRITTEN   October 2017
@@ -764,7 +760,6 @@ namespace HybridEvapCoolingModel {
 
     bool Model::MeetsSupplyAirRHOC(Real64 SupplyW)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
         //       DATE WRITTEN   October 2017
@@ -939,7 +934,6 @@ namespace HybridEvapCoolingModel {
 
     Real64 Model::CheckVal_W(Real64 W, Real64 T, Real64 P)
     {
-        EnergyPlusData & state = getCurrentState();
         // P must be in pascals NOT kPa
         Real64 OutletRHtest = PsyRhFnTdbWPb(T, W, P); // could also use outlet pressure instead of fixed
         Real64 OutletW =
@@ -948,7 +942,6 @@ namespace HybridEvapCoolingModel {
     }
     Real64 Model::CheckVal_T(Real64 T)
     {
-        EnergyPlusData & state = getCurrentState();
         if ((T > 100) || (T < 0)) {
             ShowWarningError("Supply air temperature exceeded realistic range error called in " + Name + ", check performance curve");
         }

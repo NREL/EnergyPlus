@@ -1617,7 +1617,6 @@ EnergyPlusData & state = getCurrentState();
 
     std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName)
     {
-        EnergyPlusData & state = getCurrentState();
         auto result = std::make_unique<std::ofstream>(fileName);
         if (!result->good()) {
             ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
@@ -1627,7 +1626,6 @@ EnergyPlusData & state = getCurrentState();
 
     void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams)
     {
-EnergyPlusData & state = getCurrentState();
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
         if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
             if (ResultsFramework::resultsFramework->JSONEnabled()) {

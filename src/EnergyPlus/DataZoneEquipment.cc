@@ -218,7 +218,6 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1237,7 +1236,6 @@ namespace DataZoneEquipment {
 
     int GetControlledZoneIndex(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1304,7 +1302,6 @@ namespace DataZoneEquipment {
 
     int GetSystemNodeNumberForZone(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1342,7 +1339,6 @@ namespace DataZoneEquipment {
                                 std::string const &calledFromDescription // String identifying the calling function and object
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1397,7 +1393,6 @@ namespace DataZoneEquipment {
                             std::string const &NodeName  // Return air node name to match (may be blank)
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function returns the zone return number (not the node number) for the indicated
         // zone and node name.  If NodeName is blank, return 1 (the first return node)
@@ -1864,13 +1859,11 @@ namespace DataZoneEquipment {
 
     Real64 EquipList::SequentialHeatingFraction(const int equipNum)
     {
-        EnergyPlusData & state = getCurrentState();
         return ScheduleManager::GetCurrentScheduleValue(SequentialHeatingFractionSchedPtr(equipNum));
     }
 
     Real64 EquipList::SequentialCoolingFraction(const int equipNum)
     {
-        EnergyPlusData & state = getCurrentState();
         return ScheduleManager::GetCurrentScheduleValue(SequentialCoolingFractionSchedPtr(equipNum));
     }
 

@@ -7297,7 +7297,6 @@ EnergyPlusData & state = getCurrentState();
                               Real64 &TotCapModFac             // capacity modification factor, func of temp and func of flow
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, , based on DX:CalcTotCapSHR, introducing two speed levels
         //       DATE WRITTEN   March 2012

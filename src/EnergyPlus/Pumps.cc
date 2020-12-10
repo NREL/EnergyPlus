@@ -184,7 +184,6 @@ namespace Pumps {
                   int &PumpIndex,
                   Real64 &PumpHeat)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 2001
@@ -1499,7 +1498,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetupPumpMinMaxFlows(int const LoopNum, int const PumpNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:        Edwin Lee
         //       DATE WRITTEN:  Aug 2010
@@ -1698,7 +1696,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcPumps(int const PumpNum, Real64 const FlowRequest, bool &PumpRunning)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 1998
@@ -1969,7 +1966,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SizePump(int const PumpNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2001
@@ -2335,7 +2331,6 @@ EnergyPlusData & state = getCurrentState();
                                  Real64 &PumpMinMassFlowRateVFDRange,
                                  Real64 &PumpMaxMassFlowRateVFDRange)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN

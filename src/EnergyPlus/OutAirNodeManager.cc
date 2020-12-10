@@ -120,7 +120,6 @@ namespace OutAirNodeManager {
 
     void SetOutAirNodes()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 1998
@@ -418,7 +417,6 @@ EnergyPlusData & state = getCurrentState();
 
     void InitOutAirNodes()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Sept 1998
@@ -443,7 +441,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool CheckOutAirNodeNumber(int const NodeNumber) // Number of node to check to see if in Outside Air list
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Feb 2007
@@ -499,7 +496,6 @@ EnergyPlusData & state = getCurrentState();
                                   bool &Okay            // True if found, false if not
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2007

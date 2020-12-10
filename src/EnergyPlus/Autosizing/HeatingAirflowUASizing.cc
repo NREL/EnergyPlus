@@ -53,7 +53,6 @@ namespace EnergyPlus {
 
 void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->zoneSizingRunDone = true;
     this->curZoneEqNum = 1;
@@ -65,7 +64,6 @@ void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const ele
 
 void HeatingAirflowUASizer::initializeForZoneInductionUnit(Real64 const elevation, Real64 mainFlowRate, Real64 reheatMultiplier)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->zoneSizingRunDone = true;
     this->curZoneEqNum = 1;
@@ -79,7 +77,6 @@ void HeatingAirflowUASizer::initializeForZoneInductionUnit(Real64 const elevatio
 
 void HeatingAirflowUASizer::initializeForZoneFanCoil(Real64 const elevation, Real64 designHeatVolumeFlowRate)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->zoneSizingRunDone = true;
     this->zoneEqFanCoil = true;
@@ -92,7 +89,6 @@ void HeatingAirflowUASizer::initializeForZoneFanCoil(Real64 const elevation, Rea
 
 void HeatingAirflowUASizer::initializeForSystemOutdoorAir(Real64 const elevation, Real64 overallSystemMassFlowRate, bool DOAS)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->curSysNum = 1;
     this->curOASysNum = 1;
@@ -109,7 +105,6 @@ void HeatingAirflowUASizer::initializeForSystemOutdoorAir(Real64 const elevation
 
 void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->curSysNum = 1;
     this->curDuctType = DataHVACGlobals::Main;
@@ -120,28 +115,24 @@ void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, 
 
 void HeatingAirflowUASizer::initializeForSystemCoolingDuct(Real64 const elevation)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->curSysNum = 1;
 }
 
 void HeatingAirflowUASizer::initializeForSystemHeatingDuct(Real64 const elevation)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->curSysNum = 1;
 }
 
 void HeatingAirflowUASizer::initializeForSystemOtherDuct(Real64 const elevation)
 {
-    EnergyPlusData & state = getCurrentState();
     this->initializeFromAPI(elevation);
     this->curSysNum = 1;
 }
 
 Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState();
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }

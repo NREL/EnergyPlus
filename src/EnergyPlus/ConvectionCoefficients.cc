@@ -2584,7 +2584,6 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemACH(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FLOW:
         if (!allocated(Node)) {
             return 0.0;
@@ -2682,7 +2681,6 @@ namespace ConvectionCoefficients {
                                            Real64 const height,
                                            bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -2852,7 +2850,6 @@ namespace ConvectionCoefficients {
                                     const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   ?????
@@ -4194,7 +4191,6 @@ namespace ConvectionCoefficients {
 
     void ManageInsideAdaptiveConvectionAlgo(int const SurfNum) // surface number for which coefficients are being calculated
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4231,7 +4227,6 @@ namespace ConvectionCoefficients {
                                              Real64 &Hc         // result for Hc Outside face, becomes HExt.
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -6285,7 +6280,6 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6310,7 +6304,6 @@ namespace ConvectionCoefficients {
                                                  Real64 const height,
                                                  bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6335,7 +6328,6 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6361,7 +6353,6 @@ namespace ConvectionCoefficients {
                                                  Real64 const height,
                                                  bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState();
         Real64 Hnatural;
 
         if (isWindow) {                        // Unlikely for a floor, but okay...

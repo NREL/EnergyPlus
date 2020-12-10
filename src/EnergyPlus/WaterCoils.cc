@@ -6114,7 +6114,6 @@ EnergyPlusData & state = getCurrentState();
                       Real64 const PB  // barometric pressure {Pascals}
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 1, 2009
@@ -6189,7 +6188,6 @@ EnergyPlusData & state = getCurrentState();
                             Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2009

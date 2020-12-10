@@ -173,7 +173,6 @@ namespace DataOutputs {
     OutputReportingVariables::OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName)
         : key(KeyValue), variableName(VariableName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (KeyValue == "*") return;
         for (auto const &c : KeyValue) {
             if (c == ' ' || c == '_' || std::isalnum(c)) continue;

@@ -118,7 +118,6 @@ namespace EnergyPlus::Boilers {
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->InitBoiler();
         this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
@@ -130,7 +129,6 @@ namespace EnergyPlus::Boilers {
                                           Real64 &MinLoad,
                                           Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -143,7 +141,6 @@ namespace EnergyPlus::Boilers {
 
     void BoilerSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         this->InitBoiler();
         this->SizeBoiler();
     }

@@ -553,7 +553,6 @@ namespace HeatBalanceManager {
 
     bool CheckValidSimulationObjects()
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2008
@@ -596,7 +595,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetPreConstructionInputParameters()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   October 2014
@@ -3899,7 +3897,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -4585,7 +4582,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetBuildingData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -4994,7 +4990,6 @@ EnergyPlusData & state = getCurrentState();
                          bool &ErrorsFound                                          // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -5985,7 +5980,6 @@ EnergyPlusData & state = getCurrentState();
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   May 2000
@@ -7644,7 +7638,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckScheduledSurfaceGains(int const ZoneNum) // Zone number for which error check will be performed
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2013

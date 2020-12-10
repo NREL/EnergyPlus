@@ -110,7 +110,6 @@ namespace GlobalNames {
                                  std::unordered_set<std::string> &UniqueStrings,
                                  bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         if (NameToVerify.empty()) {
             ShowSevereError("E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
             ErrorsFound = true;
@@ -133,7 +132,6 @@ namespace GlobalNames {
                                      std::string const &field_name,
                                      bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         if (object_name.empty()) {
             ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
             ErrorsFound = true;
@@ -156,7 +154,6 @@ namespace GlobalNames {
                                      std::string const &object_type,
                                      bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         if (object_name.empty()) {
             ShowSevereError("E+ object type " + object_name + " has a blank field");
             ErrorsFound = true;
@@ -177,7 +174,6 @@ namespace GlobalNames {
     void
     VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -202,7 +198,6 @@ EnergyPlusData & state = getCurrentState();
     void
     VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2008
@@ -227,7 +222,6 @@ EnergyPlusData & state = getCurrentState();
     void
     VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -251,7 +245,6 @@ EnergyPlusData & state = getCurrentState();
 
     void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -282,7 +275,6 @@ EnergyPlusData & state = getCurrentState();
 
     void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-        EnergyPlusData & state = getCurrentState();
         auto const iter = aDUNames.find(NameToVerify);
         if (iter != aDUNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");

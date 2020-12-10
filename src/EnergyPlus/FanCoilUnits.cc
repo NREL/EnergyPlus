@@ -2157,7 +2157,6 @@ namespace FanCoilUnits {
                          Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2000
@@ -3340,7 +3339,6 @@ namespace FanCoilUnits {
                                 Real64 &MaxWaterFlow           // maximum water flow rate
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad, FSEC
         //       DATE WRITTEN   May 2016
@@ -3411,7 +3409,6 @@ namespace FanCoilUnits {
                                       Real64 &PLRMax                 // maximum part-load ratio
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad, FSEC
         //       DATE WRITTEN   August 2016
@@ -3784,7 +3781,6 @@ namespace FanCoilUnits {
                                    Real64 &PowerMet               // Sensible power supplied (W)
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
@@ -4160,7 +4156,6 @@ namespace FanCoilUnits {
                                     Real64 &PowerMet               // Sensible power supplied (W)
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   July 2015
@@ -4610,7 +4605,6 @@ namespace FanCoilUnits {
 
     int GetFanCoilZoneInletAirNode(int const FanCoilNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -4662,7 +4656,6 @@ namespace FanCoilUnits {
 
     int GetFanCoilOutAirNode(int const FanCoilNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -4714,7 +4707,6 @@ namespace FanCoilUnits {
 
     int GetFanCoilReturnAirNode(int const FanCoilNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -4770,7 +4762,6 @@ namespace FanCoilUnits {
 
     int GetFanCoilMixedAirNode(int const FanCoilNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -4826,7 +4817,6 @@ namespace FanCoilUnits {
 
     int GetFanCoilInletAirNode(int const FanCoilNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -4878,7 +4868,6 @@ namespace FanCoilUnits {
 
     void GetFanCoilIndex(std::string const &FanCoilName, int &FanCoilIndex)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   April 2012
@@ -4908,7 +4897,6 @@ namespace FanCoilUnits {
                                    Array1D<Real64> const &Par  // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   July 2015
@@ -4987,7 +4975,6 @@ namespace FanCoilUnits {
                                   Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2016
@@ -5064,7 +5051,6 @@ namespace FanCoilUnits {
                                           Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate electric heating coil cycling ratio of FanCoilUnit with MultiSpeedFan
         // capacity control method when running with at lowest speed for a continuous fan
@@ -5114,7 +5100,6 @@ namespace FanCoilUnits {
                                      Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl, FSEC
         //       DATE WRITTEN   Jan 2016
@@ -5190,7 +5175,6 @@ namespace FanCoilUnits {
                                      Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl Jan 2016
         //       DATE WRITTEN   July 2015
@@ -5265,7 +5249,6 @@ namespace FanCoilUnits {
                                             Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5354,7 +5337,6 @@ namespace FanCoilUnits {
                                         Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5450,7 +5432,6 @@ namespace FanCoilUnits {
                                               Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5543,7 +5524,6 @@ namespace FanCoilUnits {
                                                 Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5642,7 +5622,6 @@ namespace FanCoilUnits {
                                        Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5734,7 +5713,6 @@ namespace FanCoilUnits {
                                        Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015
@@ -5816,7 +5794,6 @@ namespace FanCoilUnits {
                                            Array1D<Real64> const &Par // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   December 2015

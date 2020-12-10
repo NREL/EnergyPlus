@@ -680,7 +680,6 @@ EnergyPlusData & state = getCurrentState();
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2015
@@ -5480,7 +5479,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2010
@@ -5616,7 +5614,6 @@ EnergyPlusData & state = getCurrentState();
 
     void AutoCalcDOASControlStrategy()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2016

@@ -184,7 +184,6 @@ namespace HighTempRadiantSystem {
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -258,7 +257,6 @@ EnergyPlusData & state = getCurrentState();
     void GetHighTempRadiantSystem(bool &ErrorsFound // TRUE if errors are found on processing the input
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -772,7 +770,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SizeHighTempRadiantSystem(int const RadSysNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -881,7 +878,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CalcHighTempRadiantSystem(int const RadSysNum) // name of the low temperature radiant system
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -979,7 +975,6 @@ EnergyPlusData & state = getCurrentState();
         int const RadSysNum                             // name of the low temperature radiant system
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2008
@@ -1231,7 +1226,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateHTRadSourceValAvg(bool &HighTempRadSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1404,7 +1398,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ReportHighTempRadiantSystem(int const RadSysNum) // Index for the low temperature radiant system under consideration within the derived types
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001

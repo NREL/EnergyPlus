@@ -174,7 +174,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::ValidateFlowControlPaths()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -544,7 +543,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -656,7 +654,6 @@ EnergyPlusData & state = getCurrentState();
     Real64 HalfLoopData::EvaluateLoopSetPointLoad(int const FirstBranchNum,
                                                   int const LastBranchNum,
                                                   Real64 ThisLoopSideFlow) {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2010
@@ -826,7 +823,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 HalfLoopData::CalcOtherSideDemand(Real64 ThisLoopSideFlow) {
 
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2010
@@ -1210,7 +1206,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
 
-        EnergyPlusData & state = getCurrentState();
         // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
         bool LoopShutDownFlag = false;
 
@@ -1279,7 +1274,6 @@ EnergyPlusData & state = getCurrentState();
         Real64 const ThisLoopSideFlow, // [kg/s]  total flow to be split
         bool const FirstHVACIteration  // TRUE if First HVAC iteration of Time step
     ) {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson, Dan Fisher
         //       DATE WRITTEN   October 1999
@@ -1679,7 +1673,6 @@ EnergyPlusData & state = getCurrentState();
     void HalfLoopData::SimulateLoopSideBranchGroup(
         int const FirstBranchNum, int const LastBranchNum, Real64 FlowRequest, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   July 2010
@@ -1919,7 +1912,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::UpdateAnyLoopDemandAlterations(int const BranchNum, int const CompNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2010
@@ -2013,7 +2005,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::SimulateSinglePump(PlantLocation const SpecificPumpLocation, Real64 &SpecificPumpFlowRate)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   July 2010
@@ -2052,7 +2043,6 @@ EnergyPlusData & state = getCurrentState();
 
     void HalfLoopData::SimulateAllLoopSidePumps(Optional<PlantLocation const> SpecificPumpLocation,
                                                 Optional<Real64 const> SpecificPumpFlowRate) {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   July 2010
@@ -2123,7 +2113,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 HalfLoopData::DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
     {
-        EnergyPlusData & state = getCurrentState();
         Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
         Real64 TotalPumpMinAvailFlow = 0.0;
         Real64 TotalPumpMaxAvailFlow = 0.0;

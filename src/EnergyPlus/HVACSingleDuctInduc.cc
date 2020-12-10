@@ -1058,7 +1058,6 @@ EnergyPlusData & state = getCurrentState();
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 23 2004
@@ -1310,7 +1309,6 @@ EnergyPlusData & state = getCurrentState();
                              Real64 &LoadMet                // load met by unit (watts)
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1412,7 +1410,6 @@ EnergyPlusData & state = getCurrentState();
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1470,7 +1467,6 @@ EnergyPlusData & state = getCurrentState();
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1528,7 +1524,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool FourPipeInductionUnitHasMixer(std::string const &CompName) // component (mixer) name
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2011
@@ -1561,7 +1556,6 @@ EnergyPlusData & state = getCurrentState();
 
     void IndUnitData::ReportIndUnit()
     {
-        EnergyPlusData & state = getCurrentState();
         // Purpose: this subroutine for reporting
 
         // set zone OA volume flow rate

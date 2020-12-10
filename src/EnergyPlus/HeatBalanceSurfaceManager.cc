@@ -4558,7 +4558,6 @@ EnergyPlusData & state = getCurrentState();
 
     void UpdateFinalSurfaceHeatBalance()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -5468,7 +5467,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ReportIntMovInsInsideSurfTemp()
     {
-        EnergyPlusData & state = getCurrentState();
         int SurfNum;
         TempSurfInMovInsRep = TempSurfIn;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {

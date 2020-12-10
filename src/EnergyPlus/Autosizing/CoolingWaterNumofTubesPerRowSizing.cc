@@ -52,7 +52,6 @@ namespace EnergyPlus {
 
 Real64 CoolingWaterNumofTubesPerRowSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState();
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }

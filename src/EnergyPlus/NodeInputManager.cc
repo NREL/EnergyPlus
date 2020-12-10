@@ -497,7 +497,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetNodeListsInput(bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1999
@@ -640,7 +639,6 @@ EnergyPlusData & state = getCurrentState();
                          int const NodeFluidType, // must be valid
                          bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1999
@@ -747,7 +745,6 @@ EnergyPlusData & state = getCurrentState();
                           Optional_string_const InputFieldName // Input Field Name
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie; adapted from GasAbsorptionChiller;Jason Glazer
         //       DATE WRITTEN   December 2001
@@ -839,7 +836,6 @@ EnergyPlusData & state = getCurrentState();
 
     void InitUniqueNodeCheck(std::string const &ContextName)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2002
@@ -905,7 +901,6 @@ EnergyPlusData & state = getCurrentState();
                           Optional_int_const CheckNumber,
                           Optional_string_const ObjectName)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2002
@@ -1003,7 +998,6 @@ EnergyPlusData & state = getCurrentState();
 
     void EndUniqueNodeCheck(std::string const &ContextName)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2002
@@ -1347,7 +1341,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckMarkedNodes(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2004

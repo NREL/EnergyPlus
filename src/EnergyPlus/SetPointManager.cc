@@ -4916,7 +4916,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineScheduledSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 1998
@@ -4941,7 +4940,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineScheduledTESSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -4979,7 +4977,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineSchedDualSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2004
@@ -6062,7 +6059,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefRABFlowSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2005
@@ -7146,7 +7142,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 DefineIdealCondEntSetPointManager::calculateCurrentEnergyUsage()
     {
-EnergyPlusData & state = getCurrentState();
         Real64 ChillerEnergy(0.0);     // Chiller energy consumption
         Real64 ChilledPumpEnergy(0.0); // Chilled water pump energy consumption
         Real64 TowerFanEnergy(0.0);    // Cooling tower fan energy consumption
@@ -7175,7 +7170,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineReturnWaterChWSetPointManager::calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee, NREL
         //       DATE WRITTEN   May 2015
@@ -7280,7 +7274,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineReturnWaterHWSetPointManager::calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee, NREL
         //       DATE WRITTEN   May 2015
@@ -7382,7 +7375,6 @@ EnergyPlusData & state = getCurrentState();
 
     void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sep 2013

@@ -133,7 +133,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -175,7 +174,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -207,7 +205,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -472,7 +469,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState();
         std::string &ChillerName = this->Name;
 
         SetupOutputVariable("Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
@@ -1209,7 +1205,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::calculateChiller(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
 
@@ -1583,7 +1578,6 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::calculateHeater(Real64 &MyLoad, bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Jason Glazer and Michael J. Witte
         //       DATE WRITTEN   March 2001
         // Simulate a direct fired (gas consuming) absorption chiller using

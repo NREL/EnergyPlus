@@ -323,7 +323,6 @@ namespace UtilityRoutines {
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000
@@ -363,7 +362,6 @@ EnergyPlusData & state = getCurrentState();
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000

@@ -813,7 +813,6 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2016
@@ -1105,7 +1104,6 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::get_average_height() const
     {
-        EnergyPlusData & state = getCurrentState();
         if (std::abs(SinTilt) < 1.e-4) {
             return 0.0;
         }
@@ -1429,7 +1427,6 @@ namespace DataSurfaces {
 
     void SetSurfaceOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState();
         for (auto &surface : Surface) {
             surface.SetOutBulbTempAt();
         }
@@ -1437,7 +1434,6 @@ namespace DataSurfaces {
 
     void CheckSurfaceOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 

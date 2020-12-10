@@ -420,7 +420,6 @@ EnergyPlusData & state = getCurrentState();
 
     PlantComponent *GLHEBase::factory(int const objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetInput) {
             GetGroundHeatExchangerInput();
             GetInput = false;
@@ -575,7 +574,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHEVert::calcGFunctions()
     {
-EnergyPlusData & state = getCurrentState();
         // No other choice than to calculate the g-functions here
         calcShortTimestepGFunctions();
         calcLongTimestepGFunctions();
@@ -594,7 +592,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHEVert::calcLongTimestepGFunctions()
     {
-EnergyPlusData & state = getCurrentState();
         int const numDaysInYear(365);
 
         // Minimum simulation time for which finite line source method is applicable
@@ -655,7 +652,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHEVert::calcShortTimestepGFunctions()
     {
-        EnergyPlusData & state = getCurrentState();
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -984,7 +980,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHEBase::makeThisGLHECacheAndCompareWithFileCache()
     {
-        EnergyPlusData & state = getCurrentState();
         if (!DataSystemVariables::DisableGLHECaching) {
             makeThisGLHECacheStruct();
             readCacheFileAndCompareWithThisGLHECache();
@@ -1026,7 +1021,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHEVert::readCacheFileAndCompareWithThisGLHECache()
     {
-        EnergyPlusData & state = getCurrentState();
         // For convenience
         using json = nlohmann::json;
 
@@ -1181,7 +1175,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GLHESlinky::calcGFunctions()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
         //       DATE WRITTEN:    February, 2015
@@ -2822,7 +2815,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcBHAverageResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates the average thermal resistance of the borehole using the first-order multipole method.
 
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
@@ -2846,7 +2838,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcBHTotalInternalResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates the total internal thermal resistance of the borehole using the first-order multipole method.
 
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
@@ -2871,7 +2862,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcBHGroutResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates grout resistance. Use for validation.
 
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
@@ -2886,7 +2876,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcHXResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
 
         // Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
@@ -2924,7 +2913,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcPipeConvectionResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates the convection resistance using Gnielinski and Petukov, in [K/(W/m)]
 
         // Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
@@ -3005,7 +2993,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHEVert::calcPipeResistance()
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculates the combined conduction and convection pipe resistance
 
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
@@ -3020,7 +3007,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 GLHESlinky::calcHXResistance()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell

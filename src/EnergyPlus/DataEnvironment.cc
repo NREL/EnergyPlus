@@ -291,7 +291,6 @@ namespace EnergyPlus::DataEnvironment {
 
     void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         ShowSevereError("SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");

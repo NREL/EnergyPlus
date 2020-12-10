@@ -1630,7 +1630,6 @@ EnergyPlusData & state = getCurrentState();
                                        Array1D<Real64> const &Par    // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2006

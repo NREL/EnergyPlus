@@ -756,7 +756,6 @@ namespace ResultsFramework {
 
     void CSVWriter::parseTSOutputs(json const & data, std::vector<std::string> const & outputVariables, OutputProcessor::ReportingFrequency reportingFrequency)
     {
-        EnergyPlusData & state = getCurrentState();
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
         std::vector<int> indices;
@@ -823,7 +822,6 @@ namespace ResultsFramework {
     }
 
     std::string & CSVWriter::convertToMonth(std::string & datetime) {
-        EnergyPlusData & state = getCurrentState();
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
                                                                 {"02", "February"},
@@ -853,7 +851,6 @@ namespace ResultsFramework {
 
     void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
     {
-        EnergyPlusData & state = getCurrentState();
         outputFile.ensure_open("OpenOutputFiles", outputControl);
 
         print(outputFile, "{}", "Date/Time,");

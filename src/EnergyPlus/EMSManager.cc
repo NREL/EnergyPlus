@@ -1221,7 +1221,6 @@ namespace EMSManager {
 
     void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1641,7 +1640,6 @@ namespace EMSManager {
                                          SPControlType const SetPointType,
                                          bool &ErrorFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1699,7 +1697,6 @@ namespace EMSManager {
 
     void checkSetpointNodesAtEnd()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec of EffiBEM
         //       DATE WRITTEN   July 2020
@@ -1910,7 +1907,6 @@ namespace EMSManager {
 
     void SetupThermostatActuators()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1993,7 +1989,6 @@ namespace EMSManager {
 
     void SetupSurfaceConvectionActuators()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -2107,7 +2102,6 @@ namespace EMSManager {
 
     void SetupSurfaceOutdoorBoundaryConditionActuators()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   May 2013

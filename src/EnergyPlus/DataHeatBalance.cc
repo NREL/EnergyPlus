@@ -1177,7 +1177,6 @@ namespace DataHeatBalance {
 
     void SetZoneOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState();
         for (auto &zone : Zone) {
             zone.SetOutBulbTempAt();
         }
@@ -1185,7 +1184,6 @@ namespace DataHeatBalance {
 
     void CheckZoneOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
@@ -1752,7 +1750,6 @@ namespace DataHeatBalance {
                               bool &errFlag            // error flag should one be needed
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2009

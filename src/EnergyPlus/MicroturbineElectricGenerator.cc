@@ -108,7 +108,6 @@ namespace MicroturbineElectricGenerator {
 
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data for generator if it hasn't been done already
         if (GetMTInput) {
             GetMTGeneratorInput();
@@ -129,7 +128,6 @@ namespace MicroturbineElectricGenerator {
 
     void GetMTGeneratorInput()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
         //       DATE WRITTEN   Mar 2008
@@ -766,7 +764,6 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",

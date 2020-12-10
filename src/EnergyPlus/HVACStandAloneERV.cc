@@ -176,7 +176,6 @@ namespace HVACStandAloneERV {
                           int &CompIndex                 // pointer to correct component
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2003
@@ -1842,7 +1841,6 @@ EnergyPlusData & state = getCurrentState();
                                 bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1888,7 +1886,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1934,7 +1931,6 @@ EnergyPlusData & state = getCurrentState();
                                bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1977,7 +1973,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetStandAloneERVOutAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2028,7 +2023,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetStandAloneERVZoneInletAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2079,7 +2073,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetStandAloneERVReturnAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006

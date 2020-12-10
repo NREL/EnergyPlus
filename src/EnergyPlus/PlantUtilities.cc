@@ -381,7 +381,6 @@ EnergyPlusData & state = getCurrentState();
                                    bool const ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb 2010
@@ -720,7 +719,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Sept 2010
@@ -1056,7 +1054,6 @@ EnergyPlusData & state = getCurrentState();
                                              Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
                                              bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   February 2010
@@ -1142,7 +1139,6 @@ EnergyPlusData & state = getCurrentState();
                                          Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Sept 2010
@@ -1352,7 +1348,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ShiftPlantLoopSideCallingOrder(int const OldIndex, int const NewIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   <April 2011
@@ -1730,7 +1725,6 @@ EnergyPlusData & state = getCurrentState();
                                  Optional_int_const SingleLoopSearch
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   November 2009
@@ -2009,7 +2003,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ShowBranchesOnLoop(int const LoopNum) // Loop number of loop
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2011
@@ -2054,7 +2047,6 @@ EnergyPlusData & state = getCurrentState();
                            Optional_bool_const SupressErrors      // used for WSHP's where condenser loop may not be on a plant loop
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2008

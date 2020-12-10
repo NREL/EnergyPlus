@@ -135,7 +135,6 @@ namespace CondenserLoopTowers {
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
@@ -156,7 +155,6 @@ namespace CondenserLoopTowers {
                                            Real64 &MinLoad,
                                            Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         MinLoad = 0.0;
         MaxLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
         OptLoad = this->TowerNominalCapacity;
@@ -169,7 +167,6 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
@@ -1928,7 +1925,6 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState();
         // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
@@ -4986,7 +4982,6 @@ namespace CondenserLoopTowers {
 
     Real64 CoolingTower::calculateSimpleTowerOutletTemp(Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -5486,7 +5481,6 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = design tower load [W]
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -5516,7 +5510,6 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005
@@ -5550,7 +5543,6 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005

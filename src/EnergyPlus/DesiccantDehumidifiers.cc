@@ -198,7 +198,6 @@ namespace DesiccantDehumidifiers {
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
         //                      for Gas Research Institute
@@ -269,7 +268,6 @@ namespace DesiccantDehumidifiers {
 
     void GetDesiccantDehumidifierInput()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
         //                      for Gas Research Institute
@@ -1960,7 +1958,6 @@ namespace DesiccantDehumidifiers {
                                       [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte, GARD Analytics, Inc.
         //                      for Gas Research Institute
@@ -3171,7 +3168,6 @@ namespace DesiccantDehumidifiers {
                                Optional<Real64> RegenCoilLoadmet // heating load met
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -3354,7 +3350,6 @@ namespace DesiccantDehumidifiers {
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -3439,7 +3434,6 @@ namespace DesiccantDehumidifiers {
 
     int GetProcAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -3476,7 +3470,6 @@ namespace DesiccantDehumidifiers {
 
     int GetProcAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -3513,7 +3506,6 @@ namespace DesiccantDehumidifiers {
 
     int GetRegAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -3550,7 +3542,6 @@ namespace DesiccantDehumidifiers {
 
     int GetRegAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019

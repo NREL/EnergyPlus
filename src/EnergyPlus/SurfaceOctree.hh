@@ -565,7 +565,6 @@ public: // Methods
     template <typename Predicate>
     bool processSomeSurfaceRayIntersectsCube(Vertex const &a, Vertex const &dir, Vertex const &dir_inv, Predicate const &predicate) const
     {
-        EnergyPlusData & state = getCurrentState();
         if (rayIntersectsCube(a, dir, dir_inv)) {
             for (auto const *surface_p : surfaces_) {   // Process this cube's surfaces
                 if (predicate(*surface_p)) return true; // Don't need to process more surfaces

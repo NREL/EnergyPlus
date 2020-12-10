@@ -366,7 +366,6 @@ namespace EnergyPlus::DataSurfaceLists {
 
     int GetNumberOfSurfaceLists()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -415,7 +414,6 @@ namespace EnergyPlus::DataSurfaceLists {
 
     int GetNumberOfSurfListVentSlab()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie

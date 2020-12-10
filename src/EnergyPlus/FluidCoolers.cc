@@ -109,7 +109,6 @@ namespace FluidCoolers {
 
     PlantComponent *FluidCoolerspecs::factory(int objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetFluidCoolerInputFlag) {
             GetFluidCoolerInput();
             GetFluidCoolerInputFlag = false;
@@ -131,7 +130,6 @@ namespace FluidCoolers {
                                     [[maybe_unused]] Real64 &CurLoad,
                                     bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
             this->calcSingleSpeed();
@@ -144,7 +142,6 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         this->initialize();
         this->size();
     }
@@ -154,7 +151,6 @@ namespace FluidCoolers {
                                                Real64 &MinLoad,
                                                Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         MaxLoad = this->FluidCoolerNominalCapacity;
         OptLoad = this->FluidCoolerNominalCapacity;
         MinLoad = 0.0;
@@ -162,7 +158,6 @@ namespace FluidCoolers {
 
     void GetFluidCoolerInput()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    August 2008
@@ -406,7 +401,6 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
@@ -430,7 +424,6 @@ namespace FluidCoolers {
                                                      Array1D<std::string> const &cNumericFieldNames,
                                                      Array1D<std::string> const &cAlphaFieldNames)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    August 2008
@@ -529,7 +522,6 @@ namespace FluidCoolers {
                                                   Array1D<std::string> const &cNumericFieldNames,
                                                   Array1D<std::string> const &cAlphaFieldNames)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    August 2008
@@ -1380,7 +1372,6 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::calcSingleSpeed()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
@@ -1480,7 +1471,6 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::calcTwoSpeed()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   August 2008
@@ -1605,7 +1595,6 @@ namespace FluidCoolers {
 
     void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
@@ -1672,7 +1661,6 @@ namespace FluidCoolers {
                                        Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   August 2008

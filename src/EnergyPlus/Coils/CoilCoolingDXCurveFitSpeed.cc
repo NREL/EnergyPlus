@@ -67,7 +67,6 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
 {
-    EnergyPlusData & state = getCurrentState();
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -196,7 +195,6 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
                                               Optional<Real64 const> Var4, // 4th independent variable
                                               Optional<Real64 const> Var5) // 5th independent variable
 {
-    EnergyPlusData & state = getCurrentState();
     if (curveName.empty()) {
         return false;
     } else {
@@ -267,7 +265,6 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
-    EnergyPlusData & state = getCurrentState();
     int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
         // error
@@ -524,7 +521,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 
 Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p)
 {
-    EnergyPlusData & state = getCurrentState();
     static std::string const RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF;

@@ -1146,7 +1146,6 @@ EnergyPlusData & state = getCurrentState();
 
     Real64 ParametersData::IAM(Real64 const IncidentAngle)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   December 2003
@@ -1339,7 +1338,6 @@ EnergyPlusData & state = getCurrentState();
                                                        bool const AbsorberPlateHasMass // flag for absorber thermal mass
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1866,7 +1864,6 @@ EnergyPlusData & state = getCurrentState();
                                                         Real64 const TiltR2V    // collector tilt angle relative to the vertical [degree]
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1941,7 +1938,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CollectorData::update()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -1981,7 +1977,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CollectorData::GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC. Adopted from Photovoltaics module
         //       DATE WRITTEN   February 2012

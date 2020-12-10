@@ -81,7 +81,6 @@ namespace EnergyPlus {
 }
 
 int CoilCoolingDX::factory(std::string const & coilName) {
-    EnergyPlusData & state = getCurrentState();
     if (coilCoolingDXGetInputFlag) {
         CoilCoolingDX::getInput();
         coilCoolingDXGetInputFlag = false;
@@ -103,7 +102,6 @@ void CoilCoolingDX::clear_state() {
 }
 
 void CoilCoolingDX::getInput() {
-    EnergyPlusData & state = getCurrentState();
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -132,7 +130,6 @@ void CoilCoolingDX::getInput() {
 
 void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
 {
-    EnergyPlusData & state = getCurrentState();
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     bool errorsFound = false;
@@ -226,7 +223,6 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
 }
 
 void CoilCoolingDX::oneTimeInit() {
-EnergyPlusData & state = getCurrentState();
     // setup output variables, needs to be done after object is instantiated and emplaced
     SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
     SetupOutputVariable("Cooling Coil Total Cooling Energy",

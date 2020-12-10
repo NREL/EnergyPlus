@@ -6126,7 +6126,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -6403,7 +6402,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ExposedFoundationPerimeter::getData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         using namespace DataIPShortCuts;
         using DataSurfaces::Surface;
 
@@ -6704,7 +6702,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
         //       DATE WRITTEN   July 2017
@@ -8540,7 +8537,6 @@ EnergyPlusData & state = getCurrentState();
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // J.Glazer 2018 - operates on Surface array after final indices are known for windows and checks to make sure it is correct
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
@@ -8564,7 +8560,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // For each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
         for (auto theSurf : Surface) {
             if (theSurf.HasShadeControl) {
@@ -12674,7 +12669,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetupShadeSurfacesForSolarCalcs()
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2008

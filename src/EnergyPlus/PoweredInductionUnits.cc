@@ -2034,7 +2034,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ReportPIU(int const PIUNum) // number of the current fan coil unit being simulated
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -2080,7 +2079,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool PIUnitHasMixer(std::string const &CompName) // component (mixer) name
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2011
@@ -2113,7 +2111,6 @@ EnergyPlusData & state = getCurrentState();
 
     void PIUInducesPlenumAir(int const NodeNum) // induced air node number
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2012

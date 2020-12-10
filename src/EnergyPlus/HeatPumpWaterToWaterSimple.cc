@@ -130,7 +130,6 @@ namespace HeatPumpWaterToWaterSimple {
 
     PlantComponent *GshpSpecs::factory(int wwhp_type, std::string eir_wwhp_name)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GshpSpecs::GetWatertoWaterHPInput();
             GetInputFlag = false;
@@ -151,7 +150,6 @@ namespace HeatPumpWaterToWaterSimple {
                              Real64 &CurLoad,
                              [[maybe_unused]] bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
@@ -197,7 +195,6 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState();
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
 
@@ -211,7 +208,6 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->LoadLoopNum) {
             if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
                 MinLoad = 0.0;
@@ -238,7 +234,6 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::GetWatertoWaterHPInput()
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang

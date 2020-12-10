@@ -631,7 +631,6 @@ namespace EnergyPlus::PluginManagement {
     void PluginInstance::reportPythonError()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState();
         PyObject *exc_type = nullptr;
         PyObject *exc_value = nullptr;
         PyObject *exc_tb = nullptr;
@@ -705,7 +704,6 @@ namespace EnergyPlus::PluginManagement {
     void PluginInstance::setup()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState();
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
@@ -1060,7 +1058,6 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
-        EnergyPlusData & state = getCurrentState();
         if (path.empty()) return;
 
         std::string command = "sys.path.insert(0, \"" + path + "\")";
@@ -1359,7 +1356,6 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     bool PluginManager::anyUnexpectedPluginObjects()
     {
-        EnergyPlusData & state = getCurrentState();
         static std::vector<std::string> objectsToFind = {"PythonPlugin:OutputVariable",
                                                          "PythonPlugin:SearchPaths",
                                                          "PythonPlugin:Instance",

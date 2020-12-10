@@ -863,7 +863,6 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(std::string cons
                                                                 std::string const &coilType  // idf input object class name of coil
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index(-1);
     for (int i = 0; i < numCoilsReported_; i++) {
         if (coilSelectionDataObjs[i] != nullptr) {
@@ -925,7 +924,6 @@ void ReportCoilSelection::setRatedCoilConditions(std::string const &coilName,   
                                                  Real64 const RatedCoilEff        // rated coil effectiveness
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilObjName);
     auto &c(coilSelectionDataObjs[index]);
     c->coilRatedTotCap = RatedCoilTotCap;
@@ -980,7 +978,6 @@ void ReportCoilSelection::setCoilWaterFlowNodeNums(std::string const &coilName, 
                                                    int const plantLoopNum       // plant loop structure index
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int plantSizNum = -999;
     if ((DataSizing::NumPltSizInput > 0) && (inletNodeNum > 0) && (outletNodeNum > 0)) {
         bool errorsfound = false;
@@ -997,7 +994,6 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(std::string const &coilName,
                                                     int const plantLoopNum       // plant loop structure index
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->pltSizNum = plantSizNum;
@@ -1047,7 +1043,6 @@ void ReportCoilSelection::setCoilEntAirTemp(std::string const &coilName,    // u
                                             int const curZoneEqNum          // zone equipment list index, if non-zero
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->coilDesEntTemp = entAirDryBulbTemp;
@@ -1707,7 +1702,6 @@ void ReportCoilSelection::setCoilWaterCoolingCapacity(std::string const &coilNam
                                                       int const dataWaterLoopNum    // plant loop structure index
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->coilTotCapAtPeak = totalCoolingCap;
@@ -1730,7 +1724,6 @@ void ReportCoilSelection::setCoilWaterHeaterCapacityNodeNums(std::string const &
                                                              int const dataWaterLoopNum    // plant loop structure index
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->coilTotCapAtPeak = totalHeatingCap;
@@ -1752,7 +1745,6 @@ void ReportCoilSelection::setCoilWaterHeaterCapacityPltSizNum(std::string const 
                                                               int const dataWaterLoopNum    // plant loop structure index
 )
 {
-    EnergyPlusData & state = getCurrentState();
     int index = getIndexForOrCreateDataObjFromCoilName(coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->coilTotCapAtPeak = totalHeatingCap;
@@ -1795,7 +1787,6 @@ void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // u
                                                DataAirSystems::fanModelTypeEnum const &fanEnumType,
                                                int const &fanIndex)
 {
-    EnergyPlusData & state = getCurrentState();
     if (fanName == "") {
         return;
     }

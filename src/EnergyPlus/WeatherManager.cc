@@ -2011,7 +2011,6 @@ EnergyPlusData & state = getCurrentState();
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 1999
@@ -2955,7 +2954,6 @@ EnergyPlusData & state = getCurrentState();
     Real64
     CalcSkyEmissivity(EmissivityCalcType const ESkyCalcType, Real64 const OSky, Real64 const DryBulb, Real64 const DewPoint, Real64 const RelHum)
     {
-        EnergyPlusData & state = getCurrentState();
         // Calculate Sky Emissivity
         // References:
         // M. Li, Y. Jiang and C. F. M. Coimbra,
@@ -3875,7 +3873,6 @@ EnergyPlusData & state = getCurrentState();
                         Real64 &IGlbH                           // returned: global irradiance on horiz surface, W/m2
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         C Barnaby
         //       DATE WRITTEN   Nov 2010

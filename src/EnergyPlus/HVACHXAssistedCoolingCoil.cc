@@ -172,7 +172,6 @@ namespace HVACHXAssistedCoolingCoil {
                                   Optional<Real64> QTotOut            // the total cooling output of unit
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
@@ -268,7 +267,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHXAssistedCoolingCoilInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
@@ -850,7 +848,6 @@ EnergyPlusData & state = getCurrentState();
                                    Optional_bool_const EconomizerFlag   // OA (or airloop) econommizer status
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
@@ -1009,7 +1006,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHXDXCoilIndex(std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2007
@@ -1048,7 +1044,6 @@ EnergyPlusData & state = getCurrentState();
                                             Real64 &Value,
                                             int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -1107,7 +1102,6 @@ EnergyPlusData & state = getCurrentState();
                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -1189,7 +1183,6 @@ EnergyPlusData & state = getCurrentState();
                             Optional_bool_const PrintWarning // prints warning message if true
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   August 2008
@@ -1246,7 +1239,6 @@ EnergyPlusData & state = getCurrentState();
                              Optional_bool_const PrintWarning // prints warning message if true
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   April 2009
@@ -1302,7 +1294,6 @@ EnergyPlusData & state = getCurrentState();
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -1349,7 +1340,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2011
@@ -1410,7 +1400,6 @@ EnergyPlusData & state = getCurrentState();
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2006
@@ -1457,7 +1446,6 @@ EnergyPlusData & state = getCurrentState();
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad, FSEC
         //       DATE WRITTEN   September 2015
@@ -1504,7 +1492,6 @@ EnergyPlusData & state = getCurrentState();
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -1552,7 +1539,6 @@ EnergyPlusData & state = getCurrentState();
                              bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -1600,7 +1586,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2009
@@ -1649,7 +1634,6 @@ EnergyPlusData & state = getCurrentState();
                               std::string &CoolingCoilName  // returned name of cooling coil
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2011
@@ -1691,7 +1675,6 @@ EnergyPlusData & state = getCurrentState();
                                    bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2006
@@ -1759,7 +1742,6 @@ EnergyPlusData & state = getCurrentState();
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   September 2013
@@ -1818,7 +1800,6 @@ EnergyPlusData & state = getCurrentState();
                                    std::string const &HXName  // must match coil names for the coil type
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   January 2009

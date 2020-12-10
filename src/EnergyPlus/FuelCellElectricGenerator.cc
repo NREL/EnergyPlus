@@ -116,7 +116,6 @@ namespace FuelCellElectricGenerator {
 
     PlantComponent *FCDataStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getFuelCellInputFlag) {
             getFuelCellInput();
@@ -137,7 +136,6 @@ namespace FuelCellElectricGenerator {
 
     PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getFuelCellInputFlag) {
             getFuelCellInput();
@@ -160,7 +158,6 @@ namespace FuelCellElectricGenerator {
                                             Real64 const MyLoad, // demand on electric generator
                                             bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   March 2005
@@ -1865,7 +1862,6 @@ namespace FuelCellElectricGenerator {
                                                    Real64 &PgridOverage // electricity that can't be stored and needs to go out
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug 2005
@@ -2020,7 +2016,6 @@ namespace FuelCellElectricGenerator {
                                                         Array1D<Real64> const &Par // par(1) = Generator Number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith NREL
         //       DATE WRITTEN   Aug 2005
@@ -2690,7 +2685,6 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigurePowerConditioningLosses(Real64 const Pdemand, Real64 &PpcuLosses)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
@@ -3093,7 +3087,6 @@ namespace FuelCellElectricGenerator {
                                 [[maybe_unused]] Real64 &CurLoad,
                                 [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
                                                             this->CWLoopSideNum,

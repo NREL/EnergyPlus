@@ -187,7 +187,6 @@ EnergyPlusData & state = getCurrentState();
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August, 2005

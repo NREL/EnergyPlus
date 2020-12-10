@@ -94,7 +94,6 @@ namespace DataAirSystems {
 
     Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
-        EnergyPlusData & state = getCurrentState();
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 
         if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;

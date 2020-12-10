@@ -1091,7 +1091,6 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::initKivaInstances()
     {
-        EnergyPlusData & state = getCurrentState();
         // initialize temperatures at the beginning of run environment
         for (auto &kv : kivaInstances) {
             // Start with steady-state solution

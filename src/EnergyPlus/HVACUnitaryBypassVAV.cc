@@ -205,7 +205,6 @@ namespace HVACUnitaryBypassVAV {
                              int &CompIndex                 // Index to changeover-bypass VAV system
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -2137,7 +2136,6 @@ EnergyPlusData & state = getCurrentState();
                             bool &HXUnitOn                 // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -3663,7 +3661,6 @@ EnergyPlusData & state = getCurrentState();
                               Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3694,7 +3691,6 @@ EnergyPlusData & state = getCurrentState();
                                   Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3729,7 +3725,6 @@ EnergyPlusData & state = getCurrentState();
                                  Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3760,7 +3755,6 @@ EnergyPlusData & state = getCurrentState();
                                    Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         M. J. Witte, GARD Analytics, Inc.
         //       DATE WRITTEN   February 2005
@@ -3792,7 +3786,6 @@ EnergyPlusData & state = getCurrentState();
                            Real64 &OnOffAirFlowRatio // Ratio of compressor ON airflow to average airflow over timestep
     )
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -3913,7 +3906,6 @@ EnergyPlusData & state = getCurrentState();
                                Real64 &HeatCoilLoadmet        // coil heating load met
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -4071,7 +4063,6 @@ EnergyPlusData & state = getCurrentState();
                                 Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012

@@ -4063,7 +4063,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SingleDuctAirTerminal::SimVAVVS(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -4477,7 +4476,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SingleDuctAirTerminal::SimConstVol(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 2000
@@ -4688,7 +4686,6 @@ EnergyPlusData & state = getCurrentState();
                                           Real64 &LoadMet                 // load met by unit (watts)
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -5171,7 +5168,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SingleDuctAirTerminal::ReportSys() // unused1208
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Unknown
         //       DATE WRITTEN   Unknown

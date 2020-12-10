@@ -5989,7 +5989,6 @@ namespace AirflowNetworkBalanceManager {
                                Array1D<Real64> const &Par           // par(1) = PressureSet
     )
     {
-                    EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   April 2016
@@ -11138,7 +11137,6 @@ namespace AirflowNetworkBalanceManager {
                                               int &OpeningProbStatus,
                                               int &ClosingProbStatus)
     {
-    EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::MRT;
 
         Real64 Tcomfort;    // Thermal comfort temperature
@@ -11203,7 +11201,6 @@ namespace AirflowNetworkBalanceManager {
     bool OccupantVentilationControlProp::openingProbability(int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
-        EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::ZoneIntGain;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -11261,7 +11258,6 @@ namespace AirflowNetworkBalanceManager {
 
     bool OccupantVentilationControlProp::closingProbability(Real64 const TimeOpenDuration) // function to perform calculations of closing probability
     {
-            EnergyPlusData & state = getCurrentState();
         Real64 SchValue;
         Real64 RandomValue;
 

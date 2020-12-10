@@ -126,7 +126,6 @@ std::unique_ptr<InputProcessor> InputProcessor::factory()
 
 json const &InputProcessor::getFields(std::string const &objectType, std::string const &objectName)
 {
-    EnergyPlusData & state = getCurrentState();
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
         ShowFatalError("ObjectType (" + objectType + ") requested was not found in input");
@@ -147,7 +146,6 @@ json const &InputProcessor::getFields(std::string const &objectType, std::string
 
 json const &InputProcessor::getFields(std::string const &objectType)
 {
-    EnergyPlusData & state = getCurrentState();
     static const std::string blankString;
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
@@ -163,7 +161,6 @@ json const &InputProcessor::getFields(std::string const &objectType)
 
 json const &InputProcessor::getPatternProperties(json const &schema_obj)
 {
-    EnergyPlusData & state = getCurrentState();
     std::string pattern_property;
     auto const &pattern_properties = schema_obj["patternProperties"];
     int dot_star_present = pattern_properties.count(".*");
@@ -362,7 +359,6 @@ void InputProcessor::processInput()
 
 bool InputProcessor::checkVersionMatch()
 {
-    EnergyPlusData & state = getCurrentState();
     using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
@@ -390,7 +386,6 @@ bool InputProcessor::checkVersionMatch()
 
 bool InputProcessor::processErrors()
 {
-    EnergyPlusData & state = getCurrentState();
     auto const idf_parser_errors = idf_parser->errors();
     auto const idf_parser_warnings = idf_parser->warnings();
 
@@ -433,7 +428,6 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
 
 int InputProcessor::getNumObjectsFound(std::string const &ObjectWord)
 {
-    EnergyPlusData & state = getCurrentState();
 
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -515,7 +509,6 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
 
 bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
 {
-    EnergyPlusData & state = getCurrentState();
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
         auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
@@ -534,7 +527,6 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
 
 bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value)
 {
-    EnergyPlusData & state = getCurrentState();
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
         auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
@@ -989,7 +981,6 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
                                      std::string const &ObjName  // Name of the object type
 )
 {
-    EnergyPlusData & state = getCurrentState();
     // PURPOSE OF THIS SUBROUTINE:
     // Get the occurrence number of an object of type ObjType and name ObjName
 
@@ -1027,7 +1018,6 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType,     // Object T
                                      std::string const &ObjName      // Name of the object type
 )
 {
-    EnergyPlusData & state = getCurrentState();
     // PURPOSE OF THIS SUBROUTINE:
     // Get the occurrence number of an object of type ObjType and name ObjName
 
@@ -1074,7 +1064,6 @@ void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set 
                                 Optional_string_const WhatObjectName     // ObjectName -- used for error messages
 )
 {
-EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2000
@@ -1200,7 +1189,6 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
                                          int &NumNumeric                // How many Numeric arguments (max) this Object can have
 )
 {
-    EnergyPlusData & state = getCurrentState();
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine returns maximum argument limits (total, alphas, numerics) of an Object from the IDD.
     // These dimensions (not sure what one can use the total for) can be used to dynamically dimension the
@@ -1272,7 +1260,6 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
 
 void InputProcessor::reportIDFRecordsStats()
 {
-EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION: (previously called GetIDFRecordsStats)
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2009
@@ -1521,7 +1508,6 @@ EnergyPlusData & state = getCurrentState();
 
 void InputProcessor::preProcessorCheck(bool &PreP_Fatal) // True if a preprocessor flags a fatal error
 {
-EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -1631,7 +1617,6 @@ EnergyPlusData & state = getCurrentState();
 
 void InputProcessor::preScanReportingVariables()
 {
-    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010
@@ -1839,7 +1824,6 @@ void InputProcessor::preScanReportingVariables()
 
 void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 {
-EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010
@@ -2193,7 +2177,6 @@ EnergyPlusData & state = getCurrentState();
 
 void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName)
 {
-    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010

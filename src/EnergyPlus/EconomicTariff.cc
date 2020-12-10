@@ -1625,7 +1625,6 @@ namespace EnergyPlus::EconomicTariff {
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj)
     {
-        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1895,7 +1894,6 @@ namespace EnergyPlus::EconomicTariff {
 
     std::string RemoveSpaces(std::string const &StringIn)
     {
-        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -2641,7 +2639,6 @@ namespace EnergyPlus::EconomicTariff {
 
     bool isWithinRange(int const testVal, int const minThreshold, int const maxThreshold)
     {
-        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 

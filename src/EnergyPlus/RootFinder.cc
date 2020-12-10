@@ -202,7 +202,6 @@ namespace RootFinder {
                          Real64 const ATolY                  // Absolute tolerance for Y variables
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -372,7 +371,6 @@ EnergyPlusData & state = getCurrentState();
                               Real64 const XMax                   // Maximum X value allowed
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -436,7 +434,6 @@ EnergyPlusData & state = getCurrentState();
                            bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   March 2006
@@ -681,7 +678,6 @@ EnergyPlusData & state = getCurrentState();
 
     int CheckInternalConsistency(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   March 2006
@@ -1011,7 +1007,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool CheckSlope(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -1161,7 +1156,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool CheckMinConstraint(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -1235,7 +1229,6 @@ EnergyPlusData & state = getCurrentState();
 
     bool CheckMaxConstraint(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -1484,7 +1477,6 @@ EnergyPlusData & state = getCurrentState();
                        Real64 const Y                      // Y value for current iterate, F(X)=Y
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   March 2006
@@ -1733,7 +1725,6 @@ EnergyPlusData & state = getCurrentState();
                           Real64 const Y                      // Y value for current iterate, F(X)=Y
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
@@ -1883,7 +1874,6 @@ EnergyPlusData & state = getCurrentState();
 
     void AdvanceRootFinder(RootFinderDataType &RootFinderData) // Data used by root finding algorithm
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006

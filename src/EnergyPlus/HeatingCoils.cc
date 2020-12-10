@@ -194,7 +194,6 @@ namespace HeatingCoils {
                                        Optional<Real64 const> SpeedRatio // Speed ratio of MultiStage heating coil
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
@@ -323,7 +322,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetHeatingCoilInput()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
@@ -2908,7 +2906,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetCoilIndex(std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -2938,7 +2935,6 @@ EnergyPlusData & state = getCurrentState();
                                   Real64 &Value,
                                   int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -3000,7 +2996,6 @@ EnergyPlusData & state = getCurrentState();
                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -3061,7 +3056,6 @@ EnergyPlusData & state = getCurrentState();
                                   bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -3113,7 +3107,6 @@ EnergyPlusData & state = getCurrentState();
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -3165,7 +3158,6 @@ EnergyPlusData & state = getCurrentState();
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2006
@@ -3217,7 +3209,6 @@ EnergyPlusData & state = getCurrentState();
                                   bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
@@ -3281,7 +3272,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
@@ -3333,7 +3323,6 @@ EnergyPlusData & state = getCurrentState();
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2008
@@ -3385,7 +3374,6 @@ EnergyPlusData & state = getCurrentState();
                             bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2011
@@ -3431,7 +3419,6 @@ EnergyPlusData & state = getCurrentState();
                                     bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   December 2008
@@ -3480,7 +3467,6 @@ EnergyPlusData & state = getCurrentState();
                                      bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   February 2013
@@ -3539,7 +3525,6 @@ EnergyPlusData & state = getCurrentState();
                             Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this coil is used
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   February 2016
@@ -3574,7 +3559,6 @@ EnergyPlusData & state = getCurrentState();
 
     void SetHeatingCoilAirLoopNumber(std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L.Gu
         //       DATE WRITTEN   March 2018

@@ -425,7 +425,6 @@ EnergyPlusData & state = getCurrentState();
 
     void CheckCFSStates(int const iSurf) // Surface number
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -1132,7 +1131,6 @@ EnergyPlusData & state = getCurrentState();
                           int const InputType      // Basis type
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2010
@@ -2138,7 +2136,6 @@ EnergyPlusData & state = getCurrentState();
                     Real64 &Phi                        // Phi value for ray
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN August 2011

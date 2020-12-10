@@ -122,7 +122,6 @@ namespace PhotovoltaicThermalCollectors {
 
     PlantComponent *PVTCollectorStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GetPVTcollectorsInput();
             GetInputFlag = false;
@@ -404,7 +403,6 @@ EnergyPlusData & state = getCurrentState();
 
     void PVTCollectorStruct::setupReportVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
@@ -1093,7 +1091,6 @@ EnergyPlusData & state = getCurrentState();
 
     int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1125,7 +1122,6 @@ EnergyPlusData & state = getCurrentState();
     }
     int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1158,7 +1154,6 @@ EnergyPlusData & state = getCurrentState();
 
     int getPVTindexFromName(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GetPVTcollectorsInput();
             GetInputFlag = false;
@@ -1178,7 +1173,6 @@ EnergyPlusData & state = getCurrentState();
 
     void simPVTfromOASys(int const index, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState();
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);

@@ -488,7 +488,6 @@ EnergyPlusData & state = getCurrentState();
                                           Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
     )
     {
-        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   February 2012
@@ -761,7 +760,6 @@ EnergyPlusData & state = getCurrentState();
         Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, Chandan Sharma FSEC
         //       DATE WRITTEN   February 2010,
@@ -1482,7 +1480,6 @@ EnergyPlusData & state = getCurrentState();
         Real64 &IEER                                      // Integareted energy efficiency ratio of single speed DX cooling coil
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   December 2012
@@ -1745,7 +1742,6 @@ EnergyPlusData & state = getCurrentState();
         Real64 &SEER_Standard                                      // seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   December 2012

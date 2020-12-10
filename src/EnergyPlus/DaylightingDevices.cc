@@ -989,7 +989,6 @@ namespace DaylightingDevices {
 
     Real64 CalcTDDTransSolIso(int const PipeNum) // TDD pipe object number
     {
-        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003

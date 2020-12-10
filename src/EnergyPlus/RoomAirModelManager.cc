@@ -191,7 +191,6 @@ EnergyPlusData & state = getCurrentState();
 
     void GetAirModelDatas()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2005
@@ -2690,7 +2689,6 @@ EnergyPlusData & state = getCurrentState();
                         int TypeNum                   // equipment type number
     )
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2014

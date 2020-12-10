@@ -1173,7 +1173,6 @@ EnergyPlusData & state = getCurrentState();
     Real64 CoolBeamResidual(Real64 const CWFlow, // cold water flow rate in kg/s
                             Array1D<Real64> const &Par)
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2009
@@ -1298,7 +1297,6 @@ EnergyPlusData & state = getCurrentState();
 
     void ReportCoolBeam(int const CBNum)
     {
-        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl

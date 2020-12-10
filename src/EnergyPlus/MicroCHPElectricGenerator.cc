@@ -127,7 +127,6 @@ namespace MicroCHPElectricGenerator {
 
     PlantComponent *MicroCHPDataStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getMicroCHPInputFlag) {
             GetMicroCHPGeneratorInput();
@@ -407,7 +406,6 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Off Mode Time", OutputProcessor::Unit::s, this->A42Model.OffModeTime, "System", "Sum", this->Name);
 
         SetupOutputVariable("Generator Standby Mode Time", OutputProcessor::Unit::s, this->A42Model.StandyByModeTime, "System", "Sum", this->Name);
@@ -528,7 +526,6 @@ namespace MicroCHPElectricGenerator {
                                       [[maybe_unused]] Real64 &CurLoad,
                                       [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState();
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the nodes.
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
@@ -547,7 +544,6 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(const EnergyPlus::PlantLocation &)
     {
-        EnergyPlusData & state = getCurrentState();
         constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
@@ -1278,7 +1274,6 @@ EnergyPlusData & state = getCurrentState();
 
     void MicroCHPDataStruct::CalcUpdateHeatRecovery()
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2006

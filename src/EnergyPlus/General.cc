@@ -1757,7 +1757,6 @@ namespace General {
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 1999
@@ -1824,7 +1823,6 @@ EnergyPlusData & state = getCurrentState();
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -2024,7 +2022,6 @@ EnergyPlusData & state = getCurrentState();
                           int const Month,
                           bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -2930,7 +2927,6 @@ EnergyPlusData & state = getCurrentState();
 
     std::string CreateHVACTimeIntervalString()
     {
-EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2005
@@ -3504,7 +3500,6 @@ EnergyPlusData & state = getCurrentState();
                                   bool &errFlag                                   // Error flag set to true if error found here.
     )
     {
-EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2012
