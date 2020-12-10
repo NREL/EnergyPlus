@@ -1,16 +1,9 @@
+set(generate_embeddedable_epJSON_schema_src generate_embeddable_epJSON_schema.cpp)
 
-SET( generate_embeddedable_epJSON_schema_src
-  generate_embeddable_epJSON_schema.cpp
-)
-
-if (UNIX)
-  ADD_DEFINITIONS( " -fPIC " )
+if(UNIX)
+  add_definitions(" -fPIC ")
 endif()
 
-add_executable( generate_embeddedable_epJSON_schema ${generate_embeddedable_epJSON_schema_src} )
+add_executable(generate_embeddedable_epJSON_schema ${generate_embeddedable_epJSON_schema_src})
 
-set_target_properties( generate_embeddedable_epJSON_schema
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/scripts"
-)
-
+set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/scripts")

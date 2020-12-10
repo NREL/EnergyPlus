@@ -34,10 +34,10 @@ message("PYTHON: Fixing up Python Dependencies on Mac")
 include(GetPrerequisites)
 
 # derive a few terms from the args passed in
-get_filename_component(PYTHON_LIB_FILENAME ${RESOLVED_PYTHON_LIB} NAME)  # Python dylib file name
-get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY)  # Path to the staged install tree in the build directory
-set(LOCAL_PYTHON_LIBRARY "${BASE_PATH}/${PYTHON_LIB_FILENAME}")  # Path to the Python dylib once copied into the install tree
-set(ENERGYPLUS_API_PATH "${BASE_PATH}/${EPLUS_DYNAMIC_LIB_NAME}")  # Path to the EnergyPlus dylib once copied into the install tree
+get_filename_component(PYTHON_LIB_FILENAME ${RESOLVED_PYTHON_LIB} NAME) # Python dylib file name
+get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY) # Path to the staged install tree in the build directory
+set(LOCAL_PYTHON_LIBRARY "${BASE_PATH}/${PYTHON_LIB_FILENAME}") # Path to the Python dylib once copied into the install tree
+set(ENERGYPLUS_API_PATH "${BASE_PATH}/${EPLUS_DYNAMIC_LIB_NAME}") # Path to the EnergyPlus dylib once copied into the install tree
 
 # the Python dylib apparently needed chmod +x at one point; # TODO: Try without this...
 execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
@@ -48,28 +48,28 @@ execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_F
 # for the energyplus executable, just find the python dynamic library right next to it for sure
 get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
-    string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
-    if (NOT PYTHON_IN_PREREQ EQUAL -1)
-        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${EXECUTABLE_PATH}")
-    endif()
+  string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
+  if(NOT PYTHON_IN_PREREQ EQUAL -1)
+    execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${EXECUTABLE_PATH}")
+  endif()
 endforeach()
 
 # for the energyplus dylib, search for the python dylib prereq and change it to use @loader_path
 get_prerequisites("${ENERGYPLUS_API_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
-    string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
-    if (NOT PYTHON_IN_PREREQ EQUAL -1)
-        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${PYTHON_LIB_FILENAME}" "${ENERGYPLUS_API_PATH}")
-    endif()
+  string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
+  if(NOT PYTHON_IN_PREREQ EQUAL -1)
+    execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${PYTHON_LIB_FILENAME}" "${ENERGYPLUS_API_PATH}")
+  endif()
 endforeach()
 
 # and the python library itself depends on a gettext lib (on our github actions builds anyway)
 get_prerequisites("${LOCAL_PYTHON_LIBRARY}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
-    string(FIND "${PREREQ}" "libint" LIBINT_IN_PREREQ)
-    if (NOT LIBINT_IN_PREREQ EQUAL -1)
-        get_filename_component(LIB_INT_FILENAME ${PREREQ} NAME)
-        execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${PREREQ}" "${BASE_PATH}")
-        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${LIB_INT_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
-    endif()
+  string(FIND "${PREREQ}" "libint" LIBINT_IN_PREREQ)
+  if(NOT LIBINT_IN_PREREQ EQUAL -1)
+    get_filename_component(LIB_INT_FILENAME ${PREREQ} NAME)
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${PREREQ}" "${BASE_PATH}")
+    execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${LIB_INT_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
+  endif()
 endforeach()
