@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state, "Zone 1 Node",
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode("Zone 1 Node",
                                                                                          ErrorsFound,
                                                                                          "Zone",
                                                                                          "BeamTest",
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
     state->dataDefineEquipment->AirDistUnit(1).OutletNodeNum = 3;
 
-    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1));
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(state->dataDefineEquipment->AirDistUnit(1).EquipName(1));
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
@@ -1715,29 +1715,29 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing(*state);
+    SimulationManager::PostIPProcessing();
 
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;
-    SimulationManager::GetProjectData(*state);
+    SimulationManager::GetProjectData();
 
-    OutputReportPredefined::SetPredefinedTables(*state);
-    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables();
+    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant(*state);
+    OutputProcessor::SetupTimePointers("Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
-    SizingManager::ManageSizing(*state);
+    SizingManager::ManageSizing();
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
-    TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    WeatherManager::ResetEnvironmentCounter();
+    TestAirPathIntegrity(ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
+    SimulationManager::SetupSimulation(ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
@@ -1767,7 +1767,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     // DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
-    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 17.835648923740127, 0.00001);
@@ -1783,7 +1783,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
     DataLoopNode::Node(40).Temp = 21.0; // zone node
-    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
@@ -1805,7 +1805,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(38).Temp = 45.0;    // hot water inlet node
 
     NonAirSysOutput = 0.0;
-    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.549803918626715, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
@@ -1826,7 +1826,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(40).Temp = 21.0; // zone node
 
     NonAirSysOutput = 0.0;
-    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
@@ -3289,29 +3289,29 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing(*state);
+    SimulationManager::PostIPProcessing();
 
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;
-    SimulationManager::GetProjectData(*state);
+    SimulationManager::GetProjectData();
 
-    OutputReportPredefined::SetPredefinedTables(*state);
-    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables();
+    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant(*state);
+    OutputProcessor::SetupTimePointers("Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
     state->dataGlobal->DoingSizing = true;
-    SizingManager::ManageSizing(*state);
+    SizingManager::ManageSizing();
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    WeatherManager::ResetEnvironmentCounter();
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(*state, ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(ErrorsFound));
 }
 
 } // namespace EnergyPlus

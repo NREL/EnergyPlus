@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -231,23 +231,23 @@ TEST_F(EnergyPlusFixture, SizingManagerTest_TimeIndexToHrMinString_test)
 {
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(*state, 0));
-    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(*state, 1));
-    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(*state, 7));
-    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(*state, 31));
-    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(*state, 79));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(*state, 96));
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
+    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(1));
+    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(7));
+    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(31));
+    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(79));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(96));
 
     state->dataGlobal->MinutesPerTimeStep = 3;
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(*state, 0));
-    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(*state, 1));
-    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(*state, 7));
-    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(*state, 31));
-    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(*state, 79));
-    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(*state, 96));
-    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(*state, 333));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(*state, 480));
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
+    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(1));
+    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(7));
+    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(31));
+    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(79));
+    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(96));
+    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(333));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(480));
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest)
@@ -306,16 +306,16 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    SizingManager::GetOARequirements(*state);
-    SizingManager::GetZoneSizingInput(*state);
+    SizingManager::GetOARequirements();
+    SizingManager::GetZoneSizingInput();
     ASSERT_EQ(1, NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy();
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -375,16 +375,16 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    SizingManager::GetOARequirements(*state);
-    SizingManager::GetZoneSizingInput(*state);
+    SizingManager::GetOARequirements();
+    SizingManager::GetZoneSizingInput();
     ASSERT_EQ(1, NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy();
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
     //Test 16: Everything as it should be to set this to true-->result should be true
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
     //Test 2: PulseSizing is false-->result should be false
@@ -428,7 +428,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 3: Warmup is true-->result should be false
@@ -438,7 +438,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 4: HourNum not 10-->result should be false
@@ -448,7 +448,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 5: TimeStepNum not 1-->result should be false
@@ -458,7 +458,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 2;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 1;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 7: everything set to make the answer false
@@ -478,7 +478,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     TimeStepNum = 7;
     state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
 }

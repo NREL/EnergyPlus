@@ -84,15 +84,15 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
                         "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
                         "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
                         "Exterior Lights", "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
+    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
+    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
     int keyCount = 0;
     int typeVar = 0;
@@ -101,10 +101,10 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 
     fldStTest.m_variMeter = "EXTERIOR LIGHTS ELECTRIC ENERGY";
-    keyCount = fldStTest.getVariableKeyCountandTypeFromFldSt(*state, typeVar, avgSumVar, stepTypeVar, unitsVar);
+    keyCount = fldStTest.getVariableKeyCountandTypeFromFldSt(typeVar, avgSumVar, stepTypeVar, unitsVar);
     EXPECT_EQ(keyCount, 3);
 
-    fldStTest.getVariableKeysFromFldSt(*state, typeVar, keyCount, fldStTest.m_namesOfKeys, fldStTest.m_indexesForKeyVar);
+    fldStTest.getVariableKeysFromFldSt(typeVar, keyCount, fldStTest.m_namesOfKeys, fldStTest.m_indexesForKeyVar);
 
     EXPECT_EQ(fldStTest.m_namesOfKeys[0], "LITE1");
     EXPECT_EQ(fldStTest.m_namesOfKeys[1], "LITE2");

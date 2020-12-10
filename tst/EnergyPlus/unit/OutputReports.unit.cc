@@ -123,17 +123,17 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
@@ -144,13 +144,13 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     // reset eio stream
     has_eio_output(true);
 
-    DetailsForSurfaces(*state, 10); // 10 = Details Only, Surface details report
+    DetailsForSurfaces(10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
         {"! <Zone Surfaces>,Zone Name,# Surfaces", "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
          "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs) "

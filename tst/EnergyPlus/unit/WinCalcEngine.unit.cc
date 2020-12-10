@@ -97,14 +97,14 @@ TEST_F(EnergyPlusFixture, WCEClear)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
-    HeatBalanceManager::InitHeatBalance(*state);
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    WindowManager::initWindowModel();
+    WindowManager::InitWindowOpticalCalculations();
+    HeatBalanceManager::InitHeatBalance();
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
@@ -189,14 +189,14 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
-    HeatBalanceManager::InitHeatBalance(*state);
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    WindowManager::initWindowModel();
+    WindowManager::InitWindowOpticalCalculations();
+    HeatBalanceManager::InitHeatBalance();
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
@@ -267,14 +267,14 @@ TEST_F(EnergyPlusFixture, WCEShade)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
-    HeatBalanceManager::InitHeatBalance(*state);
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    WindowManager::initWindowModel();
+    WindowManager::InitWindowOpticalCalculations();
+    HeatBalanceManager::InitHeatBalance();
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront_dir_dir = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,

@@ -554,12 +554,27 @@ namespace EnergyPlus {
         this->files.zsz.close();
     }
 
+    // storing pointers to state to avoid header dependencies, no one is directly accessing this private variable anyway
     std::vector<EnergyPlusData*> stateVector;
-    EnergyPlusData & getCurrentState(unsigned int i) {
-        return *stateVector[i];
-    }
+
+    // this private variable is thread_local, each thread of EnergyPlus can have a different value of this
+    unsigned int thread_local currentStateHandler = -1;
+
+    // create a new state vector and set the handle for this current thread
     void createNewStateVector() {
         stateVector.push_back(new EnergyPlusData);
+        currentStateHandler = size(stateVector) - 1;
+        std::cout << "New state created at index: " << currentStateHandler << std::endl;
+    }
+
+    // return a reference to the currently running state, using the thread_local index
+    EnergyPlusData & getCurrentState() {
+        return *stateVector[currentStateHandler];
+    }
+
+    // get rid of the current state instance from the vector -- when the thread ends I assume it will delete the thread_local variable
+    void deleteCurrentState() {
+        delete stateVector[currentStateHandler];
     }
 
 }

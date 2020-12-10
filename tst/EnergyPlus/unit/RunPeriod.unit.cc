@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(7);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
     EXPECT_EQ(WeatherManager::WeekDay::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay);
@@ -269,7 +269,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
 
     EXPECT_TRUE(errors_in_input);
 }
@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
-        WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
         // This should just issue a warning
         EXPECT_FALSE(ErrorsFound);
 
@@ -370,7 +370,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
-        WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
+        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
         // This should issue a severe
         EXPECT_TRUE(ErrorsFound);
 
@@ -407,7 +407,7 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
 
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
-        WeatherManager::GetRunPeriodDesignData(*state, ErrorsFound);
+        WeatherManager::GetRunPeriodDesignData(ErrorsFound);
         // This should just issue a severe
         EXPECT_TRUE(ErrorsFound);
 
@@ -444,7 +444,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
 
     EXPECT_FALSE(errors_in_input);
 
@@ -455,7 +455,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
     state->dataWeatherManager->TotRunDesPers = 0;
 
     state->dataWeatherManager->WFAllowsLeapYears = true; // This was hitting a bad bit of logic
-    WeatherManager::SetupEnvironmentTypes(*state);
+    WeatherManager::SetupEnvironmentTypes();
 
     EXPECT_FALSE(state->dataWeatherManager->Environment[0].IsLeapYear);
     EXPECT_EQ(365, state->dataWeatherManager->Environment[0].TotalDays);

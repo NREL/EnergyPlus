@@ -118,12 +118,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
 
     ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
 
@@ -167,12 +167,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error);
 
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -219,12 +219,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error);
 
     error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -287,8 +287,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     bool ErrorsFound1(false);
 
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound1);
+    ScheduleManager::ProcessScheduleInput(); // read schedules
+    HeatBalanceManager::GetZoneData(ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
     ScheduleManager::ScheduleInputProcessed = true;
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     ScheduleManager::Schedule(2).MinValue = 131.8;
     ScheduleManager::Schedule(2).MaxValue = 131.8;
     ScheduleManager::Schedule(2).MaxMinSet = true;
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
 
     EXPECT_FALSE(InternalHeatGains::ErrorsFound);
 }
@@ -471,7 +471,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -479,17 +479,17 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::CalcZoneITEq(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::CalcZoneITEq();
     Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
 
     DataLoopNode::Node(1).Temp = 45.0;
-    InternalHeatGains::CalcZoneITEq(*state);
+    InternalHeatGains::CalcZoneITEq();
     Real64 NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData();
 
-    InternalHeatGains::CalcZoneITEq(*state);
+    InternalHeatGains::CalcZoneITEq();
     NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
     ASSERT_EQ(InitialPower, NewPower);
 }
@@ -653,9 +653,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
@@ -669,10 +669,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     for (int gainType = 1; gainType <= numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(*state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
+        SetupZoneInternalGain(zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
-    InternalHeatGains::UpdateInternalGainValues(*state);
+    InternalHeatGains::UpdateInternalGainValues();
 
     // Check total of all convective gains
     InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);
@@ -685,12 +685,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 10;
     state->dataGlobal->TimeStep = 1;
-    OutputReportTabular::AllocateLoadComponentArrays(*state);
+    OutputReportTabular::AllocateLoadComponentArrays();
     int timeStepInDay = (state->dataGlobal->HourOfDay - 1) * state->dataGlobal->NumOfTimeStepInHour + state->dataGlobal->TimeStep;
 
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
-    InternalHeatGains::GatherComponentLoadsIntGain(*state);
+    InternalHeatGains::GatherComponentLoadsIntGain();
     totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -893,10 +893,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
 
     DataLoopNode::Node(1).Temp = 45.0;
-    InternalHeatGains::CalcZoneITEq(*state);
+    InternalHeatGains::CalcZoneITEq();
     ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
                      DataHeatBalance::Zone(1).AdjustedReturnTempByITE);
     ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
@@ -1038,7 +1038,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     bool ErrorsFound(false);
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1046,8 +1046,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::CalcZoneITEq(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::CalcZoneITEq();
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
     Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
@@ -1299,19 +1299,19 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     state->dataEnvrn->DayOfYear_Schedule = 1;
     state->dataEnvrn->DayOfMonth = 1;
     state->dataEnvrn->DayOfWeek = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceManager::AllocateHeatBalArrays();
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
 
     EXPECT_EQ(DataHeatBalance::TotPeople, 1);
     EXPECT_EQ(DataHeatBalance::TotLights, 1);
@@ -1325,7 +1325,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 
     // First time should be all good, because ZnRpt values intialize to zero
-    InternalHeatGains::InitInternalHeatGains(*state);
+    InternalHeatGains::InitInternalHeatGains();
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
@@ -1337,7 +1337,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
-    InternalHeatGains::InitInternalHeatGains(*state);
+    InternalHeatGains::InitInternalHeatGains();
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
@@ -1560,7 +1560,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1568,7 +1568,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -1783,7 +1783,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1791,7 +1791,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
+    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput());
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesGoodInletNode)
@@ -2009,7 +2009,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2017,7 +2017,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -2236,7 +2236,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2244,7 +2244,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
+    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput());
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
@@ -2462,7 +2462,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2470,6 +2470,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput();
     ASSERT_FALSE(ErrorsFound);
 }

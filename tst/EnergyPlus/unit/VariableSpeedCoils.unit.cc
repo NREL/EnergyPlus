@@ -2486,7 +2486,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    VariableSpeedCoils::GetVarSpeedCoilInput();
 
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
 
@@ -2655,7 +2655,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    VariableSpeedCoils::GetVarSpeedCoilInput();
 
     ASSERT_EQ("HEATING COIL VARIABLESPEED", state->dataVariableSpeedCoils->VarSpeedCoil(1).Name); // Heating Coil Variable Speed
     ASSERT_EQ(-60.0, state->dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
@@ -2752,7 +2752,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    VariableSpeedCoils::GetVarSpeedCoilInput();
 
     Real64 LSInletDBTemp = 24.0; // conditions at 24 DB / 20 Wb found at http://www.sugartech.co.za/psychro/index.php
     Real64 LSInletHumRat = 0.013019367;
@@ -2773,7 +2773,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(*state, LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
                                              LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
                                              QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
                                              state->dataVariableSpeedCoils->VarSpeedCoil(1).capModFacTotal);
@@ -2781,8 +2781,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     // same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
     Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                      // Change in air enthalpy across the cooling coil [J/kg]
     Real64 hADP = LSInletEnth - hDelta / (1.0 - CBFSpeed);               // Apparatus dew point enthalpy [J/kg]
-    Real64 tADP = Psychrometrics::PsyTsatFnHPb(*state, hADP, InletAirPressure);  // Apparatus dew point temperature [C]
-    Real64 wADP = Psychrometrics::PsyWFnTdbH(*state, tADP, hADP);                // Apparatus dew point humidity ratio [kg/kg]
+    Real64 tADP = Psychrometrics::PsyTsatFnHPb(hADP, InletAirPressure);  // Apparatus dew point temperature [C]
+    Real64 wADP = Psychrometrics::PsyWFnTdbH(tADP, hADP);                // Apparatus dew point humidity ratio [kg/kg]
     Real64 hTinwADP = Psychrometrics::PsyHFnTdbW(LSInletDBTemp, wADP);   // Enthalpy at inlet dry-bulb and wADP [J/kg]
     Real64 SHRCalc = min((hTinwADP - hADP) / (LSInletEnth - hADP), 1.0); // temporary calculated value of SHR
 
@@ -2796,7 +2796,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 OutletTemp = LSInletDBTemp - (1.0 - CBFSpeed) * (LSInletDBTemp - tADP);
     Real64 OutletHumRat = LSInletHumRat - (1.0 - CBFSpeed) * (LSInletHumRat - wADP);
     Real64 OutletEnthalpy = LSInletEnth - hDelta;
-    Real64 OutletAirRH = Psychrometrics::PsyRhFnTdbWPb(*state, OutletTemp, OutletHumRat, InletAirPressure);
+    Real64 OutletAirRH = Psychrometrics::PsyRhFnTdbWPb(OutletTemp, OutletHumRat, InletAirPressure);
 
     // outlet conditions should be very near the saturation curve
     EXPECT_NEAR(OutletTemp, tADP, 0.0001);

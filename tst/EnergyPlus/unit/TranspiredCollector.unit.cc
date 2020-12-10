@@ -202,21 +202,21 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(*state);
+    ScheduleManager::ProcessScheduleInput();
 
-    GetProjectControlData(*state, ErrorsFound); // read project control data
+    GetProjectControlData(ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
-    GetZoneData(*state, ErrorsFound);
-    GetZoneEquipmentData(*state);
+    GetZoneData(ErrorsFound);
+    GetZoneEquipmentData();
 
-    GetMaterialData(*state, ErrorsFound); // read material data
+    GetMaterialData(ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(*state, ErrorsFound); // read construction data
+    GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(*state, ErrorsFound);  // read zone data
+    GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
@@ -227,17 +227,17 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     state->dataEnvrn->OutDryBulbTemp = 20.0;
     state->dataEnvrn->OutWetBulbTemp = 15.0;
 
-    SetSurfaceOutBulbTempAt(*state);
+    SetSurfaceOutBulbTempAt();
 
     InitializePsychRoutines();
 
-    GetTranspiredCollectorInput(*state);
+    GetTranspiredCollectorInput();
     EXPECT_FALSE(ErrorsFound);
 
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     state->dataEnvrn->SkyTemp = 24.0;
     state->dataEnvrn->IsRain = false;
 
-    InitTranspiredCollector(*state, UTSCNum);
+    InitTranspiredCollector(UTSCNum);
 
     EXPECT_DOUBLE_EQ(22.0, state->dataTranspiredCollector->UTSC(UTSCNum).Tcoll);
     EXPECT_DOUBLE_EQ(22.5, state->dataTranspiredCollector->UTSC(UTSCNum).Tplen);

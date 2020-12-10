@@ -115,33 +115,33 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     thisModel->minDailyAirTemp = 5.0;
     thisModel->dayOfMinDailyAirTemp = 30;
 
-    thisModel->performSimulation(*state);
+    thisModel->performSimulation();
 
-    EXPECT_NEAR(4.51, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 1), 0.01);
-    EXPECT_NEAR(19.14, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 6), 0.01);
-    EXPECT_NEAR(7.96, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 12), 0.01);
-    EXPECT_NEAR(3.46, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 14), 0.01);
+    EXPECT_NEAR(4.51, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.01);
+    EXPECT_NEAR(19.14, thisModel->getGroundTempAtTimeInMonths(0.0, 6), 0.01);
+    EXPECT_NEAR(7.96, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.01);
+    EXPECT_NEAR(3.46, thisModel->getGroundTempAtTimeInMonths(0.0, 14), 0.01);
 
-    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInMonths(*state, 3.0, 1), 0.01);
-    EXPECT_NEAR(11.78, thisModel->getGroundTempAtTimeInMonths(*state, 3.0, 6), 0.01);
-    EXPECT_NEAR(15.57, thisModel->getGroundTempAtTimeInMonths(*state, 3.0, 12), 0.01);
+    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInMonths(3.0, 1), 0.01);
+    EXPECT_NEAR(11.78, thisModel->getGroundTempAtTimeInMonths(3.0, 6), 0.01);
+    EXPECT_NEAR(15.57, thisModel->getGroundTempAtTimeInMonths(3.0, 12), 0.01);
 
-    EXPECT_NEAR(14.58, thisModel->getGroundTempAtTimeInMonths(*state, 25.0, 1), 0.01);
-    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInMonths(*state, 25.0, 6), 0.01);
-    EXPECT_NEAR(14.53, thisModel->getGroundTempAtTimeInMonths(*state, 25.0, 12), 0.01);
+    EXPECT_NEAR(14.58, thisModel->getGroundTempAtTimeInMonths(25.0, 1), 0.01);
+    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInMonths(25.0, 6), 0.01);
+    EXPECT_NEAR(14.53, thisModel->getGroundTempAtTimeInMonths(25.0, 12), 0.01);
 
-    EXPECT_NEAR(5.04, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 0.0), 0.01);
-    EXPECT_NEAR(19.28, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 14342400), 0.01);
-    EXPECT_NEAR(7.32, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 30153600), 0.01);
-    EXPECT_NEAR(3.53, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 35510400), 0.01);
+    EXPECT_NEAR(5.04, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);
+    EXPECT_NEAR(19.28, thisModel->getGroundTempAtTimeInSeconds(0.0, 14342400), 0.01);
+    EXPECT_NEAR(7.32, thisModel->getGroundTempAtTimeInSeconds(0.0, 30153600), 0.01);
+    EXPECT_NEAR(3.53, thisModel->getGroundTempAtTimeInSeconds(0.0, 35510400), 0.01);
 
-    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInSeconds(*state, 3.0, 1296000), 0.01);
-    EXPECT_NEAR(11.80, thisModel->getGroundTempAtTimeInSeconds(*state, 3.0, 14342400), 0.01);
-    EXPECT_NEAR(15.46, thisModel->getGroundTempAtTimeInSeconds(*state, 3.0, 30153600), 0.01);
+    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInSeconds(3.0, 1296000), 0.01);
+    EXPECT_NEAR(11.80, thisModel->getGroundTempAtTimeInSeconds(3.0, 14342400), 0.01);
+    EXPECT_NEAR(15.46, thisModel->getGroundTempAtTimeInSeconds(3.0, 30153600), 0.01);
 
-    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(*state, 25.0, 0.0), 0.01);
-    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInSeconds(*state, 25.0, 14342400), 0.01);
-    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(*state, 25.0, 30153600), 0.01);
+    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(25.0, 0.0), 0.01);
+    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInSeconds(25.0, 14342400), 0.01);
+    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(25.0, 30153600), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
     thisModel->evapotransCoeff = 0.408;
 
     // No Weather file specified, so we expect it to fail
-    ASSERT_THROW(thisModel->getWeatherData(*state), std::runtime_error);
+    ASSERT_THROW(thisModel->getWeatherData(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
@@ -278,14 +278,14 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Read the project data, such as Timestep
     state->dataGlobal->BeginSimFlag = true;
-    SimulationManager::GetProjectData(*state);
+    SimulationManager::GetProjectData();
     EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    SimulationManager::SetupSimulation(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     thisModel->evapotransCoeff = 0.408;
 
     // Shouldn't throw
-    thisModel->getWeatherData(*state);
+    thisModel->getWeatherData();
 
     // It should have reverted the added period
     EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);

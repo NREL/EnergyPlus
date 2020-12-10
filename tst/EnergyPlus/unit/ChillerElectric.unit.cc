@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(*state);
+    ElectricChillerSpecs::getInput();
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -159,11 +159,11 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 
     Psychrometrics::InitializePsychRoutines();
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
-    thisChiller.initialize(*state, RunFlag, MyLoad);
-    thisChiller.size(*state);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
     // run init again after sizing is complete to set mass flow rate
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.initialize(RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state->dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
@@ -181,8 +181,8 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     state->dataPlantChillers->ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // do autosizing calc
-    thisChiller.initialize(*state, RunFlag, MyLoad);
-    thisChiller.size(*state);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
     // check autocalculate chiller nominal capacity
     EXPECT_DOUBLE_EQ(state->dataPlantChillers->ElectricChiller(1).NomCap, 20987.509055700004);
     // check autocalculate chiller evap water vol flow rate
@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(*state);
+    ElectricChillerSpecs::getInput();
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -286,11 +286,11 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     Psychrometrics::InitializePsychRoutines();
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
-    thisChiller.initialize(*state, RunFlag, MyLoad);
-    thisChiller.size(*state);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
     // run init again after sizing is complete to set mass flow rate
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.initialize(RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state->dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
@@ -308,8 +308,8 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataPlantChillers->ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // Do autosizing calcs
-    thisChiller.initialize(*state, RunFlag, MyLoad);
-    thisChiller.size(*state);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
 
     // simulate
     PlantLocation loc(1, 1, 1, 1);
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     Real64 curLoad = -10000.0;
     bool runFlag = true;
 
-    thisChiller.simulate(*state, loc, firstHVAC, curLoad, runFlag);
+    thisChiller.simulate(loc, firstHVAC, curLoad, runFlag);
 
     Real64 TestCOP = thisChiller.QEvaporator / thisChiller.Power;
     EXPECT_NEAR(TestCOP, thisChiller.ActualCOP, 1E-3);

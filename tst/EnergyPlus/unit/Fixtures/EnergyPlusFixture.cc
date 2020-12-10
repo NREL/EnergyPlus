@@ -92,13 +92,13 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 
 void EnergyPlusFixture::SetUp()
 {
-    this->state = new EnergyPlusData;
-    EnergyPlus::clearAllStates(*state);
+    this->state = &getCurrentState(0);
+    EnergyPlus::clearAllStates();
     EnergyPlus::inputProcessor->clear_state();
 
     show_message();
 
-    openOutputFiles(*state);
+    openOutputFiles(*this->state);
 
     this->err_stream = new std::ostringstream;
     this->json_stream = new std::ostringstream;
@@ -131,8 +131,7 @@ void EnergyPlusFixture::TearDown()
     state->files.mtr.del();
     state->files.bnd.del();
     state->files.shade.del();
-    clearAllStates(*this->state);
-    delete this->state;
+    clearAllStates();
 }
 
 void EnergyPlusFixture::show_message()
@@ -140,7 +139,7 @@ void EnergyPlusFixture::show_message()
     // Gets information about the currently running test.
     // Do NOT delete the returned object - it's managed by the UnitTest class.
     const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-    ShowMessage(*state, "Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
+    ShowMessage("Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -347,10 +346,10 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors(*state);
+    bool hasErrors = inputProcessor->processErrors();
 
     inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing(*state);
+    SimulationManager::PostIPProcessing();
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;

@@ -72,7 +72,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::OtherFuel1);
 }
@@ -89,7 +89,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
                                                       "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
     EXPECT_FALSE(process_idf(idf_objects, false));
-    ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(*state), std::runtime_error);
+    ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - \"Electricity\" - Failed to match against any enum values.",
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Coal);
 }
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Propane);
 }
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.0, 1, 2);
     Real64 HeatLoad00 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
         (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad00, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.5, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.5, 1, 2);
     Real64 HeatLoad05 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad05, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 1.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 1.0, 1, 2);
     Real64 HeatLoad10 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -

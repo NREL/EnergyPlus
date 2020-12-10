@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult5 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
-    CalcNodeHeatFlux(*state, SurfNum, numNodes);
+    CalcNodeHeatFlux(SurfNum, numNodes);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     expectedResult1 = expectedResult1 + (SurfaceFD(SurfNum).TDT(nodeNum) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum)) *
                                             SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / state->dataGlobal->TimeStepZoneSec;
 
-    CalcNodeHeatFlux(*state, SurfNum, numNodes);
+    CalcNodeHeatFlux(SurfNum, numNodes);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
@@ -219,7 +219,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
 
     // create a materials data object and assign the phase change variable based on above IDF processing
     Material::MaterialProperties material;
-    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(*state, "PCMNAME");
+    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory("PCMNAME");
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;

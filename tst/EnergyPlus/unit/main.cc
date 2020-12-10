@@ -50,9 +50,12 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 // Google Test main
 int main(int argc, char **argv)
 {
+    EnergyPlus::createNewStateVector();
 #ifdef ENABLE_GTEST_DEBUG_MODE
     ::testing::GTEST_FLAG(break_on_failure) = true;
     ::testing::GTEST_FLAG(catch_exceptions) = false;

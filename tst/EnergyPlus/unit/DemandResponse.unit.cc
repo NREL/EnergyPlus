@@ -78,7 +78,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     OAController.allocate(NumOAControllers);
     OAController(1).Name = "OA CONTROLLER 1";
 
-    GetDemandManagerInput(*state);
+    GetDemandManagerInput();
     auto & DemandMgr(state->dataDemandManager->DemandMgr);
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, DemandMgr(1).AvailSchedule);
     EXPECT_EQ(Limit::ManagerLimitFixed, DemandMgr(1).LimitControl);

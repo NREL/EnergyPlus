@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 
     state->dataGlobal->DoWeathSim = true;
 
-    GetIndirectAbsorberInput(*state);
+    GetIndirectAbsorberInput();
 
     EXPECT_EQ(state->dataChillerIndirectAbsorption->IndirectAbsorber.size(), 1u);
     EXPECT_EQ(state->dataChillerIndirectAbsorption->IndirectAbsorber(1).Name, "BIG CHILLER");

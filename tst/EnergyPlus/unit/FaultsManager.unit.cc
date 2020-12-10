@@ -138,11 +138,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
     EXPECT_TRUE(TestRestult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
     EXPECT_FALSE(TestRestult);
 
     // Clean up
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataEnvrn->StdRhoAir = 1.2;
 
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
-    EXPECT_NO_THROW(CheckAndReadFaults(*state));
+    EXPECT_NO_THROW(CheckAndReadFaults());
     compare_err_stream("", true);
 
     DataSizing::CurZoneEqNum = 0;
@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     DataSizing::DataNonZoneNonAirloopValue = 0.114;
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
-    EXPECT_NO_THROW(Fans::SizeFan(*state, FanNum));
+    EXPECT_NO_THROW(Fans::SizeFan(FanNum));
     EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
 }
 
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataEnvrn->StdRhoAir = 1.2;
 
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
-    EXPECT_NO_THROW(CheckAndReadFaults(*state));
+    EXPECT_NO_THROW(CheckAndReadFaults());
     compare_err_stream("", true);
 
     DataSizing::CurZoneEqNum = 0;
@@ -325,7 +325,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     DataSizing::DataNonZoneNonAirloopValue = 0.15;
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
-    EXPECT_ANY_THROW(Fans::SizeFan(*state, FanNum));
+    EXPECT_ANY_THROW(Fans::SizeFan(FanNum));
     EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
-    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
+    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
         Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
@@ -464,11 +464,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Readin inputs
-    SetPointManager::GetSetPointManagerInputs(*state);
-    HVACControllers::GetControllerInput(*state);
+    SetPointManager::GetSetPointManagerInputs();
+    HVACControllers::GetControllerInput();
 
     // Run
-    CheckAndReadFaults(*state);
+    CheckAndReadFaults();
 
     // Check
     EXPECT_EQ(2.0, FaultsCoilSATSensor(1).Offset);
@@ -533,7 +533,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_CalFaultOffsetAct)
     Fault.Offset = 10;
 
     // Run and Check
-    OffsetAct = Fault.CalFaultOffsetAct(*state);
+    OffsetAct = Fault.CalFaultOffsetAct();
     EXPECT_EQ(10, OffsetAct);
 }
 
@@ -652,9 +652,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    MixedAir::GetOAControllerInputs(*state);
+    MixedAir::GetOAControllerInputs();
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
@@ -699,7 +699,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(*state), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
@@ -763,7 +763,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(*state), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
@@ -882,10 +882,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(*state);  // read schedule data
-    int avaiSchedIndex = ScheduleManager::GetScheduleIndex(*state, "AVAILSCHED");
+    ScheduleManager::ProcessScheduleInput();  // read schedule data
+    int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
-    int severitySchedIndex = ScheduleManager::GetScheduleIndex(*state, "SEVERITYSCHED");
+    int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");
     EXPECT_EQ(2, severitySchedIndex);
 
 
@@ -894,14 +894,14 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     //HVACControllers::GetControllerInput();
 
     // Run
-    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults(*state));
+    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults());
 
     // Read schedule values
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DayOfWeek = 1;
     state->dataEnvrn->DayOfYear_Schedule = 1;
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
     EXPECT_EQ(2, FaultsManager::NumFouledCoil);
     // This should also have called WaterCoil::GetWaterCoilInput

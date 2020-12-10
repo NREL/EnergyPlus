@@ -65,7 +65,7 @@ TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
     bool fileFound = false;
     std::string fullPath;
     std::string contextString = "Test File_Not_Found_ERR_Output";
-    DataSystemVariables::CheckForActualFileName(*this->state, filePath, fileFound, fullPath, contextString);
+    DataSystemVariables::CheckForActualFileName(filePath, fileFound, fullPath, contextString);
     EXPECT_FALSE(fileFound);
     EXPECT_TRUE(match_err_stream(expectedError));
 }

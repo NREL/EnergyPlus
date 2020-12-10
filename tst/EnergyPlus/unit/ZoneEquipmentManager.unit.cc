@@ -124,11 +124,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(*state, ErrorsFound);
+    GetSimpleAirModelInputs(ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -145,21 +145,21 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-    CalcZoneMassBalance(*state, false);
+    CalcZoneMassBalance(false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess balanced zone exhaust from exhaust fan, still no warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance(*state, false);
+    CalcZoneMassBalance(false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance(*state, false);
+    CalcZoneMassBalance(false);
     EXPECT_TRUE(has_err_output());
 
     // Deallocate everything - should all be taken care of in clear_states
@@ -378,11 +378,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    ScheduleManager::ProcessScheduleInput(*state);
-    GetZoneData(*state, ErrorsFound);
+    ScheduleManager::ProcessScheduleInput();
+    GetZoneData(ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
 
-    GetSimpleAirModelInputs(*state, ErrorsFound);
+    GetSimpleAirModelInputs(ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -410,17 +410,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     DataHeatBalance::AirFlowFlag = 1;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MIXINGAVAILSCHED")).CurrentValue = 1.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MININDOORTEMP")).CurrentValue = 18.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MAXINDOORTEMP")).CurrentValue = 100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("DELTATEMP")).CurrentValue = 2.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MINOUTDOORTEMP")).CurrentValue = -100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MAXOUTDOORTEMP")).CurrentValue = 100.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    InitSimpleMixingConvectiveHeatGains(*state);
+    InitSimpleMixingConvectiveHeatGains();
 
-    CalcAirFlowSimple(*state, 2);
+    CalcAirFlowSimple(2);
 
     EXPECT_NEAR(720.738493, DataHeatBalFanSys::MCPM(1), 0.00001);
     EXPECT_NEAR(119.818784, DataHeatBalFanSys::MCPM(2), 0.00001);
@@ -510,11 +510,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(*state, ErrorsFound);
+    GetSimpleAirModelInputs(ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
@@ -583,7 +583,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     StdTotalReturnMassFlow = 0.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
@@ -644,11 +644,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(*state, ErrorsFound);
+    GetSimpleAirModelInputs(ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -678,14 +678,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
         Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
-    CalcZoneMassBalance(*state, false);
+    CalcZoneMassBalance(false);
     EXPECT_EQ(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
-    CalcZoneMassBalance(*state, false);
+    CalcZoneMassBalance(false);
     EXPECT_NEAR(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
 }
 
@@ -744,11 +744,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(*state, ErrorsFound);
+    GetSimpleAirModelInputs(ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
@@ -820,7 +820,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 5.9);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.9);
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(*state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
@@ -937,9 +937,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -963,7 +963,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -976,7 +976,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -996,7 +996,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1009,7 +1009,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 4 - Cooling, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1112,9 +1112,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1137,8 +1137,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired / 3.0);
@@ -1155,8 +1155,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 
     // UniformLoad Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired / 3.0);
@@ -1176,8 +1176,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1194,8 +1194,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 
     // UniformLoad Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1298,9 +1298,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1340,8 +1340,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
@@ -1353,14 +1353,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1368,7 +1368,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1376,8 +1376,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 
     // UniformPLR Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), thisZEqList.HeatingCapacity(3) * plr);
@@ -1398,8 +1398,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
@@ -1412,8 +1412,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 
     // UniformPLR Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1516,9 +1516,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1558,8 +1558,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
@@ -1571,14 +1571,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1586,7 +1586,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1598,8 +1598,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / thisZEqList.HeatingCapacity(1);
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), 0.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1620,8 +1620,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.HeatingCapacity(1) + thisZEqList.HeatingCapacity(2));
     energy.OutputRequiredToHeatingSP = 2100.0;
     energy.OutputRequiredToCoolingSP = 2200.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1642,8 +1642,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.HeatingCapacity(1) + thisZEqList.HeatingCapacity(2) + thisZEqList.HeatingCapacity(3));
     energy.OutputRequiredToHeatingSP = 3600.0;
     energy.OutputRequiredToCoolingSP = 3800.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), thisZEqList.HeatingCapacity(3) * plr);
@@ -1664,8 +1664,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
@@ -1682,8 +1682,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1));
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -1200.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), 0.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1704,8 +1704,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1) + thisZEqList.CoolingCapacity(2));
     energy.OutputRequiredToHeatingSP = -1500.0;
     energy.OutputRequiredToCoolingSP = -1600.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1727,8 +1727,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1) + thisZEqList.CoolingCapacity(2));
     energy.OutputRequiredToHeatingSP = -2500.0;
     energy.OutputRequiredToCoolingSP = -2600.0;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1842,9 +1842,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1872,7 +1872,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1888,7 +1888,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -1896,7 +1896,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -1904,7 +1904,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -1912,14 +1912,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    SetZoneEquipSimOrder(*state, ZoneNum, ZoneNum);
-    DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration);
+    SetZoneEquipSimOrder(ZoneNum, ZoneNum);
+    DistributeSystemOutputRequired(ZoneNum, firstHVACIteration);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    UpdateSystemOutputRequired(ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
 
     // Expect next sequenced load #2 to be Total minus SysOutputProvided here, others unchanged
     Real64 expectedHeatLoad = energy.OutputRequiredToHeatingSP - SysOutputProvided;
@@ -2068,9 +2068,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
-    AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneData(ErrorsFound);
+    AllocateHeatBalArrays();
+    GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -2093,17 +2093,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -2119,7 +2119,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -2127,7 +2127,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2135,7 +2135,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2143,12 +2143,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(ZoneNum, firstHVACIteration, true);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    UpdateSystemOutputRequired(ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
 
     // Expect next sequenced load fractions to be applied here on the first and second equipments
     Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
@@ -2575,7 +2575,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
         }
     }
 
-    ZoneEquipmentManager::RezeroZoneSizingArrays(*state);
+    ZoneEquipmentManager::RezeroZoneSizingArrays();
 
     for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
         for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {

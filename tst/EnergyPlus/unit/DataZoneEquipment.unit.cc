@@ -82,8 +82,8 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 
     ZoneEquipInputsFilled = true;
 
-    EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, "NonExistingZone"));
-    EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, "Zone1"));
+    EXPECT_EQ(0, GetSystemNodeNumberForZone("NonExistingZone"));
+    EXPECT_EQ(1, GetSystemNodeNumberForZone("Zone1"));
 
     ZoneEquipConfig.deallocate();
 }
@@ -128,23 +128,23 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     Real64 OAVolumeFlowRate;
     // Test ZOAM_ProportionalControlSchOcc
     state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
     EXPECT_NEAR(0.031, OAVolumeFlowRate, 0.00001);
 
     state->dataContaminantBalance->ZoneAirCO2(1) = 405.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
     EXPECT_NEAR(0.0308115, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_ProportionalControlDesOcc
     state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
     EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_IAQP
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
     state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * state->dataEnvrn->StdRhoAir;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
     EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);
 
     // Cleanup

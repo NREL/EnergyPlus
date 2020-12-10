@@ -80,9 +80,9 @@ protected:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-    static std::string & convertToMonth(EnergyPlusData &state, std::string &datetime)
+    static std::string & convertToMonth(std::string &datetime)
     {
-        return ResultsFramework::CSVWriter::convertToMonth(state, datetime);
+        return ResultsFramework::CSVWriter::convertToMonth(datetime);
     }
 };
 

@@ -77,11 +77,11 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    WaterManager::GetWaterManagerInput(*state);
+    WaterManager::GetWaterManagerInput();
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation(*state);
+    WaterManager::UpdatePrecipitation();
 
     Real64 ExpectedNomAnnualRain = 0.80771;
     Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour;
@@ -110,11 +110,11 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
         "1;",
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    WaterManager::GetWaterManagerInput(*state);
+    WaterManager::GetWaterManagerInput();
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation(*state);
+    WaterManager::UpdatePrecipitation();
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);

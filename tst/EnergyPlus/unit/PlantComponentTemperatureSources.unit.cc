@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     bool runFlag = false;
     state->dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    PlantComponentTemperatureSources::GetWaterSourceInput(*state);
+    PlantComponentTemperatureSources::GetWaterSourceInput();
 
     // We can check that GetInput happened properly here
     EXPECT_EQ(1u, PlantComponentTemperatureSources::WaterSource.size());
@@ -108,13 +108,13 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // Second call is on firstHVAC, no load at the moment
     firstHVACIteration = true;
     PlantLocation loc;
-    waterSource1.simulate(*state, loc, firstHVACIteration, myLoad, runFlag);
+    waterSource1.simulate(loc, firstHVACIteration, myLoad, runFlag);
     EXPECT_NEAR(0.0, waterSource1.MassFlowRate, 0.00001);
 
     // Third call is no longer firstHVAC, and we now have a load
     firstHVACIteration = false;
     myLoad = 1696.55;
-    waterSource1.simulate(*state, loc, firstHVACIteration, myLoad, runFlag);
+    waterSource1.simulate(loc, firstHVACIteration, myLoad, runFlag);
     EXPECT_NEAR(0.05, waterSource1.MassFlowRate, 0.001);
 
     // Do this for scheduled temperature

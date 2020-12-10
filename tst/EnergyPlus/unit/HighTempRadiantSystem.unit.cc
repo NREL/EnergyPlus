@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ErrorsFound = false;
 
-    GetHighTempRadiantSystem(*state, ErrorsFound);
+    GetHighTempRadiantSystem(ErrorsFound);
 
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     if (SizingTypesNum < 1) SizingTypesNum = 1;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-    SizeHighTempRadiantSystem(*state, RadSysNum);
+    SizeHighTempRadiantSystem(RadSysNum);
     EXPECT_FALSE(DataSizing::DataScalableSizingON);
 }
 

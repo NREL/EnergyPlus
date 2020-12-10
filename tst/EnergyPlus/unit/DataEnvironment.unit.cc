@@ -67,16 +67,16 @@ TEST_F(EnergyPlusFixture, DataEnvironment_WindSpeedAt)
 
     // Start with normal mode
     state->dataEnvrn->SiteWindExp = 0.1;
-    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
-    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
-    EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);
-    EXPECT_NEAR(2.612, DataEnvironment::WindSpeedAt(*state, 5.0), 0.001);
-    EXPECT_NEAR(2.799, DataEnvironment::WindSpeedAt(*state, 10.0), 0.001);
-    EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(*state, 20.0), 0.001);
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(-1.0), 0.001);
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(0.0), 0.001);
+    EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(1.0), 0.001);
+    EXPECT_NEAR(2.612, DataEnvironment::WindSpeedAt(5.0), 0.001);
+    EXPECT_NEAR(2.799, DataEnvironment::WindSpeedAt(10.0), 0.001);
+    EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(20.0), 0.001);
 
     // If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
     state->dataEnvrn->SiteWindExp = 0.0;
-    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
-    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
-    EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(-1.0), 0.001);
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(0.0), 0.001);
+    EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(1.0), 0.001);
 }

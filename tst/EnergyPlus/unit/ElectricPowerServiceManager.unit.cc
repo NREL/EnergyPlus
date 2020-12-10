@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     int CurveNum1 = 1;
     Real64 k = 0.5874;
@@ -215,7 +215,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
     Real64 Pw = 2.0;
     Real64 q0 = 60.2;
 
-    EXPECT_TRUE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(*state,
+    EXPECT_TRUE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(
         I0, T0, Volt, Pw, q0, CurveNum1, k, c, qmax, E0c, InternalR));
 
     I0 = -222.7;
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
     Pw = 48000;
     q0 = 0;
 
-    EXPECT_FALSE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(*state,
+    EXPECT_FALSE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(
         I0, T0, Volt, Pw, q0, CurveNum1, k, c, qmax, E0c, InternalR));
 }
 
@@ -268,7 +268,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Case 1 ACBuss - Generators 1000+2000=3000, thermal 500+750=1250
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBuss;
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermProdRate = 750.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->thermalProd = 500.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermalProd = 750.0 * 3600.0;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
@@ -343,12 +343,12 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Case 2 ACBussStorage - Generators 1000+2000=3000, Storage 200-150=50
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBussStorage;
     //	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storagePresent
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage("TEST STORAGE BANK"));
 
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
 
@@ -364,7 +364,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVDischargeRate = 200.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVChargeRate = 150.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -441,14 +441,14 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Case 3 DCBussInverter   Inverter = 3000,
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverter;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter("TEST INVERTER"));
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
@@ -457,9 +457,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
 
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electricityProd = 1000.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->electricityProd = 2000.0 * 3600.0;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(*state, 3000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(3000.0);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelFeedInRate, 3000.0, 0.1);
@@ -538,12 +538,12 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -553,12 +553,12 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverterDCStorage;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter("TEST INVERTER"));
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -566,9 +566,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electricityProd = 2000.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->electricityProd = 3000.0 * 3600.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(*state, 5000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(5000.0);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 5000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 5000.0 * 3600.0, 0.1);
@@ -636,7 +636,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -646,16 +646,16 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Case 5 DCBussInverterACStorage     Inverter = 5000, , Storage 200-150=50, thermal should still be same as Case 1
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = (ElectPowerLoadCenter::ElectricBussType::dCBussInverterACStorage);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter("TEST INVERTER"));
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage("TEST STORAGE BANK"));
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVDischargeRate = 200.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVChargeRate = 150.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -667,9 +667,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->thermalProd = 500.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermalProd = 750.0 * 3600.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(*state, 5000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(*state);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(5000.0);
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelFeedInRate, 5050.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelDrawRate, 0.0, 0.1);
@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
     createFacilityElectricPowerServiceObject();
     bool SimElecCircuitsFlag = false;
     // GetInput and other code will be executed and SimElectricCircuits will be true
-    facilityElectricServiceObj->manageElectricPowerService(*state, true, SimElecCircuitsFlag, false);
+    facilityElectricServiceObj->manageElectricPowerService(true, SimElecCircuitsFlag, false);
     EXPECT_TRUE(SimElecCircuitsFlag);
     EXPECT_EQ(facilityElectricServiceObj->elecLoadCenterObjs[0]->numGenerators,
               0); // dummy generator has been added and report variables are available
@@ -790,15 +790,15 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    ScheduleManager::ProcessScheduleInput(*state);
+    ScheduleManager::ProcessScheduleInput();
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(*state, "TRANSFORMER"));
-    Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(*state, 2000.0);
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer("TRANSFORMER"));
+    Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(2000.0);
     // check the transformer loss rate for load and no load condition
     EXPECT_EQ(expectedtransformerObjLossRate, 0.0);
 }
@@ -932,7 +932,7 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_Photovolta
     ASSERT_TRUE(process_idf(idf_objects));
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Should warn only for SimplePV because SimplePV2 doesn't have a schedule, and the other one is a Perf One-Diode and not "Simple"
     std::string const error_string = delimited_string({
@@ -1019,7 +1019,7 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_PVWatts)
     ASSERT_TRUE(process_idf(idf_objects));
 
     createFacilityElectricPowerServiceObject();
-    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
 
     // Should warn only for PVWatts1 because PVWatts2 doesn't have a schedule
     std::string const error_string = delimited_string({

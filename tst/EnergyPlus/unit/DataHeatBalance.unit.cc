@@ -801,37 +801,37 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(*state, ErrorsFound); // read project control data
+    GetProjectControlData(ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read material data
+    GetMaterialData(ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetFrameAndDividerData(*state, ErrorsFound);
+    GetFrameAndDividerData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SetPreConstructionInputParameters(*state);
+    SetPreConstructionInputParameters();
 
     ErrorsFound = false;
-    GetConstructData(*state, ErrorsFound); // read construction data
+    GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);  // read zone data
+    GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(*state,
-                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer(*state)
+    SurfaceGeometry::SetupZoneGeometry(
+                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(state->dataConstruction->Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
@@ -852,12 +852,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
-    SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
+    SetFlagForWindowConstructionWithShadeOrBlindLayer();
     EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
 
-    GetEMSInput(*state);
+    GetEMSInput();
     // check if EMS actuator is not setup because there is no blind/shade layer
-    SetupWindowShadingControlActuators(*state);
+    SetupWindowShadingControlActuators();
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
@@ -881,12 +881,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(5), 4); // glass, inner layer
 
     // check if the construction has a blind material layer
-    SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
+    SetFlagForWindowConstructionWithShadeOrBlindLayer();
     EXPECT_TRUE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
     SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
-    SetupWindowShadingControlActuators(*state);
+    SetupWindowShadingControlActuators();
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);
     EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(1).ComponentTypeName, "Window Shading Control");
     EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(1).ControlTypeName, "Control Status");
@@ -910,19 +910,19 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicula
     // Test 1: User value is less than zero--should be reset to zero
     userInputValue = -0.25;
     expectedReturnValue = 0.0;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
     // Test 2: User value is greater than unity--should be reset to 1.0
     userInputValue = 1.23456;
     expectedReturnValue = 1.0;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
     // Test 3: User value is valid (between 0 and 1)--returned value should be equal to user input
     userInputValue = 0.234567;
     expectedReturnValue = 0.234567;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(*state, userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
 }

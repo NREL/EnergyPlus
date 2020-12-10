@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(*state, PurchAirNum);
+    SizePurchasedAir(PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(50985.58, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
     EXPECT_DOUBLE_EQ(2.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -244,7 +244,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(*state, PurchAirNum);
+    SizePurchasedAir(PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(63731.97, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
     EXPECT_DOUBLE_EQ(2.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     state->dataGlobal->DoWeathSim = true;
 
-    GetPurchasedAir(*state);
+    GetPurchasedAir();
 
     auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
     EXPECT_EQ(PurchAir.size(), 1u);
@@ -390,17 +390,17 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     state->dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
+    GetZoneData(ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays(*state);
+    AllocateHeatBalArrays();
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(*state,
+    ManageZoneEquipment(
                         FirstHVACIteration,
                         SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
@@ -500,17 +500,17 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     state->dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
+    GetZoneData(ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays(*state);
+    AllocateHeatBalArrays();
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(*state,
+    ManageZoneEquipment(
                         FirstHVACIteration,
                         SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
@@ -631,11 +631,11 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     state->dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);
+    GetZoneData(ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays(*state);
+    AllocateHeatBalArrays();
     EXPECT_FALSE(ErrorsFound); // expect no errors
     ZoneEquipConfig.allocate(1);
 
@@ -649,14 +649,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(*state); // get EMS input
-    EMSManager::GetEMSInput(*state);
+    EMSManager::CheckIfAnyEMS(); // get EMS input
+    EMSManager::GetEMSInput();
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool FirstHVACIteration(true);
 
     if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
-        GetPurchasedAir(*state);
+        GetPurchasedAir();
         state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
     }
 
@@ -665,11 +665,11 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     DataLoopNode::Node(2).Temp = 25.0;
     DataLoopNode::Node(2).HumRat = 0.001;
 
-    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    InitPurchasedAir(1, FirstHVACIteration, 1, 1);
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
-    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(1, SysOutputProvided, MoistOutputProvided, 1, 1);
 
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueMassFlowRate, 0.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 0.0);

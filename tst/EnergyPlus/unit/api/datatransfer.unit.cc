@@ -146,11 +146,11 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
     {
         EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
-        OutputProcessor::SetupTimePointers(*state, "Zone", timeStep);
-        OutputProcessor::SetupTimePointers(*state, "HVAC", timeStep);
+        OutputProcessor::SetupTimePointers("Zone", timeStep);
+        OutputProcessor::SetupTimePointers("HVAC", timeStep);
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
-        state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
+        state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>();
     }
 
     void TearDown() override
@@ -175,17 +175,17 @@ public:
 
     void setupVariablesOnceAllAreRequested()
     {
-        inputProcessor->preScanReportingVariables(*state);
+        inputProcessor->preScanReportingVariables();
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
-                SetupOutputVariable(*state,
+                SetupOutputVariable(
                     val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
             } else {
-                SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+                SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
             }
         }
         for (auto &val : this->intVariablePlaceholders) {
-            SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
         }
     }
 
@@ -213,13 +213,13 @@ public:
     void setupActuatorsOnceAllAreRequested()
     {
         for (auto &act : this->realActuatorPlaceholders) {
-            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->intActuatorPlaceholders) {
-            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->boolActuatorPlaceholders) {
-            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
@@ -231,26 +231,26 @@ public:
     void setupInternalVariablesOnceAllAreRequested()
     {
         for (auto &iv : this->internalVarPlaceholders) {
-            SetupEMSInternalVariable(*state, iv.varName, iv.varKey, "kg/s", iv.value);
+            SetupEMSInternalVariable(iv.varName, iv.varKey, "kg/s", iv.value);
         }
     }
 
     void addPluginGlobal(EnergyPlus::EnergyPlusData &state, std::string const &varName)
     {
-        state.dataPluginManager->pluginManager->addGlobalVariable(state, varName);
+        state.dataPluginManager->pluginManager->addGlobalVariable(varName);
     }
 
     void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
     {
-        state->dataPluginManager->pluginManager->addGlobalVariable(*state, newGlobalVarName);
-        int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, newGlobalVarName, true);
-        state->dataPluginManager->trends.emplace_back(*state, trendName, numTrendValues, i);
+        state->dataPluginManager->pluginManager->addGlobalVariable(newGlobalVarName);
+        int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(newGlobalVarName, true);
+        state->dataPluginManager->trends.emplace_back(trendName, numTrendValues, i);
     }
 
     void simulateTimeStepAndReport()
     {
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateMeterReporting();
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
 
@@ -656,12 +656,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes(*state);
-    EMSManager::CheckIfAnyEMS(*state);
+    OutAirNodeManager::SetOutAirNodes();
+    EMSManager::CheckIfAnyEMS();
     state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
+    EMSManager::ManageEMS(EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
     EXPECT_EQ(1, state->dataRuntimeLang->numActuatorsUsed);
 
@@ -700,12 +700,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes(*state);
-    EMSManager::CheckIfAnyEMS(*state);
+    OutAirNodeManager::SetOutAirNodes();
+    EMSManager::CheckIfAnyEMS();
     state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
+    EMSManager::ManageEMS(EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
     EXPECT_EQ(0, state->dataRuntimeLang->numActuatorsUsed);
 

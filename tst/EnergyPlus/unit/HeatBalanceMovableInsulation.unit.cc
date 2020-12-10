@@ -91,17 +91,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
-    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
 
@@ -126,17 +126,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
-    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
     state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
 TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGlazingTest)
@@ -234,18 +234,18 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ZONE ONE";
     // get schedule data
-    ScheduleManager::ProcessScheduleInput(*state);
+    ScheduleManager::ProcessScheduleInput();
     // get materials data
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, DataHeatBalance::TotMaterials);
     EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
@@ -261,9 +261,9 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
     int NeedToAddSurfaces;
     // get heat tranfer surface data
-    SurfaceGeometry::GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    SurfaceGeometry::GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
     // get movable insulation object data
-    SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
+    SurfaceGeometry::GetMovableInsulationData(ErrorsFound);
     // check movable insulation material
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material

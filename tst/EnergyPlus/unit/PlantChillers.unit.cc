@@ -89,7 +89,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state->dataPlantChillers->GTChiller(1).size(*state);
+    state->dataPlantChillers->GTChiller(1).size();
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(state->dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state->dataPlantChillers->EngineDrivenChiller(1).size(*state);
+    state->dataPlantChillers->EngineDrivenChiller(1).size();
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(state->dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EngineDrivenChillerSpecs::getInput(*state);
+    EngineDrivenChillerSpecs::getInput();
 
     EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
     EXPECT_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, "Diesel");
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GTChillerSpecs::getInput(*state);
+    GTChillerSpecs::getInput();
 
     EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);
     EXPECT_EQ(state->dataPlantChillers->GTChiller(1).FuelType, "NaturalGas");

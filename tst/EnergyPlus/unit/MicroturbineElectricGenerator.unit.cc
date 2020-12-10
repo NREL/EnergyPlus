@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
     ASSERT_TRUE(process_idf(idf_objects));
     DataIPShortCuts::cAlphaArgs(1) = "Capstone C65";
     DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
-    GetMTGeneratorInput(*state);
+    GetMTGeneratorInput();
 
     EXPECT_EQ(MTGenerator(1).FuelType, "NaturalGas");
 }

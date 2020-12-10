@@ -182,15 +182,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput();  // read schedules
 
-    GetZoneData(*state, ErrorsFound);
+    GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
-    GetZoneAirLoopEquipment(*state);
+    GetZoneEquipmentData1();
+    GetZoneAirLoopEquipment();
 
-    GetPIUs(*state);
+    GetPIUs();
 
     ASSERT_EQ(1, NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ZONE COIL", PIU(1).HCoil);     // heating coil name
@@ -291,15 +291,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput();  // read schedules
 
-    GetZoneData(*state, ErrorsFound);
+    GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
-    GetZoneAirLoopEquipment(*state);
+    GetZoneEquipmentData1();
+    GetZoneAirLoopEquipment();
 
-    GetPIUs(*state);
+    GetPIUs();
 
     int const PIUNum = 1;
     int const ADUNum = 1;
@@ -1475,7 +1475,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     // OutputProcessor::TimeValue.allocate(2);
     state->dataGlobal->DDOnlySimulation = true;
 
-    ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;

@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.RatedEIR(1) = 1 / Coil.RatedCOP(1);
     Coil.RatedAirVolFlowRate(1) = 0.50;
     Coil.RatedAirMassFlowRate(1) =
-        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
     Coil.MinOATCompressor = -10.0;
     Coil.CrankcaseHeaterCapacity = 0.0;
@@ -204,14 +204,14 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Real64 NetHeatingCapRatedLowTemp;
     Real64 HSPF;
 
-    SingleSpeedDXHeatingCoilStandardRatings(*state, Coil.RatedTotCap(1), Coil.RatedCOP(1), Coil.CCapFFlow(1), Coil.CCapFTemp(1), Coil.EIRFFlow(1),
+    SingleSpeedDXHeatingCoilStandardRatings(Coil.RatedTotCap(1), Coil.RatedCOP(1), Coil.CCapFFlow(1), Coil.CCapFTemp(1), Coil.EIRFFlow(1),
                                             Coil.EIRFTemp(1), Coil.RatedAirVolFlowRate(1), Coil.FanPowerPerEvapAirFlowRate(1),
                                             NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF, Coil.RegionNum, Coil.MinOATCompressor,
                                             Coil.OATempCompressorOn, Coil.OATempCompressorOnOffBlank, Coil.DefrostControl);
 
     // evaluate capacity curves
-    Real64 TotCapTempModFacRated = CurveValue(*state, Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
-    Real64 TotCapFlowModFac = CurveValue(*state, Coil.CCapFFlow(1), 1.0);
+    Real64 TotCapTempModFacRated = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
+    Real64 TotCapFlowModFac = CurveValue(Coil.CCapFFlow(1), 1.0);
     Real64 NetHeatingCapRated =
         Coil.RatedTotCap(1) * TotCapTempModFacRated * TotCapFlowModFac + Coil.RatedAirVolFlowRate(1) * Coil.FanPowerPerEvapAirFlowRate(1);
     // check curve values and heating capacity
@@ -219,18 +219,18 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     EXPECT_DOUBLE_EQ(TotCapFlowModFac, 1.0);
     EXPECT_DOUBLE_EQ(NetHeatingCapRatedHighTemp, NetHeatingCapRated);
     // evaluate capacity curves
-    Real64 CapTempModFacH2Test = CurveValue(*state, Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
+    Real64 CapTempModFacH2Test = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
     EXPECT_GT(CapTempModFacH2Test, 0.0);
-    Real64 CapTempModFacH3Test = CurveValue(*state, Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
+    Real64 CapTempModFacH3Test = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
     // if CapTempModFacH3Test curves value is less than zero, NetHeatingCapRatedLowTemp is set to zero
     EXPECT_LT(CapTempModFacH3Test, 0.0);
 
     // check heating capacity at low temperature
     EXPECT_DOUBLE_EQ(NetHeatingCapRatedLowTemp, 0.0);
     // evaluate EIR curves
-    Real64 EIRTempModFacRated = CurveValue(*state, Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
-    Real64 EIRTempModFacH2Test = CurveValue(*state, Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
-    Real64 EIRTempModFacH3Test = CurveValue(*state, Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
+    Real64 EIRTempModFacRated = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
+    Real64 EIRTempModFacH2Test = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
+    Real64 EIRTempModFacH3Test = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
     // check EIR curve value
     EXPECT_LT(EIRTempModFacRated, 0.0);
     EXPECT_GT(EIRTempModFacH2Test, 0.0);
@@ -311,7 +311,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(*state,
+    CalcChillerIPLV(
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
@@ -449,7 +449,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils(*state);
+    GetDXCoils();
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
@@ -461,7 +461,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
-    CurveManager::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
@@ -476,7 +476,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     thisCoil.RatedTotCap(1) = 25000.0;
     thisCoil.RatedAirVolFlowRate(1) = 1.300;
     // calculate standard ratings
-    SingleSpeedDXCoolingCoilStandardRatings(*state,
+    SingleSpeedDXCoolingCoilStandardRatings(
                                             thisCoil.Name,
                                             thisCoil.DXCoilType,
                                             thisCoil.CCapFTemp(1),
@@ -511,7 +511,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     IEER = 0.0;
     NetCoolingCapRated = 0.0;
     // rerun the standard ratings calculation
-    SingleSpeedDXCoolingCoilStandardRatings(*state,
+    SingleSpeedDXCoolingCoilStandardRatings(
                                             thisCoil.Name,
                                             thisCoil.DXCoilType,
                                             thisCoil.CCapFTemp(1),
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils(*state);
+    GetDXCoils();
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.MSPLFFPLR(1)));
@@ -734,7 +734,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
-    CurveManager::GetCurveMinMaxValues(*state, thisCoil.MSPLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(thisCoil.MSPLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     Real64 SEER_Standard(0.0);
     NetCoolingCapRated = 0.0;
     // calculate standard ratings for multispeed DX cooling coil
-    MultiSpeedDXCoolingCoilStandardRatings(*state,
+    MultiSpeedDXCoolingCoilStandardRatings(
                                            thisCoil.MSCCapFTemp,
                                            thisCoil.MSCCapFFlow,
                                            thisCoil.MSEIRFTemp,
@@ -774,7 +774,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     SEER_Standard = 0.0;
     NetCoolingCapRated = 0.0;
     // rerun the standard ratings calculation
-    MultiSpeedDXCoolingCoilStandardRatings(*state,
+    MultiSpeedDXCoolingCoilStandardRatings(
                                            thisCoil.MSCCapFTemp,
                                            thisCoil.MSCCapFFlow,
                                            thisCoil.MSEIRFTemp,

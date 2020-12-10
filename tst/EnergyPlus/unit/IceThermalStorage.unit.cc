@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
     state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
     state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.5, 1.5, 0.25);
+    CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.5, 1.5, 0.25);
     ExpectedValue = 1.475;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
     state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
     state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.960;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
     state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
     state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.768;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
     state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
     state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.951;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 }

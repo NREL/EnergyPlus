@@ -56,5 +56,7 @@ int main(int argc, const char *argv[])
 {
     EnergyPlus::createNewStateVector();
     ProcessArgs(argc, argv);
-    return EnergyPlusPgm();
+    int retVal = EnergyPlusPgm();
+    EnergyPlus::deleteCurrentState();
+    return retVal;
 }

@@ -1775,7 +1775,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(*state); // run the design day
+    SimulationManager::ManageSimulation(); // run the design day
 
     // set conditions for test
     int AbsChillNum = 1;
@@ -1819,7 +1819,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
-    thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);
+    thisChiller.calculate(AbsChillEvapLoad, AbsChillRunFlag);
     // check generator hot water mass flow rate is proportional to the chilled water flow rate
     EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
     EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);

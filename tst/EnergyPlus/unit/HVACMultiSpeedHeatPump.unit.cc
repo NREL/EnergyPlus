@@ -1248,28 +1248,28 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);
+    ProcessScheduleInput();
 
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
 
     // Get Zone Equipment Configuration data
-    DataZoneEquipment::GetZoneEquipmentData(*state);
+    DataZoneEquipment::GetZoneEquipmentData();
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 2; // 1st zone is 402, so this is 2nd direct air unit
     DataZoneEquipment::ZoneEquipList(2).EquipIndex(1) = 1; // 2nd zone is 401, so this is 1st direct air unit
-    MixedAir::GetOutsideAirSysInputs(*state);
-    MixedAir::GetOAControllerInputs(*state);
-    SplitterComponent::GetSplitterInput(*state);
-    BranchInputManager::GetMixerInput(*state);
-    BranchInputManager::ManageBranchInput(*state);
-    GetZoneAirLoopEquipment(*state);
-    SingleDuct::GetSysInput(*state);
+    MixedAir::GetOutsideAirSysInputs();
+    MixedAir::GetOAControllerInputs();
+    SplitterComponent::GetSplitterInput();
+    BranchInputManager::GetMixerInput();
+    BranchInputManager::ManageBranchInput();
+    GetZoneAirLoopEquipment();
+    SingleDuct::GetSysInput();
 
     // Get Air Loop HVAC Data
-    SimAirServingZones::GetAirPathData(*state);
-    SimAirServingZones::InitAirLoops(*state, FirstHVACIteration);
+    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::InitAirLoops(FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints();
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;
@@ -1297,7 +1297,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP;
     ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP;
 
-    HVACMultiSpeedHeatPump::GetMSHeatPumpInput(*state);
+    HVACMultiSpeedHeatPump::GetMSHeatPumpInput();
 
     state->dataGlobal->SysSizingCalc = true; // disable sizing calculation
     MSHeatPump(1).TotHeatEnergyRate = 1000.0;
@@ -1315,7 +1315,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     // InitMSHeatPump resets the current MSHeatPumpNum only
-    HVACMultiSpeedHeatPump::InitMSHeatPump(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio);
+    HVACMultiSpeedHeatPump::InitMSHeatPump(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio);
 
     EXPECT_DOUBLE_EQ(1000.0, MSHeatPump(1).TotHeatEnergyRate);
     EXPECT_DOUBLE_EQ(1000.0, MSHeatPump(1).TotCoolEnergyRate);
@@ -1346,7 +1346,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     Real64 QSensUnitOut;
     // Cooling
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
@@ -1356,7 +1356,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Direct solution
     state->dataGlobal->DoCoilDirectSolutions = true;
     MSHeatPump(2).FullOutput.allocate(2);
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.3641, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796613, 0.0001);
@@ -1366,14 +1366,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     QZnReq = -10000.00;
 
     state->dataGlobal->DoCoilDirectSolutions = false;
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = true;
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
@@ -1385,13 +1385,13 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     state->dataEnvrn->OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
     state->dataGlobal->DoCoilDirectSolutions = true;
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
@@ -1421,7 +1421,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     DataPlant::PlantLoop(1).FluidIndex = 1;
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
     Real64 calculatedOutletTemp =
@@ -1432,7 +1432,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(1).HeatRecoveryMassFlowRate);
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
 
     // outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
     calculatedOutletTemp =
@@ -1445,7 +1445,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 
     DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1;
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
 
     // outlet temp should equal max limit of 80 C since 100 kW would cause outlet water temperature to exceed 80 C
     EXPECT_DOUBLE_EQ(50.0, MSHeatPump(1).HeatRecoveryInletTemp);

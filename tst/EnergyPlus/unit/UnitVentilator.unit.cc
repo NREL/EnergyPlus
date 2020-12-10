@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->QZnReq = 2345.6;
     state->dataEnvrn->OutHumRat = 0.008;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 0.1234;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->QZnReq = 1.5678;
     state->dataEnvrn->OutHumRat = 0.008;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 0.1234;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->QZnReq = 4567.89;
     state->dataEnvrn->OutHumRat = 0.010;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.1106;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->QZnReq = 15678.9;
     state->dataEnvrn->OutHumRat = 0.010;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     DataLoopNode::Node(3).Enthalpy = 0.0;
     DataLoopNode::Node(4).Enthalpy = 0.0;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->UnitVent(1).ATMixerExists = true;
     state->dataUnitVentilators->UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_InletSide;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     state->dataUnitVentilators->UnitVent(1).ATMixerExists = true;
     state->dataUnitVentilators->UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_SupplySide;
 
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(*state, UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum, MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
 
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
     QZnReq = 5678.9;
     PartLoadRatio = 1.0;
     ExpectedResult = 0.0;
-    UnitVentilator::CalcMdotCCoilCycFan(*state, mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
 
     EXPECT_NEAR(ExpectedResult,mdot,0.0001);
     EXPECT_NEAR(ExpectedResult,QCoilReq,0.0001);
@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
     QZnReq = 0.0;
     PartLoadRatio = 1.0;
     ExpectedResult = 0.0;
-    UnitVentilator::CalcMdotCCoilCycFan(*state, mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
 
     EXPECT_NEAR(ExpectedResult,mdot,0.0001);
     EXPECT_NEAR(ExpectedResult,QCoilReq,0.0001);
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
     QZnReq = -5678.9;
     PartLoadRatio = 1.0;
     ExpectedResult = 0.1234;
-    UnitVentilator::CalcMdotCCoilCycFan(*state, mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
 
     EXPECT_NEAR(ExpectedResult,mdot,0.0001);
     EXPECT_NEAR(QCoilReq,QZnReq,0.1);
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
     QZnReq = -5678.9;
     PartLoadRatio = 0.5;
     ExpectedResult = 0.8;
-    UnitVentilator::CalcMdotCCoilCycFan(*state, mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
 
     EXPECT_NEAR(ExpectedResult,mdot,0.0001);
     EXPECT_NEAR(QCoilReq,QZnReq,0.1);

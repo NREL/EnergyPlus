@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     std::string myMessage1 = "Test message 1";
     // proper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
     int ErrIndex1 = 0;
-    ShowRecurringWarningErrorAtEnd(*state, myMessage1, ErrIndex1);
+    ShowRecurringWarningErrorAtEnd(myMessage1, ErrIndex1);
     EXPECT_EQ(ErrIndex1, 1);
     EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 1u);
     EXPECT_EQ(" ** Warning ** " + myMessage1, state->dataErrTracking->RecurringErrors(1).Message);
@@ -91,21 +91,21 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     std::string myMessage2 = "Test message 2";
     // improper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
     int ErrIndex2 = 6;
-    ShowRecurringWarningErrorAtEnd(*state, myMessage2, ErrIndex2);
+    ShowRecurringWarningErrorAtEnd(myMessage2, ErrIndex2);
     EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
     EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 2u);
     EXPECT_EQ(" ** Warning ** " + myMessage2, state->dataErrTracking->RecurringErrors(2).Message);
     EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(2).Count);
 
     ErrIndex2 = 6;
-    ShowRecurringWarningErrorAtEnd(*state, myMessage2, ErrIndex2);
+    ShowRecurringWarningErrorAtEnd(myMessage2, ErrIndex2);
     EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
     EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 2u);
     EXPECT_EQ(" ** Warning ** " + myMessage2, state->dataErrTracking->RecurringErrors(2).Message);
     EXPECT_EQ(2, state->dataErrTracking->RecurringErrors(2).Count);
 
     std::string myMessage3 = "Test message 3";
-    ShowRecurringContinueErrorAtEnd(*state, myMessage3, ErrIndex1);
+    ShowRecurringContinueErrorAtEnd(myMessage3, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 3);
     EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 3u);
@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(3).Count);
 
     std::string myMessage4 = "Test message 4";
-    ShowRecurringSevereErrorAtEnd(*state, myMessage4, ErrIndex1);
+    ShowRecurringSevereErrorAtEnd(myMessage4, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 4);
     EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 4u);
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(4).Count);
 
     // same message for different show message type (changed severe to warning) should be valid
-    ShowRecurringWarningErrorAtEnd(*state, myMessage4, ErrIndex1);
+    ShowRecurringWarningErrorAtEnd(myMessage4, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 5);
     EXPECT_EQ(" ** Warning ** " + myMessage4, state->dataErrTracking->RecurringErrors(5).Message);
@@ -129,14 +129,14 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
 
 TEST_F(EnergyPlusFixture, DisplayMessageTest)
 {
-    DisplayString(*state, "Testing");
+    DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
-    DisplayString(*state, "Testing");
+    DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // repeat this one - before fix, this broke cout_stream
     EXPECT_FALSE(has_cout_output(true));
-    DisplayString(*state, "Testing");
+    DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
 }
 
@@ -148,12 +148,12 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
 
     // add headers and values
-    UtilityRoutines::appendPerfLog(*state, "header1", "value1-1");
-    UtilityRoutines::appendPerfLog(*state, "header2", "value1-2");
-    UtilityRoutines::appendPerfLog(*state, "header3", "value1-3", true);
+    UtilityRoutines::appendPerfLog("header1", "value1-1");
+    UtilityRoutines::appendPerfLog("header2", "value1-2");
+    UtilityRoutines::appendPerfLog("header3", "value1-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
 {
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
 
     DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
 
@@ -188,9 +188,9 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     initPerfLogFile.close();
 
     // without deleting file add headers and values again
-    UtilityRoutines::appendPerfLog(*state, "ignored1", "value2-1");
-    UtilityRoutines::appendPerfLog(*state, "ignored2", "value2-2");
-    UtilityRoutines::appendPerfLog(*state, "ignored3", "value2-3", true);
+    UtilityRoutines::appendPerfLog("ignored1", "value2-1");
+    UtilityRoutines::appendPerfLog("ignored2", "value2-2");
+    UtilityRoutines::appendPerfLog("ignored3", "value2-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;

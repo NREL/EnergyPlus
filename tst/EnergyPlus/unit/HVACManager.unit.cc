@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
-    ReportAirHeatBalance(*state);
+    ReportAirHeatBalance();
 
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVolume, DataHeatBalance::ZnAirRpt(2).MixVolume, 0.0001);
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotCurDensity, DataHeatBalance::ZnAirRpt(2).MixVdotCurDensity, 0.0001);
@@ -185,7 +185,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
     DataZoneEquipment::VentMCP(1) = DataHeatBalFanSys::MCPV(1);
     // Call HVACManager
-    ReportAirHeatBalance(*state);
+    ReportAirHeatBalance();
 
     EXPECT_NEAR(2.9971591, DataHeatBalance::ZnAirRpt(1).InfilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(5.9943183, DataHeatBalance::ZnAirRpt(1).VentilVolumeCurDensity, 0.0001);
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataLoopNode::Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
-    ReportAirHeatBalance(*state);
+    ReportAirHeatBalance();
 
     EXPECT_NEAR(9.7853391, DataHeatBalance::ZnAirRpt(1).ExfilTotalLoss, 0.0001);
     EXPECT_NEAR(26.056543, DataHeatBalance::ZnAirRpt(2).ExfilTotalLoss, 0.0001);
@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 0.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance(*state);
+    HVACManager::CheckAirLoopFlowBalance();
     EXPECT_FALSE(has_err_output(true));
 
     //Case 2 - Both loops are balanced
@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 3.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance(*state);
+    HVACManager::CheckAirLoopFlowBalance();
     EXPECT_FALSE(has_err_output(true));
 
     //Case 3 - Loop 1 is unbalanced
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 3.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance(*state);
+    HVACManager::CheckAirLoopFlowBalance();
     EXPECT_TRUE(has_err_output(false));
     std::string error_string = delimited_string({
         "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 2.0;
     thisAirLoopFlow2.OAFlow = 0.99;
 
-    HVACManager::CheckAirLoopFlowBalance(*state);
+    HVACManager::CheckAirLoopFlowBalance();
     EXPECT_TRUE(has_err_output(false));
     error_string = delimited_string({
         "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",

@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ConstCOPChillerSpecs::getInput(*state);
+    ConstCOPChillerSpecs::getInput();
 
     auto &thisChiller = state->dataPlantChillers->ConstCOPChiller(1);
 
@@ -148,12 +148,12 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    thisChiller.initialize(*state, RunFlag, MyLoad);
-    thisChiller.size(*state);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
 
     // run init again after sizing is complete to set mass flow rate
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.initialize(RunFlag, MyLoad);
 
     // check autocalculate chiller nominal capacity
     EXPECT_NEAR(thisChiller.NomCap, 20987.5090557, 0.000001);

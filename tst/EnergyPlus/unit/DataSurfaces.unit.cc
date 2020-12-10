@@ -159,19 +159,19 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(*state, ErrorsFound); // read project control data
+    GetProjectControlData(ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read material data
+    GetMaterialData(ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetConstructData(*state, ErrorsFound); // read construction data
+    GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(*state, ErrorsFound);  // read zone data
+    GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
@@ -183,10 +183,10 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    SetSurfaceOutBulbTempAt(*state);
+    SetSurfaceOutBulbTempAt();
     EXPECT_EQ("T3-RF1 - FLOOR:N", Surface(1).Name);
     EXPECT_GT(Surface(1).Centroid.z, 20000.0);    // this condition is fatal
     EXPECT_LT(Surface(1).OutDryBulbTemp, -100.0); // this condition is fatal
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.0);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 0.0);
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 1, 0), Vector(1, 1, 1), Vector(0, 0, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0);
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 1), Vector(0, 1, 1)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0 / s.SinTilt );
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0 / s.SinTilt );
 
         s.Vertex = { Vector(0, 0, 0), Vector(0, 1, 0), Vector(0, 1, 1), Vector(0, 0, 1) };
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0);
 
         s.Vertex = { Vector(1, -1, 0), Vector(1, -1, -1), Vector(0, 0, -1), Vector(0, 0, 0) };
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 1.0);
 
     }
 }
@@ -313,7 +313,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.5);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 0.5);
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -322,7 +322,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.5);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 0.5);
     }
 }
 
@@ -340,7 +340,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 0.75);
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 1), Vector(1, 0, 0.5), Vector(0.5, 0, 0.5), Vector(0.5, 0, 0)};
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
@@ -349,6 +349,6 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-        EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
+        EXPECT_DOUBLE_EQ(s.get_average_height(), 0.75);
     }
 }

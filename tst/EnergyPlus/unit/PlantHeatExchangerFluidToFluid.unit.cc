@@ -1062,21 +1062,21 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;
-    SimulationManager::GetProjectData(*state);
+    SimulationManager::GetProjectData();
 
-    OutputReportPredefined::SetPredefinedTables(*state);
-    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables();
+    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant(*state);
+    OutputProcessor::SetupTimePointers("Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
-    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    WeatherManager::ResetEnvironmentCounter();
+    SimulationManager::SetupSimulation(ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1085,7 +1085,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1135,9 +1135,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(*state);
+                    HeatBalanceManager::ManageHeatBalance();
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2153,21 +2153,21 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     bool ErrorsFound = false;
 
     state->dataGlobal->BeginSimFlag = true;
-    SimulationManager::GetProjectData(*state);
+    SimulationManager::GetProjectData();
 
-    OutputReportPredefined::SetPredefinedTables(*state);
-    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables();
+    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-    PlantManager::CheckIfAnyPlant(*state);
+    OutputProcessor::SetupTimePointers("Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(); // just gets input and returns.
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
-    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    WeatherManager::ResetEnvironmentCounter();
+    SimulationManager::SetupSimulation(ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2176,7 +2176,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2226,9 +2226,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(*state);
+                    HeatBalanceManager::ManageHeatBalance();
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2267,7 +2267,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -2277,7 +2277,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
@@ -2346,13 +2346,13 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     // get availability schedule to work
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -2376,7 +2376,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(*state);
+    ScheduleManager::UpdateScheduleValues();
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
@@ -2469,14 +2469,14 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(*state);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize();
 
     // check value in FreeCoolCntrlMinCntrlTemp
     EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(*state);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize();
 }
 
 } // namespace EnergyPlus

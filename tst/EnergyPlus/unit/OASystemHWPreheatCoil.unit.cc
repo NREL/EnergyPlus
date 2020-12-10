@@ -1042,7 +1042,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(*state);
+    SimulationManager::ManageSimulation();
 
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS 1", state->dataAirLoop->OutsideAirSys(OASysNum).Name);
@@ -1052,7 +1052,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     EXPECT_EQ("OA MIXING BOX", state->dataAirLoop->OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(*state, state->dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state->dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     // Hot water coil is scheduled off, inlet and outlet conditions are the same
     EXPECT_DOUBLE_EQ(state->dataWaterCoils->WaterCoil(1).InletAirTemp, -17.3);          // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
@@ -2020,7 +2020,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(*state);
+    SimulationManager::ManageSimulation();
 
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("OA SYS 1", state->dataAirLoop->OutsideAirSys(OASysNum).Name);
@@ -2030,7 +2030,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     EXPECT_EQ("OA MIXING BOX", state->dataAirLoop->OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(*state, state->dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state->dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     EXPECT_DOUBLE_EQ(state->dataWaterCoils->WaterCoil(1).InletAirTemp, -17.3); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 

@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 21.1;                                     // 70F
     ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 25.0;                                      // 77F
     ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
     ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 21.1;                                     // 70F
     ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 25.0;                                      // 77F
     ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
     ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 21.1;                                     // 70F
     ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 25.0;                                      // 77F
     ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
     ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 21.1;                                     // 70F
     ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZTAV(1) = 25.0;                                      // 77F
     ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
     ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -705,7 +705,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     // OutputProcessor::TimeValue.allocate(2);
     state->dataGlobal->DDOnlySimulation = true;
 
-    ManageSimulation(*state);
+    ManageSimulation();
 
     //	compare_err_stream( "" );
 
@@ -713,7 +713,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger(*state);
+    CalcThermalComfortFanger();
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.262, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 27.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger(*state);
+    CalcThermalComfortFanger();
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.860, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 28.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger(*state);
+    CalcThermalComfortFanger();
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.460, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
-    CalcThermalComfortFanger(*state);
+    CalcThermalComfortFanger();
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.201, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 35.3, 0.1);
@@ -787,17 +787,17 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.6, 0.1);
 
     SurfNum = 2;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.1, 0.1);
 
     SurfNum = 3;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
 }
 
@@ -836,7 +836,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     state->dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(3).InsideAbsorpThermal = 0.8;
 
-    RadTemp = CalcAngleFactorMRT(*state, 1);
+    RadTemp = CalcAngleFactorMRT(1);
     EXPECT_NEAR(RadTemp, 16.9, 0.1);
 }
 
@@ -878,7 +878,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
 
     state->dataGlobal->BeginDayFlag = true;
 
-    CalcThermalComfortAdaptiveASH55(*state, false);
+    CalcThermalComfortAdaptiveASH55(false);
     EXPECT_NEAR(state->dataThermalComforts->runningAverageASH, 9.29236111, 0.001);
     state->dataThermalComforts->useEpwData = false;
     state->dataGlobal->BeginDayFlag = false;
@@ -910,7 +910,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
     ZoneThermostatSetPointLoAver(1) = 22.2;                 // 72F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -921,7 +921,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
     ZoneThermostatSetPointHiAver(1) = 23.9;                  // 75F
     ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -930,7 +930,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     // no cooling or heating
     ZTAV(1) = 23.0;                                      // 73F
     ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0; // must be zero
-    CalcIfSetPointMet(*state);
+    CalcIfSetPointMet();
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
@@ -992,7 +992,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QSteamBaseboardToPerson(1) = 0.0;
     QElecBaseboardToPerson(1) = 0.0;
 
-    CalcThermalComfortPierce(*state);
+    CalcThermalComfortPierce();
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, 23.62, 0.01);

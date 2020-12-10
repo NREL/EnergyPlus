@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    UpdateUtilityBills(*state);
+    UpdateUtilityBills();
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -264,7 +264,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(*state);
+    UpdateUtilityBills();
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -307,7 +307,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills();;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -347,7 +347,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     EnergyMeters(1).Name = "NATURALGAS:FACILITY";
     EnergyMeters(1).ResourceType = "NATURALGAS";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills();;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     EnergyMeters(1).ResourceType = "ELECTRICITY";
 
-    UpdateUtilityBills(*state);;
+    UpdateUtilityBills();;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -441,18 +441,18 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     state->dataEconTariff->tariff(4).totalAnnualEnergy = 1.47;
     state->dataEconTariff->tariff(4).reportMeterIndx = 4;
 
-    SetPredefinedTables(*state); // need to setup the predefined table entry numbers
+    SetPredefinedTables(); // need to setup the predefined table entry numbers
 
-    LEEDtariffReporting(*state);
+    LEEDtariffReporting();
 
-    EXPECT_EQ("SecondaryGeneralUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
-    EXPECT_EQ("SmallCGUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
-    EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
-    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
+    EXPECT_EQ("SecondaryGeneralUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
+    EXPECT_EQ("SmallCGUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
+    EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
+    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
 
-    EXPECT_EQ("0.855", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Electricity"));
-    EXPECT_EQ("6.391", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
-    EXPECT_EQ("10.871", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
+    EXPECT_EQ("0.855", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "Electricity"));
+    EXPECT_EQ("6.391", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
+    EXPECT_EQ("10.871", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
@@ -589,14 +589,14 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ExteriorEnergyUse::ManageExteriorEnergyUse();
     EXPECT_EQ(1, state->dataExteriorEnergyUse->NumExteriorLights);
     EXPECT_EQ(1000, state->dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
 
 
     // This will only do the get input routines
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills();;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -635,12 +635,12 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->TimeStep = 4;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues(*state);
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, state->dataEconTariff->tariff(1).seasonSchIndex));
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(state->dataEconTariff->tariff(1).seasonSchIndex));
     EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse();
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
     EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
@@ -650,7 +650,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     // This Should now call GatherForEconomics
     state->dataGlobal->DoOutputReporting = true;
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills();;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).seasonForMonth(6));
 
@@ -666,16 +666,16 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->TimeStep = 1;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues(*state);
-    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(*state, state->dataEconTariff->tariff(1).seasonSchIndex));
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(state->dataEconTariff->tariff(1).seasonSchIndex));
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse();
 
     EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
     EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
-    EconomicTariff::UpdateUtilityBills(*state);;
+    EconomicTariff::UpdateUtilityBills();;
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, state->dataEconTariff->tariff(1).seasonForMonth(6));
 

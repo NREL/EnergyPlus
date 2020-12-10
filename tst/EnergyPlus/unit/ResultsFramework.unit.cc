@@ -79,7 +79,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(*state);
+    resultsFramework->setupOutputOptions();
 
     EXPECT_TRUE(resultsFramework->timeSeriesAndTabularEnabled());
 }
@@ -93,7 +93,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(*state);
+    resultsFramework->setupOutputOptions();
 
     EXPECT_TRUE(resultsFramework->timeSeriesEnabled());
     compare_json_stream("");
@@ -232,10 +232,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     resultsFramework->RITimestepTSData.addVariable(var0);
-    resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 45); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 60); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 45); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 60); // month,day,hour,minute
+    resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45); // month,day,hour,minute
+    resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60); // month,day,hour,minute
+    resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
 
     resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
@@ -447,43 +447,43 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
 {
     std::string datetime;
     datetime = "01/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "January");
     datetime = "02/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "February");
     datetime = "03/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "March");
     datetime = "04/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "April");
     datetime = "05/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "May");
     datetime = "06/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "June");
     datetime = "07/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "July");
     datetime = "08/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "August");
     datetime = "09/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "September");
     datetime = "10/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "October");
     datetime = "11/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "November");
     datetime = "12/01 24:00:00";
-    convertToMonth(*state, datetime);
+    convertToMonth(datetime);
     EXPECT_EQ(datetime, "December");
     datetime = "01/01 23:00:00";
-    EXPECT_THROW(convertToMonth(*state, datetime), FatalError);
+    EXPECT_THROW(convertToMonth(datetime), FatalError);
 }
 
 } // namespace EnergyPlus
