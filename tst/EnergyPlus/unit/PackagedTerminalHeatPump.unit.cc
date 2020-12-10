@@ -487,8 +487,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
-    DataEnvironment::OutBaroPress = 101325;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
@@ -814,11 +814,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat = 0.0075;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
 
@@ -853,7 +853,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -862,9 +862,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
@@ -1160,11 +1160,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataGlobal->BeginEnvrnFlag = true;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat = 0.0075;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     //		PrimaryAirMassFlowRate = 0.20;
 
@@ -1199,7 +1199,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -1208,9 +1208,9 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;

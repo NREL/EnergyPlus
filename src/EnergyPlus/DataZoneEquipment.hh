@@ -409,7 +409,8 @@ namespace DataZoneEquipment {
         {
         }
 
-        void getPrioritiesforInletNode(int const inletNodeNum, // Zone inlet node number to match
+        void getPrioritiesForInletNode(EnergyPlusData &state,
+                                       int const inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );

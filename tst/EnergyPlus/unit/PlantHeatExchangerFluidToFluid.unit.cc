@@ -1094,7 +1094,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;
@@ -2185,7 +2185,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";
@@ -2195,7 +2195,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;
@@ -2269,14 +2269,14 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
@@ -2368,14 +2368,14 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
@@ -2464,7 +2464,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     PlantHeatExchangerFluidToFluid::NumberOfPlantFluidHXs = 1;
 
     DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet_ByNominalCap;
-    DataEnvironment::OutDryBulbTemp = 9.0;
+    state->dataEnvrn->OutDryBulbTemp = 9.0;
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 0.0;
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 

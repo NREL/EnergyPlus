@@ -180,22 +180,19 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 {
-    using DataEnvironment::DayOfYear;
-    using DataEnvironment::Latitude;
-    using DataEnvironment::WaterMainsTemp;
 
     state->dataWeatherManager->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
     state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = 9.69;
     state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = 28.1;
-    DayOfYear = 50;
+    state->dataEnvrn->DayOfYear = 50;
 
-    Latitude = 40.0;
+    state->dataEnvrn->Latitude = 40.0;
     CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(WaterMainsTemp, 6.6667, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 6.6667, 0.0001);
 
-    Latitude = -40.0;
+    state->dataEnvrn->Latitude = -40.0;
     CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.3799, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, JGDate_Test)
@@ -367,9 +364,6 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
 {
-    using DataEnvironment::DayOfYear;
-    using DataEnvironment::Latitude;
-    using DataEnvironment::WaterMainsTemp;
 
     std::string const idf_objects = delimited_string({
         "   Site:WaterMainsTemperature,",
@@ -393,24 +387,21 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
     state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
     state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
-    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+    state->dataEnvrn->Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 15th water mains temperature test
-    DataEnvironment::DayOfYear = 15; // January 15th
+    state->dataEnvrn->DayOfYear = 15; // January 15th
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.5145, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 7.5145, 0.0001);
 
     // July 15th water mains temperature test
-    DataEnvironment::DayOfYear = 196; // July 15th
+    state->dataEnvrn->DayOfYear = 196; // July 15th
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.0452, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.0452, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
-    using DataEnvironment::DayOfYear;
-    using DataEnvironment::Latitude;
-    using DataEnvironment::WaterMainsTemp;
 
     int AnnualNumberOfDays(0);
     Real64 MonthlyDailyDryBulbMin(0.0);
@@ -454,22 +445,20 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     // test water mains temperature
     // WeatherManager::WaterMainsTempsMethod = WeatherManager::CorrelationFromWeatherFileMethod;
     state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
-    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+    state->dataEnvrn->Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 21st water mains temperature test
-    DataEnvironment::DayOfYear = 21; // January 21st
+    state->dataEnvrn->DayOfYear = 21; // January 21st
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.23463, 0.00001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 7.23463, 0.00001);
 
     // July 21st water mains temperature test
-    DataEnvironment::DayOfYear = 202; // July 21st
+    state->dataEnvrn->DayOfYear = 202; // July 21st
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.33812, 0.00001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.33812, 0.00001);
 }
 TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest)
 {
-
-    using DataEnvironment::WaterMainsTemp;
 
     std::string const idf_objects = delimited_string({
         "   Site:WaterMainsTemperature,",
@@ -569,13 +558,13 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(2).DesignDayNum = 2;
-    GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // init local variables
@@ -747,10 +736,10 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     has_eio_output(true);
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 1;
+    state->dataEnvrn->TotDesDays = 1;
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
 
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(1).WP_Type1 = 0;
@@ -762,7 +751,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::SetupInterpolationValues(*state);
     WeatherManager::AllocateWeatherData(*state);
 
-    WeatherManager::GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    WeatherManager::GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(*state, 1);
@@ -1001,14 +990,14 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
 
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(2).DesignDayNum = 2;
-    GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     state->dataWeatherManager->Envrn =1;

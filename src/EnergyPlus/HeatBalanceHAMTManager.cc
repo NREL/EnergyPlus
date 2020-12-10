@@ -123,11 +123,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataEnvironment::IsRain;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutEnthalpy;
-    using DataEnvironment::SkyTemp;
-    using DataEnvironment::SunIsUp;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
     using DataHeatBalFanSys::QElecBaseboardSurf;
@@ -1198,7 +1193,7 @@ namespace HeatBalanceHAMTManager {
             cells(ExtSkycell(sid)).temp = OSCM(Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
-            cells(ExtSkycell(sid)).temp = SkyTemp;
+            cells(ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
             cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
@@ -1289,7 +1284,7 @@ namespace HeatBalanceHAMTManager {
                 if (matid > 0) {
                     interp(
                         dataMaterial.Material(matid).niso, dataMaterial.Material(matid).isorh, dataMaterial.Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
-                    if (IsRain && rainswitch) {
+                    if (state.dataEnvrn->IsRain && rainswitch) {
                         interp(dataMaterial.Material(matid).nsuc, dataMaterial.Material(matid).sucwater, dataMaterial.Material(matid).sucdata, cells(cid).water, cells(cid).dw);
                     } else {
                         interp(dataMaterial.Material(matid).nred, dataMaterial.Material(matid).redwater, dataMaterial.Material(matid).reddata, cells(cid).water, cells(cid).dw);
@@ -1320,7 +1315,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(cid).vtc > 0) {
                         vaporr1 = 1.0 / (cells(cid).overlap(ii) * cells(cid).vtc);
                     } else if (cells(cid).matid > 0) {
-                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, OutBaroPress));
+                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr1 = 0.0;
                     }
@@ -1336,7 +1331,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(adj).vtc > 0) {
                         vaporr2 = 1.0 / (cells(cid).overlap(ii) * cells(adj).vtc);
                     } else if (cells(adj).matid > 0) {
-                        vaporr2 = cells(adj).mu * cells(adj).dist(adjl) / (WVDC(cells(adj).tempp1, OutBaroPress) * cells(cid).overlap(ii));
+                        vaporr2 = cells(adj).mu * cells(adj).dist(adjl) / (WVDC(cells(adj).tempp1, state.dataEnvrn->OutBaroPress) * cells(cid).overlap(ii));
                     } else {
                         vaporr2 = 0.0;
                     }
@@ -1440,7 +1435,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(cid).vtc > 0) {
                         vaporr1 = 1.0 / (cells(cid).overlap(ii) * cells(cid).vtc);
                     } else if (cells(cid).matid > 0) {
-                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, OutBaroPress));
+                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr1 = 0.0;
                     }
@@ -1448,7 +1443,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(adj).vtc > 0) {
                         vaporr2 = 1.0 / (cells(cid).overlap(ii) * cells(adj).vtc);
                     } else if (cells(adj).matid > 0) {
-                        vaporr2 = (cells(adj).dist(adjl) * cells(adj).mu) / (cells(cid).overlap(ii) * WVDC(cells(adj).tempp1, OutBaroPress));
+                        vaporr2 = (cells(adj).dist(adjl) * cells(adj).mu) / (cells(cid).overlap(ii) * WVDC(cells(adj).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr2 = 0.0;
                     }

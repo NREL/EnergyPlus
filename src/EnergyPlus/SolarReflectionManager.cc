@@ -219,7 +219,7 @@ namespace SolarReflectionManager {
         }
 
         // Should this be moved up front?
-        if (IgnoreSolarRadiation) {
+        if (state.dataEnvrn->IgnoreSolarRadiation) {
             state.dataSolarReflectionManager->TotSolReflRecSurf = 0;
             CalcSolRefl = false;
             return;
@@ -530,7 +530,7 @@ namespace SolarReflectionManager {
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPt(RayNum, RecPtNum) = GroundHitPt;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSurfNum(RayNum, RecPtNum) = -1;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPtHitPtDis(RayNum, RecPtNum) = (RecPt(3) - GroundLevelZ) / (-RayVec(3));
-                            state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = GndReflectance;
+                            state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = state.dataEnvrn->GndReflectance;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtNormVec(RayNum, RecPtNum) = unit_z;
                         } // End of check if ray hits ground
                     }     // End of check if obstruction hit
@@ -902,7 +902,7 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
 
-        if (SUNCOSHR(iHour, 3) < SunIsUpValue) return; // Skip if sun is below horizon
+        if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
         SunVec = SUNCOSHR(iHour, {1, 3});

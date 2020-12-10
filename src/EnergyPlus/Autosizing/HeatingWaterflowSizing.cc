@@ -79,12 +79,12 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                 } else {
                     Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                     if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                     }
                     Real64 CoilInTemp =
-                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                                   this->zoneEqSizing(this->curZoneEqNum),
                                                                   this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;

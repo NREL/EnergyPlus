@@ -60,7 +60,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("HeatingWaterDesAirInletHumRatSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -248,7 +248,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // Test 10 - Zone Equipment w/ 10% OA
     DataSizing::ZoneEqSizing(1).OAVolFlow =
-        EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatMassFlow / (10.0 * DataEnvironment::StdRhoAir);
+        EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatMassFlow / (10.0 * state->dataEnvrn->StdRhoAir);
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -264,7 +264,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // Test 11 - Zone Equipment w/ AT Mixer at 20% of design flow
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.001;
-    DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.002 / DataEnvironment::StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
+    DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.002 / state->dataEnvrn->StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
     Real64 mixedHumRat2 = 0.8 * 0.007 + 0.2 * 0.001;                                 // 80% of ZoneHumRatAtCoolPeak, 20% of AT Mixer mass flow
 
     // start with an auto-sized value as the user input

@@ -883,7 +883,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
 
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRateMax;
@@ -1444,8 +1444,8 @@ namespace PlantChillers {
                     format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -1465,8 +1465,8 @@ namespace PlantChillers {
                     format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -2826,7 +2826,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -3330,8 +3330,8 @@ namespace PlantChillers {
                     "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -3346,8 +3346,8 @@ namespace PlantChillers {
                     "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -4693,7 +4693,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -5231,8 +5231,8 @@ namespace PlantChillers {
                     "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -5247,8 +5247,8 @@ namespace PlantChillers {
                                    "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -5625,7 +5625,7 @@ namespace PlantChillers {
 
             Real64 AmbientDeltaT; // (ATAIR) Difference between ambient actual and ambient design temperatures
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                AmbientDeltaT = DataEnvironment::OutDryBulbTemp - 25.0;
+                AmbientDeltaT = state.dataEnvrn->OutDryBulbTemp - 25.0;
             } else { // air or evap cooled
                 AmbientDeltaT = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb - 25.0;
             }
@@ -6375,7 +6375,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -6834,8 +6834,8 @@ namespace PlantChillers {
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -6850,8 +6850,8 @@ namespace PlantChillers {
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
