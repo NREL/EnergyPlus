@@ -7,7 +7,7 @@ endif()
 
 project(EnergyPlus)
 
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.12)
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -20,6 +20,18 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+add_library(project_options INTERFACE)
+target_compile_features(project_options INTERFACE cxx_std_17)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads)
+target_link_libraries(project_options INTERFACE Threads::Threads)
+
+include(cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
+
 
 include(cmake/Version.cmake)
 
@@ -211,93 +223,18 @@ include_directories(${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Vie
 if(OPENGL_FOUND)
   include_directories(${PROJECT_SOURCE_DIR}/third_party/penumbra/include)
 endif()
+include_directories(${PROJECT_SOURCE_DIR}/third_party/kiva-ep/src)
+include_directories("${kiva_BINARY_DIR}/src/libkiva")
+include_directories( SYSTEM "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 
-#### Create interface for JSON for Modern C++ so we can include it in targets
-# add_library( ModernJSON INTERFACE )
-# target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/third_party/nlohmann" "${PROJECT_SOURCE_DIR}/third_party/doj" )
 
-set(RE2_BUILD_TESTING
-    OFF
-    CACHE BOOL "" FORCE)
 
-if(OPENGL_FOUND)
-  set(BUILD_PENUMBRA_TESTING
-      ${BUILD_TESTING}
-      CACHE BOOL "" FORCE)
-endif()
-
-if(BUILD_TESTING)
-  set(gtest_force_shared_crt
-      ON
-      CACHE BOOL "" FORCE)
-  set(BUILD_GTEST
-      ON
-      CACHE BOOL "" FORCE)
-  set(BUILD_GMOCK
-      ON
-      CACHE BOOL "" FORCE)
-  option(TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF)
-  enable_testing()
-  add_subdirectory(third_party/gtest)
-  set_target_properties(gtest PROPERTIES FOLDER ThirdParty/gtest)
-  set_target_properties(gtest_main PROPERTIES FOLDER ThirdParty/gtest)
-  set_target_properties(gmock PROPERTIES FOLDER ThirdParty/gtest)
-  set_target_properties(gmock_main PROPERTIES FOLDER ThirdParty/gtest)
-endif()
-
-# E+ required libraries
-add_subdirectory(idd)
-
-add_subdirectory(third_party/SQLite)
-set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
-add_subdirectory(third_party/ObjexxFCL)
-set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
-add_subdirectory(third_party/BCVTB)
-set_target_properties(bcvtb PROPERTIES FOLDER ThirdParty/BCVTB)
-add_subdirectory(third_party/Expat)
-set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
-add_subdirectory(third_party/FMI)
-set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
-add_subdirectory(third_party/zlib)
-set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
-add_subdirectory(third_party/DElight)
-set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
-add_subdirectory(third_party/re2)
-set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
-add_subdirectory(third_party/fmt-6.1.2)
-set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
+add_subdirectory(third_party)
 
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
-
-if(NOT APPLE)
-  add_subdirectory(third_party/FMUParser)
-  set_target_properties(parser PROPERTIES FOLDER ThirdParty/FMI)
-endif()
-
-add_subdirectory(third_party/Windows-CalcEngine)
-set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-CalcEngine)
-
-# Btwxt
-include_directories(${gtest_SOURCE_DIR}/include/ SYSTEM)
-set(BUILD_BTWXT_TESTING
-    ${BUILD_TESTING}
-    CACHE BOOL "" FORCE)
-add_subdirectory(third_party/btwxt)
-set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
-
-# Kiva
-include(third_party/cmake/kiva.cmake)
-set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
-
-if(OPENGL_FOUND)
-  add_subdirectory(third_party/penumbra)
-  set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
-  set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
-  set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
-  set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
-  set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
-endif()
+# E+ required libraries
+add_subdirectory(idd)
 
 execute_process(
   COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"

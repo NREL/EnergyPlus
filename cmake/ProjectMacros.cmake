@@ -39,9 +39,9 @@ macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
     endif()
 
     add_executable(${BASE_NAME}_tests ${SRC})
-
+    target_link_libraries(${BASE_NAME}_tests PRIVATE project_options)
     if(ENABLE_GTEST_DEBUG_MODE)
-      set_target_properties(${BASE_NAME}_tests PROPERTIES COMPILE_DEFINITIONS ENABLE_GTEST_DEBUG_MODE)
+      target_compile_definitions(${BASE_NAME}_tests PRIVATE ENABLE_GTEST_DEBUG_MODE)
     endif()
 
     create_src_groups("${SRC}")
@@ -55,7 +55,7 @@ macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
       set(ALL_DEPENDENCIES ${BASE_NAME} ${DEPENDENCIES})
     endif()
 
-    target_link_libraries(${BASE_NAME}_tests ${ALL_DEPENDENCIES} gtest)
+    target_link_libraries(${BASE_NAME}_tests PRIVATE ${ALL_DEPENDENCIES} gtest)
 
     add_google_tests(${BASE_NAME}_tests ${SRC})
   endif()

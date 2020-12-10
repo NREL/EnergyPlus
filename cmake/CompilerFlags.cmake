@@ -63,48 +63,10 @@ elseif(
   CMAKE_COMPILER_IS_GNUCXX
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
-  option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
-  set(LINKER_FLAGS "")
-  if(ENABLE_THREAD_SANITIZER)
-    add_cxx_definitions("-fsanitize=thread")
-    add_definitions("-ggdb -fno-omit-frame-pointer")
-    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -ggdb")
-  endif()
-
-  option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
-  if(ENABLE_ADDRESS_SANITIZER)
-    add_cxx_definitions("-fsanitize=address")
-    add_definitions("-ggdb -fno-omit-frame-pointer")
-    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -ggdb")
-  endif()
-
-  option(ENABLE_MEMORY_SANITIZER "Enable reads of unintialized memory sanitizer testing in gcc/clang" FALSE)
-  if(ENABLE_MEMORY_SANITIZER)
-    add_cxx_definitions("-fsanitize=memory")
-    add_definitions("-ggdb -fno-omit-frame-pointer")
-    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=memory -ggdb")
-  endif()
-
-  option(ENABLE_UNDEFINED_SANITIZER "Enable undefined behavior sanitizer testing in gcc/clang" FALSE)
-  if(ENABLE_UNDEFINED_SANITIZER)
-    add_cxx_definitions("-fsanitize=undefined")
-    add_definitions("-ggdb -fno-omit-frame-pointer")
-    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined -ggdb")
-  endif()
-
   option(ENABLE_COVERAGE "Enable Coverage Reporting in GCC" FALSE)
   if(ENABLE_COVERAGE)
     add_definitions("--coverage -O0")
     set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
-  endif()
-
-  mark_as_advanced(ENABLE_THREAD_SANITIZER ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_SANITIZER)
-
-  if(CMAKE_HOST_UNIX)
-    if(NOT APPLE)
-      set(LINKER_FLAGS "${LINKER_FLAGS} -pthread")
-      add_definitions("-pthread")
-    endif()
   endif()
 
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
@@ -113,7 +75,7 @@ elseif(
 
   # COMPILER FLAGS
   add_cxx_definitions("-pipe") # Faster compiler processing
-  add_cxx_definitions("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+  add_cxx_definitions("-Wpedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
   add_cxx_definitions("-Wall -Wextra") # Turn on warnings
   add_cxx_definitions("-Wno-unknown-pragmas")
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
