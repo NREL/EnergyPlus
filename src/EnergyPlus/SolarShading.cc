@@ -6911,7 +6911,7 @@ namespace SolarShading {
                                         TransBeamWin = 1.0;
                                         AbsBeamWinEQL = 0.0;
                                         AbsBeamTotWin = 0.0;
-                                    } else if (SurfWinShaded(SurfNum)) {
+                                    } else if (!SurfWinShaded(SurfNum)) {
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
                                         }
