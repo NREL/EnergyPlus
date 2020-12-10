@@ -91,7 +91,7 @@ namespace BoilerSteam {
 
     PlantComponent *BoilerSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (state.dataBoilerSteam->getSteamBoilerInput) {
             GetBoilerInput();
@@ -113,7 +113,7 @@ namespace BoilerSteam {
     void BoilerSpecs::simulate(
         [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
@@ -123,7 +123,7 @@ namespace BoilerSteam {
     void
     BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -136,14 +136,14 @@ namespace BoilerSteam {
 
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
         this->autosize();
     }
 
     void GetBoilerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
@@ -296,7 +296,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::initialize() // number of the current electric chiller being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
@@ -424,7 +424,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Heating Energy",
                             OutputProcessor::Unit::J,
@@ -457,7 +457,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::autosize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -555,7 +555,7 @@ namespace BoilerSteam {
                                 DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004

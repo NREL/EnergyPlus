@@ -148,7 +148,7 @@ namespace HVACDXHeatPumpSystem {
                              Optional<Real64> QTotOut                 // the total cooling output of unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
         //       DATE WRITTEN   May 2011
@@ -280,7 +280,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetDXHeatPumpSystemInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
@@ -464,7 +464,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Optional<Real64 const> OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
         //       DATE WRITTEN   May 2011
@@ -564,7 +564,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith (derived from ControlDXSystem by Richard Liesen)
         //       DATE WRITTEN   Jan 2012
@@ -1055,7 +1055,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -1116,7 +1116,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -1195,7 +1195,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -1271,7 +1271,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetHeatingCoilInletNodeNum(std::string const &DXHeatCoilSysName, bool &InletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
@@ -1301,7 +1301,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetHeatingCoilOutletNodeNum(std::string const &DXHeatCoilSysName, bool &OutletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019

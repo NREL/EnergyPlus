@@ -111,7 +111,7 @@ namespace RoomAirModelUserTempPattern {
 
     void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   January 2004/Aug 2005
@@ -140,7 +140,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -198,7 +198,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2005
@@ -233,7 +233,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2005
@@ -310,7 +310,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureSurfMapPattern(int const PattrnID, int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -353,7 +353,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureHeightPattern(int const PattrnID, int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -418,7 +418,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureTwoGradInterpPattern(int const PattrnID, int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2005
@@ -642,7 +642,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureConstGradPattern(int const PattrnID, int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2005
@@ -678,7 +678,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FigureNDheightInZone(int const thisHBsurf) // index in main Surface array
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith
         //       DATE WRITTEN   aug 2005, Jan2004
@@ -803,7 +803,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2005,Feb. 2004

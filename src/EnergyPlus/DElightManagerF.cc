@@ -116,7 +116,7 @@ namespace DElightManagerF {
 
     void DElightInputGenerator()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
@@ -683,7 +683,7 @@ namespace DElightManagerF {
 
     void GetInputDElightComplexFenestration(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Perform GetInput function for the Daylighting:DELight:ComplexFenestration object
         // Glazer - July 2016
 
@@ -733,7 +733,7 @@ namespace DElightManagerF {
 
     void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2009

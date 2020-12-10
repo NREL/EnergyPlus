@@ -171,7 +171,7 @@ namespace SimulationManager {
 
     void ManageSimulation()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   January 1997
@@ -673,7 +673,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetProjectData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -1437,7 +1437,7 @@ EnergyPlusData & state = getCurrentState(0);
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         UtilityRoutines::appendPerfLog("Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
         UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
@@ -1466,7 +1466,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckForMisMatchedEnvironmentSpecifications()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2008
@@ -1575,7 +1575,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckForRequestedReporting()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2009
@@ -1617,7 +1617,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto result = std::make_unique<std::ofstream>(fileName);
         if (!result->good()) {
             ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
@@ -1627,7 +1627,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
         if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
             if (ResultsFramework::resultsFramework->JSONEnabled()) {
@@ -1744,7 +1744,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OpenOutputFiles()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -1797,7 +1797,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CloseOutputFiles()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -2008,7 +2008,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupSimulation(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith/L. Lawrie
         //       DATE WRITTEN   May 2008
@@ -2108,7 +2108,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportNodeConnections()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2004
@@ -2230,7 +2230,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportLoopConnections()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2001
@@ -2751,7 +2751,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportParentChildren()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -2862,7 +2862,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportCompSetMeterVariables()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -2967,7 +2967,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PostIPProcessing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -3008,7 +3008,7 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   August 2005

@@ -123,7 +123,7 @@ namespace HVACDuct {
                  int &CompIndex                                  // index of duct component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005
@@ -178,7 +178,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetDuctInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005
@@ -238,7 +238,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitDuct(int const DuctNum) // number of the current duct being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -332,7 +332,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateDuct(int const DuctNum) // number of the current duct being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   17May2005

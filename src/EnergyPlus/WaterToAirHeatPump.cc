@@ -120,7 +120,7 @@ namespace WaterToAirHeatPump {
                          int const CompOp,
                          Real64 const PartLoadRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -197,7 +197,7 @@ namespace WaterToAirHeatPump {
 
     void GetWatertoAirHPInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -766,7 +766,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const DesignAirFlow,
                           Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -1027,7 +1027,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -1630,7 +1630,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Array1D<Real64> const &Par    // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2006
@@ -1694,7 +1694,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -2159,7 +2159,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateWatertoAirHP(int const HPNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hui Jin
         //       DATE WRITTEN   Oct 2000
@@ -2265,7 +2265,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   September 2003
@@ -2390,7 +2390,7 @@ EnergyPlusData & state = getCurrentState(0);
                    int &FluidIndex         // Index number for the fluid
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //    AUTHOR         Kenneth Tang
         //    DATE WRITTEN   October 2004
@@ -2447,7 +2447,7 @@ EnergyPlusData & state = getCurrentState(0);
                      bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2007
@@ -2487,7 +2487,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2543,7 +2543,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2590,7 +2590,7 @@ EnergyPlusData & state = getCurrentState(0);
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007

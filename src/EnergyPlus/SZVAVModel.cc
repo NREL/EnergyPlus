@@ -98,7 +98,7 @@ namespace SZVAVModel {
                         Real64 &PartLoadRatio,
                         int const &CompressorONFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int const MaxIter(100);    // maximum number of iterations
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix; // label for warning reporting
@@ -503,7 +503,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &PartLoadRatio,
                         int const &CompressorONFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int const MaxIter(100);    // maximum number of iterations
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix; // label for warning reporting
@@ -927,7 +927,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &PartLoadRatio,
                         int const &CompressorONFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         UnitarySystems::UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[SysIndex];
 
         int const MaxIter(100);    // maximum number of iterations

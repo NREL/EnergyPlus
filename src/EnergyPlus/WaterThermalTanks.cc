@@ -137,7 +137,7 @@ namespace WaterThermalTanks {
 
     PlantComponent *WaterThermalTankData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
@@ -158,7 +158,7 @@ namespace WaterThermalTanks {
 
     void WaterThermalTankData::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize(true);
         this->MinePlantStructForInfo();
         if (calledFromLocation.loopNum > 0) {
@@ -198,7 +198,7 @@ namespace WaterThermalTanks {
 
     int getTankIDX(std::string const &CompName, int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
@@ -237,7 +237,7 @@ namespace WaterThermalTanks {
 
     int getHPTankIDX(std::string const &CompName, int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
@@ -277,7 +277,7 @@ namespace WaterThermalTanks {
     void WaterThermalTankData::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
         //       DATE WRITTEN   May 2000
@@ -325,7 +325,7 @@ namespace WaterThermalTanks {
 
     PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
@@ -346,7 +346,7 @@ namespace WaterThermalTanks {
 
     void HeatPumpWaterHeaterData::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(this->WaterHeaterTankNum);
         Tank.onInitLoopEquip(calledFromLocation);
     }
@@ -364,7 +364,7 @@ namespace WaterThermalTanks {
     void HeatPumpWaterHeaterData::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
         //       DATE WRITTEN   May 2000
@@ -452,7 +452,7 @@ namespace WaterThermalTanks {
 
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -517,7 +517,7 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   April 2005
@@ -581,7 +581,7 @@ namespace WaterThermalTanks {
 
     void CalcWaterThermalTankZoneGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   March 2005
@@ -667,7 +667,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getDesuperHtrInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
 
@@ -1085,7 +1085,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getHPWaterHeaterInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
 
         int const NumPumpedCondenser =
@@ -2206,7 +2206,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getWaterHeaterMixedInputs()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
         DataIPShortCuts::cCurrentModuleObject = cMixedWHModuleObj;
         std::string const RoutineName = "getWaterHeaterMixedInputs";
@@ -2632,7 +2632,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getWaterHeaterStratifiedInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
         std::string const RoutineName = "getWaterHeaterStratifiedInput";
 
@@ -3204,7 +3204,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getWaterTankMixedInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
 
         DataIPShortCuts::cCurrentModuleObject = cMixedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Mixed'
@@ -3477,7 +3477,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool getWaterTankStratifiedInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
         std::string const RoutineName = "getWaterTankStratifiedInput";
 
@@ -3845,7 +3845,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool GetWaterThermalTankInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher and Brandon Anderson
@@ -4592,7 +4592,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
             this->setupChilledWaterTankOutputVars();
         } else {
@@ -4605,7 +4605,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::setupChilledWaterTankOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
         SetupOutputVariable("Chilled Water Thermal Storage Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
@@ -4713,7 +4713,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::setupZoneInternalGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // set up internal gains if tank is in a thermal zone
         if (this->AmbientTempZone > 0) {
             {
@@ -4750,7 +4750,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::setupWaterHeaterOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // Setup report variables for WaterHeater:Mixed
         // CurrentModuleObject='WaterHeater:Mixed'
@@ -5088,7 +5088,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::ValidatePLFCurve(int const CurveIndex, bool &IsValid)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -5114,7 +5114,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SetupStratifiedNodes()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2007
@@ -5333,7 +5333,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::initialize(bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -6123,7 +6123,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::CalcWaterThermalTankMixed() // Water Heater being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -6980,7 +6980,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 WaterThermalTankData::PartLoadFactor(Real64 const PartLoadRatio_loc)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
@@ -7000,7 +7000,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::CalcWaterThermalTankStratified()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Merket, originally by Peter Graham Ellis
         //       DATE WRITTEN   January 2007
@@ -7788,7 +7788,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::CalcDesuperheaterWaterHeater(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -8279,7 +8279,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::CalcHeatPumpWaterHeater(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   March 2005
@@ -9497,7 +9497,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::ConvergeSingleSpeedHPWHCoilAndTank(Real64 const partLoadRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
         DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
 
@@ -9525,7 +9525,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                   Real64 &MdotWater,             // water flow rate
                                                   bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Shen, ORNL, 12/2014
         //       DATE WRITTEN   May 2005
@@ -9599,7 +9599,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio, // speed ratio between two speed levels
                                                       Array1D<Real64> const &Par)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Shen, ORNL, 12/2014
         //       MODIFIED
@@ -9688,7 +9688,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 WaterThermalTankData::PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1D<Real64> const &Par)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith,  Richard Raustad
         //       DATE WRITTEN   Jan 2012
@@ -9749,7 +9749,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2005
@@ -9783,7 +9783,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool WaterThermalTankData::SourceHeatNeed(Real64 const OutletTemp, Real64 const DeadBandTemp, Real64 const SetPointTemp_loc)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Yueyue Zhou
         //       DATE WRITTEN   May 2019
@@ -9867,7 +9867,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                         Real64 const DeadBandTemp,
                                                         Real64 const SetPointTemp_loc)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   October 2007
@@ -10038,7 +10038,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::MinePlantStructForInfo()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   October 2007
@@ -10100,7 +10100,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -10252,7 +10252,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SizeTankForDemandSide()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -10596,7 +10596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SizeTankForSupplySide()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -10717,7 +10717,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SizeDemandSidePlantConnections()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   October 2007
@@ -10930,7 +10930,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::SizeStandAloneWaterHeater()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   October 2013
@@ -11266,7 +11266,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::CalcStandardRatings()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
@@ -11682,7 +11682,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterThermalTankData::ReportCWTankInits()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2009
@@ -11709,7 +11709,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 WaterThermalTankData::FindStratifiedTankSensedTemp(bool UseAverage)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2012

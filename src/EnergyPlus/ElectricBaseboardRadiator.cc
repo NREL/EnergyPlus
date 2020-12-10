@@ -148,7 +148,7 @@ namespace ElectricBaseboardRadiator {
                           Real64 &PowerMet,
                           int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -220,7 +220,7 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -572,7 +572,7 @@ namespace ElectricBaseboardRadiator {
 
     void InitElectricBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -674,7 +674,7 @@ namespace ElectricBaseboardRadiator {
 
     void SizeElectricBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -772,7 +772,7 @@ namespace ElectricBaseboardRadiator {
 
     void CalcElectricBaseboard(int const BaseboardNum, [[maybe_unused]] int const ControlledZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -956,7 +956,7 @@ namespace ElectricBaseboardRadiator {
 
     void UpdateElectricBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //                      Rick Strand
@@ -982,7 +982,7 @@ namespace ElectricBaseboardRadiator {
 
     void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1026,7 +1026,7 @@ namespace ElectricBaseboardRadiator {
 
     void DistributeBBElecRadGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand

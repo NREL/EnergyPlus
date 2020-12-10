@@ -148,7 +148,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -315,7 +315,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CalcDayltgCoefficients()
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -712,7 +712,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CalcDayltgCoeffsRefMapPoints(int const ZoneNum)
     {
-                            EnergyPlusData & state = getCurrentState(0);
+                            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2004
@@ -799,7 +799,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CalcDayltgCoeffsRefPoints(int const ZoneNum)
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2012
@@ -1192,7 +1192,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CalcDayltgCoeffsMapPoints(int const ZoneNum)
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2012
@@ -1622,7 +1622,7 @@ namespace EnergyPlus::DaylightingManager {
                                                   //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
                                                   Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
-                                                  EnergyPlusData & state = getCurrentState(0);
+                                                  EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -2081,7 +2081,7 @@ namespace EnergyPlus::DaylightingManager {
         //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -2370,7 +2370,7 @@ namespace EnergyPlus::DaylightingManager {
                                   DataDaylighting::iCalledFor const CalledFrom,
                                   Optional_int_const MapNum)
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   April 2013
@@ -2583,7 +2583,7 @@ namespace EnergyPlus::DaylightingManager {
                                 [[maybe_unused]] DataDaylighting::iCalledFor const CalledFrom,
                                 [[maybe_unused]] Optional_int_const MapNum)
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -2959,7 +2959,7 @@ namespace EnergyPlus::DaylightingManager {
                                int const curWinEl,
                                Real64 const WinElArea)
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -3016,7 +3016,7 @@ namespace EnergyPlus::DaylightingManager {
     void CFSRefPointPosFactor(
         Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -3248,7 +3248,7 @@ namespace EnergyPlus::DaylightingManager {
         Optional_int_const MapNum,
         Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -3929,7 +3929,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 int const ICtrl // Window control counter
     )
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, Oct 2012, derived from legacy code by Fred Winkelmann
         //       DATE WRITTEN   Oct. 2012
@@ -4075,7 +4075,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 int const ICtrl // Window control counter
     )
     {
-                    EnergyPlusData & state = getCurrentState(0);
+                    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, Oct 2012, derived from legacy code by Fred Winkelmann, Peter Ellis, Linda Lawrie
         //       DATE WRITTEN   Nov. 2012
@@ -4211,7 +4211,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void GetDaylightingParametersInput()
     {
-                    EnergyPlusData & state = getCurrentState(0);
+                    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2004
@@ -4518,7 +4518,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void GetInputIlluminanceMap(bool &ErrorsFound)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
         using namespace DataIPShortCuts;
@@ -4910,7 +4910,7 @@ namespace EnergyPlus::DaylightingManager {
     void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting inputs
                                 bool &ErrorsFound)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2002
         //       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
@@ -5135,7 +5135,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void GeometryTransformForDaylighting()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2002
         //       MODIFIED       Glazer - July 2016 - separated this from GetInput function
@@ -5295,7 +5295,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void GetInputDayliteRefPt(bool &ErrorsFound)
     {
-                        EnergyPlusData & state = getCurrentState(0);
+                        EnergyPlusData & state = getCurrentState();
         // Perform GetInput function for the Daylighting:ReferencePoint object
         // Glazer - July 2016
         using namespace DataIPShortCuts;
@@ -5334,7 +5334,7 @@ namespace EnergyPlus::DaylightingManager {
 
     bool doesDayLightingUseDElight()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
             if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
                 return true;
@@ -5345,7 +5345,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CheckTDDsAndLightShelvesInDaylitZones()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Dec 2007
@@ -5422,7 +5422,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void AssociateWindowShadingControlWithDaylighting()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             int found = -1;
             for (int jZone = 1; jZone <= state.dataGlobal->NumOfZones; ++jZone) {
@@ -5443,7 +5443,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void GetLightWellData(bool &ErrorsFound) // If errors found in input
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Apr 2004
@@ -5547,7 +5547,7 @@ namespace EnergyPlus::DaylightingManager {
                      int &ZoneNum    // Zone number
     )
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -5622,7 +5622,7 @@ namespace EnergyPlus::DaylightingManager {
                                 int const ZoneNum        // Zone number
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2004
@@ -5700,7 +5700,7 @@ namespace EnergyPlus::DaylightingManager {
                              Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -5795,7 +5795,7 @@ namespace EnergyPlus::DaylightingManager {
                               Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -6069,7 +6069,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgInteriorIllum(int &ZoneNum) // Zone number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -7058,7 +7058,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgInteriorTDDIllum()
     {
-                        EnergyPlusData & state = getCurrentState(0);
+                        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -7142,7 +7142,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgElecLightingControl(int &ZoneNum) // Zone number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -7385,7 +7385,7 @@ namespace EnergyPlus::DaylightingManager {
                                    int const IWin     // Window index
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -8341,7 +8341,7 @@ namespace EnergyPlus::DaylightingManager {
                                        DataDaylighting::iCalledFor const CalledFrom,
                                        Optional_int_const MapNum)
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8502,7 +8502,7 @@ namespace EnergyPlus::DaylightingManager {
                                                       DataDaylighting::iCalledFor const CalledFrom,
                                                       Optional_int_const MapNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   April 2013
@@ -8664,7 +8664,7 @@ namespace EnergyPlus::DaylightingManager {
                                               DataDaylighting::iCalledFor const CalledFrom,
                                               Optional_int_const MapNum)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8784,7 +8784,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 Optional_int_const MapNum,
                                                 Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8905,7 +8905,7 @@ namespace EnergyPlus::DaylightingManager {
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -9202,7 +9202,7 @@ namespace EnergyPlus::DaylightingManager {
                                  Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
     )
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   November 2003
@@ -9286,7 +9286,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgInteriorMapIllum(int &ZoneNum) // Zone number
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // *****super modified version of DayltgInteriorIllum by Peter Graham Ellis
         // *****removes all control code, just calculates illum and glare with previously determined control settings
         // *****this should be packaged into a subroutine called from 2 places
@@ -9766,7 +9766,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void ReportIllumMap(int const MapNum)
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Ellis
         //       DATE WRITTEN   May 2003
@@ -9972,7 +9972,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CloseReportIllumMaps()
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   June 2003
@@ -10045,7 +10045,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CloseDFSFile()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -10085,7 +10085,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgSetupAdjZoneListsAndPointers()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb. 2004
@@ -10424,7 +10424,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CreateShadeDeploymentOrder(int &ZoneNum)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // J. Glazer - 2018
         // create sorted list for shade deployment order
         // first step is to create a sortable list of WindowShadingControl objects by sequence
@@ -10461,7 +10461,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum)
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
@@ -10497,7 +10497,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum) // Zone number
     {
-                EnergyPlusData & state = getCurrentState(0);
+                EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -10550,7 +10550,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CalcMinIntWinSolidAngs()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb. 2004
@@ -10673,7 +10673,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
-                            EnergyPlusData & state = getCurrentState(0);
+                            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2009
@@ -10755,7 +10755,7 @@ namespace EnergyPlus::DaylightingManager {
                                std::string const &refPt2,
                                Real64 const zcoord)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   Sept 2008

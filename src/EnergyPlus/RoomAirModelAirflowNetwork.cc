@@ -151,7 +151,7 @@ namespace RoomAirModelAirflowNetwork {
 
     void SimRoomAirModelAirflowNetwork(int const ZoneNum) // index number for the specified zone
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -203,7 +203,7 @@ namespace RoomAirModelAirflowNetwork {
 
     void LoadPredictionRoomAirModelAirflowNetwork(int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -252,7 +252,7 @@ namespace RoomAirModelAirflowNetwork {
 
     void RAFNData::InitRoomAirModelAirflowNetwork(int const RoomAirNode) // index number for the specified zone
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -628,7 +628,7 @@ namespace RoomAirModelAirflowNetwork {
 
     void RAFNData::CalcRoomAirModelAirflowNetwork(int const RoomAirNode) // index number for the specified zone and node
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   November 2009
@@ -747,7 +747,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RAFNData::UpdateRoomAirModelAirflowNetwork()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
@@ -820,7 +820,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RAFNData::CalcNodeSums(int const RoomAirNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2009
@@ -1145,7 +1145,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            Real64 &SumHmARaW,
                                            [[maybe_unused]] Array1D<bool> const &SurfMask)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //                      derived from P. Biddulph-- HAMT, L. Gu -- EPMD,
@@ -1238,7 +1238,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RAFNData::SumNonAirSystemResponseForNode(int const RAFNNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012
@@ -1367,7 +1367,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RAFNData::SumSystemDepResponseForNode()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
         //       DATE WRITTEN   aug 2005, Jan2004

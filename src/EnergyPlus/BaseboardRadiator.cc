@@ -115,7 +115,7 @@ namespace BaseboardRadiator {
                       Real64 &PowerMet,
                       int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -241,7 +241,7 @@ namespace BaseboardRadiator {
 
     void GetBaseboardInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -501,7 +501,7 @@ namespace BaseboardRadiator {
 
     void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -618,7 +618,7 @@ namespace BaseboardRadiator {
 
     void SizeBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -986,7 +986,7 @@ namespace BaseboardRadiator {
 
     void SimHWConvective(int &BaseboardNum, Real64 &LoadMet)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1123,7 +1123,7 @@ namespace BaseboardRadiator {
 
     void UpdateBaseboard(int &BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1155,7 +1155,7 @@ namespace BaseboardRadiator {
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002

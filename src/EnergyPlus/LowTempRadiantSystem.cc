@@ -262,7 +262,7 @@ namespace LowTempRadiantSystem {
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -347,7 +347,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetLowTempRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -1562,7 +1562,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(std::string const userInput)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(userInput, "ConvectionOnly")) {
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
         } else if (UtilityRoutines::SameString(userInput, "ISOStandard")) {
@@ -1579,7 +1579,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                                                        std::string const &controlInputField,
                                                                                        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
         } else if (UtilityRoutines::SameString(controlInput, "MeanRadiantTemperature")) {
@@ -1608,7 +1608,7 @@ EnergyPlusData & state = getCurrentState(0);
     LowTempRadiantSetpointTypes RadiantSystemBaseData::processRadiantSystemSetpointInput(std::string const &controlInput,
                                                                                          std::string const &controlInputField)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
             return LowTempRadiantSetpointTypes::halfFlowPower;
         } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
@@ -1623,7 +1623,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RadiantSystemBaseData::errorCheckZonesAndConstructions(bool &errorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
         Real64 zoneMultiplersTolerance = 0.001;
@@ -1674,7 +1674,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   LowTempRadiantSystem::SystemType const SystemType, // Type of radiant system: hydronic, constant flow, or electric
                                   bool &InitErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -2294,7 +2294,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HydronicSystemBaseData::updateOperatingModeHistory()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Since this is only called when the operating mode is something other than "not operating",
         // the status from the previous system time step is what it did in the last or previous time step.
         // So, we can update the last status of the system using this information before reseting things
@@ -2340,7 +2340,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HydronicSystemBaseData::setOperatingModeBasedOnChangeoverDelay()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->lastOperatingMode == NotOperating) return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
                                                              // so let things proceed with whatever the system wants to do
 
@@ -2371,7 +2371,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   LowTempRadiantSystem::SystemType const SystemType // Type of radiant system: hydronic, constant flow, or electric
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -3102,7 +3102,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 HydronicSystemBaseData::sizeRadiantSystemTubeLength()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2017
@@ -3134,7 +3134,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -3292,7 +3292,7 @@ EnergyPlusData & state = getCurrentState(0);
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents(
         Real64 &LoadMet) // Load met by the low temperature radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -3785,7 +3785,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2003
@@ -4284,7 +4284,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2003
@@ -4795,7 +4795,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This routine grabs the current weather data since it is currently available at this point in the simulation.  Note, however,
         // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
         // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
@@ -4821,7 +4821,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepNumber) {
@@ -4833,7 +4833,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet) // load met by the radiant system, in Watts
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -4934,7 +4934,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RadiantSystemBaseData::updateLowTemperatureRadiantSystemSurfaces()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // The purpose of this routine is to update the average heat source/sink for a particular system over the various system time
         // steps that make up the zone time step.  For hydronic systems, this routine must also set the outlet water conditions.
         // For the source/sink average update, if the system time step elapsed is still what it used to be, then either we are still
@@ -4970,7 +4970,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void VariableFlowRadiantSystemData::updateLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataLoopNode::Node;
@@ -5050,7 +5050,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstantFlowRadiantSystemData::updateLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataLoopNode::Node;
@@ -5127,7 +5127,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HydronicSystemBaseData::checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2013
@@ -5181,7 +5181,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         switch (this->ControlType) {
         case LowTempRadiantControlTypes::MATControl:
             return DataHeatBalFanSys::MAT(this->ZonePtr);
@@ -5223,7 +5223,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 RadiantSystemBaseData::setOffTemperatureLowTemperatureRadiantSystem(const int scheduleIndex, const Real64 throttlingRange)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(scheduleIndex);
         switch (this->SetpointType) {
         case LowTempRadiantSetpointTypes::halfFlowPower:
@@ -5245,7 +5245,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                          Real64 const NumCircs       // Number of fluid circuits in this surface
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -5400,7 +5400,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 HydronicSystemBaseData::calculateUFromISOStandard(int const SurfNum, Real64 const WaterMassFlow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Calculates the U-value for a pipe embedded in a radiant system using the information
         // from ISO Standard 11855, Part 2 (2012): "Building environment design — Design, dimensioning,
         // installation and control of embedded radiant heating and cooling systems — Part 2:
@@ -5582,7 +5582,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstantFlowRadiantSystemData::reportLowTemperatureRadiantSystem()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;

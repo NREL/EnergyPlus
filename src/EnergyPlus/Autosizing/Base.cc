@@ -70,7 +70,7 @@ void BaseSizer::initializeWithinEP(const std::string &_compType,
                                    bool const &_printWarningFlag,
                                    std::string const &_callingRoutine)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     this->initialized = true;
     this->compType = _compType;
     this->compName = _compName;
@@ -170,7 +170,7 @@ void BaseSizer::initializeWithinEP(const std::string &_compType,
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     this->clearState();
     this->initialized = true;
     this->compType = "API_component_type";
@@ -196,7 +196,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(Real64 const _originalValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (this->sizingType == AutoSizingType::Unknown) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
@@ -319,7 +319,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
                                   Optional_string_const UsrDesc,
                                   Optional<Real64 const> UsrValue)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
     static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
@@ -351,7 +351,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (this->printWarningFlag) {
         if (this->dataEMSOverrideON) { // EMS overrides value
             this->autoSizedValue = this->dataEMSOverride;
@@ -437,7 +437,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
 
 void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (this->printWarningFlag) {
         if (this->dataEMSOverrideON) { // EMS overrides value
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
@@ -589,7 +589,7 @@ bool BaseSizer::isValidFanType(std::string const &_compType)
 
 bool BaseSizer::checkInitialized(bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (!this->initialized) {
         errorsFound = true;
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -613,7 +613,7 @@ void BaseSizer::overrideSizingString(std::string &string)
 
 Real64 BaseSizer::setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 outAirFrac = 0.0;
     if (desMassFlow <= 0.0) return outAirFrac;
 

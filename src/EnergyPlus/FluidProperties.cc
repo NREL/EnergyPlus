@@ -220,7 +220,7 @@ namespace FluidProperties {
 
     void GetFluidPropertiesData()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 2000
@@ -4818,7 +4818,7 @@ namespace FluidProperties {
                                       Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -4916,7 +4916,7 @@ namespace FluidProperties {
                                    Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -5011,7 +5011,7 @@ namespace FluidProperties {
 
     void InitializeGlycolTempLimits(bool &ErrorsFound) // set to true if errors found here
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -5144,7 +5144,7 @@ namespace FluidProperties {
 
     void InitializeRefrigerantLimits(bool &ErrorsFound) // set to true if errors found here
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -5310,7 +5310,7 @@ namespace FluidProperties {
 
     void ReportAndTestGlycols()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -5579,7 +5579,7 @@ namespace FluidProperties {
 
     void ReportAndTestRefrigerants()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008; only stub provided to satisfy calling programs.
@@ -5949,7 +5949,7 @@ namespace FluidProperties {
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   24 May 2002
@@ -6071,7 +6071,7 @@ namespace FluidProperties {
                                    std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   24 May 2002
@@ -6193,7 +6193,7 @@ namespace FluidProperties {
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mike Turner
         //       DATE WRITTEN   10 December 99
@@ -6275,7 +6275,7 @@ namespace FluidProperties {
                                std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mike Turner
         //       DATE WRITTEN   10 December 99
@@ -6431,7 +6431,7 @@ namespace FluidProperties {
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mike Turner
         //       DATE WRITTEN   10 December 99
@@ -6518,7 +6518,7 @@ namespace FluidProperties {
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mike Turner
         //       DATE WRITTEN   10 December 99
@@ -6772,7 +6772,7 @@ namespace FluidProperties {
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -7076,7 +7076,7 @@ namespace FluidProperties {
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jan 2016
@@ -7192,7 +7192,7 @@ namespace FluidProperties {
     Real64 GetSupHeatTempRefrigResidual(Real64 const Temp, // temperature of the refrigerant
                                         Array1D<Real64> const &Par)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   July 2016
@@ -7260,7 +7260,7 @@ namespace FluidProperties {
                                    std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mike Turner
         //       DATE WRITTEN   10 December 99
@@ -7522,7 +7522,7 @@ namespace FluidProperties {
     )
 #endif
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -7667,7 +7667,7 @@ namespace FluidProperties {
                             std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -7832,7 +7832,7 @@ namespace FluidProperties {
                                  std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -7998,7 +7998,7 @@ namespace FluidProperties {
                               std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2004
@@ -8160,7 +8160,7 @@ namespace FluidProperties {
 
     void GetInterpValue_error()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         ShowFatalError("GetInterpValue: Temperatures for fluid property data too close together, division by zero");
     }
 
@@ -8173,7 +8173,7 @@ namespace FluidProperties {
                             std::string const &CalledFrom   // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -8300,7 +8300,7 @@ namespace FluidProperties {
     int FindRefrigerant(std::string const &Refrigerant) // carries in substance name
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -8348,7 +8348,7 @@ namespace FluidProperties {
     int FindGlycol(std::string const &Glycol) // carries in substance name
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -8566,7 +8566,7 @@ namespace FluidProperties {
                                   int const UpperBound              // Valid values upper bound (set by calling program)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   May 2002
@@ -8667,7 +8667,7 @@ namespace FluidProperties {
 
     int CheckFluidPropertyName(std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -8707,7 +8707,7 @@ namespace FluidProperties {
 
     void ReportOrphanFluids()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2010
@@ -8776,7 +8776,7 @@ namespace FluidProperties {
                                  std::string const &CalledFrom   // original called from (external to fluid properties)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2011
@@ -8836,7 +8836,7 @@ namespace FluidProperties {
                                       std::string const &CalledFrom       // original called from (external to fluid properties)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2011
@@ -8890,7 +8890,7 @@ namespace FluidProperties {
 
     void GetFluidDensityTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -8937,7 +8937,7 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -8983,7 +8983,7 @@ namespace FluidProperties {
     }
 
     GlycolAPI::GlycolAPI(std::string const &glycolName) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
         this->glycolIndex = 0;
         this->cf = "GlycolAPI:Instance";
@@ -8992,24 +8992,24 @@ namespace FluidProperties {
         }
     }
     Real64 GlycolAPI::specificHeat(Real64 temperature) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSpecificHeatGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
     }
     Real64 GlycolAPI::density(Real64 temperature) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetDensityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
     }
     Real64 GlycolAPI::conductivity(Real64 temperature) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetConductivityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
     }
     Real64 GlycolAPI::viscosity(Real64 temperature) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetViscosityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
     }
 
     RefrigerantAPI::RefrigerantAPI(std::string const &refrigName) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
         this->rIndex = 0;
         this->cf = "RefrigerantAPI:Instance";
@@ -9018,35 +9018,35 @@ namespace FluidProperties {
         }
     }
     Real64 RefrigerantAPI::saturationPressure(Real64 temperature) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSatPressureRefrig(this->rName, temperature, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::saturationTemperature(Real64 pressure) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSatTemperatureRefrig(this->rName, pressure, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::saturatedEnthalpy(Real64 temperature, Real64 quality) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSatEnthalpyRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::saturatedDensity(Real64 temperature, Real64 quality) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSatDensityRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::saturatedSpecificHeat(Real64 temperature, Real64 quality) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSatSpecificHeatRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::superHeatedEnthalpy(Real64 temperature, Real64 pressure) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSupHeatEnthalpyRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::superHeatedPressure(Real64 temperature, Real64 enthalpy) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSupHeatPressureRefrig(this->rName, temperature, enthalpy, this->rIndex, this->cf);
     }
     Real64 RefrigerantAPI::superHeatedDensity(Real64 temperature, Real64 pressure) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return FluidProperties::GetSupHeatDensityRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 

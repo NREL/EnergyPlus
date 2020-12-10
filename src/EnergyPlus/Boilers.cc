@@ -95,7 +95,7 @@ namespace EnergyPlus::Boilers {
 
     PlantComponent *BoilerSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (state.dataBoilers->getBoilerInputFlag) {
             GetBoilerInput();
@@ -118,7 +118,7 @@ namespace EnergyPlus::Boilers {
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->InitBoiler();
         this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
@@ -130,7 +130,7 @@ namespace EnergyPlus::Boilers {
                                           Real64 &MinLoad,
                                           Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -143,14 +143,14 @@ namespace EnergyPlus::Boilers {
 
     void BoilerSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->InitBoiler();
         this->SizeBoiler();
     }
 
     void GetBoilerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998
@@ -354,7 +354,7 @@ namespace EnergyPlus::Boilers {
 
     void BoilerSpecs::SetupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Heating Energy",
                             OutputProcessor::Unit::J,
@@ -403,7 +403,7 @@ namespace EnergyPlus::Boilers {
 
     void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -524,7 +524,7 @@ namespace EnergyPlus::Boilers {
 
     void BoilerSpecs::SizeBoiler()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -682,7 +682,7 @@ namespace EnergyPlus::Boilers {
                                       DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   April 1999

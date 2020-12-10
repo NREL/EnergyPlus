@@ -81,7 +81,7 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -242,7 +242,7 @@ namespace WindowManager {
     CWCEHeatTransferFactory::CWCEHeatTransferFactory(SurfaceData const &surface, int const t_SurfNum)
         : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         m_Window = SurfaceWindow(t_SurfNum);
         auto ShadeFlag = SurfWinShadingFlag(t_SurfNum);
 
@@ -273,7 +273,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(Real64 const t_HextConvCoeff)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto Indoor = getIndoor();
         auto Outdoor = getOutdoor(t_HextConvCoeff);
         auto aIGU = getIGU();
@@ -303,7 +303,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     Material::MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(int const t_Index) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto ConstrNum = m_Surface.Construction;
 
         if (SurfWinShadingFlag(m_SurfNum) == IntShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == IntBlindOn ||
@@ -321,7 +321,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getIGULayer(int const t_Index)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::shared_ptr<CBaseIGULayer> aLayer = nullptr;
 
         auto material = getLayerMaterial(t_Index);
@@ -344,7 +344,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     int CWCEHeatTransferFactory::getNumOfLayers() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return state.dataConstruction->Construct(m_ConstructionNumber).TotLayers;
     }
 
@@ -492,7 +492,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getShadeToGlassLayer(int const t_Index) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   August 2016
@@ -519,7 +519,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(Material::MaterialProperties const &material) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -591,7 +591,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getIndoor() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -614,7 +614,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getOutdoor(const Real64 t_Hext) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016

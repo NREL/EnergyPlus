@@ -70,7 +70,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutDryBulbTempAt(Real64 const Z) // Height above ground (m)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -119,7 +119,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutWetBulbTempAt(Real64 const Z) // Height above ground (m)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -163,7 +163,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutDewPointTempAt(Real64 const Z) // Height above ground (m)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -208,7 +208,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 WindSpeedAt(Real64 const Z) // Height above ground (m)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -245,7 +245,7 @@ namespace EnergyPlus::DataEnvironment {
 
     Real64 OutBaroPressAt(Real64 const Z) // Height above ground (m)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -291,7 +291,7 @@ namespace EnergyPlus::DataEnvironment {
 
     void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         ShowSevereError("SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
@@ -306,7 +306,7 @@ namespace EnergyPlus::DataEnvironment {
     void
     SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie

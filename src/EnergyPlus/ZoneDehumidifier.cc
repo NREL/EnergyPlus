@@ -118,7 +118,7 @@ namespace ZoneDehumidifier {
                              int &CompIndex                                  // Index to the zone dehumidifier
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
         //       DATE WRITTEN   July/Aug 2009
@@ -183,7 +183,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneDehumidifierInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
@@ -532,7 +532,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneDehumidifier(int const ZoneDehumNum) // Number of the current zone dehumidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
         //       DATE WRITTEN   July/Aug 2009
@@ -681,7 +681,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Real64 &LatentOutput        // Latent (dehumidification) output provided (kg/s)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
         //       DATE WRITTEN   July/Aug 2009
@@ -968,7 +968,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateZoneDehumidifier(int const ZoneDehumNum) // Number of the current zone dehumidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
         //       DATE WRITTEN   August 2009
@@ -1030,7 +1030,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportZoneDehumidifier(int const DehumidNum) // Index of the current zone dehumidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey, FSEC
         //       DATE WRITTEN   August 2009
@@ -1101,7 +1101,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool GetZoneDehumidifierNodeNumber(int const NodeNumber) // Node being tested
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   August 2009

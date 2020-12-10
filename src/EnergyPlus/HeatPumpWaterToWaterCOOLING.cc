@@ -110,7 +110,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     }
 
     PlantComponent *GshpPeCoolingSpecs::factory(const std::string& objectName) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetWWHPCoolingInput) {
             GetGshpInput();
             GetWWHPCoolingInput = false;
@@ -129,7 +129,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     void GshpPeCoolingSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
             this->initialize();
@@ -163,7 +163,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void GshpPeCoolingSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -207,7 +207,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void GetGshpInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       SUBROUTINE INFORMATION:
         //       AUTHOR:
         //       DATE WRITTEN:    April 1998
@@ -496,7 +496,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void GshpPeCoolingSpecs::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -577,7 +577,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void GshpPeCoolingSpecs::calculate(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   Sept. 1998

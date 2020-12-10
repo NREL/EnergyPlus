@@ -116,7 +116,7 @@ namespace VariableSpeedCoils {
                                Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Bo Shen, ORNL
         //       DATE WRITTEN   March 2012
         //       MODIFIED       Bo Shen, 12/2014, add variable-speed HPWH
@@ -233,7 +233,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetVarSpeedCoilInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March, 2012
@@ -3001,7 +3001,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const SpeedNum                               // compressor speed number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on  MODULE WaterToAirHeatPumpSimple:InitSimpleWatertoAirHP
         //       DATE WRITTEN   March, 2012
@@ -3596,7 +3596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeVarSpeedCoil(int const DXCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:SizeHVACWaterToAir
         //       DATE WRITTEN   March, 2012
@@ -4845,7 +4845,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const SpeedNum       // Speed number, high bound
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcHPCoolingSimple
         //       DATE WRITTEN   March 2012
         //       MODIFIED       na
@@ -5496,7 +5496,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const CyclingScheme     // Continuous fan OR cycling compressor
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, ORNL
         //       DATE WRITTEN   12/2014
@@ -6030,19 +6030,19 @@ EnergyPlusData & state = getCurrentState(0);
 
     void setVarSpeedHPWHFanTypeNum(int const dXCoilNum, int const fanTypeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFan_TypeNum = fanTypeNum;
     }
 
     void setVarSpeedHPWHFanIndex(int const dXCoilNum, int const fanIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanIndex = fanIndex;
     }
 
     void setVarSpeedFanInfo(int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanIndex = fanIndex;
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFan_TypeNum = fanTypeNum;
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanName = fanName;
@@ -6059,7 +6059,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const SpeedNum       // Speed number, high bound, i.e. SpeedNum - 1 is the other side
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcHPHeatingSimple
         //       DATE WRITTEN   March 2012
         //       MODIFIED       na
@@ -6494,7 +6494,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:GetCoilCapacity
         //       DATE WRITTEN   March 2012
@@ -6556,7 +6556,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:GetCoilIndex
         //       DATE WRITTEN   March 2012
@@ -6596,7 +6596,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:GetCoilAirFlowRate
         //       DATE WRITTEN   March 2012
@@ -6655,7 +6655,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   12/2014
@@ -6698,7 +6698,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool &ErrorsFound     // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   7/2017
@@ -6733,7 +6733,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:GetCoilInletNode
         //       DATE WRITTEN   March 2012
@@ -6780,7 +6780,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:GetCoilOutletNode
         //       DATE WRITTEN   March 2012
@@ -6826,7 +6826,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on DXCoil:GetCoilCondenserInletNode
         //       DATE WRITTEN   July 2012
@@ -6866,7 +6866,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   July 2012
@@ -6906,7 +6906,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                bool &ErrorsFound    // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2019
@@ -6944,7 +6944,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   March 2013
@@ -6986,7 +6986,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Optional_int MSHPDesignSpecIndex      // index to UnitarySystemPerformance:Multispeed object
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:SetWSHPData
         //       DATE WRITTEN   March 2012
@@ -7033,7 +7033,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateVarSpeedCoil(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:UpdateSimpleWSHP
         //       DATE WRITTEN   March 2012
@@ -7153,7 +7153,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //    AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcEffectiveSHR
         //    DATE WRITTEN   March 2012
@@ -7297,7 +7297,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Real64 &TotCapModFac             // capacity modification factor, func of temp and func of flow
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, , based on DX:CalcTotCapSHR, introducing two speed levels
         //       DATE WRITTEN   March 2012
@@ -7428,7 +7428,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 getVarSpeedPartLoadRatio(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio;
     }
 

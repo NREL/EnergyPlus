@@ -190,7 +190,7 @@ namespace HeatBalFiniteDiffManager {
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
@@ -215,7 +215,7 @@ namespace HeatBalFiniteDiffManager {
 
     void GetCondFDInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curtis Pedersen
         //       DATE WRITTEN   July 2006
@@ -485,7 +485,7 @@ namespace HeatBalFiniteDiffManager {
 
     void InitHeatBalFiniteDiff()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -586,7 +586,7 @@ namespace HeatBalFiniteDiffManager {
 
     void InitialInitHeatBalFiniteDiff()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1009,7 +1009,7 @@ namespace HeatBalFiniteDiffManager {
                                Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Oct 2003
@@ -1173,7 +1173,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportFiniteDiffInits()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -1390,7 +1390,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 const HMovInsul    // Conductance of movable(transparent) insulation.
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   November, 2003
@@ -1658,7 +1658,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Array1D<Real64> &EnthNew                      // New Nodal enthalpy
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   November, 2003
@@ -1757,7 +1757,7 @@ EnergyPlusData & state = getCurrentState(0);
                               [[maybe_unused]] int const GSiter                // Iteration number of Gauss Seidel iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   November, 2003
@@ -2049,7 +2049,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Array1D<Real64> &TDreport                     // Temperature value from previous HeatSurfaceHeatManager iteration's value
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   November, 2003
@@ -2207,7 +2207,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real64 const CheckTemperature // calculated temperature, not reset
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2012
@@ -2330,7 +2330,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const TotNodes // number of nodes in surface
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   Sept-Nov 2015

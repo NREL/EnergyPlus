@@ -153,7 +153,7 @@ namespace OutdoorAirUnit {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -216,7 +216,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOutdoorAirUnitInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   July 2009
@@ -1005,7 +1005,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   July 2009
@@ -1340,7 +1340,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeOutdoorAirUnit(int const OAUnitNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   July 2009
@@ -1581,7 +1581,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -1949,7 +1949,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimZoneOutAirUnitComps(int const OAUnitNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -1997,7 +1997,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool const Sim // if TRUE, simulate component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -2365,7 +2365,7 @@ EnergyPlusData & state = getCurrentState(0);
                              int const EquipIndex, // Component Type -- Integerized for this module
                              Real64 &LoadMet)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2009
@@ -2536,7 +2536,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportOutdoorAirUnit(int const OAUnitNum) // Index for the outdoor air unit under consideration within the derived types
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young T. Chae
         //       DATE WRITTEN   Oct. 2009
@@ -2572,7 +2572,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOutdoorAirUnitOutAirNode(int const OAUnitNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2600,7 +2600,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOutdoorAirUnitZoneInletNode(int const OAUnitNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2628,7 +2628,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOutdoorAirUnitReturnAirNode(int const OAUnitNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith

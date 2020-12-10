@@ -164,7 +164,7 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -277,7 +277,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetHWBaseboardInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aug 2007
@@ -723,7 +723,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitHWBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //                      Rick Strand
@@ -922,7 +922,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeHWBaseboard(int const BaseboardNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -1242,7 +1242,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1413,7 +1413,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateHWBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1485,7 +1485,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1547,7 +1547,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DistributeBBRadGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1754,7 +1754,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Sept. 2010

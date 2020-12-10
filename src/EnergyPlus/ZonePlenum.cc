@@ -100,7 +100,7 @@ namespace ZonePlenum {
                           Optional_bool PlenumInletChanged        // Autodesk:OPTIONAL Used without PRESENT check
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   November 2000
@@ -206,7 +206,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZonePlenumInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   November 2000
@@ -587,7 +587,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitAirZoneReturnPlenum(int const ZonePlenumNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   November 2000
@@ -756,7 +756,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   March 2000
@@ -878,7 +878,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcAirZoneReturnPlenum(int const ZonePlenumNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   November 2000
@@ -953,7 +953,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstCall)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   March 2000
@@ -1005,7 +1005,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateAirZoneReturnPlenum(int const ZonePlenumNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   November 2000
@@ -1091,7 +1091,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateAirZoneSupplyPlenum(int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   March 2000
@@ -1159,7 +1159,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetReturnPlenumIndex(int const &ExNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PlenumNum;      // loop counter
         int InducedNodeNum; // loop counter
@@ -1195,7 +1195,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (state.dataZonePlenum->GetInputFlag) { // First time subroutine has been entered
             GetZonePlenumInput();
@@ -1210,7 +1210,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int getReturnPlenumIndexFromInletNode(int const &InNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PlenumNum; // loop counter
         int InNodeCtr; // loop counter

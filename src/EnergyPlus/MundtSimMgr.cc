@@ -135,7 +135,7 @@ namespace MundtSimMgr {
 
     void ManageMundtModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   July 2003
@@ -180,7 +180,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitMundtModel()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   February 2004
@@ -357,7 +357,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfHBDataForMundtModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Weixiu Kong
         //       DATE WRITTEN   April 2003
@@ -492,7 +492,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound  // true if problems setting up model
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Febraury 2002
@@ -583,7 +583,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcMundtModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   September 2001
@@ -757,7 +757,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetSurfHBDataForMundtModel(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chanvit Chantrasrisalai
         //       DATE WRITTEN   July 2003

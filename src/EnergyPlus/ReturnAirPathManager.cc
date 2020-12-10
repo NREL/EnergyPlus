@@ -121,7 +121,7 @@ namespace ReturnAirPathManager {
 
     void SimReturnAirPath()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
@@ -155,7 +155,7 @@ namespace ReturnAirPathManager {
 
     void GetReturnAirPathInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
         //       DATE WRITTEN:    Nov 1997
@@ -262,7 +262,7 @@ namespace ReturnAirPathManager {
 
     void CalcReturnAirPath(int &ReturnAirPathNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
         //       DATE WRITTEN:    Nov 1997

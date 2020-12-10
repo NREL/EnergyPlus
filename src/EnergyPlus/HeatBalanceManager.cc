@@ -278,7 +278,7 @@ namespace HeatBalanceManager {
 
     void ManageHeatBalance()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -393,7 +393,7 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -476,7 +476,7 @@ namespace HeatBalanceManager {
     void CheckUsedConstructions(bool &ErrorsFound)
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2011
@@ -553,7 +553,7 @@ namespace HeatBalanceManager {
 
     bool CheckValidSimulationObjects()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2008
@@ -596,7 +596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetPreConstructionInputParameters()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   October 2014
@@ -647,7 +647,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetProjectControlData(bool &ErrorsFound) // Set to true if errors detected during getting data
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2004
@@ -1394,7 +1394,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSiteAtmosphereData(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2006
@@ -1461,7 +1461,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetMaterialData(bool &ErrorsFound) // set to true if errors found in input
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   September 1997
@@ -3899,7 +3899,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -4063,7 +4063,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound             // If errors found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 1999
@@ -4114,7 +4114,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetConstructData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   September 1997
@@ -4585,7 +4585,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetBuildingData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -4627,7 +4627,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetZoneData(bool &ErrorsFound) // If errors found in input
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -4869,7 +4869,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneLocalEnvData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
         //       DATE WRITTEN   July 2017
@@ -4994,7 +4994,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound                                          // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
@@ -5131,7 +5131,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
@@ -5329,7 +5329,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateHeatBalArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -5490,7 +5490,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RecKeepHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
@@ -5567,7 +5567,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckWarmupConvergence()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
@@ -5741,7 +5741,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWarmupConvergence()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2011
@@ -5842,7 +5842,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateWindowFaceTempsNonBSDFWin()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int SurfNum;
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -5865,7 +5865,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 1997
@@ -5960,7 +5960,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OpenShadingFile()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X Luo
         //       DATE WRITTEN   August 2017
@@ -5985,7 +5985,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   May 2000
@@ -6107,7 +6107,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   August 2001
@@ -7004,7 +7004,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetStormWindowControl()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Jan 2004
@@ -7071,7 +7071,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool &ErrorsFound // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tianzhen Hong
         //       DATE WRITTEN   July 2009
@@ -7321,7 +7321,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         bool &errorsFound // If errors found in input
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         cCurrentModuleObject = "Construction:AirBoundary";
         std::string RoutineName = "CreateAirBoundaryConstructions";
         int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -7423,7 +7423,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetScheduledSurfaceGains(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -7644,7 +7644,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckScheduledSurfaceGains(int const ZoneNum) // Zone number for which error check will be performed
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2013
@@ -7738,7 +7738,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CreateTCConstructions([[maybe_unused]] bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tianzhen Hong
         //       DATE WRITTEN   January 2009
@@ -7827,7 +7827,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupSimpleWindowGlazingSystem(int &MaterNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   January 2009
@@ -8019,7 +8019,7 @@ EnergyPlusData & state = getCurrentState(0);
     void SetupComplexFenestrationMaterialInput(int &MaterNum, // num of material items thus far
                                                bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   March 2012
@@ -8404,7 +8404,7 @@ EnergyPlusData & state = getCurrentState(0);
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2010
@@ -9204,7 +9204,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitConductionTransferFunctions()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
         for (auto & construction : state.dataConstruction->Construct) {

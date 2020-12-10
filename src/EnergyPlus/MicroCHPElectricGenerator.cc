@@ -127,7 +127,7 @@ namespace MicroCHPElectricGenerator {
 
     PlantComponent *MicroCHPDataStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getMicroCHPInputFlag) {
             GetMicroCHPGeneratorInput();
@@ -148,7 +148,7 @@ namespace MicroCHPElectricGenerator {
 
     void GetMicroCHPGeneratorInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
         //       DATE WRITTEN:    July 2005
@@ -407,7 +407,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Off Mode Time", OutputProcessor::Unit::s, this->A42Model.OffModeTime, "System", "Sum", this->Name);
 
         SetupOutputVariable("Generator Standby Mode Time", OutputProcessor::Unit::s, this->A42Model.StandyByModeTime, "System", "Sum", this->Name);
@@ -528,7 +528,7 @@ namespace MicroCHPElectricGenerator {
                                       [[maybe_unused]] Real64 &CurLoad,
                                       [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the nodes.
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
@@ -547,7 +547,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(const EnergyPlus::PlantLocation &)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
@@ -585,7 +585,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
         //       DATE WRITTEN   March 2007
@@ -715,7 +715,7 @@ namespace MicroCHPElectricGenerator {
                                                                    Real64 const MyThermalLoad,
                                                                    bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR        B Griffith
         //       DATE WRITTEN   July 2006
@@ -1238,7 +1238,7 @@ EnergyPlusData & state = getCurrentState(0);
     void FigureMicroCHPZoneGains()
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
@@ -1278,7 +1278,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void MicroCHPDataStruct::CalcUpdateHeatRecovery()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2006
@@ -1303,7 +1303,7 @@ EnergyPlusData & state = getCurrentState(0);
     void MicroCHPDataStruct::getDesignCapacities(
         const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         MaxLoad = state.dataGenerator->GeneratorDynamics(this->DynamicsControlID).QdotHXMax;
         MinLoad = state.dataGenerator->GeneratorDynamics(this->DynamicsControlID).QdotHXMin;
         OptLoad = state.dataGenerator->GeneratorDynamics(this->DynamicsControlID).QdotHXOpt;
@@ -1311,7 +1311,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords() // Generator number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006

@@ -132,7 +132,7 @@ namespace WindowManager {
 
     void InitWindowOpticalCalculations()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -153,7 +153,7 @@ namespace WindowManager {
 
     void InitGlassOpticalCalculations()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
@@ -1497,7 +1497,7 @@ namespace WindowManager {
 
     void W5InitGlassParameters()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Initializes variables used in the window optical and thermal calculation.
 
         int ConstrNum;        // Construction number
@@ -1657,7 +1657,7 @@ namespace WindowManager {
                                        Real64 const wlbot, // Lowest and highest wavelength considered
                                        Real64 const wltop)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by F.Winkelmann from WINDOW 5
         //                      subroutine opcalc
@@ -1745,7 +1745,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Array1A<Real64> aft // System absorptance of each glass layer
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by F. Winkelmann from WINDOW 5
         //                      subroutine op
@@ -1827,7 +1827,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &psol       // Quantity p weighted by solar spectrum
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by F.Winkelmann from WINDOW 5 subroutine solar
         //       DATE WRITTEN   August 1999
@@ -1868,7 +1868,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &pvis       // Quantity p weighted by solar spectrum and photopic
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by F.Winkelmann from WINDOW 5
         //                      subroutine w4vis
@@ -1966,7 +1966,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         S. Vidanovic
         //       DATE WRITTEN   June 2016
@@ -1990,7 +1990,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   November 1999
@@ -2667,7 +2667,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WindowHeatBalanceEquations(int const SurfNum) // Surface number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   February 2000
@@ -2765,7 +2765,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SolveForWindowTemperatures(int const SurfNum) // Surface number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   July 2000
@@ -3574,7 +3574,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real64 &QConvGap    // Convective heat gain from glass-shade/blind gap for interior shade (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   December 2000
@@ -3768,7 +3768,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Array1A<Real64> hcv      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   December 2002
@@ -3964,7 +3964,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 &QConvGap    // Convective heat gain from air flow gap (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   February 2003
@@ -4073,7 +4073,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Real64 &QConvTot         // Sum of convective heat flow from gaps (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   February 2003
@@ -4204,7 +4204,7 @@ EnergyPlusData & state = getCurrentState(0);
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann, adapted from Numerical Recipes
         //       DATE WRITTEN   February 2000
@@ -4342,7 +4342,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Real64 &gr           // Gap gas Grashof number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by Fred Winkelmann from Window5 subroutine gasses
         //       DATE WRITTEN   September 2001
@@ -4496,7 +4496,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &visc        // Gap gas dynamic viscosity at tmean (g/m-s)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   December 2002
@@ -4588,7 +4588,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Array1A<Real64> AbsRadShade // Short-wave radiation absorbed by shade/blind faces
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   January 2000
@@ -4722,7 +4722,7 @@ EnergyPlusData & state = getCurrentState(0);
                        Real64 &gnu        // Gap gas Nusselt number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Adapted by Fred Winkelmann from Window5 subroutine nusselt
         //       DATE WRITTEN   September 2001
@@ -5703,7 +5703,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      int const ConstrNum    // Construction number of window
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   May 2000
@@ -5911,7 +5911,7 @@ EnergyPlusData & state = getCurrentState(0);
                                int &errFlag                // Error flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   September 2000
@@ -6411,7 +6411,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   September 2000
@@ -6689,7 +6689,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void StartingWinTempsForNominalCond()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   September 2000
@@ -6743,7 +6743,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportGlass()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2000
@@ -7225,7 +7225,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWindowBlindProperties()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -7414,7 +7414,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWindowScreenProperties()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   April 2006
@@ -7655,7 +7655,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Array1A<Real64> p        // Blind properties
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -7975,7 +7975,7 @@ EnergyPlusData & state = getCurrentState(0);
                          Array1A<Real64> p        // Blind properties (equivalent to ST_LAY)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -8279,7 +8279,7 @@ EnergyPlusData & state = getCurrentState(0);
                       int const np,      // Dimension of matrix
                       int const n)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Hans Simmler
         //       DATE WRITTEN   July-Aug 1995
@@ -8322,7 +8322,7 @@ EnergyPlusData & state = getCurrentState(0);
                 Array1A_int INDX,
                 int &D)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann?
         //       DATE WRITTEN   <date_written>
@@ -8472,7 +8472,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckAndReadCustomSprectrumData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         T. Hong
         //       DATE WRITTEN   August 2013
@@ -8618,7 +8618,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void initWindowModel()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         const std::string objectName = "WindowsCalculationEngine";
         state.dataWindowManager->inExtWindowModel = CWindowModel::WindowModelFactory(objectName);
         state.dataWindowManager->winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();

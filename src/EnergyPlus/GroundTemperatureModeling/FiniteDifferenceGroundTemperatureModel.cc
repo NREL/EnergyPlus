@@ -80,7 +80,7 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 // Finite difference model factory
 std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(int objectType, std::string objectName)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -148,7 +148,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
 void FiniteDiffGroundTempsModel::initAndSim()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -169,7 +169,7 @@ void FiniteDiffGroundTempsModel::initAndSim()
 
 void FiniteDiffGroundTempsModel::getWeatherData()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -460,7 +460,7 @@ void FiniteDiffGroundTempsModel::developMesh()
 
 void FiniteDiffGroundTempsModel::performSimulation()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -822,7 +822,7 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
 void FiniteDiffGroundTempsModel::initDomain()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -952,7 +952,7 @@ Real64 FiniteDiffGroundTempsModel::interpolate(Real64 const x, Real64 const x_hi
 
 Real64 FiniteDiffGroundTempsModel::getGroundTemp()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -1073,7 +1073,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp()
 
 Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth, Real64 const seconds)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -1101,7 +1101,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _de
 
 Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, int const month)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

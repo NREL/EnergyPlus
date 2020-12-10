@@ -105,7 +105,7 @@ namespace IntegratedHeatPump {
                 Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Bo Shen, ORNL
         //       DATE WRITTEN   March 2016
         //       RE-ENGINEERED  na
@@ -1081,7 +1081,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetIHPInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen
@@ -1919,7 +1919,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeIHP(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataSizing::AutoSize;
         using VariableSpeedCoils::SetVarSpeedCoilData;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -2039,7 +2039,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitializeIHP(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput();
@@ -2071,7 +2071,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateIHP(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHVACGlobals::TimeStepSys;
 
         int VSCoilIndex(0);
@@ -2183,7 +2183,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 const LatentLoad // Latent demand load [W]
                         )                       // shall be called from a air loop parent
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Bo Shen, ORNL
         //       DATE WRITTEN   March 2016
         //       RE-ENGINEERED  na
@@ -2327,7 +2327,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ClearCoils(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling clear up function
@@ -2361,7 +2361,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     IHPOperationMode GetCurWorkMode(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput();
@@ -2394,7 +2394,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March 2016
@@ -2431,7 +2431,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March 2016
@@ -2475,7 +2475,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   July 2016
@@ -2519,7 +2519,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   July 2016
@@ -2564,7 +2564,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorsFound                             // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March, 2016
@@ -2615,7 +2615,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool &ErrorsFound                             // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Jan 2016
@@ -2666,7 +2666,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetLowSpeedNumIHP(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int SpeedNum(0);
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
@@ -2716,7 +2716,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetMaxSpeedNumIHP(int const DXCoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput();
@@ -2770,7 +2770,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int IHPCoilIndex(0);
         Real64 AirVolFlowRate(0.0);
         Real64 FlowScale(1.0);
@@ -2877,7 +2877,7 @@ EnergyPlusData & state = getCurrentState(0);
         [[maybe_unused]] bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int IHPCoilIndex(0);
         Real64 WaterVolFlowRate(0.0);
 
@@ -2953,7 +2953,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int IHPCoilIndex(0);
         Real64 AirMassFlowRate(0.0);
         Real64 FlowScale(1.0);

@@ -119,7 +119,7 @@ namespace ConvectionCoefficients {
                                       Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   March 1998
@@ -330,7 +330,7 @@ namespace ConvectionCoefficients {
                                      Real64 &HAir            // Radiation to Air Component
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   January 1990
@@ -679,7 +679,7 @@ namespace ConvectionCoefficients {
                                               const std::string curveFieldName,
                                               const std::string RoutineName,
                                               const std::string CurrentModuleObject){
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound = false;
 
         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
@@ -703,7 +703,7 @@ namespace ConvectionCoefficients {
 
     void GetUserConvectionCoefficients()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -1830,7 +1830,7 @@ namespace ConvectionCoefficients {
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2004
@@ -2424,7 +2424,7 @@ namespace ConvectionCoefficients {
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation){
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
               return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
@@ -2495,7 +2495,7 @@ namespace ConvectionCoefficients {
                                         Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcASHRAETARPNatural(Tsurf, Tamb, cosTilt);
@@ -2515,7 +2515,7 @@ namespace ConvectionCoefficients {
                                     Optional<Array1S<Real64> const> Vhc        // Velocity array for forced convection coeff calculation
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -2584,7 +2584,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemACH(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FLOW:
         if (!allocated(Node)) {
             return 0.0;
@@ -2632,7 +2632,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemVolFlowRate(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -2648,7 +2648,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcCeilingDiffuserACH(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 const MinFlow(0.01); // Minimum mass flow rate
         Real64 const MaxACH(100.0); // Maximum ceiling diffuser correlation limit
 
@@ -2682,7 +2682,7 @@ namespace ConvectionCoefficients {
                                            Real64 const height,
                                            bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -2726,7 +2726,7 @@ namespace ConvectionCoefficients {
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum,
                                          const Array1D<Real64> &SurfaceTemperatures) // zone number for which coefficients are being calculated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 ACH = CalcCeilingDiffuserACH(ZoneNum);
 
         Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
@@ -2760,7 +2760,7 @@ namespace ConvectionCoefficients {
                                       const Array1S<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2000
@@ -2852,7 +2852,7 @@ namespace ConvectionCoefficients {
                                     const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   ?????
@@ -3078,7 +3078,7 @@ namespace ConvectionCoefficients {
 
     Real64 SetExtConvectionCoeff(int const SurfNum) // Surface Number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   May 1998
@@ -3145,7 +3145,7 @@ namespace ConvectionCoefficients {
 
     Real64 SetIntConvectionCoeff(int const SurfNum) // Surface Number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   May 1998
@@ -3208,7 +3208,7 @@ namespace ConvectionCoefficients {
                                           Real64 const sineTilt            // sine of glazing tilt
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   January 2009
@@ -3330,7 +3330,7 @@ namespace ConvectionCoefficients {
                                         Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Get humidity ratio
         Real64 AirHumRat;
         if (Surface(SurfNum).Zone > 0) {
@@ -3358,7 +3358,7 @@ namespace ConvectionCoefficients {
 
     void SetupAdaptiveConvectionStaticMetaData()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4137,7 +4137,7 @@ namespace ConvectionCoefficients {
 
     void SetupAdaptiveConvectionRadiantSurfaceData()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Sept 2011
@@ -4194,7 +4194,7 @@ namespace ConvectionCoefficients {
 
     void ManageInsideAdaptiveConvectionAlgo(int const SurfNum) // surface number for which coefficients are being calculated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4231,7 +4231,7 @@ namespace ConvectionCoefficients {
                                              Real64 &Hc         // result for Hc Outside face, becomes HExt.
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4257,7 +4257,7 @@ namespace ConvectionCoefficients {
                              Real64 &Hc // calculated Hc value
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4599,7 +4599,7 @@ namespace ConvectionCoefficients {
 
     void EvaluateExtHcModels(int const SurfNum, int const NaturalConvModelEqNum, int const ForcedConvModelEqNum, Real64 &Hc)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -4902,7 +4902,7 @@ namespace ConvectionCoefficients {
 
     void DynamicExtConvSurfaceClassification(int const SurfNum) // surface number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2010
@@ -4949,7 +4949,7 @@ namespace ConvectionCoefficients {
 
     void MapExtConvClassificationToHcModels(int const SurfNum) // surface number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -5007,7 +5007,7 @@ namespace ConvectionCoefficients {
 
     void DynamicIntConvSurfaceClassification(int const SurfNum) // surface number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR        Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -5731,7 +5731,7 @@ namespace ConvectionCoefficients {
 
     void MapIntConvClassificationToHcModels(int const SurfNum) // surface pointer index
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -5998,7 +5998,7 @@ namespace ConvectionCoefficients {
 
     void CalcUserDefinedInsideHcModel(int const SurfNum, int const UserCurveNum, Real64 &Hc)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -6111,7 +6111,7 @@ namespace ConvectionCoefficients {
 
     void CalcUserDefinedOutsideHcModel(int const SurfNum, int const UserCurveNum, Real64 &H)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -6285,7 +6285,7 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6310,7 +6310,7 @@ namespace ConvectionCoefficients {
                                                  Real64 const height,
                                                  bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6335,7 +6335,7 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // AUTHOR: Brent Griffith (Aug 2010)
         // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
         // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
@@ -6361,7 +6361,7 @@ namespace ConvectionCoefficients {
                                                  Real64 const height,
                                                  bool const isWindow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 Hnatural;
 
         if (isWindow) {                        // Unlikely for a floor, but okay...
@@ -6410,7 +6410,7 @@ namespace ConvectionCoefficients {
                                                  int const SurfNum               // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 Hn; // function result
 
         if (HydraulicDiameter > 0.0) {
@@ -6460,7 +6460,7 @@ namespace ConvectionCoefficients {
                                                int const SurfNum               // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 Hn; // function result, natural convection Hc value
 
         if (HydraulicDiameter > 0.0) {
@@ -6510,7 +6510,7 @@ namespace ConvectionCoefficients {
                                            int const SurfNum       // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Return value
         Real64 Hn; // function result, natural convection Hc value
 
@@ -6800,7 +6800,7 @@ namespace ConvectionCoefficients {
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) && (Height != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -6892,7 +6892,7 @@ namespace ConvectionCoefficients {
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // protect divide by zero
 
             if (Height == 0.0) {
@@ -6967,7 +6967,7 @@ namespace ConvectionCoefficients {
                                                   int const ZoneNum               // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -7043,7 +7043,7 @@ namespace ConvectionCoefficients {
                                                     int const ZoneNum               // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -7118,7 +7118,7 @@ namespace ConvectionCoefficients {
                                                     int const ZoneNum               // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -7194,7 +7194,7 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum               // index of zone for messaging
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -7277,7 +7277,7 @@ namespace ConvectionCoefficients {
                                            int const SurfNum       // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (Height > 0.0) {
             return CalcFohannoPolidoriVerticalWall(DeltaTemp, Height, SurfTemp, QdotConv);
         } else {
@@ -7374,7 +7374,7 @@ namespace ConvectionCoefficients {
                                                        int const ZoneNum                // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength > 0.0) {
@@ -7449,7 +7449,7 @@ namespace ConvectionCoefficients {
                                                      int const ZoneNum                // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength > 0.0) {
@@ -7510,7 +7510,7 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum                // for messages
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength <= 0.0) {
@@ -7586,7 +7586,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (FaceArea > 0.0) {
             return CalcSparrowWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
 
@@ -7605,7 +7605,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (FaceArea > 0.0) {
             return CalcSparrowLeeward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
         } else {
@@ -7837,7 +7837,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (LengthScale > 0.0) {
             return CalcMitchell(WindAtZ, LengthScale);
         } else {
@@ -7905,7 +7905,7 @@ namespace ConvectionCoefficients {
                              Real64 const SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                              int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -7962,7 +7962,7 @@ namespace ConvectionCoefficients {
                          Real64 const LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                          int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2010
@@ -8022,7 +8022,7 @@ namespace ConvectionCoefficients {
                          Real64 const RoofPerimeter,
                          int const RoughnessIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -8080,7 +8080,7 @@ namespace ConvectionCoefficients {
                          Real64 const RoofArea,
                          Real64 const RoofPerimeter)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 x; // distance to roof edge toward wind direction
 
         int const RoughnessIndex = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;

@@ -867,7 +867,7 @@ namespace DataSizing {
                          Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2014

@@ -740,7 +740,7 @@ namespace DataSurfaces {
 
     void SurfaceData::SetOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -771,7 +771,7 @@ namespace DataSurfaces {
 
     void SurfaceData::SetWindSpeedAt(Real64 const fac)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2013
@@ -813,7 +813,7 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2016
@@ -881,7 +881,7 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::getOutsideAirTemperature(const int t_SurfNum) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2016
@@ -920,7 +920,7 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -986,7 +986,7 @@ namespace DataSurfaces {
 
     int SurfaceData::getTotLayers() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   August 2016
@@ -1105,7 +1105,7 @@ namespace DataSurfaces {
 
     Real64 SurfaceData::get_average_height() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (std::abs(SinTilt) < 1.e-4) {
             return 0.0;
         }
@@ -1429,7 +1429,7 @@ namespace DataSurfaces {
 
     void SetSurfaceOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &surface : Surface) {
             surface.SetOutBulbTempAt();
         }
@@ -1437,7 +1437,7 @@ namespace DataSurfaces {
 
     void CheckSurfaceOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
@@ -1450,7 +1450,7 @@ namespace DataSurfaces {
 
     void SetSurfaceWindSpeedAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &surface : Surface) {
             surface.SetWindSpeedAt(fac);
@@ -1459,7 +1459,7 @@ namespace DataSurfaces {
 
     void SetSurfaceWindDirAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         for (auto &surface : Surface) {
             surface.SetWindDirAt(state.dataEnvrn->WindDir);

@@ -136,7 +136,7 @@ namespace EnergyPlus::SetPointManager {
 
     void ManageSetPoints()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor, Rick Strand
         //       DATE WRITTEN   May 1998
@@ -207,7 +207,7 @@ namespace EnergyPlus::SetPointManager {
 
     void GetSetPointManagerInputData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -3310,7 +3310,7 @@ namespace EnergyPlus::SetPointManager {
 
     void VerifySetPointManagers([[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   July 2008
@@ -3440,7 +3440,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSetPointManagers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   October 2000
@@ -4720,7 +4720,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimSetPointManagers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 1998
@@ -4916,7 +4916,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineScheduledSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 1998
@@ -4941,7 +4941,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineScheduledTESSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -4979,7 +4979,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineSchedDualSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2004
@@ -5005,7 +5005,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineOutsideAirSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE ARGUMENTS:
 
         // Locals
@@ -5067,7 +5067,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineSZReheatSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -5515,7 +5515,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineMixedAirSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2001
@@ -5609,7 +5609,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineOAPretreatSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. J. Witte based on CalcMixedAirSetPoint by Fred Buhl,
         //                        Work supported by ASHRAE research project 1254-RP
@@ -5738,7 +5738,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineWarmestSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -5819,7 +5819,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineColdestSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -5923,7 +5923,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefWarmestSetPtManagerTempFlow::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -6062,7 +6062,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefRABFlowSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2005
@@ -6123,7 +6123,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneAverageHeatingSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   July 2010
@@ -6222,7 +6222,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneAverageCoolingSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   July 2010
@@ -6314,7 +6314,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneAverageMinHumSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   July 2010
@@ -6397,7 +6397,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneAverageMaxHumSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   July 2010
@@ -6480,7 +6480,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneMinHumSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   Aug 2010
@@ -6558,7 +6558,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefMultiZoneMaxHumSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   August 2010
@@ -6640,7 +6640,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineFollowOATempSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   July 2011
@@ -6766,7 +6766,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineGroundTempSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   July 2011
@@ -6809,7 +6809,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineCondEntSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Atefe Makhmalbaf and Heejin Cho, PNNL
         //       DATE WRITTEN   March 2012
@@ -7012,7 +7012,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineIdealCondEntSetPointManager::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Heejin Cho, PNNL
         //       DATE WRITTEN   March 2012
@@ -7146,7 +7146,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 DefineIdealCondEntSetPointManager::calculateCurrentEnergyUsage()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 ChillerEnergy(0.0);     // Chiller energy consumption
         Real64 ChilledPumpEnergy(0.0); // Chilled water pump energy consumption
         Real64 TowerFanEnergy(0.0);    // Cooling tower fan energy consumption
@@ -7175,7 +7175,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineReturnWaterChWSetPointManager::calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee, NREL
         //       DATE WRITTEN   May 2015
@@ -7280,7 +7280,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineReturnWaterHWSetPointManager::calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee, NREL
         //       DATE WRITTEN   May 2015
@@ -7382,7 +7382,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sep 2013
@@ -7511,7 +7511,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSetPointManagers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 1998
@@ -7976,7 +7976,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateMixedAirSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2001
@@ -8027,7 +8027,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateOAPretreatSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. J. Witte based on UpdateMixedAirSetPoints by Fred Buhl,
         //                        Work supported by ASHRAE research project 1254-RP
@@ -8088,7 +8088,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int getSPMBasedOnNode(int const NodeNum, iCtrlVarType const SetPtType, SetPointManagerType const SPMType, CtrlNodeType ctrlOrRefNode)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (state.dataSetPointManager->GetInputFlag) {
             GetSetPointManagerInputs();
             state.dataSetPointManager->GetInputFlag = false;
@@ -8126,7 +8126,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool IsNodeOnSetPtManager(int const NodeNum, iCtrlVarType const SetPtType)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   January 2007
@@ -8176,7 +8176,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool NodeHasSPMCtrlVarType(int const NodeNum, iCtrlVarType const iCtrlVarType)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   March 2013
@@ -8243,7 +8243,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetHumidityRatioCtrlVarType(int const NodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   August 2015
@@ -8318,7 +8318,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckIfAnyIdealCondEntSetPoint()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Heejin Cho, PNNL
         //       DATE WRITTEN   March 2012
@@ -8342,7 +8342,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     iCtrlVarType GetHumidityRatioVariableType(int const CntrlNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. A. Nigusse
         //       DATE WRITTEN   December 2013
@@ -8463,7 +8463,7 @@ EnergyPlusData & state = getCurrentState(0);
     void SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2014
@@ -8545,7 +8545,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool GetCoilFreezingCheckFlag(int const MixedAirSPMNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
         //       DATE WRITTEN   Nov. 2015
@@ -8596,7 +8596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetMixedAirNumWithCoilFreezingCheck(int const MixedAirNode)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
         //       DATE WRITTEN   Nov. 2015

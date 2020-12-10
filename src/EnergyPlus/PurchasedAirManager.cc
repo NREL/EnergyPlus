@@ -136,7 +136,7 @@ namespace EnergyPlus::PurchasedAirManager {
                          int const ActualZoneNum,
                          int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -192,7 +192,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetPurchasedAir()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1997
@@ -1013,7 +1013,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1283,7 +1283,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizePurchasedAir(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2003
@@ -1892,7 +1892,7 @@ EnergyPlusData & state = getCurrentState(0);
                            int const ControlledZoneNum,
                            int const ActualZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -2705,7 +2705,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. Witte (GARD)
         //       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
@@ -2763,7 +2763,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdatePurchasedAir(int const PurchAirNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. J. Witte
         //       DATE WRITTEN   Sep 2011
@@ -2814,7 +2814,7 @@ EnergyPlusData & state = getCurrentState(0);
                               OpMode const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. Witte (GARD)
         //       DATE WRITTEN   Sep 2011
@@ -2941,7 +2941,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportPurchasedAir(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -3041,7 +3041,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetPurchasedAirOutAirMassFlow(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3064,7 +3064,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetPurchasedAirZoneInletAirNode(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3089,7 +3089,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetPurchasedAirReturnAirNode(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3114,7 +3114,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetPurchasedAirMixedAirTemp(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3138,7 +3138,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetPurchasedAirMixedAirHumRat(int const PurchAirNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3163,7 +3163,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckPurchasedAirForReturnPlenum(int const &ReturnPlenumIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R Raustad
         //       DATE WRITTEN   July  2017
@@ -3193,7 +3193,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitializePlenumArrays(int const PurchAirNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R Raustad
         //       DATE WRITTEN   July  2017

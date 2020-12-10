@@ -153,7 +153,7 @@ namespace HeatBalanceAirManager {
 
     void ManageAirHeatBalance()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -211,7 +211,7 @@ namespace HeatBalanceAirManager {
 
     void GetAirHeatBalanceInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -263,7 +263,7 @@ namespace HeatBalanceAirManager {
 
     void GetAirFlowFlag(bool &ErrorsFound) // Set to true if errors found
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Garrett Westmacott
@@ -329,7 +329,7 @@ namespace HeatBalanceAirManager {
 
     void GetSimpleAirModelInputs(bool &ErrorsFound) // IF errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2000
@@ -3863,7 +3863,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetRoomAirModelParameters(bool &errFlag) // True if errors found during this input routine
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -4083,7 +4083,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitAirHeatBalance()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -4106,7 +4106,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSimpleMixingConvectiveHeatGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -4225,7 +4225,7 @@ EnergyPlusData & state = getCurrentState(0);
     void CalcHeatBalanceAir()
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN   na
@@ -4277,7 +4277,7 @@ EnergyPlusData & state = getCurrentState(0);
     // END Algorithm Section of the Module
 
     void initializeForExternalHVACManager() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
         // to allow an external hvac manager to play nice with E+
         EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints();
@@ -4289,7 +4289,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportZoneMeanAirTemp()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2000

@@ -190,7 +190,7 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   September 1998
@@ -235,7 +235,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneAirSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russell Taylor
         //       DATE WRITTEN   September 1998
@@ -2389,7 +2389,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
         //       DATE WRITTEN   January 2017
@@ -2501,7 +2501,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
         //       DATE WRITTEN   January 2017
@@ -2571,7 +2571,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneAirSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russell Taylor
         //       DATE WRITTEN   September 1998
@@ -3142,7 +3142,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -3670,7 +3670,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcZoneAirTempSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -3900,7 +3900,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -4275,7 +4275,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   May 2001
@@ -4647,7 +4647,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russell Taylor
         //       DATE WRITTEN   ???
@@ -5056,7 +5056,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PushZoneTimestepHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   February 2008
@@ -5160,7 +5160,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PushSystemTimestepHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2008
@@ -5252,7 +5252,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RevertZoneTimestepHistories()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   February 2008
@@ -5313,7 +5313,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CorrectZoneHumRat(int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   2000
@@ -5620,7 +5620,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Han Li
         //       DATE WRITTEN   February 2019
@@ -5864,7 +5864,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Real64 &RhoAir                  // Air density
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Han Li
         //       DATE WRITTEN   February 2019
@@ -6023,7 +6023,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool const CorrectorFlag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -6310,7 +6310,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Feb 2008
@@ -6636,7 +6636,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool VerifyThermostatInZone(std::string const &ZoneName) // Zone to verify
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -6689,7 +6689,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetectOscillatingZoneTemp()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2005
@@ -6826,7 +6826,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2006
@@ -6868,7 +6868,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AdjustOperativeSetPointsforAdapComfort(int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
         //       DATE WRITTEN   Jan 2017
@@ -6931,7 +6931,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcZoneAirComfortSetPoints()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2006
@@ -7290,7 +7290,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May, 2006
@@ -7377,7 +7377,7 @@ EnergyPlusData & state = getCurrentState(0);
                        Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006
@@ -7411,7 +7411,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                         int const ActualZoneNum // controlled zone actual zone number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket A Nigusse, FSEC/UCF
         //       DATE WRITTEN   Nov 2010
@@ -7577,7 +7577,7 @@ EnergyPlusData & state = getCurrentState(0);
     // add values to the LEED tabular report related to schedules used by the thermostat objects
     void FillPredefinedTableOnThermostatSetpoints()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J.Glazer - Aug 2017
         using namespace OutputReportPredefined;
         std::vector<int> uniqSch;
@@ -7708,7 +7708,7 @@ EnergyPlusData & state = getCurrentState(0);
     std::tuple<Real64, int, std::string>
     temperatureAndCountInSch(int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J.Glazer - Aug 2017
 
         // determine month to use based on hemiphere and season

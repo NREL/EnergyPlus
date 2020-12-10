@@ -241,7 +241,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ManageSurfaceHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   January 1998
@@ -324,7 +324,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSurfaceHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   January 1998
@@ -843,7 +843,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GatherForPredefinedReport()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1354,7 +1354,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateSurfaceHeatBalArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -2052,7 +2052,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitThermalAndFluxHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   March 1978
@@ -2260,7 +2260,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSolarHeatGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Anonymous
         //       DATE WRITTEN   July 1977
@@ -3393,7 +3393,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitIntSolarDistribution()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Anonymous
         //       DATE WRITTEN   July 1977
@@ -3854,7 +3854,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeIntThermalAbsorpFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code (George Walton)
         //       DATE WRITTEN   Legacy: Dec 1976
@@ -3978,7 +3978,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeIntSWAbsorpFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy (George Walton)
         //       DATE WRITTEN   Legacy (December 1980)
@@ -4158,7 +4158,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeDifSolExcZonesWIZWindows(int const NumberOfEnclosures) // Number of solar enclosures
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -4273,7 +4273,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitEMSControlledSurfaceProperties()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2011
@@ -4365,7 +4365,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitEMSControlledConstructions()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
@@ -4558,7 +4558,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateFinalSurfaceHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -4615,7 +4615,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateThermalHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1990
@@ -4926,7 +4926,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalculateZoneMRT(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
@@ -4987,7 +4987,7 @@ EnergyPlusData & state = getCurrentState(0);
     // *****************************************************************************
 
     void CalcThermalResilience() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This function calculate timestep-wise heat index and humidex.
 
         // The computation of the heat index is a refinement of a result obtained by multiple regression analysis
@@ -5069,7 +5069,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     void ReportThermalResilience() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int HINoBins = 5; // Heat Index range - number of bins
         int HumidexNoBins = 5; // Humidex range - number of bins
         int SETNoBins = 4; // SET report column numbers
@@ -5211,7 +5211,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     void ReportCO2Resilience() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NoBins = 3;
         if (reportCO2ResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5254,7 +5254,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     void ReportVisualResilience() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NoBins = 4;
         if (reportVisualResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5325,7 +5325,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     void ReportSurfaceHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2000
@@ -5468,7 +5468,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportIntMovInsInsideSurfTemp()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int SurfNum;
         TempSurfInMovInsRep = TempSurfIn;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -5491,7 +5491,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   December 1979
@@ -6137,7 +6137,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetQdotConvOutRepPerArea(int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int OPtr = Surface(SurfNum).OSCMPtr;
         if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
             return -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
@@ -6152,7 +6152,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         if (calcHeatBalInsideSurfFirstTime) {
             if (DataHeatBalance::AnyEMPD) {
@@ -6257,7 +6257,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
                                     Optional_int_const ZoneToResimulate)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   December 1979
@@ -7085,7 +7085,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // This function performs a heat balance on the inside face of each
         // surface in the building. It is a copy of CalcHeatBalanceInsideSurf,
         // simplified for CTF surfaces only.
@@ -7718,7 +7718,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
             if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
             if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
@@ -7891,7 +7891,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorFlag         // Error flag for movable insulation problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   December 1979
@@ -8168,7 +8168,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcExteriorVentedCavity(int const SurfNum) // index of surface
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
@@ -8292,7 +8292,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GatherComponentLoadsSurfAbsFact()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2012

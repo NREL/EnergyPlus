@@ -85,7 +85,7 @@ namespace EnergyPlus::BranchNodeConnections {
                                 Optional_string_const InputFieldName // Input Field Name
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -194,7 +194,7 @@ namespace EnergyPlus::BranchNodeConnections {
                                     bool &errFlag                      // Will be True if errors already detected or if errors found here
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M. J. Witte
         //       DATE WRITTEN   June 2016
@@ -262,7 +262,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void CheckNodeConnections(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2004
@@ -651,7 +651,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -688,7 +688,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -724,7 +724,7 @@ namespace EnergyPlus::BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -775,7 +775,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -807,7 +807,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -840,7 +840,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -885,7 +885,7 @@ namespace EnergyPlus::BranchNodeConnections {
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -972,7 +972,7 @@ namespace EnergyPlus::BranchNodeConnections {
                          Array1D_int &OutletNodeNum,
                          bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2005
@@ -1111,7 +1111,7 @@ namespace EnergyPlus::BranchNodeConnections {
                        Optional_string_const Description // Description
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001
@@ -1264,7 +1264,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void TestInletOutletNodes([[maybe_unused]] bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001
@@ -1331,7 +1331,7 @@ namespace EnergyPlus::BranchNodeConnections {
                      std::string const &Description // Description of Node Pair (for warning message)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2001
@@ -1391,7 +1391,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1436,7 +1436,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
     void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Jan 2007

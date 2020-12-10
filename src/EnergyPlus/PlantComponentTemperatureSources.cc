@@ -109,7 +109,7 @@ namespace PlantComponentTemperatureSources {
 
     PlantComponent *WaterSourceSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (getWaterSourceInput) {
             GetWaterSourceInput();
             getWaterSourceInput = false;
@@ -129,7 +129,7 @@ namespace PlantComponentTemperatureSources {
 
     void WaterSourceSpecs::initialize(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -256,7 +256,7 @@ namespace PlantComponentTemperatureSources {
 
     void WaterSourceSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
         SetupOutputVariable("Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
@@ -275,7 +275,7 @@ namespace PlantComponentTemperatureSources {
 
     void WaterSourceSpecs::autosize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   November 2012
@@ -356,7 +356,7 @@ namespace PlantComponentTemperatureSources {
 
     void WaterSourceSpecs::calculate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -419,7 +419,7 @@ namespace PlantComponentTemperatureSources {
 
     void GetWaterSourceInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Edwin Lee
         //       DATE WRITTEN:    October 2012

@@ -108,7 +108,7 @@ namespace MicroturbineElectricGenerator {
 
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for generator if it hasn't been done already
         if (GetMTInput) {
             GetMTGeneratorInput();
@@ -129,7 +129,7 @@ namespace MicroturbineElectricGenerator {
 
     void GetMTGeneratorInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
         //       DATE WRITTEN   Mar 2008
@@ -766,7 +766,7 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",
@@ -885,7 +885,7 @@ namespace MicroturbineElectricGenerator {
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
         //       DATE WRITTEN   Mar 2008
@@ -1049,7 +1049,7 @@ EnergyPlusData & state = getCurrentState(0);
     void MTGeneratorSpecs::CalcMTGeneratorModel(bool const RunFlag,  // TRUE when generator is being asked to operate
                                                 Real64 const MyLoad) // Generator demand (W)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
         //       DATE WRITTEN   Mar 2008

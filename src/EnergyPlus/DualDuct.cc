@@ -156,7 +156,7 @@ namespace DualDuct {
 
     void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 2000
@@ -247,7 +247,7 @@ namespace DualDuct {
 
     void GetDualDuctInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   April 1998
@@ -826,7 +826,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::InitDualDuct(bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 1998
@@ -1119,7 +1119,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::SizeDualDuct()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2002
@@ -1188,7 +1188,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Jan 2000
@@ -1321,7 +1321,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Jan 2000
@@ -1541,7 +1541,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Clayton Miller
         //       DATE WRITTEN   Aug 2010
@@ -1811,7 +1811,7 @@ namespace DualDuct {
                                              Real64 &AirLoopOAFrac // outside air based on optional user input
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
         //       DATE WRITTEN   Mar 2010
@@ -1862,7 +1862,7 @@ namespace DualDuct {
                                                  Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         C. Miller (Mod of CaclOAMassFlow by R. Raustad (FSEC))
         //       DATE WRITTEN   Aug 2010
@@ -1942,7 +1942,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::UpdateDualDuct()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 2000
@@ -2102,7 +2102,7 @@ namespace DualDuct {
 
     void ReportDualDuctConnections()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   February 2004
@@ -2244,7 +2244,7 @@ namespace DualDuct {
                                         std::string const &CompName,
                                         bool &RecircIsUsed)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug 2011
@@ -2316,7 +2316,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;

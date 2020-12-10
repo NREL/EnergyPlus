@@ -87,7 +87,7 @@ namespace WaterUse {
 
     void SimulateWaterUse(bool FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -185,7 +185,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PlantComponent *WaterConnectionsType::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (state.dataWaterUse->getWaterUseInputFlag) {
             GetWaterUseInput();
@@ -209,7 +209,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         [[maybe_unused]] Real64 &CurLoad,
                                         [[maybe_unused]] bool RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith March 2010, Demand Side Update
         //       DATE WRITTEN   August 2006
@@ -276,7 +276,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWaterUseInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -582,7 +582,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterEquipmentType::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Water Use Equipment Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotMassFlowRate, "System", "Average", this->Name);
 
         SetupOutputVariable("Water Use Equipment Cold Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ColdMassFlowRate, "System", "Average", this->Name);
@@ -774,7 +774,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterEquipmentType::CalcEquipmentFlowRates()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -869,7 +869,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterEquipmentType::CalcEquipmentDrainTemp()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -934,7 +934,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterConnectionsType::InitConnections()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -1025,7 +1025,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterConnectionsType::CalcConnectionsFlowRates(bool FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -1116,7 +1116,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterConnectionsType::CalcConnectionsDrainTemp()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -1146,7 +1146,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterConnectionsType::CalcConnectionsHeatRecovery()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -1264,7 +1264,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportStandAloneWaterUse()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, Peter Graham Ellis
         //       DATE WRITTEN   Nov. 2011
@@ -1297,7 +1297,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WaterConnectionsType::ReportWaterUse()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006
@@ -1342,7 +1342,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWaterUseZoneGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2006

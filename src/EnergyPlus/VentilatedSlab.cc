@@ -144,7 +144,7 @@ namespace VentilatedSlab {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -211,7 +211,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetVentilatedSlabInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -1259,7 +1259,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -1612,7 +1612,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeVentilatedSlab(int const Item)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -2336,7 +2336,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -3175,7 +3175,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &LoadMet                // load met by the system (watts)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -3283,7 +3283,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -3341,7 +3341,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     [[maybe_unused]] bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   June 2008
@@ -4015,7 +4015,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimVentSlabOAMixer(int const Item) // System index in Ventilated Slab array
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -4096,7 +4096,7 @@ EnergyPlusData & state = getCurrentState(0);
                               [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Young Tae Chae, Rick Strand
         //       DATE WRITTEN   November 2000
@@ -4245,7 +4245,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
                                     Real64 const CoreNumbers)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -4441,7 +4441,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportVentilatedSlab(int const Item) // Index for the ventilated slab under consideration within the derived types
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000

@@ -106,7 +106,7 @@ namespace ICEngineElectricGenerator {
 
     PlantComponent *ICEngineGeneratorSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for ICEGen if it hasn't been done already
         if (getICEInput) {
             GetICEngineGeneratorInput();
@@ -128,7 +128,7 @@ namespace ICEngineElectricGenerator {
 
     void GetICEngineGeneratorInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    Sept. 2000
@@ -307,7 +307,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",
@@ -431,7 +431,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(bool const RunFlag, Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -645,7 +645,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(Real64 const EnergyRecovered, Real64 const HeatRecMdot, Real64 &HRecRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brandon Anderson
         //       DATE WRITTEN:    November 2000
@@ -708,7 +708,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::InitICEngineGenerators(bool const RunFlag, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher

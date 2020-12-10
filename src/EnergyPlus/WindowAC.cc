@@ -135,7 +135,7 @@ namespace WindowAC {
                      int &CompIndex                 // component index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -209,7 +209,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWindowAC()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -730,7 +730,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -897,7 +897,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeWindowAC(int const WindACNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2002
@@ -1104,7 +1104,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &LatOutputProvided           // Latent power supplied (kg/s), negative = dehumidification
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -1229,7 +1229,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWindowAC(int const WindACNum) // number of the current AC unit being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -1265,7 +1265,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &LoadMet                // load met by unit (watts)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -1383,7 +1383,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2000
@@ -1546,7 +1546,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetWindowACZoneInletAirNode(int const WindACNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -1571,7 +1571,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetWindowACOutAirNode(int const WindACNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -1596,7 +1596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetWindowACReturnAirNode(int const WindACNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -1631,7 +1631,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetWindowACMixedAirNode(int const WindACNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006

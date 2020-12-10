@@ -120,7 +120,7 @@ namespace OutAirNodeManager {
 
     void SetOutAirNodes()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 1998
@@ -158,7 +158,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOutAirNodesInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 1998
@@ -418,7 +418,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitOutAirNodes()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Sept 1998
@@ -443,7 +443,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckOutAirNodeNumber(int const NodeNumber) // Number of node to check to see if in Outside Air list
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Feb 2007
@@ -499,7 +499,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool &Okay            // True if found, false if not
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2007
@@ -581,7 +581,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
         //       DATE WRITTEN   July 2018

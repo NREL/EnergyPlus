@@ -90,7 +90,7 @@ namespace GeneratorDynamicsManager {
     using namespace DataGenerators;
     void SetupGeneratorControlStateManager(int const GenNum) // index of generator to setup
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
@@ -159,7 +159,7 @@ namespace GeneratorDynamicsManager {
                                      [[maybe_unused]] bool const FirstHVACIteration // True is this is first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   February-March 2007  (replaced July 2006 attempt)
@@ -750,7 +750,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool &ConstrainedDecreasingMdot                    // true if request was altered because of fuel rate of change down
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
@@ -809,7 +809,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2009

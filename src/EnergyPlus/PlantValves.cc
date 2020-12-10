@@ -85,7 +85,7 @@ namespace PlantValves {
     using namespace DataLoopNode;
 
     PlantComponent *TemperValveData::factory(std::string objectName) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for valves if it hasn't been done already
         if (state.dataPlantValves->GetTemperingValves) {
             GetPlantValvesInput();
@@ -108,7 +108,7 @@ namespace PlantValves {
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
         this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
@@ -137,7 +137,7 @@ namespace PlantValves {
 
     void GetPlantValvesInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Jan. 2006
@@ -215,7 +215,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TemperValveData::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, NREL
@@ -423,7 +423,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TemperValveData::calculate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, NREL

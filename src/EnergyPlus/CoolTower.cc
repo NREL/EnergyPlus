@@ -90,7 +90,7 @@ namespace CoolTower {
 
     void ManageCoolTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -121,7 +121,7 @@ namespace CoolTower {
 
     void GetCoolTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -493,7 +493,7 @@ namespace CoolTower {
 
     void CalcCoolTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -653,7 +653,7 @@ namespace CoolTower {
 
     void UpdateCoolTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -689,7 +689,7 @@ namespace CoolTower {
 
     void ReportCoolTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang

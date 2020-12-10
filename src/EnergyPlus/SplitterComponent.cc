@@ -79,7 +79,7 @@ namespace SplitterComponent {
     void
     SimAirLoopSplitter(std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   March 2000
@@ -143,7 +143,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSplitterInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -286,7 +286,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -405,7 +405,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcAirLoopSplitter(int const SplitterNum, bool const FirstCall)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -470,7 +470,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSplitter(int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -540,7 +540,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound                // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb 2013
@@ -588,7 +588,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &ErrorsFound                // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb 2013

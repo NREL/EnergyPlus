@@ -111,7 +111,7 @@ namespace ZoneContaminantPredictorCorrector {
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -158,7 +158,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneContaminanInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Dec. 2011
@@ -1020,7 +1020,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneContaminanSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1226,7 +1226,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneContSetPoints()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1613,7 +1613,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2010
@@ -1967,7 +1967,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PushZoneTimestepHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2013,7 +2013,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PushSystemTimestepHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2059,7 +2059,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RevertZoneTimestepHistories()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010
@@ -2096,7 +2096,7 @@ EnergyPlusData & state = getCurrentState(0);
                          Real64 &RhoAir               // Air density
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Han Li
         //       DATE WRITTEN   February 2019
@@ -2244,7 +2244,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July, 2010

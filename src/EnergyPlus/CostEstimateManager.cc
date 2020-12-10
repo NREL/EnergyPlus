@@ -92,7 +92,7 @@ namespace CostEstimateManager {
     // Using/Aliasing
     void SimCostEstimate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -119,7 +119,7 @@ namespace CostEstimateManager {
 
     void GetCostEstimateInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -223,7 +223,7 @@ namespace CostEstimateManager {
 
     void CheckCostEstimateInput(bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -482,7 +482,7 @@ namespace CostEstimateManager {
 
     void CalcCostEstimate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith

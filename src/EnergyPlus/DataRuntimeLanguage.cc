@@ -79,7 +79,7 @@ namespace DataRuntimeLanguage {
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2012
@@ -152,7 +152,7 @@ namespace DataRuntimeLanguage {
                                 bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2012

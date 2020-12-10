@@ -83,7 +83,7 @@ std::unique_ptr<SQLite> sqlite;
 
 std::unique_ptr<SQLite> CreateSQLiteDatabase()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (!state.files.outputControl.sqlite) {
         return nullptr;
     }
@@ -128,7 +128,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 
 void CreateSQLiteZoneExtendedOutput()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (sqlite && sqlite->writeOutputToSQLite()) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addZoneData(zoneNum, DataHeatBalance::Zone(zoneNum));

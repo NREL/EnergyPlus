@@ -58,7 +58,7 @@ namespace AirflowNetwork {
     Real64 airThermConductivity(Real64 T // Temperature in Celsius
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Dry air thermal conductivity {W/m-K}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -104,7 +104,7 @@ namespace AirflowNetwork {
                             Real64 P  // Barometric pressure
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Dry air kinematic viscosity {m2/s}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -126,7 +126,7 @@ namespace AirflowNetwork {
                                  Real64 P  // Barometric pressure
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Dry air thermal diffusivity {-}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
@@ -148,7 +148,7 @@ namespace AirflowNetwork {
                       Real64 P  // Barometric pressure
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Dry air Prandtl number {-}
         // Correlated over the range -20C to 70C
         // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.

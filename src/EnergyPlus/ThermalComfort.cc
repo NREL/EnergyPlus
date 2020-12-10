@@ -120,7 +120,7 @@ namespace ThermalComfort {
 
     void ManageThermalComfort(bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Rick Strand
         //     DATE WRITTEN   February 2000
@@ -173,7 +173,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitThermalComfort()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Rick Strand
         //     DATE WRITTEN   February 2000
@@ -435,7 +435,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Optional<Real64> PMVResult   // PMV value for thermal comfort control
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000
@@ -701,7 +701,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcThermalComfortPierce()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000
@@ -1147,7 +1147,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcThermalComfortKSU()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000
@@ -1338,7 +1338,7 @@ EnergyPlusData & state = getCurrentState(0);
                Array1D<Real64> &TempChange             // Change of temperature
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000
@@ -1531,7 +1531,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   January 2000
@@ -1594,7 +1594,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetAngleFactorList()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   July 2001
@@ -1727,7 +1727,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 CalcAngleFactorMRT(int const AngleFacNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   July 2001
@@ -1769,7 +1769,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 CalcSurfaceWeightedMRT(int const ZoneNum, int const SurfNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
         //          This is necessary for the surface weighted option to not in essence
         //          double count SurfNum in the MRT calculation.  Other than that, the
@@ -1865,7 +1865,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 CalcRadTemp(int const PeopleListNum) // Type of MRT calculation (zone averaged or surface weighted)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   November 2000
@@ -1949,7 +1949,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcThermalComfortSimpleASH55()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   June 2005
@@ -2137,7 +2137,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetThermalComfortSimpleASH55()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer - October 2015
         // Reset thermal comfort table gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
@@ -2154,7 +2154,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcIfSetPointMet()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2005
@@ -2317,7 +2317,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetSetPointMet()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer - October 2015
         // Reset set point not met table gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
@@ -2341,7 +2341,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   July 2011
@@ -2583,7 +2583,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   July 2011
@@ -2795,7 +2795,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DynamicClothingModel()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   June 2013

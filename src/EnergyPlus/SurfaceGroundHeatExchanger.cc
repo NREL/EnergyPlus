@@ -136,7 +136,7 @@ namespace SurfaceGroundHeatExchanger {
     PlantComponent *
     SurfaceGroundHeatExchangerData::factory([[maybe_unused]] int const objectType, std::string const objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger();
             state.dataSurfaceGroundHeatExchangers->GetInputFlag = false;
@@ -166,7 +166,7 @@ namespace SurfaceGroundHeatExchanger {
 
     void GetSurfaceGroundHeatExchanger()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
@@ -396,7 +396,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
@@ -546,7 +546,7 @@ EnergyPlusData & state = getCurrentState(0);
     SurfaceGroundHeatExchangerData::CalcSurfaceGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
         //       MODIFIED       na
@@ -937,7 +937,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 SurfaceGroundHeatExchangerData::CalcSourceFlux() // component number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
         //       MODIFIED       na
@@ -1019,7 +1019,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                             Real64 const WaterMassFlow // Mass flow rate, in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
@@ -1291,7 +1291,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SurfaceGroundHeatExchangerData::UpdateSurfaceGroundHeatExchngr() // Index for the surface
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
@@ -1366,7 +1366,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SurfaceGroundHeatExchangerData::ReportSurfaceGroundHeatExchngr() // Index for the surface under consideration
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002

@@ -115,7 +115,7 @@ namespace OutsideEnergySources {
 
     PlantComponent *OutsideEnergySourceSpecs::factory(int objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for outside energy sources if it hasn't been done already
         if (SimOutsideEnergyGetInputFlag) {
             GetOutsideEnergySourcesInput();
@@ -160,7 +160,7 @@ namespace OutsideEnergySources {
 
     void GetOutsideEnergySourcesInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   April 1998
@@ -282,7 +282,7 @@ namespace OutsideEnergySources {
 
     void OutsideEnergySourceSpecs::initialize(Real64 MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -394,7 +394,7 @@ namespace OutsideEnergySources {
 
     void OutsideEnergySourceSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   April 2014
@@ -475,7 +475,7 @@ namespace OutsideEnergySources {
 
     void OutsideEnergySourceSpecs::calculate(bool runFlag, Real64 MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998

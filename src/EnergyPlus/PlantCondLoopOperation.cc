@@ -157,7 +157,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
                                      bool &LoopShutDownFlag, // EMS flag to tell loop solver to shut down pumps
                                      bool &LoadDistributionWasPerformed)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1999
@@ -356,7 +356,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     void GetPlantOperationInput(bool &GetInputOK)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -513,7 +513,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
     void GetOperationSchemeInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   October 1998
@@ -761,7 +761,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            bool &ErrorsFound                 // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -953,7 +953,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool &ErrorsFound                 // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   August 2010
@@ -1078,7 +1078,7 @@ EnergyPlusData & state = getCurrentState(0);
                        bool &ErrorsFound    // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -1276,7 +1276,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound                 // May be set here and passed on
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2010
@@ -1642,7 +1642,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool &ErrorsFound                 // May be set here and passed on
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -1775,7 +1775,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitLoadDistribution(bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    July 2010
@@ -2144,7 +2144,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998
@@ -2670,7 +2670,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Real64 &ChangeInLoad   // positive magnitude of load change
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Nov 2011
@@ -2833,7 +2833,7 @@ EnergyPlusData & state = getCurrentState(0);
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   Jan 2005
@@ -2994,7 +2994,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Real64 const LoopDemand,
                                         [[maybe_unused]] Real64 &RemLoopDemand)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2013
@@ -3066,7 +3066,7 @@ EnergyPlusData & state = getCurrentState(0);
                              int const CurSchemeType // identifier set in PlantData
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   Jan 2004
@@ -3256,7 +3256,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupPlantEMSActuators()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007
@@ -3348,7 +3348,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ActivateEMSControls(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D.E. Fisher
         //       DATE WRITTEN   Feb 2007

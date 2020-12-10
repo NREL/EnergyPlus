@@ -86,7 +86,7 @@ namespace EnergyPlus::DemandManager {
 
     void ManageDemand()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -191,7 +191,7 @@ namespace EnergyPlus::DemandManager {
                                    bool &ResimHVAC // Flag to resimulate the HVAC simulation
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -301,7 +301,7 @@ namespace EnergyPlus::DemandManager {
 
     void GetDemandManagerListInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -554,7 +554,7 @@ namespace EnergyPlus::DemandManager {
 
     void GetDemandManagerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1310,7 +1310,7 @@ namespace EnergyPlus::DemandManager {
 
     void SurveyDemandManagers()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1358,7 +1358,7 @@ namespace EnergyPlus::DemandManager {
 
     void ActivateDemandManagers()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1453,7 +1453,7 @@ namespace EnergyPlus::DemandManager {
 
     void UpdateDemandManagers()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1590,7 +1590,7 @@ namespace EnergyPlus::DemandManager {
 
     void ReportDemandManagerList(int const ListNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2005
@@ -1674,7 +1674,7 @@ namespace EnergyPlus::DemandManager {
 
     void LoadInterface(DemandAction const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2005
@@ -1797,7 +1797,7 @@ namespace EnergyPlus::DemandManager {
 
     void InitDemandManagers()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2010

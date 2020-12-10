@@ -144,7 +144,7 @@ namespace PlantChillers {
 
     ElectricChillerSpecs *ElectricChillerSpecs::factory(std::string const &chillerName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataPlantChillers->GetElectricInput) {
             ElectricChillerSpecs::getInput();
             state.dataPlantChillers->GetElectricInput = false;
@@ -160,7 +160,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::getInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
@@ -576,7 +576,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -669,7 +669,7 @@ namespace PlantChillers {
     void ElectricChillerSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
@@ -702,7 +702,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -999,7 +999,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1262,7 +1262,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
         //       DATE WRITTEN   Sept. 2000
@@ -1840,7 +1840,7 @@ namespace PlantChillers {
                                                 Real64 &QHeatRec            // amount of heat recovered
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Liesen
         //       DATE WRITTEN:    January 2004
@@ -1990,7 +1990,7 @@ namespace PlantChillers {
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(std::string const &chillerName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataPlantChillers->GetEngineDrivenInput) {
             EngineDrivenChillerSpecs::getInput();
             state.dataPlantChillers->GetEngineDrivenInput = false;
@@ -2007,7 +2007,7 @@ namespace PlantChillers {
     void EngineDrivenChillerSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
@@ -2040,7 +2040,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::getInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
@@ -2482,7 +2482,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
         SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
@@ -2608,7 +2608,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2855,7 +2855,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -3132,7 +3132,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
         //       DATE WRITTEN   Sept. 2000
@@ -3769,7 +3769,7 @@ namespace PlantChillers {
 
     void EngineDrivenChillerSpecs::calcHeatRecovery(Real64 const EnergyRecovered, Real64 &HeatRecRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brandon Anderson
         //       DATE WRITTEN:    November 2000
@@ -3884,7 +3884,7 @@ namespace PlantChillers {
 
     GTChillerSpecs *GTChillerSpecs::factory(std::string const &chillerName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataPlantChillers->GetGasTurbineInput) {
             GTChillerSpecs::getInput();
             state.dataPlantChillers->GetGasTurbineInput = false;
@@ -3901,7 +3901,7 @@ namespace PlantChillers {
     void
     GTChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
@@ -3934,7 +3934,7 @@ namespace PlantChillers {
 
     void GTChillerSpecs::getInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
@@ -4345,7 +4345,7 @@ namespace PlantChillers {
 
     void GTChillerSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
         SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
@@ -4442,7 +4442,7 @@ namespace PlantChillers {
 
     void GTChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -4688,7 +4688,7 @@ namespace PlantChillers {
 
     void GTChillerSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -5002,7 +5002,7 @@ namespace PlantChillers {
 
     void GTChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
         //       DATE WRITTEN   Sept. 2000
@@ -5712,7 +5712,7 @@ namespace PlantChillers {
 
     ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(std::string const &chillerName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // GET INPUT
         if (state.dataPlantChillers->GetConstCOPInput) {
             ConstCOPChillerSpecs::getInput();
@@ -5730,7 +5730,7 @@ namespace PlantChillers {
     void ConstCOPChillerSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
@@ -5752,7 +5752,7 @@ namespace PlantChillers {
 
     void ConstCOPChillerSpecs::getInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998
@@ -6039,7 +6039,7 @@ namespace PlantChillers {
 
     void ConstCOPChillerSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -6111,7 +6111,7 @@ namespace PlantChillers {
 
     void ConstCOPChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   September 2010
@@ -6303,7 +6303,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstCOPChillerSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -6532,7 +6532,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConstCOPChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 1998

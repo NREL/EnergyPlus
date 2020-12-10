@@ -136,7 +136,7 @@ namespace UnitHeater {
                        Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                        int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -207,7 +207,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUnitHeaterInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -664,7 +664,7 @@ EnergyPlusData & state = getCurrentState(0);
                         [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -899,7 +899,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeUnitHeater(int const UnitHeatNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -1333,7 +1333,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -1633,7 +1633,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Optional<Real64 const> PartLoadRatio // part-load ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -1846,7 +1846,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportUnitHeater(int const UnitHeatNum) // Unit index in unit heater array
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -1876,7 +1876,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Array1D<Real64> const &Par  // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma/Bereket Nigusse, FSEC
         //       DATE WRITTEN   October 2013

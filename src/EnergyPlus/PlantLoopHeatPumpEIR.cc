@@ -80,7 +80,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                         Real64 &CurLoad,
                                         bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
@@ -119,7 +119,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
         auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
@@ -161,7 +161,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
@@ -241,7 +241,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
@@ -282,7 +282,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::doPhysics(Real64 currentLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
@@ -342,7 +342,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This function does all one-time and begin-environment initialization
         std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
         if (this->oneTimeInit) {
@@ -518,7 +518,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->loadSideLocation.loopNum) {
             this->sizeLoadSide();
             if (this->waterSource) {
@@ -538,7 +538,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::sizeLoadSide()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Tries to size the load side flow rate and capacity, source side flow, and the rated power usage
         // There are two major sections to this function, one if plant sizing is available, and one if not
         // If plant sizing is available, then we can generate sizes for the equipment.  This is done for not-only
@@ -717,7 +717,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::sizeSrcSideWSHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // size the source-side for the water-source HP
         bool errorsFound = false;
 
@@ -820,7 +820,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::sizeSrcSideASHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // size the source-side for the air-source HP
         bool errorsFound = false;
 
@@ -884,7 +884,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PlantComponent *EIRPlantLoopHeatPump::factory(int hp_type_of_num, const std::string& hp_name)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
             EIRPlantLoopHeatPump::processInputForEIRPLHP();
             EIRPlantLoopHeatPump::pairUpCompanionCoils();
@@ -903,7 +903,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::pairUpCompanionCoils()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (!thisHP.companionCoilName.empty()) {
                 auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
@@ -938,7 +938,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::processInputForEIRPLHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using namespace DataIPShortCuts;
 
         struct ClassType
@@ -1162,7 +1162,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void EIRPlantLoopHeatPump::checkConcurrentOperation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This will do a recurring warning for concurrent companion operation.
         // This function should be called at the end of the time-step to ensure any iteration-level operation
         //  is worked out and the results are final.

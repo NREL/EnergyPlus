@@ -257,7 +257,7 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   September 1977
@@ -771,7 +771,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateModuleArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 1998
@@ -830,7 +830,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfaceData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   November 1997
@@ -2233,7 +2233,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &surfaceError        // True if surface azimuths or tilts differ by more than error tolerance
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool sameSurfNormal(false); // True if surface has the same surface normal within tolerance
         bool baseSurfHoriz(false);  // True if base surface is near horizontal
         Real64 const warningTolerance(30.0);
@@ -2296,7 +2296,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetGeometryParameters(bool &ErrorsFound) // set to true if errors found during input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -2540,7 +2540,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int const TotDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -2757,7 +2757,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2009
@@ -2871,7 +2871,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -3439,7 +3439,7 @@ EnergyPlusData & state = getCurrentState(0);
                          int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -3737,7 +3737,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 const Height,
                                  bool const SurfWorldCoordSystem)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -3924,7 +3924,7 @@ EnergyPlusData & state = getCurrentState(0);
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -4316,7 +4316,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -4621,7 +4621,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                int const FrameField             // field number for frame/divider
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -4893,7 +4893,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       std::string const &SubSurfaceConstruction, // name of the construction
                                       int &AddedSubSurfaces)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -5018,7 +5018,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Real64 const Length,
                                          Real64 const Height)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2008
@@ -5179,7 +5179,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int const TotShdSubs // Number of Attached Shading SubSurfaces to obtain
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -5393,7 +5393,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const TotFinsProjection       // Number of Fins (projection) to obtain
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2009
@@ -5749,7 +5749,7 @@ EnergyPlusData & state = getCurrentState(0);
                                int &SurfNum       // Count of Current SurfaceNumber
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -5936,7 +5936,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetNumIntMassSurfaces() // Number of Internal Mass Surfaces to obtain
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Counts internal mass surfaces applied to zones and zone lists
 
         // Using/Aliasing
@@ -5982,7 +5982,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Sept 2003
@@ -6126,7 +6126,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -6403,7 +6403,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ExposedFoundationPerimeter::getData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using namespace DataIPShortCuts;
         using DataSurfaces::Surface;
 
@@ -6547,7 +6547,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfaceLocalEnvData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
         //       DATE WRITTEN   July 2017
@@ -6704,7 +6704,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
         //       DATE WRITTEN   July 2017
@@ -6836,7 +6836,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSurfaceHeatTransferAlgorithmOverrides(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, portions from ApplyConvectionValue by Linda Lawrie
@@ -7419,7 +7419,7 @@ EnergyPlusData & state = getCurrentState(0);
                      Array1S<Real64> const Vertices // Vertices, in specified order
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -7775,7 +7775,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &SurfTilt     // Surface tilt (
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2011
@@ -7855,7 +7855,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void MakeMirrorSurface(int &SurfNum) // In=>Surface to Mirror, Out=>new Surface index
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2002
@@ -7979,7 +7979,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWindowShadingControlData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   November 1998
@@ -8504,7 +8504,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the activeWindowShadingControl
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             int curShadedConstruction = WindowShadingControl(iShadeCtrl).getInputShadedConstruction;
@@ -8540,7 +8540,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J.Glazer 2018 - operates on Surface array after final indices are known for windows and checks to make sure it is correct
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
@@ -8564,7 +8564,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // For each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
         for (auto theSurf : Surface) {
             if (theSurf.HasShadeControl) {
@@ -8601,7 +8601,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetStormWindowData(bool &ErrorsFound) // If errors found in input
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -8803,7 +8803,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWindowGapAirflowControlData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb 2003
@@ -9032,7 +9032,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetFoundationData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using namespace DataIPShortCuts;
 
         int NumAlphas;
@@ -9525,7 +9525,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOSCData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -9770,7 +9770,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOSCMData(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   November 2004
@@ -9896,7 +9896,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetMovableInsulationData(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
@@ -10076,7 +10076,7 @@ EnergyPlusData & state = getCurrentState(0);
     // Calculates the volume (m3) of a zone using the surfaces as possible.
     void CalculateZoneVolume(const Array1D_bool &CeilingHeightEntered)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN   1992-1994
@@ -10878,7 +10878,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ProcessSurfaceVertices(int const ThisSurf, bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code (Walton)
         //       DATE WRITTEN   1976
@@ -11404,7 +11404,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Vector &CompCoordTranslVector // Coordinate Translation Vector
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton, BLAST
         //       DATE WRITTEN   August 1976
@@ -11475,7 +11475,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Nov 2001
@@ -11605,7 +11605,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CreateStormWindowConstructions()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // For windows with an associated StormWindow object, creates a construction
         // consisting of the base construction plus a storm window and air gap on the outside.
         // If the window has an interior or between-glass shade/blind, also creates a
@@ -11668,7 +11668,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int createAirMaterialFromDistance(Real64 distance, std::string namePrefix)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
         std::string MatNameStAir = namePrefix + format("{}MM", mmDistance); // Name of created air layer material
         int newAirMaterial = UtilityRoutines::FindItemInList(MatNameStAir, state.dataMaterial->Material, TotMaterials);
@@ -11742,7 +11742,7 @@ EnergyPlusData & state = getCurrentState(0);
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(int oldConstruction, std::string name, int stormMaterial, int gapMaterial)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int newConstruct = UtilityRoutines::FindItemInList(name, state.dataConstruction->Construct, TotConstructs); // Number of shaded storm window construction that is created
         if (newConstruct == 0) {
             TotConstructs = TotConstructs + 1;
@@ -11825,7 +11825,7 @@ EnergyPlusData & state = getCurrentState(0);
                       int &AddedSubSurfaces // Subsurfaces added when window references a
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb 2002
@@ -11989,7 +11989,7 @@ EnergyPlusData & state = getCurrentState(0);
                    int &AddedSubSurfaces // Subsurfaces added when window references a
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Nov 2008
@@ -12415,7 +12415,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const NSides   // Number of sides to figure
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent T Griffith
         //       DATE WRITTEN   April 2003
@@ -12521,7 +12521,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcSurfaceCentroid()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2004
@@ -12674,7 +12674,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupShadeSurfacesForSolarCalcs()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2008
@@ -12801,7 +12801,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound)                                                         // Set to true if errors found
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string RoutineName = "SetupEnclosuresAndAirBoundaries";
         bool anyGroupedZones = false;
         bool radiantSetup = false;
@@ -13055,7 +13055,7 @@ EnergyPlusData & state = getCurrentState(0);
                         int const NSides   // Number of sides to figure
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   December 2010
@@ -13427,7 +13427,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const TotalLayers   // total layers for construction definition
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         RevLayerDiffs = false;
 
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {

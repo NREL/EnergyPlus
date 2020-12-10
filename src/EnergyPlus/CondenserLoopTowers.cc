@@ -112,7 +112,7 @@ namespace CondenserLoopTowers {
 
     PlantComponent *CoolingTower::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for towers if it hasn't been done already
         if (state.dataCondenserLoopTowers->GetInput) {
             GetTowerInput();
@@ -135,7 +135,7 @@ namespace CondenserLoopTowers {
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
@@ -156,7 +156,7 @@ namespace CondenserLoopTowers {
                                            Real64 &MinLoad,
                                            Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         MinLoad = 0.0;
         MaxLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
         OptLoad = this->TowerNominalCapacity;
@@ -169,7 +169,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
@@ -180,7 +180,7 @@ namespace CondenserLoopTowers {
 
     void GetTowerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1829,7 +1829,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1928,7 +1928,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
@@ -2152,7 +2152,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::SizeTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -3006,7 +3006,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::SizeVSMerkelTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -3820,7 +3820,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::calculateSingleSpeedTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -4127,7 +4127,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::calculateTwoSpeedTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -4365,7 +4365,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::calculateVariableSpeedTower()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -4696,7 +4696,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::calculateMerkelVariableSpeedTower(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
@@ -4945,7 +4945,7 @@ namespace CondenserLoopTowers {
                                             Array1D<Real64> const &Par // par(1) = Tower number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4986,7 +4986,7 @@ namespace CondenserLoopTowers {
 
     Real64 CoolingTower::calculateSimpleTowerOutletTemp(Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -5101,7 +5101,7 @@ namespace CondenserLoopTowers {
                                                           Real64 const Twb // current inlet air wet-bulb temperature (C, capped if applicable)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
@@ -5173,7 +5173,7 @@ namespace CondenserLoopTowers {
                                                         Real64 const Tr // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
@@ -5254,7 +5254,7 @@ namespace CondenserLoopTowers {
                                         Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
@@ -5486,7 +5486,7 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = design tower load [W]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -5516,7 +5516,7 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005
@@ -5550,7 +5550,7 @@ namespace CondenserLoopTowers {
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005
@@ -5591,7 +5591,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::calculateWaterUsage()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -5722,7 +5722,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::update()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

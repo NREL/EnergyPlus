@@ -141,7 +141,7 @@ namespace PlantCentralGSHP {
 
     PlantComponent *WrapperSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getWrapperInputFlag) {
             GetWrapperInput();
@@ -199,7 +199,7 @@ namespace PlantCentralGSHP {
     void WrapperSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
             this->initialize(CurLoad, calledFromLocation.loopNum);
@@ -235,7 +235,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::SizeWrapper()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Yunzhi Huang, PNNL
         //       DATE WRITTEN   Feb 2013
@@ -566,7 +566,7 @@ namespace PlantCentralGSHP {
 
     void GetWrapperInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Yunzhi Huang and Daeho Kang, PNNL
         //       DATE WRITTEN:    Feb 2013
@@ -782,7 +782,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Heater System Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.TotElecCooling,
@@ -1062,7 +1062,7 @@ namespace PlantCentralGSHP {
 
     void GetChillerHeaterInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Kyung Tae Yun, Mississippi State University
         //       DATE WRITTEN:    Feb 2013
@@ -1392,7 +1392,7 @@ namespace PlantCentralGSHP {
                                   int LoopNum    // Loop Number Index
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
         //       DATE WRITTEN   Feb 2013
@@ -1691,7 +1691,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::CalcChillerModel()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
         //       DATE WRITTEN   Feb 2013
@@ -2125,7 +2125,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::CalcChillerHeaterModel()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
         //       DATE WRITTEN   Feb 2013
@@ -2614,7 +2614,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::CalcWrapperModel(Real64 &MyLoad, int const LoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
         //       DATE WRITTEN   Feb 2013

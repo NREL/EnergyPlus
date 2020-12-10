@@ -154,7 +154,7 @@ namespace HVACCooledBeam {
                      Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 3, 2009
@@ -216,7 +216,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetCoolBeams()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 3, 2009
@@ -496,7 +496,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 6, 2009
@@ -662,7 +662,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeCoolBeam(int const CBNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 10, 2009
@@ -893,7 +893,7 @@ EnergyPlusData & state = getCurrentState(0);
                          Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 12, 2009
@@ -1043,7 +1043,7 @@ EnergyPlusData & state = getCurrentState(0);
                       Real64 &TWOut        // chilled water outlet temperature [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 2009
@@ -1173,7 +1173,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 CoolBeamResidual(Real64 const CWFlow, // cold water flow rate in kg/s
                             Array1D<Real64> const &Par)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2009
@@ -1225,7 +1225,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateCoolBeam(int const CBNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 2009
@@ -1298,7 +1298,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportCoolBeam(int const CBNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1345,7 +1345,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CoolBeamData::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;

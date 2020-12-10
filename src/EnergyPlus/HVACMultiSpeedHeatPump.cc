@@ -232,7 +232,7 @@ namespace HVACMultiSpeedHeatPump {
                        int &CompIndex                 // Index to changeover-bypass VAV system
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, Florida Solar Energy Center
         //       DATE WRITTEN   June. 2007
@@ -306,7 +306,7 @@ EnergyPlusData & state = getCurrentState(0);
                  Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -525,7 +525,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetMSHeatPumpInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2007
@@ -1746,7 +1746,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &OnOffAirFlowRatio      // Ratio of compressor ON airflow to average airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2007
@@ -2648,7 +2648,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeMSHeatPump(int const MSHeatPumpNum) // Engine driven heat pump number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
@@ -2837,7 +2837,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &SupHeaterLoad          // Supplemental heater load [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -3373,7 +3373,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &SupHeaterLoad          // supplemental heater load (W)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
@@ -3753,7 +3753,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -3832,7 +3832,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
@@ -3912,7 +3912,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateMSHeatPump(int const MSHeatPumpNum) // Engine driven heat pump number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
@@ -3947,7 +3947,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportMSHeatPump(int const MSHeatPumpNum) // Engine driven heat pump number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
@@ -4015,7 +4015,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void MSHPHeatRecovery(int const MSHeatPumpNum) // Number of the current electric MSHP being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu
         //       DATE WRITTEN:    June 2007
@@ -4100,7 +4100,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Optional<Real64 const> SpeedRatio // Speed ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing
         //       DATE WRITTEN   June 2007
@@ -4231,7 +4231,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
                                Optional<Real64 const> PartLoadFrac)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -4432,7 +4432,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   November 2011

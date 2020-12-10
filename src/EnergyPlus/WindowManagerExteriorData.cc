@@ -78,7 +78,7 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getWCECoordinates(int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 Theta = 0;
         Real64 Phi = 0;
 
@@ -103,7 +103,7 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return getWCECoordinates(t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
     }
 
@@ -112,7 +112,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultSolarRadiationSpectrum()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -133,7 +133,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultVisiblePhotopicResponse()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -235,7 +235,7 @@ namespace WindowManager {
 
     std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WavelengthRange const t_Range, int const t_ConstrNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto it = m_Equivalent.find(std::make_pair(t_Range, t_ConstrNum));
         if (it == m_Equivalent.end()) {
             // Layer was not requested before. Need to create it now.
@@ -261,7 +261,7 @@ namespace WindowManager {
 
     IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Layers_Map aMap = m_Layers.at(t_Range);
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {

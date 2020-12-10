@@ -122,7 +122,7 @@ namespace UFADManager {
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2005
@@ -187,7 +187,7 @@ EnergyPlusData & state = getCurrentState(0);
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August, 2005
@@ -234,7 +234,7 @@ EnergyPlusData & state = getCurrentState(0);
                     DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2005
@@ -597,7 +597,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HcUCSDUF(int const ZoneNum, Real64 const FractionHeight)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -886,7 +886,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcUCSDUI(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2005
@@ -1358,7 +1358,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcUCSDUE(int const ZoneNum) // index number for the specified zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2006

@@ -116,7 +116,7 @@ namespace SteamCoils {
                                      Optional_int_const FanOpMode,
                                      Optional<Real64 const> PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -201,7 +201,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSteamCoilInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -411,7 +411,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -607,7 +607,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeSteamCoil(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Jan 2005
@@ -967,7 +967,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const PartLoadRatio   // part-load ratio of heating coil
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -1374,7 +1374,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSteamCoil(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -1452,7 +1452,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSteamCoil(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
         //   DATE WRITTEN   Jan 2005
@@ -1475,7 +1475,7 @@ EnergyPlusData & state = getCurrentState(0);
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2007
@@ -1513,7 +1513,7 @@ EnergyPlusData & state = getCurrentState(0);
     void CheckSteamCoilSchedule(
         [[maybe_unused]] std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2006
@@ -1563,7 +1563,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2006
@@ -1612,7 +1612,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound    // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2007
@@ -1649,7 +1649,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1686,7 +1686,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1732,7 +1732,7 @@ EnergyPlusData & state = getCurrentState(0);
                              [[maybe_unused]] bool &ErrorsFound // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1776,7 +1776,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1813,7 +1813,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         L. Lawrie (based on R. Raustad)
         //       DATE WRITTEN   June 2008
@@ -1859,7 +1859,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1896,7 +1896,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         L. Lawrie (based on R. Raustad)
         //       DATE WRITTEN   June 2008
@@ -1942,7 +1942,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -1990,7 +1990,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -2032,7 +2032,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorFlag              // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   January 2012
@@ -2081,7 +2081,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   February 2013
@@ -2132,7 +2132,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   February 2016

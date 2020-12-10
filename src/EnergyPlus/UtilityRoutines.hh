@@ -446,7 +446,7 @@ namespace UtilityRoutines {
                            bool &IsBlank,
                            std::string const &StringToDisplay)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         IsBlank = false;
         ErrorFound = false;
         if (NameToVerify.empty()) {
@@ -484,7 +484,7 @@ namespace UtilityRoutines {
                            bool &IsBlank,
                            std::string const &StringToDisplay)
     { // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         ErrorFound = false;
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList,
@@ -513,7 +513,7 @@ namespace UtilityRoutines {
                            bool &IsBlank,
                            std::string const &StringToDisplay)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         ErrorFound = false;
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList,
@@ -543,7 +543,7 @@ namespace UtilityRoutines {
                            bool &IsBlank,
                            std::string const &StringToDisplay)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         ErrorFound = false;
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList, name_p, NumOfNames);

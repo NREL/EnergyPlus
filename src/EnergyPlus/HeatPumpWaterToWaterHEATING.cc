@@ -112,7 +112,7 @@ namespace HeatPumpWaterToWaterHEATING {
     }
 
     PlantComponent *GshpPeHeatingSpecs::factory(const std::string& objectName) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetWWHPHeatingInput) {
             GetGshpInput();
             GetWWHPHeatingInput = false;
@@ -131,7 +131,7 @@ namespace HeatPumpWaterToWaterHEATING {
     void GshpPeHeatingSpecs::simulate(
         const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
             this->initialize();
@@ -165,7 +165,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpPeHeatingSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -211,7 +211,7 @@ EnergyPlusData & state = getCurrentState(0);
 #pragma ide diagnostic ignored "readability-magic-numbers"
     void GetGshpInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       SUBROUTINE INFORMATION:
         //       AUTHOR:
         //       DATE WRITTEN:    April 1998
@@ -460,7 +460,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpPeHeatingSpecs::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -538,7 +538,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpPeHeatingSpecs::calculate(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   Sept. 1998

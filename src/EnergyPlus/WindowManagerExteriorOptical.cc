@@ -75,7 +75,7 @@ namespace WindowManager {
 
     std::shared_ptr<CBSDFLayer> getBSDFLayer(const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -100,7 +100,7 @@ namespace WindowManager {
 
     std::shared_ptr<CScatteringLayer> getScatteringLayer(const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2017
@@ -165,7 +165,7 @@ namespace WindowManager {
 
     void InitWCE_SimplifiedOpticalData()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2017
@@ -294,7 +294,7 @@ namespace WindowManager {
 
     void CWCESpecularMaterialsFactory::init()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
         std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {

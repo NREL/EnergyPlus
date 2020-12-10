@@ -118,7 +118,7 @@ namespace RoomAirModelManager {
 
     void ManageAirModel(int &ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Weixiu Kong
         //       DATE WRITTEN   April 2003
@@ -191,7 +191,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetAirModelDatas()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2005
@@ -235,7 +235,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUserDefinedPatternData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
@@ -581,7 +581,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetAirNodeData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2001
@@ -801,7 +801,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetMundtData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2001
@@ -885,7 +885,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetDisplacementVentData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   January 2004
@@ -967,7 +967,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetCrossVentData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   October 2004
@@ -1120,7 +1120,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUFADZoneData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2005
@@ -1301,7 +1301,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetRoomAirflowNetworkData(bool &ErrorsFound) // True if errors found during this get input routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   November 2009
@@ -1779,7 +1779,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SharedDVCVUFDataInit(int &ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2005
@@ -2642,7 +2642,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool &Errorfound                 // true if an error is found (TODO: Useless, RAFNodeNum is 0 when Errorfound is true)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   November 2014
@@ -2690,7 +2690,7 @@ EnergyPlusData & state = getCurrentState(0);
                         int TypeNum                   // equipment type number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2014

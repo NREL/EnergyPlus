@@ -62,7 +62,7 @@ namespace EnergyPlus {
 
 InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (!good()) {
         open(false, output_to_file);
     }
@@ -178,7 +178,7 @@ void InputFile::backspace() noexcept
 
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (!good()) {
         open(false, output_to_file);
     }
@@ -289,7 +289,7 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
     if (instances != inputProcessor->epJSON.end()) {
 

@@ -90,7 +90,7 @@ namespace GroundTemperatureManager {
 
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &objectType_str, std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
         //       DATE WRITTEN   Summer 2015

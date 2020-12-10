@@ -150,7 +150,7 @@ namespace ZoneEquipmentManager {
                              bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -184,7 +184,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneEquipment()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1997
@@ -216,7 +216,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneEquipment(bool const FirstHVACIteration) // unused 1208
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -404,7 +404,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeZoneEquipment()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2000
@@ -680,7 +680,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2015
@@ -746,7 +746,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetUpZoneSizingArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2000
@@ -1365,7 +1365,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RezeroZoneSizingArrays()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Zero zone sizing arrays between the pulse and normal sizing.
         DisplayString("Re-zeroing zone sizing arrays");
 
@@ -1381,7 +1381,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateZoneSizing(DataGlobalConstants::CallIndicator const CallIndicator)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2000
@@ -2520,7 +2520,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -3138,7 +3138,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -3205,7 +3205,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -3310,7 +3310,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Distribute zone equipment loads according to load distribution scheme
 
         // Do nothing if this zone is uncontrolled or doing zone sizing
@@ -3603,7 +3603,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Optional_int_const EquipPriorityNum // index in PrioritySimOrder for this update
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Unknown
@@ -3809,7 +3809,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcZoneMassBalance(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -4165,7 +4165,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto &thisZoneEquip(ZoneEquipConfig(ZoneNum));
         int numRetNodes = thisZoneEquip.NumReturnNodes;
         Real64 totReturnFlow = 0.0; // Total flow to all return nodes in the zone (kg/s)
@@ -4290,7 +4290,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcZoneLeavingConditions(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   January 2001
@@ -4475,7 +4475,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateZoneEquipment(bool &SimAir)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -4512,7 +4512,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN   na
@@ -5480,7 +5480,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2010
@@ -5616,7 +5616,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AutoCalcDOASControlStrategy()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2016
@@ -5694,7 +5694,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2016

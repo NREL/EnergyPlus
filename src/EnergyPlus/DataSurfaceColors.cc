@@ -189,7 +189,7 @@ namespace DataSurfaceColors {
 
     void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2007

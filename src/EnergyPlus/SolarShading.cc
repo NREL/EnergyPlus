@@ -157,7 +157,7 @@ namespace SolarShading {
 
     void InitSolarCalculations()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   September 1977
@@ -354,7 +354,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetShadowingInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 1999
@@ -739,7 +739,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateModuleArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 1998
@@ -2200,7 +2200,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AnisoSkyViewFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   April 1999
@@ -2366,7 +2366,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const NRS  // Surface Number of the potential shadow receiving surface
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -2532,7 +2532,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const SBSNR  // Surface number of subsurface
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -2868,7 +2868,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeIntSolarAbsorpFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       MODIFIED       B. Griffith, Oct 2010, deal with no floor case
@@ -3006,7 +3006,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -3160,7 +3160,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const NumVertices // Number of vertices
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -3262,7 +3262,7 @@ EnergyPlusData & state = getCurrentState(0);
                  int const NumVertices // Number of vertices
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         // Locals
@@ -3308,7 +3308,7 @@ EnergyPlusData & state = getCurrentState(0);
                  int const NumVertices // Number of vertices
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         if (NS > 2 * state.dataSolarShading->MaxHCS) {
@@ -3363,7 +3363,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int &NIN                 // Number of vertices of figure 1 within figure 2
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -3433,7 +3433,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const NS2  // Number of the figure doing overlapping
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -3672,7 +3672,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     void CLIPRECT(int const NS2, int const NV1, int &NV3) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Polygon clipping by line segment clipping for rectangles
         // Reference:
         // Slater, M., Barsky, B.A.
@@ -3907,7 +3907,7 @@ EnergyPlusData & state = getCurrentState(0);
                   int const NV2, // Number of vertices of figure 2
                   int &NV3       // Number of vertices of figure 3
     ) {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   May 4, 2010
@@ -4137,7 +4137,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const NRFIGS // Number of figures overlapped
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -4182,7 +4182,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const NS3  // Location to place results of overlap
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -4357,7 +4357,7 @@ EnergyPlusData & state = getCurrentState(0);
                int const NS3  // Location to place results of overlap
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -4475,7 +4475,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -4569,7 +4569,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const CosSolarDeclin  // value of Cosine of Solar Declination for period
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   October 2012
@@ -4607,7 +4607,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureSolarBeamAtTimestep(int const iHour, int const iTimeStep)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith, derived from CalcPerSolarBeam, Legacy and Lawrie.
         //       DATE WRITTEN   October 2012
@@ -4773,7 +4773,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetermineShadowingCombinations()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         From Legacy Code
         //       DATE WRITTEN
@@ -5212,7 +5212,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const TS     // Time Step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -5380,7 +5380,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const HTS   // Heat transfer surface number of the general receiving surf
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -5499,7 +5499,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const HTS      // Heat transfer surface number of the general receiving surf
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -5733,7 +5733,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcInteriorSolarDistribution()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -7656,7 +7656,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    int const TS     // Time step Index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   January 1999
@@ -7829,7 +7829,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     void CalcAbsorbedOnExteriorOpaqueSurfaces()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2017
@@ -7881,7 +7881,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcInteriorSolarDistributionWCE()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -7901,7 +7901,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcInteriorSolarDistributionWCESimple()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -8168,7 +8168,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PerformSolarCalculations()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -8308,7 +8308,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const Hour,
                 int const TS)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -8502,7 +8502,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const TS    // Time step Index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -8724,7 +8724,7 @@ EnergyPlusData & state = getCurrentState(0);
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN
@@ -8759,7 +8759,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WindowShadingManager()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   December 1998
@@ -9333,7 +9333,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WindowGapAirflowControl()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -9388,7 +9388,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SkyDifSolarShading()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -9629,7 +9629,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWindowProfileAngles()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -9728,7 +9728,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const HourNum   // Hour number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   June 2000
@@ -9920,7 +9920,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcBeamSolarOnWinRevealSurface()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
         //       DATE WRITTEN   April 2002
@@ -10422,7 +10422,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSurfaceShading()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2000
@@ -10505,7 +10505,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSurfaceErrors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2004
@@ -10656,7 +10656,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeWinShadeAbsorpFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Mar 2001
@@ -10721,7 +10721,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWinTransDifSolInitialDistribution()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rob Hitchcock
         //       DATE WRITTEN   July 2007
@@ -11302,7 +11302,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rob Hitchcock
         //       DATE WRITTEN   August 2007
@@ -11723,7 +11723,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int const ISurf                    // Surface number of the complex fenestration
     )
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2012
@@ -11911,7 +11911,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TimestepInitComplexFenestration()
     {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2012

@@ -238,7 +238,7 @@ namespace HVACVariableRefrigerantFlow {
                      Real64 &SysOutputProvided,
                      Real64 &LatOutputProvided)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         // AUTHOR         Richard Raustad, FSEC
         // DATE WRITTEN   August 2010
@@ -388,7 +388,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PlantComponent *VRFCondenserEquipment::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data if it hasn't been done already
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -445,7 +445,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcVRFCondenser(int const VRFCond)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad, FSEC
@@ -1377,7 +1377,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetVRFInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2015
@@ -1407,7 +1407,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetVRFInputData(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -5076,7 +5076,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitVRF(int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -6957,7 +6957,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeVRF(int const VRFTUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -8101,7 +8101,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void VRFCondenserEquipment::SizeVRFCondenser()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -8188,7 +8188,7 @@ EnergyPlusData & state = getCurrentState(0);
                 Real64 &LatOutputProvided,
                 Real64 const QZnReq)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -8239,7 +8239,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -8281,7 +8281,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                     Real64 &OnOffAirFlowRatio,
                                                     Real64 &SuppHeatCoilLoad)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
@@ -8561,7 +8561,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            Optional<Real64> LatOutputProvided // delivered latent capacity (kgWater/s)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -8989,7 +8989,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (GetVRFInputFlag) {
             GetVRFInput();
             GetVRFInputFlag = false;
@@ -9013,7 +9013,7 @@ EnergyPlusData & state = getCurrentState(0);
                        Array1D<Real64> const &Par  // par(1) = VRFTUNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -9080,7 +9080,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2010
@@ -9161,7 +9161,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &OnOffAirFlowRatio      // ratio of on to off flow rate
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2012 (Moved from InitVRF)
@@ -9711,7 +9711,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUOutAirNode(int const VRFTUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (copy of B Griffith routine)
         //       DATE WRITTEN   Jan  2015
@@ -9735,7 +9735,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUZoneInletAirNode(int const VRFTUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (copy of B Griffith routine)
         //       DATE WRITTEN   Jan  2015
@@ -9759,7 +9759,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool &errorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NodeNum; // return value of node number
 
         if (GetVRFInputFlag) {
@@ -9781,7 +9781,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool &errorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NodeNum; // return value of node number
 
         if (GetVRFInputFlag) {
@@ -9803,7 +9803,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUMixedAirNode(int const VRFTUNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (copy of B Griffith routine)
@@ -9828,7 +9828,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetVRFTUReturnAirNode(int const VRFTUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (copy of B Griffith routine)
         //       DATE WRITTEN   Jan  2015
@@ -10093,7 +10093,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc)
         //       DATE WRITTEN   June 2015
@@ -11459,7 +11459,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                          Real64 &SuppHeatCoilLoad   // supplemental heating coil load (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov 2015
@@ -11720,7 +11720,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                       Optional<Real64> LatOutputProvided // delivered latent capacity (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc)
         //       DATE WRITTEN   June 2015
@@ -11934,7 +11934,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                                     bool FirstHVACIteration // FirstHVACIteration flag
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Nov 2015
@@ -12035,7 +12035,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            Array1D<Real64> const &Par // par(1) = VRFTUNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Nov 2015
@@ -12163,7 +12163,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Array1D<Real64> const &Par // par(1) = VRFTUNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Mar 2016
@@ -12214,7 +12214,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Array1D<Real64> const &Par // parameters
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Xiufeng Pang (XP)
         //       DATE WRITTEN   Mar 2013
@@ -12253,7 +12253,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            Real64 &TeTc                  // VRF Tc at cooling mode, or Te at heating mode [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Jan 2016
@@ -12335,7 +12335,7 @@ EnergyPlusData & state = getCurrentState(0);
                                             Real64 const W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Jan 2016
@@ -12416,7 +12416,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                  Real64 const W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
     ) const
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Mar 2016
@@ -12490,7 +12490,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              Real64 const OutdoorPressure // Outdoor air pressure [Pa]
     ) const
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Jan 2016
@@ -12584,7 +12584,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 const T_cond_out_rate // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov 2015
@@ -12660,7 +12660,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &Pipe_SH_merged       // Piping Loss Algorithm Parameter: Average SH after the indoor units [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jan 2016
@@ -12798,7 +12798,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &CompSpdActual      // Actual compressor running speed [rps]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Feb 2016
@@ -12956,7 +12956,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &Ncomp              // Compressor power [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Feb 2016
@@ -13074,7 +13074,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 Real64 &Ncomp              // Compressor power [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xiufeng Pang
         //       DATE WRITTEN   Feb 2014
@@ -13421,7 +13421,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &Ncomp              // Compressor power [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xiufeng Pang
         //       DATE WRITTEN   Feb 2014
@@ -13626,7 +13626,7 @@ EnergyPlusData & state = getCurrentState(0);
                                             Real64 &Ncomp          // compressor power [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
         //       DATE WRITTEN   Jan 2016
@@ -14024,7 +14024,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &Pipe_h_comp_in       // Piping Loss Algorithm Parameter: Enthalpy after piping loss (compressor inlet) [kJ/kg]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov 2015
@@ -14171,7 +14171,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &Pipe_h_comp_out      // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
     ) const
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov 2015
@@ -14314,7 +14314,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                           Real64 &SuppCoilLoad           // supp heating coil load max (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Manages VRF terminal unit supplemental heaters simulation.
 
@@ -14419,7 +14419,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                                  std::vector<Real64> const &Par // par(1) = index to current VRF terminal unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // Calculates supplemental hot water heating coils load fraction residual [(QActual - Load)/Load]
         // hot water Coil output depends on the part load ratio which is being varied to drive the load

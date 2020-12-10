@@ -59,7 +59,7 @@ namespace EnergyPlus {
 namespace Construction {
 
     void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1990
@@ -1893,7 +1893,7 @@ namespace Construction {
     }
 
     void ConstructionProps::reportTransferFunction(int const cCounter) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
         print(state.files.eio,
               Format_700,
@@ -1984,7 +1984,7 @@ namespace Construction {
 
     bool ConstructionProps::isGlazingConstruction() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -2004,7 +2004,7 @@ namespace Construction {
 
     Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(Real64 userValue)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (userValue < 0.0) {
             ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
             ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");

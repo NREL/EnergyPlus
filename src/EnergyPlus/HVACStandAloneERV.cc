@@ -176,7 +176,7 @@ namespace HVACStandAloneERV {
                           int &CompIndex                 // pointer to correct component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2003
@@ -238,7 +238,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetStandAloneERV()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -1182,7 +1182,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool const FirstHVACIteration // TRUE if first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2003
@@ -1370,7 +1370,7 @@ EnergyPlusData & state = getCurrentState(0);
     void SizeStandAloneERV(int const StandAloneERVNum)
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -1587,7 +1587,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &LatentMassLoadMet      // latent zone load met by unit (kg/s), dehumid = negative
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2003
@@ -1782,7 +1782,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportStandAloneERV(int const StandAloneERVNum) // number of the current Stand Alone ERV being simulated
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -1842,7 +1842,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1888,7 +1888,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1934,7 +1934,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -1977,7 +1977,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetStandAloneERVOutAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2028,7 +2028,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetStandAloneERVZoneInletAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -2079,7 +2079,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetStandAloneERVReturnAirNode(int const StandAloneERVNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006

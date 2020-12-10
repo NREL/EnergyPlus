@@ -76,7 +76,7 @@ namespace OutputReportPredefined {
 
     void SetPredefinedTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1167,7 +1167,7 @@ namespace OutputReportPredefined {
 
     void PreDefTableEntry(int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1233,7 +1233,7 @@ namespace OutputReportPredefined {
 
     void PreDefTableEntry(int const columnIndex, std::string const &objName, std::string const &tableEntryChar)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1274,7 +1274,7 @@ namespace OutputReportPredefined {
 
     void PreDefTableEntry(int const columnIndex, std::string const &objName, int const tableEntryInt)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1315,7 +1315,7 @@ namespace OutputReportPredefined {
 
     std::string RetrievePreDefTableEntry(int const columnIndex, std::string const &objName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (int iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numTableEntry; ++iTableEntry) {
             if (state.dataOutRptPredefined->tableEntry(iTableEntry).indexColumn == columnIndex && state.dataOutRptPredefined->tableEntry(iTableEntry).objectName == objName) {
                 return trimmed(ljustified(state.dataOutRptPredefined->tableEntry(iTableEntry).charEntry));
@@ -1326,7 +1326,7 @@ namespace OutputReportPredefined {
 
     void incrementTableEntry()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1374,7 +1374,7 @@ namespace OutputReportPredefined {
     void
     AddCompSizeTableEntry(std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -1426,7 +1426,7 @@ namespace OutputReportPredefined {
 
     void AddShadowRelateTableEntry(int const castingField, int const receivingField, int const receivingKind)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -1480,7 +1480,7 @@ namespace OutputReportPredefined {
 
     int newPreDefReport(std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1537,7 +1537,7 @@ namespace OutputReportPredefined {
 
     int newPreDefSubTable(int const reportIndex, std::string const &subTableName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -1589,7 +1589,7 @@ namespace OutputReportPredefined {
 
     void addFootNoteSubTable(int const subTableIndex, std::string const &footnoteText)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1627,7 +1627,7 @@ namespace OutputReportPredefined {
 
     int newPreDefColumn(int const subTableIndex, std::string const &columnHeading)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006

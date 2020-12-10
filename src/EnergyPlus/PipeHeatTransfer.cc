@@ -171,7 +171,7 @@ namespace PipeHeatTransfer {
 
     PlantComponent *PipeHTData::factory(int objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
             GetPipesHeatTransfer();
@@ -202,7 +202,7 @@ namespace PipeHeatTransfer {
                               [[maybe_unused]] Real64 &CurLoad,
                               [[maybe_unused]] bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->InitPipesHeatTransfer(FirstHVACIteration);
         // make the calculations
         for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
@@ -243,7 +243,7 @@ namespace PipeHeatTransfer {
 
     void GetPipesHeatTransfer()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007
@@ -716,7 +716,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               bool &ErrorsFound                    // set to true if errors found here
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2008
@@ -810,7 +810,7 @@ EnergyPlusData & state = getCurrentState(0);
     void PipeHTData::InitPipesHeatTransfer(bool const FirstHVACIteration // component number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007
@@ -1041,7 +1041,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PipeHTData::CalcPipesHeatTransfer(Optional_int_const LengthIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007
         //       MODIFIED       na
@@ -1224,7 +1224,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PipeHTData::CalcBuriedPipeSoil() // Current Simulation Pipe Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   May 2008
         //       MODIFIED       na
@@ -1554,7 +1554,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PipeHTData::CalcZonePipesHeatGain()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   September 2008
@@ -1587,7 +1587,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              Real64 const Diameter      // Pipe diameter, m
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   July 2007
@@ -1714,7 +1714,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 PipeHTData::OutsidePipeHeatTransCoef()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2007
@@ -1872,7 +1872,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 PipeHTData::TBND(Real64 const z       // Current Depth
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   December 2007
         //       MODIFIED       na

@@ -183,7 +183,7 @@ namespace DXFEarClipping {
                     DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005
@@ -520,7 +520,7 @@ namespace DXFEarClipping {
                        Array1D_int &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005

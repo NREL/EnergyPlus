@@ -72,7 +72,7 @@ namespace EnergyPlus {
 
 void ReportSurfaces()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -192,7 +192,7 @@ void ReportSurfaces()
 
 void LinesOut(std::string const &option)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   March 1999
@@ -310,7 +310,7 @@ static std::string normalizeName(std::string name)
 
 static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
@@ -438,7 +438,7 @@ static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 
 static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELight)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using namespace DataSurfaceColors;
     using DataHeatBalance::Zone;
 
@@ -467,7 +467,7 @@ void DXFOut(std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -839,7 +839,7 @@ void DXFOut(std::string const &PolygonAction,
 
 void DXFOutLines(std::string const &ColorScheme)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -1050,7 +1050,7 @@ void DXFOutLines(std::string const &ColorScheme)
 
 void DXFOutWireFrame(std::string const &ColorScheme)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -1221,7 +1221,7 @@ void DXFOutWireFrame(std::string const &ColorScheme)
 
 void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -1705,7 +1705,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
 
 void CostInfoOut()
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   April 2003
@@ -1791,7 +1791,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void VRMLOut(const std::string &PolygonAction, const std::string &ColorScheme)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   August 2006

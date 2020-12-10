@@ -253,7 +253,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputForLifeCycleCost()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -298,7 +298,7 @@ namespace EconomicLifeCycleCost {
 
     void ComputeLifeCycleCostAndReport()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -350,7 +350,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostParameters()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -601,7 +601,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostRecurringCosts()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -779,7 +779,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostNonrecurringCost()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -904,7 +904,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostUsePriceEscalation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -1039,7 +1039,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostUseAdjustment()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
@@ -1208,7 +1208,7 @@ namespace EconomicLifeCycleCost {
 
     void ExpressAsCashFlows()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2010
@@ -2071,7 +2071,7 @@ namespace EconomicLifeCycleCost {
 
     void WriteTabularLifeCycleCostReport()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2010

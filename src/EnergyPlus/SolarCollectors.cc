@@ -96,7 +96,7 @@ namespace SolarCollectors {
 
     PlantComponent *CollectorData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (state.dataSolarCollectors->GetInputFlag) {
             GetSolarCollectorInput();
@@ -116,7 +116,7 @@ namespace SolarCollectors {
 
     void GetSolarCollectorInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -747,7 +747,7 @@ namespace SolarCollectors {
 
     void CollectorData::initialize()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -902,7 +902,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::CalcSolarCollector()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -1146,7 +1146,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 ParametersData::IAM(Real64 const IncidentAngle)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   December 2003
@@ -1198,7 +1198,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::CalcICSSolarCollector()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1339,7 +1339,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        bool const AbsorberPlateHasMass // flag for absorber thermal mass
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1403,7 +1403,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::CalcTransAbsorProduct(Real64 const IncidAngle)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket A Nigusse
         //       DATE WRITTEN   February 2012
@@ -1485,7 +1485,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                Optional<Real64> RefSysDiffuse // cover system solar reflectance from inner to outer cover
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket A Nigusse
         //       DATE WRITTEN   February 2012
@@ -1597,7 +1597,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::CalcHeatTransCoeffAndCoverTemp() // Collector object number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket A Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1866,7 +1866,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                         Real64 const TiltR2V    // collector tilt angle relative to the vertical [degree]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2012
@@ -1941,7 +1941,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::update()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -1981,7 +1981,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CollectorData::GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC. Adopted from Photovoltaics module
         //       DATE WRITTEN   February 2012

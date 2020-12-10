@@ -204,7 +204,7 @@ namespace UnitarySystems {
                                  Real64 &sysOutputProvided,
                                  Real64 &latOutputProvided)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int CompOn = 0;
 
         // Obtains and Allocates unitary system related parameters from input file
@@ -296,7 +296,7 @@ namespace UnitarySystems {
 
     DesignSpecMSHP *DesignSpecMSHP::factory(int object_type_of_num, std::string const objectName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (state.dataUnitarySystems->getMSHPInputOnceFlag) {
             DesignSpecMSHP::getDesignSpecMSHP();
             state.dataUnitarySystems->getMSHPInputOnceFlag = false;
@@ -323,7 +323,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DesignSpecMSHP::getDesignSpecMSHPdata(bool errorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
 
         auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -427,7 +427,7 @@ EnergyPlusData & state = getCurrentState(0);
     HVACSystemData *UnitarySys::factory(
         int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataUnitarySystems->getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(objectName, ZoneEquipment, ZoneOAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;
@@ -449,7 +449,7 @@ EnergyPlusData & state = getCurrentState(0);
         std::string const &objectName // IDF name in input
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int index = -1;
         for (std::size_t loop = 0; loop < state.dataUnitarySystems->designSpecMSHP.size(); ++loop) {
             DesignSpecMSHP *thisDesignSpecMSHPObjec = &state.dataUnitarySystems->designSpecMSHP[loop];
@@ -466,7 +466,7 @@ EnergyPlusData & state = getCurrentState(0);
         std::string const &objectName // IDF name in input
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int index = -1;
         bool found = false;
         for (std::size_t loop = 0; loop < state.dataUnitarySystems->unitarySys.size(); ++loop) {
@@ -483,7 +483,7 @@ EnergyPlusData & state = getCurrentState(0);
     void UnitarySys::initUnitarySystems(
         int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         static std::string const routineName("InitUnitarySystems");
         bool errorsFound = false; // error flag for mining functions
 
@@ -1232,7 +1232,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Real64 const OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   March 2013
@@ -1296,7 +1296,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                int const ControlMode       // temperature or humidity control mode
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   January 2013
@@ -1347,7 +1347,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UnitarySys::sizeSystem(bool const FirstHVACIteration, int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -2732,7 +2732,7 @@ EnergyPlusData & state = getCurrentState(0);
     void UnitarySys::getUnitarySystemInputData(
         std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
@@ -7277,7 +7277,7 @@ EnergyPlusData & state = getCurrentState(0);
     void UnitarySys::calcUnitarySuppSystemToSP(bool const FirstHVACIteration // True when first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -7326,7 +7326,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 Real64 &latOutputProvided      // sytsem latent output at supply air node
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -7493,7 +7493,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               Real64 &latOutputProvided      // latent output at supply air node
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -7654,7 +7654,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 Real64 const MaxOutletTemp // limits heating coil outlet temp [C]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -7842,7 +7842,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                                 int CompOn)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -9259,7 +9259,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           Real64 &OnOffAirFlowRatio,
                                           Real64 &ZoneLoad)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -9757,7 +9757,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           Real64 const PartLoadRatio // coil part-load ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   May 2013
@@ -10134,7 +10134,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -10263,7 +10263,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              int const CompOn               // Determines if compressor is on or off
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -10530,7 +10530,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               bool const HXUnitOn           // Flag to control HX for HXAssisted Cooling Coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -10781,7 +10781,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               Real64 HeatCoilLoad             // adjusted heating coil load if outlet temp exceeds max (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -10985,7 +10985,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                   Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -11095,7 +11095,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               int &CompOn                    // compressor on/off control
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -12363,7 +12363,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               Real64 &HeatCoilLoad           // load met by heating coil
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -12988,7 +12988,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -13360,7 +13360,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         int const CoilType,
                                         int const SpeedNumber)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   March 2013
@@ -13558,7 +13558,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool const FirstHVACIteration // True when first HVAC iteration
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -13637,7 +13637,7 @@ EnergyPlusData & state = getCurrentState(0);
     void UnitarySys::reportUnitarySystem(int const AirLoopNum)
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   July 2013
@@ -13880,7 +13880,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UnitarySys::unitarySystemHeatRecovery()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    May 2013
@@ -14045,7 +14045,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                    std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   February 2013
@@ -14102,7 +14102,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   November 2003
@@ -14135,7 +14135,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -14168,7 +14168,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                      std::vector<Real64> const &Par // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -14260,7 +14260,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                       std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   November 2003
@@ -14303,7 +14303,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                     std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -14341,7 +14341,7 @@ EnergyPlusData & state = getCurrentState(0);
                                               std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -14436,7 +14436,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                    std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -14546,7 +14546,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                     std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   January 2008
@@ -14641,7 +14641,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -14757,7 +14757,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                    std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -14850,7 +14850,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                       std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -14967,7 +14967,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        std::vector<Real64> const &Par // data array
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR        Richard Raustad, FSEC
         //       DATE WRITTEN   August 2015
@@ -15016,7 +15016,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         M. J. Witte, GARD Analytics, Inc.
         //       DATE WRITTEN   February 2005
@@ -15058,7 +15058,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                      std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -15093,7 +15093,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                std::vector<Real64> const &Par // par(1) = CoolWater coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
@@ -15132,7 +15132,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              std::vector<Real64> const &Par // par(1) = CoolWater coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
@@ -15174,7 +15174,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                   std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   February 2013
@@ -15234,7 +15234,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   February 2013
@@ -15284,7 +15284,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                     std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
@@ -15368,7 +15368,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                       std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
@@ -15442,7 +15442,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                     std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR        Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
@@ -15524,7 +15524,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              std::vector<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -15555,7 +15555,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                           std::vector<Real64> const &Par // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2017
@@ -15698,7 +15698,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Real64 const PartLoadRatio // operating PLR
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
@@ -15796,7 +15796,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UnitarySys::checkUnitarySysCoilInOASysExists(std::string const &UnitarySysName, int const ZoneOAUnitNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   April 2013
@@ -15846,7 +15846,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                int const ZoneOAUnitNum            // index to zone OA unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   April 2013
@@ -15875,7 +15875,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;
@@ -15893,7 +15893,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;

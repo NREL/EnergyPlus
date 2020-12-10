@@ -84,7 +84,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void UpdateUtilityBills()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   September 2003
 
@@ -130,7 +130,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsTariff(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //       DATE WRITTEN   May 2004
@@ -611,7 +611,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsQualify(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -694,7 +694,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsChargeSimple(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -768,7 +768,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsChargeBlock(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -872,7 +872,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsRatchet(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -940,7 +940,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsVariable(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1017,7 +1017,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsComputation(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1100,7 +1100,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetInputEconomicsCurrencyType(bool &ErrorsFound) // true if errors found during getting input objects.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
 
@@ -1155,7 +1155,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void parseComputeLine(std::string const &lineOfCompute, int const fromTariff)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2004
 
@@ -1273,7 +1273,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void initializeMonetaryUnit()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
 
@@ -1625,7 +1625,7 @@ namespace EnergyPlus::EconomicTariff {
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1654,7 +1654,7 @@ namespace EnergyPlus::EconomicTariff {
 
     int FindTariffIndex(std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1686,7 +1686,7 @@ namespace EnergyPlus::EconomicTariff {
     void warnIfNativeVarname(
             std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   March 2007
 
@@ -1761,7 +1761,7 @@ namespace EnergyPlus::EconomicTariff {
                          int const objIndex,
                          int const tariffPt)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1825,7 +1825,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void incrementEconVar()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1869,7 +1869,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void incrementSteps()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2004
 
@@ -1895,7 +1895,7 @@ namespace EnergyPlus::EconomicTariff {
 
     std::string RemoveSpaces(std::string const &StringIn)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -1919,7 +1919,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void CreateCategoryNativeVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
 
@@ -2136,7 +2136,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void CreateDefaultComputation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2004
 
@@ -2442,7 +2442,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void addOperand(int const varMe, int const varOperand)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -2481,7 +2481,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void addChargesToOperand(int const curTariff, int const curPointer)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -2523,7 +2523,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GatherForEconomics()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2004
 
@@ -2641,7 +2641,7 @@ namespace EnergyPlus::EconomicTariff {
 
     bool isWithinRange(int const testVal, int const minThreshold, int const maxThreshold)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -2671,7 +2671,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void ComputeTariff()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3060,7 +3060,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3144,7 +3144,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void popStack(Array1A<Real64> monthlyArray, int &variablePointer)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3174,7 +3174,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void evaluateChargeSimple(int const usingVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3236,7 +3236,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void evaluateChargeBlock(int const usingVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3353,7 +3353,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void evaluateRatchet(int const usingVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3485,7 +3485,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void evaluateQualify(int const usingVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3635,7 +3635,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void addMonthlyCharge(int const usingVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3669,7 +3669,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void checkMinimumMonthlyCharge(int const curTariff)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   August 2008
 
@@ -3703,7 +3703,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void setNativeVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -3892,7 +3892,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void LEEDtariffReporting()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   October 2012
 
@@ -4040,7 +4040,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void WriteTabularTariffReports()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
         //    MODIFIED       January 2010, Kyle Benne
@@ -4488,7 +4488,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void showWarningsBasedOnTotal()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -4519,7 +4519,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -4548,7 +4548,7 @@ namespace EnergyPlus::EconomicTariff {
     void
     ReportEconomicVariable(std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
         //    MODIFIED       January 2010, Kyle Benne
@@ -4714,7 +4714,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void selectTariff()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
 
@@ -4914,7 +4914,7 @@ namespace EnergyPlus::EconomicTariff {
 
     void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   May 2010
 

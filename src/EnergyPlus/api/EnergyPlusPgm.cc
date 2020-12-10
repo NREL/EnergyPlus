@@ -221,12 +221,12 @@
 
 int EnergyPlusPgm(std::string const &filepath)
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     return RunEnergyPlus(filepath);
 }
 
 void commonInitialize() {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     using namespace EnergyPlus;
 
     // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
@@ -277,7 +277,7 @@ void commonInitialize() {
 }
 
 int commonRun() {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     using namespace EnergyPlus;
 
     int errStatus = initErrorFile();
@@ -307,7 +307,7 @@ int commonRun() {
 }
 
 int initializeEnergyPlus(std::string const & filepath) {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     using namespace EnergyPlus;
     commonInitialize();
 
@@ -337,13 +337,13 @@ int initializeEnergyPlus(std::string const & filepath) {
 }
 
 int initializeAsLibrary() {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     commonInitialize();
     return commonRun();
 }
 
 int wrapUpEnergyPlus() {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     using namespace EnergyPlus;
 
     try {
@@ -385,7 +385,7 @@ int wrapUpEnergyPlus() {
 
 int RunEnergyPlus(std::string const & filepath)
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
 
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -416,7 +416,7 @@ int RunEnergyPlus(std::string const & filepath)
 
 int runEnergyPlusAsLibrary(int argc, const char *argv[])
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
     //       DATE WRITTEN   January 1997.....
@@ -455,12 +455,12 @@ int runEnergyPlusAsLibrary(int argc, const char *argv[])
 
 void StoreProgressCallback(void (*f)(int const))
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     state.dataGlobal->fProgressPtr = f;
 }
 void StoreMessageCallback(void (*f)(std::string const &))
 {
-    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState(0);
+    EnergyPlus::EnergyPlusData & state = EnergyPlus::getCurrentState();
     state.dataGlobal->fMessagePtr = f;
 }
 

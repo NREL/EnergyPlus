@@ -96,7 +96,7 @@ void createFacilityElectricPowerServiceObject()
 
 void initializeElectricPowerServiceZoneGains() // namespace routine for handling call from InternalHeatGains
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
     if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
         facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
@@ -113,7 +113,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (getInputFlag_) {
         getPowerManagerInput();
         getInputFlag_ = false;
@@ -197,7 +197,7 @@ void ElectricPowerServiceManager::reinitZoneGainsAtBeginEnvironment()
 
 void ElectricPowerServiceManager::getPowerManagerInput()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
     numLoadCenters_ = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Distribution");
@@ -365,7 +365,7 @@ void ElectricPowerServiceManager::getPowerManagerInput()
 
 void ElectricPowerServiceManager::setupMeterIndices()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     elecFacilityIndex_ = EnergyPlus::GetMeterIndex("Electricity:Facility");
     elecProducedCoGenIndex_ = EnergyPlus::GetMeterIndex("Cogeneration:ElectricityProduced");
     elecProducedPVIndex_ = EnergyPlus::GetMeterIndex("Photovoltaic:ElectricityProduced");
@@ -417,7 +417,7 @@ void ElectricPowerServiceManager::reinitAtBeginEnvironment()
 
 void ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     for (std::size_t loop = 0; loop < elecLoadCenterObjs.size(); ++loop) {
         elecLoadCenterObjs[loop]->setupLoadCenterMeterIndices();
     }
@@ -425,7 +425,7 @@ void ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr()
 
 void ElectricPowerServiceManager::updateWholeBuildingRecords()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // main panel balancing.
     totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
@@ -465,7 +465,7 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords()
 
 void ElectricPowerServiceManager::reportPVandWindCapacity()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // LEED report
     pvTotalCapacity_ = 0.0;
     windTotalCapacity_ = 0.0;
@@ -502,7 +502,7 @@ void ElectricPowerServiceManager::sumUpNumberOfStorageDevices()
 
 void ElectricPowerServiceManager::checkLoadCenters()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // issue #5302, detect if storage used on more than one load center. This is really a kind of GlobalNames issue.
     // expanded to all devices on a load center
@@ -628,7 +628,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(int const objectNum)
       eMSOverridePelIntoStorage_(false),                                        // if true, EMS calling for override
       eMSValuePelIntoStorage_(0.0)                                              // value EMS is directing to use, power into storage [W]
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "ElectPowerLoadCenter constructor ";
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
@@ -1014,7 +1014,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(int const objectNum)
 
 void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     //
     subpanelFeedInRequest = remainingWholePowerDemand;
 
@@ -1056,7 +1056,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
                                               Real64 &remainingWholePowerDemand // power request in, remaining unmet request out
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // This funciton checks generator operation scheme and assigns requests to power generators
     // the generators are called to simulate from here and passed some control data
@@ -1473,7 +1473,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
 void ElectPowerLoadCenter::dispatchStorage(Real64 const originalFeedInRequest // whole building remaining electric demand for this load center
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // 1. resolve generator power rate into storage operation control volume, by buss type
     switch (bussType) {
@@ -1743,7 +1743,7 @@ void ElectPowerLoadCenter::dispatchStorage(Real64 const originalFeedInRequest //
 
 void ElectPowerLoadCenter::setupLoadCenterMeterIndices()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     demandMeterPtr_ = EnergyPlus::GetMeterIndex(demandMeterName_);
     if ((demandMeterPtr_ == 0) && (genOperationScheme_ == GeneratorOpScheme::trackMeter)) { // throw error
         ShowFatalError("ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: " + demandMeterName_ +
@@ -1832,7 +1832,7 @@ std::string const &ElectPowerLoadCenter::generatorListName() const
 void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
 {
 
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     switch (bussType) {
     case ElectricBussType::aCBuss: {
         genElectProdRate = 0.0;
@@ -1939,7 +1939,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
 
 Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (myCoGenSetupFlag_) {
         bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
@@ -1986,7 +1986,7 @@ GeneratorController::GeneratorController(std::string const &objectName,
       cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
       electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "GeneratorController constructor ";
 
     name = objectName;
@@ -2104,7 +2104,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
                                                      Real64 &thermalPowerOutput     // Actual generator thermal power output
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // Select and call models and also collect results for load center power conditioning and reporting
     switch (generatorType) {
     case GeneratorType::ICEngine: {
@@ -2252,7 +2252,7 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
       nomVoltEfficiencyARR_(6, 0.0), curveNum_(0), ratedPower_(0.0), minPower_(0.0), maxPower_(0.0), minEfficiency_(0.0), maxEfficiency_(0.0),
       standbyPower_(0.0)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // initialize
     nomVoltEfficiencyARR_.resize(6, 0.0);
 
@@ -2494,7 +2494,7 @@ void DCtoACInverter::reinitZoneGainsAtBeginEnvironment()
 
 void DCtoACInverter::setPVWattsDCCapacity(const Real64 dcCapacity)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (modelType_ != InverterModelType::pvWatts) {
         ShowFatalError("Setting the DC Capacity for the inverter only works with PVWatts Inverters.");
     }
@@ -2533,7 +2533,7 @@ std::string const &DCtoACInverter::name() const
 
 Real64 DCtoACInverter::getLossRateForOutputPower(Real64 const powerOutOfInverter)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
     // need to invert, find a dCPowerIn that produces the desired AC power out
     // use last efficiency for initial guess
@@ -2556,7 +2556,7 @@ Real64 DCtoACInverter::getLossRateForOutputPower(Real64 const powerOutOfInverter
 
 void DCtoACInverter::calcEfficiency()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     switch (modelType_) {
     case InverterModelType::cECLookUpTableModel: {
         // we don't model voltage, so use nominal voltage
@@ -2638,7 +2638,7 @@ void DCtoACInverter::calcEfficiency()
 
 void DCtoACInverter::simulate(Real64 const powerIntoInverter)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     dCPowerIn_ = powerIntoInverter;
     dCEnergyIn_ = dCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
     // check availability schedule
@@ -2681,7 +2681,7 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
       zoneRadFract_(0.0), // radiative fraction for thermal losses to zone
       standbyPower_(0.0), maxPower_(0.0)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "ACtoDCConverter constructor ";
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
@@ -2856,7 +2856,7 @@ Real64 ACtoDCConverter::aCPowerIn() const
 
 Real64 ACtoDCConverter::getLossRateForInputPower(Real64 const powerIntoConverter)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     aCPowerIn_ = powerIntoConverter;
     calcEfficiency();
     return (1.0 - efficiency_) * aCPowerIn_;
@@ -2869,7 +2869,7 @@ std::string const &ACtoDCConverter::name() const
 
 void ACtoDCConverter::calcEfficiency()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     switch (modelType_) {
     case ConverterModelType::notYetSet:
     case ConverterModelType::simpleConstantEff: {
@@ -2885,7 +2885,7 @@ void ACtoDCConverter::calcEfficiency()
 
 void ACtoDCConverter::simulate(Real64 const powerOutFromConverter)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // need to invert, find an aCPowerIn that produces the desired DC power out
 
     // use last efficiency for initial guess
@@ -2938,7 +2938,7 @@ ElectricStorage::ElectricStorage( // main constructor
       lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0), thermLossRate_(0.0), thermLossEnergy_(0.0),
       storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0), batteryDamage_(0.0)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "ElectricStorage constructor ";
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
@@ -3299,7 +3299,7 @@ void ElectricStorage::reinitAtEndWarmup()
 
 void ElectricStorage::timeCheckAndUpdate()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (myWarmUpFlag_ && !state.dataGlobal->WarmupFlag) {
         reinitAtEndWarmup();
     }
@@ -3365,7 +3365,7 @@ void ElectricStorage::simulate(Real64 &powerCharge,
                                Real64 const controlSOCMaxFracLimit,
                                Real64 const controlSOCMinFracLimit)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // pass thru to constrain function depending on storage model type
     if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) == 0.0) { // storage not available
         discharging = false;
@@ -3476,7 +3476,7 @@ void ElectricStorage::simulateKineticBatteryModel(Real64 &powerCharge,
                                                   Real64 const controlSOCMinFracLimit)
 {
 
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // initialize locals
     Real64 I0 = 0.0;
     Real64 Volt = 0.0;
@@ -3813,7 +3813,7 @@ void ElectricStorage::rainflow(int const numbin,           // numbin = constant 
                                                               Real64 const E0c,
                                                               Real64 const InternalR)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         curI0 = 10.0;         // Initial assumption
         curT0 = qmax / curI0; // Initial Assumption
         Real64 qmaxf = qmax * k * c * curT0 /
@@ -3918,7 +3918,7 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
       noLoadLossEnergy_(0.0), loadLossRate_(0.0), loadLossEnergy_(0.0), thermalLossRate_(0.0), thermalLossEnergy_(0.0),
       elecUseMeteredUtilityLosses_(0.0), powerConversionMeteredLosses_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     std::string const routineName = "ElectricTransformer constructor ";
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
@@ -4144,21 +4144,21 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
 
 Real64 ElectricTransformer::getLossRateForOutputPower(Real64 const powerOutOfTransformer)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     manageTransformers(powerOutOfTransformer);
     return totalLossRate_;
 }
 
 Real64 ElectricTransformer::getLossRateForInputPower(Real64 const powerIntoTransformer)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     manageTransformers(powerIntoTransformer);
     return totalLossRate_;
 }
 
 void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoadCenters)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 const ambTempRef = 20.0; // reference ambient temperature (C)
     if (myOneTimeFlag_) {
         // calculate rated no load losses and rated load losses if the performance input method is based on
@@ -4334,7 +4334,7 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
 
 void ElectricTransformer::setupMeterIndices()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (usageMode_ == TransformerUse::powerInFromGrid) {
         for (std::size_t meterNum = 0; meterNum < wiredMeterNames_.size(); ++meterNum) {
 

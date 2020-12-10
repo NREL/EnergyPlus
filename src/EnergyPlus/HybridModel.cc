@@ -96,7 +96,7 @@ namespace HybridModel {
 
     void GetHybridModelZone()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         using ScheduleManager::GetScheduleIndex;
 
         bool ErrorsFound(false); // If errors detected in input

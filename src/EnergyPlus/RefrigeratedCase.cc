@@ -223,7 +223,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
     void ManageRefrigeratedCaseRacks()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -286,7 +286,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetRefrigerationInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -6109,7 +6109,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupReportInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -8629,7 +8629,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitRefrigeration()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -9003,7 +9003,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitRefrigerationPlantConnections()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -9151,7 +9151,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigRackData::CalcRackSystem()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -9411,7 +9411,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigRackData::ReportRackSystem(int const RackNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Oct/Nov 2004
@@ -9462,7 +9462,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigCaseData::CalculateCase() // Absolute pointer to refrigerated case
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad and Don Shirey, FSEC
@@ -9916,7 +9916,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PlantComponent *RefrigCondenserData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (state.dataRefrigCase->GetRefrigerationInputFlag) {
             CheckRefrigerationInput();
@@ -9945,7 +9945,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        [[maybe_unused]] Real64 &CurLoad,
                                        [[maybe_unused]] bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Randy Hudson, ORNL
         //       DATE WRITTEN   July 2007
@@ -10071,7 +10071,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PlantComponent *RefrigRackData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for boilers if it hasn't been done already
         if (state.dataRefrigCase->GetRefrigerationInputFlag) {
             CheckRefrigerationInput();
@@ -10100,7 +10100,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       [[maybe_unused]] Real64 &CurLoad,
                                       [[maybe_unused]] bool const RunFlag)
         {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Randy Hudson, ORNL
             //       DATE WRITTEN   July 2007
@@ -10266,7 +10266,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimulateDetailedRefrigerationSystems()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, Assisted by Hugh Henderson
@@ -10698,7 +10698,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimulateDetailedTransRefrigSystems()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brian A. Fricke, ORNL
         //       DATE WRITTEN   Fall 2011
@@ -10922,7 +10922,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigSystemData::CalcDetailedSystem(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, Assisted by Hugh Henderson
         //       DATE WRITTEN   Spring 2008
@@ -11000,7 +11000,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TransRefrigSystemData::CalcDetailedTransSystem(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brian A. Fricke, ORNL
         //       DATE WRITTEN   Fall 2011
@@ -11048,7 +11048,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigSystemData::CalculateCondensers(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall and C. R. Hudson, ORNL, Assisted by Hugh Henderson
         //       DATE WRITTEN   Spring 2008
@@ -11449,7 +11449,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TransRefrigSystemData::CalcGasCooler(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brian A. Fricke, ORNL
         //       DATE WRITTEN   Fall 2011
@@ -11623,7 +11623,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigSystemData::CalculateCompressors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, Assisted by Hugh Henderson
         //       DATE WRITTEN   Spring 2008
@@ -11973,7 +11973,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void TransRefrigSystemData::CalculateTransCompressors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brian A. Fricke, ORNL
         //       DATE WRITTEN   Fall 2011
@@ -12379,7 +12379,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void RefrigSystemData::CalculateSubcoolers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, Assisted by Hugh Henderson
         //       DATE WRITTEN   Spring 2008
@@ -12496,7 +12496,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Optional_string_const ThisObjectType,
                                   const Optional_bool_const &SuppressWarning)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
@@ -12547,7 +12547,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportRefrigerationComponents()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   October 2004
@@ -13256,7 +13256,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WalkInData::CalculateWalkIn() // Absolute pointer to  Walk In
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL, May 2009
         //       DATE WRITTEN   Oct/Nov 2004
@@ -13667,7 +13667,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SecondaryLoopData::CalculateSecondary(int const SecondaryNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   Spring 2009
@@ -13933,7 +13933,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SumZoneImpacts()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   Spring 2010
@@ -14013,7 +14013,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckRefrigerationInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sep 2010 - mining function
@@ -14049,7 +14049,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   January 2011
@@ -14125,7 +14125,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AirChillerSetData::CalculateAirChillerSets()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   January 2011
@@ -14175,7 +14175,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 const AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   January 2011
@@ -14254,7 +14254,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WarehouseCoilData::CalculateCoil(Real64 const QZnReq)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
         //       DATE WRITTEN   January 2011
@@ -14678,7 +14678,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureRefrigerationZoneGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2011
@@ -14749,7 +14749,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ZeroHVACValues()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         T. Stovall
         //       DATE WRITTEN   Aug 2012

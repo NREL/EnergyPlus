@@ -572,7 +572,7 @@ namespace PollutionModule {
 
     void SetupPollutionCalculations()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -629,7 +629,7 @@ namespace PollutionModule {
 
     void GetPollutionFactorInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2008
@@ -1652,7 +1652,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupPollutionMeterReporting()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   August 2002
@@ -3642,7 +3642,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckPollutionMeterReporting()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2008
@@ -3672,7 +3672,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound                       // true if errors found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2009
@@ -3724,7 +3724,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcPollution()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   1998
@@ -5640,7 +5640,7 @@ EnergyPlusData & state = getCurrentState(0);
                            int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2008
@@ -5869,7 +5869,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           Real64 &sourceFactorSteam          // if entered, the source factor for Steam
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2008

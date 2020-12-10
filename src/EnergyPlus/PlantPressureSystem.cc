@@ -115,7 +115,7 @@ namespace EnergyPlus::PlantPressureSystem {
                                Optional_int_const BranchNum    // Branch num for specific branch simulation
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -157,7 +157,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitPressureDrop(int const LoopNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -367,7 +367,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const BranchNum    // Branch Index on LoopSide LoopSideNum
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -457,7 +457,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdatePressureDrop(int const LoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -645,7 +645,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DistributePressureOnBranch(int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -826,7 +826,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Real64 const MaxPhi           // - Maximum allowable value of phi, requested by the pump manager from curve mgr
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Kaustubh Phalak
         //       DATE WRITTEN   Feb 2010

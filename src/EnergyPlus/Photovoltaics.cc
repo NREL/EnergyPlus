@@ -142,7 +142,7 @@ namespace Photovoltaics {
                         [[maybe_unused]] Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         David Bradley
         //       DATE WRITTEN   April 2003
@@ -275,7 +275,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetPVInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         David Bradley
         //       DATE WRITTEN   January 2003
@@ -763,7 +763,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetPVZone(int const SurfNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2017
@@ -790,7 +790,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcSimplePV(int const thisPV)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2004
@@ -875,7 +875,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportPV(int const PVnum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2004
@@ -928,7 +928,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool const RunFlag // controls if generator is scheduled *ON*
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith , (derived from Greg Barker's TRNSYS type101 for SANDIA PV model)
         //       DATE WRITTEN   Jan 2004
@@ -1168,7 +1168,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitTRNSYSPV(int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         David Bradley
         //       DATE WRITTEN   April 2003
@@ -1252,7 +1252,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D. Bradley
         //       DATE WRITTEN   April 2003
@@ -1485,7 +1485,7 @@ EnergyPlusData & state = getCurrentState(0);
                Real64 &PP         // power [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1540,7 +1540,7 @@ EnergyPlusData & state = getCurrentState(0);
                 Real64 const XS,
                 Real64 const EPS)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1588,7 +1588,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1689,7 +1689,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1742,7 +1742,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -1794,7 +1794,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         O. Ulleberg, IFE Norway for Hydrogems
         //       DATE WRITTEN   March 2001
@@ -2637,7 +2637,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   January 2004

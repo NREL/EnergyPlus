@@ -154,7 +154,7 @@ namespace InternalHeatGains {
 
     void ManageInternalHeatGains(Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -186,7 +186,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetInternalHeatGainsInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -5133,7 +5133,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitInternalHeatGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -5591,7 +5591,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckReturnAirHeatGain()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
         //       DATE WRITTEN   Jan 2018
@@ -5618,7 +5618,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcZoneITEq()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   October 2014
@@ -6019,7 +6019,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportInternalHeatGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   June 1997
@@ -6263,7 +6263,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetDesignLightingLevelForZone(int const WhichZone) // name of zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2007; January 2008 - moved to InternalGains
@@ -6313,7 +6313,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2007
@@ -6387,7 +6387,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateInternalGainValues(Optional_bool_const SuppressRadiationUpdate, Optional_bool_const SumLatentGains)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2011
@@ -6921,7 +6921,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GatherComponentLoadsIntGain()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2012
@@ -7092,7 +7092,7 @@ EnergyPlusData & state = getCurrentState(0);
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012
@@ -7138,7 +7138,7 @@ EnergyPlusData & state = getCurrentState(0);
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012
@@ -7184,7 +7184,7 @@ EnergyPlusData & state = getCurrentState(0);
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2012

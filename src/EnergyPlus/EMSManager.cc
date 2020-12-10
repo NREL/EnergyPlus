@@ -94,7 +94,7 @@ namespace EMSManager {
 
     void CheckIfAnyEMS()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -215,7 +215,7 @@ namespace EMSManager {
                    Optional_int_const ProgramManagerToRun // specific program manager to run
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -346,7 +346,7 @@ namespace EMSManager {
 
     void InitEMS(EMSCallFrom const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -463,7 +463,7 @@ namespace EMSManager {
 
     void GetEMSInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -971,7 +971,7 @@ namespace EMSManager {
 
     void ProcessEMSInput(bool const reportErrors) // .  If true, then report out errors ,otherwise setup what we can
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   May 2009
@@ -1221,7 +1221,7 @@ namespace EMSManager {
 
     void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1285,7 +1285,7 @@ namespace EMSManager {
 
     void EchoOutActuatorKeyChoices()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2009
@@ -1345,7 +1345,7 @@ namespace EMSManager {
 
     void EchoOutInternalVariableChoices()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2009
@@ -1395,7 +1395,7 @@ namespace EMSManager {
 
     void SetupNodeSetPointsAsActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1521,7 +1521,7 @@ namespace EMSManager {
 
     void UpdateEMSTrendVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1588,7 +1588,7 @@ namespace EMSManager {
     }
 
     bool CheckIfNodeSetPointManaged(int const NodeNum, SPControlType const SetPointType, bool byHandle) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1641,7 +1641,7 @@ namespace EMSManager {
                                          SPControlType const SetPointType,
                                          bool &ErrorFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1699,7 +1699,7 @@ namespace EMSManager {
 
     void checkSetpointNodesAtEnd()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec of EffiBEM
         //       DATE WRITTEN   July 2020
@@ -1763,7 +1763,7 @@ namespace EMSManager {
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool returnValue;
 
         returnValue = false;
@@ -1778,7 +1778,7 @@ namespace EMSManager {
 
     void SetupPrimaryAirSystemAvailMgrAsActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1827,7 +1827,7 @@ namespace EMSManager {
 
     void SetupWindowShadingControlActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1910,7 +1910,7 @@ namespace EMSManager {
 
     void SetupThermostatActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -1993,7 +1993,7 @@ namespace EMSManager {
 
     void SetupSurfaceConvectionActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -2047,7 +2047,7 @@ namespace EMSManager {
 
     void SetupSurfaceConstructionActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
@@ -2107,7 +2107,7 @@ namespace EMSManager {
 
     void SetupSurfaceOutdoorBoundaryConditionActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   May 2013
@@ -2181,7 +2181,7 @@ namespace EMSManager {
 
     void SetupZoneInfoAsInternalDataAvail()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -2230,7 +2230,7 @@ namespace EMSManager {
 
     void SetupZoneOutdoorBoundaryConditionActuators()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X Luo
         //       DATE WRITTEN   July 2017
@@ -2283,7 +2283,7 @@ namespace EMSManager {
 
     void checkForUnusedActuatorsAtEnd()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // call at end of simulation to check if any of the user's actuators were never initialized.
         // Could be a mistake we want to help users catch // Issue #4404.
         for (int actuatorUsedLoop = 1; actuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed; ++actuatorUsedLoop) {
@@ -2310,7 +2310,7 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
                       bool &lEMSActuated,
                       Real64 &rValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   June 2006
@@ -2365,7 +2365,7 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
                       bool &lEMSActuated,
                       int &iValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009
@@ -2420,7 +2420,7 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
                       bool &lEMSActuated,
                       bool &lValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   August 2009
@@ -2470,7 +2470,7 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
 
 void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009
@@ -2529,7 +2529,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
 
 void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   May 2009

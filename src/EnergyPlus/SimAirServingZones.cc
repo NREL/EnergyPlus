@@ -219,7 +219,7 @@ namespace SimAirServingZones {
                         bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
         //       DATE WRITTEN:  Oct 1997
@@ -261,7 +261,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetAirPathData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Fred Buhl
         //       DATE WRITTEN:  Jan 1998
@@ -1421,7 +1421,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitAirLoops(bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   April 1998
@@ -2313,7 +2313,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ConnectReturnNodes()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
         // same airloop)
@@ -2413,7 +2413,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimAirLoops(bool const FirstHVACIteration, bool &SimZoneEquipment)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
         //       DATE WRITTEN:  Oct 1997
@@ -2662,7 +2662,7 @@ EnergyPlusData & state = getCurrentState(0);
                     int &AirLoopIterTot,
                     int &AirLoopNumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Dimitri Curtil (LBNL)
         //       DATE WRITTEN:  March 2006
@@ -2810,7 +2810,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int &IterTot,
                                  int &NumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Dimitri Curtil (LBNL)
         //       DATE WRITTEN:  Feb 2006
@@ -3050,7 +3050,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int ControllerIndex,
                                   bool const HXAssistedWaterCoil)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //       AUTHOR:  Richard Raustad (FSEC)
         //       DATE WRITTEN:  July 2017
@@ -3255,7 +3255,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    int &IterTot,
                                    int &NumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Dimitri Curtil (LBNL)
         //       DATE WRITTEN:  Feb 2006
@@ -3371,7 +3371,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool const FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Dimitri Curtil (LBNL)
         //       DATE WRITTEN:  Feb 2006
@@ -3451,7 +3451,7 @@ EnergyPlusData & state = getCurrentState(0);
                              HVACSystemData *CompPointer    // equipment actual pointer
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
         //       DATE WRITTEN:  Oct 1997
@@ -3673,7 +3673,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const Update      // 1=BeforeBranchSim; 2=AfterBranchSim
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Fred Buhl
         //       DATE WRITTEN:  Nov 1999
@@ -3845,7 +3845,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool &SysReSim    // Set to TRUE if mass balance fails and resimulation is needed
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Fred Buhl
         //       DATE WRITTEN:  Dec 1999
@@ -3979,7 +3979,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeAirLoops()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2001
@@ -4028,7 +4028,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeAirLoopBranches(int const AirLoopNum, int const BranchNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2001
@@ -4145,7 +4145,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetUpSysSizingArrays()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2001
@@ -4740,7 +4740,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeSysOutdoorAir()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         using namespace OutputReportPredefined;
 
         Real64 MinOAFlow;                // design minimum outside air flow for a system
@@ -5199,7 +5199,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSysSizing(DataGlobalConstants::CallIndicator const CallIndicator)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2001
@@ -7175,7 +7175,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   Auguts 2014
@@ -7401,7 +7401,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 GetHeatingSATempForSizing(int const IndexAirLoop // air loop index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl, Rongpeng Zhang
         //       DATE WRITTEN   October 2015
@@ -7484,7 +7484,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 GetHeatingSATempHumRatForSizing(int const IndexAirLoop // air loop index
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl, Rongpeng Zhang
         //       DATE WRITTEN   October 2015
@@ -7581,7 +7581,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckWaterCoilOnPrimaryAirLoopBranch(int const CompTypeNum, std::string const CompName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
         // primary air loop branch. Searches for water coil name and type that match
@@ -7609,7 +7609,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckWaterCoilOnOASystem(int const CompTypeNum, std::string const CompName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
         // outdoor air system. Searches for water coil name and type that match
@@ -7640,7 +7640,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const CompTypeNum, std::string const CompName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil whcih is part of CoilSystem:Cooling:Water:HeatExchangerAssisted
         // and that has water controller is on primary air loop branch or outdoor air system. Searches for water coilsystem
@@ -7709,7 +7709,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 &SystemCoolingEv  // system ventilation efficiency
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   November 2015

@@ -323,7 +323,7 @@ namespace UtilityRoutines {
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000
@@ -363,7 +363,7 @@ EnergyPlusData & state = getCurrentState(0);
                     bool &IsBlank,
                     std::string const &StringToDisplay)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2000
@@ -423,7 +423,7 @@ EnergyPlusData & state = getCurrentState(0);
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // the following was added for unit testing to clear the static strings
         if (colHeader == "RESET" && colValue == "RESET") {
             state.dataUtilityRoutines->appendPerfLog_headerRow = "";
@@ -587,7 +587,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int AbortEnergyPlus()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -746,7 +746,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CloseMiscOpenFiles()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -781,7 +781,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int EndEnergyPlus()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -1017,7 +1017,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1054,7 +1054,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1094,7 +1094,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 2009
@@ -1134,7 +1134,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 2001
@@ -1158,7 +1158,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -1222,7 +1222,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1250,7 +1250,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -1287,7 +1287,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 2009
@@ -1328,7 +1328,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1381,7 +1381,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1434,7 +1434,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1486,7 +1486,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     std::string const &ErrorReportSumUnits   // Units for "sum" reporting
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte
         //       DATE WRITTEN   August 2004
@@ -1558,7 +1558,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1997
@@ -1613,7 +1613,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SummarizeErrors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2003
@@ -1655,7 +1655,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ShowRecurringErrors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2003

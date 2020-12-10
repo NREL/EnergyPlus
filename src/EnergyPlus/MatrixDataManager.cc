@@ -107,7 +107,7 @@ namespace MatrixDataManager {
 
     void GetMatrixInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2010
@@ -192,7 +192,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int MatrixIndex(std::string const &MatrixName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2010

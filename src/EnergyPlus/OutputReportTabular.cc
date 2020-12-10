@@ -534,7 +534,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         GatherMonthlyResultsForTimestepRunOnce = true;
         UpdateTabularReportsGetInput = true;
         GatherHeatGainReportfirstTime = true;
@@ -718,7 +718,7 @@ namespace OutputReportTabular {
 
     std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::ofstream &tbl_stream(*TabularOutputFile(iStyle));
         if (output_to_file) {
             tbl_stream.open(filename);
@@ -734,7 +734,7 @@ namespace OutputReportTabular {
 
     void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2003
@@ -795,7 +795,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2003
@@ -1034,7 +1034,7 @@ namespace OutputReportTabular {
 
     void InitializeTabularMonthly()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2008
@@ -1468,7 +1468,7 @@ namespace OutputReportTabular {
 
     bool isInvalidAggregationOrder()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool foundError = false;
         if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return foundError;
@@ -1521,7 +1521,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularTimeBins()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2003
@@ -1734,7 +1734,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (foundIndex == 0) {
             ShowWarningError(moduleName + ": Specified key not found: " + OutputTableBinned(inObjIndex).keyValue +
                              " for variable: " + OutputTableBinned(inObjIndex).varOrMeter);
@@ -1746,7 +1746,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularStyle()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2003
@@ -1931,7 +1931,7 @@ namespace OutputReportTabular {
 
     void GetInputOutputTableSummaryReports()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   November 2003
@@ -2399,7 +2399,7 @@ namespace OutputReportTabular {
 
     bool isCompLoadRepReq()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   November 2003
@@ -2481,7 +2481,7 @@ namespace OutputReportTabular {
 
     bool hasSizingPeriodsDays()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
         int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
         return ((sizePerDesDays + sizePerWeathFileDays) > 0);
@@ -2489,7 +2489,7 @@ namespace OutputReportTabular {
 
     void InitializePredefinedMonthlyTitles()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2008
@@ -3279,7 +3279,7 @@ namespace OutputReportTabular {
 
     void GetInputFuelAndPollutionFactors()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   January 2004
@@ -3523,7 +3523,7 @@ namespace OutputReportTabular {
 
     void OpenOutputTabularFile()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2003
@@ -3721,7 +3721,7 @@ namespace OutputReportTabular {
 
     void WriteTableOfContents()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   June 2005
@@ -3919,7 +3919,7 @@ namespace OutputReportTabular {
 
     void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
@@ -4049,7 +4049,7 @@ namespace OutputReportTabular {
 
     void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2003
@@ -4540,7 +4540,7 @@ namespace OutputReportTabular {
 
     void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
         //       DATE WRITTEN   September 2011
@@ -4668,7 +4668,7 @@ namespace OutputReportTabular {
 
     void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   January 2009
@@ -4814,7 +4814,7 @@ namespace OutputReportTabular {
 
     void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
         // The routine generates an annual table with the following columns which correspond to
@@ -4853,7 +4853,7 @@ namespace OutputReportTabular {
 
     void CalcHeatEmissionReport()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
         // The routine generates an annual table with the following columns which correspond to
@@ -5060,7 +5060,7 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2011
@@ -5666,7 +5666,7 @@ namespace OutputReportTabular {
 
     void WriteTabularReports()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
@@ -5797,7 +5797,7 @@ namespace OutputReportTabular {
 
     void FillWeatherPredefinedEntries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   Feb 2008
@@ -6374,7 +6374,7 @@ namespace OutputReportTabular {
 
     void FillRemainingPredefinedEntries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   May 2007
@@ -6775,7 +6775,7 @@ namespace OutputReportTabular {
 
     void WriteMonthlyTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
@@ -7160,7 +7160,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
@@ -7411,7 +7411,7 @@ namespace OutputReportTabular {
 
     void WriteBEPSTable()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   November 2003
@@ -9101,7 +9101,7 @@ namespace OutputReportTabular {
 
     void WriteSourceEnergyEndUseSummary()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
         //       DATE WRITTEN   September 2011
@@ -9461,7 +9461,7 @@ namespace OutputReportTabular {
 
     void WriteDemandEndUseSummary()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   January 2009
@@ -9970,7 +9970,7 @@ namespace OutputReportTabular {
 
      void WriteCompCostTable()
      {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -10214,7 +10214,7 @@ namespace OutputReportTabular {
 
     void WriteVeriSumTable()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   June 2006
@@ -11057,7 +11057,7 @@ namespace OutputReportTabular {
                                   std::vector<int> const &columnHead,
                                   Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<Real64> columnMax(columnNum, 0);
         std::vector<Real64> columnMin(columnNum, 0);
         std::vector<Real64> columnSum(columnNum, 0);
@@ -11085,7 +11085,7 @@ namespace OutputReportTabular {
 
     void WriteAdaptiveComfortTable()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
         //       DATE WRITTEN   August 2011
@@ -11182,7 +11182,7 @@ EnergyPlusData & state = getCurrentState(0);
                             std::vector<int> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<Real64> columnMax(columnNum - 1, 0);
         std::vector<Real64> columnMin(columnNum - 1, 0);
         std::vector<Real64> columnSum(columnNum - 1, 0);
@@ -11212,7 +11212,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteThermalResilienceTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneHeatIndexHourBins;
@@ -11291,7 +11291,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteCO2ResilienceTables()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneCO2LevelHourBins;
         using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
@@ -11311,7 +11311,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteVisualResilienceTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneLightingLevelHourBins;
@@ -11345,7 +11345,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteHeatEmissionTable()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Array1D_string columnHead(6);
         Array1D_int columnWidth;
         Array1D_string rowHead;
@@ -11388,7 +11388,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WritePredefinedTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2006
@@ -11609,7 +11609,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteComponentSizing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -11837,7 +11837,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteSurfaceShadowing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -12005,7 +12005,7 @@ EnergyPlusData & state = getCurrentState(0);
     // Glazer - November 2016
     void WriteEioTables()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (displayEioSummary) {
             Array1D_string columnHead;
             Array1D_int columnWidth;
@@ -12115,7 +12115,7 @@ EnergyPlusData & state = getCurrentState(0);
     // Glazer Nov 2016
     int unitsFromHeading(std::string &heading)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string curHeading = "";
         int unitConv = 0;
         if (unitsStyle == unitsStyleInchPound) {
@@ -12144,7 +12144,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AddTOCLoadComponentTableSummaries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2012
@@ -12204,7 +12204,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateLoadComponentArrays()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   April 2012
@@ -12367,7 +12367,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ComputeLoadComponentDecayCurve()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12498,7 +12498,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GatherComponentLoadsSurface()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2012
@@ -12571,7 +12571,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GatherComponentLoadsHVAC()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2012
@@ -12664,7 +12664,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void WriteLoadComponentSummaryTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2012
@@ -13289,7 +13289,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
 
@@ -13418,7 +13418,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Array3D<Real64> const &feneCondInstantSeq,
                                         Array2D<Real64> const &surfDelaySeq)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::Zone;
         using DataSizing::CalcZoneSizing;
         using DataSizing::NumTimeStepsInAvg;
@@ -13613,7 +13613,7 @@ EnergyPlusData & state = getCurrentState(0);
     void CollectPeakZoneConditions(
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataSizing::CalcFinalZoneSizing;
@@ -13798,7 +13798,7 @@ EnergyPlusData & state = getCurrentState(0);
     // gather the areas used in the load component tables
     void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using namespace DataSurfaces;
 
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -14004,7 +14004,7 @@ EnergyPlusData & state = getCurrentState(0);
     // apply unit conversions to the load components summary tables
     void LoadSummaryUnitConversion(CompLoadTablesType &compLoadTotal)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (unitsStyle == unitsStyleInchPound) {
             Real64 powerConversion = getSpecificUnitMultiplier("W", "Btu/h");
             Real64 areaConversion = getSpecificUnitMultiplier("m2", "ft2");
@@ -14060,7 +14060,7 @@ EnergyPlusData & state = getCurrentState(0);
     // make a list of the zones for the airloop component loads report
     void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int counter = 0;
         for (int zi = 1; zi <= state.dataGlobal->NumOfZones; ++zi) {
             if (zoneToAirLoop(zi) == curAirLoop) {
@@ -14076,7 +14076,7 @@ EnergyPlusData & state = getCurrentState(0);
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         CompLoadTablesType curCompLoad;
         bool writeOutput;
         Array1D_string columnHead;
@@ -14538,7 +14538,7 @@ EnergyPlusData & state = getCurrentState(0);
                     Optional_bool_const transposeXML,
                     Optional_string_const footnoteText)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
@@ -14980,7 +14980,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool const isHTML            // True if an HTML string
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -15195,7 +15195,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetermineBuildingFloorArea()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   November 2003
@@ -15286,7 +15286,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetTabularReports()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
@@ -15423,7 +15423,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetHeatGainGathering()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer - October 2015
         // Reset all sensible heat gas summary report gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
@@ -15536,7 +15536,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetRemainingPredefinedEntries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer - October 2015
         // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
         // simulations so that only last year is reported in tabular reports
@@ -16461,7 +16461,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void LookupSItoIP(std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   February 12, 2009
@@ -16750,7 +16750,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 getSpecificUnitMultiplier(std::string const &SIunit, std::string const &IPunit)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   February 13, 2009
@@ -16814,7 +16814,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 getSpecificUnitDivider(std::string const &SIunit, std::string const &IPunit)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   February 13, 2009

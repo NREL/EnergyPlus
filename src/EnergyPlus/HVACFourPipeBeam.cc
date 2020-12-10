@@ -90,7 +90,7 @@ namespace FourPipeBeam {
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     std::shared_ptr<AirTerminalUnit> HVACFourPipeBeam::fourPipeBeamFactory(std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
@@ -499,7 +499,7 @@ namespace FourPipeBeam {
                                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // initialize the unit
         this->init(FirstHVACIteration);
 
@@ -518,7 +518,7 @@ EnergyPlusData & state = getCurrentState(0);
     void HVACFourPipeBeam::init(bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
@@ -716,7 +716,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HVACFourPipeBeam::set_size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // Using
         using namespace DataSizing;
@@ -1003,7 +1003,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 HVACFourPipeBeam::residualSizing(Real64 const airFlow // air flow in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         static std::string const routineName("Real64 HVACFourPipeBeam::residualSizing ");
         Real64 rho;      // local fluid density
         Real64 Residuum; // residual to be minimized to zero
@@ -1063,7 +1063,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using PlantUtilities::SetComponentFlowRate;
@@ -1255,7 +1255,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HVACFourPipeBeam::calc()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
@@ -1390,7 +1390,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 HVACFourPipeBeam::residualCooling(Real64 const cWFlow // cold water flow rate in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 Residuum; // residual to be minimized to zero
         this->mDotHW = 0.0;
         this->mDotCW = cWFlow;
@@ -1405,7 +1405,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 HVACFourPipeBeam::residualHeating(Real64 const hWFlow // hot water flow rate in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 Residuum; // residual to be minimized to zero
         this->mDotHW = hWFlow;
         this->mDotCW = 0.0;
@@ -1420,7 +1420,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     void HVACFourPipeBeam::update() const // update node date elsewhere in EnergyPlus, does not change state of this
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         using PlantUtilities::SafeCopyPlantNode;
 
         // Set the outlet air nodes of the unit; note that all quantities are unchanged from inlet to outlet
@@ -1457,7 +1457,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HVACFourPipeBeam::report() // fill out local output variables for reporting
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 ReportingConstant;
 
         ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1487,7 +1487,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
             this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;

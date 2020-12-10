@@ -86,7 +86,7 @@ namespace BaseboardElectric {
     void SimElectricBaseboard(
         std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -149,7 +149,7 @@ namespace BaseboardElectric {
 
     void GetBaseboardInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -366,7 +366,7 @@ namespace BaseboardElectric {
 
     void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -427,7 +427,7 @@ namespace BaseboardElectric {
 
     void SizeElectricBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -517,7 +517,7 @@ namespace BaseboardElectric {
 
     void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001

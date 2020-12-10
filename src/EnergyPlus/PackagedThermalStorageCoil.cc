@@ -173,7 +173,7 @@ namespace PackagedThermalStorageCoil {
                     Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -243,7 +243,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetTESCoilInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -1766,7 +1766,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitTESCoil(int &TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   <date_written>
@@ -2038,7 +2038,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeTESCoil(int &TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2013
@@ -2324,7 +2324,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESCoilOffMode(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -2406,7 +2406,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESCoilCoolingOnlyMode(int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -2713,7 +2713,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     CalcTESCoilCoolingAndChargeMode(int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3145,7 +3145,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     CalcTESCoilCoolingAndDischargeMode(int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3533,7 +3533,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESCoilChargeOnlyMode(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2013
@@ -3718,7 +3718,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESCoilDischargeOnlyMode(int const TESCoilNum, Real64 const PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4041,7 +4041,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       int &LatPLRFailIndex   // index to Latent PLR Iteration fail warning message
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (based on HVACDXSystem code)
         //       DATE WRITTEN   July 13, 2015
@@ -4231,7 +4231,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4311,7 +4311,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -4389,7 +4389,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateTEStorage(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4431,7 +4431,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESWaterStorageTank(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4567,7 +4567,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcTESIceStorageTank(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4659,7 +4659,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateColdWeatherProtection(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2013
@@ -4705,7 +4705,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   April 2013
@@ -4748,7 +4748,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2013
@@ -4812,7 +4812,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     GetTESCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2013
@@ -4848,7 +4848,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetTESCoilAirInletNode(
         std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4886,7 +4886,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetTESCoilAirOutletNode(
         std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4924,7 +4924,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetTESCoilCoolingCapacity(
         std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -4970,7 +4970,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetTESCoilCoolingAirFlowRate(
         std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   September 2015

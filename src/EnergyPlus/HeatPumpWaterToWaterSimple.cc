@@ -130,7 +130,7 @@ namespace HeatPumpWaterToWaterSimple {
 
     PlantComponent *GshpSpecs::factory(int wwhp_type, std::string eir_wwhp_name)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GshpSpecs::GetWatertoWaterHPInput();
             GetInputFlag = false;
@@ -151,7 +151,7 @@ namespace HeatPumpWaterToWaterSimple {
                              Real64 &CurLoad,
                              [[maybe_unused]] bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
@@ -197,7 +197,7 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
 
@@ -211,7 +211,7 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->LoadLoopNum) {
             if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
                 MinLoad = 0.0;
@@ -238,7 +238,7 @@ namespace HeatPumpWaterToWaterSimple {
 
     void GshpSpecs::GetWatertoWaterHPInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang
@@ -652,7 +652,7 @@ namespace HeatPumpWaterToWaterSimple {
                                        Real64 const MyLoad // Demand Load
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang
         //       DATE WRITTEN   March 2005
@@ -932,7 +932,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpSpecs::sizeCoolingWaterToWaterHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // do sizing related calculations and reporting for cooling heat pumps
         bool errorsFound(false);
@@ -1252,7 +1252,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpSpecs::sizeHeatingWaterToWaterHP()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // do sizing related calculations and reporting for heating heat pumps
         bool errorsFound(false);
@@ -1570,7 +1570,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpSpecs::CalcWatertoWaterHPCooling(Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang
         //       DATE WRITTEN   March 2005
@@ -1751,7 +1751,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GshpSpecs::CalcWatertoWaterHPHeating(Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang
         //       DATE WRITTEN   March 2005

@@ -126,7 +126,7 @@ namespace EcoRoofManager {
                      Real64 &TempExt    // Exterior temperature boundary condition
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor and Toan Pham
         //     DATE WRITTEN    January 2007
@@ -668,7 +668,7 @@ namespace EcoRoofManager {
                          [[maybe_unused]] Real64 const Qsoil // unused1208
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor
         //     DATE WRITTEN    Jan 2007

@@ -173,7 +173,7 @@ namespace Fans {
                                Optional<Real64 const> PressureRise      // Pressure difference to use for DeltaPress
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -268,7 +268,7 @@ namespace Fans {
 
     void GetFanInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -985,7 +985,7 @@ namespace Fans {
                  [[maybe_unused]] bool const FirstHVACIteration // unused1208
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 1998
@@ -1142,7 +1142,7 @@ namespace Fans {
 
     void SizeFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2001
@@ -1512,7 +1512,7 @@ namespace Fans {
 
     void SimSimpleFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Unknown
         //       DATE WRITTEN   Unknown
@@ -1641,7 +1641,7 @@ namespace Fans {
 
     void SimVariableVolumeFan(int const FanNum, Optional<Real64 const> PressureRise)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Unknown
         //       DATE WRITTEN   Unknown
@@ -1852,7 +1852,7 @@ namespace Fans {
 
     void SimOnOffFan(int const FanNum, Optional<Real64 const> SpeedRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Unknown
         //       DATE WRITTEN   Unknown
@@ -2049,7 +2049,7 @@ namespace Fans {
 
     void SimZoneExhaustFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Jan 2000
@@ -2170,7 +2170,7 @@ namespace Fans {
 
     void SimComponentModelFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Craig Wray, LBNL
         //       DATE WRITTEN   Feb 2010
@@ -2458,7 +2458,7 @@ namespace Fans {
 
     void UpdateFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   April 1998
@@ -2526,7 +2526,7 @@ namespace Fans {
 
     void ReportFan(int const FanNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   April 1998
@@ -2578,7 +2578,7 @@ namespace Fans {
 
     void GetFanIndex(std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2004
@@ -2699,7 +2699,7 @@ namespace Fans {
                     Optional_string_const ThisObjectName  // parent object name (for error message)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2005
@@ -2740,7 +2740,7 @@ namespace Fans {
                                       Optional_int_const FanIndex // index to fan
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2786,7 +2786,7 @@ namespace Fans {
                         bool &ErrorsFound           // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2826,7 +2826,7 @@ namespace Fans {
                           bool &ErrorsFound    // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NodeNumber = 0; // returned outlet node of matched fan
 
         // Obtains and Allocates fan related parameters from input file
@@ -2850,7 +2850,7 @@ namespace Fans {
                          bool &ErrorsFound           // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2891,7 +2891,7 @@ namespace Fans {
                           bool &ErrorsFound           // set to true if problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   September 2007
@@ -2932,7 +2932,7 @@ namespace Fans {
                                    Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   September 2009
@@ -2986,7 +2986,7 @@ namespace Fans {
                     Optional<Real64 const> MinAirVolFlow  // Fan air volumetric flow rate    [m3/s]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -3052,7 +3052,7 @@ namespace Fans {
                     [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2014
@@ -3105,7 +3105,7 @@ namespace Fans {
                                         int const FanCurvePtr                // Fan Curve Index
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Apr. 2015
@@ -3178,7 +3178,7 @@ namespace Fans {
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2014
@@ -3237,7 +3237,7 @@ namespace Fans {
                                  Real64 &motInPower,
                                  bool &fanCompModel)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         deltaP = 0.0;
         motEff = 0.0;
         totEff = 0.0;

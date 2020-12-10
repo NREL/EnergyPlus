@@ -65,7 +65,7 @@ namespace EnergyPlus {
 // Xing model factory
 std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int objectType, std::string objectName)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -127,7 +127,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int o
 
 Real64 XingGroundTempsModel::getGroundTemp()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -179,7 +179,7 @@ Real64 XingGroundTempsModel::getGroundTemp()
 
 Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _month)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -212,7 +212,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _mon
 
 Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 _depth, Real64 seconds)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

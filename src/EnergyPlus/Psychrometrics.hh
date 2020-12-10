@@ -532,7 +532,7 @@ namespace Psychrometrics {
                                        [[maybe_unused]] std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. J. Liesen
         //       DATE WRITTEN   July 2000
@@ -609,7 +609,7 @@ namespace Psychrometrics {
                                [[maybe_unused]] std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -655,7 +655,7 @@ namespace Psychrometrics {
                              [[maybe_unused]] bool const SuppressWarnings = false           // if calling function is calculating an intermediate state
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -696,7 +696,7 @@ namespace Psychrometrics {
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2013
@@ -754,7 +754,7 @@ namespace Psychrometrics {
                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
         Int64 const Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
@@ -804,7 +804,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. J. Liesen
         //       DATE WRITTEN   July 2000
@@ -841,7 +841,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  [[maybe_unused]] std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. J. Liesen
         //       DATE WRITTEN   July 2000
@@ -897,7 +897,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Nov 1988
@@ -954,7 +954,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -1015,7 +1015,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -1078,7 +1078,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -1131,7 +1131,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         J. C. VanderZee
         //       DATE WRITTEN   Feb. 1994
@@ -1161,7 +1161,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
         assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
         Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
@@ -1187,7 +1187,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -1224,7 +1224,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976

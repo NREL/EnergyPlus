@@ -104,7 +104,7 @@ namespace GeneratorFuelSupply {
 
     void GetGeneratorFuelSupplyInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   July 2006,
@@ -245,7 +245,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2005,

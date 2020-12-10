@@ -374,7 +374,7 @@ namespace OutputProcessor {
 
     void InitializeOutput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -478,7 +478,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &TimeStep                    // The timestep variable.  Used to get the address
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -507,7 +507,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckReportVariable(std::string const &KeyedValue, std::string const &VarName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -748,7 +748,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     ReportingFrequency determineFrequency(const std::string &FreqString)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -829,7 +829,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetReportVariableInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -1021,7 +1021,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          ReportingFrequency const ReportFreq // Reporting Frequency
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2001
@@ -1106,7 +1106,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       std::string const &CalledFrom       // Routine called from (for error messages)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -1196,7 +1196,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     StoreType validateVariableType(std::string const &VariableTypeKey)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998
@@ -1293,7 +1293,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitializeMeters()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -1334,7 +1334,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetCustomMeterInput(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2006
@@ -1892,7 +1892,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       std::string const &UserInputResourceType, // Passed uppercase
                                       bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2006
@@ -2065,7 +2065,7 @@ EnergyPlusData & state = getCurrentState(0);
                   std::string const &Group               // Group for the meter
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -2179,7 +2179,7 @@ EnergyPlusData & state = getCurrentState(0);
                       bool &ErrorsFound                      // True if errors in this call
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -2301,7 +2301,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Optional_string_const ZoneName         // ZoneName when Group=Building
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -2569,7 +2569,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound                      // true if errors found during subroutine
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -3033,7 +3033,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -3156,7 +3156,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ReportHRMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -3257,7 +3257,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ReportDYMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -3353,7 +3353,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ReportMNMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -3438,7 +3438,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportYRMeters(bool PrintTimeStampToSQL)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
         //       DATE WRITTEN   January 2018
@@ -3518,7 +3518,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ReportSMMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -3613,7 +3613,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportForTabularReports()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2013
@@ -3767,7 +3767,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportMeterDetails()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2006
@@ -3896,7 +3896,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &EndUseName,
                               std::string const &EndUseSubName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2006
@@ -3960,7 +3960,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional_string_const DayType       // The day tied for the data (e.g., Monday)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
@@ -4109,7 +4109,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &yearOfSimChr,     // the year of the simulation
                               bool writeToSQL)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
         if (writeToSQL && sqlite) {
             sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
@@ -4129,7 +4129,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            Optional_string_const customUnitName,
                                            Optional_string_const ScheduleName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   August 2008
@@ -4238,7 +4238,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool const meterFileOnlyFlag              // A flag indicating whether the data is to be written to standard output
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   August 2008
@@ -4340,7 +4340,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  ReportingFrequency const reportType // The report type or interval (e.g., hourly)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   August 2008
@@ -4410,7 +4410,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 const MaxValue,
                              int const maxValueDate)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
@@ -4505,7 +4505,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         bool const meterOnlyFlag      // A flag that indicates if the data should be written to standard output
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
@@ -4550,7 +4550,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool const meterOnlyFlag                    // Indicates whether the data is for the meter file only
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
@@ -4626,7 +4626,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const repValue         // The variable's value
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mark Adams
         //       DATE WRITTEN   May 2016
@@ -4662,7 +4662,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int32_t const repValue        // The variable's value
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mark Adams
         //       DATE WRITTEN   May 2016
@@ -4696,7 +4696,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int64_t const repValue        // The variable's value
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mark Adams
         //       DATE WRITTEN   May 2016
@@ -4729,7 +4729,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     ReportingFrequency const reportType // The report type (i.e., the reporting interval)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   August 2008
@@ -4804,7 +4804,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const maxValueDate                      // The date the maximum value occurred
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
@@ -5383,7 +5383,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_string_const customUnitName       // the custom name for the units from EMS definition of units
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   December 1998
@@ -5622,7 +5622,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey           // Group identifier for SQL output
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   December 1998
@@ -5786,7 +5786,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey           // Group identifier for SQL output
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   February 1999
@@ -5838,7 +5838,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   December 1998
@@ -6581,7 +6581,7 @@ void AssignReportNumber(int &ReportNumber)
 
 void GenOutputVariablesAuditReport()
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2000
@@ -6648,7 +6648,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void UpdateMeterReporting()
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   January 2001
@@ -6883,7 +6883,7 @@ void SetInitialMeterReportingAndOutputNames(int const WhichMeter,              /
                                             bool const CumulativeIndicator // true if this is a Cumulative meter reporting
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2007
@@ -7566,7 +7566,7 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
                                 int const keyVarIndex // Array index
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   December 2000
@@ -7648,7 +7648,7 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
                                                  int const keyVarIndex // Array index
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // FUNCTION INFORMATION:
     //       AUTHOR         Thierry S. Nouidui
     //       DATE WRITTEN   August 2011
@@ -7797,7 +7797,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          int &NumFound                                          // Number Found
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   May 2005
@@ -7877,7 +7877,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D_int &VarIDs                                    // Variable Report Numbers
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   May 2005
@@ -7952,7 +7952,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
                                 OutputProcessor::Unit &varUnits             // Units enumeration
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2003
@@ -8143,7 +8143,7 @@ void GetVariableKeys(std::string const &varName, // Standard variable name
                      Array1D_int &keyVarIndexes  // Array index for
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael J. Witte
     //       DATE WRITTEN   August 2003
@@ -8317,7 +8317,7 @@ bool ReportingThisVariable(std::string const &RepVarName)
 
 void InitPollutionMeterReporting(std::string const &ReportFreqName)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:Richard Liesen
     //       DATE WRITTEN   July 2002
     //       MODIFIED       na
@@ -8534,7 +8534,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void ProduceRDDMDD()
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2009
@@ -8793,7 +8793,7 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
 
 int initErrorFile()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     state.files.err_stream = std::unique_ptr<std::ostream>(new std::ofstream(state.files.outputErrFileName));
     if (state.files.err_stream->bad()) {
         DisplayString("ERROR: Could not open file " + state.files.outputErrFileName + " for output (write).");

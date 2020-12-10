@@ -151,7 +151,7 @@ namespace WaterCoils {
                                      Optional_int_const FanOpMode,
                                      Optional<Real64 const> PartLoadRatio)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -243,7 +243,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWaterCoilInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   April 1998
@@ -846,7 +846,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitWaterCoil(int const CoilNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 1998
@@ -1795,7 +1795,7 @@ EnergyPlusData & state = getCurrentState(0);
     // refactor coilUA adjustment into separate routine, for use with rating calc
     void CalcAdjustedCoilUA(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Pull these precalc routines out of big init routine
         // modify the coil UA based on model in Wetter 1999
         Real64 x_a;                  // result of Eq.70 in Wetter 1999
@@ -1976,7 +1976,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeWaterCoil(int const CoilNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   November 2001
@@ -2703,7 +2703,7 @@ EnergyPlusData & state = getCurrentState(0);
                                int const CalcMode          // 1 = design calc; 2 = simulation calculation
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rich Liesen
         //       DATE WRITTEN
@@ -2866,7 +2866,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR(S)      Russell Taylor / Richard Liesen
         //       DATE WRITTEN   Mar 1997
@@ -3523,7 +3523,7 @@ EnergyPlusData & state = getCurrentState(0);
                      Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   Mar 2004
@@ -3757,7 +3757,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   March 2004
@@ -3851,7 +3851,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 const PartLoadRatio    // part-load ratio of heating coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   Mar 2004
@@ -4004,7 +4004,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const PartLoadRatio     // part-load ratio of heating coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   March 2004
@@ -4245,7 +4245,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 const DesTotalHeatTransfer // Heat transfer rate(W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   March 2004
@@ -4371,7 +4371,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &EnergyOutStreamTwo      // Outlet state of stream2 (C)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   March 2004
@@ -4501,7 +4501,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 &SenWaterCoilLoad     // Sensible heat transfer rate(W)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         // AUTHOR         Rahul Chillar
         // DATE WRITTEN   Mar 2004
@@ -4596,7 +4596,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateWaterCoil(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   1998
@@ -4671,7 +4671,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWaterCoil(int const CoilNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -4780,7 +4780,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
         //       DATE WRITTEN   Unknown
@@ -5129,7 +5129,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
         //       DATE WRITTEN   Unknown
@@ -5248,7 +5248,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   November 2001
@@ -5291,7 +5291,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2011
@@ -5551,7 +5551,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 &Value,
                                 int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
@@ -5603,7 +5603,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2006
@@ -5655,7 +5655,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   March 2007
@@ -5706,7 +5706,7 @@ EnergyPlusData & state = getCurrentState(0);
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   March 2007
@@ -5758,7 +5758,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -5809,7 +5809,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -5861,7 +5861,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2009
@@ -5903,7 +5903,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2009
@@ -5947,7 +5947,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &NodeNotFound         // true if matching water inlet node not found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2009
@@ -5985,7 +5985,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &NodeNotFound       // true if matching air outlet node not found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   March 2013
@@ -6114,7 +6114,7 @@ EnergyPlusData & state = getCurrentState(0);
                       Real64 const PB  // barometric pressure {Pascals}
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 1, 2009
@@ -6189,7 +6189,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2009
@@ -6235,7 +6235,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 EstimateHEXSurfaceArea(int const CoilNum) // coil number, [-]
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket A Nigusse, FSEC
         //       DATE WRITTEN   July 2010
@@ -6310,7 +6310,7 @@ EnergyPlusData & state = getCurrentState(0);
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   Feb 2012
@@ -6355,7 +6355,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad, FSEC
         //       DATE WRITTEN   Sep 2013
@@ -6412,7 +6412,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   February 2010
@@ -6506,7 +6506,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   February 2013
@@ -6559,7 +6559,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   February 2016
@@ -6600,7 +6600,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Real64 &DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
 
         // PURPOSE OF THIS SUBROUTINE:

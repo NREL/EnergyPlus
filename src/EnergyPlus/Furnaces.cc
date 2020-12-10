@@ -289,7 +289,7 @@ namespace Furnaces {
                     int &CompIndex        // Pointer to which furnace
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -794,7 +794,7 @@ namespace Furnaces {
 
     void GetFurnaceInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
@@ -4717,7 +4717,7 @@ namespace Furnaces {
                      bool const FirstHVACIteration // TRUE if first HVAC iteration
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Feb 2001
@@ -5826,7 +5826,7 @@ namespace Furnaces {
                               Real64 const PartLoadRatio              // coil part-load ratio
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -5977,7 +5977,7 @@ namespace Furnaces {
 
     void SizeFurnace(int const FurnaceNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2002
@@ -6362,7 +6362,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Real64 &OnOffAirFlowRatio      // ratio of coil on to coil off air flow rate
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
@@ -6618,7 +6618,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &HXUnitOn             // flag to control HX based on zone moisture load
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
@@ -7942,7 +7942,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 const MoistureLoad      // the control zone latent load (watts)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Feb 2004
@@ -8507,7 +8507,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Optional<Real64 const> CoolingHeatingPLRRat // cooling PLR to heating PLR ratio, used for cycling fan RH control
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Sept 2001
@@ -8929,7 +8929,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Array1D<Real64> const &Par  // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
@@ -9083,7 +9083,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Array1D<Real64> const &Par  // Function parameters
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2006
@@ -9254,7 +9254,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
@@ -9449,7 +9449,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ReportFurnace(int const FurnaceNum,
                        int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
@@ -9517,7 +9517,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &HeatCoilLoadmet         // Heating Load Met
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -9678,7 +9678,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2011
@@ -9763,7 +9763,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &OnOffAirFlowRatio      // ratio of compressor ON airflow to AVERAGE airflow over timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:CalcMSHeatPump
         //       DATE WRITTEN   March, 2012
@@ -10097,7 +10097,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &SupHeaterLoad          // Supplemental heater load [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:ControlMSHPOutput
         //       DATE WRITTEN   March,  2012
@@ -10506,7 +10506,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Real64 &SupHeaterLoad          // supplemental heater load (W)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Bo Shen, based on HVACMultiSpeedHeatPump:CalcMSHeatPump
         //       DATE WRITTEN:    March 2012
@@ -11084,7 +11084,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Array1D<Real64> const &Par // par(1) = FurnaceNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:MSHPCyclingResidual
         //       DATE WRITTEN   March, 2012
@@ -11201,7 +11201,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, , based on HVACMultiSpeedHeatPump:MSHPVarSpeedgResidual
         //       DATE WRITTEN   March, 2012
@@ -11321,7 +11321,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Optional<Real64 const> SpeedRatio // Speed ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:SetAverageAirFlow
         //       DATE WRITTEN   March, 2012
@@ -11556,7 +11556,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Real64 &PartLoadRatio                       // coil part-load ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March 2012
@@ -11673,7 +11673,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
 

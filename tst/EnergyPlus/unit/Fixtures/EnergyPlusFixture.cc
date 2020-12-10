@@ -92,7 +92,7 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 
 void EnergyPlusFixture::SetUp()
 {
-    this->state = &getCurrentState(0);
+    this->state = &getCurrentState();
     EnergyPlus::clearAllStates();
     EnergyPlus::inputProcessor->clear_state();
 

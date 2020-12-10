@@ -182,7 +182,7 @@ namespace HVACDXSystem {
                             Optional<Real64> QTotOut                // the total cooling output of unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Mar 2001
@@ -361,7 +361,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetDXCoolingSystemInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Mar 2001
@@ -747,7 +747,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Optional<Real64 const> OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2001
@@ -986,7 +986,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb. 2001
@@ -2598,7 +2598,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2653,7 +2653,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   January 2008
@@ -2708,7 +2708,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2763,7 +2763,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2002
@@ -2818,7 +2818,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   November 2003
@@ -2876,7 +2876,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -2934,7 +2934,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         M. J. Witte, GARD Analytics, Inc.
         //       DATE WRITTEN   February 2005
@@ -2996,7 +2996,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -3121,7 +3121,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2008
@@ -3185,7 +3185,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3265,7 +3265,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   April 2013
@@ -3349,7 +3349,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    int const ControlMode       // temperature or humidity control mode
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   January 2013
@@ -3402,7 +3402,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckDXCoolingCoilInOASysExists(std::string const &DXCoilSysName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   Feb 2013
@@ -3440,7 +3440,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         std::string &CoolCoilName,
                                         [[maybe_unused]] bool &ErrFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Aug 2013
@@ -3478,7 +3478,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -3548,7 +3548,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -3625,7 +3625,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -3703,7 +3703,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Array1D<Real64> const &Par // par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   Feb, 2013
@@ -3779,7 +3779,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName, bool &InletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
@@ -3809,7 +3809,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName, bool &OutletNodeErrFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019

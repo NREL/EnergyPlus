@@ -106,7 +106,7 @@ namespace WindowComplexManager {
 
     void InitBSDFWindows()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -334,7 +334,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     int const iState // Complex fenestration state number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -373,7 +373,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const iConst // Construction number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -425,7 +425,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckCFSStates(int const iSurf) // Surface number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -470,7 +470,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitComplexWindows()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2012
@@ -490,7 +490,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateComplexWindows()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -529,7 +529,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        int const iState // Window state number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2013
@@ -669,7 +669,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        int const TS                       // Timestep number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -837,7 +837,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcStaticProperties()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   <date_written>
@@ -873,7 +873,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int &NBasis                         // Calculated Basis length
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -897,7 +897,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetermineMaxBackSurfaces()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   September 2011
@@ -926,7 +926,7 @@ EnergyPlusData & state = getCurrentState(0);
     void ConstructBasis(int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN  June 2011
@@ -1132,7 +1132,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const InputType      // Basis type
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2010
@@ -1179,7 +1179,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          [[maybe_unused]] BSDFStateDescr &State // State Description
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         J. Klems
         //       DATE WRITTEN   June 2011
@@ -1574,7 +1574,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     BSDFStateDescr &State        // State Description
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   <date_written>
@@ -2055,7 +2055,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   Aug 2010
@@ -2138,7 +2138,7 @@ EnergyPlusData & state = getCurrentState(0);
                     Real64 &Phi                        // Phi value for ray
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN August 2011
@@ -2257,7 +2257,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &Phi            // Azimuthal angle in W6 Coords
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Joe Klems
         //       DATE WRITTEN   August 2011
@@ -2389,7 +2389,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int const CalcCondition // Calucation condition (summer, winter or no condition)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   October 2009

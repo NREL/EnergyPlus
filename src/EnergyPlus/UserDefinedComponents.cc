@@ -93,7 +93,7 @@ namespace UserDefinedComponents {
 
     PlantComponent *UserPlantComponentStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (state.dataUserDefinedComponents->GetPlantCompInput) {
             GetUserDefinedPlantComponents();
@@ -113,7 +113,7 @@ namespace UserDefinedComponents {
 
     void UserPlantComponentStruct::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool anyEMSRan;
         Real64 myLoad = 0.0;
         int thisLoop = 0;
@@ -174,7 +174,7 @@ namespace UserDefinedComponents {
                                                                       Real64 &CurLoad,
                                                                       [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
@@ -223,7 +223,7 @@ namespace UserDefinedComponents {
                             bool &HeatingActive,
                             bool &CoolingActive)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2012
@@ -317,7 +317,7 @@ EnergyPlusData & state = getCurrentState(0);
                                int &CompIndex                  // index to zone hvac unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   February, 2012
@@ -418,7 +418,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    [[maybe_unused]] int const ZoneNodeNum,
                                    int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2012
@@ -504,7 +504,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUserDefinedPlantComponents()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool ErrorsFound(false);
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -1213,7 +1213,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUserDefinedComponents()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
@@ -2045,7 +2045,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserPlantComponentStruct::initialize(int LoopNum, Real64 MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -2120,7 +2120,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserCoilComponentStruct::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -2189,7 +2189,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserZoneHVACForcedAirComponentStruct::initialize(int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Feb. 2012
@@ -2278,7 +2278,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserAirTerminalComponentStruct::initialize(int const ZoneNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2012
@@ -2364,7 +2364,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserPlantComponentStruct::report(int const LoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2012
@@ -2426,7 +2426,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserCoilComponentStruct::report()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2012
@@ -2476,7 +2476,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserZoneHVACForcedAirComponentStruct::report()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Feb. 2012
@@ -2528,7 +2528,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UserAirTerminalComponentStruct::report()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2012
@@ -2576,7 +2576,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2013
@@ -2607,7 +2607,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015
@@ -2644,7 +2644,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2015

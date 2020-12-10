@@ -71,7 +71,7 @@ namespace EnergyPlus {
 
 void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataSizing::Coincident;
     using DataSizing::NumPltSizInput;
     using DataSizing::PlantSizData;
@@ -93,7 +93,7 @@ void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded()
 
 void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataPlant::PlantLoop;
     using DataPlant::SupplySide;
     using DataPlant::TotNumLoops;
@@ -125,7 +125,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::st
 
 void HVACSizingSimulationManager::SetupSizingAnalyses()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataLoopNode::Node;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
@@ -156,7 +156,7 @@ void HVACSizingSimulationManager::PostProcessLogs()
 
 void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using namespace DataPlant;
     using namespace PlantManager;
     using namespace DataSizing;
@@ -186,7 +186,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
 }
 void HVACSizingSimulationManager::RedoKickOffAndResize()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using namespace WeatherManager;
     using namespace SimulationManager;
     bool ErrorsFound(false);
@@ -214,7 +214,7 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(bool &ErrorsFound)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;

@@ -286,7 +286,7 @@ namespace HVACControllers {
                            bool &BypassOAController,
                            Optional_bool AllowWarmRestartFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   July 1998
@@ -482,7 +482,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetControllerInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   July 1998
@@ -798,7 +798,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2004
@@ -909,7 +909,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitController(int const ControlNum, bool &IsConvergedFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   July 1998
@@ -1310,7 +1310,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeController(int const ControlNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   November 2001
@@ -1396,7 +1396,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &ControllerName // used when errors occur
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   May 2006
@@ -1548,7 +1548,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   std::string const &ControllerName // used when errors occur
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   March 2006
@@ -1801,7 +1801,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckSimpleController(int const ControlNum, bool &IsConvergedFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   Feb 2006
@@ -1943,7 +1943,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckMinActiveController(int const ControlNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   May 2006
@@ -2018,7 +2018,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool CheckMaxActiveController(int const ControlNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   May 2006
@@ -2149,7 +2149,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateController(int const ControlNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -2212,7 +2212,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         {
             auto &thisController(ControllerProps(ControlNum));
             if (IsConvergedFlag) {
@@ -2297,7 +2297,7 @@ EnergyPlusData & state = getCurrentState(0);
     void TrackAirLoopControllers(
         int const AirLoopNum, int const WarmRestartStatus, int const AirLoopIterMax, int const AirLoopIterTot, int const AirLoopNumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   April 2006
@@ -2379,7 +2379,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const AirLoopControlNum // Controller index on this air loop
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   April 2006
@@ -2444,7 +2444,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DumpAirLoopStatistics()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   April 2006
@@ -2645,7 +2645,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupAirLoopControllersTracer(int const AirLoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
@@ -2713,7 +2713,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool const AirLoopConverged,
                                  int const AirLoopNumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2006
@@ -2783,7 +2783,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool const AirLoopConverged,
                              int const AirLoopNumCalls)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   February 2006
@@ -2890,7 +2890,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupIndividualControllerTracer(int const ControlNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   February 2006
@@ -2951,7 +2951,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    int const Operation, // Operation to execute
                                    bool const IsConvergedFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2006
@@ -3118,7 +3118,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string CreateHVACTimeString()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2006
@@ -3164,7 +3164,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string CreateHVACStepFullString()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   April 2006
@@ -3208,7 +3208,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string MakeHVACTimeIntervalString()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2006
@@ -3254,7 +3254,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckControllerListOrder()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Oct 10.
@@ -3354,7 +3354,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  bool &NodeNotFound           // true if matching actuator node not found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Heejin Cho
         //       DATE WRITTEN   November 2010
@@ -3407,7 +3407,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound            // true if matching actuator node not found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2017
@@ -3444,7 +3444,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &NodeNotFound                 // true if matching actuator node not found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   September 2013
@@ -3473,7 +3473,7 @@ EnergyPlusData & state = getCurrentState(0);
     int GetControllerIndex(std::string const &ControllerName // name of coil controller
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2018

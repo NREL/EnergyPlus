@@ -126,7 +126,7 @@ namespace SteamBaseboardRadiator {
                            Real64 &PowerMet,
                            int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -256,7 +256,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSteamBaseboardInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   September 2009
@@ -674,7 +674,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //                      Rick Strand
@@ -847,7 +847,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeSteamBaseboard(int const BaseboardNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -1046,7 +1046,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   September 2009
@@ -1162,7 +1162,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSteamBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //                      Rick Strand
@@ -1205,7 +1205,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateBBSteamRadSourceValAvg(bool &SteamBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1248,7 +1248,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DistributeBBSteamRadGains()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
@@ -1319,7 +1319,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSteamBaseboard(int const BaseboardNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -1414,7 +1414,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   Sept. 2010

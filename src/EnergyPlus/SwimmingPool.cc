@@ -110,7 +110,7 @@ namespace SwimmingPool {
 
     void SimSwimmingPool(bool FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data if it hasn't been done already
         if (state.dataSwimmingPools->getSwimmingPoolInput) {
             GetSwimmingPool();
@@ -148,7 +148,7 @@ namespace SwimmingPool {
 
     void GetSwimmingPool()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -403,7 +403,7 @@ namespace SwimmingPool {
                                                       bool &ErrorsFound
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         static std::string const RoutineName("ErrorCheckSetupPoolSurface: "); // include trailing blank space
         static std::string const CurrentModuleObject("SwimmingPool:Indoor");
 
@@ -451,7 +451,7 @@ EnergyPlusData & state = getCurrentState(0);
     void SwimmingPoolData::initialize(bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -681,7 +681,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SwimmingPoolData::initSwimmingPoolPlantLoopIndex()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
@@ -735,7 +735,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SwimmingPoolData::calculate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -861,7 +861,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 Real64 const HumRat // zone air humidity ratio
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         static std::string const RoutineName("CalcSwimmingPoolEvap");
         Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
 
@@ -881,7 +881,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SwimmingPoolData::update()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -920,7 +920,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 2014
@@ -1044,7 +1044,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSwimmingPool()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014

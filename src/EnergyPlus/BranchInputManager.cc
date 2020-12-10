@@ -95,7 +95,7 @@ namespace BranchInputManager {
 
     void ManageBranchInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Nov 2004
@@ -128,7 +128,7 @@ namespace BranchInputManager {
                        std::string const &LoopType        // Type of Loop Branch list is on
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -187,7 +187,7 @@ namespace BranchInputManager {
 
     int NumBranchesInBranchList(std::string const &BranchListName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 2003
@@ -233,7 +233,7 @@ namespace BranchInputManager {
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -282,7 +282,7 @@ namespace BranchInputManager {
 
     int NumCompsInBranch(std::string const &BranchName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 2003
@@ -317,7 +317,7 @@ namespace BranchInputManager {
 
     int GetAirBranchIndex(std::string const &CompType, std::string const &CompName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   April 2013
@@ -367,7 +367,7 @@ namespace BranchInputManager {
                               bool &ErrFound // Set to true if error found, false otherwise
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   April 2013
@@ -427,7 +427,7 @@ namespace BranchInputManager {
                                bool &ErrorsFound                    // True when Loop Name is already assigned and this not same loop
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -481,7 +481,7 @@ namespace BranchInputManager {
                                          bool &ErrorsFound                     // if no connector list
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   April 2005
@@ -518,7 +518,7 @@ namespace BranchInputManager {
                           Optional_int_const NumInList          // Number of the current connector in the list of connectors
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -589,7 +589,7 @@ namespace BranchInputManager {
                       Optional_int MixerNumber            // Mixer number for this specific splitter
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -726,7 +726,7 @@ namespace BranchInputManager {
                          Optional_int SplitterNumber         // splitter number for this specific splitter
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -855,7 +855,7 @@ namespace BranchInputManager {
 
     std::string GetFirstBranchInletNodeName(std::string const &BranchListName) // Branch List name to search
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -898,7 +898,7 @@ namespace BranchInputManager {
 
     std::string GetLastBranchOutletNodeName(std::string const &BranchListName) // Branch List name to search
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -945,7 +945,7 @@ namespace BranchInputManager {
 
     void GetBranchInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -1061,7 +1061,7 @@ namespace BranchInputManager {
                               Array1D_int &NodeNums,
                               Array1D_bool &lAlphaBlanks)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using
         using CurveManager::GetPressureCurveTypeAndIndex;
 
@@ -1204,7 +1204,7 @@ namespace BranchInputManager {
 
     void GetBranchListInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -1347,7 +1347,7 @@ namespace BranchInputManager {
 
     void GetConnectorListInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -1606,7 +1606,7 @@ namespace BranchInputManager {
 
     void GetSplitterInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopSplitter)
@@ -1834,7 +1834,7 @@ namespace BranchInputManager {
 
     void GetMixerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopMixer)
@@ -2069,7 +2069,7 @@ namespace BranchInputManager {
                                        Real64 &FoundVolFlowRate,
                                        bool &MatchedPlantLoop)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2007
@@ -2131,7 +2131,7 @@ namespace BranchInputManager {
                                            Real64 &FoundVolFlowRate,
                                            bool &MatchedCondLoop)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2190,7 +2190,7 @@ namespace BranchInputManager {
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2243,7 +2243,7 @@ namespace BranchInputManager {
                                                  bool &MatchedLoop                  // true if found
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2307,7 +2307,7 @@ namespace BranchInputManager {
                        Optional_string_const CompName  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2011
@@ -2372,7 +2372,7 @@ namespace BranchInputManager {
 
     void TestBranchIntegrity(bool &ErrFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001

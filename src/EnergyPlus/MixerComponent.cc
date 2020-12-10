@@ -129,7 +129,7 @@ namespace MixerComponent {
 
     void SimAirMixer(std::string const &CompName, int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
@@ -196,7 +196,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetMixerInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -516,7 +516,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateAirMixer(int const MixerNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   March 2000
@@ -621,7 +621,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2015
@@ -650,7 +650,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int getZoneMixerIndexFromInletNode(int const &InNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MixerNum;  // loop counter
         int InNodeCtr; // loop counter

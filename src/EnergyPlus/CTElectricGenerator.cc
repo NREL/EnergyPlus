@@ -99,7 +99,7 @@ namespace CTElectricGenerator {
 
     PlantComponent *CTGeneratorData::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for generators if it hasn't been done already
         if (state.dataCTElectricGenerator->getCTInputFlag) {
             GetCTGeneratorInput();
@@ -124,7 +124,7 @@ namespace CTElectricGenerator {
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -142,7 +142,7 @@ namespace CTElectricGenerator {
 
     void GetCTGeneratorInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 2000
@@ -339,7 +339,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",
@@ -422,7 +422,7 @@ namespace CTElectricGenerator {
                                                Real64 const MyLoad, // Generator demand
                                                bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -644,7 +644,7 @@ namespace CTElectricGenerator {
     void CTGeneratorData::InitCTGenerators(bool const RunFlag, // TRUE when Generator operating
                                            bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher

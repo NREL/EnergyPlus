@@ -122,7 +122,7 @@ namespace SystemAvailabilityManager {
 
     void ManageSystemAvailability()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -288,7 +288,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSysAvailManagerInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -1211,7 +1211,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSysAvailManagerListInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2007
@@ -1317,7 +1317,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool &ErrorsFound                        // true if certain errors are detected here
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2007
@@ -1399,7 +1399,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool &ErrorsFound                        // true if certain errors are detected here
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2007
@@ -1475,7 +1475,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &ErrorsFound        // true if certain errors are detected here
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2011
@@ -1545,7 +1545,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSysAvailManagers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -1689,7 +1689,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Optional_int_const CompNum        // Index of ZoneHVAC:* equipment component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -1826,7 +1826,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -1854,7 +1854,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   August 2008
@@ -1882,7 +1882,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   August 2008
@@ -1913,7 +1913,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Optional_int_const CompNum        // Index of ZoneHVAC equipment component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
@@ -2267,7 +2267,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  [[maybe_unused]] Optional_int_const CompNum        // Index of ZoneHVAC equipment component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR            Xiufeng Pang (XP)
         //       DATE WRITTEN      August 2013
@@ -3369,7 +3369,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DefineOptStartSysAvailManager::SetOptStartFlag(int const AirLoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Set the OptStartFlag true for all zones on the air loop
         auto const &thisAirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum));
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter) {
@@ -3387,7 +3387,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Optional_int_const ZoneEquipType // Type of zone equipment component
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2004
@@ -3488,7 +3488,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int &AvailStatus          // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2004
@@ -3528,7 +3528,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2004
@@ -3553,7 +3553,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2004
@@ -3578,7 +3578,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2004
@@ -3613,7 +3613,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int &AvailStatus       // System status indicator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   February 2004
@@ -3636,7 +3636,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName) // name to validate
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2005
@@ -3670,7 +3670,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ManageHybridVentilation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -3712,7 +3712,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetHybridVentilationInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -4226,7 +4226,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitHybridVentSysAvailMgr()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -4451,7 +4451,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Optional_int_const PriAirSysNum // number of the primary air system affected by this Avail. Manager
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -4877,7 +4877,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool GetHybridVentilationControlStatus(int const ZoneNum) // Index of zone
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2010

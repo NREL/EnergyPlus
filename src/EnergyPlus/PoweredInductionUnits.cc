@@ -175,7 +175,7 @@ namespace PoweredInductionUnits {
                 int &CompIndex                 // PIU Index in PIU names
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2000
@@ -259,7 +259,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetPIUs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -739,7 +739,7 @@ EnergyPlusData & state = getCurrentState(0);
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -959,7 +959,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizePIU(int const PIUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2002
@@ -1458,7 +1458,7 @@ EnergyPlusData & state = getCurrentState(0);
                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -1753,7 +1753,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -2034,7 +2034,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportPIU(int const PIUNum) // number of the current fan coil unit being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2000
@@ -2080,7 +2080,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool PIUnitHasMixer(std::string const &CompName) // component (mixer) name
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2011
@@ -2113,7 +2113,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PIUInducesPlenumAir(int const NodeNum) // induced air node number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2012
@@ -2142,7 +2142,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PowIndUnitData::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;

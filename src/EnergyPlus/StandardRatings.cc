@@ -226,7 +226,7 @@ namespace StandardRatings {
                          Optional_int_const CondLoopNum,
                          Optional<Real64 const> OpenMotorEff)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2012
@@ -488,7 +488,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   February 2012
@@ -580,7 +580,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 const IPLVValueIP        // IPLV value in IP units {Btu/W-h}
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   January 2012
@@ -635,7 +635,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const EIRFTempCurveIndex    // Index for the energy input ratio modifier curve
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR            Chandan Sharma, FSEC
         //       DATE WRITTEN      January 2012
@@ -761,7 +761,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, Chandan Sharma FSEC
         //       DATE WRITTEN   February 2010,
@@ -1140,7 +1140,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   February 2012
@@ -1482,7 +1482,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &IEER                                      // Integareted energy efficiency ratio of single speed DX cooling coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   December 2012
@@ -1644,7 +1644,7 @@ EnergyPlusData & state = getCurrentState(0);
         Array1D<Real64> &TotElectricPowerRated            // total electric power including supply fan
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   October 2014
@@ -1745,7 +1745,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &SEER_Standard                                      // seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   December 2012
@@ -1976,7 +1976,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional_int_const DefrostControl                          // defrost control; 1=timed, 2=on-demand
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse, FSEC
         //       DATE WRITTEN   December 2012
@@ -2368,7 +2368,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const RegionNum             // Region Number for which HSPF is calculated
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, Chandan Sharma
         //       DATE WRITTEN   February 2010
@@ -2489,7 +2489,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   October 2014
@@ -2602,7 +2602,7 @@ EnergyPlusData & state = getCurrentState(0);
                                             int const PLFFPLRCurveIndex    // Index for the EIR vs part-load ratio curve
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D. Shirey/B. Nigusse, FSEC
         //       DATE WRITTEN   May 2010

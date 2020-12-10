@@ -153,7 +153,7 @@ namespace AirflowNetwork {
 
     void Solver::allocate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Aug. 2003
@@ -453,7 +453,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void Solver::airmov()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNETf
@@ -609,7 +609,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void Solver::solvzp(int &ITER)  // number of iterations
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -815,7 +815,7 @@ EnergyPlusData & state = getCurrentState(0);
                         bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -1038,7 +1038,7 @@ EnergyPlusData & state = getCurrentState(0);
                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1297,7 +1297,7 @@ EnergyPlusData & state = getCurrentState(0);
                 int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   Extracted from AIRNET
@@ -1931,7 +1931,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PStack()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -2305,7 +2305,7 @@ EnergyPlusData & state = getCurrentState(0);
                 Real64 &RhoDr     // Air density of dry air on the link level used
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005

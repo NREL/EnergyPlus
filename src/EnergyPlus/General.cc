@@ -1757,7 +1757,7 @@ namespace General {
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 1999
@@ -1824,7 +1824,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -2024,7 +2024,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const Month,
                           bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -2234,7 +2234,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string CreateSysTimeIntervalString()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 2003
@@ -2311,7 +2311,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const &monthNumber // January = 1
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J. Glazer - August 2017
         int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
         int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
@@ -2418,7 +2418,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   August 1976
@@ -2678,7 +2678,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -2831,7 +2831,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetCurrentHVACTime()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   November 2004
@@ -2882,7 +2882,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetPreviousHVACTime()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   November 2004
@@ -2930,7 +2930,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string CreateHVACTimeIntervalString()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil
         //       DATE WRITTEN   January 2005
@@ -3148,7 +3148,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     ScanForReports(std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2009
@@ -3504,7 +3504,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool &errFlag                                   // Error flag set to true if error found here.
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2012

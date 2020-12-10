@@ -96,7 +96,7 @@ namespace SolarReflectionManager {
 
     void InitSolReflRecSurf()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -543,7 +543,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcBeamSolDiffuseReflFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -580,7 +580,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureBeamSolDiffuseReflFactors(int const iHour)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann, derived from original CalcBeamSolDiffuseReflFactors
         //       DATE WRITTEN   September 2003
@@ -786,7 +786,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcBeamSolSpecularReflFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -835,7 +835,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FigureBeamSolSpecularReflFactors(int const iHour)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
@@ -1029,7 +1029,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcSkySolDiffuseReflFactors()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   October 2003

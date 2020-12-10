@@ -143,7 +143,7 @@ namespace UnitVentilator {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -209,7 +209,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUnitVentilatorInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -1188,7 +1188,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const ZoneNum              // number of zone being served
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -1519,7 +1519,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeUnitVentilator(int const UnitVentNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -2459,7 +2459,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -3218,7 +3218,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Optional<Real64 const> PartLoadFrac // Part Load Ratio of coil and fan
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -3526,7 +3526,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const FanOpMode    // unit ventilator fan operating mode
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -3622,7 +3622,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportUnitVentilator(int const UnitVentNum) // Unit index in unit ventilator array
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 2000
@@ -3655,7 +3655,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetUnitVentilatorOutAirNode(int const UnitVentNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3682,7 +3682,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetUnitVentilatorZoneInletAirNode(int const UnitVentNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3709,7 +3709,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetUnitVentilatorMixedAirNode(int const UnitVentNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3736,7 +3736,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetUnitVentilatorReturnAirNode(int const UnitVentNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Dec  2006
@@ -3765,7 +3765,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Array1D<Real64> const &Par  // Function parameters
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC
         //       DATE WRITTEN   October 2013
@@ -3814,7 +3814,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                       Real64 const Toutdoor      // Outdoor Air Temperature
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         Real64 ActualOAMassFlowRate(0.0); // Result or return value
 
         if (Tinlet <= Toutdoor) {
@@ -3857,7 +3857,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 const PartLoadRatio // Part load ratio for unit ventilator
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (QZnReq >= 0.0) { // Heating requested so no cooling coil needed
             mdot = 0.0;
         } else { // Cooling so set first guess at flow rate

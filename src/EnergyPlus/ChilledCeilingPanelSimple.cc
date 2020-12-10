@@ -110,7 +110,7 @@ namespace CoolingPanelSimple {
                          Real64 &PowerMet,
                          int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -208,7 +208,7 @@ namespace CoolingPanelSimple {
 
     void GetCoolingPanelInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -689,7 +689,7 @@ namespace CoolingPanelSimple {
 
     void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -866,7 +866,7 @@ namespace CoolingPanelSimple {
 
     void SizeCoolingPanel(int const CoolingPanelNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2016
@@ -1078,7 +1078,7 @@ namespace CoolingPanelSimple {
 
     bool CoolingPanelParams::SizeCoolingPanelUA()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
@@ -1148,7 +1148,7 @@ namespace CoolingPanelSimple {
 
     void CoolingPanelParams::CalcCoolingPanel(int const CoolingPanelNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1437,7 +1437,7 @@ namespace CoolingPanelSimple {
 
     void CoolingPanelParams::SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 2016
@@ -1472,7 +1472,7 @@ namespace CoolingPanelSimple {
 
     void UpdateCoolingPanel(int const CoolingPanelNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1523,7 +1523,7 @@ namespace CoolingPanelSimple {
 
     void UpdateCoolingPanelSourceValAvg(bool &CoolingPanelSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1568,7 +1568,7 @@ namespace CoolingPanelSimple {
 
     void DistributeCoolingPanelRadGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014

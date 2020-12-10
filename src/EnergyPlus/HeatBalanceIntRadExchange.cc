@@ -142,7 +142,7 @@ namespace HeatBalanceIntRadExchange {
                                  [[maybe_unused]] std::string const &CalledFrom)
 #endif
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2000
@@ -459,7 +459,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateMovableInsulationFlag(bool &MovableInsulationChange, int const SurfNum)
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -490,7 +490,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitInteriorRadExchange()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -817,7 +817,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitSolarViewFactors()
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
 
         // Initializes view factors for diffuse solar distribution between surfaces in an enclosure.
 
@@ -1106,7 +1106,7 @@ EnergyPlusData & state = getCurrentState(0);
                              bool &ErrorsFound                         // True when errors are found in number of fields vs max args
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   September 2005
@@ -1170,7 +1170,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound                        // True when errors are found
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -1290,7 +1290,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   September 2005
@@ -1377,7 +1377,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   July 2000
@@ -1502,7 +1502,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &RowSum                   // RowSum of Fixed
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   July 2000
@@ -1740,7 +1740,7 @@ EnergyPlusData & state = getCurrentState(0);
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   1980
@@ -1957,7 +1957,7 @@ EnergyPlusData & state = getCurrentState(0);
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         double sumAF = 0.0;
         for (int iS = 0; iS < N; iS++) {
             FMRT[iS] = 1.0;
@@ -2020,7 +2020,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound                        // True when errors are found
     )
     {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
         static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
 
         // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure

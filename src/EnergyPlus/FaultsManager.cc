@@ -243,7 +243,7 @@ namespace FaultsManager {
 
     void CheckAndReadFaults()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tianzhen Hong, LBNL
         //       DATE WRITTEN   August 2013
@@ -1887,7 +1887,7 @@ namespace FaultsManager {
 
     Real64 FaultProperties::CalFaultOffsetAct()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jun. 2016
@@ -1921,7 +1921,7 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesFouling::CalFoulingFactor()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Nov. 2016
@@ -1960,7 +1960,7 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang
         //       DATE WRITTEN   Jul. 2016
@@ -1998,7 +1998,7 @@ namespace FaultsManager {
 
     Real64 FaultPropertiesFoulingCoil::FaultFraction()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec, EffiBEM
         //       DATE WRITTEN   Feb. 2020
@@ -2080,7 +2080,7 @@ namespace FaultsManager {
 
     bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rongpeng Zhang

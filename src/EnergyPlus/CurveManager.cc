@@ -136,7 +136,7 @@ namespace CurveManager {
 
     void ResetPerformanceCurveOutput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -167,7 +167,7 @@ namespace CurveManager {
                       Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -223,7 +223,7 @@ namespace CurveManager {
 
     void GetCurveInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
         bool GetInputErrorsFound = false;
 
@@ -237,7 +237,7 @@ namespace CurveManager {
 
     void GetCurveInputData(bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1962,7 +1962,7 @@ namespace CurveManager {
     }
 
     int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -2004,7 +2004,7 @@ namespace CurveManager {
 
     bool TableFile::load(std::string path)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         filePath = path;
         bool fileFound;
         std::string fullPath;
@@ -2049,7 +2049,7 @@ namespace CurveManager {
     }
 
     std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
@@ -2085,7 +2085,7 @@ namespace CurveManager {
 
     void InitCurveReporting()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -2224,7 +2224,7 @@ namespace CurveManager {
                                   Optional<Real64 const> Var4  // 4th independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2345,7 +2345,7 @@ namespace CurveManager {
                                    Optional<Real64 const> Var6  // 6th independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
       // TODO: Generalize for N-dims
       Real64 var = Var1;
       var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
@@ -2466,7 +2466,7 @@ namespace CurveManager {
                         std::string objectName,
                         std::string curveFieldText)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
         if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
@@ -2491,7 +2491,7 @@ namespace CurveManager {
 
     std::string GetCurveName(int const CurveIndex) // index of curve in curve array
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   May 2010
@@ -2514,7 +2514,7 @@ namespace CurveManager {
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2555,7 +2555,7 @@ namespace CurveManager {
                       std::string const &ObjName // parent object of curve
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2587,7 +2587,7 @@ namespace CurveManager {
                               Optional<Real64> Var3Max  // Maximum values of 2nd independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2006
@@ -2612,7 +2612,7 @@ namespace CurveManager {
                                     Optional<Real64 const> CurveMax  // Maximum values of curve output
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -2648,7 +2648,7 @@ namespace CurveManager {
 
     void GetPressureSystemInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2717,7 +2717,7 @@ namespace CurveManager {
                                       DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -2804,7 +2804,7 @@ namespace CurveManager {
                               Real64 const Density,
                               Real64 const Viscosity)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2881,7 +2881,7 @@ namespace CurveManager {
 
     Real64 CalculateMoodyFrictionFactor(Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2957,7 +2957,7 @@ namespace CurveManager {
                                      Optional<Real64 const> Var5          // 5th independent variable
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   May 2017

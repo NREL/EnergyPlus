@@ -216,7 +216,7 @@ namespace HeatRecovery {
                          Optional_int_const CompanionCoilType_Num // cooling coil type of coil
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -340,7 +340,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetHeatRecoveryInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -1229,7 +1229,7 @@ EnergyPlusData & state = getCurrentState(0);
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -1556,7 +1556,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeHeatRecovery(int const ExchNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -1700,7 +1700,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -1918,7 +1918,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Optional<Real64 const> HXPartLoadRatio //
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Don Shirey
         //       DATE WRITTEN   February 2003
@@ -2480,7 +2480,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar, FSEC
         //       DATE WRITTEN   January 2007
@@ -2835,7 +2835,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FrostControl(int const ExNum) // number of the current heat exchanger being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2003
@@ -3121,7 +3121,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateHeatRecovery(int const ExNum) // number of the current heat exchanger being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3278,7 +3278,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &Eps        // heat exchanger effectiveness
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3365,7 +3365,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 const Eps   // heat exchanger effectiveness
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3470,7 +3470,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Real64 const Z    // capacity rate ratio
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -3594,7 +3594,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar, FSEC
         //       DATE WRITTEN   January 2007
@@ -3938,7 +3938,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar, FSEC
         //       DATE WRITTEN   January 2007
@@ -4283,7 +4283,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar, FSEC
         //       DATE WRITTEN   January 2007
@@ -4448,7 +4448,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar, FSEC
         //       DATE WRITTEN   January 2007
@@ -4614,7 +4614,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool const FirstHVACIteration // first HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2007
@@ -4800,7 +4800,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      bool const FirstHVACIteration // first HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   January 2007
@@ -4985,7 +4985,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool const FirstHVACIteration   // first HVAC iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2007
@@ -5085,7 +5085,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5124,7 +5124,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5163,7 +5163,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5202,7 +5202,7 @@ EnergyPlusData & state = getCurrentState(0);
                                bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   February 2007
@@ -5241,7 +5241,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -5281,7 +5281,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &ErrorsFound          // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007
@@ -5323,7 +5323,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Optional<Real64> SecondaryAirVolFlow // HX secondary air flow rate [m3/s]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2007

@@ -204,7 +204,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
     void InitializeRuntimeLanguage()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -341,7 +341,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
     void BeginEnvrnInitializeRuntimeLanguage()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -445,7 +445,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
     void ParseStack(int const StackNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -772,7 +772,7 @@ EnergyPlusData & state = getCurrentState(0);
                        Optional_int_const Argument1, // Erl variable index
                        Optional_int_const Argument2)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -822,7 +822,7 @@ EnergyPlusData & state = getCurrentState(0);
                   std::string const &Error // error message to be added to ErlStack
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -865,7 +865,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     ErlValueType EvaluateStack(int const StackNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1011,7 +1011,7 @@ EnergyPlusData & state = getCurrentState(0);
     void
     WriteTrace(int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1102,7 +1102,7 @@ EnergyPlusData & state = getCurrentState(0);
                          std::string const &Line      // Actual line from string
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1496,7 +1496,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1748,7 +1748,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int NewExpression()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -1782,7 +1782,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -2485,7 +2485,7 @@ EnergyPlusData & state = getCurrentState(0);
     void TodayTomorrowWeather(
         int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
         int iTimeStep = Operand2;
         if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
@@ -2502,7 +2502,7 @@ EnergyPlusData & state = getCurrentState(0);
     void TodayTomorrowWeather(
         int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
         int iTimeStep = Operand2;
         if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
@@ -2522,7 +2522,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int iHour = hour + 1;
         if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
             value = TodayTomorrowWeatherSource(timestep, iHour);
@@ -2533,7 +2533,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int iHour = hour + 1;
         if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
             if (TodayTomorrowWeatherSource(timestep, iHour)) {
@@ -2549,7 +2549,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetRuntimeLanguageUserInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -3562,7 +3562,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportRuntimeLanguage()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -3744,7 +3744,7 @@ EnergyPlusData & state = getCurrentState(0);
     int FindEMSVariable(std::string const &VariableName, // variable name in Erl
                         int const StackNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -3792,7 +3792,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int NewEMSVariable(std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   June 2006
@@ -3827,7 +3827,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupPossibleOperators()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   May 2009
@@ -4260,7 +4260,7 @@ EnergyPlusData & state = getCurrentState(0);
                                          Real64 const value // The real time value of the vairable to be set
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rui Zhang
         //       DATE WRITTEN   February 2010
@@ -4286,7 +4286,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                 bool const setToNull              // Flag, if true, value will be initialized to Null
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   February 2010
@@ -4319,7 +4319,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool isExternalInterfaceErlVariable(int const varNum) // The variable index to be written during run time
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   February 2010

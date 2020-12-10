@@ -172,7 +172,7 @@ namespace PondGroundHeatExchanger {
 
     void GetPondGroundHeatExchanger()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
@@ -361,7 +361,7 @@ namespace PondGroundHeatExchanger {
     void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
@@ -467,7 +467,7 @@ namespace PondGroundHeatExchanger {
 
     void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
@@ -524,7 +524,7 @@ namespace PondGroundHeatExchanger {
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
         //       MODIFIED       na
@@ -637,7 +637,7 @@ namespace PondGroundHeatExchanger {
 
     Real64 PondGroundHeatExchangerData::CalcSolarFlux() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Simon Rees
@@ -704,7 +704,7 @@ namespace PondGroundHeatExchanger {
                                                           Real64 const massFlowRate       // Mass flow rate, in kg/s
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
@@ -840,7 +840,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002

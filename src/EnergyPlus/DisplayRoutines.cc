@@ -62,7 +62,7 @@ namespace EnergyPlus {
 
 void DisplayString(std::string const &String) // String to be displayed
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -102,7 +102,7 @@ void DisplayString(std::string const &String) // String to be displayed
 
 void DisplayString(char const *String) // String to be displayed
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -145,7 +145,7 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
                             std::string const &String // String to be displayed
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -190,7 +190,7 @@ void DisplaySimDaysProgress(int const CurrentSimDay, // Current Simulation Day
                             int const TotalSimDays   // Total number of Simulation Days
 )
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0

@@ -205,7 +205,7 @@ namespace DataSystemVariables {
                                 const std::string contextString           //
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2011
@@ -331,7 +331,7 @@ namespace DataSystemVariables {
     }
 
     void processEnvironmentVariables() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         static std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);

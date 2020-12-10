@@ -314,7 +314,7 @@ namespace Psychrometrics {
                                  std::string const &CalledFrom // routine this function was called from (error messages) !unused1208
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
 
         if (rhoair < 0.0) {
@@ -337,7 +337,7 @@ namespace Psychrometrics {
                                     std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C) == 0) {
@@ -392,7 +392,7 @@ namespace Psychrometrics {
                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie/Amir Roth
         //       DATE WRITTEN   August 2011
@@ -483,7 +483,7 @@ EnergyPlusData & state = getCurrentState(0);
     )
 #endif
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -691,7 +691,7 @@ EnergyPlusData & state = getCurrentState(0);
                             std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (V <= -0.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyVFnTdbWPb) == 0) {
@@ -719,7 +719,7 @@ EnergyPlusData & state = getCurrentState(0);
                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (W < -0.0001) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbH) == 0) {
@@ -753,7 +753,7 @@ EnergyPlusData & state = getCurrentState(0);
     )
 #endif
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -874,7 +874,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (TWB > (TDB + 0.01)) {
             if (ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb) == 0) {
@@ -903,7 +903,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (W < 0.0) {
             if (ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb2) == 0) {
@@ -933,7 +933,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (TDP > TWB + 0.1) {
             if (!state.dataGlobal->WarmupFlag) { // Display error message
                 if (iPsyErrIndex(iPsyTdpFnTdbTwbPb) == 0) {
@@ -967,7 +967,7 @@ EnergyPlusData & state = getCurrentState(0);
     )
 #endif
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976
@@ -1126,7 +1126,7 @@ EnergyPlusData & state = getCurrentState(0);
                               std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhov) == 0) {
@@ -1180,7 +1180,7 @@ EnergyPlusData & state = getCurrentState(0);
                              std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (RHValue > 1.01) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbWPb) == 0) {
@@ -1235,7 +1235,7 @@ EnergyPlusData & state = getCurrentState(0);
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!state.dataGlobal->WarmupFlag) {
             if (iPsyErrIndex(iPsyWFnTdpPb) == 0) {
                 String = format(" Dew-Point= {:.2T} Barometric Pressure= {:.2T}", TDP, PB);
@@ -1262,7 +1262,7 @@ EnergyPlusData & state = getCurrentState(0);
                              std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (W <= -0.0001) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbRhPb) == 0) {
@@ -1295,7 +1295,7 @@ EnergyPlusData & state = getCurrentState(0);
     )
 #endif
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         George Shih
         //       DATE WRITTEN   May 1976

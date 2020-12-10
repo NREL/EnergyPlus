@@ -83,7 +83,7 @@ namespace PVWatts {
         : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0),
           m_outputDCPower(1000.0)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         bool errorsFound(false);
 
         if (name.empty()) {
@@ -211,7 +211,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -370,7 +370,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PVWattsGenerator::calc()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
@@ -455,7 +455,7 @@ EnergyPlusData & state = getCurrentState(0);
     DCPowerOutput
     PVWattsGenerator::powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         const Real64 &gcr = m_groundCoverageRatio;
 
         Real64 poa, tpoa, pvt, dc;
@@ -548,7 +548,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Find the generator, and create a new one if it hasn't been loaded yet.
         int ObjNum = inputProcessor->getObjectItemNum("Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);

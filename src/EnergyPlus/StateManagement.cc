@@ -177,7 +177,7 @@
 
 void EnergyPlus::clearAllStates()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // clear the passed in state
     state.clear_state();
     // then clear any other remaining global state, the number of these here will reduce over time

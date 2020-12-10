@@ -126,7 +126,7 @@ namespace HVACInterfaceManager {
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 1998
@@ -398,7 +398,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
                                   int const CommonPipeType)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 1998
@@ -566,7 +566,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateHalfLoopInletTemp(int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2001
@@ -726,7 +726,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateCommonPipe(int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2001
@@ -886,7 +886,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   November 2006
@@ -1024,7 +1024,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ManageTwoWayCommonPipe(int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2011
@@ -1282,7 +1282,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupCommonPipes()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan. 2010

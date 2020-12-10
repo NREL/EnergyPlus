@@ -82,7 +82,7 @@ namespace OutputReportTabularAnnual {
 
     void GetInputTabularAnnual()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer, August 2015
         // The function assigns the input information for
         // REPORT:TABLE:ANNUAL also known as row per object
@@ -173,7 +173,7 @@ namespace OutputReportTabularAnnual {
     // This method is used after GetInput for REPORT:TABLE:ANNUAL to set up how output variables, meters,
     // input fields, and ems variables are gathered.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int keyCount = 0;
         int typeVar = 0;
         OutputProcessor::StoreType avgSumVar;
@@ -246,7 +246,7 @@ namespace OutputReportTabularAnnual {
 
     void checkAggregationOrderForAnnual()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<AnnualTable>::iterator annualTableIt;
         bool invalidAggregationOrderFound = false;
         if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
@@ -265,7 +265,7 @@ namespace OutputReportTabularAnnual {
     // Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017
     bool AnnualTable::invalidAggregationOrder()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<AnnualFieldSet>::iterator fldStIt;
         bool foundMinOrMax = false;
         bool foundHourAgg = false;
@@ -309,7 +309,7 @@ namespace OutputReportTabularAnnual {
 
     void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // gathering data for each of the AnnualTable objects
@@ -321,7 +321,7 @@ namespace OutputReportTabularAnnual {
 
     void AnnualTable::gatherForTimestep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer, August 2015
         // For each cell of the table, gather the value as indicated by the type of aggregation
 
@@ -608,7 +608,7 @@ namespace OutputReportTabularAnnual {
 
     Real64 AnnualTable::getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 elapsedTime;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             elapsedTime = DataHVACGlobals::TimeStepSys;
@@ -620,7 +620,7 @@ namespace OutputReportTabularAnnual {
 
     Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
@@ -632,7 +632,7 @@ namespace OutputReportTabularAnnual {
 
     void WriteAnnualTables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // invoking the writeTable member function for each of the AnnualTable objects
@@ -644,7 +644,7 @@ namespace OutputReportTabularAnnual {
 
     void AnnualTable::writeTable(int unitsStyle)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Array1D_string columnHead;
         Array1D_int columnWidth;
         Array1D_string rowHead;
@@ -1070,7 +1070,7 @@ namespace OutputReportTabularAnnual {
     // The function converts a string into an enumeration that describes the type of aggregation
     // used in REPORT:TABLE:ANNUAL.
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         AnnualFieldSet::AggregationKind outAggType;
 
         if (UtilityRoutines::SameString(inString, "SumOrAverage")) {
@@ -1179,7 +1179,7 @@ namespace OutputReportTabularAnnual {
 
     void AnnualTable::computeBinColumns()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<AnnualFieldSet>::iterator fldStIt;
         Real64 const veryLarge = 1.0E280;
         Real64 const verySmall = -1.0E280;
@@ -1271,7 +1271,7 @@ namespace OutputReportTabularAnnual {
 
     void AnnualTable::convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 curConversionFactor;
         Real64 curConversionOffset;
         std::string varNameWithUnits;

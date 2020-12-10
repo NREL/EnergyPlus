@@ -81,7 +81,7 @@ namespace HeatBalanceMovableInsulation {
                                       Real64 &AbsExt           // Absorptivity of outer most layer
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   March 1998
@@ -143,7 +143,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   March 1998

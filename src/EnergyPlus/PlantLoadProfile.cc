@@ -103,7 +103,7 @@ namespace PlantLoadProfile {
 
     PlantComponent *PlantProfileData::factory(std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetPlantLoadProfileInputFlag) {
             GetPlantProfileInput();
             GetPlantLoadProfileInputFlag = false;
@@ -130,7 +130,7 @@ namespace PlantLoadProfile {
                                     [[maybe_unused]] Real64 &CurLoad,
                                     [[maybe_unused]] bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -176,7 +176,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PlantProfileData::InitPlantProfile()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -346,7 +346,7 @@ EnergyPlusData & state = getCurrentState(0);
     // Functions
     void GetPlantProfileInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004

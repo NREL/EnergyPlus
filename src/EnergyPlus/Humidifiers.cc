@@ -152,7 +152,7 @@ namespace Humidifiers {
                        int &CompIndex                                  // Pointer to Humidifier Unit
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -234,7 +234,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetHumidifierInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -586,7 +586,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HumidifierData::InitHumidifier() // number of the current humidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -677,7 +677,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HumidifierData::SizeHumidifier() // number of the current humidifier being sized
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, UCF/FSEC,
         //       DATE WRITTEN   March, 2012
@@ -957,7 +957,7 @@ EnergyPlusData & state = getCurrentState(0);
     void HumidifierData::ControlHumidifier(Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -1011,7 +1011,7 @@ EnergyPlusData & state = getCurrentState(0);
     void HumidifierData::CalcElecSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -1121,7 +1121,7 @@ EnergyPlusData & state = getCurrentState(0);
     void HumidifierData::CalcGasSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   February 2015
@@ -1261,7 +1261,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HumidifierData::UpdateReportWaterSystem() // number of the current humidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug. 2006
@@ -1318,7 +1318,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HumidifierData::UpdateHumidifier() // number of the current humidifier being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2000
@@ -1396,7 +1396,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &ErrorsFound
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1435,7 +1435,7 @@ EnergyPlusData & state = getCurrentState(0);
         bool &ErrorsFound
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given humidifier and returns the air outlet node number.
         // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.

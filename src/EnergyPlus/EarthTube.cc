@@ -120,7 +120,7 @@ namespace EarthTube {
 
     void ManageEarthTube()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -148,7 +148,7 @@ namespace EarthTube {
 
     void GetEarthTube(bool &ErrorsFound) // If errors found in input
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -514,7 +514,7 @@ namespace EarthTube {
                                 bool &ErrorsFound            // Found a problem
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int Loop;
         int Loop1;
 
@@ -533,7 +533,7 @@ namespace EarthTube {
 
     void CalcEarthTube()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -665,7 +665,7 @@ namespace EarthTube {
                              int const NZ    // Zone number (index)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -723,7 +723,7 @@ namespace EarthTube {
 
     void ReportEarthTube()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005

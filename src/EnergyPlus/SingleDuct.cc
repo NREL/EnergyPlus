@@ -134,7 +134,7 @@ namespace EnergyPlus::SingleDuct {
     void SimulateSingleDuct(
         std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   January 2000
@@ -229,7 +229,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSysInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   April 1998
@@ -1981,7 +1981,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::InitSys(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   January 2000
@@ -2336,7 +2336,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::SizeSys()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2001
@@ -3139,7 +3139,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::SimVAV(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   January 2000
@@ -3631,7 +3631,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                Real64 &AirLoopOAFrac // outside air based on optional user input
     ) const
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
         //       DATE WRITTEN   Jan 2010
@@ -3694,7 +3694,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::SimCBVAV(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2006
@@ -4063,7 +4063,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::SimVAVVS(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -4477,7 +4477,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::SimConstVol(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   February 2000
@@ -4688,7 +4688,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           Real64 &LoadMet                 // load met by unit (watts)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -4801,7 +4801,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        Array1D<Real64> const &Par      // Par(1) = REAL(SysNum)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -4872,7 +4872,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -4964,7 +4964,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        Array1D<Real64> const &Par      // Par(1) = REAL(SysNum)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -5037,7 +5037,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   July 2004
@@ -5119,7 +5119,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::UpdateSys() const
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   january 2000
@@ -5171,7 +5171,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::ReportSys() // unused1208
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Unknown
         //       DATE WRITTEN   Unknown
@@ -5218,7 +5218,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Optional_int DamperOutletNode // Damper outlet node number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   February 2006
@@ -5257,7 +5257,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   March 2012
@@ -5293,7 +5293,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetATMixers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   March 2012
@@ -5570,7 +5570,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AirTerminalMixerData::InitATMixer(bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Purpose: Initialize the AirTerminalMixers data structure with node data
         if (this->OneTimeInitFlag) {
             {
@@ -5653,7 +5653,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcATMixer(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   March 2012
@@ -5740,7 +5740,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateATMixer(int const SysNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR
         //       DATE WRITTEN   March 2012
@@ -5806,7 +5806,7 @@ EnergyPlusData & state = getCurrentState(0);
                     int const &ZoneEquipOutletNode    // zone equipment outlet node (used with inlet side mixers)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2012
@@ -5864,7 +5864,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Optional<Real64 const> PriAirMassFlowRate // Air terminal mixer primary air mass flow rate [kg/s]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2012
@@ -5897,7 +5897,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     int const &curZoneEqNum       // current zone equipment being simulated
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (inletATMixerIndex == 0) return; // protect this function from bad inputs
         if (controlledZoneNum == 0) return;
         if (curZoneEqNum == 0) return;
@@ -6074,7 +6074,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;

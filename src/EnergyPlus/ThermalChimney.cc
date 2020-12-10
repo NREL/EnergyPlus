@@ -107,7 +107,7 @@ namespace ThermalChimney {
 
     void ManageThermalChimney()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   April 2008
@@ -137,7 +137,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetThermalChimney(bool &ErrorsFound) // If errors found in input
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   April 2008
@@ -569,7 +569,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcThermalChimney()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
@@ -851,7 +851,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportThermalChimney()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   April 2008

@@ -308,7 +308,7 @@ namespace DataTimings {
 
     Real64 epGetTimeUsed(std::string const &ctimingElementstring)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -345,7 +345,7 @@ namespace DataTimings {
 
     Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -386,7 +386,7 @@ namespace DataTimings {
 
     Real64 eptime()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie

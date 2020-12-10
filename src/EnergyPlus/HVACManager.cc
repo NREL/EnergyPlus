@@ -189,7 +189,7 @@ namespace HVACManager {
 
     void ManageHVAC()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHORS:  Russ Taylor, Dan Fisher
         //       DATE WRITTEN:  Jan. 1998
@@ -631,7 +631,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimHVAC()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1997
@@ -1707,7 +1707,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor, Rick Strand
         //       DATE WRITTEN   May 1998
@@ -1866,7 +1866,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetTerminalUnitFlowLimits()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Feb 2010
@@ -1924,7 +1924,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResolveAirLoopFlowLimits()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2003
@@ -2041,7 +2041,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResolveLockoutFlags(bool &SimAir) // TRUE means air loops must be (re)simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2003
@@ -2088,7 +2088,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ResetHVACControl()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2004
@@ -2269,7 +2269,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportAirHeatBalance()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2000
@@ -2802,7 +2802,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetHeatToReturnAirFlag()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2008
@@ -2960,7 +2960,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateZoneInletConvergenceLog()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -3022,7 +3022,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckAirLoopFlowBalance()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Check for unbalanced airloop
         if (!state.dataGlobal->WarmupFlag && AirLoopsSimOnce) {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {

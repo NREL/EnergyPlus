@@ -120,7 +120,7 @@ namespace Pipes {
 
     PlantComponent *LocalPipeData::factory(int objectType, std::string objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for pipes if it hasn't been done already
         if (state.dataPipes->GetPipeInputFlag) {
             GetPipeInput();
@@ -143,7 +143,7 @@ namespace Pipes {
                                  [[maybe_unused]] Real64 &CurLoad,
                                  [[maybe_unused]] bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
@@ -176,7 +176,7 @@ namespace Pipes {
 
     void GetPipeInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998

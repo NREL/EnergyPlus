@@ -121,7 +121,7 @@ namespace TranspiredCollector {
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -211,7 +211,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetTranspiredCollectorInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -691,7 +691,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitTranspiredCollector(int const UTSCNum) // compindex already checked in calling routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -816,7 +816,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcActiveTranspiredCollector(int const UTSCNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -1152,7 +1152,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcPassiveTranspiredCollector(int const UTSCNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -1270,7 +1270,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateTranspiredCollector(int const UTSCNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.T. Griffith
         //       DATE WRITTEN   November 2004
@@ -1340,7 +1340,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 const QSource // source term in Watts
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2004
@@ -1358,7 +1358,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2004
@@ -1411,7 +1411,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -1429,7 +1429,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetAirInletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1465,7 +1465,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetAirOutletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019

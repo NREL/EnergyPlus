@@ -62,7 +62,7 @@ namespace EnergyPlus::PluginManagement {
     PluginTrendVariable::PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable) :
     name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // initialize the deque so it can be queried immediately, even with just zeroes
         for (int i = 1; i <= this->numValues; i++) {
             this->values.push_back(0);
@@ -74,12 +74,12 @@ namespace EnergyPlus::PluginManagement {
 
     void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
     }
 
     void onBeginEnvironment() {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // reset vars and trends -- sensors and actuators are reset by EMS
         for (auto & v : state.dataPluginManager->globalVariableValues) {
             v = 0;
@@ -92,13 +92,13 @@ namespace EnergyPlus::PluginManagement {
 
     int PluginManager::numActiveCallbacks()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return (int)state.dataPluginManager->callbacks.size();
     }
 
     void runAnyRegisteredCallbacks(EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataGlobal->KickOffSimulation) return;
         for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
             cb((void *) &state);
@@ -117,7 +117,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     std::string pythonStringForUsage()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataGlobal->errorCallback) {
             return "Python Version not accessible during API calls";
         }
@@ -134,7 +134,7 @@ namespace EnergyPlus::PluginManagement {
     void PluginManager::setupOutputVariables()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
         int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
@@ -402,7 +402,7 @@ namespace EnergyPlus::PluginManagement {
     PluginManager::PluginManager()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
         std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
@@ -631,7 +631,7 @@ namespace EnergyPlus::PluginManagement {
     void PluginInstance::reportPythonError()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         PyObject *exc_type = nullptr;
         PyObject *exc_value = nullptr;
         PyObject *exc_tb = nullptr;
@@ -705,7 +705,7 @@ namespace EnergyPlus::PluginManagement {
     void PluginInstance::setup()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
@@ -916,7 +916,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     bool PluginInstance::run(EMSManager::EMSCallFrom iCalledFrom) const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // returns true if a plugin actually ran
         PyObject *pFunctionName = nullptr;
         const char * functionName = nullptr;
@@ -1060,7 +1060,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (path.empty()) return;
 
         std::string command = "sys.path.insert(0, \"" + path + "\")";
@@ -1082,7 +1082,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addGlobalVariable(const std::string &name)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         state.dataPluginManager->globalVariableNames.push_back(varNameUC);
         state.dataPluginManager->globalVariableValues.push_back(Real64());
@@ -1097,7 +1097,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     int PluginManager::getGlobalVariableHandle(const std::string &name, bool const suppress_warning)
     { // note zero is a valid handle
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         auto const it = std::find(state.dataPluginManager->globalVariableNames.begin(), state.dataPluginManager->globalVariableNames.end(), varNameUC);
         if (it != state.dataPluginManager->globalVariableNames.end()) {
@@ -1127,7 +1127,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     int PluginManager::getTrendVariableHandle(const std::string &name)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         for (size_t i = 0; i < state.dataPluginManager->trends.size(); i++) {
             auto &thisTrend = state.dataPluginManager->trends[i];
@@ -1147,7 +1147,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return state.dataPluginManager->trends[handle].values[timeIndex];
     }
 #else
@@ -1160,7 +1160,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableAverage(int handle, int count)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 sum = 0;
         for (int i = 0; i < count; i++) {
             sum += state.dataPluginManager->trends[handle].values[i];
@@ -1177,7 +1177,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableMin(int handle, int count)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 minimumValue = 9999999999999;
         for (int i = 0; i < count; i++) {
             if (state.dataPluginManager->trends[handle].values[i] < minimumValue) {
@@ -1196,7 +1196,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableMax(int handle, int count)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 maximumValue = -9999999999999;
         for (int i = 0; i < count; i++) {
             if (state.dataPluginManager->trends[handle].values[i] > maximumValue) {
@@ -1215,7 +1215,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableSum(int handle, int count)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 sum = 0.0;
         for (int i = 0; i < count; i++) {
             sum += state.dataPluginManager->trends[handle].values[i];
@@ -1232,7 +1232,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableDirection(int handle, int count)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         auto &trend = state.dataPluginManager->trends[handle];
         Real64 timeSum = 0.0;
         Real64 valueSum = 0.0;
@@ -1258,7 +1258,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     size_t PluginManager::getTrendVariableHistorySize(int handle)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         return state.dataPluginManager->trends[handle].values.size();
     }
 #else
@@ -1271,7 +1271,7 @@ namespace EnergyPlus::PluginManagement {
     void PluginManager::updatePluginValues()
     {
 #if LINK_WITH_PYTHON == 1
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &trend : state.dataPluginManager->trends) {
             Real64 newVarValue = PluginManager::getGlobalVariableValue(trend.indexOfPluginVariable);
             trend.values.push_front(newVarValue);
@@ -1283,7 +1283,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getGlobalVariableValue(int handle)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataPluginManager->globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
         }
@@ -1306,7 +1306,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::setGlobalVariableValue(int handle, Real64 value)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataPluginManager->globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables "
                                        "object to declare them.");
@@ -1328,7 +1328,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
             auto const thisPlugin = state.dataPluginManager->plugins[handle];
             if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
@@ -1347,7 +1347,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::runSingleUserDefinedPlugin(int index)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataPluginManager->plugins[index].run(EMSManager::EMSCallFrom::UserDefinedComponentModel);
     }
 #else
@@ -1359,7 +1359,7 @@ namespace EnergyPlus::PluginManagement {
 #if LINK_WITH_PYTHON == 1
     bool PluginManager::anyUnexpectedPluginObjects()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         static std::vector<std::string> objectsToFind = {"PythonPlugin:OutputVariable",
                                                          "PythonPlugin:SearchPaths",
                                                          "PythonPlugin:Instance",

@@ -135,7 +135,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     PlantComponent *HeatExchangerStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data for heat exchangers if it hasn't been done already
         if (GetInput) {
             GetFluidHeatExchangerInput();
@@ -177,7 +177,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                        Real64 &CurLoad,
                                        [[maybe_unused]] bool const RunFlag)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012
@@ -204,7 +204,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetFluidHeatExchangerInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012
@@ -540,7 +540,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, "System", "Average", this->Name);
 
         SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Energy",
@@ -604,7 +604,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -825,7 +825,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::size()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   December 2012
@@ -1031,7 +1031,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::control([[maybe_unused]] int const LoopNum, Real64 const MyLoad, bool FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012
@@ -1858,7 +1858,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::calculate(Real64 const SupSideMdot, Real64 const DmdSideMdot)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith, derived from CalcEconHeatExchanger by Sankaranarayanan K P aug. 2007
         //       DATE WRITTEN   November 2012
@@ -2084,7 +2084,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void HeatExchangerStruct::findDemandSideLoopFlow(Real64 const TargetSupplySideLoopLeavingTemp, int const HXActionMode)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012
@@ -2267,7 +2267,7 @@ EnergyPlusData & state = getCurrentState(0);
                                                        Array1D<Real64> const &Par // Par(1) = HX index number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   December 2012

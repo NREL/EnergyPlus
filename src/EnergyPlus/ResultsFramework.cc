@@ -756,7 +756,7 @@ namespace ResultsFramework {
 
     void CSVWriter::parseTSOutputs(json const & data, std::vector<std::string> const & outputVariables, OutputProcessor::ReportingFrequency reportingFrequency)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
         std::vector<int> indices;
@@ -823,7 +823,7 @@ namespace ResultsFramework {
     }
 
     std::string & CSVWriter::convertToMonth(std::string & datetime) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
                                                                 {"02", "February"},
@@ -853,7 +853,7 @@ namespace ResultsFramework {
 
     void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         outputFile.ensure_open("OpenOutputFiles", outputControl);
 
         print(outputFile, "{}", "Date/Time,");
@@ -889,7 +889,7 @@ namespace ResultsFramework {
 
     void ResultsFramework::setupOutputOptions()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.files.outputControl.csv) {
             tsEnabled = true;
             tsAndTabularEnabled = true;
@@ -1260,7 +1260,7 @@ namespace ResultsFramework {
 
     void ResultsFramework::writeOutputs()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.files.outputControl.csv) {
             writeCSVOutput();
         }
@@ -1276,7 +1276,7 @@ namespace ResultsFramework {
 
     void ResultsFramework::writeCSVOutput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!hasOutputData()) {
             return;
         }

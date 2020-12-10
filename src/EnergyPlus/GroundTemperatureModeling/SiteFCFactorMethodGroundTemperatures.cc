@@ -67,7 +67,7 @@ namespace EnergyPlus {
 std::shared_ptr<SiteFCFactorMethodGroundTemps>
 SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(int objectType, std::string objectName)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -167,7 +167,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTemp()
 
 Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
@@ -198,7 +198,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds([[maybe_unuse
 
 Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths([[maybe_unused]] Real64 const _depth, int const _month)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015

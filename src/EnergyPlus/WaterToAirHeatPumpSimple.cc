@@ -146,7 +146,7 @@ namespace WaterToAirHeatPumpSimple {
                                Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Arun Shenoy
         //       DATE WRITTEN   Nov 2003
         //       MODIFIED       na
@@ -249,7 +249,7 @@ namespace WaterToAirHeatPumpSimple {
 
     void GetSimpleWatertoAirHPInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Arun Shenoy
@@ -755,7 +755,7 @@ namespace WaterToAirHeatPumpSimple {
                                 bool const FirstHVACIteration                    // Iteration flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Arun Shenoy
         //       DATE WRITTEN   Nov 2003
@@ -1059,7 +1059,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeHVACWaterToAir(int const HPNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -2031,7 +2031,7 @@ EnergyPlusData & state = getCurrentState(0);
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Arun Shenoy
         //       DATE WRITTEN   Jan 2004
         //       MODIFIED       na
@@ -2391,7 +2391,7 @@ EnergyPlusData & state = getCurrentState(0);
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         //       AUTHOR         Arun Shenoy
         //       DATE WRITTEN   Jan 2004
         //       MODIFIED       na
@@ -2617,7 +2617,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateSimpleWatertoAirHP(int const HPNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Arun Shenoy
         //       DATE WRITTEN   Jan 2004
@@ -2758,7 +2758,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   September 2003
@@ -2899,7 +2899,7 @@ EnergyPlusData & state = getCurrentState(0);
                      bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   August 2007
@@ -2939,7 +2939,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -2995,7 +2995,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   October 2011
@@ -3043,7 +3043,7 @@ EnergyPlusData & state = getCurrentState(0);
                          bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
@@ -3090,7 +3090,7 @@ EnergyPlusData & state = getCurrentState(0);
                           bool &ErrorsFound            // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   July 2007
@@ -3139,7 +3139,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2009

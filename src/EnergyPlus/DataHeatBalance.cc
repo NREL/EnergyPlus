@@ -1114,7 +1114,7 @@ namespace DataHeatBalance {
 
     void ZoneData::SetOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -1145,7 +1145,7 @@ namespace DataHeatBalance {
 
     void ZoneData::SetWindSpeedAt(Real64 const fac)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2013
@@ -1177,7 +1177,7 @@ namespace DataHeatBalance {
 
     void SetZoneOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &zone : Zone) {
             zone.SetOutBulbTempAt();
         }
@@ -1185,7 +1185,7 @@ namespace DataHeatBalance {
 
     void CheckZoneOutBulbTempAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
@@ -1198,7 +1198,7 @@ namespace DataHeatBalance {
 
     void SetZoneWindSpeedAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &zone : Zone) {
             zone.SetWindSpeedAt(fac);
@@ -1207,7 +1207,7 @@ namespace DataHeatBalance {
 
     void SetZoneWindDirAt()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Using/Aliasing
         Real64 const fac(state.dataEnvrn->WindDir);
         for (auto &zone : Zone) {
@@ -1219,7 +1219,7 @@ namespace DataHeatBalance {
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1641,7 +1641,7 @@ namespace DataHeatBalance {
     int AssignReverseConstructionNumber(int const ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2006
@@ -1752,7 +1752,7 @@ namespace DataHeatBalance {
                               bool &errFlag            // error flag should one be needed
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2009
@@ -1868,7 +1868,7 @@ namespace DataHeatBalance {
                                  Optional_int_const ScreenNumber // Optional screen number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006
@@ -2353,7 +2353,7 @@ namespace DataHeatBalance {
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // PURPOSE OF THIS SUBROUTINE:
         // check fenestrations with shading control and set a flag to true if its construction has

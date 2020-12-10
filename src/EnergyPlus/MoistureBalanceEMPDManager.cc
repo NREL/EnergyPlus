@@ -139,7 +139,7 @@ namespace MoistureBalanceEMPDManager {
                                Material::MaterialProperties const &mat // material
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // Assume T, RH, P
         Real64 const T = 24.0; // C
         Real64 const RH = 0.45;
@@ -166,7 +166,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetMoistureBalanceEMPDInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Muthusamy V. Swami and Lixing Gu
         //       DATE WRITTEN   August 2000
@@ -343,7 +343,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitMoistureBalanceEMPD()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   Authors:        Muthusamy Swami and Lixing Gu
         //   Date written:   August, 1999
@@ -437,7 +437,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Real64 &TempSat          // Saturated surface temperature.
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //   Authors:        Muthusamy Swami and Lixing Gu
         //   Date written:   August, 1999
@@ -738,7 +738,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportMoistureBalanceEMPD()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   August 2005

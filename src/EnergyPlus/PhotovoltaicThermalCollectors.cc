@@ -122,7 +122,7 @@ namespace PhotovoltaicThermalCollectors {
 
     PlantComponent *PVTCollectorStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GetPVTcollectorsInput();
             GetInputFlag = false;
@@ -160,7 +160,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2008
@@ -404,7 +404,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PVTCollectorStruct::setupReportVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
@@ -445,7 +445,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PVTCollectorStruct::initialize(bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2008
@@ -617,7 +617,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PVTCollectorStruct::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -849,7 +849,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void PVTCollectorStruct::calculate()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
@@ -1093,7 +1093,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1125,7 +1125,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -1158,7 +1158,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int getPVTindexFromName(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (GetInputFlag) {
             GetPVTcollectorsInput();
             GetInputFlag = false;
@@ -1178,7 +1178,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void simPVTfromOASys(int const index, bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);

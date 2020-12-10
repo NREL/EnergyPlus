@@ -55,7 +55,7 @@ namespace EnergyPlus {
 
 Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 

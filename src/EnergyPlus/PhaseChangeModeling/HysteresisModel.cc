@@ -65,7 +65,7 @@ namespace HysteresisPhaseChange {
 
     HysteresisPhaseChange *HysteresisPhaseChange::factory(const std::string &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (getHysteresisModels) {
             readAllHysteresisModels();
             getHysteresisModels = false;
@@ -321,7 +321,7 @@ namespace HysteresisPhaseChange {
 
     void readAllHysteresisModels()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // convenience variables
         DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";

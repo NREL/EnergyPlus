@@ -299,7 +299,7 @@ namespace MixedAir {
 
     Real64 OAGetFlowRate(int OAPtr)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 FlowRate(0);
         if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (state.dataEnvrn->StdRhoAir != 0)) {
             FlowRate = OAController(OAPtr).OAMassFlow / state.dataEnvrn->StdRhoAir;
@@ -322,7 +322,7 @@ namespace MixedAir {
     }
     void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if ((OAPtr > 0) && (OAPtr <= NumOAControllers)) {
             OAController(OAPtr).DemandLimitFlowRate = aFlow * state.dataEnvrn->StdRhoAir;
         }
@@ -373,7 +373,7 @@ namespace MixedAir {
     void
     ManageOutsideAirSystem(std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -403,7 +403,7 @@ namespace MixedAir {
 
     void SimOASysComponents(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int CompNum;
         static std::string CompType; // Tuned Made static
         static std::string CompName; // Tuned Made static
@@ -470,7 +470,7 @@ namespace MixedAir {
 
     void SimOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -561,7 +561,7 @@ namespace MixedAir {
                         bool &OAHX            // TRUE indicates a heat exchanger has been found
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION
         //             AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
         //       DATE WRITTEN:  Oct 1997
@@ -873,7 +873,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimOAMixer(std::string const &CompName, bool const FirstHVACIteration, int &CompIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -912,7 +912,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SimOAController(std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -955,7 +955,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOutsideAirSysInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -1323,7 +1323,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOAControllerInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -2059,7 +2059,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateOAControllers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
 
@@ -2075,7 +2075,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOAMixerInputs()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -2207,7 +2207,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    bool &ErrorsFound                     // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -2562,7 +2562,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitOutsideAirSys(int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -2614,7 +2614,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -3415,7 +3415,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -3487,7 +3487,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OAControllerProps::CalcOAController(int const AirLoopNum, bool const FirstHVACIteration)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -3813,7 +3813,7 @@ EnergyPlusData & state = getCurrentState(0);
         Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -4393,7 +4393,7 @@ EnergyPlusData & state = getCurrentState(0);
                                              bool &HighHumidityOperationFlag,
                                              bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         using DataLoopNode::Node;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using General::SolveRoot;
@@ -4835,7 +4835,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OAControllerProps::SizeOAController()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   September 2001
@@ -4987,7 +4987,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OAControllerProps::UpdateOAController()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -5056,7 +5056,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateOAMixer(int const OAMixerNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Oct 1998
@@ -5220,7 +5220,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         Array1D<Real64> const &Par // par(1) = mixed node number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   Nov, 2016
@@ -5298,7 +5298,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       bool &ErrorsFound               // set to true if problem
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2006
@@ -5341,7 +5341,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetNumOAMixers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5390,7 +5390,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetNumOAControllers()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5439,7 +5439,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOAMixerReliefNodeNumber(int const OAMixerNum) // Which Mixer
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5492,7 +5492,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASysControllerListIndex(int const OASysNumber) // OA Sys Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2007
@@ -5541,7 +5541,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASysNumSimpControllers(int const OASysNumber) // OA Sys Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2007
@@ -5590,7 +5590,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASysNumHeatingCoils(int const OASysNumber) // OA Sys Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2007
@@ -5665,7 +5665,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASysNumHXs(int const OASysNumber)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl, Rongpeng Zhang
         //       DATE WRITTEN   Oct. 2015
@@ -5723,7 +5723,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASysNumCoolingCoils(int const OASysNumber) // OA Sys Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2007
@@ -5798,7 +5798,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOASystemNumber(std::string const &OASysName) // OA Sys Name
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5824,7 +5824,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int FindOAMixerMatchForOASystem(int const OASysNumber) // Which OA System
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5861,7 +5861,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOAMixerIndex(std::string const &OAMixerName) // Which Mixer
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2010
@@ -5891,7 +5891,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOAMixerInletNodeNumber(int const OAMixerNumber) // Which Mixer
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -5944,7 +5944,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOAMixerReturnNodeNumber(int const OAMixerNumber) // Which Mixer
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   December 2006
@@ -5997,7 +5997,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOAMixerMixedNodeNumber(int const OAMixerNumber) // Which Mixer
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   December 2006
@@ -6052,7 +6052,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2009
@@ -6092,7 +6092,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckControllerLists(bool &ErrFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2009
@@ -6173,7 +6173,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckOAControllerName(std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -6198,7 +6198,7 @@ EnergyPlusData & state = getCurrentState(0);
                                            bool &EconomizerOperationFlag // logical used to show economizer status
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Amit bhansali
         //       DATE WRITTEN   August 2008?
@@ -6262,7 +6262,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetNumOASystems()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2010
@@ -6311,7 +6311,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetOACompListNumber(int const OASysNum) // OA Sys Number
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Heejin Cho
         //       DATE WRITTEN   November 2010
@@ -6339,7 +6339,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int const InListNum // In-list Number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Heejin Cho
         //       DATE WRITTEN   November 2010
@@ -6388,7 +6388,7 @@ EnergyPlusData & state = getCurrentState(0);
                               int const InListNum // In-list Number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Heejin Cho
         //       DATE WRITTEN   November 2010
@@ -6437,7 +6437,7 @@ EnergyPlusData & state = getCurrentState(0);
                          int const InListNum // In-list Number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Heejin Cho
         //       DATE WRITTEN   November 2010
@@ -6485,7 +6485,7 @@ EnergyPlusData & state = getCurrentState(0);
     int GetOAMixerNumber(std::string const &OAMixerName // must match OA mixer names for the OA mixer type
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb. 2018

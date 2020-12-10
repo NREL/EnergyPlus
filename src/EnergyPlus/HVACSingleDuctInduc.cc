@@ -166,7 +166,7 @@ namespace HVACSingleDuctInduc {
                     int &CompIndex                 // which terminal unit in data structure
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 18 2004
@@ -248,7 +248,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetIndUnits()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 15 2004
@@ -482,7 +482,7 @@ EnergyPlusData & state = getCurrentState(0);
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 21 2004
@@ -726,7 +726,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeIndUnit(int const IUNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 22 2004
@@ -1058,7 +1058,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 23 2004
@@ -1310,7 +1310,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 &LoadMet                // load met by unit (watts)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1412,7 +1412,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1470,7 +1470,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
@@ -1528,7 +1528,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool FourPipeInductionUnitHasMixer(std::string const &CompName) // component (mixer) name
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2011
@@ -1561,7 +1561,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void IndUnitData::ReportIndUnit()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Purpose: this subroutine for reporting
 
         // set zone OA volume flow rate
@@ -1570,7 +1570,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void IndUnitData::CalcOutdoorAirVolumeFlowRate()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;

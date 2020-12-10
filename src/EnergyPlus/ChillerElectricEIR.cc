@@ -116,7 +116,7 @@ namespace ChillerElectricEIR {
 
     PlantComponent *ElectricEIRChillerSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data if it hasn't been done already
         if (state.dataChillerElectricEIR->getInputFlag) {
             GetElectricEIRChillerInput();
@@ -136,7 +136,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2004
@@ -182,7 +182,7 @@ namespace ChillerElectricEIR {
     void ElectricEIRChillerSpecs::getDesignCapacities(
         const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;
             MaxLoad = this->RefCap * this->MaxPartLoadRat;
@@ -207,7 +207,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
@@ -220,7 +220,7 @@ namespace ChillerElectricEIR {
 
     void GetElectricEIRChillerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
         //       DATE WRITTEN:    June 2004
@@ -733,7 +733,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Chiller Part Load Ratio", OutputProcessor::Unit::None, this->ChillerPartLoadRatio, "System", "Average", this->Name);
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
@@ -903,7 +903,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2004
@@ -1191,7 +1191,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2004
@@ -1503,7 +1503,7 @@ namespace ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   July 2004
@@ -2142,7 +2142,7 @@ namespace ChillerElectricEIR {
                                                    Real64 &QHeatRec            // Amount of heat recovered [W]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Liesen
         //       DATE WRITTEN:    January 2004

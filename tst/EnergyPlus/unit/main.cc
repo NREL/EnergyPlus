@@ -64,5 +64,7 @@ int main(int argc, char **argv)
     ::testing::GTEST_FLAG(shuffle) = true;
 #endif
     ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int retVal = RUN_ALL_TESTS();
+    EnergyPlus::deleteCurrentState();
+    return retVal;
 }

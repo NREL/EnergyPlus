@@ -173,7 +173,7 @@ namespace EnergyPlus {
                               bool &SimElecCircuits                       // True when electic circuits need to be (re)simulated
         )
         {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
             //       DATE WRITTEN   Apr 2005
@@ -288,7 +288,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void GetPlantLoopData() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
             //       DATE WRITTEN   April 2005
@@ -706,7 +706,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void GetPlantInput() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
             //       DATE WRITTEN   April 2005
@@ -1826,7 +1826,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void SetupReports() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Rick Strand
             //       DATE WRITTEN   July 2001
@@ -2033,7 +2033,7 @@ EnergyPlusData & state = getCurrentState(0);
 
         void InitializeLoops(bool const FirstHVACIteration) // true if first iteration of the simulation
         {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
             //       DATE WRITTEN   May 2005
@@ -2350,7 +2350,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void ReInitPlantLoopsAtFirstHVACIteration() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Sept 2010
@@ -2708,7 +2708,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void CheckPlantOnAbort() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Septemeber 2006
@@ -2911,7 +2911,7 @@ EnergyPlusData & state = getCurrentState(0);
 
         void SizePlantLoop(int const LoopNum, // Supply side loop being simulated
                            bool const OkayToFinish) {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Fred Buhl
             //       DATE WRITTEN   December 2001
@@ -3146,7 +3146,7 @@ EnergyPlusData & state = getCurrentState(0);
 
         void ResizePlantLoopLevelSizes(int const LoopNum // Supply side loop being simulated
         ) {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Jan 2015
@@ -3353,7 +3353,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void RevisePlantCallingOrder() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   april 2011
@@ -3503,7 +3503,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void SetupBranchControlTypes() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   March 2010
@@ -4221,7 +4221,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void CheckIfAnyPlant() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Sept 2010
@@ -4255,7 +4255,7 @@ EnergyPlusData & state = getCurrentState(0);
         }
 
         void CheckOngoingPlantWarnings() {
-            EnergyPlusData & state = getCurrentState(0);
+            EnergyPlusData & state = getCurrentState();
             int LoopNum;
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time

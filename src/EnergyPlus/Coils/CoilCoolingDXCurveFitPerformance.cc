@@ -66,7 +66,7 @@ using namespace DataIPShortCuts;
 
 void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
@@ -125,7 +125,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string &name_to_find)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
@@ -183,7 +183,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 DataLoopNode::NodeData &condOutletNode,
                                                 Real64 LoadSHR)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
     if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
@@ -295,7 +295,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
 void CoilCoolingDXCurveFitPerformance::size()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size();
         if (this->hasAlternateMode == DataHVACGlobals::coilEnhancedMode) {
@@ -319,7 +319,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
                                                  DataLoopNode::NodeData &condInletNode,
                                                  DataLoopNode::NodeData &condOutletNode)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // calculate the performance at this mode/speed
     currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
@@ -358,7 +358,7 @@ EnergyPlusData & state = getCurrentState(0);
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex) {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
         ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" + this->name +
@@ -786,7 +786,7 @@ Real64
 CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // FUNCTION INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   July 2012
@@ -905,7 +905,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlo
 
 void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // set parent mode for each speed
     int numSpeeds;
     bool errorsFound = false;

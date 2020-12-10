@@ -68,7 +68,7 @@ namespace CommandLineInterface {
 
     int ProcessArgs(int argc, const char *argv[])
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         typedef std::string::size_type size_type;
 
         // Expand long-name options using "=" sign into two arguments
@@ -731,7 +731,7 @@ namespace CommandLineInterface {
 
     int runReadVarsESO()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 
         if (!fileExists(readVarsPath)) {

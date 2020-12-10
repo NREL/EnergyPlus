@@ -243,7 +243,7 @@ namespace SystemReports {
 
     void InitEnergyReports()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   April 2005
@@ -1194,7 +1194,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 2005
@@ -1385,7 +1385,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 int const PlantBranch,
                                 int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1468,7 +1468,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    int const PlantBranch,
                                    int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1555,7 +1555,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       int const PlantBranch,
                                       int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1644,7 +1644,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int const PlantBranch,
                                   int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1731,7 +1731,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      int const PlantBranch,
                                      int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1822,7 +1822,7 @@ EnergyPlusData & state = getCurrentState(0);
                                         int const PlantBranch,
                                         int const PlantComp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   June 2005
@@ -1907,7 +1907,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateAndSetUpVentReports()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   July 2005
@@ -2412,7 +2412,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CreateEnergyReportStructure()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher/Linda Lawrie
         //       DATE WRITTEN   June 2005
@@ -3495,7 +3495,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportSystemEnergyUse()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   November 2005
@@ -3825,7 +3825,7 @@ EnergyPlusData & state = getCurrentState(0);
                              Real64 const CompLoad,
                              Real64 const CompEnergy)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Nov. 2005
@@ -4378,7 +4378,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportMaxVentilationLoads()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher (with minor assistance from RKS)
         //       DATE WRITTEN   July 2004
@@ -4897,7 +4897,7 @@ EnergyPlusData & state = getCurrentState(0);
                        int const BranchNum   // counter for zone air distribution inlets
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   May 2005
@@ -5101,7 +5101,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportAirLoopConnections()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael J. Witte, Linda K. Lawrie
         //       DATE WRITTEN   February 2004 (moved from BranchInputManager ReportLoopConnections)

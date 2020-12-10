@@ -254,7 +254,7 @@ void SizingLog::ProcessRunningAverage()
 
 ZoneTimestepObject SizingLog::GetLogVariableDataMax()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;
     MaxVal = 0.0;
@@ -299,7 +299,7 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     int VectorLength(0);
     int const HoursPerDay(24);
 
@@ -354,7 +354,7 @@ int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsIn
 
 void SizingLoggerFramework::SetupSizingLogsNewEnvironment()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using namespace WeatherManager;
 
     for (auto &l : logObjs) {
@@ -364,7 +364,7 @@ void SizingLoggerFramework::SetupSizingLogsNewEnvironment()
 
 ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     // prepare current timing data once and then pass into fill routines
     // function used by both zone and system frequency log updates
 
@@ -390,7 +390,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
 
 void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     ZoneTimestepObject tmpztStepStamp;
 
     tmpztStepStamp = PrepareZoneTimestepStamp();
@@ -402,7 +402,7 @@ void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 
 void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     Real64 const MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;
@@ -443,7 +443,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
 
 void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCount)
 {
-    EnergyPlusData & state = getCurrentState(0);
+    EnergyPlusData & state = getCurrentState();
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalHeatingSizingFactorMode;

@@ -116,7 +116,7 @@ namespace FuelCellElectricGenerator {
 
     PlantComponent *FCDataStruct::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getFuelCellInputFlag) {
             getFuelCellInput();
@@ -137,7 +137,7 @@ namespace FuelCellElectricGenerator {
 
     PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data
         if (getFuelCellInputFlag) {
             getFuelCellInput();
@@ -160,7 +160,7 @@ namespace FuelCellElectricGenerator {
                                             Real64 const MyLoad, // demand on electric generator
                                             bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   March 2005
@@ -178,7 +178,7 @@ namespace FuelCellElectricGenerator {
 
     void getFuelCellInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
         //       DATE WRITTEN:    April 2005
@@ -1060,7 +1060,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced AC Electricity Energy",
@@ -1318,7 +1318,7 @@ namespace FuelCellElectricGenerator {
                                                   Real64 const MyLoad,
                                                   [[maybe_unused]] bool const FirstHVACIteration)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
@@ -1865,7 +1865,7 @@ namespace FuelCellElectricGenerator {
                                                    Real64 &PgridOverage // electricity that can't be stored and needs to go out
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug 2005
@@ -2020,7 +2020,7 @@ namespace FuelCellElectricGenerator {
                                                         Array1D<Real64> const &Par // par(1) = Generator Number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith NREL
         //       DATE WRITTEN   Aug 2005
@@ -2051,7 +2051,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureAirHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -2127,7 +2127,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureAirEnthalpy(Real64 const FluidTemp, Real64 &Hair)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
@@ -2211,7 +2211,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureFuelHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -2285,7 +2285,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureFuelEnthalpy(Real64 const FluidTemp, Real64 &Hfuel)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -2368,7 +2368,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureProductGasesEnthalpy(Real64 const FluidTemp, Real64 &HProdGases)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
@@ -2449,7 +2449,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureProductGasHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug. 2005
@@ -2513,7 +2513,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureAuxilHeatGasHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug. 2005
@@ -2660,7 +2660,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigureACAncillaries(Real64 &PacAncill)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   March 2006
@@ -2690,7 +2690,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::FigurePowerConditioningLosses(Real64 const Pdemand, Real64 &PpcuLosses)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
@@ -2727,7 +2727,7 @@ namespace FuelCellElectricGenerator {
                                                   Real64 &PelDiff    // if constrained then this is the difference, positive
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -2825,7 +2825,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::CalcFuelCellGenHeatRecovery() // Generator number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
         //       DATE WRITTEN:    Aug. 2005
@@ -3093,7 +3093,7 @@ namespace FuelCellElectricGenerator {
                                 [[maybe_unused]] Real64 &CurLoad,
                                 [[maybe_unused]] bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
                                                             this->CWLoopSideNum,
@@ -3121,7 +3121,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::initialize() // index to specific fuel cell generator
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
@@ -3288,7 +3288,7 @@ namespace FuelCellElectricGenerator {
 
     void FigureFuelCellZoneGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -3392,7 +3392,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::UpdateFuelCellGeneratorRecords()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->Report.ACPowerGen = this->ACPowerGen;                                                          // electrical power produced [W]
         this->Report.ACEnergyGen = this->ACPowerGen * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // energy produced (J)
         this->Report.QdotExhaust = 0.0;        // reporting: exhaust gas heat recovered (W)

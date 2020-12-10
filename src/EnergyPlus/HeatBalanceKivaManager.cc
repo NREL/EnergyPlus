@@ -127,7 +127,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaInstanceMap::initGround(const KivaWeatherData &kivaWeather)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
 #ifdef GROUND_PLOT
         std::string constructionName;
@@ -191,7 +191,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         unsigned index, indexPrev;
         unsigned dataSize = kivaWeather.windSpeed.size();
@@ -357,7 +357,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaInstanceMap::setBoundaryConditions()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::shared_ptr<Kiva::BoundaryConditions> bcs = instance.bcs;
 
 
@@ -445,7 +445,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::readWeatherData()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Below from OpenEPlusWeatherFile
         auto kivaWeatherFile = state.files.inputWeatherFileName.open("KivaManager::readWeatherFile");
 
@@ -635,7 +635,7 @@ namespace HeatBalanceKivaManager {
 
     bool KivaManager::setupKivaInstances()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
@@ -1091,7 +1091,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::initKivaInstances()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // initialize temperatures at the beginning of run environment
         for (auto &kv : kivaInstances) {
             // Start with steady-state solution
@@ -1102,7 +1102,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::calcKivaInstances()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculate heat transfer through ground
         for (auto &kv : kivaInstances) {
             kv.setBoundaryConditions();
@@ -1201,7 +1201,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::calcKivaSurfaceResults()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
@@ -1215,7 +1215,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::defineDefaultFoundation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         Kiva::Foundation defFnd;
 

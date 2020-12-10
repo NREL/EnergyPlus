@@ -178,7 +178,7 @@ namespace DaylightingDevices {
 
     void InitDaylightingDevices()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -435,7 +435,7 @@ namespace DaylightingDevices {
 
     void GetTDDInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -703,7 +703,7 @@ namespace DaylightingDevices {
 
     void GetShelfInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2003
@@ -989,7 +989,7 @@ namespace DaylightingDevices {
 
     Real64 CalcTDDTransSolIso(int const PipeNum) // TDD pipe object number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1054,7 +1054,7 @@ namespace DaylightingDevices {
 
     Real64 CalcTDDTransSolHorizon(int const PipeNum) // TDD pipe object number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1128,7 +1128,7 @@ namespace DaylightingDevices {
                                 Real64 const COSI  // Cosine of the incident angle
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1208,7 +1208,7 @@ namespace DaylightingDevices {
                     DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -1290,7 +1290,7 @@ namespace DaylightingDevices {
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1342,7 +1342,7 @@ namespace DaylightingDevices {
 
     int FindTDDPipe(int const WinNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -1388,7 +1388,7 @@ namespace DaylightingDevices {
 
     void DistributeTDDAbsorbedSolar()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1457,7 +1457,7 @@ namespace DaylightingDevices {
 
     void CalcViewFactorToShelf(int const ShelfNum) // Daylighting shelf object number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2003
@@ -1537,7 +1537,7 @@ namespace DaylightingDevices {
 
     void FigureTDDZoneGains()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2011

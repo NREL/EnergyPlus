@@ -101,7 +101,7 @@ namespace WindTurbine {
                         [[maybe_unused]] Real64 const WTLoad                // Electrical load on WT (not used)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   October 2009
@@ -159,7 +159,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug. 2008
@@ -179,7 +179,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWindTurbineInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   October 2009
@@ -651,7 +651,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitWindTurbine(int const WindTurbineNum)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Oct 2009
@@ -767,7 +767,7 @@ EnergyPlusData & state = getCurrentState(0);
                          [[maybe_unused]] bool const RunFlag // System is on
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Octorber 2009
@@ -1001,7 +1001,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWindTurbine(int const WindTurbineNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   October 2009

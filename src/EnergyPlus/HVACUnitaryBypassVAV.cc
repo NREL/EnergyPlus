@@ -205,7 +205,7 @@ namespace HVACUnitaryBypassVAV {
                              int &CompIndex                 // Index to changeover-bypass VAV system
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -263,7 +263,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetCBVAV()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -1294,7 +1294,7 @@ EnergyPlusData & state = getCurrentState(0);
                   bool &HXUnitOn                 // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -1402,7 +1402,7 @@ EnergyPlusData & state = getCurrentState(0);
                    bool &HXUnitOn                 // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -1967,7 +1967,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SizeCBVAV(int const CBVAVNum) // Index to CBVAV system
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -2137,7 +2137,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool &HXUnitOn                 // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -2172,7 +2172,7 @@ EnergyPlusData & state = getCurrentState(0);
                    bool const HXUnitOn            // flag to enable heat exchanger
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -3399,7 +3399,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -3663,7 +3663,7 @@ EnergyPlusData & state = getCurrentState(0);
                               Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3694,7 +3694,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3729,7 +3729,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   June 2006
@@ -3760,7 +3760,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         M. J. Witte, GARD Analytics, Inc.
         //       DATE WRITTEN   February 2005
@@ -3792,7 +3792,7 @@ EnergyPlusData & state = getCurrentState(0);
                            Real64 &OnOffAirFlowRatio // Ratio of compressor ON airflow to average airflow over timestep
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -3878,7 +3878,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportCBVAV(int const CBVAVNum) // Index of the current CBVAV unit being simulated
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
@@ -3913,7 +3913,7 @@ EnergyPlusData & state = getCurrentState(0);
                                Real64 &HeatCoilLoadmet        // coil heating load met
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
@@ -4071,7 +4071,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012

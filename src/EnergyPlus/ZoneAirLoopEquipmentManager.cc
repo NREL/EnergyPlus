@@ -94,7 +94,7 @@ namespace ZoneAirLoopEquipmentManager {
                                     int &ControlledZoneNum,
                                     int &CompIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
@@ -147,7 +147,7 @@ namespace ZoneAirLoopEquipmentManager {
 
     void GetZoneAirLoopEquipment()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1997
@@ -472,7 +472,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneAirLoopEquipment(int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -535,7 +535,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // every time step
         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk = 0.0;
         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk = 0.0;
@@ -556,7 +556,7 @@ EnergyPlusData & state = getCurrentState(0);
                                  int const ControlledZoneNum,
                                  int const ActualZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997

@@ -86,7 +86,7 @@ namespace HVACFan {
         std::string const &objectName, // IDF name in input
         bool const ErrorCheck)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int index = -1;
         bool found = false;
         for (std::size_t loop = 0; loop < fanObjs.size(); ++loop) {
@@ -110,7 +110,7 @@ namespace HVACFan {
     bool checkIfFanNameIsAFanSystem( // look up to see if input contains a Fan:SystemModel with the name (for use before object construction
         std::string const &objectName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         int testNum = inputProcessor->getObjectItemNum("Fan:SystemModel", objectName);
         if (testNum > 0) {
             return true;
@@ -133,7 +133,7 @@ EnergyPlusData & state = getCurrentState(0);
         Optional<Real64 const> pressureRise2     // Pressure difference for operating mode 2
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         m_objTurnFansOn = false;
         m_objTurnFansOff = false;
 
@@ -181,7 +181,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FanSystem::init()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!state.dataGlobal->SysSizingCalc && m_objSizingFlag) {
             set_size();
             m_objSizingFlag = false;
@@ -230,7 +230,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FanSystem::set_size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string static const routineName = "FanSystem::set_size ";
 
         Real64 tempFlow = designAirVolFlowRate;
@@ -328,7 +328,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FanSystem::report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the Fan Energy Index
 
@@ -383,7 +383,7 @@ EnergyPlusData & state = getCurrentState(0);
           m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
     // oneTimePowerCurveCheck_( true )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         std::string const static routineName = "HVACFan constructor ";
         int numAlphas;    // Number of elements in the alpha array
         int numNums;      // Number of elements in the numeric array
@@ -666,7 +666,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::vector<Real64> localPressureRise; // [0] is operating mode 1, [1] is operating mode 2
         Real64 localFlowFraction;
         Real64 localFanTotEff;
@@ -1031,7 +1031,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FanSystem::update() const // does not change state of object, only update elsewhere
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Set the outlet air node of the fan
         DataLoopNode::Node(outletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
         DataLoopNode::Node(outletNodeNum).Temp = m_outletAirTemp;
@@ -1097,7 +1097,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 FanSystem::getFanDesignTemperatureRise() const
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             Real64 cpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             Real64 designDeltaT = (deltaPress / (m_rhoAirStdInit * cpAir * m_fanTotalEff)) * (m_motorEff + m_motorInAirFrac * (1.0 - m_motorEff));
@@ -1112,7 +1112,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64 FanSystem::getFanDesignHeatGain(Real64 const FanVolFlow // fan volume flow rate [m3/s]
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             Real64 fanPowerTot = (FanVolFlow * deltaPress) / m_fanTotalEff;
             Real64 designHeatGain = m_motorEff * fanPowerTot + (fanPowerTot - m_motorEff * fanPowerTot) * m_motorInAirFrac;
@@ -1127,7 +1127,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void FanSystem::FanInputsForDesignHeatGain(Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!m_objSizingFlag) {
             deltaP = deltaPress;
             motEff = m_motorEff;

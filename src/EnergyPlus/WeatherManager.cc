@@ -126,7 +126,7 @@ namespace WeatherManager {
 
     void ManageWeather()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 1997
@@ -152,13 +152,13 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.dataWeatherManager->Envrn = 0;
     }
 
     bool CheckIfAnyUnderwaterBoundaries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         bool errorsFound = false;
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
@@ -237,7 +237,7 @@ namespace WeatherManager {
 
     void UpdateUnderwaterBoundaries()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         for (auto &thisBoundary : state.dataWeatherManager->underwaterBoundaries) {
             Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue(thisBoundary.WaterTempScheduleIndex); // C
             Real64 freeStreamVelocity = 0;
@@ -254,7 +254,7 @@ namespace WeatherManager {
 
     void ReadVariableLocationOrientation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
         if (inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject) == 0) return;
@@ -276,7 +276,7 @@ namespace WeatherManager {
 
     void UpdateLocationAndOrientation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (state.dataEnvrn->varyingLocationSchedIndexLat > 0) {
             state.dataEnvrn->Latitude = ScheduleManager::GetCurrentScheduleValue(state.dataEnvrn->varyingLocationSchedIndexLat);
         }
@@ -322,7 +322,7 @@ namespace WeatherManager {
 
     bool GetNextEnvironment(bool &Available, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -982,7 +982,7 @@ namespace WeatherManager {
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int OrigNumOfEnvrn{ state.dataWeatherManager->NumOfEnvrn};
 
         for (int i = 1; i <= OrigNumOfEnvrn; ++i) {
@@ -1008,7 +1008,7 @@ namespace WeatherManager {
 
     void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1098,7 +1098,7 @@ namespace WeatherManager {
                               bool const Rollover,
                               bool const MidSimReset)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
@@ -1291,7 +1291,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Optional_int DSTActEnMon,
                           Optional_int DSTActEnDay)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
@@ -1390,7 +1390,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetSpecialDayDates(Array1D_int const &MonWeekDay) // Weekday of each day 1 of month
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
@@ -1475,7 +1475,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void InitializeWeather(bool &printEnvrnStamp) // Set to true when the environment header should be printed
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -1747,7 +1747,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateWeatherData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -1805,7 +1805,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetCurrentWeather()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   March 1990
@@ -2011,7 +2011,7 @@ EnergyPlusData & state = getCurrentState(0);
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 1999
@@ -2031,7 +2031,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   April 1999
@@ -2955,7 +2955,7 @@ EnergyPlusData & state = getCurrentState(0);
     Real64
     CalcSkyEmissivity(EmissivityCalcType const ESkyCalcType, Real64 const OSky, Real64 const DryBulb, Real64 const DewPoint, Real64 const RelHum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Calculate Sky Emissivity
         // References:
         // M. Li, Y. Jiang and C. F. M. Coimbra,
@@ -3052,7 +3052,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real64 &Albedo,
                                   Real64 &LiquidPrecip)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2001
@@ -3324,7 +3324,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetUpDesignDay(int const EnvrnNum) // Environment number passed into the routine
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 1977
@@ -3875,7 +3875,7 @@ EnergyPlusData & state = getCurrentState(0);
                         Real64 &IGlbH                           // returned: global irradiance on horiz surface, W/m2
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         C Barnaby
         //       DATE WRITTEN   Nov 2010
@@ -3918,7 +3918,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AllocateWeatherData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2000
@@ -4008,7 +4008,7 @@ EnergyPlusData & state = getCurrentState(0);
                                    Real64 &CosineSolarDeclination // Cosine of Solar Declination
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   May 1985
@@ -4111,7 +4111,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
                                       Array1D<Real64> &SUNCOS)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
         //       DATE WRITTEN   May 1975
@@ -4147,7 +4147,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   1999
@@ -4209,7 +4209,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void OpenWeatherFile(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 1999
@@ -4230,7 +4230,7 @@ EnergyPlusData & state = getCurrentState(0);
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   June 1999
@@ -4298,13 +4298,13 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CloseWeatherFile()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         state.files.inputWeatherFile.close();
     }
 
     void ResolveLocationInformation(bool &ErrorsFound) // Set to true if no location evident
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -4373,7 +4373,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckLocationValidity()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -4459,7 +4459,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CheckWeatherFileValidity()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 1977
@@ -4485,7 +4485,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportOutputFileHeaders()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -4555,7 +4555,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWeatherAndTimeInformation(bool &printEnvrnStamp) // Set to true when the environment header should be printed
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
@@ -4623,7 +4623,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReadUserWeatherInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   September 1997
@@ -4755,7 +4755,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetRunPeriodData(int &nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   October 1997
@@ -5119,7 +5119,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetRunPeriodDesignData(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -5415,7 +5415,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSpecialDayPeriodData(bool &ErrorsFound) // will be set to true if severe errors are found in inputs
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2000
@@ -5529,7 +5529,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcSpecialDayTypes()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2000
@@ -5571,7 +5571,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetDSTData(bool &ErrorsFound) // will be set to true if severe errors are found in inputs
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
@@ -5647,7 +5647,7 @@ EnergyPlusData & state = getCurrentState(0);
     void GetDesignDayData(int &TotDesDays, // Total number of Design days to Setup
                           bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   September 1997
@@ -6478,7 +6478,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetLocationInfo(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   October 1997
@@ -6518,7 +6518,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWeatherProperties(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2009
@@ -6737,7 +6737,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetGroundTemps(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   October 1997
@@ -6775,7 +6775,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetGroundReflectances(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2002
@@ -6829,7 +6829,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSnowGroundRefModifiers(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2002
@@ -6893,7 +6893,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
@@ -6961,7 +6961,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWaterMainsTemp()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
@@ -6999,7 +6999,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 WaterMainsTempFromCorrelation(Real64 const AnnualOAAvgDryBulbTemp, Real64 const MonthlyOAAvgDryBulbTempMaxDiff)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
@@ -7042,7 +7042,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
     void GetWeatherStation(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2006
@@ -7104,7 +7104,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DayltgCurrentExtHorizIllum()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -7155,7 +7155,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 Real64 &DirLumEff   // Luminous efficacy of beam solar radiation (lum/W)
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -7299,7 +7299,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ProcessEPWHeader(std::string const &HeaderString, std::string &Line, bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 1999
@@ -7957,7 +7957,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SkipEPlusWFHeader()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2000
@@ -8031,7 +8031,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportMissing_RangeData()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2002
@@ -8106,7 +8106,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupInterpolationValues()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2002
@@ -8169,7 +8169,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupEnvironmentTypes()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2010
@@ -8370,7 +8370,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     WeekDay calculateDayOfWeek(int const year, int const month, int const day)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
@@ -8470,7 +8470,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void AnnualMonthlyDryBulbWeatherData::CalcAnnualAndMonthlyDryBulbTemp()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates monthly daily average outdoor air drybulb temperature from
         // either weather (*.EPW) file or reads monthly daily average outdoor air
@@ -8590,7 +8590,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportWaterMainsTempParameters()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // PURPOSE OF THIS SUBROUTINE:
         // report site water mains temperature object user inputs and/or parameters calculated
         // from weather or stat file
@@ -8671,7 +8671,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void calcSky(Real64 &HorizIRSky, Real64 &SkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         Real64 ESky;
 
         if (IRHoriz <= 0.0) IRHoriz = 9999.0;

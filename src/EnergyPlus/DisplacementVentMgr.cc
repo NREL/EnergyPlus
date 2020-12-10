@@ -133,7 +133,7 @@ namespace DisplacementVentMgr {
 
     void ManageUCSDDVModel(int const ZoneNum) // index number for the specified zone
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -181,7 +181,7 @@ namespace DisplacementVentMgr {
 
     void InitUCSDDV(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -254,7 +254,7 @@ namespace DisplacementVentMgr {
 
     void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004
@@ -557,7 +557,7 @@ namespace DisplacementVentMgr {
 
     void CalcUCSDDV(int const ZoneNum) // Which Zonenum
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   February 2004

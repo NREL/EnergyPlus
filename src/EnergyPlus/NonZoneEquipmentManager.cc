@@ -84,7 +84,7 @@ namespace NonZoneEquipmentManager {
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000

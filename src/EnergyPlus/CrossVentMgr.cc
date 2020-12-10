@@ -102,7 +102,7 @@ namespace CrossVentMgr {
 
     void ManageUCSDCVModel(int const ZoneNum) // index number for the specified zone
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -123,7 +123,7 @@ namespace CrossVentMgr {
 
     void InitUCSDCV(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -157,7 +157,7 @@ namespace CrossVentMgr {
 
     void HcUCSDCV(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -310,7 +310,7 @@ namespace CrossVentMgr {
 
     void EvolveParaUCSDCV(int const ZoneNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -714,7 +714,7 @@ namespace CrossVentMgr {
 
     void CalcUCSDCV(int const ZoneNum) // Which Zonenum
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca

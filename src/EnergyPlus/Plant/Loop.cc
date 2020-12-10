@@ -59,7 +59,7 @@ namespace EnergyPlus::DataPlant {
         Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
         Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
     ) {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   July 1998
@@ -90,7 +90,7 @@ namespace EnergyPlus::DataPlant {
 
 
     void PlantLoopData::CalcUnmetPlantDemand() {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   June 2011
@@ -223,7 +223,7 @@ EnergyPlusData & state = getCurrentState(0);
     }
 
     void PlantLoopData::CheckLoopExitNode(bool const FirstHVACIteration) {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   October 1998

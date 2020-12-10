@@ -107,7 +107,7 @@ namespace SizingManager {
 
     void ManageSizing()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2000
@@ -802,7 +802,7 @@ EnergyPlusData & state = getCurrentState(0);
         int const TimeStep,
         DataGlobalConstants::KindOfSim const KindOfSim)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
         // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
         // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
@@ -821,7 +821,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ManageSystemSizingAdjustments()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // This routine adjusts system sizing outcomes based on how the zone air terminals finish out their sizing.
         // The zone models are executed to trigger their sizing routines
@@ -1251,7 +1251,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ManageSystemVentilationAdjustments()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // redo std 62.1 calculations using latest information on zone flows and report to tables
 
         // redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
@@ -1831,7 +1831,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void DetermineSystemPopulationDiversity()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // determine Pz sum, Ps, and D for each air system for standard 62.1
 
         // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
@@ -1951,7 +1951,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetOARequirements()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
@@ -2065,7 +2065,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     bool &ErrorsFound                                      // If errors found in input
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad - FSEC
         //       DATE WRITTEN   February 2010
@@ -2219,7 +2219,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneAirDistribution()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         T. Hong - LBNL
         //       DATE WRITTEN   March 2012
@@ -2358,7 +2358,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSizingParams()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2002
@@ -2468,7 +2468,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneSizingInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   December 2000
@@ -3066,7 +3066,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2010
@@ -3150,7 +3150,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetSystemSizingInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2001
@@ -3674,7 +3674,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetPlantSizingInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   October 2001
@@ -3804,7 +3804,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void SetupZoneSizing(bool &ErrorsFound)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Lawrie/F. Buhl
         //       DATE WRITTEN   March 2010
@@ -3901,7 +3901,7 @@ EnergyPlusData & state = getCurrentState(0);
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   Decenber 2001
@@ -3992,7 +3992,7 @@ EnergyPlusData & state = getCurrentState(0);
                          int const &TimeStepIndex         // time step of the peak
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         if (state.dataSizingManager->ReportSysSizingMyOneTimeFlag) {
             print(state.files.eio,
                   "{}\n",
@@ -4021,7 +4021,7 @@ EnergyPlusData & state = getCurrentState(0);
     // convert an index for the timestep of the day into a hour minute string in the format 00:00
     std::string TimeIndexToHrMinString(int timeIndex)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int tMinOfDay = timeIndex * state.dataGlobal->MinutesPerTimeStep;
         int tHr = int(tMinOfDay / 60.);
         int tMin = tMinOfDay - tHr * 60;
@@ -4030,7 +4030,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetZoneHVACSizing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse - FSEC
         //       DATE WRITTEN   July 2014
@@ -4646,7 +4646,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetAirTerminalSizing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   February 2017
@@ -4707,7 +4707,7 @@ EnergyPlusData & state = getCurrentState(0);
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
     void UpdateFacilitySizing(DataGlobalConstants::CallIndicator const CallIndicator)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         //  test if allocated here
@@ -4848,7 +4848,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateTermUnitFinalZoneSizing()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
         // Called once to initialize before system sizing
         // M.J. Witte, July 2017

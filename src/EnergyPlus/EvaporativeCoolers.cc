@@ -185,7 +185,7 @@ namespace EvaporativeCoolers {
 
     void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   October 2000
@@ -267,7 +267,7 @@ namespace EvaporativeCoolers {
 
     void GetEvapInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   Oct 2000
@@ -899,7 +899,7 @@ namespace EvaporativeCoolers {
 
     void InitEvapCooler(int const EvapCoolNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
@@ -1061,7 +1061,7 @@ namespace EvaporativeCoolers {
 
     void SizeEvapCooler(int const EvapCoolNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2009
@@ -1609,7 +1609,7 @@ namespace EvaporativeCoolers {
 
     void CalcDirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
@@ -1732,7 +1732,7 @@ namespace EvaporativeCoolers {
 
     void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
@@ -1895,7 +1895,7 @@ namespace EvaporativeCoolers {
 
     void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
@@ -2048,7 +2048,7 @@ namespace EvaporativeCoolers {
 
     void CalcResearchSpecialPartLoad(int &EvapCoolNum)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2003
@@ -2156,7 +2156,7 @@ namespace EvaporativeCoolers {
 
     void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2003
@@ -2402,7 +2402,7 @@ namespace EvaporativeCoolers {
                                                        Real64 const InletDewPointTempSec,
                                                        Real64 const InletHumRatioSec)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Bigusse
         //       DATE WRITTEN   October 2014
@@ -2868,7 +2868,7 @@ namespace EvaporativeCoolers {
                                           Array1D<Real64> const &Par   // Par(2) is desired outlet temperature of Evap Cooler
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse
         //       DATE WRITTEN   Sep 2014
@@ -2914,7 +2914,7 @@ namespace EvaporativeCoolers {
                                              Real64 const EWBTSec,
                                              Real64 const EHumRatSec)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse
         //       DATE WRITTEN   Sep 2014
@@ -3042,7 +3042,7 @@ namespace EvaporativeCoolers {
                                          Real64 const QHXTotal,
                                          Real64 &QHXLatent)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse
         //       DATE WRITTEN   Oct 2014
@@ -3121,7 +3121,7 @@ namespace EvaporativeCoolers {
                               Real64 const FlowRatio   // secondary air flow fraction
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse
         //       DATE WRITTEN   Sep 2014
@@ -3184,7 +3184,7 @@ namespace EvaporativeCoolers {
 
     void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2009
@@ -3365,7 +3365,7 @@ namespace EvaporativeCoolers {
     void UpdateEvapCooler(int const EvapCoolNum)
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   October 2000
@@ -3498,7 +3498,7 @@ namespace EvaporativeCoolers {
                                       int &CompIndex                  // index to zone hvac unit
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2013
@@ -3554,7 +3554,7 @@ namespace EvaporativeCoolers {
 
     void GetInputZoneEvaporativeCoolerUnit()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2013
@@ -3983,7 +3983,7 @@ namespace EvaporativeCoolers {
                                        int const ZoneNum  // number of zone being served
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2013
@@ -4171,7 +4171,7 @@ namespace EvaporativeCoolers {
 
     void SizeZoneEvaporativeCoolerUnit(int const UnitNum) // unit number
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2013
@@ -4323,7 +4323,7 @@ namespace EvaporativeCoolers {
                                        Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2013
@@ -4456,7 +4456,7 @@ namespace EvaporativeCoolers {
                                 Real64 &LatentOutputProvided    // target cooling load
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // caculates zone evaporative cooler sensible and latent outputs
 
         Real64 MinHumRat; // minimum humidity ratio
@@ -4550,7 +4550,7 @@ namespace EvaporativeCoolers {
                                    Real64 const ZoneCoolingLoad // target cooling load
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates unit cooling part load ratio using root solver numerical method
 
         // local variables
@@ -4608,7 +4608,7 @@ namespace EvaporativeCoolers {
                                     Array1D<Real64> const &Par // parameters
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // calculates cooling load residual by varying part load ratio
 
         // local variables
@@ -4633,7 +4633,7 @@ namespace EvaporativeCoolers {
                                      Real64 const ZoneCoolingLoad // target cooling load
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4760,7 +4760,7 @@ namespace EvaporativeCoolers {
                                   Array1D<Real64> const &Par // parameters
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -4936,7 +4936,7 @@ namespace EvaporativeCoolers {
 
     int GetInletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019
@@ -4972,7 +4972,7 @@ namespace EvaporativeCoolers {
 
     int GetOutletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May 2019

@@ -70,7 +70,7 @@ void SetupZoneInternalGain(int const ZoneNum,
                            int RetNodeNum // for return air heat gains
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2011

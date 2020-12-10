@@ -140,7 +140,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
                        Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   April 2000
@@ -694,7 +694,7 @@ void CheckSysSizing(std::string const &CompType, // Component Type (e.g. Chiller
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   October 2002
@@ -794,7 +794,7 @@ void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chille
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   October 2002
@@ -898,7 +898,7 @@ void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chi
                        std::string const &CallString // Context of this pair -- for error message
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2002
@@ -942,7 +942,7 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
                        std::string const &CallString   // Context of this pair -- for error message
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2002
@@ -1000,7 +1000,7 @@ void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of ind
                                   Optional<Real64> VdotWindRpt,
                                   Optional<Real64> VdotBouyRpt)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B.T. Griffith
     //       DATE WRITTEN   November 2004
@@ -1352,7 +1352,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 )
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Chandan Sharma, FSEC
     //       DATE WRITTEN   Feb 2010
@@ -1408,7 +1408,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void TestAirPathIntegrity(bool &ErrFound)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2003
@@ -1502,7 +1502,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void TestSupplyAirPathIntegrity(bool &ErrFound)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2003
@@ -1752,7 +1752,7 @@ EnergyPlusData & state = getCurrentState(0);
 
 void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
 {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2003

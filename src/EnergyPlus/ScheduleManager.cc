@@ -201,7 +201,7 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2294,7 +2294,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportScheduleDetails(int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
@@ -2639,7 +2639,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetCurrentScheduleValue(int const ScheduleIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2706,7 +2706,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateScheduleValues()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2011; adapted from Autodesk (time reduction)
@@ -2761,7 +2761,7 @@ EnergyPlusData & state = getCurrentState(0);
                                int const ThisTimeStep // Negative => unspecified
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
@@ -2852,7 +2852,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetScheduleIndex(std::string const &ScheduleName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2899,7 +2899,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string GetScheduleType(int const ScheduleIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -2955,7 +2955,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     int GetDayScheduleIndex(std::string &ScheduleName)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -2987,7 +2987,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetScheduleValuesForDay(int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay, Optional_int_const CurDayofWeek)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -3045,7 +3045,7 @@ EnergyPlusData & state = getCurrentState(0);
                                     Array2S<Real64> DayValues   // Returned set of values
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -3094,7 +3094,7 @@ EnergyPlusData & state = getCurrentState(0);
                                       Real64 &Value // The new value for the schedule
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   February 2010
@@ -3152,7 +3152,7 @@ EnergyPlusData & state = getCurrentState(0);
                                ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -3362,7 +3362,7 @@ EnergyPlusData & state = getCurrentState(0);
                          ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K Lawrie
         //       DATE WRITTEN   January 2003
@@ -3475,7 +3475,7 @@ EnergyPlusData & state = getCurrentState(0);
                             bool &ErrorsFound               // Will be true if error found.
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3684,7 +3684,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real64 const Minimum          // Minimum desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3782,7 +3782,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real64 const Maximum          // Maximum desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3895,7 +3895,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real32 const Minimum          // Minimum desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3993,7 +3993,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   Real32 const Maximum          // Maximum desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -4096,7 +4096,7 @@ EnergyPlusData & state = getCurrentState(0);
                             Real64 const Value       // Actual desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -4168,7 +4168,7 @@ EnergyPlusData & state = getCurrentState(0);
                             int const Value          // Actual desired value
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -4241,7 +4241,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Optional_string_const MaxString // Maximum indicator ('<', ',=')
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -4333,7 +4333,7 @@ EnergyPlusData & state = getCurrentState(0);
                                      Optional_string_const MaxString // Maximum indicator ('<', ',=')
     )
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -4419,7 +4419,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     bool HasFractionalScheduleValue(int const ScheduleIndex) // Which Schedule being tested
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2008
@@ -4507,7 +4507,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetScheduleMinValue(int const ScheduleIndex) // Which Schedule being tested
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -4591,7 +4591,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     Real64 GetScheduleMaxValue(int const ScheduleIndex) // Which Schedule being tested
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -4676,7 +4676,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     std::string GetScheduleName(int const ScheduleIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2008
@@ -4733,7 +4733,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportScheduleValues()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2004
@@ -4769,7 +4769,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ReportOrphanSchedules()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2008
@@ -4863,7 +4863,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J. Glazer - July 2017
         // adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 
@@ -4900,7 +4900,7 @@ EnergyPlusData & state = getCurrentState(0);
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -4937,7 +4937,7 @@ EnergyPlusData & state = getCurrentState(0);
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     )
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // J. Glazer - July 2017
         // adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 

@@ -114,7 +114,7 @@ namespace ChillerExhaustAbsorption {
 
     PlantComponent *ExhaustAbsorberSpecs::factory(std::string const &objectName)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // Process the input data if it hasn't been done already
         if (state.dataChillerExhaustAbsorption->Sim_GetInput) {
             GetExhaustAbsorberInput();
@@ -134,7 +134,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -173,7 +173,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -206,7 +206,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         this->initialize();
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -228,7 +228,7 @@ namespace ChillerExhaustAbsorption {
 
     void GetExhaustAbsorberInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
@@ -473,7 +473,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::setupOutputVariables()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         std::string const ChillerName = this->Name;
 
         SetupOutputVariable("Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
@@ -602,7 +602,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::initialize()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -867,7 +867,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::size()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1217,7 +1217,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::calcChiller(Real64 &MyLoad)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
@@ -1646,7 +1646,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::calcHeater(Real64 &MyLoad, bool RunFlag)
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer and Michael J. Witte
         //       DATE WRITTEN   March 2001

@@ -82,7 +82,7 @@ namespace WaterManager {
 
     void ManageWater()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -142,7 +142,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void ManageWaterInits()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         UpdateWaterManager();
@@ -153,7 +153,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void GetWaterManagerInput()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -861,7 +861,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdatePrecipitation()
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -892,7 +892,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateIrrigation()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         D. Sailor
         //       DATE WRITTEN   Dec 2006
@@ -921,7 +921,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcWaterStorageTank(int const TankNum) // Index of storage tank
     {
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -1099,7 +1099,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int &TankIndex,
                                   int &WaterSupplyIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1129,7 +1129,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           int &TankIndex,
                                           int &WaterSupplyIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1206,7 +1206,7 @@ EnergyPlusData & state = getCurrentState(0);
                                   int &TankIndex,
                                   int &WaterDemandIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1236,7 +1236,7 @@ EnergyPlusData & state = getCurrentState(0);
                                           int &TankIndex,
                                           int &WaterDemandIndex)
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1311,7 +1311,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void CalcRainCollector(int const RainColNum) // Index of rain collector
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1374,7 +1374,7 @@ EnergyPlusData & state = getCurrentState(0);
     void CalcGroundwaterWell(int const WellNum) // Index of well
     {
 
-        EnergyPlusData & state = getCurrentState(0);
+        EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -1427,7 +1427,7 @@ EnergyPlusData & state = getCurrentState(0);
 
     void UpdateWaterManager()
     {
-EnergyPlusData & state = getCurrentState(0);
+EnergyPlusData & state = getCurrentState();
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
