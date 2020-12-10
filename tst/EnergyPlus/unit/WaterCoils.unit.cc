@@ -1059,8 +1059,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 {
     InitializePsychRoutines();
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1092,7 +1092,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     FinalSysSizing(1).CoolSupTemp = 10.0;
     FinalSysSizing(1).CoolSupHumRat = 0.0085;
     FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
+    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     // set up water coil
     int CoilNum = 1;
@@ -1166,7 +1166,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 
     CoilInEnth = PsyHFnTdbW(FinalSysSizing(1).MixTempAtCoolPeak, FinalSysSizing(1).MixHumRatAtCoolPeak);
     CoilOutEnth = PsyHFnTdbW(FinalSysSizing(1).CoolSupTemp, FinalSysSizing(1).CoolSupHumRat);
-    DesCoilCoolingLoad = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir * (CoilInEnth - CoilOutEnth);
+    DesCoilCoolingLoad = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * state->dataEnvrn->StdRhoAir * (CoilInEnth - CoilOutEnth);
     // check cooling coil design load
     EXPECT_DOUBLE_EQ(DesCoilCoolingLoad, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
 
@@ -1189,7 +1189,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     Real64 TempAirIn = state->dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;
     Real64 InletAirHumRat = state->dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
     Real64 TempWaterIn = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
-    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
+    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
     Real64 MinAirMassFlow = 5.0 * state->dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity;
     state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = 1.1 * MinAirMassFlow;
     Real64 AirMassFlow = state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
@@ -1214,7 +1214,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     TempAirIn = state->dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;
     InletAirHumRat = state->dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
     TempWaterIn = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
-    AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
+    AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
     MinAirMassFlow = 44.7 * state->dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity;
     state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = 1.1 * MinAirMassFlow;
     AirMassFlow = state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
