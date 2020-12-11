@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     Surface(1).Area = 10.0;
     SurfNum = 1;
     PoolNum = 1;
-    DataEnvironment::OutBaroPress = 101400.0;
+    state->dataEnvrn->OutBaroPress = 101400.0;
 
     auto &thisPool = state->dataSwimmingPools->Pool(PoolNum);
 

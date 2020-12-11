@@ -60,7 +60,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("CoolingWaterDesAirOutletHumRatSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration

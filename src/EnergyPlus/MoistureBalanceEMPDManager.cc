@@ -111,7 +111,6 @@ namespace MoistureBalanceEMPDManager {
     // USE STATEMENTS:
     // Use statements for data used in the module
     // Using/Aliasing
-    using DataEnvironment::OutBaroPress;
     using namespace DataHeatBalance;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
@@ -396,7 +395,7 @@ namespace MoistureBalanceEMPDManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), OutBaroPress),
+            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
                                                  PsyRhovFnTdbRh(state, MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
             RVSurfaceOld(SurfNum) = rv_air_in_initval;
             RVSurface(SurfNum) = rv_air_in_initval;
@@ -550,7 +549,7 @@ namespace MoistureBalanceEMPDManager {
 
         auto const &material(dataMaterial.Material(MatNum));
         if (material.EMPDmu <= 0.0) {
-            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), OutBaroPress);
+            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
             return;
         }
 
@@ -568,7 +567,7 @@ namespace MoistureBalanceEMPDManager {
         // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
         // 461.52 = universal gas constant for water [J/kg-K]
         // EMPDdiffusivity = [m^2/s]
-        EMPDdiffusivity = (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver + DataGlobalConstants::KelvinConv());
+        EMPDdiffusivity = (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) / state.dataEnvrn->OutBaroPress) / material.EMPDmu * 461.52 * (Taver + DataGlobalConstants::KelvinConv());
 
         // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
         dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
@@ -586,7 +585,7 @@ namespace MoistureBalanceEMPDManager {
         if (material.EMPDmuCoating <= 0.0) {
             Rcoating = 0;
         } else {
-            Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress /
+            Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * state.dataEnvrn->OutBaroPress /
                        (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) * 461.52 * (Taver + DataGlobalConstants::KelvinConv()));
         }
 
@@ -699,8 +698,8 @@ namespace MoistureBalanceEMPDManager {
         rvd.rv_surface = rv_surface;
         rvd.RH_surface_layer = RH_surf_layer * 100.0;
         rvd.RH_deep_layer = RH_deep_layer * 100.0;
-        rvd.w_surface_layer = 0.622 * PV_surf_layer / (OutBaroPress - PV_surf_layer);
-        rvd.w_deep_layer = 0.622 * PV_deep_layer / (OutBaroPress - PV_deep_layer);
+        rvd.w_surface_layer = 0.622 * PV_surf_layer / (state.dataEnvrn->OutBaroPress - PV_surf_layer);
+        rvd.w_deep_layer = 0.622 * PV_deep_layer / (state.dataEnvrn->OutBaroPress - PV_deep_layer);
         rvd.mass_flux_zone = mass_flux_zone;
         rvd.mass_flux_deep = mass_flux_deep_layer;
         rvd.u_surface_layer =

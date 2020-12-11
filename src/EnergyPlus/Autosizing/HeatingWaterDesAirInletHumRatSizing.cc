@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
@@ -72,14 +73,14 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
             } else {
                 Real64 desMassFlow = 0.0;
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else {
                     desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
                 this->autoSizedValue =
-                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state, desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                                 this->zoneEqSizing(this->curZoneEqNum),
                                                                 this->finalZoneSizing(this->curZoneEqNum));
             }

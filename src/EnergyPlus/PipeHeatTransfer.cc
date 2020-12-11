@@ -842,7 +842,6 @@ namespace PipeHeatTransfer {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -964,13 +963,13 @@ namespace PipeHeatTransfer {
                 if (SELECT_CASE_var == GroundEnv) {
                     // EnvironmentTemp = GroundTemp
                 } else if (SELECT_CASE_var == OutsideAirEnv) {
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == ZoneEnv) {
                     nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == ScheduleEnv) {
                     nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == None) { // default to outside temp
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
 
@@ -1262,12 +1261,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::BeamSolarRad;
-        using DataEnvironment::DifSolarRad;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::SkyTemp;
-        using DataEnvironment::SOLCOS;
-        using DataEnvironment::WindSpeed;
         using DataLoopNode::Node;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1337,7 +1330,7 @@ namespace PipeHeatTransfer {
                             // If on soil boundary, load up local variables and perform calculations
                             NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
                             PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv();
-                            SkyTempAbs = SkyTemp + DataGlobalConstants::KelvinConv();
+                            SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();
                             TopRoughness = this->SoilRoughness;
                             TopThermAbs = this->SoilThermAbs;
                             TopSolarAbs = this->SoilSolarAbs;
@@ -1347,7 +1340,7 @@ namespace PipeHeatTransfer {
                             Cp = this->SoilCp;
 
                             // ASHRAE simple convection coefficient model for external surfaces.
-                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, WindSpeed);
+                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                             ConvCoef = this->OutdoorConvCoef;
 
                             // thermal radiation coefficient using surf temp from past time step
@@ -1358,7 +1351,7 @@ namespace PipeHeatTransfer {
                             }
 
                             // total absorbed solar - no ground solar
-                            QSolAbsorbed = TopSolarAbs * (max(SOLCOS(3), 0.0) * BeamSolarRad + DifSolarRad);
+                            QSolAbsorbed = TopSolarAbs * (max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad);
 
                             // If sun is not exposed, then turn off both solar and thermal radiation
                             if (!this->SolarExposed) {
@@ -1374,7 +1367,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation, basically a detailed energy balance at the surface
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
                                      (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1387,7 +1380,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                      (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1756,7 +1749,6 @@ namespace PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataEnvironment::WindSpeed;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1835,7 +1827,7 @@ namespace PipeHeatTransfer {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == OutsideAirEnv) {
                         AirTemp = Node(this->EnvrAirNodeNum).Temp;
-                        AirVel = WindSpeed;
+                        AirVel = state.dataEnvrn->WindSpeed;
                     }
                 }
             }

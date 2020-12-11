@@ -123,8 +123,6 @@ namespace ZoneTempPredictorCorrector {
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutHumRat;
     using DataZoneEnergyDemands::CurDeadBandOrSetback;
     using DataZoneEnergyDemands::DeadBandOrSetback;
     using DataZoneEnergyDemands::Setback;
@@ -263,7 +261,7 @@ namespace ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneAirSetpoints: ");
+        constexpr auto RoutineName("GetZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempControlledZoneNum; // The Splitter that you are currently loading input into
@@ -2639,7 +2637,7 @@ namespace ZoneTempPredictorCorrector {
         using DataZoneEquipment::ZoneEquipInputsFilled;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitZoneAirSetpoints: ");
+        constexpr auto RoutineName("InitZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -2985,15 +2983,15 @@ namespace ZoneTempPredictorCorrector {
             ZTM1 = 0.0;
             ZTM2 = 0.0;
             ZTM3 = 0.0;
-            WZoneTimeMinus1 = OutHumRat;
-            WZoneTimeMinus2 = OutHumRat;
-            WZoneTimeMinus3 = OutHumRat;
-            WZoneTimeMinus4 = OutHumRat;
-            WZoneTimeMinusP = OutHumRat;
-            DSWZoneTimeMinus1 = OutHumRat;
-            DSWZoneTimeMinus2 = OutHumRat;
-            DSWZoneTimeMinus3 = OutHumRat;
-            DSWZoneTimeMinus4 = OutHumRat;
+            WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
             WZoneTimeMinus1Temp = 0.0;
             WZoneTimeMinus2Temp = 0.0;
             WZoneTimeMinus3Temp = 0.0;
@@ -3047,9 +3045,9 @@ namespace ZoneTempPredictorCorrector {
             for (auto &e : Zone)
                 e.NoHeatToReturnAir = false;
             ZoneT1 = 0.0;
-            ZoneW1 = OutHumRat;
-            ZoneWMX = OutHumRat;
-            ZoneWM2 = OutHumRat;
+            ZoneW1 = state.dataEnvrn->OutHumRat;
+            ZoneWMX = state.dataEnvrn->OutHumRat;
+            ZoneWM2 = state.dataEnvrn->OutHumRat;
             PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
             PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
             PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
@@ -3076,8 +3074,7 @@ namespace ZoneTempPredictorCorrector {
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
             if (ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
-                    ShowSevereError(state, RoutineName + "Zone=\"" + TempControlledZone(Loop).ZoneName +
-                                    "\" has specified a Thermostatic control but is not a controlled zone.");
+                    ShowSevereError(state, format("{}Zone=\"{}\" has specified a Thermostatic control but is not a controlled zone.", RoutineName, TempControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     state.dataZoneTempPredictorCorrector->ErrorsFound = true;
                 }
@@ -3133,8 +3130,7 @@ namespace ZoneTempPredictorCorrector {
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
             if (ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
-                    ShowSevereError(state, RoutineName + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
-                                    "\" has specified a Comfort control but is not a controlled zone.");
+                    ShowSevereError(state, format("{}Zone=\"{}\" has specified a Comfort control but is not a controlled zone.", RoutineName, ComfortControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     state.dataZoneTempPredictorCorrector->ErrorsFound = true;
                 }
@@ -3635,7 +3631,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                              PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
+                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
                               (TimeStepSys * DataGlobalConstants::SecInHour());
             AirCap = AIRRAT(ZoneNum);
             RAFNFrac = 0.0;
@@ -4398,7 +4394,7 @@ namespace ZoneTempPredictorCorrector {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPredictedHumidityRatio");
+        constexpr auto RoutineName("CalcPredictedHumidityRatio");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LatentGain; // Zone latent load
@@ -4433,7 +4429,7 @@ namespace ZoneTempPredictorCorrector {
         // Check all the controlled zones to see if it matches the zone simulated
         for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum) {
             if (HumidityControlZone(HumidControlledZoneNum).ActualZoneNum != ZoneNum) continue;
-            ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress) * 100.0;
+            ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex);
             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex);
 
@@ -4502,13 +4498,13 @@ namespace ZoneTempPredictorCorrector {
                             if (offsetThermostat != 0.0) {
                                 // Calculate the humidistat offset value from the thermostat offset value
                                 faultZoneWHumidifyingSetPoint =
-                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress);
+                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 faultZoneWDehumidifyingSetPoint =
-                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), OutBaroPress);
+                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 offsetZoneRHHumidifyingSetPoint =
-                                    ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWHumidifyingSetPoint, OutBaroPress) * 100.0;
+                                    ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
                                 offsetZoneRHDehumidifyingSetPoint =
-                                    ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWDehumidifyingSetPoint, OutBaroPress) * 100.0;
+                                    ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
 
                                 // Apply the calculated humidistat offset value
                                 // Positive offset means the sensor reading is higher than the actual value
@@ -4599,7 +4595,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // The density of air and latent heat of vaporization are calculated as functions.
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
             H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
 
             // Assume that the system will have flow
@@ -4613,8 +4609,8 @@ namespace ZoneTempPredictorCorrector {
                 A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr +
                     SumHmARa(ZoneNum);
             } else {
-                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 A = OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                     MDotOA(ZoneNum);
             }
@@ -4636,7 +4632,7 @@ namespace ZoneTempPredictorCorrector {
             // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
             // the amount of moisture that must be removed by the system.
             // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
-            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress, RoutineName);
+            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 exp_700_A_C(0.0);
             if (ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
@@ -4655,7 +4651,7 @@ namespace ZoneTempPredictorCorrector {
             }
             if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
             ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
-            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), OutBaroPress, RoutineName);
+            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             if (ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
                                            (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
@@ -4798,7 +4794,7 @@ namespace ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CorrectZoneAirTemp");
+        constexpr auto RoutineName("CorrectZoneAirTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                              // specific heat of air
@@ -4951,7 +4947,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                              PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
+                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
                               PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
             AirCap = AIRRAT(ZoneNum);
@@ -5124,7 +5120,7 @@ namespace ZoneTempPredictorCorrector {
             CorrectZoneHumRat(state, ZoneNum);
 
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
+            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, RoutineName);
 
             // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
             {
@@ -5199,7 +5195,7 @@ namespace ZoneTempPredictorCorrector {
         // push histories for timestep advancing
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        static std::string const CorrectZoneAirTemp("CorrectZoneAirTemp");
+        constexpr auto CorrectZoneAirTemp("CorrectZoneAirTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
@@ -5221,7 +5217,7 @@ namespace ZoneTempPredictorCorrector {
             WZoneTimeMinus1(ZoneNum) = ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
             WZoneTimeMinusP(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, CorrectZoneAirTemp);
+            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
 
             if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
                 AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
@@ -5459,7 +5455,6 @@ namespace ZoneTempPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
@@ -5471,7 +5466,7 @@ namespace ZoneTempPredictorCorrector {
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CorrectZoneHumRat");
+        constexpr auto RoutineName("CorrectZoneHumRat");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -5535,15 +5530,15 @@ namespace ZoneTempPredictorCorrector {
             // add in the leak flow
             for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
-                    MoistureMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
-                    ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                    ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
+                    ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
                 }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
-                    MoistureMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).HumRat) / ZoneMult;
-                    ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                    ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).HumRat) / ZoneMult;
+                    ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
                 }
             }
 
@@ -5583,11 +5578,11 @@ namespace ZoneTempPredictorCorrector {
             SumHmARa(ZoneNum) = 0.0;
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
         H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
 
-        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
         A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
             MDotOA(ZoneNum);
 
@@ -5633,7 +5628,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Check to make sure that is saturated there is condensation in the zone
         // by resetting to saturation conditions.
-        WZSat = PsyWFnTdbRhPb(state, ZT(ZoneNum), 1.0, OutBaroPress, RoutineName);
+        WZSat = PsyWFnTdbRhPb(state, ZT(ZoneNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
 
         if (ZoneAirHumRatTemp(ZoneNum) > WZSat) ZoneAirHumRatTemp(ZoneNum) = WZSat;
 
@@ -5760,13 +5755,7 @@ namespace ZoneTempPredictorCorrector {
         //       RE-ENGINEERED
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine inversely solve infiltration airflow rate or people count with zone air tempearture measurements.
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InverseModelTemperature");
+        // This subroutine inversely solve infiltration airflow rate or people count with zone air temperatures measurements.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                   // specific heat of air
@@ -5778,7 +5767,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 BB(0.0);
         Real64 CC(0.0);
         Real64 DD(0.0);
-        Real64 SumIntGainPeople(0.0); // Inversely solved convectice heat gain from people
+        Real64 SumIntGainPeople(0.0); // Inversely solved convective heat gain from people
         Real64 SumSysMCp_HM(0.0);
         Real64 SumSysMCpT_HM(0.0);
         Real64 NumPeople(0.0);          // Inversely solved number of people in the zone
@@ -5798,7 +5787,7 @@ namespace ZoneTempPredictorCorrector {
         Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
 
         // HM calculation only HM calculation period start
-        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             Real64 HMMultiplierAverage(1.0);
             Real64 MultpHM(1.0);
 
@@ -5807,7 +5796,7 @@ namespace ZoneTempPredictorCorrector {
                                                                  // the System Time Increment
             if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
 
-                static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+                constexpr auto RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
@@ -5837,8 +5826,8 @@ namespace ZoneTempPredictorCorrector {
 
                 zone_M_T = Zone(ZoneNum).ZoneMeasuredTemperature;
                 delta_T = (Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp);
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
                 Zone(ZoneNum).delta_T = delta_T;
 
                 // s4 - Set ACH to 0 when delta_T <= 0.5, add max and min limits to ach
@@ -5891,7 +5880,7 @@ namespace ZoneTempPredictorCorrector {
                 // Calculate multiplier
                 if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                     MultpHM = AirCapHM /
-                              (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                              (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
                               (state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour());      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
@@ -5916,7 +5905,7 @@ namespace ZoneTempPredictorCorrector {
 
                     // Calculate and store the multiplier average at the end of HM
                     // simulations
-                    if (DayOfYear == HybridModelZone(ZoneNum).HybridEndDayOfYear && state.dataGlobal->EndDayFlag) {
+                    if (state.dataEnvrn->DayOfYear == HybridModelZone(ZoneNum).HybridEndDayOfYear && state.dataGlobal->EndDayFlag) {
                         HMMultiplierAverage = Zone(ZoneNum).ZoneVolCapMultpSensHMSum / Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum;
                         Zone(ZoneNum).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
                     }
@@ -6011,11 +6000,8 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine inversely solve infiltration airflow rate or people count with zone air humidity measurements.
 
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InverseModelHumidity");
+        constexpr auto RoutineName("InverseModelHumidity");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AA(0.0);
@@ -6041,7 +6027,7 @@ namespace ZoneTempPredictorCorrector {
         // Get measured zone humidity ratio
         Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
 
-        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             ZoneAirHumRat(ZoneNum) = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
 
             // Hybrid Model calculate air infiltration rate
@@ -6058,12 +6044,12 @@ namespace ZoneTempPredictorCorrector {
 
                     AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                          MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                         SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+                         SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
                     AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) +
-                         MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) +
+                         MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -6071,12 +6057,12 @@ namespace ZoneTempPredictorCorrector {
                       (1.0 / 3.0) * PreviousMeasuredHumRat3(ZoneNum));
 
                 zone_M_HR = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
-                delta_HR = (Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat);
+                delta_HR = (Zone(ZoneNum).ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat);
 
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineName);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineName);
 
-                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
+                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat) < 0.0000001) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredHumidityRatio) / delta_HR;
@@ -6120,14 +6106,14 @@ namespace ZoneTempPredictorCorrector {
 
                     AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
                          MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) +
-                         EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
+                         EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
                     AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
                          MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) +
+                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
                          EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) +
-                         MDotOA(ZoneNum) * OutHumRat;
+                         MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -6190,7 +6176,6 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
@@ -6300,19 +6285,19 @@ namespace ZoneTempPredictorCorrector {
                      ADUListIndex <= ADUListIndex_end;
                      ++ADUListIndex) {
                     ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                    if (AirDistUnit(ADUNum).UpStreamLeak) {
-                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                         NodeTemp = Node(ADUInNode).Temp;
-                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                        MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
                         SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
                     }
-                    if (AirDistUnit(ADUNum).DownStreamLeak) {
-                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                         NodeTemp = Node(ADUOutNode).Temp;
-                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                        MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
@@ -6469,8 +6454,8 @@ namespace ZoneTempPredictorCorrector {
         // Go back and calculate each of the 6 terms in Equation 5 and fill report variables.
         // notes on these raw terms for zone air heat balance model :
         //  these are state variables at the end of the last system timestep.
-        //  they are not necessarily proper averages for what happend over entire zone time step
-        //  these are not mulitplied by zone multipliers.
+        //  they are not necessarily proper averages for what happened over entire zone time step
+        //  these are not multiplied by zone multipliers.
         //  The values are all Watts.
 
         // REFERENCES:
@@ -6480,14 +6465,11 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
 
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;          // System node number
@@ -6584,13 +6566,13 @@ namespace ZoneTempPredictorCorrector {
 
                 ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
-                    NodeTemp = Node(AirDistUnit(ADUNum).OutletNodeNum).Temp;
-                    MassFlowRate = Node(AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
+                    NodeTemp = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
+                    MassFlowRate = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
-                    AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
-                    AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
-                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatGain = state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolGain = state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
                 }
 
             } // NodeNum
@@ -6608,17 +6590,17 @@ namespace ZoneTempPredictorCorrector {
             // add in the leaks
             for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                    ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                    MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                    ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                    MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
@@ -6737,7 +6719,7 @@ namespace ZoneTempPredictorCorrector {
         // now calculate air energy storage source term.
         // capacitance is volume * density * heat capacity
         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
 
         {
             auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
@@ -7027,9 +7009,6 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine adjust the operative setpoints for each controlled adaptive thermal comfort models.
 
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int originZoneAirSetPoint = ZoneAirSetPoint;
         int AdaptiveComfortModelTypeIndex = TempControlledZone(TempControlledZoneID).AdaptiveComfortModelTypeIndex;
@@ -7041,25 +7020,25 @@ namespace ZoneTempPredictorCorrector {
             // Adjust run period cooling set point
             switch (AdaptiveComfortModelTypeIndex) {
             case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::ASH55_UPPER_90):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::ASH55_UPPER_80):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_CENTRAL):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_I):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_II):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(state.dataEnvrn->DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_III):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(state.dataEnvrn->DayOfYear);
                 break;
             default:;
             }
@@ -7867,13 +7846,13 @@ namespace ZoneTempPredictorCorrector {
         // determine month to use based on hemiphere and season
         int monthToUse;
         if (isSummer) {
-            if (DataEnvironment::Latitude > 0.) {
+            if (state.dataEnvrn->Latitude > 0.) {
                 monthToUse = 7; // July - summer in northern hemisphere
             } else {
                 monthToUse = 1; // January - summer in southern hemisphere
             }
         } else {
-            if (DataEnvironment::Latitude > 0.) {
+            if (state.dataEnvrn->Latitude > 0.) {
                 monthToUse = 1; // January - winter in northern hemisphere
             } else {
                 monthToUse = 7; // July - winter in southern hemisphere
@@ -7886,11 +7865,11 @@ namespace ZoneTempPredictorCorrector {
             monthName = "July";
         }
 
-        int jdateSelect = General::nthDayOfWeekOfMonth(dayOfWeek, 1, monthToUse);
+        int jdateSelect = General::nthDayOfWeekOfMonth(state, dayOfWeek, 1, monthToUse);
 
         // determine number of days in year
         int DaysInYear;
-        if (DataEnvironment::CurrentYearIsLeapYear) {
+        if (state.dataEnvrn->CurrentYearIsLeapYear) {
             DaysInYear = 366;
         } else {
             DaysInYear = 365;

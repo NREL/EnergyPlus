@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
     HybridModelZone(1).InfiltrationCalc_C = false;
@@ -358,7 +358,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
     HybridModelZone(1).InfiltrationCalc_C = false;
@@ -546,7 +546,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Zone(3).SystemZoneNodeNumber = 5;
     Zone(3).ZoneVolCapMultpMoist = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
@@ -754,7 +754,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Zone(3).SystemZoneNodeNumber = 5;
     Zone(3).ZoneVolCapMultpMoist = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;

@@ -1874,15 +1874,11 @@ namespace ExternalInterface {
         //  Get the current month and day in the runperiod and convert
         //  it into seconds.
 
-        // Using/Aliasing
-        using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         // Locals
         Real64 simtime;
 
-        if (!CurrentYearIsLeapYear) {
-            switch (Month) {
+        if (!state.dataEnvrn->CurrentYearIsLeapYear) {
+            switch (state.dataEnvrn->Month) {
             case 1:
                 simtime = 0;
                 break;
@@ -1923,7 +1919,7 @@ namespace ExternalInterface {
                 simtime = 0;
             }
         } else {
-            switch (Month) {
+            switch (state.dataEnvrn->Month) {
             case 1:
                 simtime = 0;
                 break;
@@ -1965,7 +1961,7 @@ namespace ExternalInterface {
             }
         }
 
-        simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be stubtracted??
+        simtime = 24 * (simtime + (state.dataEnvrn->DayOfMonth - 1)); // day of month does not need to be stubtracted??
         simtime = 60 * (simtime + (state.dataGlobal->HourOfDay - 1));  // hours to minutes
         simtime = 60 * (simtime);                    // minutes to seconds
 
@@ -1985,8 +1981,6 @@ namespace ExternalInterface {
         // This subroutine organizes the data exchange between FMU and EnergyPlus.
 
         // Using/Aliasing
-        using DataEnvironment::TotalOverallSimDays;
-        using DataEnvironment::TotDesDays;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
 
@@ -2141,7 +2135,7 @@ namespace ExternalInterface {
                 UpdateDataDuringWarmupExternalInterface = false;
                 // The time is computed in seconds for FMU
                 tStart = GetCurSimStartTimeSeconds(state);
-                tStop = tStart + (TotalOverallSimDays - TotDesDays) * 24.0 * 3600.0;
+                tStop = tStart + (state.dataEnvrn->TotalOverallSimDays - state.dataEnvrn->TotDesDays) * 24.0 * 3600.0;
                 tComm = tStart;
 
                 // Terminate all FMUs

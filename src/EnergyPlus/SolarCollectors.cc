@@ -1696,9 +1696,9 @@ namespace SolarCollectors {
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::SkyTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::SkyTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::SkyTemp);
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->SkyTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Sky = tempnom;
@@ -1710,9 +1710,9 @@ namespace SolarCollectors {
         }
 
         tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::GroundTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::GroundTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::GroundTemp);
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->GroundTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Gnd = tempnom;
