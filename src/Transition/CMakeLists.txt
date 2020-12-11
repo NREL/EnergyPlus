@@ -8,8 +8,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 set(STATIC_EXE FALSE)
 
 # first create a static library of shared stuff
@@ -26,6 +24,8 @@ set(LIB_SRC
     VCompareGlobalRoutines.f90
     VCompareUtilityRoutines.f90)
 add_library(TransitionLib STATIC ${LIB_SRC})
+target_include_directories(TransitionLib PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
 
 list(APPEND VERSIONS 1_0_0)
 list(APPEND VERSIONS 1_0_1)
