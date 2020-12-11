@@ -49,14 +49,11 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,7 +87,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataHVACGlobals;
     using namespace DataLoopNode;
 
     // <use statements for access to subroutines in other modules>
@@ -139,7 +135,6 @@ namespace HVACDuct {
         // Manage the simulation of a duct component
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum;                    // index of duct being simulated
@@ -159,13 +154,17 @@ namespace HVACDuct {
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
-                ShowFatalError(state, "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
-                               ", Entered Component name=" + CompName);
+                ShowFatalError(
+                    state,
+                    format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, NumDucts, CompName));
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError(state, "SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
-                                   ", stored Component Name for that index=" + Duct(DuctNum).Name);
+                    ShowFatalError(state,
+                                   format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
+                                          DuctNum,
+                                          CompName,
+                                          Duct(DuctNum).Name));
                 }
                 CheckEquipName(DuctNum) = false;
             }
@@ -175,7 +174,7 @@ namespace HVACDuct {
 
         CalcDuct(DuctNum);
 
-        UpdateDuct(DuctNum);
+        UpdateDuct(state, DuctNum);
 
         ReportDuct(DuctNum);
     }
@@ -336,7 +335,7 @@ namespace HVACDuct {
         // na
     }
 
-    void UpdateDuct(int const DuctNum) // number of the current duct being simulated
+    void UpdateDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -347,27 +346,6 @@ namespace HVACDuct {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Moves duct output to the outlet nodes
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;  // inlet node number
@@ -387,11 +365,11 @@ namespace HVACDuct {
         Node(OutNode).MassFlowRateMinAvail = Node(InNode).MassFlowRateMinAvail;
         Node(OutNode).MassFlowRateMaxAvail = Node(InNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutNode).CO2 = Node(InNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutNode).GenContam = Node(InNode).GenContam;
         }
     }

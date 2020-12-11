@@ -91,9 +91,9 @@ namespace BranchNodeConnections {
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
     void GetParentData(EnergyPlusData &state, std::string const &ComponentType,
                        std::string const &ComponentName,
@@ -103,13 +103,14 @@ namespace BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound);
 
-    bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName);
+    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    void GetComponentData(EnergyPlusData &state, std::string const &ComponentType,
+    void GetComponentData(EnergyPlusData &state,
+                          std::string const &ComponentType,
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,

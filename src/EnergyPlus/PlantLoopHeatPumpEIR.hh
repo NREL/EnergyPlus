@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
@@ -79,9 +80,9 @@ namespace EIRPlantLoopHeatPumps {
     {
 
         // fixed configuration parameters
-        std::string name = "";
+        std::string name;
         int plantTypeOfNum = -1;
-        std::string companionCoilName = "";
+        std::string companionCoilName;
         EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
         Real64 sizingFactor = 1.0;
         bool waterSource = false;
@@ -161,7 +162,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void sizeSrcSideASHP(EnergyPlusData &state);
 
-        Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state);
+        Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
 
         void setOperatingFlowRatesASHP(EnergyPlusData &state);
 
@@ -169,13 +170,11 @@ namespace EIRPlantLoopHeatPumps {
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name);
 
         static void pairUpCompanionCoils(EnergyPlusData &state);
 
         static void processInputForEIRPLHP(EnergyPlusData &state);
-
-        static void clear_state();
 
         static void checkConcurrentOperation(EnergyPlusData &state);
 
@@ -190,8 +189,17 @@ namespace EIRPlantLoopHeatPumps {
         }
     };
 
-    extern std::vector<EIRPlantLoopHeatPump> heatPumps;
 } // namespace EIRPlantLoopHeatPumps
+
+struct EIRPlantLoopHeatPumpsData {
+    std::vector<EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump> heatPumps;
+    bool getInputsPLHP = true;
+    void clear_state() {
+        getInputsPLHP = true;
+        heatPumps.clear();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif // ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH

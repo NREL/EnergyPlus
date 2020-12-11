@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -326,45 +327,45 @@ TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
     //			int const & monthNumber // January = 1
     //		)
 
-    DataEnvironment::CurrentYearIsLeapYear = false; // based on 2017
-    DataEnvironment::RunPeriodStartDayOfWeek = 1;   // sunday
+    state->dataEnvrn->CurrentYearIsLeapYear = false; // based on 2017
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 1;   // sunday
 
-    EXPECT_EQ(1, nthDayOfWeekOfMonth(1, 1, 1));  // first sunday of january
-    EXPECT_EQ(8, nthDayOfWeekOfMonth(1, 2, 1));  // second sunday of january
-    EXPECT_EQ(15, nthDayOfWeekOfMonth(1, 3, 1)); // third sunday of january
-    EXPECT_EQ(22, nthDayOfWeekOfMonth(1, 4, 1)); // fourth sunday of january
+    EXPECT_EQ(1, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january
+    EXPECT_EQ(8, nthDayOfWeekOfMonth(*state, 1, 2, 1));  // second sunday of january
+    EXPECT_EQ(15, nthDayOfWeekOfMonth(*state, 1, 3, 1)); // third sunday of january
+    EXPECT_EQ(22, nthDayOfWeekOfMonth(*state, 1, 4, 1)); // fourth sunday of january
 
-    EXPECT_EQ(2, nthDayOfWeekOfMonth(2, 1, 1));  // first monday of january
-    EXPECT_EQ(10, nthDayOfWeekOfMonth(3, 2, 1)); // second tuesday of january
-    EXPECT_EQ(19, nthDayOfWeekOfMonth(5, 3, 1)); // third thursday of january
-    EXPECT_EQ(28, nthDayOfWeekOfMonth(7, 4, 1)); // fourth saturday of january
+    EXPECT_EQ(2, nthDayOfWeekOfMonth(*state, 2, 1, 1));  // first monday of january
+    EXPECT_EQ(10, nthDayOfWeekOfMonth(*state, 3, 2, 1)); // second tuesday of january
+    EXPECT_EQ(19, nthDayOfWeekOfMonth(*state, 5, 3, 1)); // third thursday of january
+    EXPECT_EQ(28, nthDayOfWeekOfMonth(*state, 7, 4, 1)); // fourth saturday of january
 
-    EXPECT_EQ(32, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(60, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(60, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true;
-    DataEnvironment::RunPeriodStartDayOfWeek = 1; // sunday
+    state->dataEnvrn->CurrentYearIsLeapYear = true;
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 1; // sunday
 
-    EXPECT_EQ(32, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(61, nthDayOfWeekOfMonth(5, 1, 3)); // first thursday of march
-    EXPECT_EQ(67, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(61, nthDayOfWeekOfMonth(*state, 5, 1, 3)); // first thursday of march
+    EXPECT_EQ(67, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true; // based on 2016
-    DataEnvironment::RunPeriodStartDayOfWeek = 6;  // friday
+    state->dataEnvrn->CurrentYearIsLeapYear = true; // based on 2016
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 6;  // friday
 
-    EXPECT_EQ(3, nthDayOfWeekOfMonth(1, 1, 1));  // first sunday of january
-    EXPECT_EQ(10, nthDayOfWeekOfMonth(1, 2, 1)); // second sunday of january
-    EXPECT_EQ(17, nthDayOfWeekOfMonth(1, 3, 1)); // third sunday of january
-    EXPECT_EQ(24, nthDayOfWeekOfMonth(1, 4, 1)); // fourth sunday of january
-    EXPECT_EQ(31, nthDayOfWeekOfMonth(1, 5, 1)); // fifth sunday of january
+    EXPECT_EQ(3, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january
+    EXPECT_EQ(10, nthDayOfWeekOfMonth(*state, 1, 2, 1)); // second sunday of january
+    EXPECT_EQ(17, nthDayOfWeekOfMonth(*state, 1, 3, 1)); // third sunday of january
+    EXPECT_EQ(24, nthDayOfWeekOfMonth(*state, 1, 4, 1)); // fourth sunday of january
+    EXPECT_EQ(31, nthDayOfWeekOfMonth(*state, 1, 5, 1)); // fifth sunday of january
 
-    EXPECT_EQ(1, nthDayOfWeekOfMonth(6, 1, 1));  // first friday of january
-    EXPECT_EQ(8, nthDayOfWeekOfMonth(6, 2, 1));  // second friday of january
-    EXPECT_EQ(15, nthDayOfWeekOfMonth(6, 3, 1)); // third friday of january
-    EXPECT_EQ(22, nthDayOfWeekOfMonth(6, 4, 1)); // fourth friday of january
+    EXPECT_EQ(1, nthDayOfWeekOfMonth(*state, 6, 1, 1));  // first friday of january
+    EXPECT_EQ(8, nthDayOfWeekOfMonth(*state, 6, 2, 1));  // second friday of january
+    EXPECT_EQ(15, nthDayOfWeekOfMonth(*state, 6, 3, 1)); // third friday of january
+    EXPECT_EQ(22, nthDayOfWeekOfMonth(*state, 6, 4, 1)); // fourth friday of january
 
-    EXPECT_EQ(34, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(62, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(34, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(62, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 }
 
 TEST_F(EnergyPlusFixture, General_EpexpTest)

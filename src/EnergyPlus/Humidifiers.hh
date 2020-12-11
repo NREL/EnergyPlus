@@ -171,7 +171,7 @@ namespace Humidifiers {
 
         void UpdateReportWaterSystem(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void UpdateHumidifier(); // number of the current humidifier being simulated
+        void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
         void ReportHumidifier(); // number of the current humidifier being simulated
     };

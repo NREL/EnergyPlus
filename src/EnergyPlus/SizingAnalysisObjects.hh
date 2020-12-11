@@ -62,8 +62,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-void SizingAnalysisObjects_clear_state();
-
 class SystemTimestepObject
 {
 public:

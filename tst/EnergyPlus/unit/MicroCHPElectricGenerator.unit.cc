@@ -59,6 +59,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -294,17 +295,17 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     MicroCHP2.TypeOf = "GENERATOR:MICROCHP";
     MicroCHP2.TypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
     MicroCHP2.Name = "MICROCOGEN2";
-    MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, "MICROCOGEN1");
-    MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, "MICROCOGEN2");
+    MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN1");
+    MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN2");
     EXPECT_EQ(MicroCHPElectricGenerator::NumMicroCHPs, 2);
 
     bool FirstHVACIteration = true;
     bool InitLoopEquip = true;
     bool GetCompSizFac = false;
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(state);
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(state);
-    MicroCHP1.simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
-    MicroCHP2.simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    MicroCHP1.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+    MicroCHP2.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     EXPECT_EQ(DataGenerators::GeneratorDynamics(1).Name, MicroCHP1.Name);
     EXPECT_EQ(DataGenerators::GeneratorDynamics(2).Name, MicroCHP2.Name);
 }

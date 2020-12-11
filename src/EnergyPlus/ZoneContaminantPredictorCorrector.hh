@@ -126,8 +126,6 @@ namespace ZoneContaminantPredictorCorrector {
             this->TotGCBLDiff = 0;
             this->TotGCDVS = 0;
             this->TotGCDRS = 0;
-            DataContaminantBalance::Contaminant.CO2Simulation = false;
-            DataContaminantBalance::Contaminant.GenericContamSimulation = false;
             this->MyOneTimeFlag = true;
             this->MyEnvrnFlag = true;
             this->MyDayFlag = true;

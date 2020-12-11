@@ -216,18 +216,6 @@ namespace General {
                   int &N             // number of terms in polynomial
     );
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const SigDigits = _ // ignored
-    );
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const SigDigits = _ // ignored
-    );
-
     std::string RemoveTrailingZeros(std::string const &InputString);
 
     std::string &strip_trailing_zeros(std::string &InputString);
@@ -278,7 +266,8 @@ namespace General {
 
     std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
-    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     );

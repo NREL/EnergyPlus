@@ -409,7 +409,7 @@ public: // methods
                               DataAirSystems::fanModelTypeEnum const &fanEnumType,
                               int const &fanIndex);
 
-    std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
+    static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 
     bool isCompTypeFan(std::string const &compType // string component type, input object class name
     );
