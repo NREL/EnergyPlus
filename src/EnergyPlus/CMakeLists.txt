@@ -791,7 +791,7 @@ endif()
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
 add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
 target_link_libraries(energyplusparser PUBLIC re2 fmt::fmt ${CMAKE_DL_LIBS})
-target_link_libraries(energyplusparser PRIVATE project_options)
+target_link_libraries(energyplusparser PRIVATE project_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser Shlwapi)
 endif()
@@ -815,7 +815,7 @@ target_link_libraries(
          Windows-CalcEngine
          airflownetworklib)
 
-target_link_libraries(energypluslib PRIVATE project_options)
+target_link_libraries(energypluslib PRIVATE project_options project_warnings)
 
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)
@@ -874,7 +874,7 @@ else() # windows
     ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
 endif()
 target_link_libraries(energyplusapi PUBLIC energypluslib)
-target_link_libraries(energyplusapi PRIVATE project_options)
+target_link_libraries(energyplusapi PRIVATE project_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR
                                                "@executable_path")
@@ -890,7 +890,7 @@ if(APPLE OR UNIX)
 else() # windows
   add_executable(energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc")
 endif()
-target_link_libraries(energyplus PRIVATE energyplusapi project_options)
+target_link_libraries(energyplus PRIVATE energyplusapi project_options project_warnings)
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
@@ -983,7 +983,7 @@ if(BUILD_TESTING)
   # Build the test executable
   add_executable(TestEnergyPlusCallbacks test_ep_as_library.cc)
   target_link_libraries(TestEnergyPlusCallbacks PRIVATE energyplusapi
-                                                        project_options)
+                                                        project_options project_warnings)
   add_test(
     NAME "API.LegacyCallbackTest"
     COMMAND
@@ -1000,7 +1000,7 @@ if(BUILD_TESTING)
   add_executable(TestAPI_Functional_C
                  ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c)
   target_link_libraries(TestAPI_Functional_C PRIVATE energyplusapi
-                                                     project_options)
+                                                     project_options project_warnings)
   add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
 
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/tst/api/)
@@ -1009,7 +1009,7 @@ if(BUILD_TESTING)
   file(MAKE_DIRECTORY ${TEST_DIR})
   add_executable(TestAPI_Runtime_C
                  ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c)
-  target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options)
+  target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options project_warnings)
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}"
                                            -w "${EPW_FILE}" -D "${IDF_FILE}")
 
@@ -1018,7 +1018,7 @@ if(BUILD_TESTING)
   add_executable(TestAPI_DataTransfer_C
                  ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c)
   target_link_libraries(TestAPI_DataTransfer_C PRIVATE energyplusapi
-                                                       project_options)
+                                                       project_options project_warnings)
   add_test(NAME "API.TestDataTransferC"
            COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D
                    "${IDF_FILE}")

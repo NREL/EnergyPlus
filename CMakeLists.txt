@@ -24,6 +24,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
+add_library(project_warnings INTERFACE)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads)
 target_link_libraries(project_options INTERFACE Threads::Threads)
