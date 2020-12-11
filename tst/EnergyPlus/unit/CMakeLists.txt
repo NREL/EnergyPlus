@@ -1,3 +1,11 @@
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh

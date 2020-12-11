@@ -129,15 +129,15 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
 
     bool ErrorsFound = false;
@@ -164,8 +164,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     int ZoneNodeNum = 1;
     int InletNodeNum = 4;
     bool FirstHVACIteration = true;
-    Real64 SysMinMassFlow = 1.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
-    Real64 SysMaxMassFlow = 2.0 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
+    Real64 SysMinMassFlow = 1.0 * state->dataEnvrn->StdRhoAir; // From inputs for Zone 1 VAV
+    Real64 SysMaxMassFlow = 2.0 * state->dataEnvrn->StdRhoAir; // From inputs for Zone 1 VAV
 
     // Test with heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
@@ -300,15 +300,15 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
 
     bool ErrorsFound = false;
@@ -336,8 +336,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     int ZoneNodeNum = 1;
     int InletNodeNum = 5;
     bool FirstHVACIteration = true;
-    Real64 SysMinMassFlow = 0.25 * DataEnvironment::StdRhoAir; // From inputs for Zone 1 VAV
-    Real64 SysMaxMassFlow = 1.0 * DataEnvironment::StdRhoAir;  // From inputs for Zone 1 VAV
+    Real64 SysMinMassFlow = 0.25 * state->dataEnvrn->StdRhoAir; // From inputs for Zone 1 VAV
+    Real64 SysMaxMassFlow = 1.0 * state->dataEnvrn->StdRhoAir;  // From inputs for Zone 1 VAV
 
     // Test with heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
@@ -1331,7 +1331,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
     DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
     state->dataSingleDuct->sd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
@@ -2471,9 +2471,9 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     //	" Until: 17:00, 17.0,       !- Field 23",
     //	" Until: 24:00, 10.0;       !- Field 23",
 
-    DataEnvironment::StdRhoAir = 1.2027389349552706;
+    state->dataEnvrn->StdRhoAir = 1.2027389349552706;
     Real64 CoilInTemp = TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
-    Real64 DesMassFlow = DataEnvironment::StdRhoAir * TermUnitSizing(1).AirVolFlow;
+    Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * TermUnitSizing(1).AirVolFlow;
     Real64 DesZoneHeatLoad = FinalZoneSizing(1).DesHeatLoad * FinalZoneSizing(1).HeatSizingFactor;
     Real64 ZoneDesTemp = FinalZoneSizing(1).ZoneTempAtHeatPeak;
     Real64 ZoneDesHumRat = FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
@@ -2527,7 +2527,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
 
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
     // No airloop data exists, so skip these parts of the init
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;
@@ -2595,7 +2595,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
 
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
     // No airloop data exists, so skip these parts of the init
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;

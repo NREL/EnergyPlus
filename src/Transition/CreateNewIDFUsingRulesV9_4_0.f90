@@ -126,7 +126,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
-  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
   LOGICAL :: changeMeterNameFlag
   INTEGER :: totMeterCustom = 0
@@ -765,6 +764,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    .true.)
                 IF (DelThis) CYCLE
 
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 3) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(3))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(3), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
+
               CASE('OUTPUT:TABLE:MONTHLY')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.true.
@@ -1103,7 +1117,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       EXIT
                     ENDIF
                   ENDDO
-                  IF (.not. DelThis) CurVar=CurVar+2
+                  IF (.not. DelThis) THEN 
+                  
+                    ! Begin - Special section for v9.4
+                    changeMeterNameFlag = .true.
+                    DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                      MeterCustomName = MeterCustomNames(numMeterCustom)
+                      IF (MeterCustomName .eq. MakeUPPERCase(InArgs(Var))) THEN
+                        changeMeterNameFlag = .false.
+                      END IF
+                    END DO
+                    IF (changeMeterNameFlag) THEN
+                      CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
+                    END IF
+                    ! End - Special section for v9.4
+                  
+                  CurVar=CurVar+2
+                  END IF
                 ENDDO
                 CurArgs=CurVar
                 DO Arg=CurVar,1,-1
@@ -1118,8 +1148,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
-                CurVar=4   ! In case Source Meter would change
-                DO Var=4,CurArgs,2
+                CurVar=3   ! In case Source Meter would change
+                DO Var=3,CurArgs,2
                   UCRepVarName=MakeUPPERCase(InArgs(Var))
                   OutArgs(CurVar)=InArgs(Var)
                   OutArgs(CurVar+1)=InArgs(Var+1)
@@ -1211,7 +1241,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       EXIT
                     ENDIF
                   ENDDO
-                  IF (.not. DelThis) CurVar=CurVar+2
+                  IF (.not. DelThis) THEN 
+                  
+                    ! Begin - Special section for v9.4
+                    changeMeterNameFlag = .true.
+                    DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                      MeterCustomName = MeterCustomNames(numMeterCustom)
+                      IF (MeterCustomName .eq. MakeUPPERCase(InArgs(Var))) THEN
+                        changeMeterNameFlag = .false.
+                      END IF
+                    END DO
+                    IF (changeMeterNameFlag) THEN
+                      CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
+                    END IF
+                    ! End - Special section for v9.4
+                                    
+                  CurVar=CurVar+2
+                  END IF
                 ENDDO
                 CurArgs=CurVar
                 DO Arg=CurVar,1,-1
@@ -1243,6 +1289,57 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
 
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 2) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(2))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(2), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
+
+              CASE('ELECTRICLOADCENTER:TRANSFORMER')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+                DO Var=19,28,1
+                  CALL ScanOutputVariablesForReplacement(  &
+                     Var,  &
+                     DelThis,  &
+                     checkrvi,  &
+                     nodiff,  &
+                     ObjectName,  &
+                     DifLfn,      &
+                     .false.,  & !OutVar
+                     .true., & !MtrVar
+                     .false., & !TimeBinVar
+                     CurArgs, &
+                     Written, &
+                     .false.)
+                       
+                  ! Begin - Special section for v9.4
+                  IF (CurArgs .GE. Var) THEN
+                    changeMeterNameFlag = .true.
+                    DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                      MeterCustomName = MeterCustomNames(numMeterCustom)
+                      IF (MeterCustomName .eq. MakeUPPERCase(InArgs(Var))) THEN
+                        changeMeterNameFlag = .false.
+                      END IF
+                    END DO
+                    IF (changeMeterNameFlag) THEN
+                      CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(Var), NoDiff)
+                    END IF
+                  END IF
+                  ! End - Special section for v9.4
+                END DO
+
               CASE('ELECTRICLOADCENTER:DISTRIBUTION')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -1263,6 +1360,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
 
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 6) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(6))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(6), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
+
                ! Field 12    A11, \field Storage Control Track Meter Name
                 CALL ScanOutputVariablesForReplacement(  &
                    12,  &
@@ -1278,6 +1390,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
 
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 12) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(12))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(12), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
 
               ! ANY OTHER OBJECT
               CASE DEFAULT

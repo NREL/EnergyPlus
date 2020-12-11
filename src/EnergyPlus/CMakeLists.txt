@@ -15,6 +15,24 @@ else()
   add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
+if(USE_PSYCHROMETRICS_CACHING)
+  # Caching defaulted ON
+else()
+  add_definitions("-DEP_nocache_Psychrometrics")
+endif()
+
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_STATS)
+  add_definitions("-DEP_psych_stats")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
@@ -145,17 +163,12 @@ SET( SRC
   DataBranchNodeConnections.hh
   DataComplexFenestration.hh
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
   DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
@@ -781,6 +794,9 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )

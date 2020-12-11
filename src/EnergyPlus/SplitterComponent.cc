@@ -303,8 +303,6 @@ namespace SplitterComponent {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyHFnTdbW;
 
         int InletNode;
@@ -316,15 +314,15 @@ namespace SplitterComponent {
         if (state.dataGlobal->BeginEnvrnFlag && state.dataSplitterComponent->MyEnvrnFlag) {
 
             // Calculate the air density and enthalpy for standard conditions...
-            AirEnthalpy = PsyHFnTdbW(20.0, OutHumRat);
+            AirEnthalpy = PsyHFnTdbW(20.0, state.dataEnvrn->OutHumRat);
 
             // Initialize the inlet node to s standard set of conditions so that the
             //  flows match around the loop & do not cause convergence problems.
             InletNode = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
             Node(InletNode).Temp = 20.0;
-            Node(InletNode).HumRat = OutHumRat;
+            Node(InletNode).HumRat = state.dataEnvrn->OutHumRat;
             Node(InletNode).Enthalpy = AirEnthalpy;
-            Node(InletNode).Press = OutBaroPress;
+            Node(InletNode).Press = state.dataEnvrn->OutBaroPress;
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 Node(InletNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
             }

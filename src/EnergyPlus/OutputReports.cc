@@ -453,7 +453,6 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
-    using DataDaylighting::ZoneDaylight;
     using DataHeatBalance::Zone;
 
     static constexpr auto Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
@@ -462,15 +461,15 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         auto curcolorno = ColorNo_DaylSensor1;
 
-        for (int refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
+        for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
             print(of, "999\n{}:{}:{}\n", Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
             print(of,
                   Format_709,
                   normalizeName(Zone(zones).Name),
                   DXFcolorno(curcolorno),
-                  ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
-                  ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
-                  ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
+                  state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
+                  state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
+                  state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
                   0.2);
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
@@ -503,8 +502,6 @@ void DXFOut(EnergyPlusData &state,
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataDaylighting::IllumMapCalc;
-    using DataDaylighting::TotIllumMaps;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
@@ -836,17 +833,17 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto curcolorno = ColorNo_DaylSensor1;
 
-        for (int mapnum = 1; mapnum <= TotIllumMaps; ++mapnum) {
-            if (IllumMapCalc(mapnum).Zone != zones) continue;
-            for (int refpt = 1; refpt <= IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
+        for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
+            if (state.dataDaylightingData->IllumMapCalc(mapnum).Zone != zones) continue;
+            for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", Zone(zones).Name, refpt));
                 print(dxffile,
                       Format_709,
                       normalizeName(Zone(zones).Name),
                       DXFcolorno(curcolorno),
-                      IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
-                      IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
-                      IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt),
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt),
                       0.05);
             }
         }
@@ -881,7 +878,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataDaylighting::ZoneDaylight;
     using DataStringGlobals::VerString;
 
     // Locals
@@ -1092,7 +1088,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataDaylighting::ZoneDaylight;
     using DataStringGlobals::VerString;
 
     // Locals
@@ -1831,7 +1826,6 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
-    using DataDaylighting::ZoneDaylight;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 

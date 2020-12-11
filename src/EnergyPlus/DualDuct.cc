@@ -99,7 +99,6 @@ namespace DualDuct {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallMassFlow;
     using namespace DataSizing;
@@ -214,7 +213,7 @@ namespace DualDuct {
         auto &thisDualDuct(dd_airterminal(DDNum));
 
         if (CompIndex > 0) {
-            DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
+            DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DDNum Initialize
             thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
@@ -266,8 +265,6 @@ namespace DualDuct {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataHeatBalance;
@@ -375,10 +372,10 @@ namespace DualDuct {
                 TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
                 TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
-                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == AirDistUnit(ADUNum).OutletNodeNum) {
-                        AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                        AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
+                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
                         dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
@@ -416,9 +413,9 @@ namespace DualDuct {
                                     ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
                                     ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                     ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                    AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                                    state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                         ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                    AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                    state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
                                 }
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
                                 dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
@@ -516,10 +513,10 @@ namespace DualDuct {
                 TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
                 TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
-                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == AirDistUnit(ADUNum).OutletNodeNum) {
-                        AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                        AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
+                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).ColdAirInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).HotAirInletNodeNum;
                         dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
@@ -550,9 +547,9 @@ namespace DualDuct {
                                 ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                 ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                     ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
                                 dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
@@ -679,7 +676,7 @@ namespace DualDuct {
                 }
 
                 dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * StdRhoAir;
+                dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // Register component set data - one for OA and one for RA
                 TestCompSet(state, CurrentModuleObject + ":OutdoorAir", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
@@ -698,10 +695,10 @@ namespace DualDuct {
                 }
                 // checks on this are done later
 
-                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                    if (dd_airterminal(DDNum).OutletNodeNum == AirDistUnit(ADUNum).OutletNodeNum) {
-                        AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).OAInletNodeNum;
-                        AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).RecircAirInletNodeNum;
+                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                    if (dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = dd_airterminal(DDNum).OAInletNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = dd_airterminal(DDNum).RecircAirInletNodeNum;
                         dd_airterminal(DDNum).ADUNum = ADUNum;
                     }
                 }
@@ -736,9 +733,9 @@ namespace DualDuct {
                                 ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                 ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
+                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
                                     ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
                                 dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
@@ -854,8 +851,6 @@ namespace DualDuct {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataConvergParams::HVACFlowRateToler;
-        using DataDefineEquip::AirDistUnit;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -884,7 +879,7 @@ namespace DualDuct {
             // MyAirLoopFlag.dimension(NumDDAirTerminal, true);
             // MyEnvrnFlag = true;
             // MySizeFlag = true;
-            MassFlowSetToler = HVACFlowRateToler * 0.00001;
+            MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
             InitDualDuctMyOneTimeFlag = false;
         }
@@ -894,8 +889,8 @@ namespace DualDuct {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
                 if (this->ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->ADUNum).Name)) continue;
-                ShowSevereError(state, "InitDualDuct: ADU=[Air Distribution Unit," + AirDistUnit(this->ADUNum).Name +
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name)) continue;
+                ShowSevereError(state, "InitDualDuct: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 if (this->DamperType == DualDuct_ConstantVolume) {
                     ShowContinueError(state, "...Dual Duct Damper=[" + cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
@@ -923,7 +918,7 @@ namespace DualDuct {
                 OutNode = this->OutletNodeNum;
                 HotInNode = this->HotAirInletNodeNum;
                 ColdInNode = this->ColdAirInletNodeNum;
-                Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
+                Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                 if (this->DamperType == DualDuct_ConstantVolume) {
                     Node(OutNode).MassFlowRateMin = 0.0;
                 } else if (this->DamperType == DualDuct_VariableVolume) {
@@ -952,7 +947,7 @@ namespace DualDuct {
                 if (this->RecircIsUsed) RAInNode = this->RecircAirInletNodeNum;
                 Node(OutNode).MassFlowRateMax = this->MaxAirMassFlowRate;
                 Node(OutNode).MassFlowRateMin = 0.0;
-                this->dd_airterminalOAInlet.AirMassFlowRateMax = this->DesignOAFlowRate * StdRhoAir;
+                this->dd_airterminalOAInlet.AirMassFlowRateMax = this->DesignOAFlowRate * state.dataEnvrn->StdRhoAir;
                 if (this->RecircIsUsed) {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateMax = this->MaxAirMassFlowRate - this->dd_airterminalOAInlet.AirMassFlowRateMax;
                     Node(RAInNode).MassFlowRateMax = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
@@ -985,7 +980,7 @@ namespace DualDuct {
             if (this->AirLoopNum == 0) {
                 if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeIndex > 0)) {
                     this->AirLoopNum = ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
-                    AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
+                    state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
                     // Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
                 }
             } else {
@@ -1176,7 +1171,7 @@ namespace DualDuct {
                         this->MaxAirVolFlowRate = this->DesignOAFlowRate;
                         this->DesignRecircFlowRate = 0.0;
                     }
-                    this->MaxAirMassFlowRate = this->MaxAirVolFlowRate * StdRhoAir;
+                    this->MaxAirMassFlowRate = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
 
                 if (this->MaxAirVolFlowRate < SmallAirVolFlow) {
@@ -1867,7 +1862,7 @@ namespace DualDuct {
                                                                      this->ActualZoneNum,
                                                                      state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                      UseMinOASchFlag);
-                OAMassFlow = OAVolumeFlowRate * StdRhoAir;
+                OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
                 SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -1943,7 +1938,7 @@ namespace DualDuct {
         OAVolumeFlowRate =
             CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
-        OAMassFlow = OAVolumeFlowRate * StdRhoAir;
+        OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate =
@@ -2338,7 +2333,7 @@ namespace DualDuct {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             // do nothing for now
         }

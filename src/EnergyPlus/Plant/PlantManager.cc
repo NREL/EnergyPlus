@@ -192,8 +192,6 @@ namespace EnergyPlus {
             // Reset the flags as necessary
 
             // Using/Aliasing
-            using DataConvergParams::MaxPlantSubIterations;
-            using DataConvergParams::MinPlantSubIterations;
             using PlantUtilities::LogPlantConvergencePoints;
 
             // SUBROUTINE VARIABLE DEFINITIONS
@@ -210,9 +208,9 @@ namespace EnergyPlus {
                 return (e.CommonPipeType == DataPlant::CommonPipe_Single) ||
                        (e.CommonPipeType == DataPlant::CommonPipe_TwoWay);
             })) {
-                CurntMinPlantSubIterations = max(7, MinPlantSubIterations);
+                CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
             } else {
-                CurntMinPlantSubIterations = MinPlantSubIterations;
+                CurntMinPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations;
             }
 
             if (TotNumLoops <= 0) { // quick return if no plant in model
@@ -223,7 +221,7 @@ namespace EnergyPlus {
             IterPlant = 0;
             InitializeLoops(state, FirstHVACIteration);
 
-            while ((SimPlantLoops) && (IterPlant <= MaxPlantSubIterations)) {
+            while ((SimPlantLoops) && (IterPlant <= state.dataConvergeParams->MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
                 for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
 
@@ -314,7 +312,6 @@ namespace EnergyPlus {
             auto localTempSetPt = SetPointManager::iCtrlVarType::Temp;
             using NodeInputManager::GetOnlySingleNode;
             using namespace BranchInputManager;
-            using DataConvergParams::PlantConvergence;
             using DataSizing::AutoSize;
             using FluidProperties::CheckFluidPropertyName;
             using FluidProperties::FindGlycol;
@@ -352,7 +349,7 @@ namespace EnergyPlus {
 
             if (TotNumLoops > 0) {
                 PlantLoop.allocate(TotNumLoops);
-                PlantConvergence.allocate(TotNumLoops);
+                state.dataConvergeParams->PlantConvergence.allocate(TotNumLoops);
                 if (!allocated(PlantAvailMgr)) {
                     PlantAvailMgr.allocate(TotNumLoops);
                 }
@@ -2425,7 +2422,6 @@ namespace EnergyPlus {
             // this contains all the initializations
 
             // Using/Aliasing
-            using DataEnvironment::StdBaroPress;
             using HVACInterfaceManager::PlantCommonPipe;
             using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2587,7 +2583,7 @@ namespace EnergyPlus {
 
                                 Node(ComponentInlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentInlet).Quality = StartQuality;
-                                Node(ComponentInlet).Press = StdBaroPress;
+                                Node(ComponentInlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentInlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentInlet).HumRat = StartHumRat;
 
@@ -2603,7 +2599,7 @@ namespace EnergyPlus {
                                 Node(ComponentOutlet).MassFlowRateMaxAvail = Node(BranchInlet).MassFlowRateMaxAvail;
                                 Node(ComponentOutlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentOutlet).Quality = StartQuality;
-                                Node(ComponentOutlet).Press = StdBaroPress;
+                                Node(ComponentOutlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentOutlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentOutlet).HumRat = StartHumRat;
                             } // COMPONENT LOOP

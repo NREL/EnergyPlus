@@ -115,7 +115,7 @@ namespace ExteriorEnergyUse {
         using ScheduleManager::GetScheduleName;
         using namespace OutputReportPredefined;
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetExteriorEnergyUseInput: ");
+        auto constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
@@ -438,7 +438,7 @@ namespace ExteriorEnergyUse {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
     }
 
@@ -539,8 +539,6 @@ namespace ExteriorEnergyUse {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::SunIsUp;
-
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -566,7 +564,7 @@ namespace ExteriorEnergyUse {
                     state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
                     break;
                 case ExteriorEnergyUse::LightControlType::AstroClockOverride:
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         state.dataExteriorEnergyUse->ExteriorLights(Item).Power = 0.0;
                         state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = 0.0;
                     } else {

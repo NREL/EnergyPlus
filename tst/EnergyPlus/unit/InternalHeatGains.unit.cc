@@ -679,8 +679,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
-    DataEnvironment::TotDesDays = 1;
-    DataEnvironment::TotRunDesPersDays = 0;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataEnvrn->TotRunDesPersDays = 0;
     DataSizing::CurOverallSimDay = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 10;
@@ -1300,9 +1300,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     state->dataGlobal->NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    DataEnvironment::DayOfYear_Schedule = 1;
-    DataEnvironment::DayOfMonth = 1;
-    DataEnvironment::DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataEnvrn->DayOfWeek = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     ScheduleManager::UpdateScheduleValues(*state);

@@ -126,13 +126,6 @@ namespace HVACMultiSpeedHeatPump {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::DayOfYear;
-    using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;
     using DataHVACGlobals::Coil_HeatingElectric_MultiStage;
@@ -2055,7 +2048,7 @@ namespace HVACMultiSpeedHeatPump {
             int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
             if (ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                ZoneEquipList(ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+                ZoneEquipList(ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum = coolingPriority;
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum = heatingPriority;
             }
@@ -2116,7 +2109,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MSHeatPump(MSHeatPumpNum).MyEnvrnFlag) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             for (i = 1; i <= NumOfSpeedCooling; ++i) {
                 MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(i) = RhoAir * MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i);
@@ -2328,7 +2321,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = MSHeatPump(MSHeatPumpNum).FanVolFlow;
                 }
-                RhoAir = StdRhoAir;
+                RhoAir = state.dataEnvrn->StdRhoAir;
                 // set the mass flow rates from the reset volume flow rates
                 for (i = 1; i <= NumOfSpeedCooling; ++i) {
                     MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(i) = RhoAir * MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i);
@@ -2944,7 +2937,7 @@ namespace HVACMultiSpeedHeatPump {
         SpeedRatio = 0.0;
         SpeedNum = 1;
 
-        OutsideDryBulbTemp = OutDryBulbTemp;
+        OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
 
         //!!LKL Discrepancy with < 0
         if (GetCurrentScheduleValue(state, MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) == 0.0) return;
@@ -3475,7 +3468,6 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::ZT;
         using DXCoils::DXCoil;
         using DXCoils::DXCoilPartLoadRatio;
@@ -3516,16 +3508,16 @@ namespace HVACMultiSpeedHeatPump {
             if (DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
                 OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
             } else {
-                OutsideDryBulbTemp = OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
             if (DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
                 OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
             } else {
-                OutsideDryBulbTemp = OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else {
-            OutsideDryBulbTemp = OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
         FanOutletNode = MSHeatPump(MSHeatPumpNum).FanOutletNode;
         FanInletNode = MSHeatPump(MSHeatPumpNum).FanInletNode;

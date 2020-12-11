@@ -765,7 +765,7 @@ namespace SurfaceGeometry {
         SetupEnclosuresAndAirBoundaries(state, DataViewFactorInformation::ZoneSolarInfo, SurfaceGeometry::enclosureType::SolarEnclosures, ErrorsFound);
 
         // Do the Stratosphere check
-        SetZoneOutBulbTempAt();
+        SetZoneOutBulbTempAt(state);
         CheckZoneOutBulbTempAt(state);
     }
 
@@ -2246,7 +2246,7 @@ namespace SurfaceGeometry {
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                           TotOverhangsProjection + TotFins + TotFinsProjection;
         int NumDElightCmplxFen = inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
-        if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight())) {
+        if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
             ShowWarningError(state, RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
     }
@@ -3172,10 +3172,10 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = Ground;
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempObjInput) {
                             ShowWarningError(state, "GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp));
+                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
@@ -3184,7 +3184,7 @@ namespace SurfaceGeometry {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "GroundFCfactorMethod")) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = GroundFCfactorMethod;
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!FCGroundTemps) {
+                        if (!state.dataEnvrn->FCGroundTemps) {
                             ShowSevereError(state, "GetHTSurfaceData: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
@@ -3270,7 +3270,7 @@ namespace SurfaceGeometry {
                         if (!state.dataSurfaceGeometry->kivaManager.defaultSet) {
                             // Apply default foundation if no other foundation object specified
                             if (state.dataSurfaceGeometry->kivaManager.foundationInputs.size() == 0) {
-                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation();
+                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
                             }
                             state.dataSurfaceGeometry->kivaManager.addDefaultFoundation();
                         }
@@ -3707,17 +3707,17 @@ namespace SurfaceGeometry {
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempObjInput) {
                             ShowWarningError(state, "GetRectSurfaces: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp));
+                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
 
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!FCGroundTemps) {
+                        if (!state.dataEnvrn->FCGroundTemps) {
                             ShowSevereError(state, "GetRectSurfaces: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
@@ -8927,8 +8927,8 @@ namespace SurfaceGeometry {
 
             // Check for reversal of on and off times
             if (SurfNum > 0) {
-                if ((Latitude > 0.0 && (StormWindow(StormWinNum).MonthOn < StormWindow(StormWinNum).MonthOff)) ||
-                    (Latitude <= 0.0 && (StormWindow(StormWinNum).MonthOn > StormWindow(StormWinNum).MonthOff))) {
+                if ((state.dataEnvrn->Latitude > 0.0 && (StormWindow(StormWinNum).MonthOn < StormWindow(StormWinNum).MonthOff)) ||
+                    (state.dataEnvrn->Latitude <= 0.0 && (StormWindow(StormWinNum).MonthOn > StormWindow(StormWinNum).MonthOff))) {
                     ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" check times that storm window");
                     ShowContinueError(state,
                                       format("is put on (month={}, day={}) and taken off (month={}, day={});",
@@ -8936,7 +8936,7 @@ namespace SurfaceGeometry {
                                              StormWindow(StormWinNum).DayOfMonthOn,
                                              StormWindow(StormWinNum).MonthOff,
                                              StormWindow(StormWinNum).DayOfMonthOff));
-                    ShowContinueError(state, format("these times may be reversed for your building latitude={:.2R} deg.", Latitude));
+                    ShowContinueError(state, format("these times may be reversed for your building latitude={:.2R} deg.", state.dataEnvrn->Latitude));
                 }
             }
         }
@@ -9283,7 +9283,7 @@ namespace SurfaceGeometry {
         int TotKivaFnds = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
-            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation();
+            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
 
             Array1D_string fndNames;
             fndNames.allocate(TotKivaFnds + 1);
@@ -12829,7 +12829,7 @@ namespace SurfaceGeometry {
             ShowContinueError(state, "...in any calculations, Wind Speed will be 0.0 for these surfaces.");
             ShowContinueError(state,
                               format("...in any calculations, Outside temperatures will be the outside temperature + {:.3R} for these surfaces.",
-                                     WeatherFileTempModCoeff));
+                                     state.dataEnvrn->WeatherFileTempModCoeff));
             ShowContinueError(state, "...that is, these surfaces will have conditions as though at ground level.");
         }
     }
