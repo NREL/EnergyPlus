@@ -11,6 +11,11 @@
  -  Revised, November 25, 2020
     * Condensed and focused on final proposal somewhat agreed to back in April 2020
     * Revised to reflect simplified Construction:AirBoundary object (radiant and solar enclosures are now the same)
+ -  Revised, December 11, 2020
+    * Simplify transition rules by allowing Zone and Space to share names
+    * Per comments, decide that load assignments like internal gains, infiltration and ventilation, should be at the Space level
+    * Add language to clarify concerns raised in comments
+    * Add daylighting and thermal comfort considerations
 
 ## Justification for New Feature ##
 
@@ -21,9 +26,14 @@ Currently, the smallest building element is a zone. This requires the user (or i
 internal gains, and other specifications. The option to specify each space explicitly would greatly simplify input in data managemenent,
 especially for space-based interfaces (such as OpenStudio) and for codes and standards modeling.
 
-There are also computing performance advantages to dividing zones into smaller enclosures for radiant exchange.
+Other advantages include better surface groupings for radiant and solar exchange. For example, a private office which is part of a large 
+HVAC zone could be modeled as a space so that it does not pass solar or radiant to other surfaces in the larger zone. 
+There are also potential computing performance advantages to dividing zones into smaller enclosures for radiant exchange and solar
+distribution, especially for large HVAC zones with many surfaces.
 
 ## Overview ##
+As proposed, Zones remain the same entity as before. Space is added as a new layer for assembling surfaces and gains into a Zone. 
+HVAC connections and controls remain at the Zone level. 
 
 ### Current EnergyPlus model ###
 EnergyPlus input currently has the following (very flat) heierarchy:
@@ -53,8 +63,8 @@ The internal data model adds another layer:
             HVAC equipment
 
 Enclosures are used for radiant and solar/daylighting exchange. Enclosures are primarily concerned with Surfaces, but they
-are also related to internal gains (which cast radiant and visible energy into the enclosure). By default there is one Enclosure for each
-Zone.  By using Construction:AirBoundary, multiple zones may be grouped into a single larger Enclosure. 
+are also related to internal gains (which cast radiant and visible energy into the enclosure) and thermal comfort (MRT). 
+By default there is one Enclosure for each Zone.  By using Construction:AirBoundary, multiple zones may be grouped into a single larger Enclosure. 
 Enclosures are assigned automatically based on the zones connected by an air boundary surface. 
 
 
@@ -89,6 +99,10 @@ If we keep the current definition of "Zone" and add the concept of
  * Surface - A geometric plane which is attached to a Space. 
    * A Surface can be opaque, transparent, or an air boundary.
    * Each Surface belongs to one Space.
+   * Inter-Space Surfaces (adjacent to another Space) are modeled the same as current inter-Zone surfaces (two linked surfaces).
+   * Inter-Space surfaces connecting spaces that are part of the same Zone will see the same air temperature but may be in 
+     different enclosures. If they connect spaces that are in different Zones, then they will see different air temperatures as well.
+   * Air boundary surfaces will combine one or more spaces into an enclosure.
 
  * Space - A collection of one or more Surfaces and internal gains.
    * Each Space belongs to one Zone (explicitly user-assigned).
@@ -114,17 +128,20 @@ If we keep the current definition of "Zone" and add the concept of
 ## Proposed Input Approach ##
 Very minimal changes to current inputs.
 
- * Old Zone object becomes Space object plus some tags.
- * New Zone object has a name and a list of Spaces.
+ * Old Zone object becomes Space object plus some optional tags.
+ * New Zone object has a name and a list of Spaces (allow Zone and Space names to be the same, if desired, to
+   simplify backwards compatibility).
  * Surfaces will reference a Space instead of a Zone.
  * ZoneHVAC and Thermostats remain as-is and continue to reference a Zone or ZoneList.
  * New SpaceList object (equivalent to ZoneList, but for Spaces).
  * Internal gains reference Space or Spacelist (instead of Zone or ZoneList).
- * ZoneInfiltration and ZoneVentilation remain at the zone level.
+ * ZoneInfiltration:* and ZoneVentilation:* are changed to Infiltration:* and Ventilation:* . 
+   These will reference Space or SpaceList (instead of Zone or ZoneList).
+ * Daylighting controls will reference a Space. (Daylighting reference points see all windows in an enclosure).
 
 ### Proposed objects:
 
-    Space,  !- Same fields as old Zone object plus new tags at the end
+    Space,  !- Same fields as old Zone object plus new optional tags at the end
       Name,
       Origin,
       Multiplier,
@@ -134,24 +151,28 @@ Very minimal changes to current inputs.
       Convection algorithms,
       Part of Total Floor Area,
       User-defined Tags for Space Types (for reporting purposes only at this point)
-    
+      
+    Zone, !- Just a list of Spaces
+      Name,
+      Space Name 1,
+      Space Name 2,
+      ...
+      
     Lighting/People/Equipment
       Name,
       Space or SpaceList Name, !- Replace current Zone or ZoneList Name
       Schedule Name,
       ...
     
-    ZoneVentilation and ZoneInfiltration
+    Infiltration:* and Ventilation:*
       Name,
-      Zone or ZoneList Name, (or should these more to the Space level and be renamed?)
+      Space or SpaceList Name, !- Replace current Zone or ZoneList Name
       ...
-      Part of Total Floor Area;
     
     Surface,
       Name,
       ...
       Space Name,  !- Replace current Zone Name
-      (InterZone surfaces becomes InterSpace surfaces, air boundary surfaces will connect spaces in an enclosure)
 
 ## Data Structure Considerations ##
 
@@ -201,8 +222,15 @@ e.g., Enclosure1 contains Space1 and Space3, Enclosure2 contains Space2.
 
 ## Options/Questions for Discussion
  * Keep ZoneVentilation and ZoneInfiltration at the Zone level or move to the Space level (and rename)?
+
+   *Move to Space level and rename to Ventilation:* and Infiltration:*.
+   
  * Allow Zone Names to be the same as Space Names or force all names to be unique across Spaces and Zones?
+ 
+   *Allowing the same names would simplify backward compatibility.*
  * Zone-based or Enclosure-based surface grouping?
+ 
+   *This is a design question, somewhat premature at this point.*
 
 ## Testing/Validation/Data Sources ##
 
@@ -228,7 +256,5 @@ Calulations won't change, so doc changes will be minimal to clarify when Space, 
 
 ## Example File and Transition Changes ##
 
-* Convert Zone objects to Space objects and add "-Space" to the name.
+* Convert Zone objects to Space objects (one-to-one, just change the object class name).
 * Insert new Zone objects (one for each original Zone, no name change).
-* Surfaces - Change all Zone names to add "-Space"
-* Internal gains - Change all Zone names to add "-Space"
