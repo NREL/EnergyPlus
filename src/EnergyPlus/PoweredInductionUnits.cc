@@ -110,7 +110,6 @@ namespace PoweredInductionUnits {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
     using DataHVACGlobals::SingleHeatingSetPoint;
@@ -127,8 +126,6 @@ namespace PoweredInductionUnits {
     using DataHeatBalFanSys::TempControlType;
 
     // MODULE PARAMETER DEFINITIONS
-    int const SingleDuct_SeriesPIU_Reheat(6);
-    int const SingleDuct_ParallelPIU_Reheat(7);
     // coil types in this module
     int const HCoilType_Gas(1);
     int const HCoilType_Electric(2);
@@ -229,7 +226,7 @@ namespace PoweredInductionUnits {
             }
         }
 
-        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
+        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitPIU(state, PIUNum, FirstHVACIteration);
 
@@ -239,11 +236,11 @@ namespace PoweredInductionUnits {
         {
             auto const SELECT_CASE_var(PIU(PIUNum).UnitType_Num);
 
-            if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
+            if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
 
                 CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
-            } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
+            } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
 
                 CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
@@ -282,8 +279,6 @@ namespace PoweredInductionUnits {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using DataZoneEquipment::ZoneEquipConfig;
         using FluidProperties::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
@@ -342,7 +337,7 @@ namespace PoweredInductionUnits {
             GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
-            PIU(PIUNum).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
+            PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
                 PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -477,10 +472,10 @@ namespace PoweredInductionUnits {
             TestCompSet(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name, NodeID(PIU(PIUNum).PriAirInNode), NodeID(PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (PIU(PIUNum).OutAirNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     PIU(PIUNum).ADUNum = ADUNum;
-                    AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
                 }
             }
             // one assumes if there isn't one assigned, it's an error?
@@ -498,9 +493,9 @@ namespace PoweredInductionUnits {
                         if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
-                            AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                            AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             AirNodeFound = true;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
                             PIU(PIUNum).ctrlZoneInNodeIndex = SupAirIn;
@@ -537,7 +532,7 @@ namespace PoweredInductionUnits {
             GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
-            PIU(PIUNum).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
+            PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
                 PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -685,10 +680,10 @@ namespace PoweredInductionUnits {
             TestCompSet(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name, NodeID(PIU(PIUNum).PriAirInNode), NodeID(PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (PIU(PIUNum).OutAirNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     //      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
-                    AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
                     PIU(PIUNum).ADUNum = ADUNum;
                 }
             }
@@ -708,9 +703,9 @@ namespace PoweredInductionUnits {
                         if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
-                            AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                            AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone;
                             PIU(PIUNum).ctrlZoneInNodeIndex = SupAirIn;
                             AirNodeFound = true;
@@ -770,7 +765,6 @@ namespace PoweredInductionUnits {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -844,8 +838,8 @@ namespace PoweredInductionUnits {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumPIUs; ++Loop) {
                 if (PIU(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZoneHVAC:AirDistributionUnit", AirDistUnit(PIU(Loop).ADUNum).Name)) continue;
-                ShowSevereError(state, "InitPIU: ADU=[Air Distribution Unit," + AirDistUnit(PIU(Loop).ADUNum).Name +
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:AirDistributionUnit", state.dataDefineEquipment->AirDistUnit(PIU(Loop).ADUNum).Name)) continue;
+                ShowSevereError(state, "InitPIU: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(PIU(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...PIU=[" + PIU(Loop).UnitType + ',' + PIU(Loop).Name + "] will not be simulated.");
             }
@@ -881,7 +875,7 @@ namespace PoweredInductionUnits {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PriNode = PIU(PIUNum).PriAirInNode;
             SecNode = PIU(PIUNum).SecAirInNode;
             OutletNode = PIU(PIUNum).OutAirNode;
@@ -921,7 +915,7 @@ namespace PoweredInductionUnits {
                 if (PIU(PIUNum).CtrlZoneNum > 0 && PIU(PIUNum).ctrlZoneInNodeIndex > 0) {
                     PIU(PIUNum).AirLoopNum =
                         DataZoneEquipment::ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex);
-                    AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum = PIU(PIUNum).AirLoopNum;
+                    state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum = PIU(PIUNum).AirLoopNum;
                 }
             }
 
@@ -1252,9 +1246,9 @@ namespace PoweredInductionUnits {
         if (CurTermUnitSizingNum > 0) {
             {
                 auto const SELECT_CASE_var(PIU(PIUNum).UnitType_Num);
-                if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) {
+                if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = PIU(PIUNum).MaxTotAirVolFlow;
-                } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                         PIU(PIUNum).MaxSecAirVolFlow + PIU(PIUNum).MinPriAirFlowFrac * PIU(PIUNum).MaxPriAirVolFlow;
                 }
@@ -1328,7 +1322,7 @@ namespace PoweredInductionUnits {
                                              TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - PIU(PIUNum).MinPriAirFlowFrac);
                                 CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
                                 CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
-                                DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                                DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
                                 rho = GetDensityGlycol(state,
@@ -1421,7 +1415,7 @@ namespace PoweredInductionUnits {
                                              TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - PIU(PIUNum).MinPriAirFlowFrac);
                                 CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
                                 CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
-                                DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                                DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, PIU(PIUNum).HCoil_FluidIndex, RoutineName);
@@ -1784,7 +1778,7 @@ namespace PoweredInductionUnits {
         } else {
             PlenumInducedMassFlow = 0.0;
         }
-        DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxTotAirMassFlow;
     }
 
@@ -2073,7 +2067,7 @@ namespace PoweredInductionUnits {
         } else {
             PlenumInducedMassFlow = 0.0;
         }
-        DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxPriAirMassFlow;
     }
 
@@ -2189,7 +2183,7 @@ namespace PoweredInductionUnits {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

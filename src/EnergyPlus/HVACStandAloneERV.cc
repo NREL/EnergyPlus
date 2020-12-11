@@ -109,7 +109,6 @@ namespace HVACStandAloneERV {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using namespace DataHVACGlobals;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -1289,12 +1288,12 @@ namespace HVACStandAloneERV {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(StandAloneERVNum)) {
             SupInNode = StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
             ExhInNode = StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
-            StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow = StdRhoAir * StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-            StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow = StdRhoAir * StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
-            StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate = StdRhoAir * StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
-            StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate = StdRhoAir * StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
+            StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+            StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
+            StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
+            StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
             // set the node max and min mass flow rates
             Node(SupInNode).MassFlowRateMax = StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
             Node(SupInNode).MassFlowRateMin = 0.0;

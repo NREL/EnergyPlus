@@ -1275,7 +1275,7 @@ namespace HVACUnitaryBypassVAV {
                         // setup zone equipment sequence information based on finding matching air terminal
                         if (DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex)
-                                .getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+                                .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
                         }
@@ -1576,7 +1576,7 @@ namespace HVACUnitaryBypassVAV {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CBVAVNum)) {
             int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
-            Real64 RhoAir = DataEnvironment::StdRhoAir;
+            Real64 RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             CBVAV(CBVAVNum).MaxCoolAirMassFlow = RhoAir * CBVAV(CBVAVNum).MaxCoolAirVolFlow;
             CBVAV(CBVAVNum).CoolOutAirMassFlow = RhoAir * CBVAV(CBVAVNum).CoolOutAirVolFlow;
@@ -1745,7 +1745,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                 }
                 int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
-                Real64 RhoAir = DataEnvironment::StdRhoAir;
+                Real64 RhoAir = state.dataEnvrn->StdRhoAir;
                 // set the mass flow rates from the reset volume flow rates
                 CBVAV(CBVAVNum).MaxCoolAirMassFlow = RhoAir * CBVAV(CBVAVNum).MaxCoolAirVolFlow;
                 CBVAV(CBVAVNum).CoolOutAirMassFlow = RhoAir * CBVAV(CBVAVNum).CoolOutAirVolFlow;
@@ -2256,8 +2256,8 @@ namespace HVACUnitaryBypassVAV {
             OutdoorDryBulbTemp = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Temp;
             OutdoorBaroPress = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Press;
         } else {
-            OutdoorDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-            OutdoorBaroPress = DataEnvironment::OutBaroPress;
+            OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+            OutdoorBaroPress = state.dataEnvrn->OutBaroPress;
         }
 
         SaveCompressorPLR = 0.0;

@@ -624,7 +624,7 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
     DataSizing::DataCapacityUsedForSizing = 2500.0;
     DataSizing::DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     DataSizing::ZoneSizingRunDone = true;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Test 2 - Zone Equipment
     // start with an auto-sized value as the user input
@@ -791,7 +791,7 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
     DataSizing::DataCapacityUsedForSizing = 2500.0;
     DataSizing::DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     DataSizing::ZoneSizingRunDone = true;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Test 2 - Zone Equipment
     // start with an auto-sized value as the user input
