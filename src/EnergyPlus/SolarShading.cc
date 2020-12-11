@@ -8834,6 +8834,8 @@ namespace SolarShading {
                     if (state.dataEnvrn->SunIsUp) {
                         if (SolarOnWindow > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8842,18 +8844,24 @@ namespace SolarShading {
                     if (state.dataEnvrn->SunIsUp) {
                         if (HorizSolar > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
                 } else if (SELECT_CASE_var == WSCT_HiOutAirTemp) { // 'OnIfHighOutdoorAirTemperature'
                     if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
+                    } else if (GlareControlIsActive) {
+                        SurfWinGlareControlIsActive(ISurf) = true;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_HiZoneAirTemp) {
                     // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
                     if (MAT(IZone) > SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
+                    } else if (GlareControlIsActive) {
+                        SurfWinGlareControlIsActive(ISurf) = true;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnHiOutTemp_HiSolarWindow) {
@@ -8862,6 +8870,8 @@ namespace SolarShading {
                         if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 &&
                             SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8871,6 +8881,8 @@ namespace SolarShading {
                         if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 &&
                             SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8879,6 +8891,8 @@ namespace SolarShading {
                     if (state.dataEnvrn->SunIsUp) {
                         if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8887,6 +8901,8 @@ namespace SolarShading {
                     if (state.dataEnvrn->SunIsUp) {
                         if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8897,6 +8913,8 @@ namespace SolarShading {
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8921,17 +8939,23 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
                     if (!state.dataEnvrn->SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
+                    } else if (GlareControlIsActive) {
+                        SurfWinGlareControlIsActive(ISurf) = true;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnNightLoInTemp_OffDay) { // 'OnNightIfLowInsideTempAndOffDay')
                     if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
+                    } else if (GlareControlIsActive) {
+                        SurfWinGlareControlIsActive(ISurf) = true;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8944,6 +8968,8 @@ namespace SolarShading {
                         } else { // Day
                             if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinGlareControlIsActive(ISurf) = true;
                             }
                         }
                     }
@@ -8957,6 +8983,8 @@ namespace SolarShading {
                         } else { // Day
                             if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinGlareControlIsActive(ISurf) = true;
                             }
                         }
                     }
@@ -8966,6 +8994,8 @@ namespace SolarShading {
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
 
@@ -8976,12 +9006,10 @@ namespace SolarShading {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
+                        } else if (GlareControlIsActive) {
+                            SurfWinGlareControlIsActive(ISurf) = true;
                         }
                     }
-                }
-
-                if (GlareControlIsActive) {
-                    SurfWinGlareControlIsActive(ISurf) = true;
                 }
 
                 // Set switching factor to fully switched if ShadingFlag = 2
