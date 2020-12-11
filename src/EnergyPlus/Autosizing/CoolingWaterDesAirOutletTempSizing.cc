@@ -57,10 +57,10 @@ namespace EnergyPlus {
 
 Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -78,7 +78,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                                                                this->callingRoutine);
                 Real64 DesCoilLoad = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizCoolDeltaT * Cp * rho;
                 Real64 T1Out =
-                    this->dataDesInletAirTemp - DesCoilLoad / (DataEnvironment::StdRhoAir * Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat) *
+                    this->dataDesInletAirTemp - DesCoilLoad / (state.dataEnvrn->StdRhoAir * Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat) *
                                                                this->dataAirFlowUsedForSizing);
                 Real64 T2Out = this->plantSizData(this->dataPltSizCoolNum).ExitTemp + 2.0;
                 this->autoSizedValue = max(T1Out, T2Out);
@@ -91,7 +91,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                 if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                     Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                    fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                    fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                     this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                 }
             }
@@ -101,20 +101,20 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
-                msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
+                ShowWarningError(state, msg);
+                msg = format("    Tair,out  =  {:.3R}", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
+                ShowContinueError(state, msg);
+                msg = format("    Twater,in = {:.3R}", this->dataDesInletWaterTemp);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
+                ShowContinueError(state, msg);
+                msg = format("    Tair,out = {:.3R}", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -135,7 +135,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                        fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                        fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                         this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
@@ -148,7 +148,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                        fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                        fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                         this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
@@ -158,16 +158,16 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
-                msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
-                ShowContinueError(msg);
-                msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
-                ShowContinueError(msg);
+                ShowWarningError(state, msg);
+                msg = format("    Tair,out  =  {:.3R}", this->autoSizedValue);
+                ShowContinueError(state, msg);
+                msg = format("    Twater,in = {:.3R}", this->dataDesInletWaterTemp);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
-                ShowContinueError(msg);
-                msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
+                msg = format("    Tair,out = {:.3R}", this->autoSizedValue);
+                ShowContinueError(state, msg);
             }
         }
     }
@@ -175,9 +175,9 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
-        coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
+        coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, this->autoSizedValue);
     }
     return this->autoSizedValue;
 }

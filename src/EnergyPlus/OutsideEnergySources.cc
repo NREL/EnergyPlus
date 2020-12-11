@@ -127,13 +127,16 @@ namespace OutsideEnergySources {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool RunFlag)
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state,
+                                            [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                            [[maybe_unused]] bool FirstHVACIteration,
+                                            Real64 &CurLoad,
+                                            bool RunFlag)
     {
         this->initialize(state, CurLoad);
         this->calculate(state, RunFlag, CurLoad);
@@ -145,8 +148,8 @@ namespace OutsideEnergySources {
         this->size(state);
     }
 
-    void OutsideEnergySourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                       const PlantLocation &EP_UNUSED(calledFromLocation),
+    void OutsideEnergySourceSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                       [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                        Real64 &MaxLoad,
                                                        Real64 &MinLoad,
                                                        Real64 &OptLoad)
@@ -170,8 +173,8 @@ namespace OutsideEnergySources {
         // are initialized. Output variables are set up.
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound("DistrictHeating");
-        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound("DistrictCooling");
+        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound(state, "DistrictHeating");
+        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound(state, "DistrictCooling");
         NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
         if (allocated(EnergySource)) return;
@@ -219,7 +222,7 @@ namespace OutsideEnergySources {
                                           DataIPShortCuts::cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
-                GlobalNames::VerifyUniqueInterObjectName(EnergySourceUniqueNames,
+                GlobalNames::VerifyUniqueInterObjectName(state, EnergySourceUniqueNames,
                                                          DataIPShortCuts::cAlphaArgs(1),
                                                          DataIPShortCuts::cCurrentModuleObject,
                                                          DataIPShortCuts::cAlphaFieldNames(1),
@@ -242,7 +245,7 @@ namespace OutsideEnergySources {
                                                                                               DataLoopNode::NodeConnectionType_Outlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(2),
                                                DataIPShortCuts::cAlphaArgs(3),
@@ -257,15 +260,15 @@ namespace OutsideEnergySources {
             if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
                 EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
                 if (EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
-                    ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
                     ErrorsFound = true;
                 }
-                if (!ScheduleManager::CheckScheduleValueMinMax(EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
-                    ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) +
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) +
                                       "\" should not have negative values.");
-                    ShowContinueError("Negative values will be treated as zero, and the simulation continues.");
+                    ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
                 }
             } else {
                 EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
@@ -273,7 +276,7 @@ namespace OutsideEnergySources {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject +
+            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject +
                            ", Preceding condition caused termination.");
         }
     }
@@ -315,7 +318,7 @@ namespace OutsideEnergySources {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitSimVars: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
             }
             // set limits on outlet node temps to plant loop limits
             DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
@@ -385,7 +388,7 @@ namespace OutsideEnergySources {
 
         // get actual mass flow to use, hold in MassFlowRate variable
         PlantUtilities::SetComponentFlowRate(
-            TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+            state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
         this->MassFlowRate = TempPlantMassFlow;
@@ -430,29 +433,28 @@ namespace OutsideEnergySources {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = NomCapDes;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
+                        BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
+                        BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
                     }
                 } else { // Hard-size with sizing data
                     if (this->NomCap > 0.0 && NomCapDes > 0.0) {
                         Real64 const NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("District" + typeName,
+                            BaseSizer::reportSizerOutput(state, "District" + typeName,
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          NomCapDes,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(NomCapDes, 2) +
-                                                      " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -461,16 +463,16 @@ namespace OutsideEnergySources {
             }
         } else {
             if (this->NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-                ShowSevereError("Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in District" + typeName + " object=" + this->Name);
+                ShowSevereError(state, "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object");
+                ShowContinueError(state, "Occurs in District" + typeName + " object=" + this->Name);
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("District" + typeName, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
         if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -494,7 +496,7 @@ namespace OutsideEnergySources {
             state, DataPlant::PlantLoop(LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         //  apply power limit from input
-        Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(this->CapFractionSchedNum);
+        Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(state, this->CapFractionSchedNum);
         CapFraction = max(0.0, CapFraction); // ensure non negative
         Real64 const CurrentCap = this->NomCap * CapFraction;
         if (std::abs(MyLoad) > CurrentCap) {

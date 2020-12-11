@@ -48,8 +48,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -430,45 +430,45 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state); // read schedule data
+    state->dataGlobal->NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
 
-    state.dataGlobal->BeginSimFlag = true;
-    state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing(state);
+    SizingManager::ManageSizing(*state);
 
-    SimulationManager::SetupSimulation(state, errorsFound);
+    SimulationManager::SetupSimulation(*state, errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap
     Real64 lDotProvid(0.0); // latent removal kg/s
     int compIndex(0);
-    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(*state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(state.dataWindowAC->WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataWindowAC->WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(state.dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state->dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
 
-    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(*state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
 

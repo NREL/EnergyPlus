@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataRootFinder.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -69,12 +70,12 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
 
-    RootFinder::SetupRootFinder(rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
+    RootFinder::SetupRootFinder(*state, rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
 
     Real64 xMin = 0.0;
     Real64 xMax = 100.0;
-    RootFinder::InitializeRootFinder(rootFinderData, xMin, xMax);
+    RootFinder::InitializeRootFinder(*state, rootFinderData, xMin, xMax);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
 
     bool isDone = false;
@@ -82,28 +83,28 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
     // Set min point
     Real64 xValue = xMin;
     Real64 yValue = 100.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set max point
     xValue = xMax;
     yValue = -100.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set 3rd point
     xValue = 20.0;
     yValue = -1.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // 4th point should converge
     xValue = rootFinderData.XCandidate;
     yValue = absoluteYTolerance / 2.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusOK);
     EXPECT_TRUE(isDone);
 }
@@ -117,12 +118,12 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
 
-    RootFinder::SetupRootFinder(rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
+    RootFinder::SetupRootFinder(*state, rootFinderData, slopeType, methodType, relativeXTolerance, absoluteXTolerance, absoluteYTolerance);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
 
     Real64 xMin = 0.0;
     Real64 xMax = 100.0;
-    RootFinder::InitializeRootFinder(rootFinderData, xMin, xMax);
+    RootFinder::InitializeRootFinder(*state, rootFinderData, xMin, xMax);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
 
     bool isDone = false;
@@ -130,35 +131,35 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
     // Set min point
     Real64 xValue = xMin;
     Real64 yValue = 100.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set max point
     xValue = xMax;
     yValue = -100.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set 3rd point (this will be the upper point)
     xValue = 20.0;
     yValue = -10.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set 4th point slightly below 3rd point but with opposite sign for y (this will be the lower point)
     xValue = xValue - absoluteXTolerance / 3.0;
     yValue = 10.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusNone);
     EXPECT_FALSE(isDone);
 
     // Set 5th point in between upper and lower, but non-convergent so it gets to the Increment check)
     xValue = rootFinderData.XCandidate;
     yValue = 5.0;
-    RootFinder::IterateRootFinder(rootFinderData, xValue, yValue, isDone);
+    RootFinder::IterateRootFinder(*state, rootFinderData, xValue, yValue, isDone);
     EXPECT_EQ(rootFinderData.StatusFlag, DataRootFinder::iStatusOKRoundOff);
     EXPECT_TRUE(isDone);
 }

@@ -96,7 +96,6 @@ namespace WaterToAirHeatPump {
     // Oklahoma State University.
 
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::TimeStepSys;
@@ -135,7 +134,6 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using FluidProperties::FindGlycol;
-        using General::TrimSigDigits;
 
         // shut off after compressor cycle off  [s]
         // cycling fan/cycling compressor
@@ -155,19 +153,26 @@ namespace WaterToAirHeatPump {
         if (CompIndex == 0) {
             HPNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterToAirHeatPump->WatertoAirHP);
             if (HPNum == 0) {
-                ShowFatalError("WaterToAir HP not found=" + CompName);
+                ShowFatalError(state, "WaterToAir HP not found=" + CompName);
             }
             CompIndex = HPNum;
         } else {
             HPNum = CompIndex;
             if (HPNum > state.dataWaterToAirHeatPump->NumWatertoAirHPs || HPNum < 1) {
-                ShowFatalError("SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits(HPNum) +
-                               ", Number of Water to Air HPs=" + TrimSigDigits(state.dataWaterToAirHeatPump->NumWatertoAirHPs) + ", WaterToAir HP name=" + CompName);
+                ShowFatalError(state,
+                               format("SimWatertoAirHP: Invalid CompIndex passed={}, Number of Water to Air HPs={}, WaterToAir HP name={}",
+                                      HPNum,
+                                      state.dataWaterToAirHeatPump->NumWatertoAirHPs,
+                                      CompName));
             }
             if (state.dataWaterToAirHeatPump->CheckEquipName(HPNum)) {
                 if (!CompName.empty() && CompName != state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name) {
-                    ShowFatalError("SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits(HPNum) + ", WaterToAir HP name=" + CompName +
-                                   ", stored WaterToAir HP Name for that index=" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimWatertoAirHP: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}",
+                               HPNum,
+                               CompName,
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name));
                 }
                 state.dataWaterToAirHeatPump->CheckEquipName(HPNum) = false;
             }
@@ -187,7 +192,7 @@ namespace WaterToAirHeatPump {
             UpdateWatertoAirHP(state, HPNum);
 
         } else {
-            ShowFatalError("SimWatertoAirHP: AirtoAir heatpump not in either HEATING or COOLING");
+            ShowFatalError(state, "SimWatertoAirHP: AirtoAir heatpump not in either HEATING or COOLING");
         }
     }
 
@@ -243,13 +248,13 @@ namespace WaterToAirHeatPump {
 
         // FLOW
 
-        NumCool = inputProcessor->getNumObjectsFound("Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
-        NumHeat = inputProcessor->getNumObjectsFound("Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
+        NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
+        NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
         state.dataWaterToAirHeatPump->NumWatertoAirHPs = NumCool + NumHeat;
         HPNum = 0;
 
         if (state.dataWaterToAirHeatPump->NumWatertoAirHPs <= 0) {
-            ShowSevereError("No Equipment found in SimWatertoAirHP");
+            ShowSevereError(state, "No Equipment found in SimWatertoAirHP");
             ErrorsFound = true;
         }
 
@@ -259,10 +264,10 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->CheckEquipName.dimension(state.dataWaterToAirHeatPump->NumWatertoAirHPs, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         AlphArray.allocate(MaxAlphas);
@@ -293,7 +298,7 @@ namespace WaterToAirHeatPump {
                                           cNumericFields);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
@@ -321,10 +326,10 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff = NumArray(8);
 
             if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue())) {
-                ShowSevereError("Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-                ShowContinueError(" One or both load side UA values entered are below tolerance, likely zero or blank.");
-                ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
-                ShowContinueError("  the release of EnergyPlus version 5.");
+                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
+                ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
+                ShowContinueError(state, "  the release of EnergyPlus version 5.");
                 ErrorsFound = true;
             }
 
@@ -353,7 +358,7 @@ namespace WaterToAirHeatPump {
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LeakRateCoeff = NumArray(17);
 
                 } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
+                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
@@ -363,8 +368,8 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 = NumArray(19);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 = NumArray(20);
 
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
 
             // Setup Report variables for the detailed cooling Heat Pump
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"
@@ -445,7 +450,7 @@ namespace WaterToAirHeatPump {
                                           cAlphaFields,
                                           cNumericFields);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "HEATING";
@@ -468,10 +473,10 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
             if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue()) {
-                ShowSevereError("Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-                ShowContinueError(" Load side UA value is less than tolerance, likely zero or blank.");
-                ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
-                ShowContinueError("  the release of EnergyPlus version 5.");
+                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
+                ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
+                ShowContinueError(state, "  the release of EnergyPlus version 5.");
                 ErrorsFound = true;
             }
 
@@ -500,7 +505,7 @@ namespace WaterToAirHeatPump {
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LeakRateCoeff = NumArray(14);
 
                 } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
+                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
@@ -510,8 +515,8 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 = NumArray(16);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 = NumArray(17);
 
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
 
             // CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:ParameterEstimation"
             SetupOutputVariable(state, "Heating Coil Electricity Energy",
@@ -565,7 +570,7 @@ namespace WaterToAirHeatPump {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, RoutineName + "Errors found getting input. Program terminates.");
         }
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPump->NumWatertoAirHPs; ++HPNum) {
@@ -850,24 +855,24 @@ namespace WaterToAirHeatPump {
 
             if (PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
                 if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue()) {
-                    ShowSevereError("Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
-                    ShowContinueError(" Source side UA value is less than tolerance, likely zero or blank.");
-                    ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
-                    ShowContinueError("  the release of EnergyPlus version 5.");
+                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
+                    ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
+                    ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
+                    ShowContinueError(state, "  the release of EnergyPlus version 5.");
                     errFlag = true;
                 }
             } else {
                 if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < DataGlobalConstants::rTinyValue())) {
-                    ShowSevereError("Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
-                    ShowContinueError(" A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
-                    ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
-                    ShowContinueError("  the release of EnergyPlus version 5.");
+                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
+                    ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
+                    ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
+                    ShowContinueError(state, "  the release of EnergyPlus version 5.");
                     errFlag = true;
                 }
             }
 
             if (errFlag) {
-                ShowFatalError("InitWatertoAirHP: Program terminated for previous conditions.");
+                ShowFatalError(state, "InitWatertoAirHP: Program terminated for previous conditions.");
             }
 
             MyPlantScanFlag(HPNum) = false;
@@ -993,7 +998,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate = 0.0;
         }
         // constrain water flow provided by plant
-        SetComponentFlowRate(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate,
+        SetComponentFlowRate(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
@@ -1029,11 +1034,12 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy = 0.0;
     }
 
-    void CalcWatertoAirHPCooling(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPCooling(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // suppress property errors if true
+                                 [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
@@ -1051,7 +1057,7 @@ namespace WaterToAirHeatPump {
         // Using/Aliasing
         using namespace FluidProperties;
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
@@ -1374,7 +1380,7 @@ namespace WaterToAirHeatPump {
                     //        END IF
                     //      END DO LOOP1
 
-                    EffectiveSurfaceTemp = PsyTsatFnHPb(EffectiveSatEnth, PB, RoutineNameLoadSideSurfaceTemp);
+                    EffectiveSurfaceTemp = PsyTsatFnHPb(state, EffectiveSatEnth, PB, RoutineNameLoadSideSurfaceTemp);
 
                     QSensible = LoadSideMassFlowRate * CpAir * (LoadSideInletDBTemp - EffectiveSurfaceTemp) * LoadSideEffec;
                     EvapSatEnth = LoadSideAirInletEnth - initialQLoadTotal / (EffectWET * LoadSideMassFlowRate);
@@ -1403,7 +1409,7 @@ namespace WaterToAirHeatPump {
                     //        END IF
                     //      END DO LOOP2
 
-                    EvapTemp = PsyTsatFnHPb(EvapSatEnth, PB, RoutineNameLoadSideEvapTemp);
+                    EvapTemp = PsyTsatFnHPb(state, EvapSatEnth, PB, RoutineNameLoadSideEvapTemp);
 
                     // Load Side Saturated Temperature (Evaporating Temp in this case)
                     LoadSideTemp = EvapTemp;
@@ -1413,9 +1419,10 @@ namespace WaterToAirHeatPump {
                     LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
 
                     if (LoadSidePressure < LowPressCutoff && !FirstHVACIteration) {
-                        if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:cooling [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                               "] shut off on low pressure < " + RoundSigDigits(LowPressCutoff, 0),
+                        if (!state.dataGlobal->WarmupFlag) {
+                            ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}",
+                                                                  state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                                  LowPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressClgError,
                                                            LoadSidePressure,
                                                            LoadSidePressure,
@@ -1428,9 +1435,10 @@ namespace WaterToAirHeatPump {
                     }
 
                     if (SourceSidePressure > HighPressCutoff && !FirstHVACIteration) {
-                        if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:cooling [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                               "] shut off on high pressure > " + RoundSigDigits(HighPressCutoff, 0),
+                        if (!state.dataGlobal->WarmupFlag) {
+                            ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}",
+                                                                  state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                                  HighPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressClgError,
                                                            SourceSideInletTemp,
                                                            SourceSideInletTemp,
@@ -1559,12 +1567,12 @@ namespace WaterToAirHeatPump {
             }
 
             if (SuctionPr < LowPressCutoff) {
-                ShowWarningError("Heat pump:cooling shut down on low pressure");
+                ShowWarningError(state, "Heat pump:cooling shut down on low pressure");
                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             }
 
             if (DischargePr > HighPressCutoff && !FirstHVACIteration) {
-                ShowWarningError("Heat pump:cooling shut down on high pressure");
+                ShowWarningError(state, "Heat pump:cooling shut down on high pressure");
                 state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             }
 
@@ -1579,7 +1587,7 @@ namespace WaterToAirHeatPump {
                 } else if (NumIteration4 == 2) {
                     QLatActual = QLoadTotal - QSensible;
                     SHRss = QSensible / QLoadTotal;
-                    LoadSideInletWBTemp = PsyTwbFnTdbWPb(LoadSideInletDBTemp, LoadSideInletHumRat, PB);
+                    LoadSideInletWBTemp = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp, LoadSideInletHumRat, PB);
                     SHReff =
                         CalcEffectiveSHR(state, HPNum, SHRss, CyclingScheme, RuntimeFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp);
                     //   Update sensible capacity based on effective SHR
@@ -1597,7 +1605,7 @@ namespace WaterToAirHeatPump {
         // calculate coil outlet state variables
         LoadSideAirOutletEnth = LoadSideAirInletEnth - QLoadTotal / LoadSideMassFlowRate;
         LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible * LoadSideMassFlowRate_CpAir_inv;
-        LoadSideOutletHumRat = PsyWFnTdbH(LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy);
+        LoadSideOutletHumRat = PsyWFnTdbH(state, LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy);
         SourceSideOutletTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpWater);
 
         // Actual outlet conditions are "average" for time step
@@ -1695,11 +1703,12 @@ namespace WaterToAirHeatPump {
         return Residuum;
     }
 
-    void CalcWatertoAirHPHeating(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPHeating(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // first iteration flag
+                                 [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
@@ -1721,7 +1730,7 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
 
         // Locals
@@ -1942,9 +1951,10 @@ namespace WaterToAirHeatPump {
                 SourceSidePressure = GetSatPressureRefrig(state, Refrigerant, SourceSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameSourceSideTemp);
                 LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
                 if (SourceSidePressure < LowPressCutoff && !FirstHVACIteration) {
-                    if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:heating [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "] shut off on low pressure < " +
-                                                           RoundSigDigits(LowPressCutoff, 0),
+                    if (!state.dataGlobal->WarmupFlag) {
+                        ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}",
+                                                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                              LowPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressHtgError,
                                                        SourceSidePressure,
                                                        SourceSidePressure,
@@ -1957,9 +1967,10 @@ namespace WaterToAirHeatPump {
                 }
 
                 if (LoadSidePressure > HighPressCutoff && !FirstHVACIteration) {
-                    if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:heating [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                           "] shut off on high pressure > " + RoundSigDigits(HighPressCutoff, 0),
+                    if (!state.dataGlobal->WarmupFlag) {
+                        ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}",
+                                                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                              HighPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressHtgError,
                                                        SourceSideInletTemp,
                                                        SourceSideInletTemp,
@@ -1967,11 +1978,11 @@ namespace WaterToAirHeatPump {
                                                        "SourceSideInletTemp[C]",
                                                        "SourceSideInletTemp[C]");
                     }
-                    //         CALL ShowWarningError('Heat pump:heating shut off on high pressure')
+                    //         CALL ShowWarningError(state, 'Heat pump:heating shut off on high pressure')
                     //         WRITE(CErrCount,*) SourceSideInletTemp
                     //         CErrCount=ADJUSTL(CErrCount)
-                    //         CALL ShowContinueError('Source side inlet temperature too low, T='//TRIM(CErrCount))
-                    //         CALL ShowContinueError('Heat pump heating demand not met by plant side')
+                    //         CALL ShowContinueError(state, 'Source side inlet temperature too low, T='//TRIM(CErrCount))
+                    //         CALL ShowContinueError(state, 'Heat pump heating demand not met by plant side')
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
                     return;
                 }
@@ -2101,13 +2112,13 @@ namespace WaterToAirHeatPump {
         }
 
         if (SuctionPr < LowPressCutoff && !FirstHVACIteration) {
-            ShowWarningError("Heat pump:heating shut down on low pressure");
+            ShowWarningError(state, "Heat pump:heating shut down on low pressure");
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }
 
         if (DischargePr > HighPressCutoff && !FirstHVACIteration) {
-            ShowWarningError("Heat pump:heating shut down on high pressure");
+            ShowWarningError(state, "Heat pump:heating shut down on high pressure");
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }
@@ -2115,7 +2126,7 @@ namespace WaterToAirHeatPump {
         // calculate coil outlet state variables
         LoadSideAirOutletEnth = LoadSideAirInletEnth + QLoadTotal / LoadSideMassFlowRate;
         LoadSideOutletDBTemp = LoadSideInletDBTemp + QLoadTotal / (LoadSideMassFlowRate * CpAir);
-        LoadSideOutletHumRat = PsyWFnTdbH(LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy);
+        LoadSideOutletHumRat = PsyWFnTdbH(state, LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy);
         SourceSideOutletTemp = SourceSideInletTemp - QSource / (SourceSideMassFlowRate * CpWater);
 
         // Calculate actual outlet conditions for the run time fraction
@@ -2180,7 +2191,6 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -2252,10 +2262,10 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).EnergyLatent = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLatent * ReportingConstant;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).EnergySource = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource * ReportingConstant;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }
@@ -2482,7 +2492,7 @@ namespace WaterToAirHeatPump {
         IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
 
         if (IndexNum == 0) {
-            ShowSevereError("Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
         }
 
@@ -2537,7 +2547,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             CoilCapacity = -1000.0;
         }
@@ -2584,7 +2594,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -2631,7 +2641,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }

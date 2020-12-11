@@ -151,21 +151,6 @@ namespace DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-    int const SurfaceClass_Wall(1);
-    int const SurfaceClass_Floor(2);
-    int const SurfaceClass_Roof(3);
-    int const SurfaceClass_IntMass(5);
-    int const SurfaceClass_Detached_B(6);
-    int const SurfaceClass_Detached_F(7);
-    int const SurfaceClass_Window(11);
-    int const SurfaceClass_Door(13);
-    int const SurfaceClass_GlassDoor(12);
-    int const SurfaceClass_Shading(14);
-    int const SurfaceClass_Overhang(15);
-    int const SurfaceClass_Fin(16);
-    int const SurfaceClass_TDD_Dome(17);
-    int const SurfaceClass_TDD_Diffuser(18);
-
     Array1D_string const HeatTransferModelNames(10,
                                                 {"CTF - ConductionTransferFunction",
                                                  "EMPD - MoisturePenetrationDepthConductionTransferFunction",
@@ -367,6 +352,8 @@ namespace DataSurfaces {
     int BuildingShadingCount(0); // Total number of Building External Shades
     int FixedShadingCount(0);    // Total number of Fixed External Shades
     int AttachedShadingCount(0); // Total number of Shades attached to Zones
+    int ShadingSurfaceFirst(-1); // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    int ShadingSurfaceLast(-1);  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
 
     bool AspectTransform(false);  // Set to true when GeometryTransform object is used
     bool CalcSolRefl(false);      // Set to true when Solar Reflection Calculations object is used
@@ -393,32 +380,23 @@ namespace DataSurfaces {
     Array1D<Real64> X0;     // X-component of translation vector
     Array1D<Real64> Y0;     // Y-component of translation vector
     Array1D<Real64> Z0;     // Z-component of translation vector
-    Array1D<Real64> DSZone; // Factor for sky diffuse solar radiation into a zone
-    Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
-    Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
+    Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from
                             // beam reflecting from inside surfaces
-    Array1D<Real64>
-        DBZoneSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
-    Array1D<Real64> AISurf; // Time step value of factor for beam
-    // absorbed on inside of opaque surface
-    Array1D<Real64> AOSurf; // Time step value of factor for beam
-    // absorbed on outside of opaque surface
-    Array1D<Real64> BmToBmReflFacObs; // Factor for incident solar from specular beam refl
-    // from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
-    // from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
+    Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+    Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
+    Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
+    Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SurfSkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
-    Array2D<Real64> AWinSurf; // Time step value of factor for beam
-    // absorbed in window glass layers
+    Array2D<Real64> SurfWinA; // Time step value of factor for beam absorbed in window glass layers
 
     // Time step value of factor for diffuse absorbed in window layers
-    Array2D<Real64> AWinSurfDiffFront;
-    Array2D<Real64> AWinSurfDiffBack;
+    Array2D<Real64> SurfWinADiffFront;
+    Array2D<Real64> SurfWinADiffBack;
 
-    Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
+    Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
     // It happens sometimes that beam enters one window and hits back of
     // second window. It is used in complex fenestration only
@@ -434,7 +412,7 @@ namespace DataSurfaces {
     Array1D<Real64> ReflFacSkySolObs;
     Array1D<Real64> ReflFacSkySolGnd;
     Array2D<Real64> CosIncAveBmToBmSolObs;
-    Array1D<Real64> DBZoneIntWin;                          // Value of factor for beam solar entering a zone through interior windows (considered to contribute to diffuse in zone)
+    Array1D<Real64> EnclSolDBIntWin;                          // Value of factor for beam solar entering a zone through interior windows (considered to contribute to diffuse in zone)
     Array1D<Real64> SurfSunlitArea;                        // Sunlit area by surface number
     Array1D<Real64> SurfSunlitFrac;                        // Sunlit fraction by surface number
     Array1D<Real64> SurfSkySolarInc;                       // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
@@ -452,7 +430,6 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinBmBmSolar;                     // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinBmDifSolar;                    // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinDifSolar;                      // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinDirSolTransAtIncAngle;         // Window's beam-beam solar transmittance at current timestep's angle of incidence
     Array1D<Real64> SurfWinHeatGain;                      // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
                                                           // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
                                                           // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
@@ -580,7 +557,7 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinGlazedFrac;                      // (Glazed area)/(Glazed area + divider area)
     Array1D<Real64> SurfWinCenterGlArea;                    // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac;                   // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging effects near frame and divider
-    Array1D<int> SurfWinOriginalClass;                      // 0 or if entered originally as:
+    Array1D<SurfaceClass> SurfWinOriginalClass;                      // 0 or if entered originally as:
     Array1D<Real64> SurfWinShadeAbsFacFace1;                // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2;                // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is apportioned to the two faces
     Array1D<Real64> SurfWinConvCoeffWithShade;              // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
@@ -761,7 +738,7 @@ namespace DataSurfaces {
         }
     }
 
-    void SurfaceData::SetOutBulbTempAt()
+    void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
@@ -772,31 +749,26 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Temperature at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::EarthRadius;
-        using DataEnvironment::SiteTempGradient;
-        using DataEnvironment::WeatherFileTempModCoeff;
-
-        if (SiteTempGradient == 0.0) {
-            OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-            OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
+            OutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+            OutWetBulbTemp = state.dataEnvrn->OutWetBulbTemp;
         } else {
             // Base temperatures at Z = 0 (C)
-            Real64 const BaseDryTemp(DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff);
-            Real64 const BaseWetTemp(DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff);
+            Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
+            Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
 
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
                 OutDryBulbTemp = BaseDryTemp;
                 OutWetBulbTemp = BaseWetTemp;
             } else {
-                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
-                OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+                OutDryBulbTemp = BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                OutWetBulbTemp = BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
             }
         }
     }
 
-    void SurfaceData::SetWindSpeedAt(Real64 const fac)
+    void SurfaceData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -807,11 +779,8 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Windspeed at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::SiteWindExp;
-
-        if (SiteWindExp == 0.0) {
-            WindSpeed = DataEnvironment::WindSpeed;
+        if (state.dataEnvrn->SiteWindExp == 0.0) {
+            WindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
@@ -820,7 +789,7 @@ namespace DataSurfaces {
                 //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
                 //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
                 //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-                WindSpeed = fac * std::pow(Z, SiteWindExp);
+                WindSpeed = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
             }
         }
     }
@@ -840,7 +809,7 @@ namespace DataSurfaces {
         WindDir = fac;
     }
 
-    Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
+    Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -874,7 +843,7 @@ namespace DataSurfaces {
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
                 if (!DataHeatBalance::Zone(Zone).IsControlled) {
-                    ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                    ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                    DataHeatBalance::Zone(Zone).Name);
                     // return;
                 }
@@ -907,7 +876,7 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getOutsideAirTemperature(const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -925,11 +894,11 @@ namespace DataSurfaces {
 
         if (ExtBoundCond > 0) // Interzone window
         {
-            temperature = getInsideAirTemperature(t_SurfNum);
+            temperature = getInsideAirTemperature(state, t_SurfNum);
         } else {
             if (ExtWind) {
                 // Window is exposed to wind (and possibly rain)
-                if (IsRain) {
+                if (state.dataEnvrn->IsRain) {
                     // Raining: since wind exposed, outside window surface gets wet
                     temperature = OutWetBulbTemp;
                 } else {
@@ -960,9 +929,9 @@ namespace DataSurfaces {
             value = SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
-            Real64 tout = getOutsideAirTemperature(t_SurfNum) + DataGlobalConstants::KelvinConv();
+            Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;
@@ -1128,7 +1097,7 @@ namespace DataSurfaces {
         }
     }
 
-    Real64 SurfaceData::get_average_height() const
+    Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     {
         if (std::abs(SinTilt) < 1.e-4) {
             return 0.0;
@@ -1164,7 +1133,7 @@ namespace DataSurfaces {
         if (totalWidth == 0.0) {
             // This should never happen, but if it does, print a somewhat meaningful fatal error
             // (instead of allowing a divide by zero).
-            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+            ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
         }
 
         Real64 averageHeight = 0.0;
@@ -1206,6 +1175,8 @@ namespace DataSurfaces {
         BuildingShadingCount = 0;
         FixedShadingCount = 0;
         AttachedShadingCount = 0;
+        ShadingSurfaceFirst = -1;
+        ShadingSurfaceLast = -1;
         AspectTransform = false;
         CalcSolRefl = false;
         CCW = false;
@@ -1223,21 +1194,18 @@ namespace DataSurfaces {
         X0.deallocate();
         Y0.deallocate();
         Z0.deallocate();
-        DSZone.deallocate();
-        DGZone.deallocate();
-        DBZone.deallocate();
-        DBZoneSSG.deallocate();
-        CBZone.deallocate();
-        AISurf.deallocate();
-        AOSurf.deallocate();
-        BmToBmReflFacObs.deallocate();
-        BmToDiffReflFacObs.deallocate();
-        BmToDiffReflFacGnd.deallocate();
-        SkyDiffReflFacGnd.deallocate();
-        AWinSurf.deallocate();
-        AWinSurfDiffFront.deallocate();
-        AWinSurfDiffBack.deallocate();
-        AWinCFOverlap.deallocate();
+        EnclSolDB.deallocate();
+        EnclSolDBSSG.deallocate();
+        SurfOpaqAI.deallocate();
+        SurfOpaqAO.deallocate();
+        SurfBmToBmReflFacObs.deallocate();
+        SurfBmToDiffReflFacObs.deallocate();
+        SurfBmToDiffReflFacGnd.deallocate();
+        SurfSkyDiffReflFacGnd.deallocate();
+        SurfWinA.deallocate();
+        SurfWinADiffFront.deallocate();
+        SurfWinADiffBack.deallocate();
+        SurfWinACFOverlap.deallocate();
         AirSkyRadSplit.deallocate();
         SUNCOSHR.dimension(24, 3, 0.0);
         ReflFacBmToDiffSolObs.deallocate();
@@ -1246,7 +1214,7 @@ namespace DataSurfaces {
         ReflFacSkySolObs.deallocate();
         ReflFacSkySolGnd.deallocate();
         CosIncAveBmToBmSolObs.deallocate();
-        DBZoneIntWin.deallocate();
+        EnclSolDBIntWin.deallocate();
         SurfSunlitArea.deallocate();
         SurfSunlitFrac.deallocate();
         SurfSkySolarInc.clear();
@@ -1280,7 +1248,6 @@ namespace DataSurfaces {
         SurfWinBmBmSolar.deallocate();
         SurfWinBmDifSolar.deallocate();
         SurfWinDifSolar.deallocate();
-        SurfWinDirSolTransAtIncAngle.deallocate();
         SurfWinHeatGain.deallocate();
         SurfWinHeatTransfer.deallocate();
         SurfWinHeatGainRep.deallocate();
@@ -1453,14 +1420,14 @@ namespace DataSurfaces {
         SurfWinTDDPipeNum.clear();
     }
 
-    void SetSurfaceOutBulbTempAt()
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
         for (auto &surface : Surface) {
-            surface.SetOutBulbTempAt();
+            surface.SetOutBulbTempAt(state);
         }
     }
 
-    void CheckSurfaceOutBulbTempAt()
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
@@ -1468,33 +1435,27 @@ namespace DataSurfaces {
         Real64 minBulb = 0.0;
         for (auto &surface : Surface) {
             minBulb = min(minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp);
-            if (minBulb < -100.0) SetOutBulbTempAt_error("Surface", surface.Centroid.z, surface.Name);
+            if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Surface", surface.Centroid.z, surface.Name);
         }
     }
 
-    void SetSurfaceWindSpeedAt()
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state)
+    {
+        Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
+        for (auto &surface : Surface) {
+            surface.SetWindSpeedAt(state, fac);
+        }
+    }
+
+    void SetSurfaceWindDirAt(EnergyPlusData &state)
     {
         // Using/Aliasing
-        using DataEnvironment::SiteWindBLHeight;
-        using DataEnvironment::SiteWindExp;
-        using DataEnvironment::WeatherFileWindModCoeff;
-
-        Real64 const fac(DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
         for (auto &surface : Surface) {
-            surface.SetWindSpeedAt(fac);
+            surface.SetWindDirAt(state.dataEnvrn->WindDir);
         }
     }
 
-    void SetSurfaceWindDirAt()
-    {
-        // Using/Aliasing
-        using DataEnvironment::WindDir;
-        for (auto &surface : Surface) {
-            surface.SetWindDirAt(WindDir);
-        }
-    }
-
-    std::string cSurfaceClass(int const ClassNo)
+    std::string cSurfaceClass(SurfaceClass const ClassNo)
     {
 
         // FUNCTION INFORMATION:
@@ -1535,40 +1496,40 @@ namespace DataSurfaces {
 
         {
             auto const SELECT_CASE_var(ClassNo);
-            if (SELECT_CASE_var == SurfaceClass_Wall) {
+            if (SELECT_CASE_var == SurfaceClass::Wall) {
                 ClassName = "Wall";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Floor) {
+            } else if (SELECT_CASE_var == SurfaceClass::Floor) {
                 ClassName = "Floor";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Roof) {
+            } else if (SELECT_CASE_var == SurfaceClass::Roof) {
                 ClassName = "Roof";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Window) {
+            } else if (SELECT_CASE_var == SurfaceClass::Window) {
                 ClassName = "Window";
 
-            } else if (SELECT_CASE_var == SurfaceClass_GlassDoor) {
+            } else if (SELECT_CASE_var == SurfaceClass::GlassDoor) {
                 ClassName = "Glass Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Door) {
+            } else if (SELECT_CASE_var == SurfaceClass::Door) {
                 ClassName = "Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass_TDD_Dome) {
+            } else if (SELECT_CASE_var == SurfaceClass::TDD_Dome) {
                 ClassName = "TubularDaylightDome";
 
-            } else if (SELECT_CASE_var == SurfaceClass_TDD_Diffuser) {
+            } else if (SELECT_CASE_var == SurfaceClass::TDD_Diffuser) {
                 ClassName = "TubularDaylightDiffuser";
 
-            } else if (SELECT_CASE_var == SurfaceClass_IntMass) {
+            } else if (SELECT_CASE_var == SurfaceClass::IntMass) {
                 ClassName = "Internal Mass";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Shading) {
+            } else if (SELECT_CASE_var == SurfaceClass::Shading) {
                 ClassName = "Shading";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Detached_B) {
+            } else if (SELECT_CASE_var == SurfaceClass::Detached_B) {
                 ClassName = "Detached Shading:Building";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Detached_F) {
+            } else if (SELECT_CASE_var == SurfaceClass::Detached_F) {
                 ClassName = "Detached Shading:Fixed";
 
             } else {

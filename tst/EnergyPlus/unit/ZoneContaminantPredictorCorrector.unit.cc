@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +82,6 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace DataGlobals;
 using namespace DataStringGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
@@ -109,65 +109,65 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    DataGlobals::NumOfZones = 1;
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
-    DataContaminantBalance::AZ.allocate(1);
-    DataContaminantBalance::BZ.allocate(1);
-    DataContaminantBalance::CZ.allocate(1);
-    DataContaminantBalance::AZGC.allocate(1);
-    DataContaminantBalance::BZGC.allocate(1);
-    DataContaminantBalance::CZGC.allocate(1);
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus1.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus2.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus3.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus3Temp.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus1.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus2.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus3.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus1.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus2.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus3.allocate(1);
 
-    DataContaminantBalance::MixingMassFlowCO2.allocate(1);
-    DataContaminantBalance::MixingMassFlowGC.allocate(1);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(1);
-    DataContaminantBalance::ZoneCO21.allocate(1);
-    DataContaminantBalance::ZoneAirCO2.allocate(1);
-    DataContaminantBalance::ZoneAirGCTemp.allocate(1);
-    DataContaminantBalance::ZoneGC1.allocate(1);
-    DataContaminantBalance::ZoneAirGC.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowGC.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneCO21.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirGCTemp.allocate(1);
+    state->dataContaminantBalance->ZoneGC1.allocate(1);
+    state->dataContaminantBalance->ZoneAirGC.allocate(1);
 
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(1);
-    DataContaminantBalance::CO2PredictedRate.allocate(1);
-    DataContaminantBalance::GCPredictedRate.allocate(1);
-    DataContaminantBalance::ContaminantControlledZone.allocate(1);
-    DataContaminantBalance::ZoneGCSetPoint.allocate(1);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(1);
+    state->dataContaminantBalance->GCPredictedRate.allocate(1);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
+    state->dataContaminantBalance->ZoneGCSetPoint.allocate(1);
 
-    DataContaminantBalance::ZoneAirDensityCO.allocate(1);
-    DataContaminantBalance::ZoneCO2Gain.allocate(1);
-    DataContaminantBalance::ZoneCO2GainExceptPeople.allocate(1);
-    DataContaminantBalance::ZoneGCGain.allocate(1);
-    DataContaminantBalance::ZoneCO2Gain(1) = 0.0001;
-    DataContaminantBalance::ZoneCO2GainExceptPeople = 0.0001;
-    DataContaminantBalance::ZoneGCGain(1) = 0.0000001;
-    DataContaminantBalance::MixingMassFlowCO2(1) = 0.0;
-    DataContaminantBalance::MixingMassFlowGC(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneCO2Gain.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople = 0.0001;
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0000001;
+    state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowGC(1) = 0.0;
 
-    DataContaminantBalance::DSCO2ZoneTimeMinus1(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus2(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus3(1) = 200.0;
-    DataContaminantBalance::OutdoorCO2 = 400.0;
-    DataContaminantBalance::OutdoorGC = 0.001;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 450.0;
-    DataContaminantBalance::ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
-    DataContaminantBalance::ZoneAirGC(1) = DataContaminantBalance::ZoneGC1(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3(1) = 200.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->OutdoorGC = 0.001;
+    state->dataContaminantBalance->ZoneCO21(1) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneGC1(1) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = state->dataContaminantBalance->ZoneCO21(1);
+    state->dataContaminantBalance->ZoneAirGC(1) = state->dataContaminantBalance->ZoneGC1(1);
 
     Real64 PriorTimeStep;
 
@@ -201,14 +201,14 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -243,27 +243,27 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    DataContaminantBalance::CO2PredictedRate.allocate(1);
-    DataContaminantBalance::ZoneSysContDemand.allocate(1);
-    DataContaminantBalance::NumContControlledZones = 1;
+    state->dataContaminantBalance->CO2PredictedRate.allocate(1);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
+    state->dataContaminantBalance->NumContControlledZones = 1;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(1);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
-    DataContaminantBalance::ZoneGCSetPoint(1) = 0.0025;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ZoneGCSetPoint(1) = 0.0025;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-    EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
-    EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    EXPECT_NEAR(1.041692180, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
+    EXPECT_NEAR(76.89754831, state->dataContaminantBalance->GCPredictedRate(1), 0.00001);
 
-    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(489.931000, Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, Node(5).GenContam, 0.00001);
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContaminantsTest)
@@ -276,55 +276,55 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    DataGlobals::NumOfZones = 1;
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
-    DataContaminantBalance::AZ.allocate(1);
-    DataContaminantBalance::BZ.allocate(1);
-    DataContaminantBalance::CZ.allocate(1);
-    DataContaminantBalance::AZGC.allocate(1);
-    DataContaminantBalance::BZGC.allocate(1);
-    DataContaminantBalance::CZGC.allocate(1);
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus1.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus2.allocate(1);
-    DataContaminantBalance::DSCO2ZoneTimeMinus3.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::GCZoneTimeMinus3Temp.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus1.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus2.allocate(1);
-    DataContaminantBalance::DSGCZoneTimeMinus3.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(1);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->GCZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus1.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus2.allocate(1);
+    state->dataContaminantBalance->DSGCZoneTimeMinus3.allocate(1);
 
-    DataContaminantBalance::MixingMassFlowCO2.allocate(1);
-    DataContaminantBalance::MixingMassFlowGC.allocate(1);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(1);
-    DataContaminantBalance::ZoneCO21.allocate(1);
-    DataContaminantBalance::ZoneAirCO2.allocate(1);
-    DataContaminantBalance::ZoneAirGCTemp.allocate(1);
-    DataContaminantBalance::ZoneGC1.allocate(1);
-    DataContaminantBalance::ZoneAirGC.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowGC.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneCO21.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirGCTemp.allocate(1);
+    state->dataContaminantBalance->ZoneGC1.allocate(1);
+    state->dataContaminantBalance->ZoneAirGC.allocate(1);
 
-    DataContaminantBalance::ZoneAirDensityCO.allocate(1);
-    DataContaminantBalance::ZoneCO2Gain.allocate(1);
-    DataContaminantBalance::ZoneCO2GainExceptPeople.allocate(1);
-    DataContaminantBalance::ZoneGCGain.allocate(1);
-    DataContaminantBalance::ZoneCO2Gain(1) = 0.0001;
-    DataContaminantBalance::ZoneGCGain(1) = 0.0001;
-    DataContaminantBalance::MixingMassFlowCO2(1) = 0.0;
-    DataContaminantBalance::MixingMassFlowGC(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneCO2Gain.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0001;
+    state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowGC(1) = 0.0;
 
-    DataContaminantBalance::DSCO2ZoneTimeMinus1(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus2(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus3(1) = 200.0;
-    DataContaminantBalance::OutdoorCO2 = 400.0;
-    DataContaminantBalance::OutdoorGC = 0.001;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorGC;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3(1) = 200.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->OutdoorGC = 0.001;
+    state->dataContaminantBalance->ZoneCO21(1) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneGC1(1) = state->dataContaminantBalance->OutdoorGC;
 
     Real64 PriorTimeStep;
 
@@ -358,14 +358,14 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -397,12 +397,12 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(490.0, Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, Node(5).GenContam, 0.00001);
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlTest)
@@ -415,67 +415,67 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    DataGlobals::NumOfZones = 3;
+    state->dataGlobal->NumOfZones = 3;
 
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
 
-    DataContaminantBalance::AZ.allocate(3);
-    DataContaminantBalance::BZ.allocate(3);
-    DataContaminantBalance::CZ.allocate(3);
+    state->dataContaminantBalance->AZ.allocate(3);
+    state->dataContaminantBalance->BZ.allocate(3);
+    state->dataContaminantBalance->CZ.allocate(3);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(3);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(3);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(3);
-    DataContaminantBalance::DSCO2ZoneTimeMinus1.allocate(3);
-    DataContaminantBalance::DSCO2ZoneTimeMinus2.allocate(3);
-    DataContaminantBalance::DSCO2ZoneTimeMinus3.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(3);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(3);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(3);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(3);
 
-    DataContaminantBalance::GCZoneTimeMinus1Temp.allocate(3);
-    DataContaminantBalance::GCZoneTimeMinus2Temp.allocate(3);
-    DataContaminantBalance::GCZoneTimeMinus3Temp.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus1.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus2.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus3.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus1Temp.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus2Temp.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus3Temp.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus1.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus2.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus3.allocate(3);
 
-    DataContaminantBalance::MixingMassFlowCO2.allocate(3);
-    DataContaminantBalance::MixingMassFlowGC.allocate(3);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(3);
-    DataContaminantBalance::ZoneCO21.allocate(3);
-    DataContaminantBalance::ZoneAirCO2.allocate(3);
-    DataContaminantBalance::ZoneAirGCTemp.allocate(3);
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(3);
+    state->dataContaminantBalance->MixingMassFlowGC.allocate(3);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(3);
+    state->dataContaminantBalance->ZoneCO21.allocate(3);
+    state->dataContaminantBalance->ZoneAirCO2.allocate(3);
+    state->dataContaminantBalance->ZoneAirGCTemp.allocate(3);
 
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(3);
-    DataContaminantBalance::CO2PredictedRate.allocate(3);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(3);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(3);
 
-    DataContaminantBalance::ZoneAirDensityCO.allocate(3);
-    DataContaminantBalance::ZoneCO2Gain.allocate(3);
-    DataContaminantBalance::ZoneGCGain.allocate(3);
-    DataContaminantBalance::ZoneCO2Gain(1) = 0.0001;
-    DataContaminantBalance::ZoneCO2Gain(2) = 0.0002;
-    DataContaminantBalance::ZoneCO2Gain(3) = 0.0003;
-    DataContaminantBalance::MixingMassFlowCO2(1) = 0.0;
-    DataContaminantBalance::MixingMassFlowCO2(2) = 0.0;
-    DataContaminantBalance::MixingMassFlowCO2(3) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(3);
+    state->dataContaminantBalance->ZoneCO2Gain.allocate(3);
+    state->dataContaminantBalance->ZoneGCGain.allocate(3);
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneCO2Gain(2) = 0.0002;
+    state->dataContaminantBalance->ZoneCO2Gain(3) = 0.0003;
+    state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowCO2(2) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowCO2(3) = 0.0;
 
-    DataContaminantBalance::DSCO2ZoneTimeMinus1(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus2(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus3(1) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus1(2) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus2(2) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus3(2) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus1(3) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus2(3) = 200.0;
-    DataContaminantBalance::DSCO2ZoneTimeMinus3(3) = 200.0;
-    DataContaminantBalance::OutdoorCO2 = 400.0;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO21(2) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO21(3) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 450.0;
-    DataContaminantBalance::ZoneCO2SetPoint(2) = 500.0;
-    DataContaminantBalance::ZoneCO2SetPoint(3) = 550.0;
-    DataContaminantBalance::ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
-    DataContaminantBalance::ZoneAirCO2(2) = DataContaminantBalance::ZoneCO21(2);
-    DataContaminantBalance::ZoneAirCO2(3) = DataContaminantBalance::ZoneCO21(3);
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3(1) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1(2) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2(2) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3(2) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus1(3) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus2(3) = 200.0;
+    state->dataContaminantBalance->DSCO2ZoneTimeMinus3(3) = 200.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->ZoneCO21(1) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(2) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(3) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(2) = 500.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(3) = 550.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = state->dataContaminantBalance->ZoneCO21(1);
+    state->dataContaminantBalance->ZoneAirCO2(2) = state->dataContaminantBalance->ZoneCO21(2);
+    state->dataContaminantBalance->ZoneAirCO2(3) = state->dataContaminantBalance->ZoneCO21(3);
 
     Real64 PriorTimeStep;
 
@@ -546,10 +546,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Zone(3).SystemZoneNodeNumber = 5;
     Zone(3).ZoneVolCapMultpMoist = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -601,26 +601,26 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Node(8).MassFlowRate = 0.01;
     Node(9).MassFlowRate = 0.01;
 
-    DataContaminantBalance::CO2PredictedRate.allocate(3);
-    DataContaminantBalance::ZoneSysContDemand.allocate(3);
-    DataContaminantBalance::NumContControlledZones = 3;
+    state->dataContaminantBalance->CO2PredictedRate.allocate(3);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
+    state->dataContaminantBalance->NumContControlledZones = 3;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(3);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).ActualZoneNum = 2;
-    DataContaminantBalance::ContaminantControlledZone(2).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
-    DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).ActualZoneNum = 2;
+    state->dataContaminantBalance->ContaminantControlledZone(2).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).ActualZoneNum = 3;
+    state->dataContaminantBalance->ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-    EXPECT_NEAR(1.0416921806, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
-    EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
-    EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    EXPECT_NEAR(1.0416921806, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
+    EXPECT_NEAR(1.0434496257, state->dataContaminantBalance->CO2PredictedRate(2), 0.00001);
+    EXPECT_NEAR(1.0399406399, state->dataContaminantBalance->CO2PredictedRate(3), 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTest)
@@ -633,57 +633,57 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    DataGlobals::NumOfZones = 3;
+    state->dataGlobal->NumOfZones = 3;
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
-    DataContaminantBalance::AZGC.allocate(3);
-    DataContaminantBalance::BZGC.allocate(3);
-    DataContaminantBalance::CZGC.allocate(3);
+    state->dataContaminantBalance->AZGC.allocate(3);
+    state->dataContaminantBalance->BZGC.allocate(3);
+    state->dataContaminantBalance->CZGC.allocate(3);
 
-    DataContaminantBalance::GCZoneTimeMinus1Temp.allocate(3);
-    DataContaminantBalance::GCZoneTimeMinus2Temp.allocate(3);
-    DataContaminantBalance::GCZoneTimeMinus3Temp.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus1.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus2.allocate(3);
-    DataContaminantBalance::DSGCZoneTimeMinus3.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus1Temp.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus2Temp.allocate(3);
+    state->dataContaminantBalance->GCZoneTimeMinus3Temp.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus1.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus2.allocate(3);
+    state->dataContaminantBalance->DSGCZoneTimeMinus3.allocate(3);
 
-    DataContaminantBalance::MixingMassFlowGC.allocate(3);
-    DataContaminantBalance::ZoneAirGCTemp.allocate(3);
-    DataContaminantBalance::ZoneGC1.allocate(3);
-    DataContaminantBalance::ZoneAirGC.allocate(3);
+    state->dataContaminantBalance->MixingMassFlowGC.allocate(3);
+    state->dataContaminantBalance->ZoneAirGCTemp.allocate(3);
+    state->dataContaminantBalance->ZoneGC1.allocate(3);
+    state->dataContaminantBalance->ZoneAirGC.allocate(3);
 
-    DataContaminantBalance::ZoneGCSetPoint.allocate(3);
-    DataContaminantBalance::GCPredictedRate.allocate(3);
+    state->dataContaminantBalance->ZoneGCSetPoint.allocate(3);
+    state->dataContaminantBalance->GCPredictedRate.allocate(3);
 
-    DataContaminantBalance::ZoneGCGain.allocate(3);
-    DataContaminantBalance::ZoneGCGain(1) = 0.0001;
-    DataContaminantBalance::ZoneGCGain(2) = 0.0002;
-    DataContaminantBalance::ZoneGCGain(3) = 0.0003;
-    DataContaminantBalance::MixingMassFlowGC(1) = 0.0;
-    DataContaminantBalance::MixingMassFlowGC(2) = 0.0;
-    DataContaminantBalance::MixingMassFlowGC(3) = 0.0;
+    state->dataContaminantBalance->ZoneGCGain.allocate(3);
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0001;
+    state->dataContaminantBalance->ZoneGCGain(2) = 0.0002;
+    state->dataContaminantBalance->ZoneGCGain(3) = 0.0003;
+    state->dataContaminantBalance->MixingMassFlowGC(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowGC(2) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowGC(3) = 0.0;
 
-    DataContaminantBalance::OutdoorGC = 10.0;
-    DataContaminantBalance::DSGCZoneTimeMinus1(1) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus2(1) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus3(1) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus1(2) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus2(2) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus3(2) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus1(3) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus2(3) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::DSGCZoneTimeMinus3(3) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneGC1(2) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneGC1(3) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneGCSetPoint(1) = 15.0;
-    DataContaminantBalance::ZoneGCSetPoint(2) = 20.0;
-    DataContaminantBalance::ZoneGCSetPoint(3) = 25.0;
-    DataContaminantBalance::ZoneAirGC(1) = DataContaminantBalance::ZoneGC1(1);
-    DataContaminantBalance::ZoneAirGC(2) = DataContaminantBalance::ZoneGC1(2);
-    DataContaminantBalance::ZoneAirGC(3) = DataContaminantBalance::ZoneGC1(3);
+    state->dataContaminantBalance->OutdoorGC = 10.0;
+    state->dataContaminantBalance->DSGCZoneTimeMinus1(1) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus2(1) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus3(1) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus1(2) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus2(2) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus3(2) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus1(3) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus2(3) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->DSGCZoneTimeMinus3(3) = state->dataContaminantBalance->OutdoorGC;
+    state->dataContaminantBalance->ZoneGC1(1) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneGC1(2) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneGC1(3) = state->dataContaminantBalance->OutdoorCO2;
+    state->dataContaminantBalance->ZoneGCSetPoint(1) = 15.0;
+    state->dataContaminantBalance->ZoneGCSetPoint(2) = 20.0;
+    state->dataContaminantBalance->ZoneGCSetPoint(3) = 25.0;
+    state->dataContaminantBalance->ZoneAirGC(1) = state->dataContaminantBalance->ZoneGC1(1);
+    state->dataContaminantBalance->ZoneAirGC(2) = state->dataContaminantBalance->ZoneGC1(2);
+    state->dataContaminantBalance->ZoneAirGC(3) = state->dataContaminantBalance->ZoneGC1(3);
 
     Real64 PriorTimeStep;
 
@@ -754,10 +754,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Zone(3).SystemZoneNodeNumber = 5;
     Zone(3).ZoneVolCapMultpMoist = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -810,26 +810,26 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Node(8).MassFlowRate = 0.01;
     Node(9).MassFlowRate = 0.01;
 
-    DataContaminantBalance::GCPredictedRate.allocate(3);
+    state->dataContaminantBalance->GCPredictedRate.allocate(3);
 
-    DataContaminantBalance::ZoneSysContDemand.allocate(3);
-    DataContaminantBalance::NumContControlledZones = 3;
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
+    state->dataContaminantBalance->NumContControlledZones = 3;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(3);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).ActualZoneNum = 2;
-    DataContaminantBalance::ContaminantControlledZone(2).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
-    DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).ActualZoneNum = 2;
+    state->dataContaminantBalance->ContaminantControlledZone(2).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).ActualZoneNum = 3;
+    state->dataContaminantBalance->ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-    EXPECT_NEAR(19.549478386, DataContaminantBalance::GCPredictedRate(1), 0.00001);
-    EXPECT_NEAR(20.887992514, DataContaminantBalance::GCPredictedRate(2), 0.00001);
-    EXPECT_NEAR(21.251538064, DataContaminantBalance::GCPredictedRate(3), 0.00001);
+    EXPECT_NEAR(19.549478386, state->dataContaminantBalance->GCPredictedRate(1), 0.00001);
+    EXPECT_NEAR(20.887992514, state->dataContaminantBalance->GCPredictedRate(2), 0.00001);
+    EXPECT_NEAR(21.251538064, state->dataContaminantBalance->GCPredictedRate(3), 0.00001);
 }

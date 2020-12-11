@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 
 namespace EnergyPlus {

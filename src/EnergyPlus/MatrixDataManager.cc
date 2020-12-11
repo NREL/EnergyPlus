@@ -86,14 +86,7 @@ namespace MatrixDataManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    // INTEGER, PARAMETER :: OneDimensional = 1
     int const TwoDimensional(2);
-    // INTEGER, PARAMETER :: ThreeDimensional = 3
-    static std::string const BlankString;
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumMats; // number of matracies in input file
 
@@ -140,7 +133,7 @@ namespace MatrixDataManager {
         int NumElements;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
-        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         NumMats = NumTwoDimMatrix;
 
@@ -161,7 +154,7 @@ namespace MatrixDataManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++MatNum;
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MatData(MatNum).Name = cAlphaArgs(1);
             NumRows = std::floor(rNumericArgs(1));
@@ -170,14 +163,14 @@ namespace MatrixDataManager {
 
             // test
             if (NumElements < 1) {
-                ShowSevereError("GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError("Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
+                ShowContinueError(state, "Check " + cNumericFieldNames(1) + " and " + cNumericFieldNames(2) +
                                   " total number of elements in matrix must be 1 or more");
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError("GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError("Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + cAlphaArgs(1));
+                ShowContinueError(state, "Check input, total number of elements does not agree with " + cNumericFieldNames(1) + " and " +
                                   cNumericFieldNames(2));
                 ErrorsFound = true;
             }
@@ -194,7 +187,7 @@ namespace MatrixDataManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
+            ShowFatalError(state, "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
         }
     }
 

@@ -100,6 +100,26 @@ namespace DataSurfaces {
         Polygonal
     };
 
+    enum class SurfaceClass : int {
+        INVALID = -1,
+        None = 0,
+        Wall,
+        Floor,
+        Roof,
+        IntMass,
+        Detached_B,
+        Detached_F,
+        Window,
+        GlassDoor,
+        Door,
+        Shading,
+        Overhang,
+        Fin,
+        TDD_Dome,
+        TDD_Diffuser,
+        Count // The counter representing the total number of surface class, always stays at the bottom
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -143,20 +163,6 @@ namespace DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-    extern int const SurfaceClass_Wall;
-    extern int const SurfaceClass_Floor;
-    extern int const SurfaceClass_Roof;
-    extern int const SurfaceClass_IntMass;
-    extern int const SurfaceClass_Detached_B;
-    extern int const SurfaceClass_Detached_F;
-    extern int const SurfaceClass_Window;
-    extern int const SurfaceClass_Door;
-    extern int const SurfaceClass_GlassDoor;
-    extern int const SurfaceClass_Shading;
-    extern int const SurfaceClass_Overhang;
-    extern int const SurfaceClass_Fin;
-    extern int const SurfaceClass_TDD_Dome;
-    extern int const SurfaceClass_TDD_Diffuser;
 
     // Parameters to indicate heat transfer model to use for surface
     extern Array1D_string const HeatTransferModelNames;
@@ -348,6 +354,8 @@ namespace DataSurfaces {
     extern int BuildingShadingCount; // Total number of Building External Shades
     extern int FixedShadingCount;    // Total number of Fixed External Shades
     extern int AttachedShadingCount; // Total number of Shades attached to Zones
+    extern int ShadingSurfaceFirst; // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    extern int ShadingSurfaceLast;  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
 
     extern bool AspectTransform;  // Set to true when GeometryTransform object is used
     extern bool CalcSolRefl;      // Set to true when Solar Reflection Calculations object is used
@@ -374,32 +382,23 @@ namespace DataSurfaces {
     extern Array1D<Real64> X0;     // X-component of translation vector
     extern Array1D<Real64> Y0;     // Y-component of translation vector
     extern Array1D<Real64> Z0;     // Z-component of translation vector
-    extern Array1D<Real64> DSZone; // Factor for sky diffuse solar radiation into a zone
-    extern Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
-    extern Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
-                                   // beam reflecting from inside surfaces
-    extern Array1D<Real64>
-        DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    extern Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
-    extern Array1D<Real64> AISurf; // Time step value of factor for beam
-    // absorbed on inside of opaque surface
-    extern Array1D<Real64> AOSurf; // Time step value of factor for beam
-    // absorbed on outside of opaque surface
-    extern Array1D<Real64> BmToBmReflFacObs; // Factor for incident solar from specular beam refl
-    // from obstructions (W/m2)/(W/m2)
-    extern Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
-    // from obstructions (W/m2)/(W/m2)
-    extern Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    extern Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
+    extern Array1D<Real64> EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+    extern Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
+    extern Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
+    extern Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
+    extern Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    extern Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    extern Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    extern Array1D<Real64> SurfSkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
-    extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
+    extern Array2D<Real64> SurfWinA; // Time step value of factor for beam
     // absorbed in window glass layers
 
     // Time step value of factor for diffuse absorbed in window layers
-    extern Array2D<Real64> AWinSurfDiffFront;
-    extern Array2D<Real64> AWinSurfDiffBack;
+    extern Array2D<Real64> SurfWinADiffFront;
+    extern Array2D<Real64> SurfWinADiffBack;
 
-    extern Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
+    extern Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
     // It happens sometimes that beam enters one window and hits back of
     // second window. It is used in complex fenestration only
@@ -416,7 +415,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> ReflFacSkySolObs;
     extern Array1D<Real64> ReflFacSkySolGnd;
     extern Array2D<Real64> CosIncAveBmToBmSolObs;
-    extern Array1D<Real64> DBZoneIntWin; // Value of factor for beam solar entering a zone through interior windows
+    extern Array1D<Real64> EnclSolDBIntWin; // Value of factor for beam solar entering a zone through interior windows
     // (considered to contribute to diffuse in zone)
     extern Array1D<Real64> SurfSunlitArea; // Sunlit area by surface number
     extern Array1D<Real64> SurfSunlitFrac; // Sunlit fraction by surface number
@@ -435,7 +434,6 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinBmBmSolar;                     // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinBmDifSolar;                    // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinDifSolar;                      // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    extern Array1D<Real64> SurfWinDirSolTransAtIncAngle;         // Window's beam-beam solar transmittance at current timestep's angle of incidence
     extern Array1D<Real64> SurfWinHeatGain;                      // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
     // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
     // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
@@ -566,7 +564,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinGlazedFrac;                      // (Glazed area)/(Glazed area + divider area)
     extern Array1D<Real64> SurfWinCenterGlArea;                    // Center of glass area (m2); area of glass where 1-D conduction dominates
     extern Array1D<Real64> SurfWinEdgeGlCorrFac;                   // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging effects near frame and divider
-    extern Array1D<int> SurfWinOriginalClass;                      // 0 or if entered originally as:
+    extern Array1D<SurfaceClass> SurfWinOriginalClass;                      // 0 or if entered originally as:
     extern Array1D<Real64> SurfWinShadeAbsFacFace1;                // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is apportioned to the two faces
     extern Array1D<Real64> SurfWinShadeAbsFacFace2;                // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is apportioned to the two faces
     extern Array1D<Real64> SurfWinConvCoeffWithShade;              // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
@@ -717,7 +715,7 @@ namespace DataSurfaces {
         bool EMSConstructionOverrideON;   // if true, EMS is calling to override the construction value
         int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
-        int Class;
+        SurfaceClass Class;
         // Geometry related parameters
         SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
         //                Rectangular Window/Door=4,Rectangular Overhang=5,
@@ -920,7 +918,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceData()
-            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(0),
+            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(SurfaceClass::None),
               Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0),
               Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel_NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), LowTempErrCount(0),
@@ -958,17 +956,17 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
         void SetWindDirAt(Real64 const fac);
 
-        void SetWindSpeedAt(Real64 const fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
 
-        Real64 getInsideAirTemperature(const int t_SurfNum) const;
+        Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
 
@@ -980,7 +978,7 @@ namespace DataSurfaces {
 
         int getTotLayers(EnergyPlusData &state) const;
 
-        Real64 get_average_height() const;
+        Real64 get_average_height(EnergyPlusData &state) const;
 
     private: // Methods
              // Computed Shape Category
@@ -1454,19 +1452,19 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSurfaceOutBulbTempAt();
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
-    void CheckSurfaceOutBulbTempAt();
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 
-    void SetSurfaceWindSpeedAt();
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state);
 
-    void SetSurfaceWindDirAt();
+    void SetSurfaceWindDirAt(EnergyPlusData &state);
 
     Real64 AbsFrontSide(int SurfNum);
 
     Real64 AbsBackSide(int SurfNum);
 
-    std::string cSurfaceClass(int const ClassNo);
+    std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
 

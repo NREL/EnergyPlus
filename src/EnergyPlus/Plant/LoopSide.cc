@@ -109,7 +109,7 @@ namespace DataPlant {
             PlantCondLoopOperation::InitLoadDistribution(state, FirstHVACIteration);
 
             // Now that the op scheme types are updated, do LoopSide validation
-            this->ValidateFlowControlPaths();
+            this->ValidateFlowControlPaths(state);
 
             // Set the flag to false so we won't do these again this time step
             this->OncePerTimeStepOperations = false;
@@ -164,7 +164,7 @@ namespace DataPlant {
                                                            thisPlantLoop.CommonPipeType);
 
             // Update the loop outlet node conditions
-            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(FirstHVACIteration); // TODO: This is a loop level check, move out
+            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
 
             DataPlant::PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
                                                                            this->LoadToLoopSetPointThatWasntMet);
@@ -173,7 +173,7 @@ namespace DataPlant {
 
     }
 
-    void HalfLoopData::ValidateFlowControlPaths()
+    void HalfLoopData::ValidateFlowControlPaths(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -237,10 +237,10 @@ namespace DataPlant {
                 if ((SELECT_CASE_var >= DataPlant::LoadRangeBasedMin) && (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                        ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
-                        ShowContinueError("PlaLoad range based components are separated by other control type components.");
-                        ShowContinueError("Load Range Based should be grouped together on each flow path.");
-                        ShowFatalError("Plant topology issue causes program termination");
+                        ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
+                        ShowContinueError(state, "PlaLoad range based components are separated by other control type components.");
+                        ShowContinueError(state, "Load Range Based should be grouped together on each flow path.");
+                        ShowFatalError(state, "Plant topology issue causes program termination");
                     } else {
                         EncounteredLRB = true;
                     }
@@ -255,8 +255,8 @@ namespace DataPlant {
                 } else if (SELECT_CASE_var ==
                            DataPlant::UnknownStatusOpSchemeType) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
                     // throw fatal
-                    ShowSevereError("ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
-                    ShowFatalError("ValidateFlowControlPaths: developer notice, Inlet path validation loop");
+                    ShowSevereError(state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
+                    ShowFatalError(state, "ValidateFlowControlPaths: developer notice, Inlet path validation loop");
                 } else { //~ Other control type
                     if (EncounteredLRB) {
                         EncounteredNonLRBAfterLRB = true;
@@ -299,10 +299,10 @@ namespace DataPlant {
                             (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
-                                ShowContinueError("Load range based components are separated by other control type components.");
-                                ShowContinueError("Load Range Based should be grouped together on each flow path.");
-                                ShowFatalError("Plant topology issue causes program termination");
+                                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
+                                ShowContinueError(state, "Load range based components are separated by other control type components.");
+                                ShowContinueError(state, "Load Range Based should be grouped together on each flow path.");
+                                ShowFatalError(state, "Plant topology issue causes program termination");
                             } else {
                                 EncounteredLRB = true;
                             }
@@ -316,9 +316,9 @@ namespace DataPlant {
 
                         } else if (SELECT_CASE_var == DataPlant::UnknownStatusOpSchemeType) { //~ Uninitialized, this should be sufficient place to catch for this on other branches
                             // throw fatal error
-                            ShowSevereError("ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " +
+                            ShowSevereError(state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " +
                                             this_component.Name);
-                            ShowFatalError("ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop");
+                            ShowFatalError(state, "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop");
                         } else { //~ Other control type
                             if (EncounteredLRB) {
                                 EncounteredNonLRBAfterLRB = true;
@@ -750,22 +750,20 @@ namespace DataPlant {
                         // 4  LoadToHeatingSetPoint  >  LoadToCoolingSetPoint       -->  Not Feasible if LoopSetPointHi >= LoopSetPointLo
                         // First trap bad set-points
                         if (LoadToHeatingSetPoint > LoadToCoolingSetPoint) {
-                            ShowSevereError(
+                            ShowSevereError(state,
                                 "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, but the "
                                 "heating-related low setpoint appears to be above the cooling-related high setpoint.");
-                            ShowContinueError(
+                            ShowContinueError(state,
                                 "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is "
                                 "below the high setpoint.");
-                            ShowContinueError("Occurs in PlantLoop=" + thisPlantLoop.Name);
+                            ShowContinueError(state, "Occurs in PlantLoop=" + thisPlantLoop.Name);
                             ShowContinueError(
-                                "LoadToHeatingSetPoint=" + General::RoundSigDigits(LoadToHeatingSetPoint, 3) +
-                                ", LoadToCoolingSetPoint=" + General::RoundSigDigits(LoadToCoolingSetPoint, 3));
-                            ShowContinueError("Loop Heating Low Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureLo, 2));
-                            ShowContinueError("Loop Cooling High Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureHi, 2));
+                                state,
+                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
+                            ShowContinueError(state, format("Loop Heating Low Setpoint={:.2R}", LoopSetPointTemperatureLo));
+                            ShowContinueError(state, format("Loop Cooling High Setpoint={:.2R}", LoopSetPointTemperatureHi));
 
-                            ShowFatalError("Program terminates due to above conditions.");
+                            ShowFatalError(state, "Program terminates due to above conditions.");
                         }
                         if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
                             LoadToLoopSetPoint = LoadToHeatingSetPoint;
@@ -775,18 +773,16 @@ namespace DataPlant {
                                    LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
                             LoadToLoopSetPoint = 0.0;
                         } else {
-                            ShowSevereError(
+                            ShowSevereError(state,
                                 "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus "
                                 "Development Team");
-                            ShowContinueError("occurs in PlantLoop=" + thisPlantLoop.Name);
+                            ShowContinueError(state, "occurs in PlantLoop=" + thisPlantLoop.Name);
                             ShowContinueError(
-                                "LoadToHeatingSetPoint=" + General::RoundSigDigits(LoadToHeatingSetPoint, 3) +
-                                ", LoadToCoolingSetPoint=" + General::RoundSigDigits(LoadToCoolingSetPoint, 3));
-                            ShowContinueError("Loop Heating Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureLo, 2));
-                            ShowContinueError("Loop Cooling Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureHi, 2));
-                            ShowFatalError("Program terminates due to above conditions.");
+                                state,
+                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
+                            ShowContinueError(state, format("Loop Heating Setpoint={:.2R}", LoopSetPointTemperatureLo));
+                            ShowContinueError(state, format("Loop Cooling Setpoint={:.2R}", LoopSetPointTemperatureHi));
+                            ShowFatalError(state, "Program terminates due to above conditions.");
                         }
                     } else {
                         LoadToLoopSetPoint = 0.0;
@@ -1267,7 +1263,7 @@ namespace DataPlant {
 
         // The flow resolver takes information such as requested flows and min/max available flows and
         //  sets the corrected flow on the inlet to each parallel branch
-        this->ResolveParallelFlows(ThisLoopSideFlow, FirstHVACIteration);
+        this->ResolveParallelFlows(state, ThisLoopSideFlow, FirstHVACIteration);
 
         // Re-Initialize variables for this next pass
         this->InitialDemandToLoopSetPointSAVED = this->InitialDemandToLoopSetPoint;
@@ -1283,6 +1279,7 @@ namespace DataPlant {
     }
 
     void HalfLoopData::ResolveParallelFlows(
+        EnergyPlusData &state,
         Real64 const ThisLoopSideFlow, // [kg/s]  total flow to be split
         bool const FirstHVACIteration  // TRUE if First HVAC iteration of Time step
     ) {
@@ -1310,15 +1307,9 @@ namespace DataPlant {
         // properties.  Finally, Max/MinAvail are reset for the next time step.
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::ControlType_Active;
-        using DataBranchAirLoopPlant::ControlType_Bypass;
-        using DataBranchAirLoopPlant::ControlType_Passive;
-        using DataBranchAirLoopPlant::ControlType_SeriesActive;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::TypeOf_PumpBankVariableSpeed;
         using DataPlant::TypeOf_PumpVariableSpeed;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
@@ -1372,11 +1363,11 @@ namespace DataPlant {
                 // now with flow locked, this single branch will just ran at the specified flow rate, so we are done
                 return;
             } else {
-                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
-                ShowContinueError(
+                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
+                ShowContinueError(state,
                     "There are multiple branches, yet no splitter.  This is an invalid configuration.");
-                ShowContinueError("Add a set of connectors, use put components on a single branch.");
-                ShowFatalError("Invalid plant topology causes program termination.");
+                ShowContinueError(state, "Add a set of connectors, use put components on a single branch.");
+                ShowFatalError(state, "Invalid plant topology causes program termination.");
                 return;
             }
         }
@@ -1388,10 +1379,10 @@ namespace DataPlant {
             TotParallelBranchFlowReq = 0.0;
             NumSplitOutlets = this->Splitter.TotalOutletNodes;
             if (NumSplitOutlets < 1) {
-                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
-                ShowContinueError("Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
-                ShowContinueError("Splitter improperly specified, no splitter outlets.");
-                ShowFatalError("Invalid plant topology causes program termination.");
+                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
+                ShowContinueError(state, "Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
+                ShowContinueError(state, "Splitter improperly specified, no splitter outlets.");
+                ShowFatalError(state, "Invalid plant topology causes program termination.");
             }
 
             NumActiveBranches = 0;
@@ -1418,8 +1409,8 @@ namespace DataPlant {
                 BranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
                 BranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
                 //            !sum the branch flow requests to a total parallel branch flow request
-                bool activeBranch = this_splitter_outlet_branch.ControlType == ControlType_Active;
-                bool isSeriesActiveAndRequesting = (this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) && (BranchFlowReq > 0.0);
+                bool activeBranch = this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                bool isSeriesActiveAndRequesting = (this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) && (BranchFlowReq > 0.0);
                 if (activeBranch || isSeriesActiveAndRequesting ) { // revised logic for series active
                     TotParallelBranchFlowReq += BranchFlowReq;
                     ++NumActiveBranches;
@@ -1466,15 +1457,15 @@ namespace DataPlant {
             for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                 SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                 FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                if (this->Branch(SplitterBranchOut).ControlType != ControlType_Active &&
-                    this->Branch(SplitterBranchOut).ControlType != ControlType_SeriesActive) {
+                if (this->Branch(SplitterBranchOut).ControlType != DataBranchAirLoopPlant::ControlTypeEnum::Active &&
+                    this->Branch(SplitterBranchOut).ControlType != DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     Node(FirstNodeOnBranch).MassFlowRate = 0.0;
                     this->PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                 }
             }
 
             // IF SUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
-            if (FlowRemaining < MassFlowTolerance) { // no flow available at all for splitter
+            if (FlowRemaining < DataBranchAirLoopPlant::MassFlowTolerance) { // no flow available at all for splitter
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     for (CompCounter = 1;
@@ -1496,16 +1487,16 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == ControlType_Active ||
-                        this->Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
+                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active ||
+                        this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                         // branch flow is min of requested flow and remaining flow
                         Node(FirstNodeOnBranch).MassFlowRate = min(Node(FirstNodeOnBranch).MassFlowRate,
                                                                    FlowRemaining);
-                        if (Node(FirstNodeOnBranch).MassFlowRate < MassFlowTolerance)
+                        if (Node(FirstNodeOnBranch).MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)
                             Node(FirstNodeOnBranch).MassFlowRate = 0.0;
                         this->PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                         FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
-                        if (FlowRemaining < MassFlowTolerance) FlowRemaining = 0.0;
+                        if (FlowRemaining < DataBranchAirLoopPlant::MassFlowTolerance) FlowRemaining = 0.0;
                     }
                 }
                 // IF the active branches take the entire loop flow, return
@@ -1516,7 +1507,7 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == ControlType_Passive) {
+                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Passive) {
                         // Calculate the total max available
                         totalMax += Node(FirstNodeOnBranch).MassFlowRateMaxAvail;
                     }
@@ -1526,7 +1517,7 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        if (this->Branch(SplitterBranchOut).ControlType == ControlType_Passive) {
+                        if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Passive) {
                             FracFlow = FlowRemaining / totalMax;
                             if (FracFlow <= 1.0) { // the passive branches will take all the flow
                                 PassiveFlowRate = FracFlow * Node(FirstNodeOnBranch).MassFlowRateMaxAvail;
@@ -1553,7 +1544,7 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= this->Splitter.TotalOutletNodes; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == ControlType_Bypass) {
+                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
                         Node(FirstNodeOnBranch).MassFlowRate = min(FlowRemaining,
                                                                    Node(FirstNodeOnBranch).MassFlowRateMaxAvail);
                         this->PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
@@ -1570,8 +1561,8 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        bool branchIsActive = this->Branch(SplitterBranchOut).ControlType == ControlType_Active;
-                        bool branchIsSeriesActiveAndRequesting = this->Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive && this->Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
+                        bool branchIsActive = this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                        bool branchIsSeriesActiveAndRequesting = this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive && this->Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
                         if (branchIsActive || branchIsSeriesActiveAndRequesting) { // only series active branches that want to be "on"
                             // check Remaining flow (should be correct!)
                             ActiveFlowRate = min(ActiveFlowRate, FlowRemaining);
@@ -1593,8 +1584,8 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        if (this->Branch(SplitterBranchOut).ControlType == ControlType_Active ||
-                            this->Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
+                        if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active ||
+                            this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                             StartingFlowRate = Node(FirstNodeOnBranch).MassFlowRate;
                             ActiveFlowRate = min(FlowRemaining,
                                                  (Node(FirstNodeOnBranch).MassFlowRateMaxAvail - StartingFlowRate));
@@ -1640,8 +1631,8 @@ namespace DataPlant {
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     auto &this_splitter_outlet_branch(this->Branch(SplitterBranchOut));
 
-                    if ((this_splitter_outlet_branch.ControlType == ControlType_Active) ||
-                        (this_splitter_outlet_branch.ControlType == ControlType_SeriesActive)) {
+                    if ((this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) ||
+                        (this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)) {
 
                         // since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to
                         // make sure the math works every time that means we must make the variable speed pump correction here as well.
@@ -1670,14 +1661,13 @@ namespace DataPlant {
                 }
 
                 // 1b) check if flow all apportioned
-                if (FlowRemaining > MassFlowTolerance) {
+                if (FlowRemaining > DataBranchAirLoopPlant::MassFlowTolerance) {
                     // Call fatal diagnostic error. !The math should work out!
-                    ShowSevereError("ResolveParallelFlows: Dev note, failed to redistribute restricted flow");
-                    ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Loop side flow = " + RoundSigDigits(ThisLoopSideFlow, 8) + " (kg/s)");
-                    ShowContinueError("Flow Remaining = " + RoundSigDigits(FlowRemaining, 8) + " (kg/s)");
-                    ShowContinueError("Parallel Branch requests  = " + RoundSigDigits(TotParallelBranchFlowReq, 8) +
-                                      " (kg/s)");
+                    ShowSevereError(state, "ResolveParallelFlows: Dev note, failed to redistribute restricted flow");
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, format("Loop side flow = {:.8R} (kg/s)", ThisLoopSideFlow));
+                    ShowContinueError(state, format("Flow Remaining = {:.8R} (kg/s)", FlowRemaining));
+                    ShowContinueError(state, format("Parallel Branch requests  = {:.8R} (kg/s)", TotParallelBranchFlowReq));
                 }
 
                 // 2)  ! Reset the flow on the Mixer outlet branch
@@ -1916,7 +1906,7 @@ namespace DataPlant {
                     break;
                 default:
                     if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
-                        ShowFatalError("Encountered Load Based Object after other components, invalid.");
+                        ShowFatalError(state, "Encountered Load Based Object after other components, invalid.");
                     } else { //~ Typical control equipment
                         branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
                     }
@@ -1964,7 +1954,6 @@ namespace DataPlant {
         //    Therefore they are not included
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::FlowLocked;
         using DataPlant::FlowUnlocked;
@@ -2016,7 +2005,7 @@ namespace DataPlant {
         }
 
         // Leave early if there wasn't a mass flow rate or request
-        if (ComponentMassFlowRate < MassFlowTolerance) return;
+        if (ComponentMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
 
         // Get an average temperature for the property call
         Real64 const InletTemp(Node(InletNode).Temp);

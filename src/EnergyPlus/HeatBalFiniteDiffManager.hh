@@ -129,7 +129,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> EnthOld; // Current node enthalpy
         Array1D<Real64> EnthNew; // Node enthalpy at new time
         Array1D<Real64> EnthLast;
-        Array1D<Real64> QDreport;        // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
+        Array1D<Real64> QDreport;        // Node heat flux for reporting [W/m2] positive is flow towards inside face of surface
         Array1D<Real64> CpDelXRhoS1;     // Current outer half-node Cp * DelX * RhoS / Delt
         Array1D<Real64> CpDelXRhoS2;     // Current inner half-node Cp * DelX * RhoS / Delt
         Array1D<Real64> TDpriortimestep; // Node temperatures from previous timestep
@@ -211,7 +211,8 @@ namespace HeatBalFiniteDiffManager {
 
     void ReportFiniteDiffInits(EnergyPlusData &state);
 
-    void CalcNodeHeatFlux(int const Surf,    // surface number
+    void CalcNodeHeatFlux(EnergyPlusData &state,
+                          int const Surf,    // surface number
                           int const TotNodes // number of nodes in surface
     );
 
@@ -285,7 +286,8 @@ namespace HeatBalFiniteDiffManager {
                         Array1D<Real64> &TDreport    // Temperature value from previous HeatSurfaceHeatManager titeration's value
     );
 
-    void CheckFDSurfaceTempLimits(int const SurfNum,            // surface number
+    void CheckFDSurfaceTempLimits(EnergyPlusData &state,
+                                  int const SurfNum,            // surface number
                                   Real64 const CheckTemperature // calculated temperature, not reset
     );
 

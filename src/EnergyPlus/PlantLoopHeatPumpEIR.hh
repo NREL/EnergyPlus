@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
@@ -79,9 +80,9 @@ namespace EIRPlantLoopHeatPumps {
     {
 
         // fixed configuration parameters
-        std::string name = "";
+        std::string name;
         int plantTypeOfNum = -1;
-        std::string companionCoilName = "";
+        std::string companionCoilName;
         EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
         Real64 sizingFactor = 1.0;
         bool waterSource = false;
@@ -145,13 +146,13 @@ namespace EIRPlantLoopHeatPumps {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
@@ -159,25 +160,23 @@ namespace EIRPlantLoopHeatPumps {
 
         void sizeSrcSideWSHP(EnergyPlusData &state);
 
-        void sizeSrcSideASHP();
+        void sizeSrcSideASHP(EnergyPlusData &state);
 
-        Real64 getLoadSideOutletSetPointTemp();
+        Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
 
-        void setOperatingFlowRatesASHP();
+        void setOperatingFlowRatesASHP(EnergyPlusData &state);
 
-        void setOperatingFlowRatesWSHP();
+        void setOperatingFlowRatesWSHP(EnergyPlusData &state);
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name);
 
-        static void pairUpCompanionCoils();
+        static void pairUpCompanionCoils(EnergyPlusData &state);
 
         static void processInputForEIRPLHP(EnergyPlusData &state);
 
-        static void clear_state();
-
-        static void checkConcurrentOperation();
+        static void checkConcurrentOperation(EnergyPlusData &state);
 
         static Real64 add(Real64 const a, Real64 const b)
         {
@@ -190,8 +189,17 @@ namespace EIRPlantLoopHeatPumps {
         }
     };
 
-    extern std::vector<EIRPlantLoopHeatPump> heatPumps;
 } // namespace EIRPlantLoopHeatPumps
+
+struct EIRPlantLoopHeatPumpsData {
+    std::vector<EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump> heatPumps;
+    bool getInputsPLHP = true;
+    void clear_state() {
+        getInputsPLHP = true;
+        heatPumps.clear();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif // ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH

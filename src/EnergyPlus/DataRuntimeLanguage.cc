@@ -326,7 +326,8 @@ namespace DataRuntimeLanguage {
         EMSActuator_lookup.clear();            // Fast duplicate lookup structure
     }
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
@@ -367,38 +368,39 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '.')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if ((cFieldValue.length() > 0) && (has_any_of(cFieldValue[0], InvalidStartCharacters))) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
             errFlag = true;
             ErrorsFound = true;
         }
     }
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine
@@ -441,27 +443,27 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         //  pos=SCAN(cFieldValue(1:1),InvalidStartCharacters)
         //  IF (pos > 0) THEN
-        //    CALL ShowSevereError(TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
-        //    CALL ShowContinueError('...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
+        //    CALL ShowSevereError(state, TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
+        //    CALL ShowContinueError(state, '...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
         //    errFlag=.TRUE.
         //    ErrorsFound = .TRUE.
         //  ENDIF

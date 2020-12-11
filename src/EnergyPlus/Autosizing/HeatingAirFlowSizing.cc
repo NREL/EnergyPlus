@@ -46,20 +46,20 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-Real64 HeatingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
 
@@ -196,7 +196,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _origi
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).HeatingAirVolFlow;
                     } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                         this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               DataEnvironment::StdRhoAir;
+                                               state.dataEnvrn->StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }
@@ -244,10 +244,10 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _origi
             this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
             this->addErrorMessage(msg);
-            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
-            ShowContinueError(msg);
+            msg = format("SizingString = {}, SizingResult = {:.1T}", this->sizingString, this->autoSizedValue);
+            ShowContinueError(state, msg);
             this->addErrorMessage(msg);
             errorsFound = true;
         }
@@ -269,11 +269,11 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _origi
             }
         }
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s
-        coilSelectionReportObj->setCoilAirFlow(this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
+        coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized);
     }
     if (this->isFanReportObject) {
         //  fill fan peak day and time here

@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
@@ -57,25 +58,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace SimulationManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool RunPeriodsInInput;
-    extern bool RunControlInInput;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // Functions
-    void clear_state();
 
     void ManageSimulation(EnergyPlusData &state);
 
@@ -87,13 +69,13 @@ namespace SimulationManager {
 
     void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state);
 
-    void CheckForRequestedReporting();
+    void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName);
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
 
     void OpenOutputFiles(EnergyPlusData &state);
 
-    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams);
+    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(EnergyPlusData &state);
 
@@ -109,12 +91,21 @@ namespace SimulationManager {
 
     void PostIPProcessing(EnergyPlusData &state);
 
-    //	void
-    //	CheckCachedIPErrors();
-
 } // namespace SimulationManager
 
-// EXTERNAL SUBROUTINES:
+struct SimulationManagerData : BaseGlobalStruct {
+    bool RunPeriodsInInput = false;
+    bool RunControlInInput = false;
+    bool PreP_Fatal = false;
+    bool WarningOut = true;
+    void clear_state() override {
+        this->RunPeriodsInInput = false;
+        this->RunControlInInput = false;
+        this->PreP_Fatal = false;
+        this->WarningOut = true;
+    }
+};
+
 
 void Resimulate(EnergyPlusData &state,
                 bool &ResimExt, // Flag to resimulate the exterior energy use simulation

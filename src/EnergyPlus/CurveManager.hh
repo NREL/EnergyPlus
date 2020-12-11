@@ -68,6 +68,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -243,8 +244,8 @@ namespace CurveManager {
         std::string filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        void load(EnergyPlusData &state, std::string path);
-        std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
+        bool load(EnergyPlusData &state, std::string path);
+        std::vector<double>& getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
         std::size_t numRows = 0u;
@@ -266,7 +267,7 @@ namespace CurveManager {
         };
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
-        int getGridIndex(std::string &indVarListName, bool &ErrorsFound);
+        int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
@@ -369,7 +370,7 @@ namespace CurveManager {
 
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
-                                      int &PressureCurveType,
+                                      DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex);
 
     Real64 PressureCurveValue(EnergyPlusData &state, int PressureCurveIndex, Real64 MassFlow, Real64 Density, Real64 Viscosity);

@@ -53,7 +53,6 @@
 // ObjexxFCL Headers
 
 #include "Fixtures/EnergyPlusFixture.hh"
-
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -69,7 +68,6 @@
 // EnergyPlus Headers
 using namespace EnergyPlus::DataDefineEquip;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::PoweredInductionUnits;
@@ -182,17 +180,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state);  // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);  // read schedules
 
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state);
+    GetZoneEquipmentData1(*state);
+    GetZoneAirLoopEquipment(*state);
 
-    GetPIUs(state);
+    GetPIUs(*state);
 
     ASSERT_EQ(1, NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ZONE COIL", PIU(1).HCoil);     // heating coil name
@@ -291,26 +289,26 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state);  // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);  // read schedules
 
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state);
+    GetZoneEquipmentData1(*state);
+    GetZoneAirLoopEquipment(*state);
 
-    GetPIUs(state);
+    GetPIUs(*state);
 
     int const PIUNum = 1;
     int const ADUNum = 1;
 
     ASSERT_EQ(1, NumSeriesPIUs);
-    EXPECT_EQ("SPACE1-1 ATU", AirDistUnit(ADUNum).Name); // ADU name
+    EXPECT_EQ("SPACE1-1 ATU", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name
     EXPECT_EQ("SPACE1-1 PIU REHEAT", PIU(PIUNum).Name);  // PIU series name
-    EXPECT_GT(AirDistUnit(ADUNum).InletNodeNum, 0);
-    EXPECT_EQ(AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
+    EXPECT_GT(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, 0);
+    EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
@@ -1475,18 +1473,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;
 
     ASSERT_EQ(1, NumSeriesPIUs);
-    EXPECT_EQ("SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", AirDistUnit(ADUNum).Name); // ADU name
+    EXPECT_EQ("SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name
     EXPECT_EQ("SERIES PIU ELEC RHT", PIU(PIUNum).Name);                               // PIU series name
-    EXPECT_EQ(AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
-    EXPECT_EQ(AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum,
+    EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
+    EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum,
               ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex));
     ASSERT_TRUE(ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
 }

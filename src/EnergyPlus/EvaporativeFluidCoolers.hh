@@ -257,7 +257,7 @@ namespace EvaporativeFluidCoolers {
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
@@ -265,7 +265,7 @@ namespace EvaporativeFluidCoolers {
 
         void CalculateWaterUsage(EnergyPlusData &state);
 
-        void UpdateEvapFluidCooler();
+        void UpdateEvapFluidCooler(EnergyPlusData &state);
 
         void ReportEvapFluidCooler(bool RunFlag);
 

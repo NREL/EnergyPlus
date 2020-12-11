@@ -183,7 +183,7 @@ namespace PipeHeatTransfer {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("PipeHTFactory: Error getting inputs for pipe named: " + objectName);
+        ShowFatalError(state, "PipeHTFactory: Error getting inputs for pipe named: " + objectName);
         // Shut up the compiler
         return nullptr;
     }
@@ -196,10 +196,11 @@ namespace PipeHeatTransfer {
         MyEnvrnFlag = true;
     }
 
-    void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &state,
+                              [[maybe_unused]] const PlantLocation &calledFromLocation,
                               bool const FirstHVACIteration,
-                              Real64 &EP_UNUSED(CurLoad),
-                              bool const EP_UNUSED(RunFlag))
+                              [[maybe_unused]] Real64 &CurLoad,
+                              [[maybe_unused]] bool const RunFlag)
     {
         this->InitPipesHeatTransfer(state, FirstHVACIteration);
         // make the calculations
@@ -257,7 +258,7 @@ namespace PipeHeatTransfer {
         using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -284,11 +285,11 @@ namespace PipeHeatTransfer {
 
         // Initializations and allocations
         cCurrentModuleObject = "Pipe:Indoor";
-        NumOfPipeHTInt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTInt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Outdoor";
-        NumOfPipeHTExt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTExt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Underground";
-        NumOfPipeHTUG = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTUG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
         // allocate data structures
@@ -315,7 +316,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeInterior;
 
@@ -324,8 +325,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -334,8 +335,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -344,12 +345,12 @@ namespace PipeHeatTransfer {
             PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
 
             // get environmental boundary condition type
 
@@ -363,8 +364,8 @@ namespace PipeHeatTransfer {
                     PipeHT(Item).EnvrZone = cAlphaArgs(6);
                     PipeHT(Item).EnvrZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(6), Zone);
                     if (PipeHT(Item).EnvrZonePtr == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
@@ -375,20 +376,20 @@ namespace PipeHeatTransfer {
                     PipeHT(Item).EnvrVelSchedule = cAlphaArgs(8);
                     PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(state, PipeHT(Item).EnvrVelSchedule);
                     if (PipeHT(Item).EnvrSchedPtr == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                     if (PipeHT(Item).EnvrVelSchedPtr == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError("Should be \"ZONE\" or \"SCHEDULE\""); // TODO rename point
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "Should be \"ZONE\" or \"SCHEDULE\""); // TODO rename point
                     ErrorsFound = true;
                 }
             }
@@ -396,18 +397,18 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("GetPipesHeatTransfer: invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
-                ShowContinueError(cNumericFieldNames(1) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
+                ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 
                 ErrorsFound = true;
             }
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("GetPipesHeatTransfer: invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
-                ShowContinueError(cNumericFieldNames(2) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
+                ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -435,7 +436,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeExterior;
 
@@ -444,8 +445,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -454,8 +455,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -464,12 +465,12 @@ namespace PipeHeatTransfer {
             PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
 
             // get environmental boundary condition type
             //    PipeHT(Item)%Environment = 'OutdoorAir'
@@ -486,32 +487,32 @@ namespace PipeHeatTransfer {
                                                             ObjectIsNotParent);
             if (!lAlphaFieldBlanks(5)) {
                 if (!CheckOutAirNodeNumber(state, PipeHT(Item).EnvrAirNodeNum)) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError("Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
+                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("An " + cAlphaFieldNames(5) + " must be used ");
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowContinueError(state, "An " + cAlphaFieldNames(5) + " must be used ");
                 ErrorsFound = true;
             }
 
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
-                ShowContinueError(cNumericFieldNames(1) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
+                ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
-                ShowContinueError(cNumericFieldNames(2) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
+                ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -540,7 +541,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeUnderground;
 
@@ -549,8 +550,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -559,8 +560,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -569,12 +570,12 @@ namespace PipeHeatTransfer {
             PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Pipe Nodes");
 
             PipeHT(Item).EnvironmentPtr = GroundEnv;
 
@@ -585,25 +586,25 @@ namespace PipeHeatTransfer {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NOSUN")) {
                 PipeHT(Item).SolarExposed = false;
             } else {
-                ShowSevereError("GetPipesHeatTransfer: invalid key for sun exposure flag for " + cAlphaArgs(1));
-                ShowContinueError("Key should be either SunExposed or NoSun.  Entered Key: " + cAlphaArgs(5));
+                ShowSevereError(state, "GetPipesHeatTransfer: invalid key for sun exposure flag for " + cAlphaArgs(1));
+                ShowContinueError(state, "Key should be either SunExposed or NoSun.  Entered Key: " + cAlphaArgs(5));
                 ErrorsFound = true;
             }
 
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
-                ShowContinueError(cNumericFieldNames(1) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
+                ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError("Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
-                ShowContinueError(cNumericFieldNames(2) + " must be > 0.0");
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
+                ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -612,8 +613,8 @@ namespace PipeHeatTransfer {
             PipeHT(Item).SoilMaterial = cAlphaArgs(6);
             PipeHT(Item).SoilMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), dataMaterial.Material);
             if (PipeHT(Item).SoilMaterialNum == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + PipeHT(Item).SoilMaterial);
-                ShowContinueError("Found in " + cCurrentModuleObject + '=' + PipeHT(Item).Name);
+                ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + PipeHT(Item).SoilMaterial);
+                ShowContinueError(state, "Found in " + cCurrentModuleObject + '=' + PipeHT(Item).Name);
                 ErrorsFound = true;
             } else {
                 PipeHT(Item).SoilDensity = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).Density;
@@ -688,7 +689,7 @@ namespace PipeHeatTransfer {
 
         // final error check
         if (ErrorsFound) {
-            ShowFatalError("GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination.");
+            ShowFatalError(state, "GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination.");
         }
 
         // Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
@@ -709,7 +710,7 @@ namespace PipeHeatTransfer {
                 SetupOutputVariable(state,
                     "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).EnvHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
-                SetupZoneInternalGain(
+                SetupZoneInternalGain(state,
                     PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, &PipeHT(Item).ZoneHeatGainRate);
             }
 
@@ -748,7 +749,6 @@ namespace PipeHeatTransfer {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -815,8 +815,9 @@ namespace PipeHeatTransfer {
             this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
         } else {
-            ShowSevereError(PipeType + ": invalid " + FieldName + "=\"" + ConstructionName + "\", too many layers=[" + TrimSigDigits(TotalLayers) +
-                            "], only 1 or 2 allowed.");
+            ShowSevereError(
+                state,
+                format("{}: invalid {}=\"{}\", too many layers=[{}], only 1 or 2 allowed.", PipeType, FieldName, ConstructionName, TotalLayers));
             ErrorsFound = true;
         }
     }
@@ -841,10 +842,6 @@ namespace PipeHeatTransfer {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -886,7 +883,7 @@ namespace PipeHeatTransfer {
             ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
-                ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
             }
             // unset one-time flag
             this->OneTimeInit = false;
@@ -966,13 +963,13 @@ namespace PipeHeatTransfer {
                 if (SELECT_CASE_var == GroundEnv) {
                     // EnvironmentTemp = GroundTemp
                 } else if (SELECT_CASE_var == OutsideAirEnv) {
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == ZoneEnv) {
                     nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == ScheduleEnv) {
-                    nsvEnvironmentTemp = GetCurrentScheduleValue(this->EnvrSchedPtr);
+                    nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == None) { // default to outside temp
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
 
@@ -984,7 +981,7 @@ namespace PipeHeatTransfer {
         if (!FirstHVACIteration) this->FirstHVACupdateFlag = true;
 
         // Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (std::abs(this->CurrentSimTime - this->PreviousSimTime) > 1.0e-6) {
             PushArrays = true;
             this->PreviousSimTime = this->CurrentSimTime;
@@ -1137,7 +1134,7 @@ namespace PipeHeatTransfer {
         // Revised by L. Gu by including insulation conductance 6/19/08
 
         if (this->EnvironmentPtr != GroundEnv) {
-            AirConvCoef = 1.0 / (1.0 / this->OutsidePipeHeatTransCoef() + this->InsulationResistance);
+            AirConvCoef = 1.0 / (1.0 / this->OutsidePipeHeatTransCoef(state) + this->InsulationResistance);
         }
 
         FluidConvCoef = this->CalcPipeHeatTransCoef(state, nsvInletTemp, nsvMassFlowRate, this->PipeID);
@@ -1264,14 +1261,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::BeamSolarRad;
-        using DataEnvironment::DifSolarRad;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::SkyTemp;
-        using DataEnvironment::SOLCOS;
-        using DataEnvironment::WindSpeed;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
         using DataLoopNode::Node;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1319,7 +1308,7 @@ namespace PipeHeatTransfer {
 
         for (IterationIndex = 1; IterationIndex <= MaxIterations; ++IterationIndex) {
             if (IterationIndex == MaxIterations) {
-                ShowWarningError("BuriedPipeHeatTransfer: Large number of iterations detected in object: " + this->Name);
+                ShowWarningError(state, "BuriedPipeHeatTransfer: Large number of iterations detected in object: " + this->Name);
             }
 
             // Store computed values in T_O array
@@ -1341,7 +1330,7 @@ namespace PipeHeatTransfer {
                             // If on soil boundary, load up local variables and perform calculations
                             NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
                             PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv();
-                            SkyTempAbs = SkyTemp + DataGlobalConstants::KelvinConv();
+                            SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();
                             TopRoughness = this->SoilRoughness;
                             TopThermAbs = this->SoilThermAbs;
                             TopSolarAbs = this->SoilSolarAbs;
@@ -1351,7 +1340,7 @@ namespace PipeHeatTransfer {
                             Cp = this->SoilCp;
 
                             // ASHRAE simple convection coefficient model for external surfaces.
-                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, WindSpeed);
+                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                             ConvCoef = this->OutdoorConvCoef;
 
                             // thermal radiation coefficient using surf temp from past time step
@@ -1362,7 +1351,7 @@ namespace PipeHeatTransfer {
                             }
 
                             // total absorbed solar - no ground solar
-                            QSolAbsorbed = TopSolarAbs * (max(SOLCOS(3), 0.0) * BeamSolarRad + DifSolarRad);
+                            QSolAbsorbed = TopSolarAbs * (max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad);
 
                             // If sun is not exposed, then turn off both solar and thermal radiation
                             if (!this->SolarExposed) {
@@ -1378,7 +1367,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation, basically a detailed energy balance at the surface
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
                                      (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1391,7 +1380,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                      (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1742,7 +1731,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    Real64 PipeHTData::OutsidePipeHeatTransCoef()
+    Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -1760,7 +1749,6 @@ namespace PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataEnvironment::WindSpeed;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1824,8 +1812,8 @@ namespace PipeHeatTransfer {
                 {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == ScheduleEnv) {
-                        AirTemp = GetCurrentScheduleValue(this->EnvrSchedPtr);
-                        AirVel = GetCurrentScheduleValue(this->EnvrVelSchedPtr);
+                        AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+                        AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
 
                     } else if (SELECT_CASE_var1 == ZoneEnv) {
                         AirTemp = MAT(this->EnvrZonePtr);
@@ -1839,7 +1827,7 @@ namespace PipeHeatTransfer {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == OutsideAirEnv) {
                         AirTemp = Node(this->EnvrAirNodeNum).Temp;
-                        AirVel = WindSpeed;
+                        AirVel = state.dataEnvrn->WindSpeed;
                     }
                 }
             }
@@ -1859,7 +1847,7 @@ namespace PipeHeatTransfer {
         if (!ViscositySet) {
             AirVisc = DynVisc(NumOfPropDivisions);
             if (AirTemp > Temperature(NumOfPropDivisions)) {
-                ShowWarningError("Heat Transfer Pipe = " + this->Name + "Viscosity out of range, air temperature too high, setting to upper limit.");
+                ShowWarningError(state, "Heat Transfer Pipe = " + this->Name + "Viscosity out of range, air temperature too high, setting to upper limit.");
             }
         }
 
@@ -1882,7 +1870,7 @@ namespace PipeHeatTransfer {
             Coef = CCoef(NumOfParamDivisions);
             rExp = mExp(NumOfParamDivisions);
             if (ReD > UpperBound(NumOfParamDivisions)) {
-                ShowWarningError("Heat Transfer Pipe = " + this->Name + "Reynolds Number out of range, setting coefficients to upper limit.");
+                ShowWarningError(state, "Heat Transfer Pipe = " + this->Name + "Reynolds Number out of range, setting coefficients to upper limit.");
             }
         }
 

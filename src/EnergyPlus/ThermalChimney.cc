@@ -96,7 +96,6 @@ namespace ThermalChimney {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
@@ -105,8 +104,6 @@ namespace ThermalChimney {
 
     // Use statements for access to subroutines in other modules
     using namespace Psychrometrics;
-
-    static std::string const BlankString;
 
     void ManageThermalChimney(EnergyPlusData &state)
     {
@@ -152,7 +149,7 @@ namespace ThermalChimney {
         // stores it in the ThermalChimney data structure.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
 
@@ -170,10 +167,10 @@ namespace ThermalChimney {
         int Loop1;
 
         // Following used for reporting
-        state.dataThermalChimneys->ZnRptThermChim.allocate(NumOfZones);
+        state.dataThermalChimneys->ZnRptThermChim.allocate(state.dataGlobal->NumOfZones);
 
         cCurrentModuleObject = "ZoneThermalChimney";
-        state.dataThermalChimneys->TotThermalChimney = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataThermalChimneys->TotThermalChimney = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataThermalChimneys->ThermalChimneySys.allocate(state.dataThermalChimneys->TotThermalChimney);
         state.dataThermalChimneys->ThermalChimneyReport.allocate(state.dataThermalChimneys->TotThermalChimney);
@@ -192,7 +189,7 @@ namespace ThermalChimney {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                 continue;
             }
 
@@ -202,13 +199,13 @@ namespace ThermalChimney {
             // Second Alpha is Zone Name
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr == 0) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid Zone");
-                ShowContinueError("invalid - not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid Zone");
+                ShowContinueError(state, "invalid - not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else if (!Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr).HasWindow) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid Zone");
-                ShowContinueError("...invalid - no window(s) in " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError("...thermal chimney zones must have window(s).");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid Zone");
+                ShowContinueError(state, "...invalid - no window(s) in " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowContinueError(state, "...thermal chimney zones must have window(s).");
                 ErrorsFound = true;
             }
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZoneName = cAlphaArgs(2);
@@ -219,30 +216,42 @@ namespace ThermalChimney {
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
-                    ShowContinueError("Invalid-not found " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                    ShowContinueError(state, "Invalid-not found " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
             }
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth = rNumericArgs(1);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth < 0.0) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) +
-                                " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(1), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(1),
+                                       rNumericArgs(1)));
                 ErrorsFound = true;
             }
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea = rNumericArgs(2);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea < 0.0) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(2) +
-                                " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(2), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(2),
+                                       rNumericArgs(2)));
                 ErrorsFound = true;
             }
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff = rNumericArgs(3);
             if ((state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff <= 0.0) || (state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff > 1.0)) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3) +
-                                " must be > 0 and <=1.0, entered value=[" + RoundSigDigits(rNumericArgs(3), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be > 0 and <=1.0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(3),
+                                       rNumericArgs(3)));
                 ErrorsFound = true;
             }
 
@@ -264,33 +273,45 @@ namespace ThermalChimney {
 
                 //!! Error trap for zones that do not exist or zones not in the zone the thermal chimney is in
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == 0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
                                     cAlphaArgs(TCZoneNum + 3) + "\" not found.");
                     ErrorsFound = true;
                 } else if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid reference " + cAlphaFieldNames(2) + "=\"" +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid reference " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2));
-                    ShowContinueError("...must not have same zone as reference= " + cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
+                    ShowContinueError(state, "...must not have same zone as reference= " + cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
                                       cAlphaArgs(TCZoneNum + 3) + "\".");
                     ErrorsFound = true;
                 }
 
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).DistanceThermChimInlet(TCZoneNum) < 0.0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 1) +
-                                    " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 1), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 1),
+                                           rNumericArgs(3 * TCZoneNum + 1)));
                     ErrorsFound = true;
                 }
 
                 if ((state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) <= 0.0) ||
                     (state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) > 1.0)) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 2) +
-                                    " must be > 0 and <=1.0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 2), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be > 0 and <=1.0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 2),
+                                           rNumericArgs(3 * TCZoneNum + 2)));
                     ErrorsFound = true;
                 }
 
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).EachAirInletCrossArea(TCZoneNum) < 0.0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 3) +
-                                    " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 3), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 3),
+                                           rNumericArgs(3 * TCZoneNum + 3)));
                     ErrorsFound = true;
                 }
 
@@ -300,9 +321,11 @@ namespace ThermalChimney {
 
             // Error trap if the sum of fractions is not equal to 1.0
             if (std::abs(AllRatiosSummed - 1.0) > FlowFractionTolerance) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                " invalid sum of fractions, must be =1.0, entered value (summed from entries)=[" +
-                                RoundSigDigits(AllRatiosSummed, 4) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid sum of fractions, must be =1.0, entered value (summed from entries)=[{:.4R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       AllRatiosSummed));
                 ErrorsFound = true;
             }
 
@@ -311,7 +334,7 @@ namespace ThermalChimney {
         // check infiltration output
         // setup zone-level infiltration reports
         Array1D_bool RepVarSet;
-        RepVarSet.dimension(DataGlobals::NumOfZones, true);
+        RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
         for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
             if (Infiltration(Loop).ZonePtr > 0 && !Infiltration(Loop).QuadratureSum) {
                 RepVarSet(Infiltration(Loop).ZonePtr) = false;
@@ -344,7 +367,7 @@ namespace ThermalChimney {
                                 "Average",
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Thermal Chimney",
                                  state.dataThermalChimneys->ThermalChimneySys(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -471,7 +494,7 @@ namespace ThermalChimney {
                     if (state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib >= (TCZoneNum + 1)) {
                         for (TCZoneNum1 = TCZoneNum + 1; TCZoneNum1 <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum1) {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
-                                ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                 " has two ZoneThermalChimney objects associated with it");
                                 ErrorsFound = true;
@@ -479,7 +502,7 @@ namespace ThermalChimney {
                         }
                         for (TCZoneNum1 = 1; TCZoneNum1 <= TCZoneNum - 1; ++TCZoneNum1) {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
-                                ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                 " has two ZoneThermalChimney objects associated with it");
                                 ErrorsFound = true;
@@ -488,7 +511,7 @@ namespace ThermalChimney {
                     } else { // IF ( ThermalChimneySys(Loop)%TotZoneToDistrib >= (TCZoneNum+1) ) THEN
                         for (TCZoneNum1 = 1; TCZoneNum1 <= TCZoneNum - 1; ++TCZoneNum1) {
                             if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum1)) {
-                                ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                 " has two ZoneThermalChimney objects associated with it");
                                 ErrorsFound = true;
@@ -509,7 +532,7 @@ namespace ThermalChimney {
                         for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                             for (TCZoneNum1 = 1; TCZoneNum1 <= state.dataThermalChimneys->ThermalChimneySys(Loop1).TotZoneToDistrib; ++TCZoneNum1) {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
-                                    ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                    ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                     state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                     " has two ZoneThermalChimney objects associated with it");
                                     ErrorsFound = true;
@@ -521,7 +544,7 @@ namespace ThermalChimney {
                         for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                             for (TCZoneNum1 = 1; TCZoneNum1 <= state.dataThermalChimneys->ThermalChimneySys(Loop1).TotZoneToDistrib; ++TCZoneNum1) {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
-                                    ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                    ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                     state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                     " has two ZoneThermalChimney objects associated with it");
                                     ErrorsFound = true;
@@ -534,7 +557,7 @@ namespace ThermalChimney {
                         for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                             for (TCZoneNum1 = 1; TCZoneNum1 <= state.dataThermalChimneys->ThermalChimneySys(Loop1).TotZoneToDistrib; ++TCZoneNum1) {
                                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) == state.dataThermalChimneys->ThermalChimneySys(Loop1).ZonePtr(TCZoneNum1)) {
-                                    ShowSevereError("Only one ZoneThermalChimney object allowed per zone but zone " +
+                                    ShowSevereError(state, "Only one ZoneThermalChimney object allowed per zone but zone " +
                                                     state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) +
                                                     " has two ZoneThermalChimney objects associated with it");
                                     ErrorsFound = true;
@@ -548,7 +571,7 @@ namespace ThermalChimney {
         }     // IF (TotThermalChimney > 1) THEN
 
         if (ErrorsFound) {
-            ShowFatalError(cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -564,7 +587,6 @@ namespace ThermalChimney {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the components making up the ThermalChimney.
 
-        using DataEnvironment::StdRhoAir;
         using ScheduleManager::GetCurrentScheduleValue;
 
         int const NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
@@ -628,7 +650,7 @@ namespace ThermalChimney {
 
             // determine major width and minor width
             for (SurfNum = Zone(ZoneNum).SurfaceFirst + 1; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+                if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
                 if (Surface(SurfNum).Width > majorW) {
                     majorW = Surface(SurfNum).Width;
@@ -653,7 +675,7 @@ namespace ThermalChimney {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-                if (Surface(SurfNum).Class == SurfaceClass_Window) {
+                if (Surface(SurfNum).Class == SurfaceClass::Window) {
 
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
@@ -668,7 +690,7 @@ namespace ThermalChimney {
                 AbsorberWallWidthTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth;
             }
 
-            AirDensityThermalChim = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
+            AirDensityThermalChim = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
             AirSpecHeatThermalChim = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             AirOutletCrossAreaTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea;
             DischargeCoeffTC = state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff;
@@ -790,7 +812,7 @@ namespace ThermalChimney {
             // Now assignment of the overall mass flow rate into each zone
             for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
-                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(TCZoneNumCounter), ZoneAirHumRat(TCZoneNumCounter));
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(TCZoneNumCounter), ZoneAirHumRat(TCZoneNumCounter));
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(TCZoneNumCounter));
                 MCPThermChim(TCZoneNumCounter) = TCVolumeAirFlowRate * AirDensity * CpAir * state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 if (MCPThermChim(TCZoneNumCounter) <= 0.0) {
@@ -809,13 +831,13 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow = TCVolumeAirFlowRate;
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow = TCMassAirFlowRate;
-            state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlowStd = TCMassAirFlowRate / StdRhoAir;
+            state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlowStd = TCMassAirFlowRate / state.dataEnvrn->StdRhoAir;
             if (state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow = state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
 
-            if (GetCurrentScheduleValue(state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                     TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                     MCPThermChim(TCZoneNumCounter) = 0.0;
@@ -855,10 +877,10 @@ namespace ThermalChimney {
 
         TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 
             // Break the infiltration load into heat gain and loss components.
-            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRat(ZoneLoop));
+            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneLoop), ZoneAirHumRat(ZoneLoop));
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneLoop));
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (MCPThermChim(ZoneLoop) / CpAir / AirDensity) * TSMult;
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (MCPThermChim(ZoneLoop) / CpAir) * TSMult;

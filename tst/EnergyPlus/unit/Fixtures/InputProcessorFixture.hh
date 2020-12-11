@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 
 namespace EnergyPlus {
@@ -71,12 +70,12 @@ protected:
     {
     }
 
-    virtual void SetUp()
+    void SetUp() override
     {
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
-    virtual void TearDown()
+    void TearDown() override
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
@@ -86,9 +85,9 @@ protected:
         return EnergyPlusFixture::process_idd(idd, errors_found);
     }
 
-    bool processErrors()
+    bool processErrors(EnergyPlusData &state)
     {
-        return inputProcessor->processErrors();
+        return inputProcessor->processErrors(state);
     }
 
     std::vector<std::string> const &validationErrors()

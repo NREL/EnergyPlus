@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace WindowComplexManager;
 
 using namespace SingleLayerOptics;
@@ -103,7 +102,7 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(state, t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -236,7 +235,7 @@ namespace WindowManager {
         if (it == m_Equivalent.end()) {
             // Layer was not requested before. Need to create it now.
             // shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
-            IGU_Layers iguLayers = getLayers(t_Range, t_ConstrNum);
+            IGU_Layers iguLayers = getLayers(state, t_Range, t_ConstrNum);
             std::shared_ptr<CMultiLayerScattered> aEqLayer = std::make_shared<CMultiLayerScattered>(iguLayers[0]);
             for (auto i = 1u; i < iguLayers.size(); ++i) {
                 aEqLayer->addLayer(iguLayers[i]);
@@ -255,12 +254,12 @@ namespace WindowManager {
         p_inst = nullptr;
     }
 
-    IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
+    IGU_Layers CWindowConstructionsSimplified::getLayers(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum) const
     {
         Layers_Map aMap = m_Layers.at(t_Range);
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {
-            ShowFatalError("Incorrect construction selection.");
+            ShowFatalError(state, "Incorrect construction selection.");
             // throw std::runtime_error("Incorrect construction selection.");
         }
         return aMap.at(t_ConstrNum);

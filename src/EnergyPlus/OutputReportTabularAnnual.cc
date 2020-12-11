@@ -108,16 +108,16 @@ namespace OutputReportTabularAnnual {
         int curNumDgts(2);
         AnnualFieldSet::AggregationKind curAgg(AnnualFieldSet::AggregationKind::sumOrAvg);
 
-        objCount = inputProcessor->getNumObjectsFound(currentModuleObject);
+        objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
             // if not a run period using weather do not create reports
-            if (!DataGlobals::DoWeathSim) {
-                ShowWarningError(currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
+            if (!state.dataGlobal->DoWeathSim) {
+                ShowWarningError(state, currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  currentModuleObject + " will not be generated");
                 return;
             }
         }
-        inputProcessor->getObjectDefMaxArgs(currentModuleObject, numParams, numAlphas, numNums);
+        inputProcessor->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
         alphArray.allocate(numAlphas);
         numArray.dimension(numNums, 0.0);
         for (int tabNum = 1; tabNum <= objCount; ++tabNum) {
@@ -128,11 +128,11 @@ namespace OutputReportTabularAnnual {
                 for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                     curVarMtr = alphArray(jAlpha);
                     if (curVarMtr.empty()) {
-                        ShowFatalError("Blank report name in Oputput:Table:Annual");
+                        ShowFatalError(state, "Blank report name in Oputput:Table:Annual");
                     }
                     if (jAlpha <= numAlphas) {
                         std::string aggregationString = alphArray(jAlpha + 1);
-                        curAgg = stringToAggKind(aggregationString);
+                        curAgg = stringToAggKind(state, aggregationString);
                     } else {
                         curAgg = AnnualFieldSet::AggregationKind::sumOrAvg; // if missing aggregation type use SumOrAverage
                     }
@@ -146,7 +146,7 @@ namespace OutputReportTabularAnnual {
                 }
                 annualTables.back().setupGathering(state);
             } else {
-                ShowSevereError(currentModuleObject + ": Must enter at least the first six fields.");
+                ShowSevereError(state, currentModuleObject + ": Must enter at least the first six fields.");
             }
         }
     }
@@ -243,25 +243,25 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    void checkAggregationOrderForAnnual()
+    void checkAggregationOrderForAnnual(EnergyPlusData &state)
     {
         std::vector<AnnualTable>::iterator annualTableIt;
         bool invalidAggregationOrderFound = false;
-        if (!DataGlobals::DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
+        if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return;
         }
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            if (annualTableIt->invalidAggregationOrder()) {
+            if (annualTableIt->invalidAggregationOrder(state)) {
                 invalidAggregationOrderFound = true;
             }
         }
         if (invalidAggregationOrderFound) {
-            ShowFatalError("OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed.");
+            ShowFatalError(state, "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed.");
         }
     }
 
     // Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017
-    bool AnnualTable::invalidAggregationOrder()
+    bool AnnualTable::invalidAggregationOrder(EnergyPlusData &state)
     {
         std::vector<AnnualFieldSet>::iterator fldStIt;
         bool foundMinOrMax = false;
@@ -292,42 +292,42 @@ namespace OutputReportTabularAnnual {
             }
         }
         if (missingMaxOrMinError) {
-            ShowSevereError("The Output:Table:Annual report named=\"" + m_name +
+            ShowSevereError(state, "The Output:Table:Annual report named=\"" + m_name +
                             "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or "
                             "maximum aggregation types. The report will not be generated.");
         }
         if (missingHourAggError) {
-            ShowSevereError("The Output:Table:Annual report named=\"" + m_name +
+            ShowSevereError(state, "The Output:Table:Annual report named=\"" + m_name +
                             "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- "
                             "aggregation types. The report will not be generated.");
         }
         return (missingHourAggError || missingMaxOrMinError);
     }
 
-    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
+    void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // gathering data for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            annualTableIt->gatherForTimestep(kindOfTimeStep);
+            annualTableIt->gatherForTimestep(state, kindOfTimeStep);
         }
     }
 
-    void AnnualTable::gatherForTimestep(OutputProcessor::TimeStepType kindOfTimeStep)
+    void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // For each cell of the table, gather the value as indicated by the type of aggregation
 
         int timestepTimeStamp;
-        Real64 elapsedTime = AnnualTable::getElapsedTime(kindOfTimeStep);
-        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(kindOfTimeStep);
+        Real64 elapsedTime = AnnualTable::getElapsedTime(state, kindOfTimeStep);
+        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(state, kindOfTimeStep);
         bool activeMinMax = false;
         bool activeHoursShown = false;
         // if schedule is used and the current value is zero, don't gather values
         if (m_scheduleNum != 0) {
-            if (ScheduleManager::GetCurrentScheduleValue(m_scheduleNum) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, m_scheduleNum) == 0.0) {
                 return;
             }
         }
@@ -342,7 +342,7 @@ namespace OutputReportTabularAnnual {
                 {
                     int curVarNum = fldStIt->m_cell[row].indexesForKeyVar;
                     if (curVarNum > 0) {
-                        Real64 curValue = GetInternalVariableValue(curTypeOfVar, curVarNum);
+                        Real64 curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                         // Get the value from the result array
                         Real64 oldResultValue = fldStIt->m_cell[row].result;
                         // int oldTimeStamp = fldStIt->m_cell[row].timeStamp;
@@ -353,9 +353,9 @@ namespace OutputReportTabularAnnual {
                         Real64 newDuration = 0.0;
                         bool activeNewValue = false;
                         // the current timestamp
-                        int minuteCalculated = General::DetermineMinuteForReporting(kindOfTimeStep);
+                        int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
                         General::EncodeMonDayHrMin(
-                            timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::HourOfDay, minuteCalculated);
+                            timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
                         // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
@@ -500,7 +500,7 @@ namespace OutputReportTabularAnnual {
                                     // int scanStepType = fldStRemainIt->m_varStepType;
                                     int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                                     if (scanVarNum > 0) {
-                                        Real64 scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
+                                        Real64 scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                         // When a summed variable is used divide it by the length of the time step
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
@@ -521,7 +521,7 @@ namespace OutputReportTabularAnnual {
                                 int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                                 Real64 oldScanValue = fldStRemainIt->m_cell[row].result;
                                 if (scanVarNum > 0) {
-                                    Real64 scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
+                                    Real64 scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                     if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursZero ||
                                         fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonZero ||
                                         fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursPositive ||
@@ -601,24 +601,24 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    Real64 AnnualTable::getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep)
+    Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 elapsedTime;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             elapsedTime = DataHVACGlobals::TimeStepSys;
         } else {
-            elapsedTime = DataGlobals::TimeStepZone;
+            elapsedTime = state.dataGlobal->TimeStepZone;
         }
         return elapsedTime;
     }
 
-    Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
+    Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
-            secondsInTimeStep = DataGlobals::TimeStepZoneSec;
+            secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }
         return secondsInTimeStep;
     }
@@ -663,7 +663,7 @@ namespace OutputReportTabularAnnual {
         Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
 
         // Compute the columns related to the binning schemes
-        computeBinColumns();
+        computeBinColumns(state);
 
         // Use title case names of variables if available for column headers
         columnHeadersToTitleCase();
@@ -703,7 +703,7 @@ namespace OutputReportTabularAnnual {
             // do the unit conversions
             if (unitsStyle == OutputReportTabular::unitsStyleInchPound) {
                 varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
-                OutputReportTabular::LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+                OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                 OutputReportTabular::GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
             } else { // just do the Joule conversion
                 // if units is in Joules, convert if specified
@@ -1056,7 +1056,7 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    AnnualFieldSet::AggregationKind stringToAggKind(std::string inString)
+    AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::string inString)
     // Jason Glazer, August 2015
     // The function converts a string into an enumeration that describes the type of aggregation
     // used in REPORT:TABLE:ANNUAL.
@@ -1105,7 +1105,7 @@ namespace OutputReportTabularAnnual {
             outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
         } else {
             outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
-            ShowWarningError("Invalid aggregation type=\"" + inString + "\"  Defaulting to SumOrAverage.");
+            ShowWarningError(state, "Invalid aggregation type=\"" + inString + "\"  Defaulting to SumOrAverage.");
         }
         return outAggType;
     }
@@ -1167,7 +1167,7 @@ namespace OutputReportTabularAnnual {
                      << "</a>    |   \n";
     }
 
-    void AnnualTable::computeBinColumns()
+    void AnnualTable::computeBinColumns(EnergyPlusData &state)
     {
         std::vector<AnnualFieldSet>::iterator fldStIt;
         Real64 const veryLarge = 1.0E280;
@@ -1183,7 +1183,7 @@ namespace OutputReportTabularAnnual {
                 curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev) {
                 // the size the deferred vectors should be same for all rows
                 if (allRowsSameSizeDefferedVectors(fldStIt)) {
-                    convertUnitForDeferredResults(fldStIt, OutputReportTabular::unitsStyle);
+                    convertUnitForDeferredResults(state, fldStIt, OutputReportTabular::unitsStyle);
                     std::vector<Real64> deferredTotalForColumn;
                     Real64 minVal = veryLarge;
                     Real64 maxVal = verySmall;
@@ -1258,7 +1258,7 @@ namespace OutputReportTabularAnnual {
         return returnFlag;
     }
 
-    void AnnualTable::convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle)
+    void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle)
     {
         Real64 curConversionFactor;
         Real64 curConversionOffset;
@@ -1272,7 +1272,7 @@ namespace OutputReportTabularAnnual {
         // do the unit conversions
         if (unitsStyle == OutputReportTabular::unitsStyleInchPound) {
             varNameWithUnits = fldStIt->m_variMeter + '[' + unitEnumToString(fldStIt->m_varUnits) + ']';
-            OutputReportTabular::LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+            OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
             OutputReportTabular::GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
         } else { // just do the Joule conversion
             // if units is in Joules, convert if specified

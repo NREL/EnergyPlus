@@ -704,6 +704,7 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
         int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
@@ -807,9 +808,9 @@ namespace DataHeatBalance {
         {
         }
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
     };
@@ -2202,13 +2203,13 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetZoneOutBulbTempAt();
+    void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void CheckZoneOutBulbTempAt();
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void SetZoneWindSpeedAt();
+    void SetZoneWindSpeedAt(EnergyPlusData &state);
 
-    void SetZoneWindDirAt();
+    void SetZoneWindDirAt(EnergyPlusData &state);
 
     void CheckAndSetConstructionProperties(EnergyPlusData &state,
                                            int ConstrNum, // Construction number to be set/checked
@@ -2219,12 +2220,14 @@ namespace DataHeatBalance {
                                         int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number

@@ -54,7 +54,6 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -65,19 +64,15 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/RoomAirModelManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -87,9 +82,7 @@ using namespace DataMoistureBalance;
 using namespace DataSurfaces;
 using namespace DataHeatBalSurface;
 using namespace EnergyPlus::RoomAirModelAirflowNetwork;
-using namespace EnergyPlus::RoomAirModelManager;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
 using DataZoneEquipment::ZoneEquipConfig;
@@ -105,15 +98,15 @@ protected:
         CurZoneEqNum = 0;
         CurSysNum = 0;
         CurOASysNum = 0;
-        NumOfZones = 1;
+        state->dataGlobal->NumOfZones = 1;
         NumOfNodes = 5;
-        state.dataGlobal->BeginEnvrnFlag = true;
+        state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
-        RoomAirflowNetworkZoneInfo.allocate(NumOfZones);
-        Zone.allocate(NumOfZones);
-        ZoneEquipConfig.allocate(NumOfZones);
-        ZoneEquipList.allocate(NumOfZones);
-        ZoneIntGain.allocate(NumOfZones);
+        RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
+        Zone.allocate(state->dataGlobal->NumOfZones);
+        ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+        ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+        ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
         Surface.allocate(NumOfSurfaces);
@@ -128,12 +121,12 @@ protected:
         RhoVaporSurfIn.allocate(NumOfSurfaces);
         RhoVaporAirIn.allocate(NumOfSurfaces);
         HMassConvInFD.allocate(NumOfSurfaces);
-        MAT.allocate(NumOfZones);
+        MAT.allocate(state->dataGlobal->NumOfZones);
         ZoneAirHumRat.allocate(1);
         AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
         AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
         AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
-        RAFN.allocate(NumOfZones);
+        RAFN.allocate(state->dataGlobal->NumOfZones);
     }
 
     virtual void TearDown()
@@ -148,7 +141,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     int ZoneNum = 1;
     int RoomAirNode;
     TimeStepSys = 15.0 / 60.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     Zone(ZoneNum).ZoneVolCapMultpSens = 1;
 
     RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed = true;
@@ -292,18 +285,18 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     HConvIn(2) = 1.0;
     TempSurfInTmp(1) = 25.0;
     TempSurfInTmp(2) = 30.0;
-    RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
-    RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
-    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
+    RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
+    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
-    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
+    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(RAFN(ZoneNum));
     thisRAFN.ZoneNum = ZoneNum;
 
-    thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
+    thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);
 
     EXPECT_NEAR(120.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(80.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -322,14 +315,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0009756833, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(9.0784549e-7, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.CalcRoomAirModelAirflowNetwork(*state, RoomAirNode);
 
     EXPECT_NEAR(24.907085, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.00189601, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
     EXPECT_NEAR(9.770445, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
     RoomAirNode = 2;
-    thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
+    thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);
 
     EXPECT_NEAR(180.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(120.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -348,13 +341,13 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0019191284, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(1.98975381e-6, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.CalcRoomAirModelAirflowNetwork(*state, RoomAirNode);
 
     EXPECT_NEAR(24.057841, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.0028697086, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
     EXPECT_NEAR(15.53486185, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
-    thisRAFN.UpdateRoomAirModelAirflowNetwork(state);
+    thisRAFN.UpdateRoomAirModelAirflowNetwork(*state);
 
     EXPECT_NEAR(24.397538, Node(2).Temp, 0.00001);
     EXPECT_NEAR(0.0024802305, Node(2).HumRat, 0.000001);

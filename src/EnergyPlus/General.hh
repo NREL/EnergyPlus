@@ -216,18 +216,6 @@ namespace General {
                   int &N             // number of terms in polynomial
     );
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const SigDigits = _ // ignored
-    );
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const SigDigits = _ // ignored
-    );
-
     std::string RemoveTrailingZeros(std::string const &InputString);
 
     std::string &strip_trailing_zeros(std::string &InputString);
@@ -238,7 +226,8 @@ namespace General {
                    Array1A<Real64> SmoothedData  // output data after smoothing
     );
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
@@ -246,7 +235,8 @@ namespace General {
                            bool &ErrorsFound,
                            Optional_int PYear = _);
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,            // Number of tokens found in string
                              int &TokenDay,             // Value of numeric field found
                              int &TokenMonth,           // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -256,7 +246,8 @@ namespace General {
                              Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound);
@@ -273,9 +264,10 @@ namespace General {
                       int const EndDate    // End date in sequence
     );
 
-    std::string CreateSysTimeIntervalString();
+    std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
-    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     );
@@ -328,7 +320,7 @@ namespace General {
     );
 
     // TODO: this probably shouldn't be here
-    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
     void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                            int const Month, // month in integer format (1:12)
@@ -339,11 +331,11 @@ namespace General {
 
     int LogicalToInteger(bool const Flag);
 
-    Real64 GetCurrentHVACTime();
+    Real64 GetCurrentHVACTime(EnergyPlusData &state);
 
-    Real64 GetPreviousHVACTime();
+    Real64 GetPreviousHVACTime(EnergyPlusData &state);
 
-    std::string CreateHVACTimeIntervalString();
+    std::string CreateHVACTimeIntervalString(EnergyPlusData &state);
 
     std::string CreateTimeString(Real64 const Time); // Time in seconds
 
@@ -368,7 +360,8 @@ namespace General {
         Array.redimension(ArrayMax += ArrayInc, 0.0);
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -380,7 +373,8 @@ namespace General {
     );
 
     template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
-    inline void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    inline void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                         std::string const &calledFrom,                  // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -394,7 +388,7 @@ namespace General {
         Array1D_string ItemNames(Items.size());
         for (std::size_t i = 0, e = Items.size(); i < e; ++i)
             ItemNames[i] = Items[i].Name;
-        CheckCreatedZoneItemName(calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
+        CheckCreatedZoneItemName(state, calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);

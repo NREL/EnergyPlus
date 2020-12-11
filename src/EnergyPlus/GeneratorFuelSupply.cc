@@ -140,7 +140,7 @@ namespace GeneratorFuelSupply {
         using DataLoopNode::NodeConnectionType_Sensor;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -158,10 +158,10 @@ namespace GeneratorFuelSupply {
 
         if (MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (NumGeneratorFuelSups <= 0) {
-                ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");
+                ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
 
@@ -170,7 +170,7 @@ namespace GeneratorFuelSupply {
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 FuelSupply(FuelSupNum).Name = AlphArray(1);
                 ObjMSGName = cCurrentModuleObject + " Named " + AlphArray(1);
@@ -179,8 +179,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
                     FuelSupply(FuelSupNum).FuelTempMode = FuelInTempSchedule;
                 } else {
-                    ShowSevereError("Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -190,17 +190,17 @@ namespace GeneratorFuelSupply {
 
                 FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((FuelSupply(FuelSupNum).SchedNum == 0) && (FuelSupply(FuelSupNum).FuelTempMode == FuelInTempSchedule)) {
-                    ShowSevereError("Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError("Schedule named was not found");
+                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Schedule named was not found");
                     ErrorsFound = true;
                 }
 
                 FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
-                    ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError("Curve named was not found ");
+                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Curve named was not found ");
                     ErrorsFound = true;
                 }
 
@@ -212,8 +212,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
                     FuelSupply(FuelSupNum).FuelTypeMode = fuelModeGenericLiquid;
                 } else {
-                    ShowSevereError("Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -227,11 +227,11 @@ namespace GeneratorFuelSupply {
                     FuelSupply(FuelSupNum).NumConstituents = NumFuelConstit;
 
                     if (NumFuelConstit > 12) {
-                        ShowSevereError(cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
+                        ShowSevereError(state, cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
                         ErrorsFound = true;
                     }
                     if (NumFuelConstit < 1) {
-                        ShowSevereError(cCurrentModuleObject + " model needs at least one fuel constituent");
+                        ShowSevereError(state, cCurrentModuleObject + " model needs at least one fuel constituent");
                         ErrorsFound = true;
                     }
 
@@ -242,9 +242,9 @@ namespace GeneratorFuelSupply {
 
                     // check for molar fractions summing to 1.0.
                     if (std::abs(sum(FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
-                        ShowSevereError(cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError("Sum was=" + RoundSigDigits(sum(FuelSupply(FuelSupNum).ConstitMolalFract), 5));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
+                        ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0");
+                        ShowContinueError(state, format("Sum was={:.5R}", sum(FuelSupply(FuelSupNum).ConstitMolalFract)));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }
                 }
@@ -257,7 +257,7 @@ namespace GeneratorFuelSupply {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Problem found processing input for " + cCurrentModuleObject);
+                ShowFatalError(state, "Problem found processing input for " + cCurrentModuleObject);
             }
 
             MyOneTimeFlag = false;
@@ -629,7 +629,7 @@ namespace GeneratorFuelSupply {
                 FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
                 if (thisGasID == 0) {
-                    ShowSevereError("Fuel constituent not found in thermochemistry data: " + thisName);
+                    ShowSevereError(state, "Fuel constituent not found in thermochemistry data: " + thisName);
                     ErrorsFound = true;
                 }
 

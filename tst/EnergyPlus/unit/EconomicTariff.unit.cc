@@ -62,6 +62,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -191,7 +192,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    UpdateUtilityBills(state);
+    UpdateUtilityBills(*state);
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -263,7 +264,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(state);
+    UpdateUtilityBills(*state);
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -306,7 +307,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills(state);;
+    UpdateUtilityBills(*state);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -346,7 +347,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     EnergyMeters(1).Name = "NATURALGAS:FACILITY";
     EnergyMeters(1).ResourceType = "NATURALGAS";
 
-    UpdateUtilityBills(state);;
+    UpdateUtilityBills(*state);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -387,7 +388,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     EnergyMeters(1).ResourceType = "ELECTRICITY";
 
-    UpdateUtilityBills(state);;
+    UpdateUtilityBills(*state);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -440,7 +441,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     tariff(4).totalAnnualEnergy = 1.47;
     tariff(4).reportMeterIndx = 4;
 
-    SetPredefinedTables(); // need to setup the predefined table entry numbers
+    SetPredefinedTables(*state); // need to setup the predefined table entry numbers
 
     LEEDtariffReporting();
 
@@ -583,19 +584,19 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
-    ScheduleManager::ProcessScheduleInput(state); // read schedules
-    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
-    EXPECT_EQ(1, state.dataExteriorEnergyUse->NumExteriorLights);
-    EXPECT_EQ(1000, state.dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+    EXPECT_EQ(1, state->dataExteriorEnergyUse->NumExteriorLights);
+    EXPECT_EQ(1000, state->dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
 
 
     // This will only do the get input routines
-    EconomicTariff::UpdateUtilityBills(state);;
+    EconomicTariff::UpdateUtilityBills(*state);;
 
     // tariff
     EXPECT_EQ(1, EconomicTariff::numTariff);
@@ -617,64 +618,64 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(EconomicTariff::seasonSummer, EconomicTariff::chargeSimple(2).season);
     EXPECT_EQ(0.04, EconomicTariff::chargeSimple(2).costPerVal);
 
-    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
 
     // Unitialized: default initialized to 0
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
-    DataEnvironment::Month = 5;
-    DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 23;
-    DataEnvironment::DSTIndicator = 1; // DST IS ON
-    DataEnvironment::MonthTomorrow = 6;
-    DataEnvironment::DayOfWeek = 4;
-    DataEnvironment::DayOfWeekTomorrow = 5;
-    DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 4;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 23;
+    state->dataEnvrn->DSTIndicator = 1; // DST IS ON
+    state->dataEnvrn->MonthTomorrow = 6;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 4;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
-    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
+    ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, tariff(1).seasonSchIndex));
     EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
-    EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     int curPeriod = 1;
-    EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(DataEnvironment::Month, curPeriod));
+    EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(state->dataEnvrn->Month, curPeriod));
 
     // This Should now call GatherForEconomics
-    DataGlobals::DoOutputReporting = true;
-    EconomicTariff::UpdateUtilityBills(state);;
+    state->dataGlobal->DoOutputReporting = true;
+    EconomicTariff::UpdateUtilityBills(*state);;
     EXPECT_EQ(1, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
 
-    DataEnvironment::Month = 5;
-    DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 24;
-    DataEnvironment::DSTIndicator = 1; // DST IS ON
-    DataEnvironment::MonthTomorrow = 6;
-    DataEnvironment::DayOfWeek = 4;
-    DataEnvironment::DayOfWeekTomorrow = 5;
-    DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 24;
+    state->dataEnvrn->DSTIndicator = 1; // DST IS ON
+    state->dataEnvrn->MonthTomorrow = 6;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
+    ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(*state, tariff(1).seasonSchIndex));
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
-    EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorLights(1).Power);
+    EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
-    EconomicTariff::UpdateUtilityBills(state);;
+    EconomicTariff::UpdateUtilityBills(*state);;
     EXPECT_EQ(1, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, EconomicTariff::tariff(1).seasonForMonth(6));
 

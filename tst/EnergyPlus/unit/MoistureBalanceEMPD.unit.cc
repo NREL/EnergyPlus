@@ -68,6 +68,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -99,7 +100,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state, errors_found);
+    HeatBalanceManager::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -122,17 +123,17 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Construction
     surface.Construction = 1;
-    state.dataConstruction->Construct.allocate(1);
-    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
+    state->dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
-    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
+    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
     DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
@@ -144,7 +145,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Do calcs
     Real64 Tsat(0.0);
-    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(state, 1, 19.907302679986064, 19.901185713164697, Tsat);
+    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
     auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
@@ -188,9 +189,9 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state, errors_found);
+    HeatBalanceManager::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
-    MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(state);
+    MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(*state);
 
     const Material::MaterialProperties &material = dataMaterial.Material(1);
     ASSERT_NEAR(material.EMPDSurfaceDepth, 0.014143, 0.000001);
@@ -225,7 +226,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state, errors_found);
+    HeatBalanceManager::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -248,17 +249,17 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Construction
     surface.Construction = 1;
-    state.dataConstruction->Construct.allocate(1);
-    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
+    state->dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
-    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
+    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
     DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
@@ -270,7 +271,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Do calcs
     Real64 Tsat(0.0);
-    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(state, 1, 19.907302679986064, 19.901185713164697, Tsat);
+    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
     auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
@@ -314,7 +315,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state, errors_found);
+    HeatBalanceManager::GetMaterialData(*state, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -340,17 +341,17 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    state.dataConstruction->Construct.allocate( constNum );
-    Construction::ConstructionProps &construction = state.dataConstruction->Construct( constNum );
+    state->dataConstruction->Construct.allocate( constNum );
+    Construction::ConstructionProps &construction = state->dataConstruction->Construct( constNum );
     construction.TotLayers = constNum;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", dataMaterial.Material);
 
     // Initialize and get inputs
-    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
+    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(surfNum) = 0.0070277983586713262;
     DataMoistureBalanceEMPD::RVSurfaceOld(surfNum) = DataMoistureBalanceEMPD::RVSurface( surfNum );
     DataMoistureBalance::HMassConvInFD(surfNum) = 0.0016826898264131584;
@@ -379,9 +380,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
                     material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 
     // Convert stored vapor density to RH.
-    Real64 RH_deep_layer_old = PsyRhFnTdbRhov(Taver, RV_Deep_Old);
-    Real64 RH_surf_layer_old = PsyRhFnTdbRhov(Taver, RVaver);
-    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (DataGlobals::TimeStepZone * 3600.0);
+    Real64 RH_deep_layer_old = PsyRhFnTdbRhov(*state, Taver, RV_Deep_Old);
+    Real64 RH_surf_layer_old = PsyRhFnTdbRhov(*state, Taver, RVaver);
+    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state->dataGlobal->TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;
     Real64 mass_flux_surf_deep_result = hm_deep_layer * (RVaver - RV_Deep_Old);
@@ -390,7 +391,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     }
 
     // Calculate and verify it against the results determined above
-    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(state, 1, Taver, Taver, Tsat);
+    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, Taver, Taver, Tsat);
     auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(surfNum);
     EXPECT_DOUBLE_EQ(mass_flux_surf_deep_result, report_vars.mass_flux_deep);
 

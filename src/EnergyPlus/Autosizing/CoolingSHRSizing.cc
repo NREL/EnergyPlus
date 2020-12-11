@@ -52,15 +52,15 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
@@ -99,7 +99,8 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalV
                     }
 
                     // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                    this->autoSizedValue = DXCoils::ValidateADP(this->compType,
+                    this->autoSizedValue = DXCoils::ValidateADP(state,
+                                                                this->compType,
                                                                 this->compName,
                                                                 RatedInletAirTemp,
                                                                 RatedInletAirHumRat,
@@ -124,7 +125,7 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalV
         }
     }
     this->updateSizingString();
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     return this->autoSizedValue;
 }
 
@@ -148,9 +149,9 @@ void CoolingSHRSizer::updateSizingString()
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
         if (this->isEpJSON) {
-            this->sizingString = "speed_" + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + "_rated_sensible_heat_ratio";
+            this->sizingString = fmt::format("speed_{}_rated_sensible_heat_ratio", DataSizing::DataDXSpeedNum);
         } else {
-            this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
+            this->sizingString = fmt::format("Speed {} Rated Sensible Heat Ratio", DataSizing::DataDXSpeedNum);
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
         if (this->isEpJSON) {

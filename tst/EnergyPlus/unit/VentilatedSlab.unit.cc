@@ -68,7 +68,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::VentilatedSlab;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
@@ -81,17 +80,17 @@ using namespace EnergyPlus::SurfaceGeometry;
 TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
 {
 
-    state.dataGlobal->BeginEnvrnFlag = false;
+    state->dataGlobal->BeginEnvrnFlag = false;
     Real64 PowerMet = 0.0;
     Real64 LatOutputProvided = 0.0;
 
-    state.dataVentilatedSlab->NumOfVentSlabs = 1;
-    state.dataVentilatedSlab->VentSlab.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
+    state->dataVentilatedSlab->NumOfVentSlabs = 1;
+    state->dataVentilatedSlab->VentSlab.allocate(state->dataVentilatedSlab->NumOfVentSlabs);
     int Item = 1;
     int FanOutletNode = 1;
     int OutletNode = 2;
-    state.dataVentilatedSlab->VentSlab(Item).FanOutletNode = FanOutletNode;
-    state.dataVentilatedSlab->VentSlab(Item).RadInNode = OutletNode;
+    state->dataVentilatedSlab->VentSlab(Item).FanOutletNode = FanOutletNode;
+    state->dataVentilatedSlab->VentSlab(Item).RadInNode = OutletNode;
     Node.allocate(2);
     Node(OutletNode).MassFlowRate = 0.5;
 
@@ -108,12 +107,12 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     Node(FanOutletNode).HumRat = 0.003;
     Node(OutletNode).Temp = 20.0;
     Node(OutletNode).HumRat = 0.003;
-    CalcVentilatedSlabCoilOutput(state, Item, PowerMet, LatOutputProvided);
+    CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower > 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower == 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower == 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower > 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower == 0.0);
     EXPECT_TRUE(LatOutputProvided == 0.0);
     EXPECT_TRUE(PowerMet > 0.0);
 
@@ -122,12 +121,12 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     Node(FanOutletNode).HumRat = 0.003;
     Node(OutletNode).Temp = 20.0;
     Node(OutletNode).HumRat = 0.003;
-    CalcVentilatedSlabCoilOutput(state, Item, PowerMet, LatOutputProvided);
+    CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower > 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower == state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower > 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower == state->dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower == 0.0);
     EXPECT_TRUE(LatOutputProvided == 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
 
@@ -136,12 +135,12 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     Node(FanOutletNode).HumRat = 0.008;
     Node(OutletNode).Temp = 20.0;
     Node(OutletNode).HumRat = 0.003;
-    CalcVentilatedSlabCoilOutput(state, Item, PowerMet, LatOutputProvided);
+    CalcVentilatedSlabCoilOutput(*state, Item, PowerMet, LatOutputProvided);
 
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower > 0.0);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower > state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower);
-    EXPECT_TRUE(state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower > 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).HeatCoilPower == 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower > 0.0);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower > state->dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower);
+    EXPECT_TRUE(state->dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower > 0.0);
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
 
@@ -150,7 +149,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 {
 
-    state.dataGlobal->BeginEnvrnFlag = false;
+    state->dataGlobal->BeginEnvrnFlag = false;
     bool ErrorsFound(false);       // function returns true on error
     int Item(1);                   // index for the current ventilated slab
     int VentSlabZoneNum(1);        // number of zone being served
@@ -2300,40 +2299,40 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state);  // read schedule data
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(state, ErrorsFound); // read construction material data
+    GetMaterialData(*state, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    HeatBalanceManager::GetConstructData(state, ErrorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(state, ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(*state, ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetSurfaceListsInputs(state); // read surface data
+    GetSurfaceListsInputs(*state); // read surface data
     EXPECT_FALSE(ErrorsFound);
 
-    GetVentilatedSlabInput(state); // read ventilated slab data
-    EXPECT_EQ(2, state.dataVentilatedSlab->NumOfVentSlabs);
-    EXPECT_EQ("ZONE1VENTSLAB", state.dataVentilatedSlab->VentSlab(1).Name);
-    EXPECT_EQ("ZONE4VENTSLAB", state.dataVentilatedSlab->VentSlab(2).Name);
+    GetVentilatedSlabInput(*state); // read ventilated slab data
+    EXPECT_EQ(2, state->dataVentilatedSlab->NumOfVentSlabs);
+    EXPECT_EQ("ZONE1VENTSLAB", state->dataVentilatedSlab->VentSlab(1).Name);
+    EXPECT_EQ("ZONE4VENTSLAB", state->dataVentilatedSlab->VentSlab(2).Name);
 
-    InitVentilatedSlab(state, Item, VentSlabZoneNum, FirstHVACIteration);
-    EXPECT_EQ(324.38499999999999, state.dataVentilatedSlab->VentSlab(1).TotalSurfaceArea);
-    EXPECT_EQ(139.21499999999997, state.dataVentilatedSlab->VentSlab(2).TotalSurfaceArea);
+    InitVentilatedSlab(*state, Item, VentSlabZoneNum, FirstHVACIteration);
+    EXPECT_EQ(324.38499999999999, state->dataVentilatedSlab->VentSlab(1).TotalSurfaceArea);
+    EXPECT_EQ(139.21499999999997, state->dataVentilatedSlab->VentSlab(2).TotalSurfaceArea);
 }

@@ -53,10 +53,14 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSizing {
 
@@ -1240,12 +1244,13 @@ namespace DataSizing {
                                 bool &firstPassFlag     // Can be set to false during the routine
     );
 
-    void GetCoilDesFlowT(int SysNum, // central air system index
-        Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
-        Real64& DesFlow,      // returned design mass flow [kg/s]
-        Real64& DesExitTemp,  // returned design coil exit temperature [kg/s]
-        Real64& DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
-        );
+    void GetCoilDesFlowT(EnergyPlusData &state,
+                         int SysNum,            // central air system index
+                         Real64 CpAir,          // specific heat to be used in calculations [J/kgC]
+                         Real64& DesFlow,       // returned design mass flow [kg/s]
+                         Real64& DesExitTemp,   // returned design coil exit temperature [kg/s]
+                         Real64& DesExitHumRat  // returned design coil exit humidity ratio [kg/kg]
+    );
 
 } // namespace DataSizing
 

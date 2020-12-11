@@ -58,18 +58,14 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace PlantPressureSystem {
+namespace EnergyPlus::PlantPressureSystem {
 
     // Module containing the routines dealing with the PlantPressureSystem simulation
 
@@ -103,9 +99,6 @@ namespace PlantPressureSystem {
     // Using/Aliasing
     using namespace DataBranchAirLoopPlant;
 
-    // Data
-    // MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-    static std::string const BlankString;
     namespace {
         bool InitPressureDropOneTimeInit(true);
     }
@@ -156,7 +149,7 @@ namespace PlantPressureSystem {
             } else if (SELECT_CASE_var == PressureCall_Calc) {
                 BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
             } else if (SELECT_CASE_var == PressureCall_Update) {
-                UpdatePressureDrop(LoopNum);
+                UpdatePressureDrop(state, LoopNum);
             } else {
                 // Calling routines should only use the three possible keywords here
             }
@@ -177,7 +170,6 @@ namespace PlantPressureSystem {
         // On FirstHVAC, updates the demand inlet node pressure
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
         using DataLoopNode::Node;
         using DataPlant::CommonPipe_No;
         using DataPlant::DemandSide;
@@ -282,9 +274,9 @@ namespace PlantPressureSystem {
                         FullParallelBranchSetFound(LoopSideNum) = true;
                     } else {
                         // we aren't ok
-                        ShowSevereError("Pressure drop component configuration error detected on loop: " + loop.Name);
-                        ShowContinueError("Pressure drop components must be on ALL or NONE of the parallel branches.");
-                        ShowContinueError("Partial distribution is not allowed.");
+                        ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name);
+                        ShowContinueError(state, "Pressure drop components must be on ALL or NONE of the parallel branches.");
+                        ShowContinueError(state, "Partial distribution is not allowed.");
                         ErrorsFound = true;
                     }
                     if (loop_side.Branch(1).HasPressureComponents || loop_side.Branch(NumBranches).HasPressureComponents) {
@@ -297,30 +289,30 @@ namespace PlantPressureSystem {
                 if (FullParallelBranchSetFound(DemandSide) || FullParallelBranchSetFound(SupplySide) || SeriesPressureComponentFound) {
                     // we are fine, either way we will always have a path with at least one pressure component hit
                 } else {
-                    ShowSevereError("Pressure drop component configuration error detected on loop: " + loop.Name);
-                    ShowContinueError("The loop has at least one fluid path which does not encounter a pressure component.");
-                    ShowContinueError("Either use at least one serial component for pressure drop OR all possible parallel paths");
-                    ShowContinueError("must be pressure drop components.");
+                    ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name);
+                    ShowContinueError(state, "The loop has at least one fluid path which does not encounter a pressure component.");
+                    ShowContinueError(state, "Either use at least one serial component for pressure drop OR all possible parallel paths");
+                    ShowContinueError(state, "must be pressure drop components.");
                     ErrorsFound = true;
                 } // valid pressure path
 
             } // Has pressure components
 
-            if (ErrorsFound) ShowFatalError("Preceding errors cause program termination");
+            if (ErrorsFound) ShowFatalError(state, "Preceding errors cause program termination");
 
             // Also issue one time warning if there is a mismatch between plant loop simulation type and whether objects were entered
             if (loop.HasPressureComponents && (loop.PressureSimType == Press_NoPressure)) {
                 // Then we found pressure components on the branches, but the plant loop said it didn't want to do pressure simulation
-                ShowWarningError("Error for pressure simulation on plant loop: " + loop.Name);
-                ShowContinueError("Plant loop contains pressure simulation components on the branches,");
-                ShowContinueError(" yet in the PlantLoop object, there is no pressure simulation specified.");
-                ShowContinueError("Simulation continues, ignoring pressure simulation data.");
+                ShowWarningError(state, "Error for pressure simulation on plant loop: " + loop.Name);
+                ShowContinueError(state, "Plant loop contains pressure simulation components on the branches,");
+                ShowContinueError(state, " yet in the PlantLoop object, there is no pressure simulation specified.");
+                ShowContinueError(state, "Simulation continues, ignoring pressure simulation data.");
             } else if ((!loop.HasPressureComponents) && (loop.PressureSimType != Press_NoPressure)) {
                 // Then we don't have any pressure components on the branches, yet the plant loop wants to do some sort of pressure simulation
-                ShowWarningError("Error for pressure simulation on plant loop: " + loop.Name);
-                ShowContinueError("Plant loop is requesting a pressure simulation,");
-                ShowContinueError(" yet there are no pressure simulation components detected on any of the branches in that loop.");
-                ShowContinueError("Simulation continues, ignoring pressure simulation data.");
+                ShowWarningError(state, "Error for pressure simulation on plant loop: " + loop.Name);
+                ShowContinueError(state, "Plant loop is requesting a pressure simulation,");
+                ShowContinueError(state, " yet there are no pressure simulation components detected on any of the branches in that loop.");
+                ShowContinueError(state, "Simulation continues, ignoring pressure simulation data.");
             }
 
             LoopInit(LoopNum) = false;
@@ -339,8 +331,8 @@ namespace PlantPressureSystem {
                     auto const &branch(loop_side.Branch(BranchNum));
                     for (int CompNum = 1, CompNum_end = isize(branch.Comp); CompNum <= CompNum_end; ++CompNum) {
                         auto const &component(branch.Comp(CompNum));
-                        Node(component.NodeNumIn).Press = StdBaroPress;
-                        Node(component.NodeNumOut).Press = StdBaroPress;
+                        Node(component.NodeNumIn).Press = state.dataEnvrn->StdBaroPress;
+                        Node(component.NodeNumOut).Press = state.dataEnvrn->StdBaroPress;
                     }
                 }
             }
@@ -359,12 +351,12 @@ namespace PlantPressureSystem {
             if (loop.CommonPipeType != CommonPipe_No) {
                 // There is a common pipe!
                 if (!CommonPipeErrorEncountered) {
-                    ShowSevereError("Invalid pressure simulation configuration for Plant Loop=" + loop.Name);
-                    ShowContinueError("Currently pressure simulations cannot be performed for loops with common pipes.");
-                    ShowContinueError("To repair, either remove the common pipe simulation, or remove the pressure simulation.");
-                    ShowContinueError("The simulation will continue, but the pump power is not updated with pressure drop data.");
-                    ShowContinueError("Check all results including node pressures to ensure proper simulation.");
-                    ShowContinueError("This message is reported once, but may have been encountered in multiple loops.");
+                    ShowSevereError(state, "Invalid pressure simulation configuration for Plant Loop=" + loop.Name);
+                    ShowContinueError(state, "Currently pressure simulations cannot be performed for loops with common pipes.");
+                    ShowContinueError(state, "To repair, either remove the common pipe simulation, or remove the pressure simulation.");
+                    ShowContinueError(state, "The simulation will continue, but the pump power is not updated with pressure drop data.");
+                    ShowContinueError(state, "Check all results including node pressures to ensure proper simulation.");
+                    ShowContinueError(state, "This message is reported once, but may have been encountered in multiple loops.");
                     CommonPipeErrorEncountered = true;
                 }
                 loop.UsePressureForPumpCalcs = false;
@@ -397,14 +389,12 @@ namespace PlantPressureSystem {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPlantPressureSystem");
-        static std::string const DummyFluid;
+        constexpr auto RoutineName("CalcPlantPressureSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FluidIndex;               // Plant loop level Fluid Index
         int InletNodeNum;             // Component inlet node number
-        int OutletNodeNum;            // Component outlet node number
-        int PressureCurveType;        // Type of curve used to evaluate pressure drop
+        DataBranchAirLoopPlant::PressureCurveType pressureCurveType;        // Type of curve used to evaluate pressure drop
         int PressureCurveIndex;       // Curve index for PerfCurve structure
         Real64 NodeMassFlow;          // Nodal mass flow rate {kg/s}
         Real64 NodeTemperature;       // Nodal temperature {C}
@@ -423,24 +413,23 @@ namespace PlantPressureSystem {
         // Get data from data structure
         FluidIndex = PlantLoop(LoopNum).FluidIndex;
         InletNodeNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
-        OutletNodeNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
-        PressureCurveType = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType;
+        pressureCurveType = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType;
         PressureCurveIndex = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveIndex;
 
         // Get nodal conditions
         NodeMassFlow = Node(InletNodeNum).MassFlowRate;
         NodeTemperature = Node(InletNodeNum).Temp;
-        NodeDensity = GetDensityGlycol(state, DummyFluid, NodeTemperature, FluidIndex, RoutineName);
-        NodeViscosity = GetViscosityGlycol(state, DummyFluid, NodeTemperature, FluidIndex, RoutineName);
+        NodeDensity = GetDensityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
+        NodeViscosity = GetViscosityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
         // Call the appropriate pressure calculation routine
         {
-            auto const SELECT_CASE_var(PressureCurveType);
-            if (SELECT_CASE_var == PressureCurve_Pressure) {
+            auto const SELECT_CASE_var(pressureCurveType);
+            if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Pressure) {
                 // DeltaP = [f*(L/D) + K] * (rho * V^2) / 2
                 BranchDeltaPress = PressureCurveValue(state, PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
 
-            } else if (SELECT_CASE_var == PressureCurve_Generic) {
+            } else if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Generic) {
                 // DeltaP = func(mdot)
                 // Generic curve, only pass V1=mass flow rate
                 BranchDeltaPress = CurveValue(state, PressureCurveIndex, NodeMassFlow);
@@ -449,11 +438,11 @@ namespace PlantPressureSystem {
                 // Shouldn't end up here, but just in case
                 ++ErrorCounter;
                 if (ErrorCounter == 1) {
-                    ShowSevereError("Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
-                    ShowContinueError("Occurs for branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
-                    ShowContinueError("This error will be issued only once, although other branches may encounter the same problem");
-                    ShowContinueError("For now, pressure drop on this branch will be set to zero.");
-                    ShowContinueError("Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
+                    ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
+                    ShowContinueError(state, "Occurs for branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+                    ShowContinueError(state, "This error will be issued only once, although other branches may encounter the same problem");
+                    ShowContinueError(state, "For now, pressure drop on this branch will be set to zero.");
+                    ShowContinueError(state, "Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
                 }
             }
         }
@@ -469,7 +458,7 @@ namespace PlantPressureSystem {
         }
     }
 
-    void UpdatePressureDrop(int const LoopNum)
+    void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -527,7 +516,7 @@ namespace PlantPressureSystem {
 
                 //***SINGLE BRANCH***!
                 BranchNum = 1;
-                DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                 LoopSidePressureDrop += BranchPressureDrop;
                 LoopPressureDrop += BranchPressureDrop;
                 //*******************!
@@ -536,7 +525,7 @@ namespace PlantPressureSystem {
 
                 //***OUTLET BRANCH***!
                 BranchNum = NumBranches;
-                DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                 LoopSidePressureDrop += BranchPressureDrop;
                 LoopPressureDrop += BranchPressureDrop;
                 //*******************!
@@ -557,7 +546,7 @@ namespace PlantPressureSystem {
                 FoundAPumpOnBranch = false;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
-                    DistributePressureOnBranch(
+                    DistributePressureOnBranch(state,
                         LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                     // Store the branch inlet pressure so we can pass it properly across the splitter
                     ParallelBranchInletPressures(ParallelBranchCounter) =
@@ -575,10 +564,10 @@ namespace PlantPressureSystem {
                 // If we are on the demand side, we have a common pipe situation and should issue a warning
                 if (FoundAPumpOnBranch) {
                     if (LoopSideNum == DemandSide) {
-                        ShowSevereError("Pressure system information was found in a demand pump (common pipe) simulation");
-                        ShowContinueError("Currently the pressure simulation is not set up to handle common pipe simulations");
-                        ShowContinueError("Either modify simulation to avoid common pipe, or remove pressure curve information");
-                        ShowFatalError("Pressure configuration mismatch causes program termination");
+                        ShowSevereError(state, "Pressure system information was found in a demand pump (common pipe) simulation");
+                        ShowContinueError(state, "Currently the pressure simulation is not set up to handle common pipe simulations");
+                        ShowContinueError(state, "Either modify simulation to avoid common pipe, or remove pressure curve information");
+                        ShowFatalError(state, "Pressure configuration mismatch causes program termination");
                     }
                     // If we are on the supply side, we simply hit the branch pump, so we exit the IF statement as
                     //  we don't need to simulate the splitter or inlet branch
@@ -598,7 +587,7 @@ namespace PlantPressureSystem {
 
                     //***INLET BRANCH***!
                     BranchNum = 1;
-                    DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                    DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                     LoopSidePressureDrop += BranchPressureDrop;
                     LoopPressureDrop += BranchPressureDrop;
                     //******************!
@@ -658,7 +647,7 @@ namespace PlantPressureSystem {
         PlantLoop(LoopNum).PressureEffectiveK = EffectiveLoopKValue;
     }
 
-    void DistributePressureOnBranch(int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
+    void DistributePressureOnBranch(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -700,15 +689,15 @@ namespace PlantPressureSystem {
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
             PumpFound = true;
             if (TempBranchPressureDrop != 0.0) {
-                ShowSevereError("Error in plant pressure simulation for plant loop: " + PlantLoop(LoopNum).Name);
+                ShowSevereError(state, "Error in plant pressure simulation for plant loop: " + PlantLoop(LoopNum).Name);
                 if (LoopNum == DemandSide) {
-                    ShowContinueError("Occurs for demand side, branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+                    ShowContinueError(state, "Occurs for demand side, branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
                 } else if (LoopNum == SupplySide) {
-                    ShowContinueError("Occurs for supply side, branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+                    ShowContinueError(state, "Occurs for supply side, branch: " + PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
                 }
-                ShowContinueError("Branch contains only a single pump component, yet also a pressure drop component.");
-                ShowContinueError("Either add a second component to this branch after the pump, or move pressure drop data.");
-                ShowFatalError("Preceding pressure drop error causes program termination");
+                ShowContinueError(state, "Branch contains only a single pump component, yet also a pressure drop component.");
+                ShowContinueError(state, "Either add a second component to this branch after the pump, or move pressure drop data.");
+                ShowFatalError(state, "Preceding pressure drop error causes program termination");
             }
             return;
         }
@@ -868,15 +857,13 @@ namespace PlantPressureSystem {
         using DataPlant::SupplySide;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetViscosityGlycol;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 ResolvedLoopMassFlowRate;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ResolvedLoopMassFlowRate: ");
+        constexpr auto RoutineName("ResolvedLoopMassFlowRate: ");
         int const MaxIters(100);
-        static std::string const DummyFluidName;
         Real64 const PressureConvergeCriteria(0.1); // Pa
         Real64 const ZeroTolerance(0.0001);
 
@@ -907,7 +894,7 @@ namespace PlantPressureSystem {
 
         // Read data off the node data structure
         NodeTemperature = Node(PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn).Temp;
-        NodeDensity = GetDensityGlycol(state, DummyFluidName, NodeTemperature, FluidIndex, RoutineName);
+        NodeDensity = GetDensityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
         // Store the passed in (requested, design) flow to the local value for performing iterations
         LocalSystemMassFlow = SystemMassFlow;
@@ -916,11 +903,11 @@ namespace PlantPressureSystem {
         if (LoopEffectiveK <= ZeroTolerance) {
             ++ZeroKWarningCounter;
             if (ZeroKWarningCounter == 1) {
-                ShowWarningError("Pump pressure-flow resolution attempted, but invalid loop conditions encountered.");
-                ShowContinueError("Loop being calculated: " + PlantLoop(LoopNum).Name);
-                ShowContinueError("An invalid pressure/flow condition existed which resulted in the approximation of");
-                ShowContinueError("the pressure coefficient K to be zero.  The pressure simulation will use the requested (design)");
-                ShowContinueError("pump flow in order to proceed with the simulation.  This warning is only issued once.");
+                ShowWarningError(state, "Pump pressure-flow resolution attempted, but invalid loop conditions encountered.");
+                ShowContinueError(state, "Loop being calculated: " + PlantLoop(LoopNum).Name);
+                ShowContinueError(state, "An invalid pressure/flow condition existed which resulted in the approximation of");
+                ShowContinueError(state, "the pressure coefficient K to be zero.  The pressure simulation will use the requested (design)");
+                ShowContinueError(state, "pump flow in order to proceed with the simulation.  This warning is only issued once.");
             }
             ResolvedLoopMassFlowRate = SystemMassFlow;
             return ResolvedLoopMassFlowRate;
@@ -985,11 +972,11 @@ namespace PlantPressureSystem {
         if (!Converged) {
             ++MaxIterWarningCounter;
             if (MaxIterWarningCounter == 1) {
-                ShowWarningError("Pump pressure-flow resolution attempted, but iteration loop did not converge.");
-                ShowContinueError("Loop being calculated: " + PlantLoop(LoopNum).Name);
-                ShowContinueError("A mismatch between the pump curve entered and the pressure drop components");
-                ShowContinueError("on the loop may be the cause.  The pressure simulation will use the requested (design)");
-                ShowContinueError("pump flow in order to proceed with the simulation.  This warning is only issued once.");
+                ShowWarningError(state, "Pump pressure-flow resolution attempted, but iteration loop did not converge.");
+                ShowContinueError(state, "Loop being calculated: " + PlantLoop(LoopNum).Name);
+                ShowContinueError(state, "A mismatch between the pump curve entered and the pressure drop components");
+                ShowContinueError(state, "on the loop may be the cause.  The pressure simulation will use the requested (design)");
+                ShowContinueError(state, "pump flow in order to proceed with the simulation.  This warning is only issued once.");
             }
             ResolvedLoopMassFlowRate = SystemMassFlow;
             return ResolvedLoopMassFlowRate;
@@ -999,7 +986,5 @@ namespace PlantPressureSystem {
     }
 
     //=================================================================================================!
-
-} // namespace PlantPressureSystem
 
 } // namespace EnergyPlus

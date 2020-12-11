@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -67,8 +67,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
-    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
-    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
+    state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     thisEIR.EvapInletNodeNum = 1;
     thisEIR.EvapOutletNodeNum = 2;
@@ -92,8 +92,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
-    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
-    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
+    state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     thisEIR.SizFac = 1.0;
     thisEIR.DesignHeatRecVolFlowRateWasAutoSized = true;
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    thisEIR.size(state);
+    thisEIR.size(*state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -140,11 +140,11 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     Real64 MyLoad(-10000.0);
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -205,8 +205,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state);
-    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
+    GetElectricEIRChillerInput(*state);
+    auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -226,12 +226,12 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    thisEIR.initialize(state, RunFlag, MyLoad);
-    thisEIR.size(state);
+    thisEIR.initialize(*state, RunFlag, MyLoad);
+    thisEIR.size(*state);
 
     // run through init again after sizing is complete to set mass flow rate
-    state.dataGlobal->BeginEnvrnFlag = true;
-    thisEIR.initialize(state, RunFlag, MyLoad);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisEIR.initialize(*state, RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIR.EvapMassFlowRateMax, 0.999898, 0.0000001);
@@ -291,11 +291,11 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_TRUE(process_idf(idf_objects, false));
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -312,8 +312,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state);
-    auto &thisEIRChiller = state.dataChillerElectricEIR->ElectricEIRChiller(1);
+    GetElectricEIRChillerInput(*state);
+    auto &thisEIRChiller = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -333,28 +333,28 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    DataEnvironment::OutDryBulbTemp = 29.4;
-    DataEnvironment::OutWetBulbTemp = 23.0;
-    DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = DataEnvironment::OutHumRat;
+    state->dataEnvrn->OutDryBulbTemp = 29.4;
+    state->dataEnvrn->OutWetBulbTemp = 23.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
 
     // set load and run flag
     bool RunFlag(true);
     Real64 MyLoad(-18000.0);
-    openOutputFiles(state);
+    openOutputFiles(*state);
 
     DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
     DataLoopNode::Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
     // init and size
-    thisEIRChiller.initialize(state, RunFlag, MyLoad);
-    thisEIRChiller.size(state);
+    thisEIRChiller.initialize(*state, RunFlag, MyLoad);
+    thisEIRChiller.size(*state);
     // init again after sizing is complete to set mass flow rate
-    state.dataGlobal->BeginEnvrnFlag = true;
-    thisEIRChiller.initialize(state, RunFlag, MyLoad);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisEIRChiller.initialize(*state, RunFlag, MyLoad);
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIRChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
     // check autocalculate for evaporatively-cooled chiller condenser side fluid flow rate
@@ -363,9 +363,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_NEAR(thisEIRChiller.CondVolFlowRate, 2.3925760323498, 0.0000001);
     EXPECT_NEAR(thisEIRChiller.CondMassFlowRateMax, 2.7918772761695, 0.0000001);
     // run chiller
-    thisEIRChiller.calculate(state, MyLoad, RunFlag);
+    thisEIRChiller.calculate(*state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
-    Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
+    Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - state->dataEnvrn->OutHumRat) /
                                       Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
     // check evap-cooled condenser water consumption rate
     EXPECT_NEAR(2.31460814, thisEIRChiller.CondMassFlowRate, 0.0000001);

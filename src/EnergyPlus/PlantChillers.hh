@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -175,16 +176,16 @@ namespace PlantChillers {
         }
 
         void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
-        void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
+        void getSizingFactor([[maybe_unused]] Real64 &SizFac) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
+        void getDesignTemperatures([[maybe_unused]] Real64 &TempDesCondIn, [[maybe_unused]] Real64 &TempDesEvapOut) override;
 
         virtual void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) = 0;
 
@@ -239,7 +240,7 @@ namespace PlantChillers {
 
         static ElectricChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
@@ -248,7 +249,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // current load
@@ -336,7 +337,7 @@ namespace PlantChillers {
 
         static void getInput(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables(EnergyPlusData &state);
 
@@ -347,7 +348,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void calcHeatRecovery(EnergyPlusData &state,
@@ -430,7 +431,7 @@ namespace PlantChillers {
 
         static void getInput(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables(EnergyPlusData &state);
 
@@ -441,7 +442,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // current load
@@ -463,7 +464,7 @@ namespace PlantChillers {
 
         static void getInput(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables(EnergyPlusData &state);
 
@@ -471,7 +472,7 @@ namespace PlantChillers {
 
         void size(EnergyPlusData &state) override;
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl);
 
         void update(Real64 MyLoad, bool RunFlag);
     };

@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
@@ -63,12 +64,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
-
-    bool eioHeaderDoneOnce(false);
-
-    void SizingAnalysisObjects_clear_state() {
-        eioHeaderDoneOnce = false;
-    }
 
 ZoneTimestepObject::ZoneTimestepObject()
 {
@@ -258,7 +253,7 @@ void SizingLog::ProcessRunningAverage()
     }
 }
 
-ZoneTimestepObject SizingLog::GetLogVariableDataMax()
+ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
 {
     Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;
@@ -273,7 +268,7 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax()
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
         } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Unassigned) { // null timestamp, problem to fix
-            ShowWarningMessage("GetLogVariableDataMax: null timestamp in log");
+            ShowWarningMessage(state, "GetLogVariableDataMax: null timestamp in log");
         }
     }
     return tmpztStepStamp;
@@ -304,7 +299,6 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage)
 {
-    using DataGlobals::NumOfTimeStepInHour;
     int VectorLength(0);
     int const HoursPerDay(24);
 
@@ -330,10 +324,10 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
 
         if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour;
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour;
         }
         if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
         }
     }
 
@@ -373,7 +367,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
 
     int locDayOfSim(1);
 
-    if (DataGlobals::WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
+    if (state.dataGlobal->WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
         locDayOfSim = 1;
     } else {
         locDayOfSim = state.dataGlobal->DayOfSim;
@@ -383,10 +377,10 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
         state.dataGlobal->KindOfSim,
         state.dataWeatherManager->Envrn,
         locDayOfSim,
-        DataGlobals::HourOfDay,
-        DataGlobals::TimeStep,
+        state.dataGlobal->HourOfDay,
+        state.dataGlobal->TimeStep,
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
-        DataGlobals::NumOfTimeStepInHour);
+        state.dataGlobal->NumOfTimeStepInHour);
 
     return tmpztStepStamp;
 }
@@ -451,8 +445,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
     using DataSizing::LoopComponentSizingFactorMode;
     using DataSizing::NoSizingFactorMode;
     using DataSizing::PlantSizData;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
+
     using namespace DataPlant;
     using namespace OutputReportPredefined;
     using DataHVACGlobals::SmallWaterVolFlow;
@@ -547,14 +540,14 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
     }
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
-    if (!eioHeaderDoneOnce) {
+    if (!state.dataGlobal->sizingAnalysisEioHeaderDoneOnce) {
         print(state.files.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
-        eioHeaderDoneOnce = true;
+        state.dataGlobal->sizingAnalysisEioHeaderDoneOnce = true;
     }
-    chIteration = TrimSigDigits(HVACSizingIterCount);
+    chIteration = fmt::to_string(HVACSizingIterCount);
     if (setNewSizes) {
         chSetSizes = "Yes";
     } else {

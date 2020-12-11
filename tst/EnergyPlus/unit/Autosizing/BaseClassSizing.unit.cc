@@ -51,37 +51,29 @@
 #include <gtest/gtest.h>
 
 #include "AutosizingFixture.hh"
-#include "../Fixtures/EnergyPlusFixture.hh"
 #include "../Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirSystems;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 
@@ -110,7 +102,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = 2.0;
     DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.15;
     DataSizing::DataAirFlowUsedForSizing = 0.2;
-    DataEnvironment::StdRhoAir = 1000;
+    state->dataEnvrn->StdRhoAir = 1000;
     DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
@@ -127,14 +119,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
 
     // Single path for VAV
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::OnOff;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.2, designFlowValue);
@@ -143,14 +135,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     // CoolSupTemp > calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
     // CoolSupTemp < calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_NEAR(13.00590, designExitTemp, 0.0001);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -160,13 +152,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
     // MixTemp < DesExitTemp
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 5;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -177,7 +169,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     // Repeat a VT case
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -185,7 +177,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
@@ -212,7 +204,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = 2.0;
     DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.15;
     DataSizing::DataAirFlowUsedForSizing = 0.2;
-    DataEnvironment::StdRhoAir = 1000;
+    state->dataEnvrn->StdRhoAir = 1000;
     DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
@@ -229,14 +221,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
 
     // Single path for VAV
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::OnOff;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.2, designFlowValue);
@@ -244,7 +236,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     // VT
     // CoolSupTemp > calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
@@ -252,7 +244,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
 
     // Bypass
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
@@ -283,17 +275,17 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
     SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
@@ -314,8 +306,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
     // confirm that sizing data is saved for use by parent object
@@ -329,12 +321,12 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
-    DataEnvironment::StdRhoAir = 1.18;
+    state->dataEnvrn->StdRhoAir = 1.18;
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*state, SizingResult, errorsFound);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
 }
 
@@ -408,33 +400,33 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN 1";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[0]->simulate(state, _, _, _, _);                         // triggers sizing call
+    state->dataEnvrn->StdRhoAir = 1.2;
+    HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain1 = HVACFan::fanObjs[0]->getFanDesignHeatGain(state, locFanSizeVdot);
+    Real64 locDesignHeatGain1 = HVACFan::fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
     fanName = "TEST FAN 2";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
-    HVACFan::fanObjs[1]->simulate(state, _, _, _, _);                      // triggers sizing call
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    HVACFan::fanObjs[1]->simulate(*state, _, _, _, _);                      // triggers sizing call
     locFanSizeVdot = HVACFan::fanObjs[1]->designAirVolFlowRate;     // get function
-    Real64 locDesignHeatGain2 = HVACFan::fanObjs[1]->getFanDesignHeatGain(state, locFanSizeVdot);
+    Real64 locDesignHeatGain2 = HVACFan::fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
     fanName = "TEST FAN 3";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
-    DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[2]->simulate(state, _, _, _, _);                  // triggers sizing call
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataEnvrn->StdRhoAir = 1.2;
+    HVACFan::fanObjs[2]->simulate(*state, _, _, _, _);                  // triggers sizing call
     locFanSizeVdot = HVACFan::fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(state, locFanSizeVdot);
+    Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
 
-    GetFanInput(state);
-    Real64 locDesignHeatGain4 = FanDesHeatGain(state, 1, locFanSizeVdot);
+    GetFanInput(*state);
+    Real64 locDesignHeatGain4 = FanDesHeatGain(*state, 1, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.0, 0.1);
 
     std::string CompName;       // component name
@@ -459,18 +451,18 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
     SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
@@ -492,15 +484,15 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
 
     // With Test Fan 4 fan heat
-    PrimaryAirSystem(CurSysNum).SupFanNum = 1;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -513,15 +505,15 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix
-    PrimaryAirSystem(CurSysNum).SupFanNum = 2;
-    PrimaryAirSystem(CurSysNum).supFanVecIndex = 2;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -534,8 +526,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 }
 
@@ -565,7 +557,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.30;
 
     ZoneSizingRunDone = true;
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
@@ -589,20 +581,20 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     bool errorsFound = false;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
-    DataEnvironment::StdRhoAir = 1.18;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.18;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    sizerCoolingCapacity.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(*this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
 }
 
@@ -624,7 +616,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     UsrDesc = "User-Specified Nominal Capacity [W]";
     UsrValue = 26352.97405;
     // boiler hot water autosizing and userspecified nominal capacity reporting to SQLite output
-    BaseSizer::reportSizerOutput(CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
+    BaseSizer::reportSizerOutput(*state, CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
@@ -645,27 +637,27 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.34;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
-    DataEnvironment::StdRhoAir = 1.23;
+    state->dataEnvrn->StdRhoAir = 1.23;
 
     Real64 oaFrac = 0.0;
     Real64 DesMassFlow = 0.685;
-    Real64 massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
+    Real64 massFlowRate = state->dataEnvrn->StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
     Real64 oaFrac_Test = massFlowRate / DesMassFlow;
 
     ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(1);
 
     // ATMixer flow rate = 0 so oaFrac depends on ZoneEqSizing.OAVolFlow
-    oaFrac = sizer.setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     zoneEqSizing.ATMixerVolFlow = 0.11;
 
     oaFrac = 0.0;
-    massFlowRate = DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow;
+    massFlowRate = state->dataEnvrn->StdRhoAir * zoneEqSizing.ATMixerVolFlow;
     oaFrac_Test = massFlowRate / DesMassFlow;
 
     // ATMixer flow rate > 0 so oaFrac depends on ZoneEqSizing.ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     DesMassFlow = 0.0;
@@ -674,7 +666,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     zoneEqSizing.OAVolFlow = 1.0;
     zoneEqSizing.ATMixerVolFlow = 1.0;
     // DesMassFlow = 0 so oaFrac = 0 regardless of OAVolFlow or ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 }
 
@@ -688,10 +680,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
 
     zoneEqSizing.OAVolFlow = 0.34;
     zoneEqSizing.ATMixerVolFlow = 0.0;
-    DataEnvironment::StdRhoAir = 1.23;
+    state->dataEnvrn->StdRhoAir = 1.23;
 
     Real64 DesMassFlow = 0.685;
-    Real64 massFlowRate = DataEnvironment::StdRhoAir * zoneEqSizing.OAVolFlow;
+    Real64 massFlowRate = state->dataEnvrn->StdRhoAir * zoneEqSizing.OAVolFlow;
     Real64 oaFrac = massFlowRate / DesMassFlow;
 
     // Test heating mode coil inlet temperature
@@ -880,11 +872,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 {
 
     // This is needed to compute time of Peak as a string
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 15;
 
     // Setup the predefined tables, because that's where the info is written.
-    EnergyPlus::OutputReportPredefined::SetPredefinedTables();
+    EnergyPlus::OutputReportPredefined::SetPredefinedTables(*state);
 
     // If you wanted to check SQL, you also need this:
     // We enable the report we care about, making sure it's the right one
@@ -919,13 +911,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     DataSizing::FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 72;
 
     // Fake a design day
-    state.dataWeatherManager->DesDayInput.allocate(1);
+    state->dataWeatherManager->DesDayInput.allocate(1);
     std::string DDTitle = "CHICAGO ANN CLG 1% CONDNS DB=>MWB";
-    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title = DDTitle;
-    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
-    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
+    state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title = DDTitle;
+    state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
+    state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
-    DataEnvironment::TotDesDays = 1;
+    state->dataEnvrn->TotDesDays = 1;
 
     DataSizing::ZoneSizingRunDone = true;
 
@@ -941,8 +933,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     // Now, we're ready to call the function
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
-    sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerSystemAirFlow.size(state, SizingResult, errorsFound);
+    sizerSystemAirFlow.initializeWithinEP(*state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerSystemAirFlow.size(*state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
@@ -1431,7 +1423,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state);
+    SimulationManager::ManageSimulation(*state);
 
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature

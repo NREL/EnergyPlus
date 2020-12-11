@@ -76,7 +76,6 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     // Reads input and creates instance of Site:GroundDomain:Shallow object
 
     // USE STATEMENTS:
-    using DataEnvironment::GroundTemp_SurfaceObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -90,7 +89,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -101,7 +100,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
         inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -110,10 +109,10 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
             thisModel->surfaceGroundTemps(i) = rNumericArgs(i);
         }
 
-        GroundTemp_SurfaceObjInput = true;
+        state.dataEnvrn->GroundTemp_SurfaceObjInput = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
     } else {
         thisModel->surfaceGroundTemps = 13.0;
@@ -126,14 +125,14 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError("Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
+        ShowContinueError(state, "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
+Real64 SiteShallowGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -149,7 +148,7 @@ Real64 SiteShallowGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -179,7 +178,7 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData& stat
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

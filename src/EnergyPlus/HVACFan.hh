@@ -67,7 +67,7 @@ struct EnergyPlusData;
 
 namespace HVACFan {
 
-    int getFanObjectVectorIndex(std::string const &objectName, bool const CheckFlag = true);
+    int getFanObjectVectorIndex(EnergyPlusData &state, std::string const &objectName, bool const CheckFlag = true);
 
     bool checkIfFanNameIsAFanSystem(EnergyPlusData &state, std::string const &objectName);
 
@@ -105,7 +105,7 @@ namespace HVACFan {
 
         Real64 maxAirMassFlowRate() const;
 
-        Real64 getFanDesignTemperatureRise() const;
+        Real64 getFanDesignTemperatureRise(EnergyPlusData &state) const;
 
         Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
 
@@ -145,7 +145,7 @@ namespace HVACFan {
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
 
     private: // methods
         void init(EnergyPlusData &state);

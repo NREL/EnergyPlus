@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -387,9 +388,9 @@ namespace WaterThermalTanks {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterThermalTankData : PlantComponent
@@ -449,7 +450,7 @@ namespace WaterThermalTanks {
         Real64 SavedUseOutletTemp;             // Use side outlet temp saved for demand-side flow control (C)
         Real64 UseDesignVolFlowRate;           // Use side plant volume flow rate (input data, autosizable) m3/s
         bool UseDesignVolFlowRateWasAutoSized; // true if use flow rate was autosize on input
-        int UseBranchControlType;              // Use side plant branch control type e.g active, passive, bypass
+        DataBranchAirLoopPlant::ControlTypeEnum UseBranchControlType;              // Use side plant branch control type e.g active, passive, bypass
         int UseSidePlantSizNum;                // index in plant sizing that the use side is on
         bool UseSideSeries;
         int UseSideAvailSchedNum;    // use side availability schedule
@@ -465,7 +466,7 @@ namespace WaterThermalTanks {
         Real64 SavedSourceOutletTemp;             // Source side outlet temp saved for demand-side flow control (C)
         Real64 SourceDesignVolFlowRate;           // Source side plant volume flow rate (input, autosizable) m3/s
         bool SourceDesignVolFlowRateWasAutoSized; // true if source flow rate was autosize on input
-        int SourceBranchControlType;              // source side plant branch control type e.g active, passive, bypass
+        DataBranchAirLoopPlant::ControlTypeEnum SourceBranchControlType;              // source side plant branch control type e.g active, passive, bypass
         int SourceSidePlantSizNum;                // index in plant sizing that the source side is on
         bool SourceSideSeries;
         int SourceSideAvailSchedNum; // source side availability schedule.
@@ -605,10 +606,10 @@ namespace WaterThermalTanks {
               DeadBandDeltaTemp(0.0), TankTempLimit(0.0), IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0),
               OnCycParaFracToTank(0.0), UseCurrentFlowLock(0), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0), UseOutletTemp(0.0),
               UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0), SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0),
-              UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(2), UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0),
+              UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0),
               UseSideLoadRequested(0.0), SourceInletNode(0), SourceInletTemp(0.0), SourceOutletNode(0), SourceOutletTemp(0.0),
               SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0),
-              SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false), SourceBranchControlType(2), SourceSidePlantSizNum(0),
+              SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false), SourceBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), SourceSidePlantSizNum(0),
               SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint),
               SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
               FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
@@ -636,7 +637,7 @@ namespace WaterThermalTanks {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void setupZoneInternalGains();
+        void setupZoneInternalGains(EnergyPlusData &state);
 
         void setupChilledWaterTankOutputVars(EnergyPlusData &state);
 
@@ -660,7 +661,7 @@ namespace WaterThermalTanks {
 
         void SizeTankForDemandSide(EnergyPlusData &state);
 
-        void MinePlantStructForInfo();
+        void MinePlantStructForInfo(EnergyPlusData &state);
 
         void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
 
@@ -691,7 +692,7 @@ namespace WaterThermalTanks {
                                       SideEnum WaterThermalTankSide,
                                       int PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
-                                      int BranchControlType,
+                                      DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,
                                       Real64 OutletTemp,
                                       Real64 DeadBandTemp,
                                       Real64 SetPointTemp);
@@ -773,9 +774,9 @@ namespace WaterThermalTanks {
 
         static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterHeaterDesuperheaterData

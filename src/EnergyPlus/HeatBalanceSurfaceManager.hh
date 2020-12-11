@@ -130,9 +130,9 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportSurfaceHeatBalance();
+    void ReportSurfaceHeatBalance(EnergyPlusData &state);
 
-    void ReportIntMovInsInsideSurfTemp();
+    void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
     void CalcThermalResilience(EnergyPlusData &state);
 
@@ -149,7 +149,7 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetQdotConvOutRepPerArea(int SurfNum);
+    Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int SurfNum);
 
     void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
@@ -167,7 +167,8 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12,
+    void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state,
+                                               Real64 TH12,
                                                DataSurfaces::SurfaceData &surface,
                                                DataHeatBalance::ZoneData &zone,
                                                int WarmupSurfTemp);
@@ -181,9 +182,9 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
-    void GatherComponentLoadsSurfAbsFact();
+    void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
 } // namespace HeatBalanceSurfaceManager
 

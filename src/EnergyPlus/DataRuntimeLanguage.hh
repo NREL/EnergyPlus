@@ -72,6 +72,21 @@ namespace DataRuntimeLanguage {
     // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
+    enum class ErlKeywordParam // keyword parameters for types of Erl statements
+    {
+        KeywordNone,     // statement type not set
+        KeywordReturn,   // Return statement, as in leave program
+        KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
+        KeywordSet,      // Set statement, as in assign RHS to LHS
+        KeywordRun,      // Run statement, used to call a subroutine from a main program
+        KeywordIf,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
+        KeywordElseIf,   // ElseIf statement, begins an ElseIf block
+        KeywordElse,     // Else statement, begins an Else block
+        KeywordEndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
+        KeywordWhile,    // While statement, begins a While block
+        KeywordEndWhile, // EndWhile statement, terminates a While block
+    };
+
     // MODULE PARAMETER DEFINITIONS:
     extern int const ValueNull;       // Erl entity type, "Null" value
     extern int const ValueNumber;     // Erl entity type,  hard numeric value
@@ -421,12 +436,12 @@ namespace DataRuntimeLanguage {
         // Members
         // nested structure inside ErlStack that holds program instructions
         int LineNum;   // Erl program line number reference
-        int Keyword;   // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
+        DataRuntimeLanguage::ErlKeywordParam Keyword; // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
         int Argument1; // Index to a variable, function, expression, or stack
         int Argument2; // Index to a variable, function, expression, or stack
 
         // Default Constructor
-        InstructionType() : LineNum(0), Keyword(0), Argument1(0), Argument2(0)
+        InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
         {
         }
     };
@@ -509,7 +524,7 @@ namespace DataRuntimeLanguage {
 
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
-    struct EMSActuatorKey_hash : public std::unary_function<EMSActuatorKey, std::size_t>
+    struct EMSActuatorKey_hash
     {
         inline static void hash_combine(std::size_t &seed, std::string const &s)
         {
@@ -532,14 +547,16 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state();
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine

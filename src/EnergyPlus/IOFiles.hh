@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 class InputFile
 {
 public:
@@ -93,7 +96,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputFile &ensure_open(const std::string &caller, bool output_to_file = true);
+    InputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
@@ -139,7 +142,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputOutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
+    InputOutputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
 
     void open(const bool forAppend = false, bool output_to_file = true);
     std::fstream::pos_type position() const noexcept;
@@ -161,10 +164,10 @@ private:
 template <typename FileType> struct IOFileName
 {
     std::string fileName;
-    FileType open(const std::string &caller, bool output_to_file = true)
+    FileType open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true)
     {
         FileType file{fileName};
-        file.ensure_open(caller, output_to_file);
+        file.ensure_open(state, caller, output_to_file);
         return file;
     }
     FileType try_open(bool output_to_file = true)
@@ -245,7 +248,7 @@ public:
     {
         OutputControl() = default;
 
-        void getInput();
+        void getInput(EnergyPlusData &state);
 
         bool csv = false;
         bool mtr = true;
@@ -463,9 +466,9 @@ template <class InputIterator> void print(InputIterator first, InputIterator las
     std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream));
 }
 
-template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)
+template <typename... Args> std::string format(::fmt::string_view format_str, const Args &... args)
 {
-    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
+    return EnergyPlus::vprint(format_str, ::fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus

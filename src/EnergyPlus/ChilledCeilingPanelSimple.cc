@@ -101,8 +101,6 @@ namespace CoolingPanelSimple {
     // Existing code for hot water baseboard models (radiant-convective variety)
 
     // USE STATEMENTS:
-    using namespace DataGlobals;
-
     // MODULE PARAMETER DEFINITIONS
     std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
@@ -129,7 +127,6 @@ namespace CoolingPanelSimple {
         using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // Index of unit in baseboard array
@@ -146,19 +143,25 @@ namespace CoolingPanelSimple {
         if (CompIndex == 0) {
             CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName, state.dataChilledCeilingPanelSimple->CoolingPanel, &CoolingPanelParams::EquipID, state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             if (CoolingPanelNum == 0) {
-                ShowFatalError("SimCoolingPanelSimple: Unit not found=" + EquipName);
+                ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
             }
             CompIndex = CoolingPanelNum;
         } else {
             CoolingPanelNum = CompIndex;
             if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
-                ShowFatalError("SimCoolingPanelSimple:  Invalid CompIndex passed=" + TrimSigDigits(CoolingPanelNum) +
-                               ", Number of Units=" + TrimSigDigits(state.dataChilledCeilingPanelSimple->NumCoolingPanels) + ", Entered Unit name=" + EquipName);
+                ShowFatalError(state,
+                               format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      CoolingPanelNum,
+                                      state.dataChilledCeilingPanelSimple->NumCoolingPanels,
+                                      EquipName));
             }
             if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
                 if (EquipName != state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID) {
-                    ShowFatalError("SimCoolingPanelSimple: Invalid CompIndex passed=" + TrimSigDigits(CoolingPanelNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+                    ShowFatalError(state,
+                                   format("SimCoolingPanelSimple: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          CoolingPanelNum,
+                                          EquipName,
+                                          state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID));
                 }
                 state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum) = false;
             }
@@ -188,9 +191,11 @@ namespace CoolingPanelSimple {
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                     ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
-                    ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-                    ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
-                    ShowFatalError("Preceding condition causes termination.");
+                    ShowSevereError(state, "SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+                    ShowContinueError(state,
+                                      format("Invalid or unimplemented equipment type={}",
+                                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
+                    ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
 
@@ -201,7 +206,7 @@ namespace CoolingPanelSimple {
             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
 
         } else {
-            ShowFatalError("SimCoolingPanelSimple: Unit not found=" + EquipName);
+            ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
         }
     }
 
@@ -226,8 +231,7 @@ namespace CoolingPanelSimple {
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using DataSurfaces::Surface;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -264,7 +268,7 @@ namespace CoolingPanelSimple {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
+        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
         // Count total number of baseboard units
 
@@ -288,7 +292,7 @@ namespace CoolingPanelSimple {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames.allocate(NumNumbers);
             state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = "";
@@ -298,8 +302,8 @@ namespace CoolingPanelSimple {
                 for (CoolPanelNumI = 2; CoolPanelNumI <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolPanelNumI) {
                     if (cAlphaArgs(1) == state.dataChilledCeilingPanelSimple->CoolingPanel(CoolPanelNumI).EquipID) {
                         ErrorsFound = true;
-                        ShowSevereError(cAlphaArgs(1) + " is used as a name for more than one simple COOLING PANEL.");
-                        ShowContinueError("This is not allowed.");
+                        ShowSevereError(state, cAlphaArgs(1) + " is used as a name for more than one simple COOLING PANEL.");
+                        ShowContinueError(state, "This is not allowed.");
                     }
                 }
             }
@@ -315,7 +319,7 @@ namespace CoolingPanelSimple {
             } else {
                 ThisCP.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ThisCP.SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
+                    ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
                     ErrorsFound = true;
                 }
@@ -328,39 +332,39 @@ namespace CoolingPanelSimple {
             // Get outlet node number
             ThisCP.WaterOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
+            TestCompSet(state, cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
             ThisCP.RatedWaterTemp = rNumericArgs(1);
             if (ThisCP.RatedWaterTemp > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was higher than the allowable maximum.");
-                ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterTempAvg, 2) + "].");
+                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxWaterTempAvg));
                 ThisCP.RatedWaterTemp = MaxWaterTempAvg;
             } else if (ThisCP.RatedWaterTemp < MinWaterTempAvg - 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was lower than the allowable minimum.");
-                ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterTempAvg, 2) + "].");
+                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinWaterTempAvg));
                 ThisCP.RatedWaterTemp = MinWaterTempAvg;
             }
 
             ThisCP.RatedZoneAirTemp = rNumericArgs(2);
             if (ThisCP.RatedZoneAirTemp > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " was higher than the allowable maximum.");
-                ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterTempAvg, 2) + "].");
+                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxWaterTempAvg));
                 ThisCP.RatedZoneAirTemp = MaxWaterTempAvg;
             } else if (ThisCP.RatedZoneAirTemp < MinWaterTempAvg - 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " was lower than the allowable minimum.");
-                ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterTempAvg, 2) + "].");
+                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinWaterTempAvg));
                 ThisCP.RatedZoneAirTemp = MinWaterTempAvg;
             }
 
             ThisCP.RatedWaterFlowRate = rNumericArgs(3);
             if (ThisCP.RatedWaterFlowRate < 0.00001 || ThisCP.RatedWaterFlowRate > 10.0) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " is an invalid Standard Water mass flow rate.");
-                ShowContinueError("...reset to a default value=[" + RoundSigDigits(WaterMassFlowDefault, 1) + "].");
+                ShowContinueError(state, format("...reset to a default value=[{:.1R}].", WaterMassFlowDefault));
                 ThisCP.RatedWaterFlowRate = WaterMassFlowDefault;
             }
 
@@ -369,15 +373,15 @@ namespace CoolingPanelSimple {
                 if (!lNumericFieldBlanks(4)) {
                     ThisCP.ScaledCoolingCapacity = rNumericArgs(4);
                     if (ThisCP.ScaledCoolingCapacity < 0.0 && ThisCP.ScaledCoolingCapacity != DataSizing::AutoSize) {
-                        ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Illegal " + cNumericFieldNames(4) + " = " + TrimSigDigits(rNumericArgs(4), 7));
+                        ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(4), rNumericArgs(4)));
                         ErrorsFound = true;
                     }
                 } else {
                     if ((!lAlphaFieldBlanks(6)) || (!lAlphaFieldBlanks(7))) {
-                        ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                        ShowContinueError("Blank field not allowed for " + cNumericFieldNames(4));
+                        ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, "Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                        ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(4));
                         ErrorsFound = true;
                     }
                 }
@@ -386,20 +390,20 @@ namespace CoolingPanelSimple {
                 if (!lNumericFieldBlanks(5)) {
                     ThisCP.ScaledCoolingCapacity = rNumericArgs(5);
                     if (ThisCP.CoolingCapMethod <= 0.0) {
-                        ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                        ShowContinueError("Illegal " + cNumericFieldNames(5) + " = " + TrimSigDigits(rNumericArgs(5), 7));
+                        ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, "Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(5), rNumericArgs(5)));
                         ErrorsFound = true;
                     } else if (ThisCP.ScaledCoolingCapacity == DataSizing::AutoSize) {
-                        ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                        ShowContinueError("Illegal " + cNumericFieldNames(5) + " = Autosize");
+                        ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, "Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                        ShowContinueError(state, "Illegal " + cNumericFieldNames(5) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                    ShowContinueError("Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                    ShowContinueError("Blank field not allowed for " + cNumericFieldNames(5));
+                    ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                    ShowContinueError(state, "Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(5));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "FractionOfAutosizedCoolingCapacity")) {
@@ -407,32 +411,32 @@ namespace CoolingPanelSimple {
                 if (!lNumericFieldBlanks(6)) {
                     ThisCP.ScaledCoolingCapacity = rNumericArgs(6);
                     if (ThisCP.ScaledCoolingCapacity < 0.0) {
-                        ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Illegal " + cNumericFieldNames(6) + " = " + TrimSigDigits(rNumericArgs(6), 7));
+                        ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(6), rNumericArgs(6)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                    ShowContinueError("Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
-                    ShowContinueError("Blank field not allowed for " + cNumericFieldNames(6));
+                    ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                    ShowContinueError(state, "Input for " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(6));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                ShowContinueError("Illegal " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
+                ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                ShowContinueError(state, "Illegal " + cAlphaFieldNames(5) + " = " + cAlphaArgs(5));
                 ErrorsFound = true;
             }
 
             ThisCP.WaterVolFlowRateMax = rNumericArgs(7);
             if ((ThisCP.WaterVolFlowRateMax <= MinWaterFlowRate) && ThisCP.WaterVolFlowRateMax != DataSizing::AutoSize) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was less than the allowable minimum.");
-                ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterFlowRate, 2) + "].");
+                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinWaterFlowRate));
                 ThisCP.WaterVolFlowRateMax = MinWaterFlowRate;
             } else if (ThisCP.WaterVolFlowRateMax > MaxWaterFlowRate) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was higher than the allowable maximum.");
-                ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterFlowRate, 2) + "].");
+                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxWaterFlowRate));
                 ThisCP.WaterVolFlowRateMax = MaxWaterFlowRate;
             }
 
@@ -452,24 +456,24 @@ namespace CoolingPanelSimple {
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), ZoneConvectiveLoad)) {
                 ThisCP.ControlType = Control::ZoneConvectiveLoad;
             } else {
-                ShowWarningError("Invalid " + cAlphaFieldNames(6) + " =" + cAlphaArgs(6));
-                ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
-                ShowContinueError("Control reset to MAT control for this Simple Cooling Panel.");
+                ShowWarningError(state, "Invalid " + cAlphaFieldNames(6) + " =" + cAlphaArgs(6));
+                ShowContinueError(state, "Occurs in " + RoutineName + " = " + cAlphaArgs(1));
+                ShowContinueError(state, "Control reset to MAT control for this Simple Cooling Panel.");
                 ThisCP.ControlType = Control::MAT;
             }
 
             ThisCP.ColdThrottlRange = rNumericArgs(8);
             if (ThisCP.ColdThrottlRange < MinThrottlingRange) {
-                ShowWarningError(cCMO_CoolingPanel_Simple + "Cooling throttling range too small, reset to 0.5");
-                ShowContinueError("Occurs in Cooling Panel=" + ThisCP.EquipID);
+                ShowWarningError(state, cCMO_CoolingPanel_Simple + "Cooling throttling range too small, reset to 0.5");
+                ShowContinueError(state, "Occurs in Cooling Panel=" + ThisCP.EquipID);
                 ThisCP.ColdThrottlRange = MinThrottlingRange;
             }
 
             ThisCP.ColdSetptSched = cAlphaArgs(7);
             ThisCP.ColdSetptSchedPtr = GetScheduleIndex(state, ThisCP.ColdSetptSched);
             if ((ThisCP.ColdSetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
-                ShowSevereError(cAlphaFieldNames(7) + " not found: " + ThisCP.ColdSetptSched);
-                ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
+                ShowSevereError(state, cAlphaFieldNames(7) + " not found: " + ThisCP.ColdSetptSched);
+                ShowContinueError(state, "Occurs in " + RoutineName + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -487,22 +491,22 @@ namespace CoolingPanelSimple {
 
             ThisCP.FracRadiant = rNumericArgs(10);
             if (ThisCP.FracRadiant < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
                                  " was lower than the allowable minimum.");
-                ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 2) + "].");
+                ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
                 ThisCP.FracRadiant = MinFraction;
             }
             if (ThisCP.FracRadiant > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
                                  " was higher than the allowable maximum.");
-                ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
+                ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
                 ThisCP.FracRadiant = MaxFraction;
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
             AllFracsSummed = ThisCP.FracRadiant;
             if (AllFracsSummed > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                  "\", Fraction Radiant was higher than the allowable maximum.");
                 ThisCP.FracRadiant = MaxFraction;
                 ThisCP.FracConvect = 0.0;
@@ -512,23 +516,23 @@ namespace CoolingPanelSimple {
 
             ThisCP.FracDistribPerson = rNumericArgs(11);
             if (ThisCP.FracDistribPerson < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
                                  " was lower than the allowable minimum.");
-                ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 3) + "].");
+                ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
                 ThisCP.FracDistribPerson = MinFraction;
             }
             if (ThisCP.FracDistribPerson > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
+                ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
                                  " was higher than the allowable maximum.");
-                ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 3) + "].");
+                ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
                 ThisCP.FracDistribPerson = MaxFraction;
             }
 
             ThisCP.TotSurfToDistrib = NumNumbers - 11;
             if ((ThisCP.TotSurfToDistrib < MinDistribSurfaces) && (ThisCP.FracRadiant > MinFraction)) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
-                ShowContinueError("...the minimum that must be entered=[" + RoundSigDigits(MinDistribSurfaces) + "].");
+                ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
                 ThisCP.TotSurfToDistrib = 0; // error
             }
@@ -541,7 +545,7 @@ namespace CoolingPanelSimple {
             ThisCP.FracDistribToSurf = 0.0;
 
             // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
                     if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
                         DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
@@ -550,7 +554,7 @@ namespace CoolingPanelSimple {
                 }
             }
             if (ThisCP.ZonePtr <= 0) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID +
+                ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID +
                     "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
@@ -559,19 +563,19 @@ namespace CoolingPanelSimple {
             AllFracsSummed = ThisCP.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= ThisCP.TotSurfToDistrib; ++SurfNum) {
                 ThisCP.SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 8);
-                ThisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
+                ThisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
                     cCMO_CoolingPanel_Simple, ThisCP.EquipID, ThisCP.ZonePtr, ThisCP.SurfaceName(SurfNum), ErrorsFound);
                 ThisCP.FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 11);
                 if (ThisCP.FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");
-                    ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
+                    ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
                     ThisCP.TotSurfToDistrib = MaxFraction;
                 }
                 if (ThisCP.FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was less than the allowable minimum.");
-                    ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MinFraction, 2) + "].");
+                    ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MinFraction));
                     ThisCP.TotSurfToDistrib = MinFraction;
                 }
                 if (ThisCP.SurfacePtr(SurfNum) != 0) {
@@ -582,30 +586,31 @@ namespace CoolingPanelSimple {
             } // Surfaces
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups > 1.0");
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
                 (ThisCP.FracRadiant > MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups < 1.0");
-                ShowContinueError("This would result in some of the radiant energy delivered by the high temp radiant heater being lost.");
-                ShowContinueError("The sum of all radiation fractions to surfaces = " +
-                                  TrimSigDigits((AllFracsSummed - ThisCP.FracDistribPerson), 5));
-                ShowContinueError("The radiant fraction to people = " + TrimSigDigits(ThisCP.FracDistribPerson, 5));
-                ShowContinueError("So, all radiant fractions including surfaces and people = " + TrimSigDigits(AllFracsSummed, 5));
-                ShowContinueError(
-                    "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +
-                    TrimSigDigits((1.0 - AllFracsSummed), 5));
-                ShowContinueError("Please check and correct this so that all radiant energy is accounted for in " + cCMO_CoolingPanel_Simple + " = " +
+                ShowContinueError(state, "This would result in some of the radiant energy delivered by the high temp radiant heater being lost.");
+                ShowContinueError(state,
+                                  format("The sum of all radiation fractions to surfaces = {:.5T}", (AllFracsSummed - ThisCP.FracDistribPerson)));
+                ShowContinueError(state, format("The radiant fraction to people = {:.5T}", ThisCP.FracDistribPerson));
+                ShowContinueError(state, format("So, all radiant fractions including surfaces and people = {:.5T}", AllFracsSummed));
+                ShowContinueError(state,
+                                  format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater "
+                                         "would be = {:.5T}",
+                                         (1.0 - AllFracsSummed)));
+                ShowContinueError(state, "Please check and correct this so that all radiant energy is accounted for in " + cCMO_CoolingPanel_Simple + " = " +
                                   cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + cCMO_CoolingPanel_Simple + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, RoutineName + cCMO_CoolingPanel_Simple + "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils
@@ -736,7 +741,7 @@ namespace CoolingPanelSimple {
 
             // Initialize the environment and sizing flags
             MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf.allocate(NumOfZones);
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
             state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf = 0.0;
             state.dataChilledCeilingPanelSimple->CoolingPanelSource.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             state.dataChilledCeilingPanelSimple->CoolingPanelSource = 0.0;
@@ -765,8 +770,8 @@ namespace CoolingPanelSimple {
         if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
-                if (CheckZoneEquipmentList(cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
-                ShowSevereError("InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
+                if (CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
+                ShowSevereError(state, "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
@@ -777,13 +782,13 @@ namespace CoolingPanelSimple {
                 ScanPlantLoopsForObject(state,
                     ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
-                    ShowFatalError("InitCoolingPanel: Program terminated for previous conditions.");
+                    ShowFatalError(state, "InitCoolingPanel: Program terminated for previous conditions.");
                 }
                 state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum) = false;
             }
         }
 
-        if (!SysSizingCalc) {
+        if (!state.dataGlobal->SysSizingCalc) {
             if (state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel(CoolingPanelNum) && !state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
                 // for each cooling panel do the sizing once.
                 SizeCoolingPanel(state, CoolingPanelNum);
@@ -902,7 +907,7 @@ namespace CoolingPanelSimple {
         using DataHeatBalance::Zone;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -966,8 +971,8 @@ namespace CoolingPanelSimple {
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
-                        ShowSevereError(RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
-                        ShowContinueError("The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
+                        ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
+                        ShowContinueError(state, "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
                                           "Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\".");
                         ErrorsFound = true;
                     }
@@ -977,7 +982,7 @@ namespace CoolingPanelSimple {
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == CoolingDesignCapacity) {
                         if (ZoneSizingRunDone) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             SizingMethod = AutoCalculateSizing;
                             DataConstantUsedForSizing = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                             DataFractionUsedForSizing = 1.0;
@@ -989,14 +994,14 @@ namespace CoolingPanelSimple {
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         if (ZoneSizingRunDone) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
                         TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
                         DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                        CheckZoneSizing(CompType, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                         TempSize = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
@@ -1026,11 +1031,11 @@ namespace CoolingPanelSimple {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
+                    BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
             } else { // Autosize or hard-size with sizing run
                 if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
-                    PltSizCoolNum = MyPlantSizingIndex(CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
+                    PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
@@ -1040,35 +1045,34 @@ namespace CoolingPanelSimple {
                             WaterVolFlowMaxCoolDes = 0.0;
                         }
                     } else {
-                        ShowSevereError("Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                        ShowContinueError("Occurs in ZoneHVAC:CoolingPanel:RadiantConvective:Water Object=" + ThisCP.EquipID);
+                        ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
+                        ShowContinueError(state, "Occurs in ZoneHVAC:CoolingPanel:RadiantConvective:Water Object=" + ThisCP.EquipID);
                         ErrorsFound = true;
                     }
                 }
 
                 if (IsAutoSize) {
                     ThisCP.WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
+                    BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
                 } else { // hard-size with sizing data
                     if (ThisCP.WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                         WaterVolFlowMaxCoolUser = ThisCP.WaterVolFlowRateMax;
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                            ThisCP.EquipID,
                                            "Design Size Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolDes,
                                            "User-Specified Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage(
+                                ShowMessage(state,
                                     "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" +
                                     ThisCP.EquipID + "\".");
-                                ShowContinueError("User-Specified Maximum Cool Water Flow of " + RoundSigDigits(WaterVolFlowMaxCoolUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError("differs from Design Size Maximum Cool Water Flow of " + RoundSigDigits(WaterVolFlowMaxCoolDes, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                ShowContinueError(state, format("User-Specified Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
                         }
                     }
@@ -1079,11 +1083,11 @@ namespace CoolingPanelSimple {
         RegisterPlantCompDesignFlow(ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
 
         bool SizeCoolingPanelUASuccess;
-        SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA();
-        if (!SizeCoolingPanelUASuccess) ShowFatalError("SizeCoolingPanelUA: Program terminated for previous conditions.");
+        SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA(state);
+        if (!SizeCoolingPanelUASuccess) ShowFatalError(state, "SizeCoolingPanelUA: Program terminated for previous conditions.");
     }
 
-    bool CoolingPanelParams::SizeCoolingPanelUA()
+    bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1121,32 +1125,32 @@ namespace CoolingPanelSimple {
             // close to unity with some graciousness given in case the approximation of Cp causes a problem
             RatCapToTheoMax = 0.9999;
         } else if (RatCapToTheoMax >= 1.1) {
-            ShowSevereError("SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
+            ShowSevereError(state, "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
                             "] has a cooling capacity that is greater than the maximum possible value.");
-            ShowContinueError("The result of this is that a UA value is impossible to calculate.");
-            ShowContinueError("Check the rated input for temperatures, flow, and capacity for this unit.");
-            ShowContinueError("The ratio of the capacity to the rated theoretical maximum must be less than unity.");
-            ShowContinueError("The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the "
+            ShowContinueError(state, "The result of this is that a UA value is impossible to calculate.");
+            ShowContinueError(state, "Check the rated input for temperatures, flow, and capacity for this unit.");
+            ShowContinueError(state, "The ratio of the capacity to the rated theoretical maximum must be less than unity.");
+            ShowContinueError(state, "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the "
                               "rated flow being too low, rated temperatures being too close to each other, or all of those reasons.");
-            ShowContinueError("Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference "
+            ShowContinueError(state, "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference "
                               "between the rated temperatures.");
-            ShowContinueError(
+            ShowContinueError(state,
                 "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics.");
             SizeCoolingPanelUA = false;
             this->UA = 1.0;
         }
         if (Tinletr >= Tzoner) {
-            ShowSevereError("SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
+            ShowSevereError(state, "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
                             "] has a rated water temperature that is higher than the rated zone temperature.");
-            ShowContinueError("Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted.");
+            ShowContinueError(state, "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted.");
             SizeCoolingPanelUA = false;
             this->UA = 1.0;
         } else {
             this->UA = -MDotXCp * log(1.0 - RatCapToTheoMax);
             if (this->UA <= 0.0) {
-                ShowSevereError("SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
+                ShowSevereError(state, "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID +
                                 "] has a zero or negative calculated UA value.");
-                ShowContinueError(
+                ShowContinueError(state,
                     "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct.");
                 SizeCoolingPanelUA = false;
             }
@@ -1171,7 +1175,6 @@ namespace CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
@@ -1181,7 +1184,7 @@ namespace CoolingPanelSimple {
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1234,7 +1237,7 @@ namespace CoolingPanelSimple {
         waterMassFlowRateMax = this->WaterMassFlowRateMax;
         Xr = this->FracRadiant;
 
-        if (GetCurrentScheduleValue(this->SchedPtr) > 0) {
+        if (GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
             CoolingPanelOn = true;
         } else {
             CoolingPanelOn = false;
@@ -1255,7 +1258,7 @@ namespace CoolingPanelSimple {
         // iterate like in the low temperature radiant systems because the inlet water condition is known
         // not calculated.  So, we can deal with this upfront rather than after calculation and then more
         // iteration.
-        DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(ZoneNum), OutBaroPress);
+        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
         if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1268,18 +1271,18 @@ namespace CoolingPanelSimple {
                 waterMassFlowRate = 0.0;
                 CoolingPanelOn = false;
                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
-                        ShowWarningMessage(cCMO_CoolingPanel_Simple + " [" + this->EquipID +
+                        ShowWarningMessage(state, cCMO_CoolingPanel_Simple + " [" + this->EquipID +
                                            "] inlet water temperature below dew-point temperature--potential for condensation exists");
-                        ShowContinueError("Flow to the simple cooling panel will be shut-off to avoid condensation");
-                        ShowContinueError("Water inlet temperature = " + RoundSigDigits(waterInletTemp, 2));
-                        ShowContinueError("Zone dew-point temperature + safety delta T= " + RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
-                        ShowContinueErrorTimeStamp("");
-                        ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
-                                          " C safety was chosen in the input for the shut-off criteria");
+                        ShowContinueError(state, "Flow to the simple cooling panel will be shut-off to avoid condensation");
+                        ShowContinueError(state, format("Water inlet temperature = {:.2R}", waterInletTemp));
+                        ShowContinueError(state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + this->CondDewPtDeltaT));
+                        ShowContinueErrorTimeStamp(state, "");
+                        ShowContinueError(
+                            state, format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", this->CondDewPtDeltaT));
                     }
-                    ShowRecurringWarningErrorAtEnd(cCMO_CoolingPanel_Simple + " [" + this->EquipID + "] condensation shut-off occurrence continues.",
+                    ShowRecurringWarningErrorAtEnd(state, cCMO_CoolingPanel_Simple + " [" + this->EquipID + "] condensation shut-off occurrence continues.",
                                                    this->CondErrIndex,
                                                    DewPointTemp,
                                                    DewPointTemp,
@@ -1360,9 +1363,9 @@ namespace CoolingPanelSimple {
 
             if (CoolingPanelOn) {
 
-                this->SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+                this->SetCoolingPanelControlTemp(state, ControlTemp, ZoneNum);
 
-                SetPointTemp = GetCurrentScheduleValue(this->ColdSetptSchedPtr);
+                SetPointTemp = GetCurrentScheduleValue(state, this->ColdSetptSchedPtr);
                 OffTempCool = SetPointTemp - 0.5 * this->ColdThrottlRange;
                 FullOnTempCool = SetPointTemp + 0.5 * this->ColdThrottlRange;
 
@@ -1381,7 +1384,7 @@ namespace CoolingPanelSimple {
         }
 
         if (CoolingPanelOn) {
-            SetComponentFlowRate(
+            SetComponentFlowRate(state,
                 waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
             if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
         }
@@ -1445,7 +1448,7 @@ namespace CoolingPanelSimple {
         this->RadPower = RadHeat;
     }
 
-    void CoolingPanelParams::SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum)
+    void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1474,8 +1477,8 @@ namespace CoolingPanelSimple {
                 ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
             } else { // Should never get here
                 ControlTemp = MAT(ZoneNum);
-                ShowSevereError("Illegal control type in cooling panel system: " + this->EquipID);
-                ShowFatalError("Preceding condition causes termination.");
+                ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
+                ShowFatalError(state, "Preceding condition causes termination.");
             }
         }
     }
@@ -1493,7 +1496,6 @@ namespace CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -1505,10 +1507,10 @@ namespace CoolingPanelSimple {
 
         // First, update the running average if necessary...
         if (state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {
-            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) -= state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) * state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) / TimeStepZone;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) -= state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) * state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * TimeStepSys / TimeStepZone;
+        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) = state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum);
         state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) = SysTimeElapsed;
@@ -1604,7 +1606,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::QCoolingPanelSurf;
         using DataHeatBalFanSys::QCoolingPanelToPerson;
         using DataSurfaces::Surface;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1637,21 +1638,21 @@ namespace CoolingPanelSimple {
                     QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
-                        ShowSevereError("DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
-                        ShowContinueError("Surface = " + ThisSurf.Name);
-                        ShowContinueError("Surface area = " + RoundSigDigits(ThisSurf.Area, 3) + " [m2]");
-                        ShowContinueError("Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                        ShowContinueError("Radiation intensity = " + RoundSigDigits(ThisSurfIntensity, 2) + " [W/m2]");
-                        ShowContinueError("Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
-                        ShowFatalError("DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
+                        ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
+                        ShowContinueError(state, "Surface = " + ThisSurf.Name);
+                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
+                        ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                        ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
+                        ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
+                        ShowFatalError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
                     }
                 } else {
-                    ShowSevereError("DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
-                    ShowContinueError("Surface = " + ThisSurf.Name);
-                    ShowContinueError("Surface area = " + RoundSigDigits(ThisSurf.Area, 3) + " [m2]");
-                    ShowContinueError("Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
-                    ShowContinueError("Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
-                    ShowFatalError("DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
+                    ShowSevereError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
+                    ShowContinueError(state, "Surface = " + ThisSurf.Name);
+                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", ThisSurf.Area));
+                    ShowContinueError(state, "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
+                    ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple);
+                    ShowFatalError(state, "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux");
                 }
             }
         }
@@ -1707,7 +1708,6 @@ namespace CoolingPanelSimple {
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::SurfWinShadingFlag;
         using DataSurfaces::SurfWinFrameArea;
         using DataSurfaces::SurfWinProjCorrFrIn;
@@ -1734,7 +1734,7 @@ namespace CoolingPanelSimple {
 
             Area = ThisSurf.Area;
 
-            if (ThisSurf.Class == SurfaceClass_Window) {
+            if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)

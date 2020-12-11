@@ -55,9 +55,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -357,9 +357,9 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 }
 
 TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
@@ -400,7 +400,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
                                         "    0,                       !- Minimum Value of x",
                                         "    1;                       !- Maximum Value of x"});
     for (int i = 1; i <= 2; ++i) {
-        std::string const i_str = std::to_string(i);
+        std::string const i_str = fmt::to_string(i);
         idf_lines.push_back("Coil:WaterHeating:AirToWaterHeatPump:Wrapped,");
         idf_lines.push_back("    HPWH Coil " + i_str + ",               !- Name");
         idf_lines.push_back("    2349.6,                  !- Rated Heating Capacity {W}");
@@ -531,11 +531,11 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    WaterThermalTanks::GetWaterThermalTankInput(state);
+    WaterThermalTanks::GetWaterThermalTankInput(*state);
 
-    for (int i = 1; i <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++i) {
-        auto const &HPWH = state.dataWaterThermalTanks->HPWaterHeater(i);
-        auto const &Tank = state.dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
+    for (int i = 1; i <= state->dataWaterThermalTanks->numHeatPumpWaterHeater; ++i) {
+        auto const &HPWH = state->dataWaterThermalTanks->HPWaterHeater(i);
+        auto const &Tank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.CondWaterInletNode, Tank.SourceOutletNode);
         EXPECT_EQ(HPWH.CondWaterOutletNode, Tank.SourceInletNode);
     }
@@ -543,9 +543,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -725,12 +722,12 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
-    ASSERT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    ASSERT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
-    WaterThermalTanks::HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+    WaterThermalTanks::HeatPumpWaterHeaterData &HPWH = state->dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
     DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
     Tank.Node(1).SavedTemp = 51.190278176501131;
     Tank.Node(2).SavedTemp = 51.190445301209223;
@@ -761,23 +758,23 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     Tank.UseInletTemp = 15.624554988670047;
     Tank.AmbientTemp = 23.0;
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 10. / 60.;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 10. / 60.;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + SysTimeElapsed;
 
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
     OutputReportPredefined::pdstHeatCoil = -1;
-    state.dataWaterThermalTanks->mdotAir = 0.0993699992873531;
+    state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
-    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
+    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
 
-    Tank.CalcHeatPumpWaterHeater(state, false);
+    Tank.CalcHeatPumpWaterHeater(*state, false);
 
     const Real64 HeatFromCoil = Coil.TotalHeatingEnergyRate * TimeStepSys * 3600; // J
     Real64 TankEnergySum = 0;
@@ -799,7 +796,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     EXPECT_NEAR(HeatFromCoil, TankEnergySum, ErrorBound);
 
     // ValidateFuelType tests for WaterHeater:Stratified
-    WaterThermalTanks::getWaterHeaterStratifiedInput(state);
+    WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
     EXPECT_EQ(Tank.FuelType, "Electricity");
     EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
     EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
@@ -1031,20 +1028,20 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     bool ErrorsFound = false;
     int CompIndex = 1;
     Real64 SenseLoadMet = 0;
     Real64 LatLoadMet = 0;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHVACGlobals::TimeStepSys = 1;
-    SetPredefinedTables();
+    SetPredefinedTables(*state);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::MAT(1) = 20.0;
-    WaterThermalTanks::SimHeatPumpWaterHeater(state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state.dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
+    WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
+    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, DXCoils::DXCoil(1).RatedAirVolFlowRate(1));
 }
 
@@ -1230,7 +1227,7 @@ TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    bool ErrorsFound = WaterThermalTanks::GetWaterThermalTankInput(state);
+    bool ErrorsFound = WaterThermalTanks::GetWaterThermalTankInput(*state);
     EXPECT_TRUE(ErrorsFound);
     ASSERT_TRUE(ErrorsFound);
 
@@ -1395,49 +1392,49 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    SetPredefinedTables();
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    SetPredefinedTables(*state);
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
-    WaterThermalTanks::HeatPumpWaterHeaterData &HeatPump = state.dataWaterThermalTanks->HPWaterHeater(1);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+    WaterThermalTanks::HeatPumpWaterHeaterData &HeatPump = state->dataWaterThermalTanks->HPWaterHeater(1);
     DataHVACGlobals::HPWHInletDBTemp = 30.0;
-    DataEnvironment::WaterMainsTemp = 40.0;
+    state->dataEnvrn->WaterMainsTemp = 40.0;
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
     DXCoils::HPWHHeatingCapacity = 4000.0;
 
     DataLoopNode::Node(3).Temp = 30.0;
     DataLoopNode::Node(3).HumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
-    DataGlobals::WarmupFlag = true;
+    state->dataGlobal->WarmupFlag = true;
 
     //	HeatPump.SetPointTemp = 60.0, deadband = 2C, HP on at 58 C and off at 60 C
     //	Tank.SetPointTemp = 30.0, tank elements should not be used
     //	Tank.TankTemp = 60.0; // based on schedule
     //	Tank.SavedTankTemp = 60.0;
-    HeatPump.SaveMode = state.dataWaterThermalTanks->floatMode;
-    Tank.Mode = state.dataWaterThermalTanks->floatMode;
-    Tank.initialize(state, FirstHVACIteration);
-    DataGlobals::WarmupFlag = false;
-    Tank.initialize(state, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    HeatPump.SaveMode = state->dataWaterThermalTanks->floatMode;
+    Tank.Mode = state->dataWaterThermalTanks->floatMode;
+    Tank.initialize(*state, FirstHVACIteration);
+    state->dataGlobal->WarmupFlag = false;
+    Tank.initialize(*state, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
     EXPECT_NEAR(60.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(state.dataWaterThermalTanks->floatMode, HeatPump.Mode); // expect HP to remain in floating mode
+    EXPECT_EQ(state->dataWaterThermalTanks->floatMode, HeatPump.Mode); // expect HP to remain in floating mode
     EXPECT_NEAR(60.0, Tank.TankTempAvg, 0.0000001);         // average tank temp over time step
     EXPECT_NEAR(60.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 
@@ -1446,45 +1443,45 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     // HP in heating mode and tank at low temp needing full HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 50.0;
     Tank.SavedTankTemp = 50.0;
-    HeatPump.SaveMode = state.dataWaterThermalTanks->heatMode;
-    Tank.SavedMode = state.dataWaterThermalTanks->heatMode;
-    Tank.initialize(state, FirstHVACIteration);
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
+    Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
+    Tank.initialize(*state, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
     EXPECT_NEAR(57.2028862, Tank.TankTemp, 0.0000001); // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
-    EXPECT_EQ(state.dataWaterThermalTanks->heatMode, HeatPump.Mode);     // expect HP to remain in heating mode
+    EXPECT_EQ(state->dataWaterThermalTanks->heatMode, HeatPump.Mode);     // expect HP to remain in heating mode
     EXPECT_NEAR(53.6014431, Tank.TankTempAvg, 0.0000001);             // average tank temp over time step
     EXPECT_NEAR(53.6014431, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp needing only partial HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = state.dataWaterThermalTanks->heatMode;
-    Tank.SavedMode = state.dataWaterThermalTanks->heatMode;
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
+    Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
     EXPECT_NEAR(60.0011328, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.5548081, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(state.dataWaterThermalTanks->floatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
+    EXPECT_EQ(state->dataWaterThermalTanks->floatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
     EXPECT_NEAR(58.0005664, Tank.TankTempAvg, 0.0000001);       // average tank temp over time step
     EXPECT_NEAR(58.0005664, Tank.SourceOutletTemp, 0.0000001);  // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = state.dataWaterThermalTanks->heatMode;
-    Tank.SavedMode = state.dataWaterThermalTanks->heatMode;
+    HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
+    Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(state.dataWaterThermalTanks->floatMode,
+    EXPECT_EQ(state->dataWaterThermalTanks->floatMode,
               HeatPump.Mode); // expect HP to switch to floating mode since use nodes added sufficient heat to exceed set point
     EXPECT_NEAR(59.08095576, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(59.08095576, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
@@ -1492,16 +1489,16 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     // HP in floating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = state.dataWaterThermalTanks->floatMode;
-    Tank.SavedMode = state.dataWaterThermalTanks->floatMode;
+    HeatPump.SaveMode = state->dataWaterThermalTanks->floatMode;
+    Tank.SavedMode = state->dataWaterThermalTanks->floatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(state.dataWaterThermalTanks->floatMode,
+    EXPECT_EQ(state->dataWaterThermalTanks->floatMode,
               HeatPump.Mode); // expect HP to remain in floating mode since use nodes added sufficient heat to exceed set point
     EXPECT_NEAR(59.08095576, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(59.08095576, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
@@ -1510,21 +1507,21 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
     HeatPump.SetPointTemp = 30.0; // SP reduced below tank temperature while in heating mode
-    HeatPump.SaveMode = state.dataWaterThermalTanks->heatMode;
-    Tank.SavedMode = state.dataWaterThermalTanks->heatMode;
+    HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
+    Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.UseMassFlowRate = 0.0;
     Tank.UseInletTemp = 90.0;
-    Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should remain at 56 C since use nodes are not adding heat to tank and HP set point temp was reduced
     EXPECT_NEAR(56.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(state.dataWaterThermalTanks->floatMode, HeatPump.Mode); // expect HP to switch to floating mode since HP set point temperature was reduced
+    EXPECT_EQ(state->dataWaterThermalTanks->floatMode, HeatPump.Mode); // expect HP to switch to floating mode since HP set point temperature was reduced
     EXPECT_NEAR(56.0, Tank.TankTempAvg, 0.0000001);         // average tank temp over time step
     EXPECT_NEAR(56.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 
     // ValidateFuelType tests for WaterHeater:Mixed
-    WaterThermalTanks::getWaterHeaterMixedInputs(state);
+    WaterThermalTanks::getWaterHeaterMixedInputs(*state);
     EXPECT_EQ(Tank.FuelType, "Electricity");
     EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
     EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
@@ -1532,9 +1529,6 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1602,9 +1596,9 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
         auto &node = Tank.Node(i);
@@ -1613,19 +1607,19 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
     }
 
     Tank.TankTemp = 48.89;
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 10. / 60.;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 10. / 60.;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + SysTimeElapsed;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
     Tank.SetPointTemp = 48.89;
     Tank.SetPointTemp2 = Tank.SetPointTemp;
     Tank.UseMassFlowRate = 0.000189;
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     // Energy Use is negative relative to the tank
     ASSERT_LT(Tank.UseRate, 0.0);
@@ -1633,9 +1627,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1704,31 +1695,31 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
         auto &node = Tank.Node(i);
@@ -1747,13 +1738,13 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     Tank.SourceMassFlowRate = 5.0;
     Tank.TimeElapsed = 0.0;
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 15. / 60.;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 15. / 60.;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     // check source inlet and outlet temperatures are different
     EXPECT_EQ(Tank.SourceInletTemp, 5.0);
@@ -1762,9 +1753,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
 TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1825,19 +1813,19 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     int TankNum(1);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     Tank.TankTemp = 60.0;
     Tank.AmbientTempZone = 20.0;
     Tank.AmbientTemp = 20.0;
@@ -1851,7 +1839,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     // zero source mass flow rate
     Tank.SourceMassFlowRate = 0.0;
 
-    Tank.CalcWaterThermalTankMixed(state);
+    Tank.CalcWaterThermalTankMixed(*state);
 
     // steady state estimated tank skin heat loss rate (1 minute time step)
     Real64 TankSkinHeatLossRate = -Tank.OffCycLossFracToZone * Tank.OffCycLossCoeff * (Tank.AmbientTempZone - Tank.TankTempAvg);
@@ -1863,9 +1851,6 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1942,18 +1927,18 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 20.0 / 60.0;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     const int TankNum = 1;
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
         node.Temp = 60.0;
         node.SavedTemp = 60.0;
@@ -1967,7 +1952,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     Tank.UseMassFlowRate = 0.0;
     Tank.SourceMassFlowRate = 0.0;
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     std::vector<Real64> NodeTemps;
     NodeTemps.resize(Tank.Nodes);
@@ -1991,7 +1976,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
         node.SavedTemp = 58.05;
     }
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2014,7 +1999,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
     Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2031,7 +2016,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
         auto &node = Tank.Node[i];
         TankNodeEnergy += node.Mass * (NodeTemps[i] - PrevNodeTemps[i]);
     }
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
     TankNodeEnergy *= Cp;
     EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
 
@@ -2051,7 +2036,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
         node.SavedTemp = node.Temp;
     }
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     for (auto &node : Tank.Node) {
         EXPECT_LE(node.Temp, Tank.TankTempLimit);
@@ -2063,9 +2048,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -2142,22 +2124,22 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     const int TankNum = 1;
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;
-    Tank.SetupStratifiedNodes(state);
+    Tank.SetupStratifiedNodes(*state);
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 20.0 / 60.0;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
 
     // Test a constant temperature source flow rate
     for (auto &node : Tank.Node) {
@@ -2175,9 +2157,9 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     Tank.SourceMassFlowRate = 6.30901964e-5 * 997; // 1 gal/min
 
     int DummyIndex = 1;
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
 
-    Tank.CalcWaterThermalTankStratified(state);
+    Tank.CalcWaterThermalTankStratified(*state);
 
     Real64 EnergySum = 0.0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2191,9 +2173,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -2384,39 +2363,39 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum = 1;
     int DXNum = 1;
     bool FirstHVAC = true;
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
-    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state.dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
 
     // Inititate tank conditions
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
     // First iteration condition set (extreme)
@@ -2436,7 +2415,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Tank.Mode = 0;
     Tank.SetPointTemp = 50;
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
-    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     // FirsttimeThroughFlag attribute supposed to set as false after first run
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     // Advanced to next time step (0 => 1)
@@ -2449,7 +2428,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
     Tank.TankTemp = 20.0; // Assumed Tank temperature from previous iteration
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
-    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     EXPECT_EQ(Node(Desuperheater.WaterInletNode).Temp, 50);
     // Saved temperature not supposed to change
@@ -2463,7 +2442,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     FirstHVAC = false;
     Tank.TankTemp = 20.0;
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
-    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     // Flag changed from false to true
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
     // Saved temperature not supposed to change
@@ -2475,9 +2454,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -2618,24 +2594,24 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
     DataPlant::TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
@@ -2647,7 +2623,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     int CompNum(1);
     Real64 PLR(0.5);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     // Test if the new data Structure for water to air heat pump coils successfully initialized
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
@@ -2659,9 +2635,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).Temp = 15.0;
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
     PlantLoop.allocate(LoopNum);
-    PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
     PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
     PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
     auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
@@ -2673,18 +2649,18 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     CoilBranch.Comp(CompNum).TypeOf_Num = 67;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
-    state.dataGlobal->BeginEnvrnFlag = true;
-    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
-    EXPECT_EQ(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
-    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state.dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
         auto &node = Tank.Node(i);
@@ -2703,17 +2679,17 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Desuperheater.Mode = 1;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
 
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 1. / 60.;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1. / 60.;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
-    Tank.initialize(state, true);
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
+    Tank.initialize(*state, true);
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
-    Tank.CalcDesuperheaterWaterHeater(state, true);
+    Tank.CalcDesuperheaterWaterHeater(*state, true);
     // If there's no demand in water thermal tank, no heat is reclaimed
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
@@ -2728,10 +2704,10 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SourceMassFlowRate = 0.003;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
 
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
-    Tank.initialize(state, false);
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
+    Tank.initialize(*state, false);
     Desuperheater.SaveMode = 1;
-    Tank.CalcDesuperheaterWaterHeater(state, false);
+    Tank.CalcDesuperheaterWaterHeater(*state, false);
     // The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
     // The heater rate is correctly calculated
@@ -2742,9 +2718,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
 TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -3016,38 +2989,38 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
     int DXNum(1);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     // Source name and type successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
     EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).Name, "MULTISPEED_COIL");
     EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).SourceType, "Coil:Cooling:DX:MultiSpeed");
 
     // Initiate conditions for multispeed coil calculation
-    DataEnvironment::OutDryBulbTemp = 32.0;
-    DataEnvironment::OutHumRat = 0.02;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(32.0, 0.02, 101325.0);
+    state->dataEnvrn->OutDryBulbTemp = 32.0;
+    state->dataEnvrn->OutHumRat = 0.02;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 
     DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
@@ -3064,20 +3037,20 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
-    DXCoils::CalcMultiSpeedDXCoilCooling(state, DXNum, 1, 1, 2, 1, 1, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
     EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower);
 
     // Now move to the water thermal tank calculation
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
-    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state.dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
 
     // Inititate tank conditions
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
     Tank.TankTemp = 45.0;
     Tank.AmbientTemp = 20.0;
@@ -3093,7 +3066,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.Mode = 0;
     Tank.SetPointTemp = 40.0;
     Desuperheater.FirstTimeThroughFlag = true;
-    Tank.CalcDesuperheaterWaterHeater(state, true);
+    Tank.CalcDesuperheaterWaterHeater(*state, true);
 
     EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
@@ -3110,8 +3083,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.SaveMode = 0;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
-    DXCoils::CalcMultiSpeedDXCoilCooling(state, DXNum, 1, 1, 2, 1, 1, 1);
-    Tank.CalcDesuperheaterWaterHeater(state, false);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
+    Tank.CalcDesuperheaterWaterHeater(*state, false);
     EXPECT_EQ(Desuperheater.Mode, 0);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
     EXPECT_EQ(Tank.SourceRate, 0.0);
@@ -3119,9 +3092,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetDensityGlycol;
@@ -3181,30 +3151,30 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Schedules setup
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     int TankNum(1);
     int DemandSide(1);
     Real64 rho;
     int WaterIndex(1);
     bool NeedsHeatOrCool;
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
     // set tank temp to be alternate setpoint
     Tank.TankTemp = 70.0;
@@ -3213,27 +3183,27 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     // Source side is in the demand side of the plant loop
     Tank.SrcSide.loopSideNum = DemandSide;
     Tank.SavedSourceOutletTemp = 60.0;
-    rho = GetDensityGlycol(state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
+    rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
     DataLoopNode::Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
 
-    NeedsHeatOrCool = Tank.SourceHeatNeed(state, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    NeedsHeatOrCool = Tank.SourceHeatNeed(*state, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_FALSE(NeedsHeatOrCool);
 
     // set tank temp between 55 to 70 to enable alternate setpoint control
     Tank.TankTemp = 60.0;
-    NeedsHeatOrCool = Tank.SourceHeatNeed(state, 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    NeedsHeatOrCool = Tank.SourceHeatNeed(*state, 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_TRUE(NeedsHeatOrCool);
 
     // plant mass flow rate logic for firstHVAC mode not crashed
-    Tank.initialize(state, true);
+    Tank.initialize(*state, true);
     EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005 * rho);
 
     // plant mass flow rate logic added to other iterations run
-    Tank.initialize(state, false);
+    Tank.initialize(*state, false);
     EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005 * rho);
 }
 
@@ -3287,15 +3257,15 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     int TankNum(1);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
-    DataGlobals::HourOfDay = 0;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     Tank.AmbientTemp = -40;
@@ -3310,7 +3280,7 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankMixed
-    Tank.CalcWaterThermalTank(state);
+    Tank.CalcWaterThermalTank(*state);
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
@@ -3387,15 +3357,15 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     int TankNum(1);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
 
-    DataGlobals::HourOfDay = 0;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     for (auto &node : Tank.Node) {
@@ -3415,7 +3385,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankStratified
-    Tank.CalcWaterThermalTank(state);
+    Tank.CalcWaterThermalTank(*state);
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
@@ -3435,9 +3405,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -3679,44 +3646,44 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    // Inititate tank conditions
-    HourOfDay = 0;
-    TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    // Initiate tank conditions
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
     int DXNum = 1;
     bool FirstHVAC = true;
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     // first tank
-    WaterThermalTanks::WaterThermalTankData &Tank1 = state.dataWaterThermalTanks->WaterThermalTank(1);
+    WaterThermalTanks::WaterThermalTankData &Tank1 = state->dataWaterThermalTanks->WaterThermalTank(1);
     int desuperheaterNum1 = Tank1.DesuperheaterNum;
-    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater1 = state.dataWaterThermalTanks->WaterHeaterDesuperheater(desuperheaterNum1);
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater1 = state->dataWaterThermalTanks->WaterHeaterDesuperheater(desuperheaterNum1);
     // second tank
-    WaterThermalTanks::WaterThermalTankData &Tank2 = state.dataWaterThermalTanks->WaterThermalTank(2);
+    WaterThermalTanks::WaterThermalTankData &Tank2 = state->dataWaterThermalTanks->WaterThermalTank(2);
     int desuperheaterNum2 = Tank2.DesuperheaterNum;
-    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater2 = state.dataWaterThermalTanks->WaterHeaterDesuperheater(desuperheaterNum2);
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater2 = state->dataWaterThermalTanks->WaterHeaterDesuperheater(desuperheaterNum2);
 
-    for (auto &e : state.dataWaterThermalTanks->WaterThermalTank) {
+    for (auto &e : state->dataWaterThermalTanks->WaterThermalTank) {
         e.TankTemp = 20; // previous time step temperature
         e.UseInletTemp = 10;
         e.UseMassFlowRate = 0.0;
@@ -3725,7 +3692,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         e.Mode = 0;
         e.SetPointTemp = 50;
     }
-    for (auto &desuperheater : state.dataWaterThermalTanks->WaterHeaterDesuperheater) {
+    for (auto &desuperheater : state->dataWaterThermalTanks->WaterHeaterDesuperheater) {
         desuperheater.SetPointTemp = 55;
         desuperheater.Mode = 1;
     }
@@ -3735,7 +3702,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     // first tank heat reclaim
     // Call desuperheater calculation function
-    Tank1.CalcDesuperheaterWaterHeater(state, FirstHVAC);
+    Tank1.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater1.HeaterRate, 500 * 0.1);
     // Results stored in ata structs
@@ -3746,7 +3713,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     EXPECT_NEAR(Tank1.SourceRate, Desuperheater1.HeaterRate, Tank1.SourceRate * 0.05);
 
     // Call desuperheater calculation function
-    Tank2.CalcDesuperheaterWaterHeater(state, FirstHVAC);
+    Tank2.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater2.HeaterRate, 500 * 0.15);
     // Results stored in ata structs
@@ -4204,15 +4171,15 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    EXPECT_EQ(state.dataWaterThermalTanks->HPWaterHeater.size(), 2u);
-    EXPECT_EQ(state.dataWaterThermalTanks->numHeatPumpWaterHeater, 2);
+    EXPECT_EQ(state->dataWaterThermalTanks->HPWaterHeater.size(), 2u);
+    EXPECT_EQ(state->dataWaterThermalTanks->numHeatPumpWaterHeater, 2);
 
     int HPWaterHeaterNum = 1;
     {
-        auto const &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HPWaterHeaterNum);
-        auto const &HPWHTank = state.dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
+        auto const &HPWH = state->dataWaterThermalTanks->HPWaterHeater(HPWaterHeaterNum);
+        auto const &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.Name, "HPWHPUMPED");
         EXPECT_EQ(HPWHTank.Name, "HPWHPUMPED MIXED TANK");
         EXPECT_EQ(HPWH.CondWaterInletNode, HPWHTank.SourceOutletNode);
@@ -4221,7 +4188,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         EXPECT_EQ(HPWH.FanName, "HPWHPUMPED FANSYSTEMMODEL");
 
         // ValidateFuelType tests for WaterHeater:Mixed
-        WaterThermalTanks::getWaterHeaterMixedInputs(state);
+        WaterThermalTanks::getWaterHeaterMixedInputs(*state);
         EXPECT_EQ(HPWHTank.FuelType, "Steam");
         EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
         EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
@@ -4229,8 +4196,8 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
     ++HPWaterHeaterNum;
     {
-        auto const &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HPWaterHeaterNum);
-        auto const &HPWHTank = state.dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
+        auto const &HPWH = state->dataWaterThermalTanks->HPWaterHeater(HPWaterHeaterNum);
+        auto const &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.Name, "HPWHWRAPPED");
         EXPECT_EQ(HPWHTank.Name, "HPWHWRAPPED STRATIFIED TANK");
         EXPECT_EQ(HPWH.CondWaterInletNode, HPWHTank.SourceOutletNode);
@@ -4429,64 +4396,64 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    SetPredefinedTables();
-    ScheduleManager::UpdateScheduleValues(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    SetPredefinedTables(*state);
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     {
-        auto &HPWH = state.dataWaterThermalTanks->HPWaterHeater(1);
+        auto &HPWH = state->dataWaterThermalTanks->HPWaterHeater(1);
         EXPECT_EQ(HPWH.WaterHeaterTankNum, 1);
-        auto &HPWHTank = state.dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
+        auto &HPWHTank = state->dataWaterThermalTanks->WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWHTank.Name, "HPWHTANK");
 
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         DXCoils::HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
-        DataGlobals::WarmupFlag = true;
+        state->dataGlobal->WarmupFlag = true;
 
         //  HeatPump.SetPointTemp = 60.0, deadband = 2C, HP on at 58 C and off at 60 C
         //  Tank.SetPointTemp = 30.0, tank elements should not be used
         //  Tank.TankTemp = 60.0; // based on schedule
         //  Tank.SavedTankTemp = 60.0;
-        HPWH.SaveMode = state.dataWaterThermalTanks->floatMode;
-        HPWHTank.Mode = state.dataWaterThermalTanks->floatMode;
-        HPWHTank.initialize(state, FirstHVACIteration);
+        HPWH.SaveMode = state->dataWaterThermalTanks->floatMode;
+        HPWHTank.Mode = state->dataWaterThermalTanks->floatMode;
+        HPWHTank.initialize(*state, FirstHVACIteration);
     }
     {
-        WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(2);
+        WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(2);
         EXPECT_EQ(Tank.Name, "STANDALONE TANK");
         EXPECT_EQ(Tank.HeatPumpNum, 0);
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         DXCoils::HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
-        DataGlobals::WarmupFlag = true;
+        state->dataGlobal->WarmupFlag = true;
 
-        Tank.Mode = state.dataWaterThermalTanks->floatMode;
-        Tank.initialize(state, FirstHVACIteration);
+        Tank.Mode = state->dataWaterThermalTanks->floatMode;
+        Tank.initialize(*state, FirstHVACIteration);
     }
 }
 
@@ -4724,7 +4691,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // This returns true if ErrorsFound
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     // Previous warning before fix
     //std::string const error_string = delimited_string({
@@ -4998,7 +4965,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // This returns true if ErrorsFound
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     // Previous warning before fix
     //std::string const error_string = delimited_string({
@@ -5087,14 +5054,14 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveBlank
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    EXPECT_EQ(1, state.dataWaterThermalTanks->numWaterHeaterStratified);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
+    EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {
@@ -5188,14 +5155,14 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveZeroe
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    EXPECT_EQ(1, state.dataWaterThermalTanks->numWaterHeaterStratified);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
+    EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {
@@ -5287,14 +5254,14 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
-    EXPECT_EQ(1, state.dataWaterThermalTanks->numWaterHeaterStratified);
-    WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(1);
+    EXPECT_EQ(1, state->dataWaterThermalTanks->numWaterHeaterStratified);
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
     EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {

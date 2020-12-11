@@ -57,15 +57,14 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace DataGlobals;
 using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSizing;
@@ -109,7 +108,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ErrorsFound = false;
 
-    GetHighTempRadiantSystem(state, ErrorsFound);
+    GetHighTempRadiantSystem(*state, ErrorsFound);
 
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
@@ -153,7 +152,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     if (SizingTypesNum < 1) SizingTypesNum = 1;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-    SizeHighTempRadiantSystem(state, RadSysNum);
+    SizeHighTempRadiantSystem(*state, RadSysNum);
     EXPECT_FALSE(DataSizing::DataScalableSizingON);
 }
 

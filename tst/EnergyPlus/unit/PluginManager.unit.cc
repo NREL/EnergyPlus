@@ -50,6 +50,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/PluginManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -59,16 +60,16 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
 // this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
 
     // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager;
+    EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
 
     // first create a plugin variable
     pluginManager.addGlobalVariable("my_var");
-    int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle("my_var", true);
+    int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, "my_var", true);
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
     size_t const numValues = 4;
-    PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
+    PluginManagement::trends.emplace_back(*state, "TREND_VAR", numValues, globalVarIndex);
     int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
@@ -81,8 +82,8 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     // now pretend to run through a few simulation time steps, setting the value a few times and updating the trend
     std::vector<Real64> fakeValues = {3.14, 2.78, 12.0};
     for (int i = 0; i < 3; i++) {
-        EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(globalVarIndex, fakeValues[i]);
-        EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
+        EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(*state, globalVarIndex, fakeValues[i]);
+        EnergyPlus::PluginManagement::PluginManager::updatePluginValues(*state);
     }
 
     // now check the values at the end, it should still be zero at the oldest (fourth) item, and 12.0 at the recent

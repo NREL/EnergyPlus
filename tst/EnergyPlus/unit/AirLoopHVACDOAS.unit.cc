@@ -52,10 +52,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +81,6 @@
 using namespace EnergyPlus;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -3951,32 +3950,32 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::CosZoneRelNorth.allocate(6);
-    SurfaceGeometry::SinZoneRelNorth.allocate(6);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    ZoneEquipmentManager::GetZoneEquipment(state);
-    SimAirServingZones::GetAirPathData(state);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ZoneEquipmentManager::GetZoneEquipment(*state);
+    SimAirServingZones::GetAirPathData(*state);
     // OA inlet node
     DataLoopNode::Node(2).MassFlowRate = 0.1;
     DataLoopNode::Node(3).MassFlowRate = 0.1;
@@ -4000,7 +3999,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(65).HumRat = 0.001;
     DataLoopNode::Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS->airloopDOAS[0];
+    auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;
@@ -4008,7 +4007,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(11).HumRat = 0.0008;
     DataLoopNode::Node(70).TempSetPoint = 4.5;
     Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
-    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(state, true, index);
+    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet
     EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
@@ -4249,22 +4248,22 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    MixedAir::GetOutsideAirSysInputs(state);
+    MixedAir::GetOutsideAirSysInputs(*state);
     MixedAir::GetOASysInputFlag = false;
-    MixedAir::GetOAMixerInputs(state);
+    MixedAir::GetOAMixerInputs(*state);
 
-    DataAirSystems::PrimaryAirSystem.allocate(5);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PSZ-AC:1";
-    DataAirSystems::PrimaryAirSystem(2).Name = "PSZ-AC:2";
-    DataAirSystems::PrimaryAirSystem(3).Name = "PSZ-AC:3";
-    DataAirSystems::PrimaryAirSystem(4).Name = "PSZ-AC:4";
-    DataAirSystems::PrimaryAirSystem(5).Name = "PSZ-AC:5";
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(5);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PSZ-AC:1";
+    state->dataAirSystemsData->PrimaryAirSystems(2).Name = "PSZ-AC:2";
+    state->dataAirSystemsData->PrimaryAirSystems(3).Name = "PSZ-AC:3";
+    state->dataAirSystemsData->PrimaryAirSystems(4).Name = "PSZ-AC:4";
+    state->dataAirSystemsData->PrimaryAirSystems(5).Name = "PSZ-AC:5";
 
-    AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
+    AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(*state);
 
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
 }
 
 } // namespace EnergyPlus

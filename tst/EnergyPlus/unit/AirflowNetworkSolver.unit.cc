@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
@@ -83,7 +84,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     MultizoneSurfaceData(i).Height = 5.0;
     MultizoneSurfaceData(i).OpenFactor = 1.0;
 
-    solver.properties.resize(2);
+    solver.properties.clear();
+    for (int it = 0; it < 2; ++it) solver.properties.emplace_back(AirProperties(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
     solver.properties[0].density = 1.2;
     solver.properties[1].density = 1.18;
 
@@ -100,13 +102,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     Real64 multiplier = 1.0;
     Real64 control = 1.0;
 
-    NF = MultizoneCompHorOpeningData(1).calculate(state, 1, 0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
+    NF = MultizoneCompHorOpeningData(1).calculate(*state, 1, 0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = MultizoneCompHorOpeningData(1).calculate(state, 1, -0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
+    NF = MultizoneCompHorOpeningData(1).calculate(*state, 1, -0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -133,7 +135,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     DisSysCompCoilData[0].hydraulicDiameter = 1.0;
     DisSysCompCoilData[0].L = 1.0;
 
-    solver.properties.resize(2);
+    solver.properties.clear();
+    for (int it = 0; it < 2; ++it) solver.properties.emplace_back(AirProperties(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
     solver.properties[0].density = 1.2;
     solver.properties[1].density = 1.2;
 
@@ -145,13 +148,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     Real64 multiplier = 1.0;
     Real64 control = 1.0;
 
-    NF = DisSysCompCoilData[0].calculate(state, 1, 0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
+    NF = DisSysCompCoilData[0].calculate(*state, 1, 0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
     EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = DisSysCompCoilData[0].calculate(state, 1, -0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
+    NF = DisSysCompCoilData[0].calculate(*state, 1, -0.05, 1, multiplier, control, solver.properties[0], solver.properties[1], F, DF);
     EXPECT_NEAR( 294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);

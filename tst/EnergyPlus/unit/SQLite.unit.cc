@@ -55,6 +55,7 @@
 #include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -209,7 +210,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_informationalErrorRecords)
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    ShowMessage("This is an informational message");
+    ShowMessage(*state, "This is an informational message");
 
     auto result = queryResult("SELECT * FROM Errors;", "Errors");
     EnergyPlus::sqlite->sqliteCommit();

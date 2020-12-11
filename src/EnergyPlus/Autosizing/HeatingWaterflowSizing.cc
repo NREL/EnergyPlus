@@ -56,10 +56,10 @@ namespace EnergyPlus {
 
 Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     // component used AutoCalculate method to size value
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
@@ -79,12 +79,12 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                 } else {
                     Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                     if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                     }
                     Real64 CoilInTemp =
-                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                                   this->zoneEqSizing(this->curZoneEqNum),
                                                                   this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
@@ -109,7 +109,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                                               ", certain inputs are required. Add PlantLoop, Plant loop number and/or Water Coil water delta T.";
                             this->errorType = AutoSizingResultType::ErrorType1;
                             this->addErrorMessage(msg);
-                            ShowSevereError(msg);
+                            ShowSevereError(state, msg);
                         }
                     } else {
                         this->autoSizedValue = 0.0;
@@ -141,7 +141,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                             ", certain inputs are required. Add PlantLoop, Plant loop number, coil capacity and/or Water Coil water delta T.";
                         this->errorType = AutoSizingResultType::ErrorType1;
                         this->addErrorMessage(msg);
-                        ShowSevereError(msg);
+                        ShowSevereError(state, msg);
                     }
                 } else {
                     this->autoSizedValue = 0.0;
@@ -153,14 +153,14 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "maximum_water_flow_rate [m3/s]";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, DataGlobalConstants::HWInitConvTemp());
+        coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp());
         if (this->plantSizData.size() > 0 && this->dataPltSizHeatNum > 0) {
-            coilSelectionReportObj->setCoilWaterDeltaT(this->compName, this->compType, this->plantSizData(this->dataPltSizHeatNum).DeltaT);
-            coilSelectionReportObj->setCoilLvgWaterTemp(
+            coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, this->plantSizData(this->dataPltSizHeatNum).DeltaT);
+            coilSelectionReportObj->setCoilLvgWaterTemp(state,
                 this->compName, this->compType, DataGlobalConstants::HWInitConvTemp() - this->plantSizData(this->dataPltSizHeatNum).DeltaT);
         }
     }

@@ -80,13 +80,13 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataIPShortCuts;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::ScheduleManager;
@@ -128,10 +128,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    auto numZones = inputProcessor->getNumObjectsFound("Zone");
+    auto numZones = inputProcessor->getNumObjectsFound(*state, "Zone");
     ZoneReOrder.allocate(numZones);
-    GetZoneData(state, ErrorsFound);
-    GetAirFlowFlag(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
+    GetAirFlowFlag(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 }
 
@@ -161,13 +161,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -198,13 +198,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -229,8 +229,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     int NumNumbers(9);
 
     cCurrentModuleObject = "Zone";
-    NumOfZones = 2;
-    Zone.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 2;
+    Zone.allocate(state->dataGlobal->NumOfZones);
 
     // Set up a Zone object
     NumAlphas = 2;
@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     cAlphaArgs(2) = "ADAPTIVECONVECTIONALGORITHM"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 
     ErrorsFound = false;
-    ProcessZoneData(state, cCurrentModuleObject,
+    ProcessZoneData(*state, cCurrentModuleObject,
                     ZoneNum,
                     cAlphaArgs,
                     NumAlphas,
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     cAlphaArgs(1) = "Zone Two";      // Name
     cAlphaArgs(2) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(state, cCurrentModuleObject,
+    ProcessZoneData(*state, cCurrentModuleObject,
                     ZoneNum,
                     cAlphaArgs,
                     NumAlphas,
@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     cAlphaArgs(1) = "Zone Two"; // Name
     cAlphaArgs(2) = "TARP";     // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
     ErrorsFound = false;
-    ProcessZoneData(state, cCurrentModuleObject,
+    ProcessZoneData(*state, cCurrentModuleObject,
                     ZoneNum,
                     cAlphaArgs,
                     NumAlphas,
@@ -357,11 +357,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     // call to get valid window material types
     ErrorsFound = false;
-    GetConstructData(state, ErrorsFound); // returns ErrorsFound as false since all layers are valid
+    GetConstructData(*state, ErrorsFound); // returns ErrorsFound as false since all layers are valid
     EXPECT_FALSE(ErrorsFound);
 
     // Clear shared arrays that were allocated in GetConstructData
-    state.dataConstruction->Construct.deallocate();
+    state->dataConstruction->Construct.deallocate();
 
     // call to get invalid window material type
     //		Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -457,9 +457,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     bool ErrorsFound(false); // If errors detected in input
 
     // call to process input
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -467,18 +467,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
     // setup mixing and infiltration objects
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(*state);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(state, ErrorsFound);
+    GetSimpleAirModelInputs(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
-    ZoneEquipConfig.allocate(NumOfZones);
+    ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -536,14 +536,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
-    state.dataAirLoop->AirLoopFlow.allocate(1);
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(1).OASysExists = true;
+    state->dataAirLoop->AirLoopFlow.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
     Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
     Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
@@ -560,13 +560,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    state.dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
-    state.dataAirLoop->AirLoopFlow(1).MaxOutAir = state.dataAirLoop->AirLoopFlow(1).OAFlow;
+    state->dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance(state, false);
+    CalcZoneMassBalance(*state, false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -576,8 +576,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneReOrder.deallocate();
     ZoneEquipConfig.deallocate();
     Node.deallocate();
-    PrimaryAirSystem.deallocate();
-    state.dataAirLoop->AirLoopFlow.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
 }
 
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -666,15 +666,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(state, ErrorsFound);
+    GetSimpleAirModelInputs(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(state, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -726,26 +726,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 {
 
-    WarmupFlag = false;
-    state.dataGlobal->DayOfSim = 7;
+    state->dataGlobal->WarmupFlag = false;
+    state->dataGlobal->DayOfSim = 7;
     MinNumberOfWarmupDays = 25;
-    NumOfZones = 1;
-    WarmupConvergenceValues.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 1;
+    WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
     TempConvergTol = 0.01;
     LoadsConvergTol = 0.01;
-    MaxTempPrevDay.allocate(NumOfZones);
+    MaxTempPrevDay.allocate(state->dataGlobal->NumOfZones);
     MaxTempPrevDay(1) = 23.0;
-    MaxTempZone.allocate(NumOfZones);
+    MaxTempZone.allocate(state->dataGlobal->NumOfZones);
     MaxTempZone(1) = 23.0;
-    MinTempPrevDay.allocate(NumOfZones);
+    MinTempPrevDay.allocate(state->dataGlobal->NumOfZones);
     MinTempPrevDay(1) = 23.0;
-    MinTempZone.allocate(NumOfZones);
+    MinTempZone.allocate(state->dataGlobal->NumOfZones);
     MinTempZone(1) = 23.0;
-    MaxHeatLoadZone.allocate(NumOfZones);
-    MaxHeatLoadPrevDay.allocate(NumOfZones);
+    MaxHeatLoadZone.allocate(state->dataGlobal->NumOfZones);
+    MaxHeatLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
-    MaxCoolLoadZone.allocate(NumOfZones);
-    MaxCoolLoadPrevDay.allocate(NumOfZones);
+    MaxCoolLoadZone.allocate(state->dataGlobal->NumOfZones);
+    MaxCoolLoadPrevDay.allocate(state->dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
 
     // Test 1: All Maxs both less than MinLoad (100.0)
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 90.0;
     MaxCoolLoadZone(1) = 50.0;
     MaxCoolLoadPrevDay(1) = 90.0;
-    CheckWarmupConvergence(state);
+    CheckWarmupConvergence(*state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 90.0;
     MaxCoolLoadZone(1) = 100.5;
     MaxCoolLoadPrevDay(1) = 90.0;
-    CheckWarmupConvergence(state);
+    CheckWarmupConvergence(*state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 100.5;
     MaxCoolLoadZone(1) = 90.0;
     MaxCoolLoadPrevDay(1) = 100.5;
-    CheckWarmupConvergence(state);
+    CheckWarmupConvergence(*state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 200.0;
     MaxCoolLoadZone(1) = 201.0;
     MaxCoolLoadPrevDay(1) = 200.0;
-    CheckWarmupConvergence(state);
+    CheckWarmupConvergence(*state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 200.0;
     MaxCoolLoadZone(1) = 210.0;
     MaxCoolLoadPrevDay(1) = 200.0;
-    CheckWarmupConvergence(state);
+    CheckWarmupConvergence(*state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 1);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 1);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
@@ -1208,18 +1208,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(state);
+    ScheduleManager::ProcessScheduleInput(*state);
 
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
@@ -1250,22 +1250,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataHeatBalance::HConvIn(5) = 0.5;
     DataHeatBalance::HConvIn(6) = 0.5;
 
-    DataGlobals::KickOffSimulation = true;
+    state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state->dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
-    OutAirNodeManager::GetOutAirNodesInput(state);
-    DataEnvironment::OutBaroPress = 101325;
+    OutAirNodeManager::GetOutAirNodesInput(*state);
+    state->dataEnvrn->OutBaroPress = 101325;
     ScheduleManager::Schedule(1).CurrentValue = 25.0;
     ScheduleManager::Schedule(2).CurrentValue = 20.0;
     ScheduleManager::Schedule(3).CurrentValue = 1.5;
     ScheduleManager::Schedule(4).CurrentValue = 90.0;
 
-    OutAirNodeManager::InitOutAirNodes();
+    OutAirNodeManager::InitOutAirNodes(*state);
 
     // Test if local nodes data correctly overwritten
     EXPECT_EQ(25.0, DataLoopNode::Node(1).OutAirDryBulb);
@@ -1275,7 +1275,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance(state);
+    InitHeatBalance(*state);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1288,12 +1288,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::OutWetBulbTemp = 20.0;
-    DataEnvironment::WindSpeed = 1.5;
-    DataEnvironment::WindDir = 90.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutWetBulbTemp = 20.0;
+    state->dataEnvrn->WindSpeed = 1.5;
+    state->dataEnvrn->WindDir = 90.0;
 
-    InitHeatBalance(state);
+    InitHeatBalance(*state);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1330,7 +1330,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1360,7 +1360,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1567,40 +1567,40 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(state);
-    state.dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
-    state.dataWeatherManager->Envrn = 1;
+    SimulationManager::ManageSimulation(*state);
+    state->dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
+    state->dataWeatherManager->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 11;
-    DataGlobals::CurrentTime = 11.0;
-    WeatherManager::SetCurrentWeather(state);
-    HeatBalanceManager::ManageHeatBalance(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 11;
+    state->dataGlobal->CurrentTime = 11.0;
+    WeatherManager::SetCurrentWeather(*state);
+    HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(state);
+    HeatBalanceManager::ManageHeatBalance(*state);
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
-    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", state.dataConstruction->Construct);
+    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
-    Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    Real64 refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 14;
-    DataGlobals::CurrentTime = 14.0;
-    WeatherManager::SetCurrentWeather(state);
-    HeatBalanceManager::ManageHeatBalance(state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 14;
+    state->dataGlobal->CurrentTime = 14.0;
+    WeatherManager::SetCurrentWeather(*state);
+    HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(state);
-    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", state.dataConstruction->Construct);
+    HeatBalanceManager::ManageHeatBalance(*state);
+    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
-    refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
 }
 
@@ -1618,7 +1618,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state, errorsfound);
+    HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1645,7 +1645,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state, errorsfound);
+    HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1671,7 +1671,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state, errorsfound);
+    HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1694,7 +1694,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state, errorsfound);
+    HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1717,7 +1717,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state, errorsfound);
+    HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1766,7 +1766,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, errorsfound);
+    HeatBalanceManager::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
@@ -1807,11 +1807,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1829,53 +1829,53 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     // get constructions
     ErrorsFound = false;
-    GetConstructData(state, ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), state.dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Non-Grouped Air Boundary"));
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state.dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryMixingSched, -1);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), state->dataConstruction->Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Non-Grouped Air Boundary"));
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, -1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state.dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state.dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state.dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 1);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
 }
@@ -1900,7 +1900,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
@@ -1908,7 +1908,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // get constructions
     ErrorsFound = false;
-    GetConstructData(state, ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -1921,18 +1921,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 1);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state.dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.1);
-    EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.1);
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
@@ -1948,7 +1948,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
 
     ASSERT_FALSE(ErrorsFound);
 
@@ -1971,21 +1971,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalance::TotConstructs = 3;
-    state.dataConstruction->Construct.allocate( DataHeatBalance::TotConstructs);
+    state->dataConstruction->Construct.allocate( DataHeatBalance::TotConstructs);
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
-    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Window;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(2).Construction = 2;
     DataSurfaces::Surface(3).Construction = 3;
-    state.dataConstruction->Construct(1).WindowTypeBSDF = false;
-    state.dataConstruction->Construct(2).WindowTypeBSDF = false;
-    state.dataConstruction->Construct(3).WindowTypeBSDF = true;
+    state->dataConstruction->Construct(1).WindowTypeBSDF = false;
+    state->dataConstruction->Construct(2).WindowTypeBSDF = false;
+    state->dataConstruction->Construct(3).WindowTypeBSDF = true;
     int SurfsForRegWindow = 3;
-    state.dataConstruction->Construct(1).TotLayers = 1;
-    state.dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
-    state.dataConstruction->Construct(3).TotLayers = 1;
+    state->dataConstruction->Construct(1).TotLayers = 1;
+    state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
+    state->dataConstruction->Construct(3).TotLayers = 1;
 
     SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
@@ -2000,7 +2000,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 
     Real64 ZeroResult = 0.0;
 
-    HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin(state);
+    HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin(*state);
 
     // First surface is NOT a window so these should NOT be set
     EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,1),ZeroResult,0.0001);
@@ -2042,7 +2042,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }
@@ -2245,7 +2245,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state);
+    SimulationManager::ManageSimulation(*state);
 
     int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);

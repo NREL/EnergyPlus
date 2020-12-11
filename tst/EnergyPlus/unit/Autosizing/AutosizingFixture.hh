@@ -47,5 +47,6 @@
 
 #include <gtest/gtest.h>
 #include "../Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 class AutoSizingFixture : public EnergyPlus::EnergyPlusFixture {};

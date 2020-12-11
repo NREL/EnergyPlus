@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+//C++ Headers
+#include <utility>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -179,7 +182,6 @@ namespace DataSystemVariables {
     bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
     std::string envinputpath1;
     std::string envinputpath2;
-    std::string envprogrampath;
     bool TestAllPaths(false);
     int iEnvSetThreads(0);
     bool lEnvSetThreadsInput(false);
@@ -200,7 +202,8 @@ namespace DataSystemVariables {
     void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName              // Blank if not found.
+                                std::string &CheckedFileName,             // Blank if not found.
+                                const std::string contextString           //
     )
     {
 
@@ -215,32 +218,17 @@ namespace DataSystemVariables {
         // be accurate. This searches a few folders (CurrentWorkingFolder, Program folder) to see
         // if the file can be found. (It may have been input with full path so that is checked first.)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
         if (firstTime) {
-            state.files.audit.ensure_open("CheckForActualFileName", state.files.outputControl.audit);
+            state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -251,81 +239,51 @@ namespace DataSystemVariables {
             firstTime = false;
         }
 
-
         FileFound = false;
         CheckedFileName.clear();
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        if (FileSystem::fileExists(InputFileName)) {
-            FileFound = true;
-            CheckedFileName = InputFileName;
-            print(state.files.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
+        std::vector<std::pair<std::string, std::string>> pathsChecked;
+
+        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {{
+            {InputFileName, "Current Working Directory"},
+            {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
+            {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
+            {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
+            {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
+            {CurrentWorkingFolder + InputFileName, "INI File Directory"},
+            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
+        };
+
+        std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
+
+        for(std::size_t i = 0; i < numPathsToNotTest; i++) {
+            if (FileSystem::fileExists(pathsToCheck[i].first)) {
+                FileFound = true;
+                CheckedFileName = pathsToCheck[i].first;
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
+                return;
+            } else {
+                std::pair <std::string,std::string> currentPath(getParentDirectoryPath(getAbsolutePath(pathsToCheck[i].first)), pathsToCheck[i].second);
+                bool found = false;
+                for(auto path: pathsChecked){
+                    if (path.first == currentPath.first){
+                        found = true;
+                    }
+                }
+                if (!found){
+                    pathsChecked.push_back(currentPath);
+                }
+                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
+            }
         }
-
-        // Look relative to input file path
-        if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
-        }
-
-        // Look relative to input path
-        if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envinputpath1 + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
-        }
-
-        // Look relative to input path
-        if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envinputpath2 + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
-        }
-
-        // Look relative to program path
-        if (FileSystem::fileExists(envprogrampath + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envprogrampath + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
-        }
-
-        if (!TestAllPaths) return;
-
-        // Look relative to current working folder
-        if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = CurrentWorkingFolder + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
-        }
-
-        // Look relative to program path
-        if (FileSystem::fileExists(ProgramPath + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = ProgramPath + InputFileName;
-            print(state.files.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            print(state.files.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
+        if (!FileFound) {
+            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found.");
+            ShowContinueError(state, "  Paths searched:");
+            for(auto path: pathsChecked){
+                ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
+            }
         }
     }
 
@@ -392,28 +350,28 @@ namespace DataSystemVariables {
         if (state.dataGlobal->AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
-        DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::DisplayAllWarnings) {
-            DataGlobals::DisplayAllWarnings = true;
-            DataGlobals::DisplayExtraWarnings = true;
-            DataGlobals::DisplayUnusedSchedules = true;
-            DataGlobals::DisplayUnusedObjects = true;
+        state.dataGlobal->DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->DisplayAllWarnings) {
+            state.dataGlobal->DisplayAllWarnings = true;
+            state.dataGlobal->DisplayExtraWarnings = true;
+            state.dataGlobal->DisplayUnusedSchedules = true;
+            state.dataGlobal->DisplayUnusedObjects = true;
         }
 
         get_environment_variable(cDisplayExtraWarnings, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayUnusedObjects, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cReportDuringWarmup, cEnvValue);
         if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
@@ -427,10 +385,10 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSortIDD, cEnvValue);
         if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
@@ -442,10 +400,10 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSutherlandHodgman, cEnvValue);
         if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
@@ -470,7 +428,7 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
 
     }
 

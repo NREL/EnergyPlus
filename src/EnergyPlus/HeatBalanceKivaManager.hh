@@ -113,7 +113,7 @@ namespace HeatBalanceKivaManager {
         void setBoundaryConditions(EnergyPlusData &state);
         void plotDomain();
         Real64 floorWeight;
-        int constructionNum;
+        int constructionNum = 0;
         class KivaManager* kmPtr;
 
 #ifdef GROUND_PLOT
@@ -133,10 +133,10 @@ namespace HeatBalanceKivaManager {
         bool setupKivaInstances(EnergyPlusData &state);
         void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances(EnergyPlusData &state);
-        void defineDefaultFoundation();
+        void defineDefaultFoundation(EnergyPlusData &state);
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        void calcKivaSurfaceResults();
+        void calcKivaSurfaceResults(EnergyPlusData &state);
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;

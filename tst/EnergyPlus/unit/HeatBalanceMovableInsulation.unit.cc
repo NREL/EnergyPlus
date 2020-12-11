@@ -61,6 +61,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -90,17 +91,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
     dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
     dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+    EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
 
@@ -125,17 +126,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
     dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
     dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
-    EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
+    EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
 TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGlazingTest)
@@ -229,43 +230,43 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // set error to false
     bool ErrorsFound(false);
     // set zone data
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ZONE ONE";
     // get schedule data
-    ScheduleManager::ProcessScheduleInput(state);
+    ScheduleManager::ProcessScheduleInput(*state);
     // get materials data
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, DataHeatBalance::TotMaterials);
     EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
     DataSurfaces::TotSurfaces = 1;
-    SurfaceGeometry::SurfaceTmp.allocate(1);
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
     Array1D_string const BaseSurfCls(1, {"WALL"});
-    Array1D_int const BaseSurfIDs(1, {1});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
     int NeedToAddSurfaces;
     // get heat tranfer surface data
-    SurfaceGeometry::GetHTSurfaceData(state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    SurfaceGeometry::GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
     // get movable insulation object data
-    SurfaceGeometry::GetMovableInsulationData(state, ErrorsFound);
+    SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
     // check movable insulation material
-    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
-    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
     EXPECT_EQ(dataMaterial.Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
     EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
     EXPECT_TRUE(ErrorsFound);                                                            // error found due to invalid material
