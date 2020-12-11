@@ -963,7 +963,6 @@ namespace RoomAirModelUserTempPattern {
         // sets values in Heat balance variables
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::TempEffBulkAir;
         using DataHeatBalance::Zone;
@@ -1050,7 +1049,7 @@ namespace RoomAirModelUserTempPattern {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state, OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                      DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -1102,7 +1101,7 @@ namespace RoomAirModelUserTempPattern {
             Node(ReturnNode).Press = Node(ZoneNode).Press;
 
             H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio

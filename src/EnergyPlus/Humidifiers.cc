@@ -102,9 +102,6 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::OutHumRat;
     using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
@@ -814,7 +811,7 @@ namespace Humidifiers {
                     if (CurOASysNum > 0) {
                         // size to outdoor air volume flow rate if available
                         if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
-                            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutDryBulbTemp, OutHumRat, CalledFrom);
+                            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, CalledFrom);
                             MassFlowDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow * AirDensity;
                             InletHumRatDes = std::min(FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatOutHumRat);
                             OutletHumRatDes = std::max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);
@@ -832,7 +829,7 @@ namespace Humidifiers {
                                 AirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
                             }
                             AirDensity = PsyRhoAirFnPbTdbW(state,
-                                OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                                state.dataEnvrn->OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                             MassFlowDes = AirVolFlow * AirDensity;
                             InletHumRatDes = min(FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatMixHumRat);
                             OutletHumRatDes = max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);
@@ -851,7 +848,7 @@ namespace Humidifiers {
                             AirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
                         }
                         AirDensity = PsyRhoAirFnPbTdbW(state,
-                            OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                            state.dataEnvrn->OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                         MassFlowDes = AirVolFlow * AirDensity;
                         InletHumRatDes = std::min(FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatMixHumRat);
                         OutletHumRatDes = std::max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);
@@ -1020,7 +1017,7 @@ namespace Humidifiers {
         if (AirInMassFlowRate <= SmallMassFlow) UnitOn = false;
         if (GetCurrentScheduleValue(state, SchedPtr) <= 0.0) UnitOn = false;
         if (AirInHumRat >= HumRatSet) UnitOn = false;
-        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, OutBaroPress, RoutineName);
+        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
         if (AirInHumRat >= HumRatSatIn) UnitOn = false;
         if (UnitOn) {
             // AirMassFlowRate*AirInHumRat + WaterAddNeeded = AirMassFlowRate*HumRatSet
@@ -1079,7 +1076,7 @@ namespace Humidifiers {
         // crosses the saturation line.
         Real64 WaterDens; // density of liquid water [kg/m3]
 
-        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, OutBaroPress, RoutineName);
+        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
@@ -1095,7 +1092,7 @@ namespace Humidifiers {
             AirOutEnthalpy = (AirInMassFlowRate * AirInEnthalpy + WaterAddNeededMax * WaterInEnthalpy) / AirInMassFlowRate;
             AirOutHumRat = (AirInMassFlowRate * AirInHumRat + WaterAddNeededMax) / AirInMassFlowRate;
             AirOutTemp = PsyTdbFnHW(AirOutEnthalpy, AirOutHumRat);
-            HumRatSatOut = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, OutBaroPress, RoutineName);
+            HumRatSatOut = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
             if (AirOutHumRat <= HumRatSatOut) {
                 // If the outlet condition is below the saturation curve, the desired moisture addition rate can be met.
                 WaterAdd = WaterAddNeededMax;
@@ -1118,7 +1115,7 @@ namespace Humidifiers {
                 // This point isn't quite on the saturation curve since we made a linear approximation of the curve,
                 // but the temperature should be very close to the correct outlet temperature. We will use this temperature
                 // as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy
-                AirOutHumRat = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, OutBaroPress, RoutineName);
+                AirOutHumRat = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
                 AirOutEnthalpy = PsyHFnTdbW(AirOutTemp, AirOutHumRat);
                 WaterAdd = AirInMassFlowRate * (AirOutHumRat - AirInHumRat);
             }
@@ -1160,7 +1157,6 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::WaterMainsTemp;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -1193,7 +1189,7 @@ namespace Humidifiers {
         int RefrigerantIndex;           // refiferant index
         int WaterIndex;                 // fluid type index
 
-        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, OutBaroPress, RoutineName);
+        HumRatSatIn = PsyWFnTdbRhPb(state, AirInTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
@@ -1209,7 +1205,7 @@ namespace Humidifiers {
             AirOutEnthalpy = (AirInMassFlowRate * AirInEnthalpy + WaterAddNeededMax * WaterInEnthalpy) / AirInMassFlowRate;
             AirOutHumRat = (AirInMassFlowRate * AirInHumRat + WaterAddNeededMax) / AirInMassFlowRate;
             AirOutTemp = PsyTdbFnHW(AirOutEnthalpy, AirOutHumRat);
-            HumRatSatOut = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, OutBaroPress, RoutineName);
+            HumRatSatOut = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
             if (AirOutHumRat <= HumRatSatOut) {
                 // If the outlet condition is below the saturation curve, the desired moisture addition rate can be met.
                 WaterAdd = WaterAddNeededMax;
@@ -1232,7 +1228,7 @@ namespace Humidifiers {
                 // This point isn't quite on the saturation curve since we made a linear approximation of the curve,
                 // but the temperature should be very close to the correct outlet temperature. We will use this temperature
                 // as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy
-                AirOutHumRat = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, OutBaroPress, RoutineName);
+                AirOutHumRat = PsyWFnTdbRhPb(state, AirOutTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
                 AirOutEnthalpy = PsyHFnTdbW(AirOutTemp, AirOutHumRat);
                 WaterAdd = AirInMassFlowRate * (AirOutHumRat - AirInHumRat);
             }
@@ -1250,7 +1246,7 @@ namespace Humidifiers {
                 if (SuppliedByWaterSystem) { // use water use storage tank supply temperature
                     CurMakeupWaterTemp = state.dataWaterData->WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
                 } else { // use water main temperature
-                    CurMakeupWaterTemp = WaterMainsTemp;
+                    CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
                 }
                 Tref = CurMakeupWaterTemp;
                 RefrigerantIndex = FindRefrigerant(state, fluidNameSteam);

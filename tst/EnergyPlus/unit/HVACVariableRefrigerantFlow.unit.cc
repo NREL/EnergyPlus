@@ -139,17 +139,17 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
+        state->dataEnvrn->OutBaroPress = 101325.0;
         DataSizing::DesDayWeath.allocate(1);
         DataSizing::DesDayWeath(1).Temp.allocate(1);
         DataSizing::DesDayWeath(1).Temp(1) = 35.0;
         state->dataGlobal->BeginEnvrnFlag = true;
-        DataEnvironment::OutDryBulbTemp = 35.0;
-        DataEnvironment::OutHumRat = 0.012;
-        DataEnvironment::OutWetBulbTemp =
-            Psychrometrics::PsyTwbFnTdbWPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::StdPressureSeaLevel);
-        DataEnvironment::OutBaroPress = 101325;          // sea level
+        state->dataEnvrn->OutDryBulbTemp = 35.0;
+        state->dataEnvrn->OutHumRat = 0.012;
+        state->dataEnvrn->OutWetBulbTemp =
+            Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
+        state->dataEnvrn->OutBaroPress = 101325;          // sea level
         DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
         int numZones = state->dataGlobal->NumOfZones = 5;
@@ -286,7 +286,7 @@ protected:
         finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
         finalZoneSizing.HeatDesTemp = 30.0;
         finalZoneSizing.HeatDesHumRat = 0.007;
-        finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * DataEnvironment::StdRhoAir;
+        finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
         finalZoneSizing.TimeStepNumAtCoolMax = 1;
         finalZoneSizing.CoolDDNum = 1;
 
@@ -531,7 +531,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 {
 
     static std::string const RoutineName("VRF_SysModel_inAirloop");
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     int curSysNum = DataSizing::CurSysNum = 1;
     int curZoneNum = 1;
     int curTUNum = 1;
@@ -563,12 +563,12 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     Node(VRFTUOAMixerOANodeNum).Temp = 35.0;
     Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
     Node(VRFTUOAMixerOANodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerOANodeNum).Temp, Node(VRFTUOAMixerOANodeNum).HumRat);
-    Node(VRFTUOAMixerOANodeNum).Press = DataEnvironment::OutBaroPress;
+    Node(VRFTUOAMixerOANodeNum).Press = state->dataEnvrn->OutBaroPress;
 
     Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
     Node(VRFTUOAMixerRetNodeNum).HumRat = 0.01;
     Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerRetNodeNum).Temp, Node(VRFTUOAMixerRetNodeNum).HumRat);
-    Node(VRFTUOAMixerRetNodeNum).Press = DataEnvironment::OutBaroPress;
+    Node(VRFTUOAMixerRetNodeNum).Press = state->dataEnvrn->OutBaroPress;
 
     bool FirstHVACIteration = true;
     Real64 SysOutputProvided = 0.0;
@@ -612,7 +612,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     Node(VRFTUOAMixerRetNodeNum).Temp = 18.0;
     Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
     Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerRetNodeNum).Temp, Node(VRFTUOAMixerRetNodeNum).HumRat);
-    DataEnvironment::OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
     Node(VRF(curSysNum).CondenserNodeNum).Temp = 10.0;
     Node(VRFTUOAMixerOANodeNum).Temp = 10.0;
 
@@ -2247,9 +2247,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
     ProcessScheduleInput(*state);                    // read schedules
@@ -2292,7 +2292,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 Temperature = 44;      // temperature to be returned [C]
         std::string CalledFrom = "EnergyPlusFixture:VRF_FluidTCtrl_VRFOU_Compressor";
 
-        DataEnvironment::OutDryBulbTemp = 10.35;
+        state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
         Temperature = GetSupHeatTempRefrig(*state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
@@ -2326,7 +2326,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 CompSpdActual;               // Actual compressor running speed [rps]
         Real64 Ncomp;                       // compressor power [W]
 
-        DataEnvironment::OutDryBulbTemp = 10.35;
+        state->dataEnvrn->OutDryBulbTemp = 10.35;
 
         // Run
         VRF(VRFCond).VRFHR_OU_HR_Mode(*state,
@@ -2514,7 +2514,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     VRF(VRFCond).C3Tc = 0.075;
 
     // Pre-process
-    DataEnvironment::OutBaroPress = OutBaroPress;
+    state->dataEnvrn->OutBaroPress = OutBaroPress;
     InitializePsychRoutines();
 
     // Run and Check: VRFOU_Cap
@@ -2858,8 +2858,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     using namespace DXCoils;
     using namespace DataZoneEnergyDemands;
     using namespace EnergyPlus::Psychrometrics;
-    using DataEnvironment::OutBaroPress;
-
     int ZoneIndex;      // index to zone where the VRF Terminal Unit resides
     int CoolCoilIndex;  // index to VRFTU cooling coil
     int HeatCoilIndex;  // index to VRFTU heating coil
@@ -2883,7 +2881,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     HeatCoilIndex = 2;
     FanSpdRatio = 0;
     Wout = 1;
-    OutBaroPress = 101570;
+    state->dataEnvrn->OutBaroPress = 101570;
     InitializePsychRoutines();
 
     DXCoil(CoolCoilIndex).C1Te = 0;
@@ -3705,9 +3703,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     DataSizing::ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -3818,7 +3816,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 outHR = Node(VRF(VRFCond).CondenserNodeNum).HumRat;
     // adjust for defrost factors
     Real64 outT = 0.82 * Node(VRF(VRFCond).CondenserNodeNum).Temp - 8.589;
-    Real64 OutdoorCoildw = max(1.0e-6, (outHR - PsyWFnTdpPb(*state, outT, DataEnvironment::OutBaroPress)));
+    Real64 OutdoorCoildw = max(1.0e-6, (outHR - PsyWFnTdpPb(*state, outT, state->dataEnvrn->OutBaroPress)));
     Real64 FractionalDefrostTime = VRF(VRFCond).DefrostFraction;
     Real64 LoadDueToDefrost =
         (0.01 * FractionalDefrostTime) * (7.222 - Node(VRF(VRFCond).CondenserNodeNum).Temp) * (VRF(VRFCond).HeatingCapacity / 1.01667);
@@ -4694,9 +4692,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -5544,9 +5542,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneSizingRunDone = true;
     DataSizing::ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -5647,10 +5645,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 24.0;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0093;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 47794.1;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.017767; // 50% RH
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 26.045;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.017767; // 50% RH
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.045;
     SimulateVRF(*state,
                 VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -5692,10 +5690,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;              // also set zone conditions
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0056;
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 34823.5;
-    DataEnvironment::OutDryBulbTemp = 5.0;
-    DataEnvironment::OutHumRat = 0.00269; // 50% RH
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 1.34678;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.00269; // 50% RH
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 1.34678;
     SimulateVRF(*state,
                 VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -6430,9 +6428,9 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -6458,7 +6456,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     ASSERT_EQ(VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);               // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
-    AverageOAMassFlow = DataEnvironment::StdRhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
+    AverageOAMassFlow = state->dataEnvrn->StdRhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
     EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
 }
 
@@ -6570,10 +6568,10 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataGlobal->CurrentTime = 0.25;
     state->dataGlobal->TimeStepZone = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 21.1340575;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
 
     // TU's are off
     TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
@@ -7933,7 +7931,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
     state->dataGlobal->SysSizingCalc = true;
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
@@ -7997,7 +7995,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
     state->dataGlobal->SysSizingCalc = true;
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
@@ -8108,7 +8106,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 
     state->dataGlobal->DoingSizing = true;
     state->dataGlobal->SysSizingCalc = true;
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
     DataLoopNode::Node(state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
@@ -8218,7 +8216,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
     DataLoopNode::Node(state->dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
@@ -11144,9 +11142,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
@@ -11190,11 +11188,11 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     Node(thisVRFTU.ZoneAirNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0100;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
@@ -11202,7 +11200,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = DataEnvironment::OutDryBulbTemp;
+    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
@@ -12875,9 +12873,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
@@ -12922,11 +12920,11 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Node(thisVRFTU.ZoneAirNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0100;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
@@ -12934,7 +12932,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = DataEnvironment::OutDryBulbTemp;
+    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
 
@@ -13115,10 +13113,10 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     state->dataGlobal->TimeStepZone = 0.25;
     DataHVACGlobals::TimeStepSys = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 21.1340575;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
 
     // call with zero loads to reset CurrentEndTimeLast until that's resolved
     TerminalUnitList(1).TotalCoolLoad = 0.0;
@@ -14928,9 +14926,9 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;

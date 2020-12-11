@@ -182,8 +182,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     int DualZoneNum(1);
 
-    DataEnvironment::DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
-    DataEnvironment::DayOfWeek = 1;             // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;             // must initialize this to get schedules initialized
     state->dataGlobal->HourOfDay = 1;                 // must initialize this to get schedules initialized
     state->dataGlobal->TimeStep = 1;                  // must initialize this to get schedules initialized
     state->dataGlobal->NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
