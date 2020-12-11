@@ -15550,9 +15550,9 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
@@ -15596,11 +15596,11 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     Node(thisVRFTU.ZoneAirNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0100;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0100;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
@@ -15608,7 +15608,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = DataEnvironment::OutDryBulbTemp;
+    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
