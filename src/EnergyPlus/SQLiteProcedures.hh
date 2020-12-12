@@ -152,6 +152,9 @@ public:
     // Commit a transaction
     void sqliteCommit();
 
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
+
     // Within a current transaction
     bool sqliteWithinTransaction();
 
