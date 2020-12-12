@@ -5651,9 +5651,9 @@ namespace EnergyPlus::DaylightingManager {
         for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             IS = 1;
-            if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                ((SurfWinShaded(IWin) && !SurfWinGlareControlIsActive(IWin)) || SurfWinSolarDiffusing(IWin)))
+            if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) && ((SurfWinShaded(IWin) && !SurfWinGlareControlIsActive(IWin)) || SurfWinSolarDiffusing(IWin))) {
                 IS = 2;
+            }
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
             GTOT1 = 0.4794 * (std::pow(state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -6571,6 +6571,7 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).BacLum(IL) += state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
             }
         } // End of second window loop over exterior windows associated with this zone
+        std::cout << "Day " << state.dataGlobal->DayOfSim << " hour " << state.dataGlobal->HourOfDay << " DaylIllum " << state.dataDaylightingManager->DaylIllum(1) << "\n";
 
         // Optical switching control (e.g. electrochromic glass) to adjust
         // window's vis trans downward so daylight level equals or is as
@@ -6656,7 +6657,7 @@ namespace EnergyPlus::DaylightingManager {
                             continueOuterLoop = true;
                             continue;
                         }
-                        if (!(SurfWinShadingFlag(IWin) == WinShadingFlag::SwitchableGlazing && SurfWinGlareControlIsActive(IWin)) ||
+                        if ((SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing && !SurfWinGlareControlIsActive(IWin)) ||
                             WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
                             continueOuterLoop = true;
                             continue;
@@ -6810,7 +6811,7 @@ namespace EnergyPlus::DaylightingManager {
                             }
                         }
 
-                        if (SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing) SurfWinGlareControlIsActive = false;
+                        if (SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing || SurfWinGlareControlIsActive(IWin) ) SurfWinGlareControlIsActive = false;
 
                         // For switchable glazings, it is switched to fully dark state,
                         // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare

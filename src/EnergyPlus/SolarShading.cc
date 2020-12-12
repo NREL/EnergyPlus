@@ -8708,8 +8708,14 @@ namespace SolarShading {
                         const int LayPtr = construction.LayerPoint(Lay);
                         auto &material(dataMaterial.Material(LayPtr));
                         const bool isShading = material.Group == ComplexWindowShade;
-                        if (isShading && Lay == 1) SurfWinShadingFlag(ISurf) = WinShadingFlag::ExtShadeOn;
-                        if (isShading && Lay == TotLayers) SurfWinShadingFlag(ISurf) = WinShadingFlag::IntShadeOn;
+                        if (isShading && Lay == 1) {
+                            SurfWinShadingFlag(ISurf) = WinShadingFlag::ExtShadeOn;
+                            SurfWinShaded(ISurf) = true;
+                        }
+                        if (isShading && Lay == TotLayers) {
+                            SurfWinShadingFlag(ISurf) = WinShadingFlag::IntShadeOn;
+                            SurfWinShaded(ISurf) = true;
+                        }
                     }
                     if (SurfWinShadingFlag(ISurf) == WinShadingFlag::IntShadeOn) {
                         auto &construction(state.dataConstruction->Construct(Surface(ISurf).Construction));

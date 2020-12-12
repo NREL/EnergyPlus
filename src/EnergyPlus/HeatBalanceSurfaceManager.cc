@@ -689,7 +689,7 @@ namespace HeatBalanceSurfaceManager {
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-                if (SurfWinShaded(SurfNum)) {
+                if (SurfWinShaded(SurfNum) || SurfWinGlareControlIsActive(SurfNum)) {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
                 } else {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
