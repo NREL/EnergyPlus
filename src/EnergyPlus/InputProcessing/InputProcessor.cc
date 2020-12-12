@@ -1233,7 +1233,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
         extension_key = key.value().get<std::string>();
     }
 
-    for (auto const obj : *objects) {
+    for (auto const &obj : *objects) {
         if (obj.find(extension_key) != obj.end()) {
             auto const size = obj[extension_key].size();
             if (size > max_size) max_size = size;

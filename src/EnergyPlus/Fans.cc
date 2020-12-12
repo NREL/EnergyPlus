@@ -1105,7 +1105,10 @@ namespace Fans {
 
             // Init the Node Control variables
             Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
-            Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
+            // According to the IO Ref guide:
+            // "Note that this field is only used to calculate the fan power.
+            // This field does not enforce the system air flow rate during simulation"
+            // Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
 
             // Initialize all report variables to a known state at beginning of simulation
             Fan(FanNum).FanPower = 0.0;
