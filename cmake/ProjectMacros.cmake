@@ -32,17 +32,18 @@ endmacro()
 macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
   if(BUILD_TESTING)
 
-    if(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-      # Disabled Warnings:
-      # 1684 conversion from pointer to same-sized integral type (potential portability problem) - Due to gtest...
-      add_cxx_definitions("-diag-disable:1684")
-    endif()
-
     add_executable(${BASE_NAME}_tests ${SRC})
     target_link_libraries(${BASE_NAME}_tests PRIVATE project_options)
     if(ENABLE_GTEST_DEBUG_MODE)
       target_compile_definitions(${BASE_NAME}_tests PRIVATE ENABLE_GTEST_DEBUG_MODE)
     endif()
+
+    if(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+      # Disabled Warnings:
+      # 1684 conversion from pointer to same-sized integral type (potential portability problem) - Due to gtest...
+      target_compile_options(${BASE_NAME}_tests PRIVATE -diag-disable:1684)
+    endif()
+
 
     create_src_groups("${SRC}")
 
@@ -168,17 +169,6 @@ function(ADD_SIMULATION_TEST)
 
 endfunction()
 
-macro(ADD_CXX_DEFINITIONS NEWFLAGS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NEWFLAGS}")
-endmacro()
-
-macro(ADD_CXX_DEBUG_DEFINITIONS NEWFLAGS)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${NEWFLAGS}")
-endmacro()
-
-macro(ADD_CXX_RELEASE_DEFINITIONS NEWFLAGS)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${NEWFLAGS}")
-endmacro()
 
 function(fixup_executable EXECUTABLE_PATH)
   include(GetPrerequisites)

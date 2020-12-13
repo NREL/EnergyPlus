@@ -9,8 +9,6 @@ endif()
 # Make sure expat is compiled as a static library
 target_compile_definitions(project_options INTERFACE "-DXML_STATIC")
 
-set(CMAKE_CXX_STANDARD 17)
-
 if(APPLE)
   # Force no auto ptr
   # TODO remove this after kiva/boost is updated to a version that supports
@@ -81,8 +79,8 @@ elseif(
   target_compile_options(project_warnings INTERFACE "-Wno-delete-non-virtual-dtor")
   target_compile_options(project_warnings INTERFACE "-Wno-missing-braces")
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_warnings INTERFACE "-Wno-unused-but-set-parameter" "-Wno-unused-but-set-variable"
-    )# Suppress unused-but-set warnings until more serious ones are addressed
+    target_compile_options(project_warnings INTERFACE "-Wno-unused-but-set-parameter" "-Wno-unused-but-set-variable")
+    # Suppress unused-but-set warnings until more serious ones are addressed
     target_compile_options(project_warnings INTERFACE "-Wno-maybe-uninitialized")
     target_compile_options(project_warnings INTERFACE "-Wno-aggressive-loop-optimizations")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")

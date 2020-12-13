@@ -1009,7 +1009,9 @@ if(BUILD_TESTING)
   file(MAKE_DIRECTORY ${TEST_DIR})
   add_executable(TestAPI_Runtime_C
                  ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c)
-  target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options project_warnings)
+  target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options )
+  target_compile_options(TestAPI_Runtime_C PRIVATE -Wall -Wextra -Wno-unused)
+
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}"
                                            -w "${EPW_FILE}" -D "${IDF_FILE}")
 
