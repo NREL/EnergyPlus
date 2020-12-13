@@ -1,8 +1,5 @@
 
 
-
-
-
 Separate Design and Control Variables
 ================
 
@@ -55,7 +52,9 @@ University of Illinois at Urbana-Champaign and Center for the Built Environment(
 
 "Potentially separate the lowtemp:radiant objects such that one main object contains the design parameters of the radiant system (e.g. amount of tubing, hot and chilled water loop connections), while the other contains the control parameters (e.g. two position, modulating, zone circulator pump, etc.)." (Quote from CBE)   Right now, all of the parameters associated with a radiant system in EnergyPlus are contained in a single input syntax.  The concern here is that much of the control information is probably pretty similar from system to system within a single user input file.  So, there could be less work and smaller files if the input was broken up into two separate inputs, allowing many radiant systems to re-use a single control definition.  This could potentially be applied to other input syntax beyond the low temperature radiant systems.
 
-
+Conversation with E+ Team on Slack:
+1. Create a design object for each radiant temp and baseboard object.
+2. Maybe name the design oobject something else. 
  
 ## Approach/Timeline/Design Rationale ##
 
@@ -79,11 +78,11 @@ Project to end by April 2021 since Jermy's internship ends by May 2021.
 
 The proposed approach is to identify the design variables in the LowTemperatureRadiant and Baseboard objects and create separate design objects for the LowTemperatureRadiant and Baseboard objects.
 
-<span style="display:block;text-align:center">![How the objects will be split](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/BigSplit.jpg)
+<span style="display:block;text-align:center">![How the objects will be split](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/SeparateDesignAndControlVariablesFiles/BigSplit.jpg)
 
 <span style="display:block;text-align:center">**Figure: How the objects will be split**
 
-<span style="display:block;text-align:center">![How the design objects will be brokendown](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/Breakdown.jpg)
+<span style="display:block;text-align:center">![How the design objects will be brokendown](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/SeparateDesignAndControlVariablesFiles/Breakdown.jpg)
 
 <span style="display:block;text-align:center">**Figure: How the design objects will be brokendown**
 
