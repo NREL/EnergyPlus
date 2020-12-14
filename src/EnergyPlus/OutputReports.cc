@@ -1399,7 +1399,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     }
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1) << '\n';
+        *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
@@ -1893,9 +1893,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     //  Do all detached shading surfaces first
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
-        if (Surface(surf).Construction > 0) {
-            if (state.dataConstruction->Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
-        }
+        if (Surface(surf).IsAirBoundarySurf) continue;
         if (Surface(surf).Class == SurfaceClass::Shading) continue;
         if (Surface(surf).Sides == 0) continue;
         if (Surface(surf).Class == SurfaceClass::Detached_F) colorindex = 3;

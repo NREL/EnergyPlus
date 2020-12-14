@@ -1597,11 +1597,7 @@ namespace HeatBalanceManager {
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
-        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
-        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
-        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
-
-        state.dataMaterial->Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
+        state->dataMaterial.Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
 
         NominalR.dimension(TotMaterials, 0.0);
@@ -1839,28 +1835,6 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
-        }
-
-        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
-        if (totAirBoundaryConstructs > 0) {
-            ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = IRTMaterial;
-            state.dataMaterial->Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
-            state.dataMaterial->Material(MaterNum).ROnly = true;
-            state.dataMaterial->Material(MaterNum).Resistance = 0.01;
-            state.dataMaterial->Material(MaterNum).AbsorpThermal = 0.9999;
-            state.dataMaterial->Material(MaterNum).AbsorpThermalInput = 0.9999;
-            // Air boundaries should not participate in solar or daylighting
-            state.dataMaterial->Material(MaterNum).AbsorpSolar = 0.0;
-            state.dataMaterial->Material(MaterNum).AbsorpSolarInput = 0.0;
-            state.dataMaterial->Material(MaterNum).AbsorpVisible = 0.0;
-            state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = 0.0;
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
-            if (GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueMaterialNames, state.dataMaterial->Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
-                ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
-                ShowContinueError(state, "...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
-            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -4654,8 +4628,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
-            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
-            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
+            // For air boundaries, skip TypeIsAirBoundary
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -5951,7 +5925,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF && !state.dataConstruction->Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
+                if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
                     SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
@@ -7476,47 +7450,6 @@ namespace HeatBalanceManager {
                 thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisConstruct.TypeIsAirBoundary = true;
                 thisConstruct.IsUsedCTF = false;
-
-                // Solar and Daylighting Method
-                std::string const solarMethod = fields.at("solar_and_daylighting_method");
-                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    thisConstruct.TransDiff = 1.0;
-                    thisConstruct.TransDiffVis = 1.0;
-                    thisConstruct.AbsDiffBackShade = 0.0;
-                    thisConstruct.ShadeAbsorpThermal = 0.0;
-                    thisConstruct.ReflectSolDiffBack = 0.0;
-                    thisConstruct.ReflectSolDiffFront = 0.0;
-                    thisConstruct.ReflectVisDiffFront = 0.0;
-                    thisConstruct.AbsBeamShadeCoef = 0.0;
-                    thisConstruct.TransSolBeamCoef = 0.0;
-                    thisConstruct.TransSolBeamCoef(1) = 1.0;
-                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
-                    thisConstruct.ReflSolBeamBackCoef = 0.0;
-                    thisConstruct.TransVisBeamCoef = 0.0;
-                    thisConstruct.TransVisBeamCoef(1) = 1.0;
-                    thisConstruct.AbsBeamCoef = 0.0;
-                    thisConstruct.AbsBeamBackCoef = 0.0;
-                    thisConstruct.AbsDiff = 0.0;
-                    thisConstruct.AbsDiffBack = 0.0;
-                }
-
-                // Radiant Exchange Method
-                std::string const radMethod = fields.at("radiant_exchange_method");
-                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
-                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
-                    thisConstruct.IsUsedCTF = true;
-                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
-                    thisConstruct.TotLayers = 1;
-                    // Find the auto-generated special IRT material for air boundaries
-                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", state.dataMaterial->Material);
-                    thisConstruct.LayerPoint(1) = materNum;
-                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
-                }
 
                 // Air Exchange Method
                 std::string const airMethod = fields.at("air_exchange_method");
