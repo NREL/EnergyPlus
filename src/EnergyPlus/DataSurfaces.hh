@@ -956,11 +956,11 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
         void SetWindDirAt(Real64 const fac);
 
-        void SetWindSpeedAt(Real64 const fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
@@ -1452,13 +1452,13 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSurfaceOutBulbTempAt();
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
     void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 
-    void SetSurfaceWindSpeedAt();
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state);
 
-    void SetSurfaceWindDirAt();
+    void SetSurfaceWindDirAt(EnergyPlusData &state);
 
     Real64 AbsFrontSide(int SurfNum);
 

@@ -169,7 +169,6 @@ SET( SRC
   DataDElight.hh
   DataDaylighting.hh
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
@@ -795,6 +794,9 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )

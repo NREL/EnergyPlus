@@ -198,7 +198,8 @@ namespace PlantCondLoopOperation {
 
     //********************************
 
-    Real64 FindRangeVariable(int const LoopNum,      // PlantLoop data structure loop counter
+    Real64 FindRangeVariable(EnergyPlusData &state,
+                             int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     );

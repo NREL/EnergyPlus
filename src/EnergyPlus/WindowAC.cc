@@ -111,9 +111,6 @@ namespace WindowAC {
 
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutRelHum;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;
     using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
@@ -831,7 +828,7 @@ namespace WindowAC {
             InNode = state.dataWindowAC->WindAC(WindACNum).AirInNode;
             OutNode = state.dataWindowAC->WindAC(WindACNum).AirOutNode;
             OutsideAirNode = state.dataWindowAC->WindAC(WindACNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             state.dataWindowAC->WindAC(WindACNum).MaxAirMassFlow = RhoAir * state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow;
             state.dataWindowAC->WindAC(WindACNum).OutAirMassFlow = RhoAir * state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow;

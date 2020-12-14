@@ -809,9 +809,9 @@ namespace DataHeatBalance {
         {
         }
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
     };
@@ -2204,13 +2204,13 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetZoneOutBulbTempAt();
+    void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
     void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void SetZoneWindSpeedAt();
+    void SetZoneWindSpeedAt(EnergyPlusData &state);
 
-    void SetZoneWindDirAt();
+    void SetZoneWindDirAt(EnergyPlusData &state);
 
     void CheckAndSetConstructionProperties(EnergyPlusData &state,
                                            int ConstrNum, // Construction number to be set/checked

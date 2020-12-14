@@ -298,7 +298,7 @@ public:
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
     Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);

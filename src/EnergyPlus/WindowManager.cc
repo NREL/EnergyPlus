@@ -2159,7 +2159,7 @@ namespace WindowManager {
             // This is code repeating and it is necessary to calculate report variables.  Do not know
             // how to solve this in more elegant way :(
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                     state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                 } else { // Dry
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
@@ -2169,7 +2169,7 @@ namespace WindowManager {
             }
 
             state.dataWindowManager->Ebout = state.dataWindowManager->sigma * pow_4(state.dataWindowManager->tout);
-            state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
+            state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
                     surface.ViewFactorGroundIR * state.dataWindowManager->Ebout;
 
         } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
@@ -2178,7 +2178,7 @@ namespace WindowManager {
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                     state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                 } else { // Dry
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
@@ -2539,7 +2539,7 @@ namespace WindowManager {
                     }
                 }
                 if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                         state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                     } else { // Dry
                         state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
@@ -2548,7 +2548,7 @@ namespace WindowManager {
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
                 }
                 state.dataWindowManager->Ebout = state.dataWindowManager->sigma * pow_4(state.dataWindowManager->tout);
-                state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
+                state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
                         surface.ViewFactorGroundIR * state.dataWindowManager->Ebout + OutSrdIR;
             }
 
@@ -2622,7 +2622,7 @@ namespace WindowManager {
         if (!state.dataConstruction->Construct(surface.Construction).WindowTypeEQL) {
             InsideGlassTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
             RoomHumRat = ZoneAirHumRat(surface.Zone);
-            RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, OutBaroPress);
+            RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, state.dataEnvrn->OutBaroPress);
             InsideGlassCondensationFlag(SurfNum) = 0;
             if (InsideGlassTemp < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
             // If airflow window, is there condensation on either glass face of the airflow gap?
@@ -2632,7 +2632,7 @@ namespace WindowManager {
                 if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                     if (Tleft < RoomDewPoint || Tright < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
                 } else if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_OutdoorAir) {
-                    if (Tleft < OutDewPointTemp || Tright < OutDewPointTemp) InsideGlassCondensationFlag(SurfNum) = 1;
+                    if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp) InsideGlassCondensationFlag(SurfNum) = 1;
                 }
             }
 
@@ -2672,7 +2672,7 @@ namespace WindowManager {
 
         Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
         Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(state.dataEnvrn->SkyTempKelvin));
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
         SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
@@ -3503,7 +3503,7 @@ namespace WindowManager {
                     if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                         InletAirHumRat = ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
-                        InletAirHumRat = OutHumRat;
+                        InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
@@ -3552,7 +3552,7 @@ namespace WindowManager {
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
-            if (SunIsUp) {
+            if (state.dataEnvrn->SunIsUp) {
 
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);

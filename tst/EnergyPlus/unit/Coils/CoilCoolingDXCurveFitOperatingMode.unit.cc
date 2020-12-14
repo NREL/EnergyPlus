@@ -129,8 +129,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    state->dataEnvrn->StdBaroPress = 101325.0;
 
     DataSizing::ZoneSizingRunDone = true;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = false;
