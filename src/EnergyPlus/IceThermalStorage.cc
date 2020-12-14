@@ -56,7 +56,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -180,9 +179,10 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
-                                        bool EP_UNUSED(FirstHVACIteration),
-                                        Real64 &EP_UNUSED(CurLoad),
+    void SimpleIceStorageData::simulate(EnergyPlusData &state,
+                                        const PlantLocation &calledFromLocation,
+                                        [[maybe_unused]] bool FirstHVACIteration,
+                                        [[maybe_unused]] Real64 &CurLoad,
                                         bool RunFlag)
     {
         std::string const RoutineName("SimpleIceStorageData::simulate");
@@ -288,10 +288,11 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                          bool EP_UNUSED(FirstHVACIteration),
-                                          Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+    void DetailedIceStorageData::simulate(EnergyPlusData &state,
+                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                          [[maybe_unused]] bool FirstHVACIteration,
+                                          [[maybe_unused]] Real64 &CurLoad,
+                                          [[maybe_unused]] bool RunFlag)
     {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
@@ -531,7 +532,7 @@ namespace IceThermalStorage {
                             ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, "Detailed Ice Storage system [" + this->Name +
                                                                "]  charging maximum iteration limit exceeded occurrence continues.",
                                                            this->ChargeErrorCount);
                         }
@@ -661,14 +662,14 @@ namespace IceThermalStorage {
                     } // ...loop iterating for the ice storage outlet temperature
 
                     // Keep track of times that the iterations got excessive
-                    if (IterNum >= MaxIterNum && (!DataGlobals::WarmupFlag)) {
+                    if (IterNum >= MaxIterNum && (!state.dataGlobal->WarmupFlag)) {
                         ++this->DischargeIterErrors;
                         if (this->DischargeIterErrors <= 25) {
                             ShowWarningError(state, "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit");
                             ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, "Detailed Ice Storage system [" + this->Name +
                                                                "]  discharging maximum iteration limit exceeded occurrence continues.",
                                                            this->DischargeErrorCount);
                         }
@@ -680,7 +681,7 @@ namespace IceThermalStorage {
                     // outlet parameters.  If outlet temperature is greater than or equal
                     // to the setpoint temperature, then send all flow through the tank.
                     // Otherwise, we have more capacity than needed so let's bypass some
-                    // flow and meet the setpoint temperautre.
+                    // flow and meet the setpoint temperature.
                     if (ToutNew >= TempSetPt) {
                         this->OutletTemp = ToutNew;
                         this->TankOutletTemp = ToutNew;
@@ -769,8 +770,7 @@ namespace IceThermalStorage {
             SimpleIceStorage(iceNum).ITSNomCap = DataIPShortCuts::rNumericArgs(1) * 1.e+09;
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowContinueError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -869,8 +869,7 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).NomCapacity = DataIPShortCuts::rNumericArgs(1) * (1.e+09) / (DataGlobalConstants::SecInHour());
 
             if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -985,8 +984,7 @@ namespace IceThermalStorage {
 
             DetailedIceStorage(iceNum).CurveFitTimeStep = DataIPShortCuts::rNumericArgs(2);
             if ((DetailedIceStorage(iceNum).CurveFitTimeStep <= 0.0) || (DetailedIceStorage(iceNum).CurveFitTimeStep > 1.0)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 3));
+                ShowSevereError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "Curve fit time step invalid, less than zero or greater than 1 for " + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
@@ -1013,32 +1011,29 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).FreezingTemp = DataIPShortCuts::rNumericArgs(6);
 
             if ((DetailedIceStorage(iceNum).DischargeParaElecLoad < 0.0) || (DetailedIceStorage(iceNum).DischargeParaElecLoad > 1.0)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
+                ShowSevereError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(3), DataIPShortCuts::rNumericArgs(3)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "Value is either less than/equal to zero or greater than 1");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).ChargeParaElecLoad < 0.0) || (DetailedIceStorage(iceNum).ChargeParaElecLoad > 1.0)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(4), 3));
+                ShowSevereError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "Value is either less than/equal to zero or greater than 1");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).TankLossCoeff < 0.0) || (DetailedIceStorage(iceNum).TankLossCoeff > 0.1)) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 3));
+                ShowSevereError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "Value is either less than/equal to zero or greater than 0.1 (10%)");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).FreezingTemp < -10.0) || (DetailedIceStorage(iceNum).FreezingTemp > 10.0)) {
-                ShowWarningError(state, "Potentially invalid " + DataIPShortCuts::cNumericFieldNames(6) + '=' +
-                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(6), 3));
+                ShowWarningError(state,
+                                 format("Potentially invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "Value is either less than -10.0C or greater than 10.0C");
                 ShowContinueError(state, "This value will be allowed but the user should verify that this temperature is correct");

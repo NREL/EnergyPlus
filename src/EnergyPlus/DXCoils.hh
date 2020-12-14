@@ -66,7 +66,6 @@ struct EnergyPlusData;
 namespace DXCoils {
 
     // Using/Aliasing
-    using DataEnvironment::StdBaroPress;
     using DataHVACGlobals::AirCooled;
     using DataHVACGlobals::DryBulbIndicator;
 
@@ -744,7 +743,7 @@ namespace DXCoils {
                                      int const SingleMode     // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void UpdateDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
+    void UpdateDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
 
     void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
 

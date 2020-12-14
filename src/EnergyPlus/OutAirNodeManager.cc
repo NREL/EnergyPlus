@@ -91,11 +91,7 @@ namespace OutAirNodeManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
-    using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorCO2;
-    using DataContaminantBalance::OutdoorGC;
     // USE DataHVACGlobals, ONLY: FirstTimeStepSysFlag
 
     // Data
@@ -365,7 +361,7 @@ namespace OutAirNodeManager {
                 if (NumNums > 0) Node(NodeNums(1)).Height = Numbers(1);
 
                 if (NumAlphas > 1) {
-                    AnyLocalEnvironmentsInModel = true;
+                    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
@@ -607,16 +603,16 @@ namespace OutAirNodeManager {
         // Set node data to global values
         if (Node(NodeNum).Height < 0.0) {
             // Note -- this setting is different than the DataEnvironment "AT" settings.
-            Node(NodeNum).OutAirDryBulb = OutDryBulbTemp;
-            Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
+            Node(NodeNum).OutAirDryBulb = state.dataEnvrn->OutDryBulbTemp;
+            Node(NodeNum).OutAirWetBulb = state.dataEnvrn->OutWetBulbTemp;
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(state, Node(NodeNum).Height);
             Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(state, Node(NodeNum).Height);
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = DataEnvironment::WindSpeedAt(state, Node(NodeNum).Height);
         }
-        if (!InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
-        Node(NodeNum).OutAirWindDir = WindDir;
+        if (!InitCall) Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
+        Node(NodeNum).OutAirWindDir = state.dataEnvrn->WindDir;
 
         if (InitCall) {
             // Set node data to local air node values if defined
@@ -647,23 +643,23 @@ namespace OutAirNodeManager {
                     Node(NodeNum).OutAirWetBulb = Node(NodeNum).OutAirDryBulb;
                 }
                 if (Node(NodeNum).OutAirWetBulbSchedNum == 0 && !Node(NodeNum).EMSOverrideOutAirWetBulb && (Node(NodeNum).EMSOverrideOutAirDryBulb || Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
-                    Node(NodeNum).HumRat = OutHumRat;
-                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(state, Node(NodeNum).OutAirDryBulb, OutHumRat, OutBaroPress);
+                    Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
+                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(state, Node(NodeNum).OutAirDryBulb, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
                 } else {
-                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, state.dataEnvrn->OutBaroPress);
                 }
             } else {
-                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, state.dataEnvrn->OutBaroPress);
             }
         } else {
-            Node(NodeNum).HumRat = OutHumRat;
+            Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
         }
         Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).OutAirDryBulb, Node(NodeNum).HumRat);
-        Node(NodeNum).Press = OutBaroPress;
+        Node(NodeNum).Press = state.dataEnvrn->OutBaroPress;
         Node(NodeNum).Quality = 0.0;
         // Add contaminants
-        if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = OutdoorCO2;
-        if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = OutdoorGC;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
 
     }
 

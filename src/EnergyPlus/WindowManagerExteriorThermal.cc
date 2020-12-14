@@ -50,7 +50,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -59,7 +58,6 @@
 // Windows library headers
 #include <WCETarcog.hpp>
 
-#include "WindowManagerExteriorData.hh"
 #include "WindowManagerExteriorThermal.hh"
 
 namespace EnergyPlus {
@@ -71,7 +69,6 @@ using namespace FenestrationCommon;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace General;
 
 namespace WindowManager {
@@ -154,7 +151,7 @@ namespace WindowManager {
         HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
         if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
-            // soltuion from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
+            // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
             // these calculations just to confirm that current exterior engine is giving close results to what is in here. (Simon)
             auto totLayers = aLayers.size();
@@ -599,7 +596,7 @@ namespace WindowManager {
 
         auto IR = m_Surface.getInsideIR(m_SurfNum);
 
-        std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, OutBaroPress);
+        std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
         Indoor->setHCoeffModel(BoundaryConditionsCoeffModel::CalculateH, hcin);
         Indoor->setEnvironmentIR(IR);
         return Indoor;
@@ -620,15 +617,15 @@ namespace WindowManager {
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(m_SurfNum);
-        double tSky = SkyTempKelvin;
+        double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {
             airSpeed = m_Surface.WindSpeed;
         }
-        double fclr = 1 - CloudFraction;
+        double fclr = 1 - state.dataEnvrn->CloudFraction;
         AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
         std::shared_ptr<CEnvironment> Outdoor =
-            std::make_shared<COutdoorEnvironment>(tout, OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);
+            std::make_shared<COutdoorEnvironment>(tout, state.dataEnvrn->OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);
         Outdoor->setHCoeffModel(BoundaryConditionsCoeffModel::HcPrescribed, t_Hext);
         Outdoor->setEnvironmentIR(IR);
         return Outdoor;

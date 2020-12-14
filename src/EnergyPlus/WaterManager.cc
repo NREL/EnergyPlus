@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -164,7 +163,7 @@ namespace WaterManager {
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using General::RoundSigDigits;
+
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -294,10 +293,14 @@ namespace WaterManager {
                             ShowSevereError(state, "Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, cNumericFieldNames(6) + " must be greater than " + cNumericFieldNames(5));
-                            ShowContinueError(state, "Check value for " + cNumericFieldNames(5) + " = " +
-                                              RoundSigDigits(state.dataWaterData->WaterStorage(Item).ValveOnCapacity, 5));
-                            ShowContinueError(state, "which must be lower than " + cNumericFieldNames(6) + " = " +
-                                              RoundSigDigits(state.dataWaterData->WaterStorage(Item).ValveOffCapacity, 5));
+                            ShowContinueError(state,
+                                              format("Check value for {} = {:.5R}",
+                                                     cNumericFieldNames(5),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOnCapacity));
+                            ShowContinueError(state,
+                                              format("which must be lower than {} = {:.5R}",
+                                                     cNumericFieldNames(6),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOffCapacity));
                             ErrorsFound = true;
                         }
                     }
@@ -421,12 +424,12 @@ namespace WaterManager {
                     }
                     state.dataWaterData->RainCollector(Item).LossFactor = rNumericArgs(1);
                     if (state.dataWaterData->RainCollector(Item).LossFactor > 1.0) {
-                        ShowWarningError(state, "Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
+                        ShowWarningError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "found rain water collection loss factor greater than 1.0, simulation continues");
                     }
                     if (state.dataWaterData->RainCollector(Item).LossFactor < 0.0) {
-                        ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
+                        ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "found rain water collection loss factor less than 0.0");
                         ErrorsFound = true;
@@ -1046,8 +1049,13 @@ namespace WaterManager {
 
         // is tank lower than float valve on capacity and requesting fill from controlled supplier?
         FillVolRequest = 0.0;
-        if ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).ValveOnCapacity) { // turn on supply to fill tank
+
+        if ( ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).ValveOnCapacity) ||
+              state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling )
+        { // turn on supply to fill tank
             FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
+
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = true;
 
             // set mains draws for float on (all the way to Float off)
             if (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::MainsFloatValve) {
@@ -1077,6 +1085,11 @@ namespace WaterManager {
         }
 
         state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
+        if (state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume >= state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity) {
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = false;
+        }
+
+
         state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour());
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
         state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = overflowTwater;
@@ -1402,7 +1415,6 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        using DataEnvironment::GroundTemp_Deep;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1416,7 +1428,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest >= state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
                 PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
@@ -1425,7 +1437,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest < state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
 
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 PumpPower =
@@ -1456,10 +1468,6 @@ namespace WaterManager {
         // that hold the value of the Last Timestep
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankNum;
         int RainColNum;
@@ -1471,7 +1479,7 @@ namespace WaterManager {
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
             }
-            if ((!DoingSizing) && (!KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
+            if ((!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
                 if (state.dataWaterData->NumWaterStorageTanks > 0) {
                     for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
                         if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands == 0) {
@@ -1491,7 +1499,7 @@ namespace WaterManager {
             state.dataWaterManager->MyEnvrnFlag = true;
         }
 
-        if (state.dataWaterManager->MyWarmupFlag && (!WarmupFlag)) { // do environment inits.  just went out of warmup mode
+        if (state.dataWaterManager->MyWarmupFlag && (!state.dataGlobal->WarmupFlag)) { // do environment inits.  just went out of warmup mode
             for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;

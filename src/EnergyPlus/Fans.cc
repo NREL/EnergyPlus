@@ -57,7 +57,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -67,7 +66,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -103,11 +101,6 @@ namespace Fans {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
-    using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::Cooling;
@@ -192,7 +185,6 @@ namespace Fans {
         // This subroutine manages Fan component simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
@@ -214,13 +206,19 @@ namespace Fans {
         } else {
             FanNum = CompIndex;
             if (FanNum > state.dataFans->NumFans || FanNum < 1) {
-                ShowFatalError(state, "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits(FanNum) +
-                               ", Number of Fans=" + TrimSigDigits(state.dataFans->NumFans) + ", Fan name=" + CompName);
+                ShowFatalError(state,
+                               format("SimulateFanComponents: Invalid CompIndex passed={}, Number of Fans={}, Fan name={}",
+                                      FanNum,
+                                      state.dataFans->NumFans,
+                                      CompName));
             }
             if (CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
-                    ShowFatalError(state, "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits(FanNum) + ", Fan name=" + CompName +
-                                   ", stored Fan Name for that index=" + Fan(FanNum).FanName);
+                    ShowFatalError(state,
+                                   format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
+                                          FanNum,
+                                          CompName,
+                                          Fan(FanNum).FanName));
                 }
                 CheckEquipName(FanNum) = false;
             }
@@ -289,7 +287,6 @@ namespace Fans {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -575,7 +572,7 @@ namespace Fans {
             Fan(FanNum).MotEff = 1.0;
             Fan(FanNum).MotInAirFrac = 1.0;
             Fan(FanNum).MinAirFlowRate = 0.0;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             if (Fan(FanNum).MaxAirFlowRate == 0.0) {
@@ -711,7 +708,7 @@ namespace Fans {
             Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
             //       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
             //       (Standard Rating procedure may be called before BeginEnvirFlag is set to TRUE, if so MaxAirMassFlowRate = 0)
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             Fan(FanNum).MotEff = rNumericArgs(4);
@@ -964,7 +961,7 @@ namespace Fans {
                                     Fan(FanNum).FanName);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
                 SetupEMSActuator("Fan",
@@ -1008,7 +1005,7 @@ namespace Fans {
 
     void InitFan(EnergyPlusData &state,
                  int const FanNum,
-                 bool const EP_UNUSED(FirstHVACIteration) // unused1208
+                 [[maybe_unused]] bool const FirstHVACIteration // unused1208
     )
     {
 
@@ -1064,13 +1061,13 @@ namespace Fans {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
                 if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
-                if (CheckZoneEquipmentList(Fan(Loop).FanType, Fan(Loop).FanName)) continue;
+                if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
                 ShowSevereError(state, "InitFans: Fan=[" + Fan(Loop).FanType + ',' + Fan(Loop).FanName +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(FanNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
 
             SizeFan(state, FanNum);
             // Set the loop cycling flag
@@ -1089,7 +1086,7 @@ namespace Fans {
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
             OutNode = Fan(FanNum).OutletNodeNum;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -1108,7 +1105,10 @@ namespace Fans {
 
             // Init the Node Control variables
             Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
-            Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
+            // According to the IO Ref guide:
+            // "Note that this field is only used to calculate the fan power.
+            // This field does not enforce the system air flow rate during simulation"
+            // Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
 
             // Initialize all report variables to a known state at beginning of simulation
             Fan(FanNum).FanPower = 0.0;
@@ -1191,7 +1191,6 @@ namespace Fans {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1269,7 +1268,7 @@ namespace Fans {
             // From PsychRoutines:
             //   w=MAX(dw,1.0d-5)
             //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // Adjust max fan volumetric airflow using fan sizing factor
             FanVolFlow *= Fan(FanNum).FanSizingFactor; //[m3/s at standard conditions]
@@ -1324,7 +1323,7 @@ namespace Fans {
             if (MotorSpeed > (Fan(FanNum).MotorMaxSpd + 1.e-5)) {
                 ShowWarningError(state, "Drive ratio for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is too low at design conditions -- check motor speed and drive ratio inputs");
-                ShowContinueError(state, "...Design fan speed [rev/min]: " + RoundSigDigits(Fan(FanNum).FanSpd, 2));
+                ShowContinueError(state, format("...Design fan speed [rev/min]: {:.2R}", Fan(FanNum).FanSpd));
             }
 
             Fan(FanNum).FanTrq = Fan(FanNum).FanShaftPower / FanSpdRadS; //[N-m]
@@ -1340,7 +1339,7 @@ namespace Fans {
             if (Fan(FanNum).FanTrq > (Fan(FanNum).BeltMaxTorque + 1.e-5)) {
                 ShowWarningError(state, "Belt for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check belt inputs");
-                ShowContinueError(state, "...Design belt output torque (without oversizing) [Nm]: " + RoundSigDigits(Fan(FanNum).FanTrq, 2));
+                ShowContinueError(state, format("...Design belt output torque (without oversizing) [Nm]: {:.2R}", Fan(FanNum).FanTrq));
             }
 
             // Calculate belt max efficiency using correlations and coefficients based on AMCA data
@@ -1382,7 +1381,7 @@ namespace Fans {
             if (Fan(FanNum).BeltInputPower > (Fan(FanNum).MotorMaxOutPwr + 1.e-5)) {
                 ShowWarningError(state, "Motor for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check motor inputs");
-                ShowContinueError(state, "...Design motor output power (without oversizing) [W]: " + RoundSigDigits(Fan(FanNum).BeltInputPower, 2));
+                ShowContinueError(state, format("...Design motor output power (without oversizing) [W]: {:.2R}", Fan(FanNum).BeltInputPower));
             }
 
             // Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
@@ -1423,7 +1422,7 @@ namespace Fans {
                     if (Fan(FanNum).MotorInputPower > (Fan(FanNum).VFDMaxOutPwr + 1.e-5)) {
                         ShowWarningError(state, "VFD for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                          " is undersized at design conditions -- check VFD inputs");
-                        ShowContinueError(state, "...Design VFD output power (without oversizing) [W]: " + RoundSigDigits(Fan(FanNum).MotorInputPower, 2));
+                        ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", Fan(FanNum).MotorInputPower));
                     }
 
                     VFDOutPwrRatio = Fan(FanNum).MotorInputPower / Fan(FanNum).VFDMaxOutPwr;       //[-]
@@ -1497,7 +1496,7 @@ namespace Fans {
         PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
-            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, StdRhoAir);
+            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, state.dataEnvrn->StdRhoAir);
         }
         PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
@@ -1606,9 +1605,9 @@ namespace Fans {
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
-        // Faulty fan operations_Jun. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1764,9 +1763,9 @@ namespace Fans {
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
-        // Faulty fan operations_Apr. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1907,7 +1906,6 @@ namespace Fans {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1944,9 +1942,9 @@ namespace Fans {
         FanEff = Fan(FanNum).FanEff;
         RhoAir = Fan(FanNum).RhoAirStdInit;
 
-        // Faulty fan operations_Apr. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1989,7 +1987,7 @@ namespace Fans {
             PartLoadRatio = min(1.0, FlowFrac);
             // Fan is operating
             if (OnOffFanPartLoadFraction <= 0.0) {
-                ShowRecurringWarningErrorAtEnd("Fan:OnOff, OnOffFanPartLoadFraction <= 0.0, Reset to 1.0", ErrCount);
+                ShowRecurringWarningErrorAtEnd(state, "Fan:OnOff, OnOffFanPartLoadFraction <= 0.0, Reset to 1.0", ErrCount);
                 OnOffFanPartLoadFraction = 1.0; // avoid divide by zero or negative PLF
             }
 
@@ -2017,11 +2015,10 @@ namespace Fans {
 
                     SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                     if (SpeedRaisedToPower < 0.0) {
-                        if (Fan(FanNum).OneTimePowerRatioCheck && !WarmupFlag) {
+                        if (Fan(FanNum).OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
                             ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                             ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
-                            ShowContinueError(state, "Curve output = " + TrimSigDigits(SpeedRaisedToPower, 5) +
-                                              ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
+                            ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio));
                             ShowContinueError(state, "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.");
                             ShowContinueError(state, "Resetting Fan Power Ratio curve output to 0.0 and the simulation continues.");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
@@ -2029,14 +2026,13 @@ namespace Fans {
                         }
                         SpeedRaisedToPower = 0.0;
                     }
-                    if (Fan(FanNum).FanEffRatioCurveIndex > 0 && !WarmupFlag) {
+                    if (Fan(FanNum).FanEffRatioCurveIndex > 0 && !state.dataGlobal->WarmupFlag) {
                         EffRatioAtSpeedRatio = CurveValue(state, Fan(FanNum).FanEffRatioCurveIndex, SpeedRatio);
                         if (EffRatioAtSpeedRatio < 0.01) {
-                            if (Fan(FanNum).OneTimeEffRatioCheck && !WarmupFlag) {
+                            if (Fan(FanNum).OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
                                 ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                                 ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
-                                ShowContinueError(state, "Curve output = " + TrimSigDigits(EffRatioAtSpeedRatio, 5) +
-                                                  ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
+                                ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio));
                                 ShowContinueError(state, "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.");
                                 ShowContinueError(state, "Resetting Fan Efficiency Ratio curve output to 0.01 and the simulation continues.");
                                 ShowContinueErrorTimeStamp(state, "Occurrence info:");
@@ -2238,11 +2234,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-        using General::CreateSysTimeIntervalString;
-        using General::RoundSigDigits;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2509,24 +2500,6 @@ namespace Fans {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the fan data structure to the fan outlet nodes.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
         int InletNode;
@@ -2565,11 +2538,11 @@ namespace Fans {
             Fan(FanNum).BalancedOutletMassFlowRate = BalancedExhMassFlow;
         }
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutletNode).CO2 = Node(InletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
     }
@@ -3069,7 +3042,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3113,8 +3085,9 @@ namespace Fans {
         }
     }
 
-    Real64 FanDesDT(int const FanNum,                  // index of fan in Fan array
-                    Real64 const EP_UNUSED(FanVolFlow) // fan volumetric flow rate [m3/s]
+    Real64 FanDesDT(EnergyPlusData &state,
+                    int const FanNum,                        // index of fan in Fan array
+                    [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
         // FUNCTION INFORMATION:
@@ -3151,7 +3124,7 @@ namespace Fans {
             TotEff = Fan(FanNum).FanEff;
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {
@@ -3282,7 +3255,7 @@ namespace Fans {
             FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
             DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
         } else {
-            if (!SysSizingCalc && MySizeFlag(FanNum)) {
+            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
                 SizeFan(state, FanNum);
                 MySizeFlag(FanNum) = false;
             }
@@ -3318,7 +3291,7 @@ namespace Fans {
             totEff = Fan(fanIndex).FanEff;
             motInAirFrac = Fan(fanIndex).MotInAirFrac;
         } else {
-            if (!SysSizingCalc && MySizeFlag(fanIndex)) {
+            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(fanIndex)) {
                 SizeFan(state, fanIndex);
                 MySizeFlag(fanIndex) = false;
             }

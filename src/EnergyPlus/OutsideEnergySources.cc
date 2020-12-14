@@ -132,8 +132,11 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool RunFlag)
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state,
+                                            [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                            [[maybe_unused]] bool FirstHVACIteration,
+                                            Real64 &CurLoad,
+                                            bool RunFlag)
     {
         this->initialize(state, CurLoad);
         this->calculate(state, RunFlag, CurLoad);
@@ -145,8 +148,8 @@ namespace OutsideEnergySources {
         this->size(state);
     }
 
-    void OutsideEnergySourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                       const PlantLocation &EP_UNUSED(calledFromLocation),
+    void OutsideEnergySourceSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                       [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                        Real64 &MaxLoad,
                                                        Real64 &MinLoad,
                                                        Real64 &OptLoad)
@@ -445,12 +448,11 @@ namespace OutsideEnergySources {
                                                          NomCapDes,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(NomCapDes, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

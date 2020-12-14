@@ -181,12 +181,6 @@ namespace PlantCondLoopOperation {
         // REFERENCES:
         // na
         // Using/Aliasing
-        using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::OutRelHum;
-        using DataEnvironment::OutWetBulbTemp; // Current outdoor relative humidity [%]
-        using General::RoundSigDigits;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -283,16 +277,16 @@ namespace PlantCondLoopOperation {
             }
             RangeVariable = LoopDemand;
         } else if (CurSchemeType == DryBulbRBOpSchemeType) {
-            RangeVariable = OutDryBulbTemp;
+            RangeVariable = state.dataEnvrn->OutDryBulbTemp;
         } else if (CurSchemeType == WetBulbRBOpSchemeType) {
-            RangeVariable = OutWetBulbTemp;
+            RangeVariable = state.dataEnvrn->OutWetBulbTemp;
         } else if (CurSchemeType == RelHumRBOpSchemeType) {
-            RangeVariable = OutRelHum;
+            RangeVariable = state.dataEnvrn->OutRelHum;
         } else if (CurSchemeType == DewPointRBOpSchemeType) {
-            RangeVariable = OutDewPointTemp;
+            RangeVariable = state.dataEnvrn->OutDewPointTemp;
         } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) ||
                    (CurSchemeType == DewPointTDBOpSchemeType)) {
-            RangeVariable = FindRangeVariable(LoopNum, CurSchemePtr, CurSchemeType);
+            RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
         } else {
             // No controls specified.  This is a fatal error
             ShowFatalError(state, "Invalid Operation Scheme Type Requested=" + PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
@@ -795,7 +789,6 @@ CurrentModuleObject, PlantOpSchemeName);
         //       PlantEquipmentOperation:Uncontrolled
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
@@ -924,10 +917,13 @@ CurrentModuleObject, PlantOpSchemeName);
                                     ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state, "Range # " + RoundSigDigits(InnerListNum) +
-                                                      " Lower limit = " + RoundSigDigits(InnerListNumLowerLimit, 1) + " lies within the Range # " +
-                                                      RoundSigDigits(ListNum) + " (" + RoundSigDigits(OuterListNumLowerLimit, 1) + " to " +
-                                                      RoundSigDigits(OuterListNumUpperLimit, 1) + ").");
+                                    ShowContinueError(state,
+                                                      format("Range # {} Lower limit = {:.1R} lies within the Range # {} ({:.1R} to {:.1R}).",
+                                                             InnerListNum,
+                                                             InnerListNumLowerLimit,
+                                                             ListNum,
+                                                             OuterListNumLowerLimit,
+                                                             OuterListNumUpperLimit));
                                     ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                                 // Check if inner list has an upper limit that is between an outer's lower and upper limit
@@ -935,10 +931,13 @@ CurrentModuleObject, PlantOpSchemeName);
                                     ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state, "Range # " + RoundSigDigits(InnerListNum) +
-                                                      " Upper limit = " + RoundSigDigits(InnerListNumUpperLimit, 1) + " lies within Range # " +
-                                                      RoundSigDigits(ListNum) + " (" + RoundSigDigits(OuterListNumLowerLimit, 1) + " to " +
-                                                      RoundSigDigits(OuterListNumUpperLimit, 1) + ").");
+                                    ShowContinueError(state,
+                                                      format("Range # {} Upper limit = {:.1R} lies within Range # {} ({:.1R} to {:.1R}).",
+                                                             InnerListNum,
+                                                             InnerListNumUpperLimit,
+                                                             ListNum,
+                                                             OuterListNumLowerLimit,
+                                                             OuterListNumUpperLimit));
                                     ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                             }
@@ -1321,7 +1320,6 @@ CurrentModuleObject, PlantOpSchemeName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using namespace DataIPShortCuts;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureMaxSetPoint;
         using EMSManager::iTemperatureMinSetPoint;
@@ -1444,9 +1442,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            BaseSizer::reportSizerOutput(state, CurrentModuleObject,
+                            BaseSizer::reportSizerOutput(state,
+                                                         CurrentModuleObject,
                                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                                         "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
+                                                         format("Design Water Flow Rate [m3/s] Equipment # {}", Num),
                                                          CompFlowRate);
                         }
 
@@ -1507,7 +1506,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             if (SELECT_CASE_var == SingleSetPoint) {
                                 if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
                                     SensedNodeFlagValue) {
-                                    if (!AnyEnergyManagementSystemInModel) {
+                                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
                                         ShowContinueError(state, "A temperature setpoint is needed at the node named " +
                                                           PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
@@ -1544,7 +1543,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == CoolingOp) {
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                         SensedNodeFlagValue) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature high setpoint is needed at the node named " +
@@ -1582,7 +1581,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 } else if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == HeatingOp) {
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                         SensedNodeFlagValue) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature low setpoint is needed at the node named " +
@@ -1626,7 +1625,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                          SensedNodeFlagValue) ||
                                         (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                          SensedNodeFlagValue)) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A dual temperaturesetpoint is needed at the node named " +
@@ -2741,8 +2740,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // USE STATEMENTS:
         //  USE EconomizerHeatExchanger,  ONLY: GetEconHeatExchangerCurrentCapacity
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::OutWetBulbTemp;
         using DataLoopNode::Node;
 
         // Locals
@@ -2797,9 +2794,9 @@ CurrentModuleObject, PlantOpSchemeName);
                 {
                     auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
                     if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
-                        Tsensor = OutWetBulbTemp;
+                        Tsensor = state.dataEnvrn->OutWetBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
-                        Tsensor = OutDryBulbTemp;
+                        Tsensor = state.dataEnvrn->OutDryBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
@@ -2826,9 +2823,9 @@ CurrentModuleObject, PlantOpSchemeName);
                 {
                     auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
                     if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
-                        Tsensor = OutWetBulbTemp;
+                        Tsensor = state.dataEnvrn->OutWetBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
-                        Tsensor = OutDryBulbTemp;
+                        Tsensor = state.dataEnvrn->OutDryBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
@@ -3047,7 +3044,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
                                         int const CurSchemePtr,
                                         Real64 const LoopDemand,
-                                        Real64 &EP_UNUSED(RemLoopDemand))
+                                        [[maybe_unused]] Real64 &RemLoopDemand)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3117,7 +3114,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
     //********************************
 
-    Real64 FindRangeVariable(int const LoopNum,      // PlantLoop data structure loop counter
+    Real64 FindRangeVariable(EnergyPlusData &state,
+                             int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     )
@@ -3131,10 +3129,6 @@ CurrentModuleObject, PlantOpSchemeName);
 
         // Using/Aliasing
         using namespace DataLoopNode;
-        using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::OutWetBulbTemp;
-
         // Return value
         Real64 FindRangeVariable(0.0);
 
@@ -3157,15 +3151,15 @@ CurrentModuleObject, PlantOpSchemeName);
         if (CurSchemeType == DryBulbTDBOpSchemeType) { // drybulb temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;
-            FindRangeVariable = NodeTemperature - OutDryBulbTemp;
+            FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
         } else if (CurSchemeType == WetBulbTDBOpSchemeType) { // wetbulb temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;
-            FindRangeVariable = NodeTemperature - OutWetBulbTemp;
+            FindRangeVariable = NodeTemperature - state.dataEnvrn->OutWetBulbTemp;
         } else if (CurSchemeType == DewPointTDBOpSchemeType) { // dewpoint temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;
-            FindRangeVariable = NodeTemperature - OutDewPointTemp;
+            FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;
         } else {
             assert(false);
         } // OperationScheme

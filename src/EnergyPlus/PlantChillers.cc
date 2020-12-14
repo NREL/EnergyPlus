@@ -109,7 +109,8 @@ namespace PlantChillers {
     // Parameters for use in Chillers
     Real64 constexpr KJtoJ(1000.0); // convert Kjoules to joules
 
-    void BaseChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BaseChillerSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->NomCap * this->MinPartLoadRat;
@@ -229,15 +230,13 @@ namespace PlantChillers {
                 thisChiller.NomCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
             thisChiller.COP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 3));
+                ShowSevereError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -470,8 +469,8 @@ namespace PlantChillers {
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AIRCOOLED ||
                     thisChiller.CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10) + '=' +
-                                        General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 6));
+                        ShowSevereError(state,
+                                        format("Invalid {}={:.6R}", DataIPShortCuts::cNumericFieldNames(10), DataIPShortCuts::rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                         ErrorsFound = true;
@@ -670,7 +669,7 @@ namespace PlantChillers {
             SetupOutputVariable(state,
                 "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, this->ChillerCondAvgTemp, "System", "Average", this->Name);
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -802,7 +801,7 @@ namespace PlantChillers {
                 // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(state,
@@ -884,7 +883,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
 
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRateMax;
@@ -927,7 +926,7 @@ namespace PlantChillers {
                         }
                     }
                     if (THeatRecSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                        if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             if (!this->HRSPErrDone) {
                                 ShowWarningError(state, "Missing heat recovery temperature setpoint for chiller named " + this->Name);
                                 ShowContinueError(state, "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node "
@@ -1079,12 +1078,11 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1132,14 +1130,15 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->EvapVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1200,14 +1199,15 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->CondVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1261,14 +1261,16 @@ namespace PlantChillers {
                                                          tmpHeatRecVolFlowRate,
                                                          "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                          this->DesignHeatRecVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - this->DesignHeatRecVolFlowRate) / this->DesignHeatRecVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(this->DesignHeatRecVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
+                                                             this->DesignHeatRecVolFlowRate));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
+                                                             tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1289,7 +1291,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ElectricChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -1322,7 +1324,7 @@ namespace PlantChillers {
         this->ActualCOP = 0.0;
 
         //   calculate end time of current time step
-        Real64 CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -1336,7 +1338,7 @@ namespace PlantChillers {
                     ShowWarningError(state, this->MsgBuffer1 + '.');
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
                 }
             }
@@ -1350,7 +1352,7 @@ namespace PlantChillers {
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             // call for zero flow before leaving
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -1365,7 +1367,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -1417,7 +1419,7 @@ namespace PlantChillers {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         // If there is a fault of chiller fouling
-        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 RatedCOP_ff = this->COP;
@@ -1436,15 +1438,15 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) { // Condenser inlet temp = outdoor temp
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 =
                     format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -1457,15 +1459,15 @@ namespace PlantChillers {
                                                                     DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                                                     DataLoopNode::Node(this->CondInletNodeNum).Press);
             //  Warn user if evap condenser wet bulb temperature falls below 10C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 =
                     format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -1487,7 +1489,7 @@ namespace PlantChillers {
         }
 
         // If there is a fault of Chiller SWT Sensor
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
@@ -1634,7 +1636,7 @@ namespace PlantChillers {
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -1749,7 +1751,7 @@ namespace PlantChillers {
             }
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -1844,20 +1846,20 @@ namespace PlantChillers {
                 if (condInletTemp > 70.0) {
                     ShowSevereError(state, "CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Condenser loop water temperatures are too high at" + General::RoundSigDigits(condInletTemp, 2));
+                    ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", condInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
 
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
                     ShowSevereError(state, "CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
-                    ShowContinueError(state, "Condenser inlet temperature: " + General::RoundSigDigits(condInletTemp, 2));
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", condInletTemp));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
@@ -2131,16 +2133,14 @@ namespace PlantChillers {
                 thisChiller.NomCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             thisChiller.COP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -2425,8 +2425,8 @@ namespace PlantChillers {
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AIRCOOLED ||
                     thisChiller.CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10) + '=' +
-                                        General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 6));
+                        ShowSevereError(state,
+                                        format("Invalid {}={:.6R}", DataIPShortCuts::cNumericFieldNames(10), DataIPShortCuts::rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                         ErrorsFound = true;
@@ -2650,7 +2650,7 @@ namespace PlantChillers {
             SetupOutputVariable(state,
                 "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -2747,7 +2747,7 @@ namespace PlantChillers {
                 // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(state,
@@ -2826,7 +2826,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -2978,12 +2978,11 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3029,14 +3028,15 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->EvapVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3097,14 +3097,15 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->CondVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3152,7 +3153,7 @@ namespace PlantChillers {
                     if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                              this->Name,
                                                              "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
@@ -3165,14 +3166,16 @@ namespace PlantChillers {
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(DesignHeatRecVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state,
+                                        format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
+                                                             tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3198,7 +3201,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -3253,7 +3256,7 @@ namespace PlantChillers {
         }
 
         //   calculate end time of current time step
-        Real64 CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -3267,7 +3270,7 @@ namespace PlantChillers {
                     ShowWarningError(state, this->MsgBuffer1 + '.');
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
                 }
             }
@@ -3279,7 +3282,7 @@ namespace PlantChillers {
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -3296,7 +3299,7 @@ namespace PlantChillers {
 
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -3321,15 +3324,15 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) { // Condenser inlet temp = outdoor temp
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 = format(
                     "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3337,15 +3340,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) { // Condenser inlet temp = (outdoor wet bulb)
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirWetBulb;
             //  Warn user if evap condenser wet bulb temperature falls below 10C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 = format(
                     "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3384,7 +3387,7 @@ namespace PlantChillers {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         // If there is a fault of chiller fouling
-        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 COP_ff = COPLocal;
@@ -3397,8 +3400,8 @@ namespace PlantChillers {
             COPLocal = COP_ff * this->FaultyChillerFoulingFactor;
         }
 
-        // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of Chiller SWT Sensor
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
@@ -3531,8 +3534,8 @@ namespace PlantChillers {
                 }
             } // End of Constant Variable Flow If Block
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            // If there is a fault of Chiller SWT Sensor
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -3653,8 +3656,8 @@ namespace PlantChillers {
                 }
             }
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            // If there is a fault of Chiller SWT Sensor
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -3816,20 +3819,20 @@ namespace PlantChillers {
                 if (this->CondInletTemp > 70.0) {
                     ShowSevereError(state, "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Condenser loop water temperatures are too high at" + General::RoundSigDigits(this->CondInletTemp, 2));
+                    ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", this->CondInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
 
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
                     ShowSevereError(state, "CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
-                    ShowContinueError(state, "Condenser inlet temperature: " + General::RoundSigDigits(this->CondInletTemp, 2));
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", this->CondInletTemp));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
@@ -4065,16 +4068,14 @@ namespace PlantChillers {
                 thisChiller.NomCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             thisChiller.COP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -4306,8 +4307,8 @@ namespace PlantChillers {
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AIRCOOLED ||
                     thisChiller.CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
                     if (thisChiller.CondVolFlowRate <= 0.0) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10) + '=' +
-                                        General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 6));
+                        ShowSevereError(state,
+                                        format("Invalid {}={:.6R}", DataIPShortCuts::cNumericFieldNames(10), DataIPShortCuts::rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                         ErrorsFound = true;
@@ -4517,7 +4518,7 @@ namespace PlantChillers {
         SetupOutputVariable(state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
         SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -4616,7 +4617,7 @@ namespace PlantChillers {
                 // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(state,
@@ -4692,7 +4693,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -4844,12 +4845,11 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -4897,14 +4897,15 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->EvapVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -4966,14 +4967,15 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(this->CondVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5021,14 +5023,13 @@ namespace PlantChillers {
                                                      "User-Specified Gas Turbine Engine Capacity [W]",
                                                      this->GTEngineCapacity);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(GTEngineCapacityDes - this->GTEngineCapacity) / this->GTEngineCapacity) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError(state, "User-Specified Gas Turbine Engine Capacity of " + General::RoundSigDigits(this->GTEngineCapacity, 2) +
-                                              " [W]");
-                            ShowContinueError(state, "differs from Design Size Gas Turbine Engine Capacity of " +
-                                              General::RoundSigDigits(GTEngineCapacityDes, 2) + " [W]");
+                            ShowContinueError(state, format("User-Specified Gas Turbine Engine Capacity of {:.2R} [W]", this->GTEngineCapacity));
+                            ShowContinueError(state,
+                                              format("differs from Design Size Gas Turbine Engine Capacity of {:.2R} [W]", GTEngineCapacityDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -5059,7 +5060,7 @@ namespace PlantChillers {
                     if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                              this->Name,
                                                              "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
@@ -5072,14 +5073,16 @@ namespace PlantChillers {
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGasTurbineChiller: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(DesignHeatRecVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Heat Recovery Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state,
+                                        format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
+                                                             tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5105,7 +5108,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -5153,7 +5156,7 @@ namespace PlantChillers {
         this->ExhaustStackTemp = 0.0;
 
         // calculate end time of current time step
-        Real64 CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         // Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         // Wait for next time step to print warnings. If simulation iterates, print out
@@ -5167,7 +5170,7 @@ namespace PlantChillers {
                     ShowWarningError(state, this->MsgBuffer1 + '.');
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
                 }
             }
@@ -5181,7 +5184,7 @@ namespace PlantChillers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -5197,7 +5200,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -5222,15 +5225,15 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) { // Condenser inlet temp = outdoor temp
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 =
                     "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -5238,15 +5241,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) { // Condenser inlet temp = (outdoor wet bulb)
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirWetBulb;
             //  Warn user if evap condenser wet bulb temperature falls below 10C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + this->Name +
                                    "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -5286,7 +5289,7 @@ namespace PlantChillers {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         // If there is a fault of chiller fouling
-        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 COP_ff = COP;
@@ -5299,8 +5302,8 @@ namespace PlantChillers {
             COP = COP_ff * this->FaultyChillerFoulingFactor;
         }
 
-        // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of Chiller SWT Sensor
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
@@ -5421,8 +5424,8 @@ namespace PlantChillers {
                 }
             } // End of Constant Variable Flow If Block
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            // If there is a fault of Chiller SWT Sensor
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -5531,8 +5534,8 @@ namespace PlantChillers {
                 }
             }
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            // If there is a fault of Chiller SWT Sensor
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -5622,7 +5625,7 @@ namespace PlantChillers {
 
             Real64 AmbientDeltaT; // (ATAIR) Difference between ambient actual and ambient design temperatures
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                AmbientDeltaT = DataEnvironment::OutDryBulbTemp - 25.0;
+                AmbientDeltaT = state.dataEnvrn->OutDryBulbTemp - 25.0;
             } else { // air or evap cooled
                 AmbientDeltaT = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb - 25.0;
             }
@@ -5723,20 +5726,20 @@ namespace PlantChillers {
                 if (condInletTemp > 70.0) {
                     ShowSevereError(state, "CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Condenser loop water temperatures are too high at" + General::RoundSigDigits(condInletTemp, 2));
+                    ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", condInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
 
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
                     ShowSevereError(state, "CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
-                    ShowContinueError(state, "Condenser inlet temperature: " + General::RoundSigDigits(condInletTemp, 2));
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", condInletTemp));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }
             }
@@ -5922,15 +5925,13 @@ namespace PlantChillers {
                 thisChiller.NomCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
             thisChiller.COP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -6218,7 +6219,7 @@ namespace PlantChillers {
                                     "Plant");
             }
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -6298,7 +6299,7 @@ namespace PlantChillers {
                 // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(state,
@@ -6374,7 +6375,7 @@ namespace PlantChillers {
                                                    this->CDCompNum);
             } else { // air or evap-air
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate =
-                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, TempDesCondIn, 0.0, RoutineName);
 
                 DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -6498,12 +6499,11 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -6551,14 +6551,15 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -6614,14 +6615,15 @@ namespace PlantChillers {
                                                              tmpCondVolFlowRate,
                                                              "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                              CondVolFlowRateUser);
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
-                                        ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
-                                                          General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
-                                        ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
-                                                          General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                        ShowContinueError(
+                                            state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                        ShowContinueError(
+                                            state,
+                                            format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                     }
@@ -6661,7 +6663,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ConstCOPChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -6686,7 +6688,7 @@ namespace PlantChillers {
         COP = this->COP;
 
         // If there is a fault of chiller fouling
-        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 COP_ff = COP;
@@ -6729,7 +6731,7 @@ namespace PlantChillers {
         }
 
         // If there is a fault of Chiller SWT Sensor
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
 
@@ -6749,7 +6751,7 @@ namespace PlantChillers {
             // If Chiller load is 0 or greater or chiller is not running then leave the subroutine.Before leaving
             // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
             // flow resolver will not shut down the branch
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -6764,7 +6766,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -6797,7 +6799,7 @@ namespace PlantChillers {
         }
 
         //   calculate end time of current time step
-        CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -6811,7 +6813,7 @@ namespace PlantChillers {
                     ShowWarningError(state, this->MsgBuffer1 + '.');
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->MsgBuffer1 + " error continues.", this->ErrCount1, this->MsgDataLast, this->MsgDataLast, _, "[C]", "[C]");
                 }
             }
@@ -6826,15 +6828,15 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) { // Condenser inlet temp = outdoor temp
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 =
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6842,15 +6844,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) { // Condenser inlet temp = (outdoor wet bulb)
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirWetBulb;
             //  Warn user if evap condenser wet bulb temperature falls below 10C
-            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !state.dataGlobal->WarmupFlag) {
                 this->PrintMessage = true;
                 this->MsgBuffer1 =
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6969,7 +6971,7 @@ namespace PlantChillers {
             } // End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -7048,7 +7050,7 @@ namespace PlantChillers {
             }
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -7124,9 +7126,9 @@ namespace PlantChillers {
                 if (CondInletTemp > 70.0) {
                     ShowSevereError(state, "CalcConstCOPChillerModel: Condenser loop inlet temperatures over 70.0 C for ConstCOPChiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Condenser loop water temperatures are too high at" + General::RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", CondInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
-                    ShowContinueError(state, "Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
+                    ShowContinueError(state, format("Evaporator inlet temperature: {:.2R}", DataLoopNode::Node(this->EvapInletNodeNum).Temp));
 
                     ShowFatalError(state, "Program Terminates due to previous error condition");
                 }

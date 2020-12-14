@@ -55,7 +55,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -73,8 +72,6 @@ namespace IntegratedHeatPump {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
-    using General::RoundSigDigits;
 
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
@@ -91,21 +88,22 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps.deallocate();
     }
 
-    void SimIHP(EnergyPlusData &state, std::string const &CompName,              // Coil Name
-                int &CompIndex,                           // Index for Component name
-                int const CyclingScheme,                  // Continuous fan OR cycling compressor
-                Real64 &MaxONOFFCyclesperHour,            // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 &HPTimeConstant,                   // Heat pump time constant [s]
-                Real64 &FanDelayTime,                     // Fan delay time, time delay for the HP's fan to
-                int const CompOp,                         // compressor on/off. 0 = off; 1= on
-                Real64 const PartLoadFrac,                // part load fraction
-                int const SpeedNum,                       // compressor speed number
-                Real64 const SpeedRatio,                  // compressor speed ratio
-                Real64 const SensLoad,                    // Sensible demand load [W]
-                Real64 const LatentLoad,                  // Latent demand load [W]
-                bool const IsCallbyWH,                    // whether the call from the water heating loop or air loop, true = from water heating loop
-                bool const EP_UNUSED(FirstHVACIteration), // TRUE if First iteration of simulation
-                Optional<Real64 const> OnOffAirFlowRat    // ratio of comp on to comp off air flow rate
+    void SimIHP(EnergyPlusData &state,
+                std::string const &CompName,   // Coil Name
+                int &CompIndex,                // Index for Component name
+                int const CyclingScheme,       // Continuous fan OR cycling compressor
+                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
+                Real64 &HPTimeConstant,        // Heat pump time constant [s]
+                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                int const CompOp,              // compressor on/off. 0 = off; 1= on
+                Real64 const PartLoadFrac,     // part load fraction
+                int const SpeedNum,            // compressor speed number
+                Real64 const SpeedRatio,       // compressor speed ratio
+                Real64 const SensLoad,         // Sensible demand load [W]
+                Real64 const LatentLoad,       // Latent demand load [W]
+                bool const IsCallbyWH,         // whether the call from the water heating loop or air loop, true = from water heating loop
+                [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -117,7 +115,6 @@ namespace IntegratedHeatPump {
         // This subroutine manages variable-speed integrated Air source heat pump simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
         using VariableSpeedCoils::InitVarSpeedCoil;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::UpdateVarSpeedCoil;
@@ -143,12 +140,18 @@ namespace IntegratedHeatPump {
         } else {
             DXCoilNum = CompIndex;
             if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-                ShowFatalError(state, "SimIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                               ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + CompName);
+                ShowFatalError(state,
+                               format("SimIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name={}",
+                                      DXCoilNum,
+                                      IntegratedHeatPumps.size(),
+                                      CompName));
             }
             if (!CompName.empty() && CompName != IntegratedHeatPumps(DXCoilNum).Name) {
-                ShowFatalError(state, "SimIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) + ", Integrated HP name=" + CompName +
-                               ", stored Integrated HP Name for that index=" + IntegratedHeatPumps(DXCoilNum).Name);
+                ShowFatalError(state,
+                               format("SimIHP: Invalid CompIndex passed={}, Integrated HP name={}, stored Integrated HP Name for that index={}",
+                                      DXCoilNum,
+                                      CompName,
+                                      IntegratedHeatPumps(DXCoilNum).Name));
             }
         };
 
@@ -1100,7 +1103,6 @@ namespace IntegratedHeatPump {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueCoilName;
-        using General::TrimSigDigits;
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1922,7 +1924,6 @@ namespace IntegratedHeatPump {
     void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using DataSizing::AutoSize;
-        using General::TrimSigDigits;
         using VariableSpeedCoils::SetVarSpeedCoilData;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::SizeVarSpeedCoil;
@@ -1937,8 +1938,9 @@ namespace IntegratedHeatPump {
         };
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "SizeIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(
+                state,
+                format("SizeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) {
@@ -2041,8 +2043,6 @@ namespace IntegratedHeatPump {
 
     void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
     {
-        using General::TrimSigDigits;
-
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput(state);
@@ -2050,8 +2050,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "InitializeIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("InitializeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = 0.0;             // air loop mass flow rate [kg/s]
@@ -2074,7 +2076,6 @@ namespace IntegratedHeatPump {
     void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using DataHVACGlobals::TimeStepSys;
-        using General::TrimSigDigits;
 
         int VSCoilIndex(0);
         Real64 ReportingConstant(0.0);
@@ -2087,8 +2088,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "UpdateIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("UpdateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2194,10 +2197,8 @@ namespace IntegratedHeatPump {
         // it should be called by an air loop parent object, when FirstHVACIteration == true
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::TimeStepSys;
-        using General::TrimSigDigits;
         using WaterThermalTanks::GetWaterThermalTankInput;
 
         Real64 MyLoad(0.0);
@@ -2211,8 +2212,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "DecideWorkMode: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("DecideWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
@@ -2281,7 +2284,7 @@ namespace IntegratedHeatPump {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCMode;
             } else if (SensLoad > SmallLoad) {
                 if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                    (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
+                    (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::IdleMode;
                 else
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHMode;
@@ -2304,11 +2307,11 @@ namespace IntegratedHeatPump {
             };
 
         } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                   (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
+                   (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
         {
             IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCWHMatchWHMode;
         } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorWHHighPriority) &&
-                   (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
+                   (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
         {
             IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::DWHMode;
         } else if (SensLoad > SmallLoad) {
@@ -2329,7 +2332,6 @@ namespace IntegratedHeatPump {
 
     void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     {
-        using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling clear up function
@@ -2343,8 +2345,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "ClearCoils: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("ClearCoils: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         // clear up
@@ -2370,8 +2374,6 @@ namespace IntegratedHeatPump {
 
     IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)
     {
-        using General::TrimSigDigits;
-
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput(state);
@@ -2380,8 +2382,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetCurWorkMode: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetCurWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
@@ -2569,10 +2573,10 @@ namespace IntegratedHeatPump {
     }
 
     int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
-                             std::string const &CoilType,            // must match coil types in this module
-                             std::string const &CoilName,            // must match coil names for the coil type
-                             IHPOperationMode const EP_UNUSED(Mode), // mode coil type
-                             bool &ErrorsFound                       // set to true if problem
+                             std::string const &CoilType,                  // must match coil types in this module
+                             std::string const &CoilName,                  // must match coil names for the coil type
+                             [[maybe_unused]] IHPOperationMode const Mode, // mode coil type
+                             bool &ErrorsFound                             // set to true if problem
     )
     {
         // FUNCTION INFORMATION:
@@ -2620,10 +2624,10 @@ namespace IntegratedHeatPump {
     }
 
     Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
-                                 std::string const &CoilType,            // must match coil types in this module
-                                 std::string const &CoilName,            // must match coil names for the coil type
-                                 IHPOperationMode const EP_UNUSED(Mode), // mode coil type
-                                 bool &ErrorsFound                       // set to true if problem
+                                 std::string const &CoilType,                  // must match coil types in this module
+                                 std::string const &CoilName,                  // must match coil names for the coil type
+                                 [[maybe_unused]] IHPOperationMode const Mode, // mode coil type
+                                 bool &ErrorsFound                             // set to true if problem
     )
     {
 
@@ -2678,8 +2682,6 @@ namespace IntegratedHeatPump {
 
     int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
     {
-        using General::TrimSigDigits;
-
         int SpeedNum(0);
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
@@ -2690,8 +2692,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetLowSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetLowSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2728,8 +2732,6 @@ namespace IntegratedHeatPump {
 
     int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
     {
-        using General::TrimSigDigits;
-
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetIHPInput(state);
@@ -2738,8 +2740,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetMaxSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetMaxSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         int SpeedNum(0);
@@ -2782,8 +2786,6 @@ namespace IntegratedHeatPump {
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        using General::TrimSigDigits;
-
         int IHPCoilIndex(0);
         Real64 AirVolFlowRate(0.0);
         Real64 FlowScale(1.0);
@@ -2796,8 +2798,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetAirVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetAirVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
@@ -2882,15 +2886,14 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
+    Real64 GetWaterVolFlowRateIHP(
+        EnergyPlusData &state,
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,
-        bool const EP_UNUSED(IsCallbyWH) // whether the call from the water heating loop or air loop, true = from water heating loop
+        [[maybe_unused]] bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        using General::TrimSigDigits;
-
         int IHPCoilIndex(0);
         Real64 WaterVolFlowRate(0.0);
 
@@ -2901,8 +2904,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetWaterVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetWaterVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
@@ -2965,8 +2970,6 @@ namespace IntegratedHeatPump {
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
-        using General::TrimSigDigits;
-
         int IHPCoilIndex(0);
         Real64 AirMassFlowRate(0.0);
         Real64 FlowScale(1.0);
@@ -2980,8 +2983,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, "GetAirMassFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits(DXCoilNum) +
-                           ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
+            ShowFatalError(state,
+                           format("GetAirMassFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);

@@ -711,7 +711,7 @@ namespace ChillerGasAbsorption {
             // check if outlet node of chilled water side has a setpoint.
             if ((DataLoopNode::Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->ChillSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
                         ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
@@ -743,7 +743,7 @@ namespace ChillerGasAbsorption {
             // check if outlet node of hot water side has a setpoint.
             if ((DataLoopNode::Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->HeatSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
                         ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
@@ -967,12 +967,11 @@ namespace ChillerGasAbsorption {
                                                                     tmpNomCap,
                                                                     "User-Specified Nominal Cooling Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1032,14 +1031,15 @@ namespace ChillerGasAbsorption {
                                                                     tmpEvapVolFlowRate,
                                                                     "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                                     EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1104,14 +1104,14 @@ namespace ChillerGasAbsorption {
                                                                     tmpHeatRecVolFlowRate,
                                                                     "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                                     HeatRecVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser) / HeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Hot Water Flow Rate of " +
-                                                      General::RoundSigDigits(HeatRecVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Hot Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Design Hot Water Flow Rate of {:.5R} [m3/s]", HeatRecVolFlowRateUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Design Hot Water Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1188,14 +1188,15 @@ namespace ChillerGasAbsorption {
                                                                     tmpCondVolFlowRate,
                                                                     "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                                     CondVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1463,7 +1464,7 @@ namespace ChillerGasAbsorption {
                         // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
                     } else {
                         lChillWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:Cooling\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:Cooling\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempCoolErrCount);
                     }
@@ -1586,7 +1587,7 @@ namespace ChillerGasAbsorption {
                 if (revisedEstimateAvailCap > 0.0) {
                     errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                     if (errorAvailCap > 0.05) { // if more than 5% error in estimate
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
                                                        this->CondErrCount,
                                                        errorAvailCap,
                                                        errorAvailCap);
@@ -1748,7 +1749,7 @@ namespace ChillerGasAbsorption {
 
                     } else {
                         lHotWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:Heating\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:Heating\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempHeatErrCount);
                     }

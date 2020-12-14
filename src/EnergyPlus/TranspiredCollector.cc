@@ -138,7 +138,7 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using DataHVACGlobals::TempControlTol;
         using DataLoopNode::Node;
-        using General::TrimSigDigits;
+
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -160,13 +160,20 @@ namespace TranspiredCollector {
         } else {
             UTSCNum = CompIndex;
             if (UTSCNum > state.dataTranspiredCollector->NumUTSC || UTSCNum < 1) {
-                ShowFatalError(state, "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits(UTSCNum) +
-                               ", Number of Transpired Collectors=" + TrimSigDigits(state.dataTranspiredCollector->NumUTSC) + ", UTSC name=" + CompName);
+                ShowFatalError(state,
+                               format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}",
+                                      UTSCNum,
+                                      state.dataTranspiredCollector->NumUTSC,
+                                      CompName));
             }
             if (state.dataTranspiredCollector->CheckEquipName(UTSCNum)) {
                 if (CompName != state.dataTranspiredCollector->UTSC(UTSCNum).Name) {
-                    ShowFatalError(state, "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits(UTSCNum) + ", Transpired Collector name=" +
-                                   CompName + ", stored Transpired Collector Name for that index=" + state.dataTranspiredCollector->UTSC(UTSCNum).Name);
+                    ShowFatalError(state,
+                                   format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired "
+                                          "Collector Name for that index={}",
+                                          UTSCNum,
+                                          CompName,
+                                          state.dataTranspiredCollector->UTSC(UTSCNum).Name));
                 }
                 state.dataTranspiredCollector->CheckEquipName(UTSCNum) = false;
             }
@@ -239,8 +246,7 @@ namespace TranspiredCollector {
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -286,8 +292,10 @@ namespace TranspiredCollector {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 11) {
-            ShowSevereError(state, "GetTranspiredCollectorInput: " + CurrentModuleObject +
-                            " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits(MaxNumNumbers));
+            ShowSevereError(state,
+                            format("GetTranspiredCollectorInput: {} Object Definition indicates not = 11 Number Objects, Number Indicated={}",
+                                   CurrentModuleObject,
+                                   MaxNumNumbers));
             ErrorsFound = true;
         }
         Alphas.allocate(MaxNumAlphas);
@@ -324,8 +332,10 @@ namespace TranspiredCollector {
                 inputProcessor->getObjectDefMaxArgs(state, CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
 
                 if (MaxNumNumbersSplit != 0) {
-                    ShowSevereError(state, "GetTranspiredCollectorInput: " + CurrentModuleMultiObject +
-                                    " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits(MaxNumNumbersSplit));
+                    ShowSevereError(state,
+                                    format("GetTranspiredCollectorInput: {} Object Definition indicates not = 0 Number Objects, Number Indicated={}",
+                                           CurrentModuleMultiObject,
+                                           MaxNumNumbersSplit));
                     ErrorsFound = true;
                 }
                 if (!allocated(AlphasSplit)) AlphasSplit.allocate(MaxNumAlphasSplit);
@@ -531,7 +541,7 @@ namespace TranspiredCollector {
                     ShowWarningError(state, "Suspected input problem with collector surface = " + Alphas(ThisSurf + AlphaOffset));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataTranspiredCollector->UTSC(Item).Name);
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits(Surface(Found).Tilt, 2));
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", Surface(Found).Tilt));
                 }
 
                 state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf) = Found;
@@ -716,7 +726,6 @@ namespace TranspiredCollector {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
         using namespace DataLoopNode;
@@ -763,13 +772,13 @@ namespace TranspiredCollector {
         } // first time
 
         // Check that setpoint is active (from test by RJL in HVACEvapComponent)
-        if (!SysSizingCalc && state.dataTranspiredCollector->MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataTranspiredCollector->MySetPointCheckFlag && DoSetPointTest) {
             for (UTSCUnitNum = 1; UTSCUnitNum <= state.dataTranspiredCollector->NumUTSC; ++UTSCUnitNum) {
                 for (SplitBranch = 1; SplitBranch <= state.dataTranspiredCollector->UTSC(UTSCUnitNum).NumOASysAttached; ++SplitBranch) {
                     ControlNode = state.dataTranspiredCollector->UTSC(UTSCUnitNum).ControlNode(SplitBranch);
                     if (ControlNode > 0) {
                         if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
                                 ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 SetPointErrorFlag = true;
@@ -801,7 +810,7 @@ namespace TranspiredCollector {
 
         // determine average ambient temperature
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!DataEnvironment::IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
         } else { // when raining we use wet bulb not drybulb
             Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
@@ -844,15 +853,11 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
-        using DataEnvironment::SkyTemp;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-        using General::RoundSigDigits;
+
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -938,7 +943,7 @@ namespace TranspiredCollector {
         // Active UTSC calculation
         // first do common things for both correlations
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
             // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
@@ -951,9 +956,9 @@ namespace TranspiredCollector {
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
 
-        CpAir = PsyCpAirFnW(OutHumRat);
+        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
 
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
@@ -969,7 +974,7 @@ namespace TranspiredCollector {
             if (state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex == 0) {
                 ShowWarningMessage(state, "Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name +
                                    "\", Suction velocity is outside of range for a good design");
-                ShowContinueErrorTimeStamp(state, "Suction velocity =" + RoundSigDigits(Vsuction, 4));
+                ShowContinueErrorTimeStamp(state, format("Suction velocity ={:.4R}", Vsuction));
                 if (Vsuction < 0.003) {
                     ShowContinueError(state, "Velocity is low -- suggest decreasing area of transpired collector");
                 }
@@ -978,7 +983,7 @@ namespace TranspiredCollector {
                 }
                 ShowContinueError(state, "Occasional suction velocity messages are not unexpected when simulating actual conditions");
             }
-            ShowRecurringWarningErrorAtEnd("Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
+            ShowRecurringWarningErrorAtEnd(state, "Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
                                            state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex,
                                            Vsuction,
                                            Vsuction,
@@ -1074,7 +1079,7 @@ namespace TranspiredCollector {
             HcWind = 0.0;
         }
 
-        if (IsRain) HcWind = 1000.0;
+        if (state.dataEnvrn->IsRain) HcWind = 1000.0;
 
         HXeff = 0.0; // init
 
@@ -1111,7 +1116,7 @@ namespace TranspiredCollector {
 
         // now calculate collector temperature
 
-        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
+        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
                   (Mdot * CpAir / A) * (1.0 - HXeff) * Tamb + QdotSource) /
                  (HrAtm + HrSky + HrGround + HrPlen + HcWind + (Mdot * CpAir / A) * HXeff);
 
@@ -1142,7 +1147,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).Vsuction = Vsuction;
         state.dataTranspiredCollector->UTSC(UTSCNum).PlenumVelocity = Vplen;
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp = Taplen;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = OutHumRat; // stays the same with sensible heating
+        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = state.dataEnvrn->OutHumRat; // stays the same with sensible heating
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
@@ -1185,7 +1190,6 @@ namespace TranspiredCollector {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyHFnTdbW;
@@ -1227,9 +1231,9 @@ namespace TranspiredCollector {
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         Twbamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                  surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, OutBaroPress);
+        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRatAmb);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
         AspRat = state.dataTranspiredCollector->UTSC(UTSCNum).Height / state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick;

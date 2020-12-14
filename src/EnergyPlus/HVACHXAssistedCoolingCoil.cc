@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -65,7 +64,6 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -102,7 +100,6 @@ namespace HVACHXAssistedCoolingCoil {
     //  Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     // unused0909USE DataEnvironment, ONLY: CurMnDy, EnvironmentName
 
@@ -186,9 +183,6 @@ namespace HVACHXAssistedCoolingCoil {
         //  This subroutine manages the simulation of the
         //  cooling coil/heat exchanger combination.
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // (not used for Coil:Water:DetailedFlatCooling)
@@ -218,14 +212,19 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError(state, "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
-                               ", Number of HX Assisted Cooling Coils=" + TrimSigDigits(TotalNumHXAssistedCoils) +
-                               ", Coil name=" + HXAssistedCoilName);
+                ShowFatalError(state,
+                               format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Number of HX Assisted Cooling Coils={}, Coil name={}",
+                                      HXAssistedCoilNum,
+                                      TotalNumHXAssistedCoils,
+                                      HXAssistedCoilName));
             }
             if (CheckEquipName(HXAssistedCoilNum)) {
                 if (!HXAssistedCoilName.empty() && HXAssistedCoilName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                    ShowFatalError(state, "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) + ", Coil name=" +
-                                   HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil(HXAssistedCoilNum).Name);
+                    ShowFatalError(state,
+                                   format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                          HXAssistedCoilNum,
+                                          HXAssistedCoilName,
+                                          HXAssistedCoil(HXAssistedCoilNum).Name));
                 }
                 CheckEquipName(HXAssistedCoilNum) = false;
             }
@@ -881,9 +880,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // Using/Aliasing
         using DXCoils::SimDXCoil;
-        using General::TrimSigDigits;
         using HeatRecovery::SimHeatRecovery;
-        using Psychrometrics::PsyHFnTdbW;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
@@ -1003,11 +1000,14 @@ namespace HVACHXAssistedCoolingCoil {
         if (Iter > MaxIter) {
             if (HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter < 1) {
                 ++HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter;
-                ShowWarningError(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
-                                 "\" -- Exceeded max iterations (" + TrimSigDigits(MaxIter) + ") while calculating operating conditions.");
+                ShowWarningError(state,
+                                 format("{} \"{}\" -- Exceeded max iterations ({}) while calculating operating conditions.",
+                                        HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                                        MaxIter));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
                                                    "\" -- Exceeded max iterations error continues...",
                                                HXAssistedCoil(HXAssistedCoilNum).MaxIterIndex);
             }
@@ -1056,7 +1056,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
+                                            [[maybe_unused]] std::string const &CompType, // unused1208
                                             std::string const &CompName,
                                             Real64 &Value,
                                             int &CompIndex)
@@ -1071,9 +1072,6 @@ namespace HVACHXAssistedCoolingCoil {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine provides a method for outside routines to check if
         // the hx assisted cooling coil is scheduled to be on.
-
-        // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HXAssistedCoilNum;
@@ -1101,12 +1099,19 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
-                               ", Number of Heating Coils=" + TrimSigDigits(TotalNumHXAssistedCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      HXAssistedCoilNum,
+                                      TotalNumHXAssistedCoils,
+                                      CompName));
             }
             if (CompName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
-                               ", Coil name=" + CompName + ", stored Coil Name for that index=" + HXAssistedCoil(HXAssistedCoilNum).Name);
+                ShowFatalError(
+                    state,
+                    format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                           HXAssistedCoilNum,
+                           CompName,
+                           HXAssistedCoil(HXAssistedCoilNum).Name));
             }
 
             Value = 1.0; // not scheduled?
@@ -1168,7 +1173,7 @@ namespace HVACHXAssistedCoolingCoil {
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 }
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
                 }
             }
         } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
@@ -1176,7 +1181,7 @@ namespace HVACHXAssistedCoolingCoil {
                 // coil does not have capacity in input so mine information from DX cooling coil
                 CoilCapacity = GetWaterCoilCapacity(state, HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
                 }
             }
         } else {
@@ -1741,7 +1746,7 @@ namespace HVACHXAssistedCoolingCoil {
                 if (WhichCoil != 0) {
                     // coil does not specify MaxWaterFlowRate
                     MaxWaterFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd("Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount);
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {

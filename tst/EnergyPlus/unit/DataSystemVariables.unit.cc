@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -64,7 +65,7 @@ TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
     bool fileFound = false;
     std::string fullPath;
     std::string contextString = "Test File_Not_Found_ERR_Output";
-    DataSystemVariables::CheckForActualFileName(this->state, filePath, fileFound, fullPath, contextString);
+    DataSystemVariables::CheckForActualFileName(*this->state, filePath, fileFound, fullPath, contextString);
     EXPECT_FALSE(fileFound);
     EXPECT_TRUE(match_err_stream(expectedError));
 }

@@ -737,7 +737,7 @@ namespace RefrigeratedCase {
             GasCooler.allocate(NumSimulationGasCooler);
         }
         if (NumSimulationCases > 0) {
-            CaseRAFraction.allocate(DataGlobals::NumOfZones);
+            CaseRAFraction.allocate(state.dataGlobal->NumOfZones);
             RefrigCase.allocate(NumSimulationCases);
             ShowStockingWarning.dimension(NumSimulationCases, true);
         }
@@ -745,7 +745,7 @@ namespace RefrigeratedCase {
             WalkIn.allocate(NumSimulationWalkIns);
         }
         if ((NumSimulationWalkIns > 0) || (NumSimulationCases > 0)) {
-            CaseWIZoneReport.allocate(DataGlobals::NumOfZones);
+            CaseWIZoneReport.allocate(state.dataGlobal->NumOfZones);
         } else {
             UseSysTimeStep = true;
             // needed to avoid accessing unallocated caseWIZoneReport on early call to SumZones
@@ -756,7 +756,7 @@ namespace RefrigeratedCase {
         }
         if (NumSimulationRefrigAirChillers > 0) {
             WarehouseCoil.allocate(NumSimulationRefrigAirChillers);
-            CoilSysCredit.allocate(DataGlobals::NumOfZones);
+            CoilSysCredit.allocate(state.dataGlobal->NumOfZones);
         }
         if (NumSimulationCompressors > 0) Compressor.allocate(NumSimulationCompressors);
         if (NumSimulationSubcoolers > 0) Subcooler.allocate(NumSimulationSubcoolers);
@@ -764,8 +764,8 @@ namespace RefrigeratedCase {
         if (NumCompressorLists > 0) CompressorLists.allocate(NumCompressorLists);
         if (NumSimulationTransferLoadLists > 0) TransferLoadList.allocate(NumSimulationTransferLoadLists);
 
-        DayValues.allocate(DataGlobals::NumOfTimeStepInHour, 24);
-        RefrigPresentInZone.dimension(DataGlobals::NumOfZones, false);
+        DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+        RefrigPresentInZone.dimension(state.dataGlobal->NumOfZones, false);
 
         inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
         inputProcessor->getObjectDefMaxArgs(state,
@@ -895,8 +895,8 @@ namespace RefrigeratedCase {
                 }
                 RefrigCase(CaseNum).RatedAmbientDewPoint = Psychrometrics::PsyTdpFnWPb(state,
                     Psychrometrics::PsyWFnTdbRhPb(state,
-                        RefrigCase(CaseNum).RatedAmbientTemp, (RefrigCase(CaseNum).RatedAmbientRH / 100.0), DataEnvironment::StdBaroPress),
-                    DataEnvironment::StdBaroPress);
+                        RefrigCase(CaseNum).RatedAmbientTemp, (RefrigCase(CaseNum).RatedAmbientRH / 100.0), state.dataEnvrn->StdBaroPress),
+                    state.dataEnvrn->StdBaroPress);
 
                 RefrigCase(CaseNum).RateTotCapPerLength = Numbers(3);
                 if (Numbers(3) <= 0.0) {
@@ -1105,7 +1105,7 @@ namespace RefrigeratedCase {
                 if (RefrigCase(CaseNum).Height <= 0.0 && RefrigCase(CaseNum).AntiSweatControlType == ASHeatBalance) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
                                     " must be greater than 0 when " + cAlphaFieldNames(7) + " is Heat Balance Method.");
-                    ShowContinueError(state, "..given " + cNumericFieldNames(NumNum) + " was: " + General::RoundSigDigits(RefrigCase(CaseNum).Height, 3));
+                    ShowContinueError(state, format("..given {} was: {:.3R}", cNumericFieldNames(NumNum), RefrigCase(CaseNum).Height));
                     ErrorsFound = true;
                 }
 
@@ -1216,7 +1216,7 @@ namespace RefrigeratedCase {
                 DayValues = 0.0;
                 ScheduleManager::GetScheduleValuesForDay(state, RefrigCase(CaseNum).DefrostSchedPtr, DayValues, 1);
                 for (int HRNum = 1; HRNum <= 24; ++HRNum) {
-                    for (int TSNum = 1; TSNum <= DataGlobals::NumOfTimeStepInHour; ++TSNum) {
+                    for (int TSNum = 1; TSNum <= state.dataGlobal->NumOfTimeStepInHour; ++TSNum) {
                         if (DayValues(TSNum, HRNum) > 0.0) {
                             if (!StartCycle) {
                                 ++NumDefCycles;
@@ -3127,15 +3127,15 @@ namespace RefrigeratedCase {
                         Condenser(CondNum).RatedCapacity = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, CondARI460DelT);
                     }
                     // elevation capacity correction on air-cooled condensers, Carrier correlation more conservative than Trane
-                    Condenser(CondNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                    Condenser(CondNum).RatedCapacity *= (1.0 - 7.17e-5 * state.dataEnvrn->Elevation);
                     if (Condenser(CondNum).RatedCapacity > 0.0) {
                         CurveManager::GetCurveMinMaxValues(state,Condenser(CondNum).CapCurvePtr, DelTempMin, DelTempMax);
                         Real64 Capmin = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, DelTempMin) *
-                                        (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug fix
+                                        (1.0 - 7.17e-5 * state.dataEnvrn->Elevation); // Mar 2011 bug fix
                         Real64 Capmax = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, DelTempMax) *
-                                        (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug
+                                        (1.0 - 7.17e-5 * state.dataEnvrn->Elevation); // Mar 2011 bug
                         Condenser(CondNum).TempSlope =
-                            (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * DataEnvironment::Elevation ) ) //Mar 2011 bug fix
+                            (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * state.dataEnvrn->Elevation ) ) //Mar 2011 bug fix
                         Condenser(CondNum).MinCondLoad = Capmax - DelTempMax / Condenser(CondNum).TempSlope;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name +
@@ -3254,7 +3254,7 @@ namespace RefrigeratedCase {
                         ErrorsFound = true;
                     }
                     // Calculate capacity elevation derate factor per ARI 490 barometric pressure correction factor
-                    Condenser(CondNum).EvapElevFact = 1.0 - 3.074e-5 * DataEnvironment::Elevation;
+                    Condenser(CondNum).EvapElevFact = 1.0 - 3.074e-5 * state.dataEnvrn->Elevation;
 
                     Condenser(CondNum).RatedSubcool = 0.0; // default value
                     if ((!lNumericBlanks(2)) && (Numbers(2) > 0.0)) Condenser(CondNum).RatedSubcool = Numbers(2);
@@ -3724,13 +3724,13 @@ namespace RefrigeratedCase {
                         GasCooler(GCNum).RatedCapacity = CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, GasCooler(GCNum).RatedApproachT);
                     }
                     // elevation capacity correction on air-cooled condensers, Carrier correlation more conservative than Trane
-                    GasCooler(GCNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                    GasCooler(GCNum).RatedCapacity *= (1.0 - 7.17e-5 * state.dataEnvrn->Elevation);
                     if (GasCooler(GCNum).RatedCapacity > 0.0) {
                         CurveManager::GetCurveMinMaxValues(state,GasCooler(GCNum).CapCurvePtr, DelTempMin, DelTempMax);
                         Real64 Capmin =
-                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * state.dataEnvrn->Elevation);
                         Real64 Capmax =
-                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * state.dataEnvrn->Elevation);
                         GasCooler(GCNum).TempSlope = (DelTempMax - DelTempMin) / ((Capmax - Capmin));
                         GasCooler(GCNum).MinCondLoad = Capmax - DelTempMax / GasCooler(GCNum).TempSlope;
                     } else {
@@ -4093,11 +4093,14 @@ namespace RefrigeratedCase {
                             Real64 NominalSecondaryCapacity = FlowMassRated * CpBrineRated * Secondary(SecondaryNum).TRangeDifRated;
                             Real64 TestDelta = (NominalSecondaryCapacity - Secondary(SecondaryNum).CoolingLoadRated) / NominalSecondaryCapacity;
                             if (std::abs(TestDelta) > 0.2) {
-                                ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                                 " You may wish to check the system definition. Based upon the design flow rate and range "
-                                                 "temperature difference,  The nominal secondary loop heat exchanger capacity is, " +
-                                                 General::RoundSigDigits(NominalSecondaryCapacity, 0) + " but the specified design capacity is,  " +
-                                                 General::RoundSigDigits(Secondary(SecondaryNum).CoolingLoadRated, 0));
+                                ShowWarningError(state,
+                                                 format("{}=\"{} You may wish to check the system definition. Based upon the design flow rate and "
+                                                        "range temperature difference,  The nominal secondary loop heat exchanger capacity is, "
+                                                        "{:.0R} but the specified design capacity is,  {:.0R}",
+                                                        CurrentModuleObject,
+                                                        Secondary(SecondaryNum).Name,
+                                                        NominalSecondaryCapacity,
+                                                        Secondary(SecondaryNum).CoolingLoadRated));
                             }
                         } else if (!lNumericBlanks(1)) {
                             Secondary(SecondaryNum).CoolingLoadRated = Numbers(1);
@@ -4122,9 +4125,12 @@ namespace RefrigeratedCase {
                                 (FlowMassRated * CpBrineRated * (TBrineInRated - Secondary(SecondaryNum).TEvapDesign));
                             Secondary(SecondaryNum).TBrineInRated = TBrineInRated;
                             if (Secondary(SecondaryNum).HeatExchangeEta > 0.99) {
-                                ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                                 " You may wish to check the system definition.  The heat exchanger effectiveness is, " +
-                                                 General::RoundSigDigits(Secondary(SecondaryNum).HeatExchangeEta, 2));
+                                ShowWarningError(
+                                    state,
+                                    format("{}=\"{} You may wish to check the system definition.  The heat exchanger effectiveness is, {:.2R}",
+                                           CurrentModuleObject,
+                                           Secondary(SecondaryNum).Name,
+                                           Secondary(SecondaryNum).HeatExchangeEta));
                                 Secondary(SecondaryNum).HeatExchangeEta = 0.99;
                             }
                         } else {
@@ -4174,11 +4180,16 @@ namespace RefrigeratedCase {
                                 DensityPhaseChange * DeltaHPhaseChange * PumpTotRatedFlowVol / Secondary(SecondaryNum).CoolingLoadRated;
                             Real64 DiffCircRates = (CalcCircRate - Secondary(SecondaryNum).CircRate) / Secondary(SecondaryNum).CircRate;
                             if (std::abs(DiffCircRates) > 0.3) {
-                                ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + ' ' + cNumericFieldNames(7) +
-                                                 " Produces a circulating rate of " + General::RoundSigDigits(CalcCircRate, 2) +
-                                                 " ;  A circulating rate of " + General::RoundSigDigits(Secondary(SecondaryNum).CircRate, 2) +
-                                                 " would need a " + cNumericFieldNames(7) + " of " + General::RoundSigDigits(CalcTotFlowVol, 2) +
-                                                 " m3/s");
+                                ShowWarningError(state,
+                                                 format("{}=\"{} {} Produces a circulating rate of {:.2R} ;  A circulating rate of {:.2R} would need "
+                                                        "a {} of {:.2R} m3/s",
+                                                        CurrentModuleObject,
+                                                        Secondary(SecondaryNum).Name,
+                                                        cNumericFieldNames(7),
+                                                        CalcCircRate,
+                                                        Secondary(SecondaryNum).CircRate,
+                                                        cNumericFieldNames(7),
+                                                        CalcTotFlowVol));
                             } // warning check on pump flow rate vs circ rate input
                         }     // blank pump flow rate
                         SecondaryFlowVolRated = PumpTotRatedFlowVol;
@@ -4271,9 +4282,13 @@ namespace RefrigeratedCase {
                         if ((0.5 <= Numbers(NumNum)) && (1.0 >= Numbers(NumNum))) {
                             Secondary(SecondaryNum).PumpPowerToHeat = Numbers(NumNum);
                         } else {
-                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " +
-                                             cNumericFieldNames(NumNum) + " must be between 0.5 and 1.0. Default value of : " +
-                                             General::RoundSigDigits(PumpMotorEfficiency, 3) + " will be used");
+                            ShowWarningError(state,
+                                             format("{}{}=\"{}\" {} must be between 0.5 and 1.0. Default value of : {:.3R} will be used",
+                                                    RoutineName,
+                                                    CurrentModuleObject,
+                                                    Secondary(SecondaryNum).Name,
+                                                    cNumericFieldNames(NumNum),
+                                                    PumpMotorEfficiency));
                         } // range of pump moter heat to fluid
                     }     // blank input for pumppowertoheat
 
@@ -4381,10 +4396,13 @@ namespace RefrigeratedCase {
                     if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
                         if (TBrineOutRated > (Secondary(SecondaryNum).TMinNeeded + 0.5)) {
                             ShowWarningError(state,
-                                CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                " The design brine temperature to the refrigeration loads: " + General::RoundSigDigits(TBrineOutRated, 1) + " ;");
-                            ShowContinueError(state, " is greater than the design inlet temperature for at least one of the cases or walkins: " +
-                                              General::RoundSigDigits(Secondary(SecondaryNum).TMinNeeded, 1));
+                                             format("{}=\"{} The design brine temperature to the refrigeration loads: {:.1R} ;",
+                                                    CurrentModuleObject,
+                                                    Secondary(SecondaryNum).Name,
+                                                    TBrineOutRated));
+                            ShowContinueError(state,
+                                              format(" is greater than the design inlet temperature for at least one of the cases or walkins: {:.1R}",
+                                                     Secondary(SecondaryNum).TMinNeeded));
                             ShowContinueError(state,
                                 " Compare your Approach and Evaporating Temperature to the design inlet temperatures needed for the loads.");
                             // ErrorsFound = .TRUE.
@@ -4395,11 +4413,13 @@ namespace RefrigeratedCase {
                         Real64 DeltaCap1 =
                             std::abs((Secondary(SecondaryNum).CoolingLoadRated - CapacityAtMaxVolFlow) / Secondary(SecondaryNum).CoolingLoadRated);
                         if (DeltaCap1 > (0.3)) { // diff between chiller rating and capacity at max flow > 30%
-                            ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                             "\" You may wish to check the system sizing.  The nominal secondary loop heat exchanger capacity is " +
-                                             General::RoundSigDigits(Secondary(SecondaryNum).CoolingLoadRated, 0) +
-                                             " But the capacity based upon the maximum flow rate is " +
-                                             General::RoundSigDigits(CapacityAtMaxVolFlow, 0));
+                            ShowWarningError(state,
+                                             format("{}=\"{}\" You may wish to check the system sizing.  The nominal secondary loop heat exchanger "
+                                                    "capacity is {:.0R} But the capacity based upon the maximum flow rate is {:.0R}",
+                                                    CurrentModuleObject,
+                                                    Secondary(SecondaryNum).Name,
+                                                    Secondary(SecondaryNum).CoolingLoadRated,
+                                                    CapacityAtMaxVolFlow));
                         }                            // DeltaCap1 > .3
                     } else {                         // Fluid type phase change                !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                         if (lNumericBlanks(1)) {     // Chiller/evaporator capacity was not specified
@@ -4426,18 +4446,24 @@ namespace RefrigeratedCase {
                     Real64 DeltaCap2 =
                         std::abs((Secondary(SecondaryNum).CoolingLoadRated - NominalSecondaryRefLoad) / Secondary(SecondaryNum).CoolingLoadRated);
                     if (DeltaCap2 > (0.3)) { // diff between chiller rating and sum of nominal loads > 30%
-                        ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                         "\" You may wish to check the system sizing. Total nominal refrigerating load is " +
-                                         General::RoundSigDigits(NominalSecondaryRefLoad, 0) +
-                                         " (Including cases, walk-ins, and pump heat).  The nominal secondary loop heat exchanger capacity is " +
-                                         General::RoundSigDigits(Secondary(SecondaryNum).CoolingLoadRated, 0));
+                        ShowWarningError(
+                            state,
+                            format("{}=\"{}\" You may wish to check the system sizing. Total nominal refrigerating load is {:.0R} (Including cases, "
+                                   "walk-ins, and pump heat).  The nominal secondary loop heat exchanger capacity is {:.0R}",
+                                   CurrentModuleObject,
+                                   Secondary(SecondaryNum).Name,
+                                   NominalSecondaryRefLoad,
+                                   Secondary(SecondaryNum).CoolingLoadRated));
                     }
                     // compare rated xt xchanger brine flow to the total rated pump flow
                     if (SecondaryFlowVolRated > (1.1 * PumpTotRatedFlowVol)) {
-                        ShowWarningError(state, CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
-                                         "\" You may wish to check the pump sizing. Total nominal brine flow is " +
-                                         General::RoundSigDigits(SecondaryFlowVolRated, 0) + " m3/s, but the total nominal pump flow rate is:  " +
-                                         General::RoundSigDigits(PumpTotRatedFlowVol, 0) + " m3/s. ");
+                        ShowWarningError(state,
+                                         format("{}=\"{}\" You may wish to check the pump sizing. Total nominal brine flow is {:.0R} m3/s, but the "
+                                                "total nominal pump flow rate is:  {:.0R} m3/s. ",
+                                                CurrentModuleObject,
+                                                Secondary(SecondaryNum).Name,
+                                                SecondaryFlowVolRated,
+                                                PumpTotRatedFlowVol));
                     }
 
                 } // Secondary Loops
@@ -5140,7 +5166,7 @@ namespace RefrigeratedCase {
                 if (!lNumericBlanks(1)) {
                     System(RefrigSysNum).TCondenseMin = Numbers(1);
                     System(RefrigSysNum).TCondenseMinInput = System(RefrigSysNum).TCondenseMin;
-                    if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("Refrigeration:System",
                                          System(RefrigSysNum).Name,
                                          "Minimum Condensing Temperature",
@@ -5307,8 +5333,10 @@ namespace RefrigeratedCase {
                     System(RefrigSysNum).IntercoolerEffectiveness = Numbers(4);
                     if (System(RefrigSysNum).IntercoolerEffectiveness < 0.0 || System(RefrigSysNum).IntercoolerEffectiveness > 1.0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", The specified value for the");
-                        ShowContinueError(state, cNumericFieldNames(4) + " = " + General::RoundSigDigits(System(RefrigSysNum).IntercoolerEffectiveness, 2) +
-                                          " is invalid.  This value must be");
+                        ShowContinueError(state,
+                                          format("{} = {:.2R} is invalid.  This value must be",
+                                                 cNumericFieldNames(4),
+                                                 System(RefrigSysNum).IntercoolerEffectiveness));
                         ShowContinueError(state, "between 0.0 and 1.0.  The default value of 0.8 will be used.");
                         System(RefrigSysNum).IntercoolerEffectiveness = 0.8;
                     }
@@ -5421,19 +5449,25 @@ namespace RefrigeratedCase {
                 if (System(RefrigSysNum).SystemRejectHeatToZone) NominalCondCap *= 2.0;
                 if (System(RefrigSysNum).NumStages == 1) { // Single-stage system
                     if ((NominalTotalCompCap < (0.7 * NominalTotalCoolingCap)) || (NominalCondCap < (1.3 * NominalTotalCoolingCap))) {
-                        ShowWarningError(state, CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
-                                         "\", You may wish to check the system sizing. Total nominal cooling capacity is " +
-                                         General::RoundSigDigits(NominalTotalCoolingCap, 0) + "W. Condenser capacity is " +
-                                         General::RoundSigDigits(NominalCondCap, 0) + "W. Nominal compressor capacity is " +
-                                         General::RoundSigDigits(NominalTotalCompCap, 0) + "W.");
+                        ShowWarningError(state,
+                                         format("{}=\"{}\", You may wish to check the system sizing. Total nominal cooling capacity is {:.0R}W. "
+                                                "Condenser capacity is {:.0R}W. Nominal compressor capacity is {:.0R}W.",
+                                                CurrentModuleObject,
+                                                System(RefrigSysNum).Name,
+                                                NominalTotalCoolingCap,
+                                                NominalCondCap,
+                                                NominalTotalCompCap));
                     }
                 } else if (System(RefrigSysNum).NumStages == 2) { // Two-stage system
                     if ((NominalTotalHiStageCompCap < (0.7 * NominalTotalCoolingCap)) || (NominalCondCap < (1.3 * NominalTotalCoolingCap))) {
-                        ShowWarningError(state, CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
-                                         "\", You may wish to check the system sizing. Total nominal cooling capacity is " +
-                                         General::RoundSigDigits(NominalTotalCoolingCap, 0) + "W. Condenser capacity is " +
-                                         General::RoundSigDigits(NominalCondCap, 0) + "W. Nominal compressor capacity is " +
-                                         General::RoundSigDigits(NominalTotalCompCap, 0) + "W.");
+                        ShowWarningError(state,
+                                         format("{}=\"{}\", You may wish to check the system sizing. Total nominal cooling capacity is {:.0R}W. "
+                                                "Condenser capacity is {:.0R}W. Nominal compressor capacity is {:.0R}W.",
+                                                CurrentModuleObject,
+                                                System(RefrigSysNum).Name,
+                                                NominalTotalCoolingCap,
+                                                NominalCondCap,
+                                                NominalTotalCompCap));
                     }
                 } // NumStages
 
@@ -5981,21 +6015,28 @@ namespace RefrigeratedCase {
                 TransSystem(TransRefrigSysNum).TReceiver = FluidProperties::GetSatTemperatureRefrig(state,
                     TransSystem(TransRefrigSysNum).RefrigerantName, TransSystem(TransRefrigSysNum).PReceiver, RefrigIndex, RoutineNameNoColon);
                 if (TransSystem(TransRefrigSysNum).TReceiver > GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(NumGasCoolers)).MinCondTemp) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
-                                     ": The receiver temperature (" + General::RoundSigDigits(TransSystem(TransRefrigSysNum).TReceiver, 2) +
-                                     "C) is greater than the minimum condensing temperature specified for subcritical operation (" +
-                                     General::RoundSigDigits(GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(NumGasCoolers)).MinCondTemp, 2) +
-                                     "C).");
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}: The receiver temperature ({:.2R}C) is greater than the minimum condensing temperature "
+                                            "specified for subcritical operation ({:.2R}C).",
+                                            RoutineName,
+                                            CurrentModuleObject,
+                                            TransSystem(TransRefrigSysNum).Name,
+                                            TransSystem(TransRefrigSysNum).TReceiver,
+                                            GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(NumGasCoolers)).MinCondTemp));
                     ShowContinueError(state, "  The minimum condensing temperature will be set at 5C greater than the receiver temperature.");
                     GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(NumGasCoolers)).MinCondTemp =
                         TransSystem(TransRefrigSysNum).TReceiver + 5.0;
                 }
                 if (NominalTotalCompCapLP > 0.0) {
                     if (TransSystem(TransRefrigSysNum).TReceiver <= TransSystem(TransRefrigSysNum).TEvapDesignLT) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
-                                        ": The receiver temperature (" + General::RoundSigDigits(TransSystem(TransRefrigSysNum).TReceiver, 2) +
-                                        "C) is less than the design evaporator temperature for the low temperature loads (" +
-                                        General::RoundSigDigits(TransSystem(TransRefrigSysNum).TEvapDesignLT, 2) + "C).");
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}: The receiver temperature ({:.2R}C) is less than the design evaporator temperature for the "
+                                               "low temperature loads ({:.2R}C).",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               TransSystem(TransRefrigSysNum).Name,
+                                               TransSystem(TransRefrigSysNum).TReceiver,
+                                               TransSystem(TransRefrigSysNum).TEvapDesignLT));
                         ShowContinueError(state, "  Ensure that the receiver temperature is sufficiently greater than the design evaporator temperature for "
                                           "the low temperature loads.");
                         ShowContinueError(state,
@@ -6005,10 +6046,14 @@ namespace RefrigeratedCase {
                 }
                 if (NominalTotalCompCapHP > 0.0) {
                     if (TransSystem(TransRefrigSysNum).TReceiver <= TransSystem(TransRefrigSysNum).TEvapDesignMT) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
-                                        ": The receiver temperature (" + General::RoundSigDigits(TransSystem(TransRefrigSysNum).TReceiver, 2) +
-                                        "C) is less than the design evaporator temperature for the medium temperature loads (" +
-                                        General::RoundSigDigits(TransSystem(TransRefrigSysNum).TEvapDesignMT, 2) + "C).");
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}: The receiver temperature ({:.2R}C) is less than the design evaporator temperature for the "
+                                               "medium temperature loads ({:.2R}C).",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               TransSystem(TransRefrigSysNum).Name,
+                                               TransSystem(TransRefrigSysNum).TReceiver,
+                                               TransSystem(TransRefrigSysNum).TEvapDesignMT));
                         ShowContinueError(state, "  Ensure that the receiver temperature is sufficiently greater than the design evaporator temperature for "
                                           "the medium temperature loads.");
                         ShowContinueError(state,
@@ -6103,9 +6148,12 @@ namespace RefrigeratedCase {
                 if ((NominalTotalCompCap < (0.7 * NominalTotalCoolingCap)) || (NominalCondCap < (1.3 * NominalTotalCoolingCap))) {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                      "\", You may wish to check the system sizing.");
-                    ShowContinueError(state, "Total nominal cooling capacity is " + General::RoundSigDigits(NominalTotalCoolingCap, 0) +
-                                      "W. Condenser capacity is " + General::RoundSigDigits(NominalCondCap, 0) +
-                                      "W. Nominal compressor capacity is " + General::RoundSigDigits(NominalTotalCompCap, 0) + "W.");
+                    ShowContinueError(
+                        state,
+                        format("Total nominal cooling capacity is {:.0R}W. Condenser capacity is {:.0R}W. Nominal compressor capacity is {:.0R}W.",
+                               NominalTotalCoolingCap,
+                               NominalCondCap,
+                               NominalTotalCompCap));
                 }
 
             } // Transcritical refrigeration systems
@@ -6123,7 +6171,7 @@ namespace RefrigeratedCase {
         if (NumSimulationCases > 0) {
             // Find unused and non-unique display case objects to report in eio and err file and sum
             //    all HVAC RA fractions and write error message if greater than 1 for any zone
-            for (int ZoneIndex = 1; ZoneIndex <= DataGlobals::NumOfZones; ++ZoneIndex) { // numofzones from dataglobals
+            for (int ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) { // numofzones from dataglobals
                 Real64 TempRAFraction = CaseRAFraction(ZoneIndex).TotalCaseRAFraction;
                 for (int CaseNum = 1; CaseNum <= NumSimulationCases; ++CaseNum) {
                     // TempRaFraction already includes contributions from ALL cases in zone
@@ -6148,7 +6196,7 @@ namespace RefrigeratedCase {
                 if (RefrigCase(CaseNum).NumSysAttach == 1) continue;
                 if (RefrigCase(CaseNum).NumSysAttach < 1) {
                     ++NumUnusedRefrigCases;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual case names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Case=\"" + RefrigCase(CaseNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused cases
@@ -6161,11 +6209,11 @@ namespace RefrigeratedCase {
                 } // if looking for same case attached to multiple systems/racks
             }     // NumSimulationCases
 
-            if ((NumUnusedRefrigCases > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedRefrigCases > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused cases given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, "Refrigeration:Case -> " + General::RoundSigDigits(NumUnusedRefrigCases) +
-                                 " unused refrigerated case(s) found during input processing.");
+                ShowWarningError(state,
+                                 format("Refrigeration:Case -> {} unused refrigerated case(s) found during input processing.", NumUnusedRefrigCases));
                 ShowContinueError(state, "  These refrigerated cases are in the input file but are not connected to a ");
                 ShowContinueError(state, "  Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem object.");
                 ShowContinueError(state, "  These unused refrigeration cases will not be simulated.");
@@ -6181,7 +6229,7 @@ namespace RefrigeratedCase {
                 if (Compressor(CompNum).NumSysAttach == 1) continue;
                 if (Compressor(CompNum).NumSysAttach < 1) {
                     ++NumUnusedCompressors;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual compressor names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Compressor=\"" + Compressor(CompNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused compressors
@@ -6194,11 +6242,12 @@ namespace RefrigeratedCase {
                 } // looking for same compressor attached to multiple systems/racks
             }     // NumSimulationCompressors
 
-            if ((NumUnusedCompressors > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCompressors > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused compressors given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, "Refrigeration:Compressor -> " + General::RoundSigDigits(NumUnusedCompressors) +
-                                 " unused refrigeration compressor(s) found during input processing.");
+                ShowWarningError(
+                    state,
+                    format("Refrigeration:Compressor -> {} unused refrigeration compressor(s) found during input processing.", NumUnusedCompressors));
                 ShowContinueError(state, "  Those refrigeration compressors are in the input file but are not connected to a Refrigeration:System object.");
                 ShowContinueError(state, "   These unused refrigeration compressors will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
@@ -6213,7 +6262,7 @@ namespace RefrigeratedCase {
                 if (WalkIn(WalkInNum).NumSysAttach == 1) continue;
                 if (WalkIn(WalkInNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual walkin names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:WalkIn=\"" + WalkIn(WalkInNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused WalkIns
@@ -6226,11 +6275,13 @@ namespace RefrigeratedCase {
                 } // if looking for same walk in attached to multiple systems/racks
             }     // NumSimulationWalkIns
 
-            if ((NumUnusedWalkIns > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedWalkIns > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused walkins given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, RoutineName + "Refrigeration:WalkIn -> " + General::RoundSigDigits(NumUnusedWalkIns) +
-                                 " unused refrigeration WalkIns found during input processing.");
+                ShowWarningError(state,
+                                 format("{}Refrigeration:WalkIn -> {} unused refrigeration WalkIns found during input processing.",
+                                        RoutineName,
+                                        NumUnusedWalkIns));
                 ShowContinueError(state, "   Those refrigeration WalkIns are in the input file but are not connected to a ");
                 ShowContinueError(state, "   Refrigeration:CompressorRack, Refrigeration:System or Refrigeration:SecondarySystem object.");
                 ShowContinueError(state, "   These unused refrigeration WalkIns will not be simulated.");
@@ -6246,7 +6297,7 @@ namespace RefrigeratedCase {
                 if (WarehouseCoil(CoilNum).NumSysAttach == 1) continue;
                 if (WarehouseCoil(CoilNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual walkin names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:AirChiller=\"" + WarehouseCoil(CoilNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused chillers
@@ -6259,11 +6310,13 @@ namespace RefrigeratedCase {
                 } // if looking for same walk in attached to multiple systems/racks
             }     // NumSimulationRefrigAirchillers
 
-            if ((NumUnusedCoils > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCoils > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused air chillers given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, RoutineName + "Refrigeration:AirChiller -> " + General::RoundSigDigits(NumUnusedCoils) +
-                                 " unused refrigeration air chillers found during input processing.");
+                ShowWarningError(state,
+                                 format("{}Refrigeration:AirChiller -> {} unused refrigeration air chillers found during input processing.",
+                                        RoutineName,
+                                        NumUnusedCoils));
                 ShowContinueError(state, "   Those refrigeration air chillers are in the input file but are not connected to a ");
                 ShowContinueError(state, "   Refrigeration:CompressorRack, Refrigeration:System or Refrigeration:SecondarySystem object.");
                 ShowContinueError(state, "   These unused refrigeration air chillers will not be simulated.");
@@ -6279,7 +6332,7 @@ namespace RefrigeratedCase {
                 if (Secondary(SecondaryNum).NumSysAttach == 1) continue;
                 if (Secondary(SecondaryNum).NumSysAttach < 1) {
                     ++NumUnusedSecondarys;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual secondary names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Secondary=\"" + Secondary(SecondaryNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused Secondaries
@@ -6292,11 +6345,13 @@ namespace RefrigeratedCase {
                 } // looking for same secondary loop attached to multiple systems/racks
             }     // NumSimulationSecondarys
 
-            if ((NumUnusedSecondarys > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedSecondarys > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused secondaries given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, RoutineName + "Refrigeration:Secondary -> " + General::RoundSigDigits(NumUnusedSecondarys) +
-                                 " unused refrigeration Secondary Loops found during input processing.");
+                ShowWarningError(state,
+                                 format("{}Refrigeration:Secondary -> {} unused refrigeration Secondary Loops found during input processing.",
+                                        RoutineName,
+                                        NumUnusedSecondarys));
                 ShowContinueError(state, "  Those refrigeration Secondary Loops are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "   These unused refrigeration secondaries will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
@@ -6313,7 +6368,7 @@ namespace RefrigeratedCase {
                 if (Condenser(CondNum).NumSysAttach == 1) continue;
                 if (Condenser(CondNum).NumSysAttach < 1) {
                     ++NumUnusedCondensers;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual condenser names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Condenser=\"" + Condenser(CondNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused condensers
@@ -6323,11 +6378,13 @@ namespace RefrigeratedCase {
                 } // looking for shared condensers
             }     // CondNum
 
-            if ((NumUnusedCondensers > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCondensers > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused condensers given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, RoutineName + "Refrigeration condenser -> " + General::RoundSigDigits(NumUnusedCondensers) +
-                                 " unused refrigeration condensers found during input processing.");
+                ShowWarningError(state,
+                                 format("{}Refrigeration condenser -> {} unused refrigeration condensers found during input processing.",
+                                        RoutineName,
+                                        NumUnusedCondensers));
                 ShowContinueError(state, "  Those refrigeration condensers are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "   These unused refrigeration condensers will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
@@ -6342,7 +6399,7 @@ namespace RefrigeratedCase {
                 if (GasCooler(GCNum).NumSysAttach == 1) continue;
                 if (GasCooler(GCNum).NumSysAttach < 1) {
                     ++NumUnusedGasCoolers;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual gas cooler names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:GasCooler=\"" + GasCooler(GCNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused gas coolers
@@ -6352,11 +6409,13 @@ namespace RefrigeratedCase {
                 } // looking for shared gas coolers
             }     // GCNum
 
-            if ((NumUnusedGasCoolers > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedGasCoolers > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused gas coolers given if DataGlobals::DisplayExtraWarnings option not selected
-                ShowWarningError(state, RoutineName + "Refrigeration gas cooler -> " + General::RoundSigDigits(NumUnusedGasCoolers) +
-                                 " unused refrigeration gas cooler(s) found during input processing.");
+                ShowWarningError(state,
+                                 format("{}Refrigeration gas cooler -> {} unused refrigeration gas cooler(s) found during input processing.",
+                                        RoutineName,
+                                        NumUnusedGasCoolers));
                 ShowContinueError(state, "  These refrigeration gas coolers are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "  These unused refrigeration gas coolers will not be simulated.");
                 ShowContinueError(state, "  Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
@@ -6986,7 +7045,7 @@ namespace RefrigeratedCase {
 
         // Report sum of all refrigeration interactions with each zone
 
-        for (int zoneID = 1; zoneID <= DataGlobals::NumOfZones; ++zoneID) {
+        for (int zoneID = 1; zoneID <= state.dataGlobal->NumOfZones; ++zoneID) {
             if (RefrigPresentInZone(zoneID)) {
                 if (HaveCasesOrWalkins) {
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Sensible Cooling Rate",
@@ -8920,7 +8979,7 @@ namespace RefrigeratedCase {
         // These 'casecredit' variables are also used to transfer energy from zone-located
         // compressor-rack condenser heat rejection, heat absorption by distribution piping,
         // suction piping, and receiver shells to zone
-        if (DataGlobals::NumOfZones > 0) {
+        if (state.dataGlobal->NumOfZones > 0) {
             if (UseSysTimeStep) {
                 for (int i = CoilSysCredit.l(), e = CoilSysCredit.u(); i <= e; ++i) {
                     CoilSysCredit(i).reset();
@@ -9082,7 +9141,7 @@ namespace RefrigeratedCase {
                 System(systemId).LSHXTransEnergy = 0.0;
             }
 
-            if (DataGlobals::NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+            if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
             InitRefrigerationMyBeginEnvrnFlag = false;
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
@@ -9090,11 +9149,11 @@ namespace RefrigeratedCase {
         if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
-        if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
+        if (!state.dataGlobal->WarmupFlag) { // because no accumulation is done during warm up
             // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
             if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
                 // Used to determine whether the zone time step is a repetition
-                Real64 MyCurrentTime = (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStep * TimeStepFraction;
+                Real64 MyCurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * TimeStepFraction;
                 if (std::abs(MyCurrentTime - MyCurrentTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (NumSimulationCases > 0) {
@@ -9187,7 +9246,7 @@ namespace RefrigeratedCase {
             } else { // using UseSysTimeStep as a flag for a chiller system
 
                 // Used to determine whether the system time step is a repetition
-                Real64 MyStepStartTime = DataGlobals::CurrentTime - DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+                Real64 MyStepStartTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
                 if (std::abs(MyStepStartTime - MyStepStartTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (NumSimulationRefrigAirChillers > 0) {
@@ -9223,7 +9282,7 @@ namespace RefrigeratedCase {
 
         } // warm up flag
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (int systemID = 1; systemID <= DataHeatBalance::NumRefrigSystems; ++systemID) {
                     if (System(systemID).EMSOverrideOnTCondenseMin) {
@@ -9322,7 +9381,7 @@ namespace RefrigeratedCase {
             }
 
             MyReferPlantScanFlag = false;
-        } else if (MyReferPlantScanFlag && !DataGlobals::AnyPlantInModel) {
+        } else if (MyReferPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
             MyReferPlantScanFlag = false;
         }
 
@@ -9509,8 +9568,8 @@ namespace RefrigeratedCase {
                 OutDbTemp = DataLoopNode::Node(this->OutsideAirNodeNum).Temp;
                 BPress = DataLoopNode::Node(this->OutsideAirNodeNum).Press;
             } else {
-                OutDbTemp = DataEnvironment::OutDryBulbTemp;
-                BPress = DataEnvironment::OutBaroPress;
+                OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
+                BPress = state.dataEnvrn->OutBaroPress;
             }
             EffectTemp = OutDbTemp;
 
@@ -9531,7 +9590,7 @@ namespace RefrigeratedCase {
                 if (this->OutsideAirNodeNum != 0) {
                     HumRatIn = DataLoopNode::Node(this->OutsideAirNodeNum).HumRat;
                 } else {
-                    HumRatIn = DataEnvironment::OutHumRat;
+                    HumRatIn = state.dataEnvrn->OutHumRat;
                 } // outsideairnode
                 OutWbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, OutDbTemp, HumRatIn, BPress);
                 EffectTemp = OutWbTemp + (1.0 - this->EvapEffect) * (OutDbTemp - OutWbTemp);
@@ -9547,7 +9606,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "Water-cooled condenser inlet temp lower than minimum allowed temp. Check returning water temperature "
                                           "and/or minimum temperature setpoints.");
                     } // LowTempWarnIndex
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Compressor Rack " + this->Name +
                                                        " - Condenser inlet temp lower than minimum allowed ... continues",
                                                    this->LowTempWarnIndex);
                     // END IF  !LowTempWarn
@@ -9610,7 +9669,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "and condenser inlet air dry-bulb temp at or below the basin heater setpoint temperature.");
                         ShowContinueErrorTimeStamp(state, "Continuing simulation.");
                     } // EvapFreezeWarnIndex == 0
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Compressor Rack " + this->Name +
                                                        " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                    this->EvapFreezeWarnIndex);
                     // END IF
@@ -9653,7 +9712,7 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // To report compressor rack variables
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         this->RackCompressorPower = TotalCompressorPower;
@@ -9689,7 +9748,7 @@ namespace RefrigeratedCase {
             state.dataWaterData->WaterStorage(RackTankID).VdotRequestDemand(DemandARRID) = this->EvapWaterConsumpRate;
         }
 
-        SumZoneImpacts();
+        SumZoneImpacts(state);
     }
 
     void RefrigCaseData::CalculateCase(EnergyPlusData &state) // Absolute pointer to refrigerated case
@@ -9760,11 +9819,11 @@ namespace RefrigeratedCase {
         // Zone relative humidity (%)
         Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(state, DataLoopNode::Node(this->ZoneNodeNum).Temp,
                                                              DataLoopNode::Node(this->ZoneNodeNum).HumRat,
-                                                             DataEnvironment::OutBaroPress) *
+                                                             state.dataEnvrn->OutBaroPress) *
                                100.0;
 
         // Zone dew point (C)
-        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(this->ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress);
+        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(this->ZoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress);
 
         // Display case operating temperature
         Real64 TCase = this->Temperature;
@@ -9826,8 +9885,8 @@ namespace RefrigeratedCase {
 
         // Total load due to stocking case product (W)
         Real64 StockingLoad = StockingSchedule * this->Length;
-        if (!DataGlobals::WarmupFlag) {
-            Real64 DeltaStockingEnergy = (StockingLoad * DataGlobals::TimeStepZoneSec);
+        if (!state.dataGlobal->WarmupFlag) {
+            Real64 DeltaStockingEnergy = (StockingLoad * state.dataGlobal->TimeStepZoneSec);
             this->StockingEnergy += DeltaStockingEnergy;
         } // warm up
         // CALCULTE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
@@ -9907,8 +9966,8 @@ namespace RefrigeratedCase {
 
         // FROST:  keep track of frost build up on evaporator coil
         // avoid accumulation during warm-up to avoid reverse dd test problem
-        if (!DataGlobals::WarmupFlag) {
-            Real64 DeltaFreezeKgFrost = LatentLoad * DataGlobals::TimeStepZoneSec / IcetoVaporEnthalpy;
+        if (!state.dataGlobal->WarmupFlag) {
+            Real64 DeltaFreezeKgFrost = LatentLoad * state.dataGlobal->TimeStepZoneSec / IcetoVaporEnthalpy;
             this->KgFrost += DeltaFreezeKgFrost;
         }
 
@@ -9943,7 +10002,7 @@ namespace RefrigeratedCase {
                 Real64 StartFrostKg = this->KgFrost;
 
                 // Energy form of defrost capacity (J)
-                Real64 defrostEnergy = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
+                Real64 defrostEnergy = DefrostCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
                 // Frost melted by defrost during a time step (kg)
                 Real64 FrostMeltedKg = min(defrostEnergy / IceMeltEnthalpy, StartFrostKg);
@@ -9952,9 +10011,9 @@ namespace RefrigeratedCase {
                 // Reduce defrost heat load on case by amount of ice melted during time step
                 // However, don't reduce the defrost capacity applied
 
-                DefrostLoad_Actual = DefrostCap_Actual - FrostMeltedKg * IceMeltEnthalpy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour();
+                DefrostLoad_Actual = DefrostCap_Actual - FrostMeltedKg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
 
-                if (!DataGlobals::WarmupFlag) { // avoid reverse dd test problems
+                if (!state.dataGlobal->WarmupFlag) { // avoid reverse dd test problems
                     // keep running total of defrost energy above that needed to melt frost for use in evaluating
                     //      problems of excessive unmet loads
                     this->DeltaDefrostEnergy = max(0.0, (defrostEnergy - (FrostMeltedKg * IceMeltEnthalpy)));
@@ -9981,7 +10040,7 @@ namespace RefrigeratedCase {
         Real64 TotalLoad_Actual = SensibleLoadTotal + LatentLoad + DefrostLoad_Actual;
 
         // Rate needed to serve all stored energy during single time step (W)
-        Real64 StoredEnergyRate = this->StoredEnergy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour();
+        Real64 StoredEnergyRate = this->StoredEnergy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
         Real64 LoadRequested = TotalLoad_Actual + StoredEnergyRate;
 
         // prorate available cooling capacity for portion of time off due to drip down.
@@ -9997,7 +10056,7 @@ namespace RefrigeratedCase {
             TotalCap_Actual = CapAvail;
             LatentCap_Actual = min(LatentLoad, CapAvail); // Latent load should never be > capavail, but just in case...
             SensibleCap_Actual = TotalCap_Actual - LatentCap_Actual;
-            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * state.dataGlobal->TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
@@ -10032,56 +10091,56 @@ namespace RefrigeratedCase {
 
         // ReportRefrigeratedCase(CaseID)
         this->TotalCoolingLoad = TotalCap_Actual;
-        this->TotalCoolingEnergy = TotalCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingEnergy = TotalCap_Actual * state.dataGlobal->TimeStepZoneSec;
         this->SensCoolingEnergyRate = SensibleCap_Actual;
-        this->SensCoolingEnergy = SensibleCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->SensCoolingEnergy = SensibleCap_Actual * state.dataGlobal->TimeStepZoneSec;
         this->LatCoolingEnergyRate = LatentCap_Actual;
-        this->LatCoolingEnergy = LatentCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->LatCoolingEnergy = LatentCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
         this->SensZoneCreditRate = CaseSenCreditToZone; // both positive or negative
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToZone <= 0.0) {
             this->SensZoneCreditCoolRate = -CaseSenCreditToZone;
-            this->SensZoneCreditCool = -CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditCool = -CaseSenCreditToZone * state.dataGlobal->TimeStepZoneSec;
             this->SensZoneCreditHeatRate = 0.0;
             this->SensZoneCreditHeat = 0.0;
         } else {
             this->SensZoneCreditHeatRate = CaseSenCreditToZone;
-            this->SensZoneCreditHeat = CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditHeat = CaseSenCreditToZone * state.dataGlobal->TimeStepZoneSec;
             this->SensZoneCreditCoolRate = 0.0;
             this->SensZoneCreditCool = 0.0;
         }
 
         // This rate should always be negative
         this->LatZoneCreditRate = CaseLatCreditToZone;
-        this->LatZoneCredit = CaseLatCreditToZone * DataGlobals::TimeStepZoneSec;
+        this->LatZoneCredit = CaseLatCreditToZone * state.dataGlobal->TimeStepZoneSec;
 
         this->SensHVACCreditRate = CaseSenCreditToHVAC;
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToHVAC <= 0.0) {
             this->SensHVACCreditCoolRate = -CaseSenCreditToHVAC;
-            this->SensHVACCreditCool = -CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditCool = -CaseSenCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
             this->SensHVACCreditHeatRate = 0.0;
             this->SensHVACCreditHeat = 0.0;
         } else {
             this->SensHVACCreditHeatRate = CaseSenCreditToHVAC;
-            this->SensHVACCreditHeat = CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditHeat = CaseSenCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
             this->SensHVACCreditCoolRate = 0.0;
             this->SensHVACCreditCool = 0.0;
         }
 
         // This rate should always be negative
         this->LatHVACCreditRate = CaseLatCreditToHVAC;
-        this->LatHVACCredit = CaseLatCreditToHVAC * DataGlobals::TimeStepZoneSec;
+        this->LatHVACCredit = CaseLatCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
 
         this->ElecFanPower = TotalFan;
-        this->ElecFanConsumption = TotalFan * DataGlobals::TimeStepZoneSec;
+        this->ElecFanConsumption = TotalFan * state.dataGlobal->TimeStepZoneSec;
         this->ElecAntiSweatPower = TotalAntiSweat;
-        this->ElecAntiSweatConsumption = TotalAntiSweat * DataGlobals::TimeStepZoneSec;
+        this->ElecAntiSweatConsumption = TotalAntiSweat * state.dataGlobal->TimeStepZoneSec;
         this->ElecLightingPower = TotalLightingLoad;
-        this->ElecLightingConsumption = TotalLightingLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingConsumption = TotalLightingLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecDefrostPower = DefrostCap_Actual;
-        this->ElecDefrostConsumption = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->ElecDefrostConsumption = DefrostCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
         this->DefEnergyCurveValue = DefrostRatio;
         this->LatEnergyCurveValue = LatentRatio;
@@ -10093,8 +10152,8 @@ namespace RefrigeratedCase {
         // Collect extra sensible load above design for possible warning if that is determining factor in
         // excessively large stored energy
         if ((ZoneTempFactor * CaseCreditFraction) > 1.0) {
-            if (!DataGlobals::WarmupFlag) {
-                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) {
+                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * state.dataGlobal->TimeStepZoneSec;
                 this->WarmEnvEnergy += DeltaWarmEnvEnergy;
             }
         }
@@ -10164,16 +10223,17 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         InitRefrigeration(state);
         InitRefrigerationPlantConnections(state);
     }
 
-    void RefrigCondenserData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigCondenserData::simulate(EnergyPlusData &state,
+                                       [[maybe_unused]] const PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration,
-                                       Real64 &EP_UNUSED(CurLoad),
-                                       bool const EP_UNUSED(RunFlag))
+                                       [[maybe_unused]] Real64 &CurLoad,
+                                       [[maybe_unused]] bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10239,7 +10299,7 @@ namespace RefrigeratedCase {
                                     "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
                     ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
                 }
-                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
                                                    "\" : has inlet water temp equal to desired outlet temp.... continues. ",
                                                this->HighInletWarnIndex);
                 this->VolFlowRate = 9999.0;
@@ -10254,7 +10314,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
                         ShowContinueError(state, "Flow reset to maximum value.");
                     } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
+                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
                                                    this->HighFlowWarnIndex);
                     // END IF
                     this->MassFlowRate = this->MassFlowRateMax;
@@ -10282,7 +10342,7 @@ namespace RefrigeratedCase {
             this->OutletTemp = this->InletTemp;
             if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
                     this->FlowType);
@@ -10295,7 +10355,7 @@ namespace RefrigeratedCase {
                 ShowContinueError(state,
                     "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
                         }
-            ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
+            ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
                                            this->HighTempWarnIndex);
                     }
 
@@ -10321,142 +10381,144 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
         }
 
-    void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
-    {
+        void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+        {
             InitRefrigeration(state);
             InitRefrigerationPlantConnections(state);
         }
 
-    void RefrigRackData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                  bool const FirstHVACIteration,
-                                  Real64 &EP_UNUSED(CurLoad),
-                                  bool const EP_UNUSED(RunFlag))
-    {
+        void RefrigRackData::simulate(EnergyPlusData &state,
+                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                      bool const FirstHVACIteration,
+                                      [[maybe_unused]] Real64 &CurLoad,
+                                      [[maybe_unused]] bool const RunFlag)
+        {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Randy Hudson, ORNL
-        //       DATE WRITTEN   July 2007
-        //       MODIFIED       Therese Stovall, ORNL May 2008
-        //                      Brent Griffith, NREL Oct 2010, generalize fluid properties
-        //                        plant upgrades, moved where called from to SimPlantEquip from ManageNonZoneEquipment
-        //       RE-ENGINEERED  na
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         Randy Hudson, ORNL
+            //       DATE WRITTEN   July 2007
+            //       MODIFIED       Therese Stovall, ORNL May 2008
+            //                      Brent Griffith, NREL Oct 2010, generalize fluid properties
+            //                        plant upgrades, moved where called from to SimPlantEquip from ManageNonZoneEquipment
+            //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // Simulates the water-cooled refrigeration condenser object.
-        // Modified to add condensers for detailed refrigeration systems and to
-        // avoid double-counting heat rejection that has been used in desuperheater
-        // hvac coils or water heaters.
+            // PURPOSE OF THIS SUBROUTINE:
+            // Simulates the water-cooled refrigeration condenser object.
+            // Modified to add condensers for detailed refrigeration systems and to
+            // avoid double-counting heat rejection that has been used in desuperheater
+            // hvac coils or water heaters.
 
-        // METHODOLOGY EMPLOYED:
-        // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
-        // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
+            // METHODOLOGY EMPLOYED:
+            // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
+            // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        static std::string const RoutineName("SimRefrigCondenser");
-        int PlantInletNode(0);
-        int PlantOutletNode(0);
-        int PlantLoopIndex(0);
-        int PlantLoopSideIndex(0);
-        int PlantBranchIndex(0);
-        int PlantCompIndex(0);
+            static std::string const RoutineName("SimRefrigCondenser");
+            int PlantInletNode(0);
+            int PlantOutletNode(0);
+            int PlantLoopIndex(0);
+            int PlantLoopSideIndex(0);
+            int PlantBranchIndex(0);
+            int PlantCompIndex(0);
 
-        InitRefrigerationPlantConnections(state);
+            InitRefrigerationPlantConnections(state);
 
-        std::string TypeName;
-        std::string ErrIntro;
+            std::string TypeName;
+            std::string ErrIntro;
 
-        // set variables depending upon system type
-        PlantInletNode = this->InletNode;
-        PlantOutletNode = this->OutletNode;
-        PlantLoopIndex = this->PlantLoopNum;
-        PlantLoopSideIndex = this->PlantLoopSideNum;
-        PlantBranchIndex = this->PlantBranchNum;
-        PlantCompIndex = this->PlantCompNum;
+            // set variables depending upon system type
+            PlantInletNode = this->InletNode;
+            PlantOutletNode = this->OutletNode;
+            PlantLoopIndex = this->PlantLoopNum;
+            PlantLoopSideIndex = this->PlantLoopSideNum;
+            PlantBranchIndex = this->PlantBranchNum;
+            PlantCompIndex = this->PlantCompNum;
 
-                TotalCondenserHeat =
-            DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
-                TypeName = "Refrigeration:CompressorRack:";
-                ErrIntro = "Condenser for refrigeration rack ";
+            TotalCondenserHeat =
+                DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
+            TypeName = "Refrigeration:CompressorRack:";
+            ErrIntro = "Condenser for refrigeration rack ";
 
-        // Current condenser is water cooled
-        // Make demand request on first HVAC iteration
+            // Current condenser is water cooled
+            // Make demand request on first HVAC iteration
 
-        // get cooling fluid properties
-        Real64 rho = FluidProperties::GetDensityGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+            // get cooling fluid properties
+            Real64 rho = FluidProperties::GetDensityGlycol(
+                state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+                state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-        if (this->FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
-            this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
+            if (this->FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
+                this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
-            if (this->OutletTemp == this->InletTemp) {
+                if (this->OutletTemp == this->InletTemp) {
 
-                if (this->HighInletWarnIndex == 0) {
-                    ShowSevereError(state, ErrIntro + ", \"" + this->Name +
-                                    "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
-                    ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
-                }
-                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + this->Name +
-                                                   "\" : has inlet water temp equal to desired outlet temp.... continues. ",
-                                               this->HighInletWarnIndex);
-                this->VolFlowRate = 9999.0;
+                    if (this->HighInletWarnIndex == 0) {
+                        ShowSevereError(state,
+                                        ErrIntro + ", \"" + this->Name +
+                                            "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
+                        ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
+                    }
+                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
+                                                       "\" : has inlet water temp equal to desired outlet temp.... continues. ",
+                                                   this->HighInletWarnIndex);
+                    this->VolFlowRate = 9999.0;
+                    this->MassFlowRate = this->VolFlowRate * rho;
+                } else {
+                    Real64 DeltaT = this->OutletTemp - this->InletTemp;
+                    this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
+                    // Check for maximum flow in the component
+                    if (this->MassFlowRate > this->MassFlowRateMax) {
+                        if (this->HighFlowWarnIndex == 0) {
+                            ShowWarningMessage(state, TypeName + this->Name);
+                            ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
+                            ShowContinueError(state, "Flow reset to maximum value.");
+                        } // HighFlowWarnIndex
+                        ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
+                                                       this->HighFlowWarnIndex);
+                        // END IF
+                        this->MassFlowRate = this->MassFlowRateMax;
+                    }
+                } // compare outlet T to inlet T
+
+            } else if (this->FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
+                // this part for constant flow condition
+                this->VolFlowRate = this->DesVolFlowRate;
                 this->MassFlowRate = this->VolFlowRate * rho;
+
+            } else if (TotalCondenserHeat == 0.0) {
+                this->MassFlowRate = 0.0;
+
+            } // on flow type
+            // check against plant, might get changed.
+            PlantUtilities::SetComponentFlowRate(
+                state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+
+            this->VolFlowRate = this->MassFlowRate / rho;
+
+            if (this->MassFlowRate > 0) {
+                this->OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
             } else {
-                Real64 DeltaT = this->OutletTemp - this->InletTemp;
-                this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
-                // Check for maximum flow in the component
-                if (this->MassFlowRate > this->MassFlowRateMax) {
-                    if (this->HighFlowWarnIndex == 0) {
-                        ShowWarningMessage(state, TypeName + this->Name);
-                        ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
-                        ShowContinueError(state, "Flow reset to maximum value.");
-                    } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
-                                                   this->HighFlowWarnIndex);
-                    // END IF
-                    this->MassFlowRate = this->MassFlowRateMax;
+                this->OutletTemp = this->InletTemp;
+                if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
+
+                    ShowRecurringWarningErrorAtEnd(state,
+                        TypeName + this->Name +
+                            "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
+                        this->NoFlowWarnIndex);
                 }
-            } // compare outlet T to inlet T
-
-        } else if (this->FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
-            // this part for constant flow condition
-            this->VolFlowRate = this->DesVolFlowRate;
-            this->MassFlowRate = this->VolFlowRate * rho;
-
-        } else if (TotalCondenserHeat == 0.0) {
-            this->MassFlowRate = 0.0;
-
-        } // on flow type
-        // check against plant, might get changed.
-        PlantUtilities::SetComponentFlowRate(state,
-            this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
-
-        this->VolFlowRate = this->MassFlowRate / rho;
-
-        if (this->MassFlowRate > 0) {
-            this->OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
-        } else {
-            this->OutletTemp = this->InletTemp;
-            if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
-
-                ShowRecurringWarningErrorAtEnd(
-                    TypeName + this->Name +
-                        "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                    this->NoFlowWarnIndex);
             }
-        }
-        // Check outlet water temp for max value
-        if (this->OutletTemp > this->OutletTempMax) {
-            if (this->HighTempWarnIndex == 0) {
-                ShowWarningMessage(state, TypeName + this->Name);
-                ShowContinueError(state,
-                    "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
+            // Check outlet water temp for max value
+            if (this->OutletTemp > this->OutletTempMax) {
+                if (this->HighTempWarnIndex == 0) {
+                    ShowWarningMessage(state, TypeName + this->Name);
+                    ShowContinueError(
+                        state, "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
+                }
+                ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
+                                               HighTempWarnIndex);
             }
-            ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
-                                           HighTempWarnIndex);
-        }
 
-        this->UpdateCondenser();
+            this->UpdateCondenser();
         }
 
     void RefrigCondenserData::UpdateCondenser()
@@ -10521,7 +10583,7 @@ namespace RefrigeratedCase {
         static std::string const RoutineName("SimulateDetailedRefrigerationSystems");
         Real64 const MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Cascade condenser assumes a constant approach delta T (Tcond - Tevap), not f(load)
@@ -10754,10 +10816,10 @@ namespace RefrigeratedCase {
                         {
                             auto const SELECT_CASE_var(Condenser(System(SysNum).CondenserNum(1)).CondenserType); // only one condenser allowed now
                             if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
-                                System(SysNum).TCondense = DataEnvironment::OutDryBulbTemp + 16.7;
+                                System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 16.7;
                                 // 16.7C is delta T at rating point for air-cooled condensers, just estimate, so ok for zone-located condensers
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
-                                System(SysNum).TCondense = DataEnvironment::OutDryBulbTemp + 15.0;
+                                System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 15.0;
                                 // 15C is delta T at rating point for evap-cooled condensers
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
                                 // define starting estimate at temperature of water exiting condenser
@@ -10792,7 +10854,7 @@ namespace RefrigeratedCase {
                             System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                         if ((System(SysNum).CoilFlag) && (CurrentLoads > (System(SysNum).TotCompCapacity * 1.001))) {
                             DeRate = true;
-                            FinalRateCoils(DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
+                            FinalRateCoils(state, DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
                             System(SysNum).TotalCoolingLoad = 0.0;
                             System(SysNum).TotalCondDefrostCredit = 0.0;
                             for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
@@ -10812,11 +10874,11 @@ namespace RefrigeratedCase {
                             if (System(SysNum).NumStages == 2 &&
                                 System(SysNum).TotHiStageCompCapacity <
                                     (System(SysNum).TotalCoolingLoad + System(SysNum).LSHXTrans + System(SysNum).TotCompPower)) {
-                                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + System(SysNum).Name +
+                                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:System: " + System(SysNum).Name +
                                                                    ":The specified high-stage compressors for this system are unable to meet the sum "
                                                                    "of the refrigeration loads, ",
                                                                System(SysNum).HiStageWarnIndex1);
-                                ShowRecurringContinueErrorAtEnd(" subcooler loads (if any), and low-stage compressor loads for this sytem.",
+                                ShowRecurringContinueErrorAtEnd(state, " subcooler loads (if any), and low-stage compressor loads for this sytem.",
                                                                 System(SysNum).HiStageWarnIndex2);
                             } // Hi-stage capacity<(load+LSHX load + lo-stage compressor load)
                         }     // CoilFlag (Numcoils > 0) and load > capacity
@@ -10832,7 +10894,7 @@ namespace RefrigeratedCase {
         for (int SysNum = 1; SysNum <= DataHeatBalance::NumRefrigSystems; ++SysNum) {
             // Only do those systems appropriate for this analysis, supermarket type on load time step or coil type on sys time step
             if ((((!UseSysTimeStep) && (!System(SysNum).CoilFlag)) || ((UseSysTimeStep) && (System(SysNum).CoilFlag))) &&
-                (!DataGlobals::WarmupFlag)) {
+                (!state.dataGlobal->WarmupFlag)) {
                 Real64 CurrentLoads =
                     System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                 Real64 CurrentHiStageLoads(0.0); // Current loads on high-stage compressor, exclusive of unmet loads from
@@ -10848,10 +10910,10 @@ namespace RefrigeratedCase {
                     // perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
                     // If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
                     // Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-                    System(SysNum).UnmetEnergy += (CurrentLoads - System(SysNum).TotCompCapacity) * DataGlobals::TimeStepZoneSec;
+                    System(SysNum).UnmetEnergy += (CurrentLoads - System(SysNum).TotCompCapacity) * state.dataGlobal->TimeStepZoneSec;
                     if (System(SysNum).NumStages == 2) {
                         System(SysNum).UnmetHiStageEnergy +=
-                            (CurrentHiStageLoads - System(SysNum).TotHiStageCompCapacity) * DataGlobals::TimeStepZoneSec;
+                            (CurrentHiStageLoads - System(SysNum).TotHiStageCompCapacity) * state.dataGlobal->TimeStepZoneSec;
                     }
                     if (System(SysNum).UnmetEnergy > MyLargeNumber) {
                         System(SysNum).UnmetEnergy = MyLargeNumber;
@@ -10895,7 +10957,7 @@ namespace RefrigeratedCase {
                 System(SysNum).PipeHeatEnergy = System(SysNum).PipeHeatLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
                 System(SysNum).TotalCoolingEnergy = System(SysNum).TotalCoolingLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
             } //(((.NOT. UseSysTimeStep).AND.(.NOT. System(SysNum)%CoilFlag)).OR.((UseSysTimeStep).AND.(System(SysNum)%CoilFlag))).and.not
-              //DataGlobals::WarmupFlag
+              //WarmupFlag
         }     // SysNum = 1,NumRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
@@ -10904,7 +10966,7 @@ namespace RefrigeratedCase {
         // Note that case credit is negative for cooling, thus subtract positive value calculated for coil
         //   Note this is done whether or not the coils are derated.
         if (UseSysTimeStep) {
-            for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 for (int CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID) {
                     if (WarehouseCoil(CoilID).ZoneNum != ZoneNum) continue;
                     CoilSysCredit(ZoneNum).SenCreditToZoneRate -= WarehouseCoil(CoilID).SensCreditRate;
@@ -10917,7 +10979,7 @@ namespace RefrigeratedCase {
             }
         }
 
-        SumZoneImpacts();
+        SumZoneImpacts(state);
     }
 
     void SimulateDetailedTransRefrigSystems(EnergyPlusData &state)
@@ -10939,7 +11001,7 @@ namespace RefrigeratedCase {
 
         static std::string const RoutineName("SimulateDetailedTransRefrigSystems");
 
-        int LocalTimeStep = DataGlobals::TimeStepZone;
+        int LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         //  Do transcritical CO2 refrigeration system loop outside of iterative solution to initialize time step and
@@ -11101,13 +11163,13 @@ namespace RefrigeratedCase {
         // Unmet load is done outside iterative loop
         for (int SysNum = 1; SysNum <= NumTransRefrigSystems; ++SysNum) {
             // Only do those systems appropriate for this analysis, supermarket type on load time step or coil type on sys time step
-            if ((!UseSysTimeStep) && (!DataGlobals::WarmupFlag)) {
+            if ((!UseSysTimeStep) && (!state.dataGlobal->WarmupFlag)) {
                 Real64 CurrentLoads = TransSystem(SysNum).TotalSystemLoad;
                 // Meeting current and possibly some portion of the previously unmet energy
                 // perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
                 // If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
                 // Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-                TransSystem(SysNum).UnmetEnergy += (CurrentLoads - TransSystem(SysNum).TotCompCapacity) * DataGlobals::TimeStepZoneSec;
+                TransSystem(SysNum).UnmetEnergy += (CurrentLoads - TransSystem(SysNum).TotCompCapacity) * state.dataGlobal->TimeStepZoneSec;
 
                 if (TransSystem(SysNum).UnmetEnergy > MyLargeNumber) {
                     TransSystem(SysNum).UnmetEnergy = MyLargeNumber;
@@ -11134,12 +11196,12 @@ namespace RefrigeratedCase {
                     (TransSystem(SysNum).PipeHeatLoadMT + TransSystem(SysNum).PipeHeatLoadLT) * LocalTimeStep * DataGlobalConstants::SecInHour();
                 TransSystem(SysNum).TotalCoolingEnergy =
                     (TransSystem(SysNum).TotalCoolingLoadMT + TransSystem(SysNum).TotalCoolingLoadMT) * LocalTimeStep * DataGlobalConstants::SecInHour();
-            } //(.NOT. UseSysTimeStep).AND. (.not. DataGlobals::WarmupFlag)
+            } //(.NOT. UseSysTimeStep).AND. (.not. WarmupFlag)
         }     // SysNum = 1,NumTransRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
 
-        SumZoneImpacts();
+        SumZoneImpacts(state);
     }
 
     void RefrigSystemData::CalcDetailedSystem(EnergyPlusData &state, int const SysNum)
@@ -11257,7 +11319,7 @@ namespace RefrigeratedCase {
             if (NumIter < 2) continue;
             if ((this->RefMassFlowReceiverBypass == 0.0) || (MassFlowStart == 0.0)) {
                 ShowSevereError(state, "Refrigeration:TranscriticalSystem: " + this->Name + " showing zero refrigerant flow through receiver bypass.");
-                ShowContinueError(state, "Receiver Bypass Flow = " + General::RoundSigDigits(this->RefMassFlowReceiverBypass, 6));
+                ShowContinueError(state, format("Receiver Bypass Flow = {:.6R}", this->RefMassFlowReceiverBypass));
                 ShowContinueError(state, "Check input file to ensure that refrigeration loads on this system are not zero.");
             } else {
                 ErrorMassFlow = std::abs(MassFlowStart - this->RefMassFlowReceiverBypass) / MassFlowStart;
@@ -11349,7 +11411,7 @@ namespace RefrigeratedCase {
         Real64 TotalLoadFromThisSystem(0.0); // total heat rejection load from the detailed system id'd in subroutine call [W]
         Real64 TotalLoadFromSystems;         // total heat rejection load from all systems served by this condenser [W]
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Initialize this condenser for this time step
@@ -11404,23 +11466,23 @@ namespace RefrigeratedCase {
         if (TotalCondenserHeat < 0.0) {
 
             TotalCondenserHeat = 0.0;
-            if (!DataGlobals::WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + this->Name +
+            if (!state.dataGlobal->WarmupFlag) {
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:System: " + this->Name +
                                                    ":heat reclaimed(defrost,other purposes) >current condenser load. ",
                                                CondCreditWarnIndex1);
-                ShowRecurringContinueErrorAtEnd("For heat recovered for defrost: ASHRAE rule of thumb: <= 25% of the load on a rack ",
+                ShowRecurringContinueErrorAtEnd(state, "For heat recovered for defrost: ASHRAE rule of thumb: <= 25% of the load on a rack ",
                                                 CondCreditWarnIndex2);
-                ShowRecurringContinueErrorAtEnd("should be in defrost at the same time. Consider diversifying defrost schedules.",
+                ShowRecurringContinueErrorAtEnd(state, "should be in defrost at the same time. Consider diversifying defrost schedules.",
                                                 CondCreditWarnIndex3);
-                ShowRecurringContinueErrorAtEnd(
+                ShowRecurringContinueErrorAtEnd(state,
                     "For heat recovered for other purposes: this warning may be an artifact of refrigeration calculation at the load",
                     CondCreditWarnIndex4);
-                ShowRecurringContinueErrorAtEnd(
+                ShowRecurringContinueErrorAtEnd(state,
                     "time step and heat recovery at the system time step. In that case, and ONLY if it occurs a large number of times",
                     CondCreditWarnIndex5);
-                ShowRecurringContinueErrorAtEnd("(relative to the number of time steps in the simulation), there may be a mis-match between the",
+                ShowRecurringContinueErrorAtEnd(state, "(relative to the number of time steps in the simulation), there may be a mis-match between the",
                                                 CondCreditWarnIndex6);
-                ShowRecurringContinueErrorAtEnd("operating schedules of the refrigeration system and the heat recovery load.", CondCreditWarnIndex7);
+                ShowRecurringContinueErrorAtEnd(state, "operating schedules of the refrigeration system and the heat recovery load.", CondCreditWarnIndex7);
             } // not warmup
         }     // total condenser heat < 0
 
@@ -11440,7 +11502,7 @@ namespace RefrigeratedCase {
                     ShowContinueError(state, "Water-cooled condenser inlet temp lower than minimum allowed temp. Check returning water temperature and/or "
                                       "minimum temperature setpoints relative to minimum allowed condensing temperature.");
                 }
-                ShowRecurringWarningErrorAtEnd("Refrigeration:Condenser:WaterCooled " + condenser.Name +
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:Condenser:WaterCooled " + condenser.Name +
                                                    " - Condenser inlet temp lower than minimum allowed ... continues",
                                                condenser.LowTempWarnIndex);
                 // END IF
@@ -11463,9 +11525,9 @@ namespace RefrigeratedCase {
                 BPress = DataLoopNode::Node(condenser.InletAirNodeNum).Press;
                 HumRatIn = DataLoopNode::Node(condenser.InletAirNodeNum).HumRat;
             } else {
-                OutDbTemp = DataEnvironment::OutDryBulbTemp;
-                BPress = DataEnvironment::OutBaroPress;
-                HumRatIn = DataEnvironment::OutHumRat;
+                OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
+                BPress = state.dataEnvrn->OutBaroPress;
+                HumRatIn = state.dataEnvrn->OutHumRat;
             }
             AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, HumRatIn);
             AirDensityDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, 0.0);
@@ -11492,7 +11554,7 @@ namespace RefrigeratedCase {
                 // Apply ARI490 elevation correction factor here for evap condenser, then apply hrcf limits
                 if (CapFac > 0.0) {
                     HRCF = condenser.EvapElevFact / CapFac;
-                    // Condenser(CondNum)%EvapElevFact=1.0d0-3.074D-5*DataEnvironment::Elevation
+                    // Condenser(CondNum)%EvapElevFact=1.0d0-3.074D-5*state.dataEnvrn->Elevation
                 } else {
                     HRCF = MyLargeNumber;
                 }
@@ -11609,7 +11671,7 @@ namespace RefrigeratedCase {
                             ShowContinueError(state, "and condenser inlet air dry-bulb temp at or below the basin heater setpoint temperature.");
                             ShowContinueErrorTimeStamp(state, "Continuing simulation.");
                         }
-                        ShowRecurringWarningErrorAtEnd("Refrigeration Condenser " + condenser.Name +
+                        ShowRecurringWarningErrorAtEnd(state, "Refrigeration Condenser " + condenser.Name +
                                                            " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                        condenser.EvapFreezeWarnIndex);
                         // END IF  !freeze warnings <= 5
@@ -11629,7 +11691,7 @@ namespace RefrigeratedCase {
                 this->TCondense = System(condenser.CascadeSinkSystemID).TEvapNeeded + condenser.RatedApproachT;
                 if (this->TCondense < this->TCondenseMin) {
                     this->TCondense = this->TCondenseMin;
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Condenser " + condenser.Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Condenser " + condenser.Name +
                                                        " - Cascade condenser floating condensing temperature less than specified minimum condensing "
                                                        "temperature. Minimum specified temperature used for system below cascade condenser. No "
                                                        "correction made for system absorbing heat rejected by the cascade condenser.",
@@ -11719,7 +11781,7 @@ namespace RefrigeratedCase {
         Real64 TotalLoadFromSystems;         // Total heat rejection load from all systems served by this condenser [W]
         Real64 TotalLoadFromThisSystem(0.0); // Total heat rejection load from the detailed system identified in subroutine call [W]
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Initialize this gas cooler for this time step
@@ -11749,8 +11811,8 @@ namespace RefrigeratedCase {
 
         if (TotalGasCoolerHeat < 0.0) {
             TotalGasCoolerHeat = 0.0;
-            if (!DataGlobals::WarmupFlag)
-                ShowRecurringWarningErrorAtEnd("Refrigeration:TranscriticalSystem: " + this->Name +
+            if (!state.dataGlobal->WarmupFlag)
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:TranscriticalSystem: " + this->Name +
                                                    ":heat reclaimed (defrost,other purposes) is greater than current gas cooler load. ASHRAE rule of "
                                                    "thumb: <= 25% of the load on a system should be in defrost at the same time. Consider "
                                                    "diversifying defrost schedules.",
@@ -11764,7 +11826,7 @@ namespace RefrigeratedCase {
         if (GasCooler(GasCoolerID).InletAirNodeNum != 0) {
             OutDbTemp = DataLoopNode::Node(GasCooler(GasCoolerID).InletAirNodeNum).Temp;
         } else {
-            OutDbTemp = DataEnvironment::OutDryBulbTemp;
+            OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
         // Determine gas cooler outlet temperature and pressure
         // Transcritical:  Gas cooler outlet temperature based on ambient temperature and approach temperature.
@@ -11773,7 +11835,7 @@ namespace RefrigeratedCase {
         //               transition temperature.
         if (OutDbTemp > GasCooler(GasCoolerID).TransitionTemperature) { // Gas cooler in transcritical operation
             GasCooler(GasCoolerID).TGasCoolerOut = OutDbTemp + GasCooler(GasCoolerID).GasCoolerApproachT;
-            GasCooler(GasCoolerID).PGasCoolerOut = 1.0e5 * (2.3083 * DataEnvironment::OutDryBulbTemp + 11.9);
+            GasCooler(GasCoolerID).PGasCoolerOut = 1.0e5 * (2.3083 * state.dataEnvrn->OutDryBulbTemp + 11.9);
             if (GasCooler(GasCoolerID).PGasCoolerOut < 7.5e6) { // Ensure gas cooler pressure is at least 7.5 MPa for transcritical operation
                 GasCooler(GasCoolerID).PGasCoolerOut = 7.5e6;
             }
@@ -11896,7 +11958,7 @@ namespace RefrigeratedCase {
         Real64 HHiStageCompIn;            // Enthalpy at inlet of high-stage compressor (J/kg)
         Real64 HCaseInRated_base(0.0), HCompInRated_base(0.0); // Autodesk:Tuned Intermediate values for performance tuning
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
         Real64 const LocalTimeStepSec(LocalTimeStep * DataGlobalConstants::SecInHour());
 
@@ -12273,7 +12335,7 @@ namespace RefrigeratedCase {
         Real64 Xl;                          // Initial lower guess for iterative search
         Real64 Xnew(0.0);                   // New guess for iterative search
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Determine refrigerating capacity needed
@@ -12616,7 +12678,7 @@ namespace RefrigeratedCase {
         static std::string const RoutineName("CalculateSubcoolers");
         Real64 TLiqInActualLocal(0.0); // Liquid T in, after condenser, before any mechanical subcooler
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // HCaseIn has to be recalculated as the starting point for the subcoolers here because
@@ -13516,12 +13578,12 @@ namespace RefrigeratedCase {
         Real64 TWalkIn = this->Temperature; // WalkIn operating temperature (C)
 
         // Enthalpy of air corresponding to walk in temperature and 90% assumed RH (J/kg)
-        Real64 EnthalpyAirWalkIn = Psychrometrics::PsyHFnTdbRhPb(state, TWalkIn, 0.9, DataEnvironment::OutBaroPress); // assume 90%RH in cooler
+        Real64 EnthalpyAirWalkIn = Psychrometrics::PsyHFnTdbRhPb(state, TWalkIn, 0.9, state.dataEnvrn->OutBaroPress); // assume 90%RH in cooler
 
         // corresponds to walk in temp and 90% assumed RH(kg water/kg dry air)
         Real64 HumRatioAirWalkIn = Psychrometrics::PsyWFnTdbH(state, TWalkIn, EnthalpyAirWalkIn);
-        Real64 DensityAirWalkIn = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, TWalkIn, HumRatioAirWalkIn);
-        Real64 Conv = DataEnvironment::Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0; // Convert DataEnvironment::Latitude to radians
+        Real64 DensityAirWalkIn = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TWalkIn, HumRatioAirWalkIn);
+        Real64 Conv = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0; // Convert DataEnvironment::Latitude to radians
         Real64 Gravity = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(Conv)) - 0.0000059 * pow_2(std::sin(2.0 * Conv)));
 
         // CALCULATE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
@@ -13558,11 +13620,11 @@ namespace RefrigeratedCase {
             if (StockDoorArea > 0.0 || GlassDoorArea > 0.0) {
                 // Zone relative humidity fraction (decimal)
                 Real64 ZoneRHFrac = Psychrometrics::PsyRhFnTdbWPb(state,
-                    DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, DataEnvironment::OutBaroPress, RoutineName);
+                    DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                 // Enthalpy of the air in a particular zone (J/kg)
-                Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(state, ZoneDryBulb, ZoneRHFrac, DataEnvironment::OutBaroPress, RoutineName);
+                Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(state, ZoneDryBulb, ZoneRHFrac, state.dataEnvrn->OutBaroPress, RoutineName);
                 Real64 HumRatioZoneAir = Psychrometrics::PsyWFnTdbH(state, ZoneDryBulb, EnthalpyZoneAir, RoutineName);
-                Real64 DensityZoneAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName);
+                Real64 DensityZoneAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName);
                 if (DensityZoneAir < DensityAirWalkIn) { // usual case when walk in is colder than zone
                     DensitySqRtFactor = std::sqrt(1.0 - DensityZoneAir / DensityAirWalkIn);
                     DensityFactorFm = std::pow(2.0 / (1.0 + std::pow(DensityAirWalkIn / DensityZoneAir, 0.333)), 1.5);
@@ -13644,8 +13706,8 @@ namespace RefrigeratedCase {
                     WalkInLatLoad = WaterRemovRate * IcetoVaporEnthalpy * (1.0 - DefrostDripDownSchedule);
                     // FROST:  keep track of frost build up on evaporator coil
                     //         avoid accumulation during warm-up to avoid reverse dd test problem
-                    if (!DataGlobals::WarmupFlag) {
-                        Real64 FrostChangekg = (WaterRemovRate * DataGlobals::TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
+                    if (!state.dataGlobal->WarmupFlag) {
+                        Real64 FrostChangekg = (WaterRemovRate * state.dataGlobal->TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
                         this->KgFrost += FrostChangekg;
                     }
                 } // water to ice
@@ -13667,18 +13729,18 @@ namespace RefrigeratedCase {
             this->SensZoneCreditRate(ZoneID) = ZoneSensLoad;
             if (ZoneSensLoad <= 0.0) {
                 this->SensZoneCreditCoolRate(ZoneID) = -ZoneSensLoad;
-                this->SensZoneCreditCool(ZoneID) = -ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditCool(ZoneID) = -ZoneSensLoad * state.dataGlobal->TimeStepZoneSec;
                 this->SensZoneCreditHeatRate(ZoneID) = 0.0;
                 this->SensZoneCreditHeat(ZoneID) = 0.0;
             } else {
                 this->SensZoneCreditHeatRate(ZoneID) = ZoneSensLoad;
-                this->SensZoneCreditHeat(ZoneID) = ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditHeat(ZoneID) = ZoneSensLoad * state.dataGlobal->TimeStepZoneSec;
                 this->SensZoneCreditCoolRate(ZoneID) = 0.0;
                 this->SensZoneCreditCool(ZoneID) = 0.0;
             }
             // This rate should always be negative
             this->LatZoneCreditRate(ZoneID) = ZoneLatentLoad;
-            this->LatZoneCredit(ZoneID) = ZoneLatentLoad * DataGlobals::TimeStepZoneSec;
+            this->LatZoneCredit(ZoneID) = ZoneLatentLoad * state.dataGlobal->TimeStepZoneSec;
 
             // Running total over all zones, use later to dispatch capacity
             SensibleLoadTotal += WalkInSensLoad;
@@ -13698,7 +13760,7 @@ namespace RefrigeratedCase {
         // Calculate floor load - using 'DataEnvironment::GroundTemp' assigned in weather manager (can be entered by user if desired)
         //    Default value is 18C.
         // Total floor energy rate (W)
-        Real64 FloorLoad = this->FloorArea * this->FloorUValue * (DataEnvironment::GroundTemp - TWalkIn);
+        Real64 FloorLoad = this->FloorArea * this->FloorUValue * (state.dataEnvrn->GroundTemp - TWalkIn);
 
         Real64 DefrostLoad;
 
@@ -13706,7 +13768,7 @@ namespace RefrigeratedCase {
         if ((DefrostSchedule > 0.0) && (this->DefrostType != WalkInDefrostNone) && (this->DefrostType != WalkInDefrostOffCycle)) {
             DefrostLoad = this->DefrostCapacity * DefrostSchedule;             // W
             Real64 StartFrostKg = this->KgFrost;                               // frost load at start of time step (kg of ice)
-            Real64 DefrostEnergy = DefrostLoad * DataGlobals::TimeStepZoneSec; // Joules
+            Real64 DefrostEnergy = DefrostLoad * state.dataGlobal->TimeStepZoneSec; // Joules
             if (this->DefrostControlType == DefrostContTempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
@@ -13731,19 +13793,19 @@ namespace RefrigeratedCase {
                     // Reduce defrost heat load on walkin by amount of ice melted during time step
                     Real64 FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
-                        DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour();
-                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                        DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
+                        if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 page 3 notes
                         this->KgFrost = 0.0;
                         DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                               this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
-                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (this->DefrostCapacity * DataGlobals::TimeStepZoneSec)));
+                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (this->DefrostCapacity * state.dataGlobal->TimeStepZoneSec)));
                         // reduce load on walkin by energy put into ice melting
                         DefrostLoad = max(0.0,
                                           (DefrostSchedule * this->DefrostCapacity -
-                                           (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / DataGlobals::TimeStepZoneSec));
+                                           (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / state.dataGlobal->TimeStepZoneSec));
                         this->IceTemp = this->TEvapDesign;
 
                     }    // frost melted during time step less than amount of ice at start
@@ -13756,8 +13818,8 @@ namespace RefrigeratedCase {
             } else { // Not temperature control type
                 Real64 FrostChangekg = min(DefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                 // Reduce defrost heat load on walkin by amount of ice melted during time step
-                DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour();
-                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
+                if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                 // DefrostSchedule not changed
             } // Temperature termination control type
 
@@ -13766,7 +13828,7 @@ namespace RefrigeratedCase {
         } // Defrost calculations
 
         if (this->DefrostType == WalkInDefrostElec) {
-            this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * DataGlobals::TimeStepZoneSec;
+            this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * state.dataGlobal->TimeStepZoneSec;
             this->ElecDefrostPower = this->DefrostCapacity * DefrostSchedule;
         } else {
             this->ElecDefrostConsumption = 0.0;
@@ -13794,7 +13856,7 @@ namespace RefrigeratedCase {
         //  run full out until the temperature is brought back down.
 
         // Rate needed to serve all stored energy during single time step (W)
-        Real64 StoredEnergyRate = this->StoredEnergy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour();
+        Real64 StoredEnergyRate = this->StoredEnergy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
         Real64 LoadRequested = LoadTotal + StoredEnergyRate; // Load necessary to meet current and all stored energy needs (W)
 
         Real64 LatentCapApplied;        // Walk In latent capacity at specific operating conditions
@@ -13815,25 +13877,25 @@ namespace RefrigeratedCase {
             CapApplied = MaxCap;
             LatentCapApplied = min(LatentLoadTotal, MaxCap); // Latent load should never be > capavail, but just in case...
             SensibleCapApplied = CapApplied - LatentCapApplied;
-            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * state.dataGlobal->TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // ReportWalkIn( WalkInID)
         this->TotalCoolingLoad = CapApplied;
-        this->TotalCoolingEnergy = CapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingEnergy = CapApplied * state.dataGlobal->TimeStepZoneSec;
         this->TotSensCoolingEnergyRate = SensibleCapApplied;
-        this->TotSensCoolingEnergy = SensibleCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotSensCoolingEnergy = SensibleCapApplied * state.dataGlobal->TimeStepZoneSec;
         this->TotLatCoolingEnergyRate = LatentCapApplied;
-        this->TotLatCoolingEnergy = LatentCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotLatCoolingEnergy = LatentCapApplied * state.dataGlobal->TimeStepZoneSec;
 
         this->ElecFanPower = FanLoad;
-        this->ElecFanConsumption = FanLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecFanConsumption = FanLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecHeaterPower = HeaterLoad;
-        this->ElecHeaterConsumption = HeaterLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecHeaterConsumption = HeaterLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecLightingPower = LightLoad;
-        this->ElecLightingConsumption = LightLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingConsumption = LightLoad * state.dataGlobal->TimeStepZoneSec;
         this->TotalElecPower = FanLoad + HeaterLoad + LightLoad + this->ElecDefrostPower;
-        this->TotalElecConsumption = this->TotalElecPower * DataGlobals::TimeStepZoneSec;
+        this->TotalElecConsumption = this->TotalElecPower * state.dataGlobal->TimeStepZoneSec;
 
         //**************************************************************************************************
         // Cap Energy and Kg Frost to avoid floating overflow errors
@@ -13843,8 +13905,8 @@ namespace RefrigeratedCase {
             if (this->ShowUnmetWIEnergyWarning) {
                 ShowWarningError(state, "Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(state, " This walk-in cooler has insufficient capacity to meet the loads");
-                ShowContinueError(state, "... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                  General::CreateSysTimeIntervalString());
+                ShowContinueError(state, "... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
+                                  General::CreateSysTimeIntervalString(state));
                 ShowContinueError(state, " Refer to documentation for further explanation of Total Cooling Capacity.");
                 this->ShowUnmetWIEnergyWarning = false;
             } // ShowStoreEnergyWarning
@@ -13855,8 +13917,8 @@ namespace RefrigeratedCase {
                 ShowWarningError(state, "Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(state, " This walkin cooler has insufficient defrost capacity to remove the excess frost accumulation.");
                 ShowContinueError(state, " Check the defrost schedule or defrost capacity. ");
-                ShowContinueError(state, "... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                  General::CreateSysTimeIntervalString());
+                ShowContinueError(state, "... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
+                                  General::CreateSysTimeIntervalString(state));
                 this->ShowWIFrostWarning = false;
             }
         }
@@ -13914,7 +13976,7 @@ namespace RefrigeratedCase {
         Real64 VarFrac;                   // Pump power fraction for variable speed pump, dimensionless
         Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
 
-        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         {
@@ -14065,8 +14127,8 @@ namespace RefrigeratedCase {
                 if (Error < ErrorTol) break;
             } // end iteration on pump energy convergence
 
-            //   IF (Iter >=10 .AND. .NOT. DataGlobals::WarmupFlag)THEN
-            //     If( .not. DataGlobals::WarmupFlag) Then
+            //   IF (Iter >=10 .AND. .NOT. WarmupFlag)THEN
+            //     If( .not. WarmupFlag) Then
             //      Write(OutputFileDebug,707)Month, DataGlobals::CurrentTime, Iter, TotalLoad, TotalPumpPower
             //     End If
             // 707 format(' in iter loop at 707: ',1x,I2,1x,F5.2,1x,I5,7(F10.5,1x))
@@ -14081,7 +14143,7 @@ namespace RefrigeratedCase {
         //  (e.g. as it may be following defrost cycles on cases or walk-ins served by secondary loop)
         //  save the unmet/stored load to be met in succeeding time steps.
         if (this->NumCoils == 0) {
-            StoredEnergyRate = max(0.0, (this->UnmetEnergy / DataGlobals::TimeStepZone / DataGlobalConstants::SecInHour()));
+            StoredEnergyRate = max(0.0, (this->UnmetEnergy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour()));
             // Load necessary to meet current and all stored energy needs (W)
             Real64 LoadRequested = TotalLoad + StoredEnergyRate;
             if (this->MaxLoad > LoadRequested) {
@@ -14093,7 +14155,7 @@ namespace RefrigeratedCase {
                 // Don't have as much capacity as needed (likely following defrost periods)
                 this->TotalCoolingLoad = this->MaxLoad;
                 RefrigerationLoad -= (TotalLoad - this->MaxLoad);
-                if (!DataGlobals::WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * DataGlobals::TimeStepZoneSec);
+                if (!state.dataGlobal->WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * state.dataGlobal->TimeStepZoneSec);
             } // load requested greater than MaxLoad
             if (this->UnmetEnergy > MyLargeNumber) {
                 this->UnmetEnergy = MyLargeNumber;
@@ -14107,9 +14169,7 @@ namespace RefrigeratedCase {
         } else { // air coils on secondary loop, no "unmet" energy accounting, just reduce amount of cooling provided to zone by coils
             DeRate = false;
             if (TotalLoad > this->MaxLoad) DeRate = true;
-            //  TotalLoad = RefrigerationLoad + DistPipeHeatGain  + ReceiverHeatGain &
-            //           + TotalPumpPower*Secondary(SecondaryNum)%PumpPowertoHeat
-            FinalRateCoils(DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
+            FinalRateCoils(state, DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
             // Bug TotalCoolingLoad not set but used below
         } // no air coils on secondary loop
         this->PumpPowerTotal = TotalPumpPower;
@@ -14125,7 +14185,7 @@ namespace RefrigeratedCase {
         this->ReceiverHeatGainEnergy = receiverHeatGain * LocalTimeStep * DataGlobalConstants::SecInHour();
     }
 
-    void SumZoneImpacts()
+    void SumZoneImpacts(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14144,7 +14204,7 @@ namespace RefrigeratedCase {
         //   secondary receiver shells
 
         if (UseSysTimeStep) { // air chillers
-            for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 CoilSysCredit(ZoneNum).ReportH2ORemovedKgPerS_FromZoneRate = -CoilSysCredit(ZoneNum).LatKgPerS_ToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneRate = -CoilSysCredit(ZoneNum).LatCreditToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneEnergy = -CoilSysCredit(ZoneNum).LatCreditToZoneEnergy;
@@ -14170,18 +14230,18 @@ namespace RefrigeratedCase {
 
         // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
         if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
-            for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 CaseWIZoneReport(ZoneNum).SenCaseCreditToZoneEnergy =
-                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 // Latent always negative
                 CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
-                CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy = CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate * DataGlobals::TimeStepZoneSec;
+                CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy = CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate * state.dataGlobal->TimeStepZoneSec;
                 // Sensible rate can be positive or negative, split into separate output variables and
                 //   always report positive value
                 if (DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone <= 0.0) {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy =
-                        -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                        -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneRate = 0.0;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy = 0.0;
                 } else {
@@ -14189,7 +14249,7 @@ namespace RefrigeratedCase {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy = 0.0;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneRate = DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy =
-                        DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                        DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 }
                 CaseWIZoneReport(ZoneNum).TotCoolingToZoneRate =
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate + CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate;
@@ -14197,7 +14257,7 @@ namespace RefrigeratedCase {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy + CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy;
                 CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate =
                     DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone + DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
-                CaseWIZoneReport(ZoneNum).TotHtXferToZoneEnergy = CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate * DataGlobals::TimeStepZoneSec;
+                CaseWIZoneReport(ZoneNum).TotHtXferToZoneEnergy = CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate * state.dataGlobal->TimeStepZoneSec;
             } // over zones for cases and walkins
         }
     }
@@ -14268,13 +14328,19 @@ namespace RefrigeratedCase {
         } else { // airchllersetpointer passed in call to subroutine not ==0
             ChillerSetID = AirChillerSetPtr;
             if (ChillerSetID > DataHeatBalance::NumRefrigChillerSets || ChillerSetID < 1) {
-                ShowFatalError(state, "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + General::TrimSigDigits(ChillerSetID) + ", Number of Units=" +
-                               General::TrimSigDigits(DataHeatBalance::NumRefrigChillerSets) + ", Entered Unit name=" + AirChillerSetName);
+                ShowFatalError(state,
+                               format("SimAirChillerSet:  Invalid AirChillerSetPtr passed={}, Number of Units={}, Entered Unit name={}",
+                                      ChillerSetID,
+                                      DataHeatBalance::NumRefrigChillerSets,
+                                      AirChillerSetName));
             } // ChillerSetID makes no sense
             if (CheckChillerSetName(ChillerSetID)) {
                 if (AirChillerSetName != AirChillerSet(ChillerSetID).Name) {
-                    ShowFatalError(state, "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + General::TrimSigDigits(ChillerSetID) +
-                                   ", Unit name=" + AirChillerSetName + ", stored Unit Name for that index=" + AirChillerSet(ChillerSetID).Name);
+                    ShowFatalError(state,
+                                   format("SimAirChillerSet:  Invalid AirChillerSetPtr passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          ChillerSetID,
+                                          AirChillerSetName,
+                                          AirChillerSet(ChillerSetID).Name));
                 } // name not equal correct name
                 CheckChillerSetName(ChillerSetID) = false;
             } // CheckChillerSetName logical test
@@ -14350,7 +14416,8 @@ namespace RefrigeratedCase {
         } // CoilIndex
     }
 
-    void FinalRateCoils(bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+    void FinalRateCoils(EnergyPlusData &state,
+                        bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int const SystemSourceType,     // Secondarysystem or DetailedSystem
                         int const SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 const InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
@@ -14385,7 +14452,7 @@ namespace RefrigeratedCase {
         } // DeRateCoils
 
         if (DeRate) {
-            ShowRecurringWarningErrorAtEnd(
+            ShowRecurringWarningErrorAtEnd(state,
                 "Refrigeration:System chilling WarehouseCoils " + System(SystemID).Name +
                     " - Refrigeration system unable to meet load of warehouse coils chilled by system ... continues by derating coil load",
                 System(SystemID).InsuffCapWarn);
@@ -14517,10 +14584,10 @@ namespace RefrigeratedCase {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
                 Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(this->ZoneNodeNum).Temp;    // (C)
                 Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
-                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(state, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);
-                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage);
-                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
-                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
+                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(state, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, state.dataEnvrn->OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, state.dataEnvrn->OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
+                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
                 Real64 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -14573,7 +14640,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, " The estimated air outlet temperature is less than the evaporating temperature.");
                     }
                     Real64 ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(state,
-                        ExitTemperatureEstimate, 1.0, DataEnvironment::OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
+                        ExitTemperatureEstimate, 1.0, state.dataEnvrn->OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
                     if (ExitEnthalpyEstimate <= CoilInletEnthalpy) {
                         CoilCapTotEstimate = (CoilInletEnthalpy - ExitEnthalpyEstimate) * AirVolumeFlowMax * CoilInletDensity;
                     } else {
@@ -14637,7 +14704,7 @@ namespace RefrigeratedCase {
                 Real64 ExitEnthalpy =
                     CoilInletEnthalpy - (CoilCapTotEstimate / (AirVolumeFlowMax * CoilInletDensity)); // Air enthalpy leaving the coil (J/kg)
                 Real64 ExitTemperature = Psychrometrics::PsyTsatFnHPb(state,
-                    ExitEnthalpy, DataEnvironment::OutBaroPress, TrackMessage); // RH =1.0 at Tsat // Air temperature leaving the coil (C)
+                    ExitEnthalpy, state.dataEnvrn->OutBaroPress, TrackMessage); // RH =1.0 at Tsat // Air temperature leaving the coil (C)
                 Real64 ExitHumRatio = Psychrometrics::PsyWFnTdbH(state, ExitTemperature, ExitEnthalpy, TrackMessage); // kg water/kg air
                 if (ExitHumRatio > CoilInletHumRatio) ExitHumRatio = CoilInletHumRatio;
                 WaterRemovRate = DryAirMassFlowMax * (CoilInletHumRatio - ExitHumRatio);
@@ -14705,7 +14772,7 @@ namespace RefrigeratedCase {
             // now handle ice on coil and defrost because defrost energy not into melting ice goes into sensible load
             // FROST:  keep track of frost build up on evaporator coil
             //         avoid accumulation during warm-up to avoid reverse dd test problem
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 FrostChangekg = (WaterRemovRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 this->KgFrost += FrostChangekg;
             }
@@ -14752,7 +14819,7 @@ namespace RefrigeratedCase {
                     FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
                         DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour();
-                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                        if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed because ice not all melted, temp term not triggered
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 2010 page 3 notes
@@ -14782,7 +14849,7 @@ namespace RefrigeratedCase {
                 // But DefrostSchedule not changed
                 FrostChangekg = max(0.0, min((DefrostEnergy / IceMeltEnthalpy), StartFrostKg));
                 DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour();
-                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
             } // Temperature termination vs. time-clock control type
 
         } else { // DefrostSchedule <= 0 or have None or OffCycle

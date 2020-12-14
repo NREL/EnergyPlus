@@ -64,84 +64,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace DataGlobals {
-
-    // (last time step of last hour of last day of environ which is a design day)
-    extern bool EndDayFlag;                          // True at the end of each day (last time step of last hour of day)
-    extern bool EndHourFlag;                         // True at the end of each hour (last time step of hour)
-    extern int PreviousHour;                         // Previous Hour Index
-    extern int HourOfDay;                            // Counter for hours in a simulation day
-    extern Real64 WeightPreviousHour;                // Weighting of value for previous hour
-    extern Real64 WeightNow;                         // Weighting of value for current hour
-    extern int NumOfDayInEnvrn;                      // Number of days in the simulation for a particular environment
-    extern int NumOfTimeStepInHour;                  // Number of time steps in each hour of the simulation
-    extern int NumOfZones;                           // Total number of Zones for simulation
-    extern int TimeStep;                             // Counter for time steps (fractional hours)
-    extern Real64 TimeStepZone;                      // Zone time step in fractional hours
-    extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
-    extern bool SysSizingCalc;                       // TRUE if system sizing calculation
-    extern bool DoZoneSizing;                        // User input in SimulationControl object
-    extern bool DoSystemSizing;                      // User input in SimulationControl object
-    extern bool DoPlantSizing;                       // User input in SimulationControl object
-    extern bool DoDesDaySim;                         // User input in SimulationControl object
-    extern bool DoWeathSim;                          // User input in SimulationControl object
-    extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
-    extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
-    extern bool WeathSimReq;                         // Input has a RunPeriod request
-    extern bool DoOutputReporting;                   // TRUE if variables to be written out
-    extern bool DoingSizing;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
-    extern bool DoingHVACSizingSimulations;          // true when HVAC Sizing Simulations are being performed.
-    extern bool DoingInputProcessing;                // TRUE when "IP" is being performed (some error messages are cached)
-    extern bool DisplayAllWarnings;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
-    extern bool DisplayExtraWarnings;                // True when selection for  "DisplayExtraWarnings" is entered
-    extern bool DisplayUnusedObjects;                // True when selection for  "DisplayUnusedObjects" is entered
-    extern bool DisplayUnusedSchedules;              // True when selection for  "DisplayUnusedSchedules" is entered
-    extern bool DisplayAdvancedReportVariables;      // True when selection for  "DisplayAdvancedReportVariables" is entered
-    extern bool DisplayZoneAirHeatBalanceOffBalance; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
-    extern bool DisplayInputInAudit;                 // True when environmental variable "DisplayInputInAudit" is used
-    extern bool CreateMinimalSurfaceVariables;       // True when selection for  "CreateMinimalSurfaceVariables" is entered
-    extern Real64 CurrentTime;                       // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
-    extern int SimTimeSteps;                         // Number of (Loads) timesteps since beginning of run period (environment).
-    extern int MinutesPerTimeStep;                   // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
-    extern Real64 TimeStepZoneSec;                   // Seconds per time step
-    extern bool MetersHaveBeenInitialized;
-    extern bool KickOffSimulation;                 // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
-    extern bool KickOffSizing;                     // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
-    extern bool RedoSizesHVACSimulation;           // doing kick off simulation for redoing sizes as part of sizing
-    extern bool FinalSizingHVACSizingSimIteration; // true if this will be no more HVAC sizing sim iterations
-    extern bool AnyEnergyManagementSystemInModel;  // true if there is any EMS or Erl in model.  otherwise false
-    extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
-    extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
-    extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
-    extern bool RunOptCondEntTemp;                 // true if the ideal condenser entering set point optimization is running
-    extern bool CompLoadReportIsReq;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
-    extern bool isPulseZoneSizing;                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    extern int
-        OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
-    extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
-    extern bool ShowDecayCurvesInEIO;    // true if the Radiant to Convective Decay Curves should appear in the EIO file
-    extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
-    extern bool AnyBasementsInModel;     // true if there are any basements in the input file
-    extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-    extern bool createPerfLog; //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
-    extern int Progress;
-    extern void (*fProgressPtr)(int const);
-    extern void (*fMessagePtr)(std::string const &);
-    // these are the new ones
-    extern std::function<void(int const)> progressCallback;
-    extern std::function<void(const std::string &)> messageCallback;
-    extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
-    extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
-    // Clears the global data in DataGlobals.
-    // Needed for unit tests, should not be normally called.
-    void clear_state(EnergyPlus::IOFiles &ioFiles);
-
-} // namespace DataGlobals
-
     struct DataGlobal : BaseGlobalStruct {
         bool BeginDayFlag = false;                  // True at the start of each day, False after first time step in day
         bool BeginEnvrnFlag = false;                // True at the start of each environment, False after first time step in environ
@@ -155,7 +77,6 @@ namespace DataGlobals {
         std::string CalendarYearChr;                // Calendar year of the current day of simulation (character -- for reporting)
         bool EndEnvrnFlag = false;                  // True at the end of each environment (last time step of last hour of last day of environ)
         bool EndDesignDayEnvrnsFlag = false;        // True at the end of the last design day environment
-
         bool AnnualSimulation = false;
         std::string DayOfSimChr = "0";              // Counter for days (during the simulation) (character -- for reporting)
         bool runReadVars= false;
@@ -172,6 +93,71 @@ namespace DataGlobals {
         std::function<void (void *)> externalHVACManager;
         bool externalHVACManagerInitialized = false;
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        bool sizingAnalysisEioHeaderDoneOnce = false;
+        bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
+        bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
+        int PreviousHour = 0;                             // Previous Hour Index
+        int HourOfDay = 0;                                // Counter for hours in a simulation day
+        Real64 WeightPreviousHour = 0.0;                  // Weighting of value for previous hour
+        Real64 WeightNow = 0.0;                           // Weighting of value for current hour
+        int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
+        int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
+        int NumOfZones = 0;                               // Total number of Zones for simulation
+        int TimeStep = 0;                                 // Counter for time steps (fractional hours)
+        Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
+        bool WarmupFlag = false;                          // True during the warmup portion of a simulation
+        int StdOutputRecordCount = 0;                     // Count of Standard output records
+        int StdMeterRecordCount = 0;                      // Count of Meter output records
+        bool ZoneSizingCalc = false;                      // TRUE if zone sizing calculation
+        bool SysSizingCalc = false;                       // TRUE if system sizing calculation
+        bool DoZoneSizing = false;                        // User input in SimulationControl object
+        bool DoSystemSizing = false;                      // User input in SimulationControl object
+        bool DoPlantSizing = false;                       // User input in SimulationControl object
+        bool DoDesDaySim = false;                         // User input in SimulationControl object
+        bool DoWeathSim = false;                          // User input in SimulationControl object
+        bool DoHVACSizingSimulation = false;              // User input in SimulationControl object
+        int HVACSizingSimMaxIterations = 0;               // User input in SimulationControl object
+        bool WeathSimReq = false;                         // Input has a RunPeriod request
+        bool DoOutputReporting = false;                   // TRUE if variables to be written out
+        bool DoingSizing = false;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
+        bool DoingHVACSizingSimulations = false;          // true when HVAC Sizing Simulations are being performed.
+        bool DoingInputProcessing = false;                // TRUE when "IP" is being performed (some error messages are cached)
+        bool DisplayAllWarnings = false;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
+        bool DisplayExtraWarnings = false;                // True when selection for  "DisplayExtraWarnings" is entered
+        bool DisplayUnusedObjects = false;                // True when selection for  "DisplayUnusedObjects" is entered
+        bool DisplayUnusedSchedules = false;              // True when selection for  "DisplayUnusedSchedules" is entered
+        bool DisplayAdvancedReportVariables = false;      // True when selection for  "DisplayAdvancedReportVariables" is entered
+        bool DisplayZoneAirHeatBalanceOffBalance = false; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+        bool DisplayInputInAudit = false;                 // True when environmental variable "DisplayInputInAudit" is used
+        bool CreateMinimalSurfaceVariables = false;       // True when selection for  "CreateMinimalSurfaceVariables" is entered
+        Real64 CurrentTime = 0.0;                         // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
+        int SimTimeSteps = 0;                             // Number of (Loads) timesteps since beginning of run period (environment).
+        int MinutesPerTimeStep = 0;                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+        Real64 TimeStepZoneSec = 0.0;                     // Seconds per time step
+        bool MetersHaveBeenInitialized = false;
+        bool KickOffSimulation = false;                   // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
+        bool KickOffSizing = false;                       // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+        bool RedoSizesHVACSimulation = false;             // doing kick off simulation for redoing sizes as part of sizing
+        bool FinalSizingHVACSizingSimIteration = false;   // when doing HVAC sizing Simulation
+        bool AnyEnergyManagementSystemInModel = false;    // true if there is any EMS or Erl in model.  otherwise false
+        bool AnyLocalEnvironmentsInModel = false;         // true if there is any local environmental data objected defined in model, otherwise false
+        bool AnyPlantInModel = false;                     // true if there are any plant or condenser loops in model, otherwise false
+        bool AnyIdealCondEntSetPointInModel = false;      // true if there is any ideal condenser entering set point manager in model.
+        bool RunOptCondEntTemp = false;                   // true if the ideal condenser entering set point optimization is running
+        bool CompLoadReportIsReq = false;                 // true if the extra sizing calcs are performed to create a "pulse" for the load component report
+        bool isPulseZoneSizing = false;                   // true during the set of zone sizing calcs that include the "pulse" for the load component report
+        bool doLoadComponentPulseNow = false;             // true for the time step that is the "pulse" for the load component report
+        bool ShowDecayCurvesInEIO = false;                // true if the Radiant to Convective Decay Curves should appear in the EIO file
+        bool AnySlabsInModel = false;                     // true if there are any zone-coupled ground domains in the input file
+        bool AnyBasementsInModel = false;                 // true if there are any basements in the input file
+        bool DoCoilDirectSolutions = false;               // true if use coil direction solutions
+        bool createPerfLog = false;                       // true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+        void (*fProgressPtr)(int const) = nullptr;
+        void (*fMessagePtr)(std::string const &) = nullptr;
+        std::function<void(int const)> progressCallback = nullptr;
+        std::function<void(const std::string &)> messageCallback = nullptr;
+        std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback = nullptr;
+        bool eplusRunningViaAPI = false;
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -186,7 +172,6 @@ namespace DataGlobals {
             this->CalendarYearChr = "0";
             this->EndEnvrnFlag = false;
             this->EndDesignDayEnvrnsFlag = false;
-
             this->AnnualSimulation = false;
             this->DayOfSimChr = "0";
             this->runReadVars = false;
@@ -202,7 +187,72 @@ namespace DataGlobals {
             this->stopSimulation= false;
             this->externalHVACManager = nullptr;
             this->externalHVACManagerInitialized = false;
-            KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+            this->sizingAnalysisEioHeaderDoneOnce = false;
+            this->KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+            this->EndDayFlag = false;
+            this->EndHourFlag = false;
+            this->PreviousHour = 0;
+            this->HourOfDay = 0;
+            this->WeightPreviousHour = 0.0;
+            this->WeightNow = 0.0;
+            this->NumOfDayInEnvrn = 0;
+            this->NumOfTimeStepInHour = 0;
+            this->NumOfZones = 0;
+            this->TimeStep = 0;
+            this->TimeStepZone = 0.0;
+            this->WarmupFlag = false;
+            this->StdOutputRecordCount = 0;
+            this->StdMeterRecordCount = 0;
+            this->ZoneSizingCalc = false;
+            this->SysSizingCalc = false;
+            this->DoZoneSizing = false;
+            this->DoSystemSizing = false;
+            this->DoPlantSizing = false;
+            this->DoDesDaySim = false;
+            this->DoWeathSim = false;
+            this->DoHVACSizingSimulation = false;
+            this->HVACSizingSimMaxIterations = 0;
+            this->WeathSimReq = false;
+            this->DoOutputReporting = false;
+            this->DoingSizing = false;
+            this->DoingHVACSizingSimulations = false;
+            this->DoingInputProcessing = false;
+            this->DisplayAllWarnings = false;
+            this->DisplayExtraWarnings = false;
+            this->DisplayUnusedObjects = false;
+            this->DisplayUnusedSchedules = false;
+            this->DisplayAdvancedReportVariables = false;
+            this->DisplayZoneAirHeatBalanceOffBalance = false;
+            this->DisplayInputInAudit = false;
+            this->CreateMinimalSurfaceVariables = false;
+            this->CurrentTime = 0.0;
+            this->SimTimeSteps = 0;
+            this->MinutesPerTimeStep = 0;
+            this->TimeStepZoneSec = 0.0;
+            this->MetersHaveBeenInitialized = false;
+            this->KickOffSimulation = false;
+            this->KickOffSizing = false;
+            this->RedoSizesHVACSimulation = false;
+            this->FinalSizingHVACSizingSimIteration = false;
+            this->AnyEnergyManagementSystemInModel = false;
+            this->AnyLocalEnvironmentsInModel = false;
+            this->AnyPlantInModel = false;
+            this->AnyIdealCondEntSetPointInModel = false;
+            this->RunOptCondEntTemp = false;
+            this->CompLoadReportIsReq = false;
+            this->isPulseZoneSizing = false;
+            this->doLoadComponentPulseNow = false;
+            this->ShowDecayCurvesInEIO = false;
+            this->AnySlabsInModel = false;
+            this->AnyBasementsInModel = false;
+            this->DoCoilDirectSolutions = false;
+            this->createPerfLog = false;
+            this->fProgressPtr = nullptr;
+            this->fMessagePtr = nullptr;
+            this->progressCallback = nullptr;
+            this->messageCallback = nullptr;
+            this->errorCallback = nullptr;
+            this->eplusRunningViaAPI = false;
         }
     };
 

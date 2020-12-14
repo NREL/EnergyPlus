@@ -389,7 +389,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void ReportMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
+    void ReportMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     void MSHPHeatRecovery(EnergyPlusData &state, int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
 

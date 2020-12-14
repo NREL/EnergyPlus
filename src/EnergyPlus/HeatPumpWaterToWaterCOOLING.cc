@@ -90,10 +90,6 @@ namespace HeatPumpWaterToWaterCOOLING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
 
     // MODULE PARAMETER DEFINITIONS
@@ -130,8 +126,9 @@ namespace HeatPumpWaterToWaterCOOLING {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GshpPeCoolingSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
-                  bool EP_UNUSED(RunFlag)) {
+    void GshpPeCoolingSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
+    {
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
             this->initialize(state);
@@ -153,8 +150,8 @@ namespace HeatPumpWaterToWaterCOOLING {
         }
     }
 
-    void GshpPeCoolingSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                 const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GshpPeCoolingSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                  Real64 &MaxLoad,
                                                  Real64 &MinLoad,
                                                  Real64 &OptLoad)
@@ -164,7 +161,8 @@ namespace HeatPumpWaterToWaterCOOLING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -638,7 +636,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         }
 
         // CALCULATE THE SIMULATION TIME
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         if (MyLoad < 0.0) {
             this->MustRun = true;
@@ -792,16 +790,20 @@ namespace HeatPumpWaterToWaterCOOLING {
 
             if (SourceSidePressure < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Cooling Source Side Pressure Less than the Design Minimum");
-                ShowContinueError(state, "Cooling Source Side Pressure=" + General::TrimSigDigits(SourceSidePressure, 2) +
-                                  " and user specified Design Minimum Pressure=" + General::TrimSigDigits(this->LowPressCutoff, 2));
+                ShowContinueError(state,
+                                  format("Cooling Source Side Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}",
+                                         SourceSidePressure,
+                                         this->LowPressCutoff));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             if (LoadSidePressure > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Cooling Load Side Pressure greater than the Design Maximum");
-                ShowContinueError(state, "Cooling Load Side Pressure=" + General::TrimSigDigits(LoadSidePressure, 2) +
-                                  " and user specified Design Maximum Pressure=" + General::TrimSigDigits(this->HighPressCutoff, 2));
+                ShowContinueError(state,
+                                  format("Cooling Load Side Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}",
+                                         LoadSidePressure,
+                                         this->HighPressCutoff));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
@@ -812,16 +814,19 @@ namespace HeatPumpWaterToWaterCOOLING {
 
             if (SuctionPr < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Cooling Suction Pressure Less than the Design Minimum");
-                ShowContinueError(state, "Cooling Suction Pressure=" + General::TrimSigDigits(SuctionPr, 2) +
-                                  " and user specified Design Minimum Pressure=" + General::TrimSigDigits(this->LowPressCutoff, 2));
+                ShowContinueError(
+                    state,
+                    format("Cooling Suction Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}", SuctionPr, this->LowPressCutoff));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             if (DischargePr > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Cooling Discharge Pressure greater than the Design Maximum");
-                ShowContinueError(state, "Cooling Discharge Pressure=" + General::TrimSigDigits(DischargePr, 2) +
-                                  " and user specified Design Maximum Pressure=" + General::TrimSigDigits(this->HighPressCutoff, 2));
+                ShowContinueError(state,
+                                  format("Cooling Discharge Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}",
+                                         DischargePr,
+                                         this->HighPressCutoff));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }

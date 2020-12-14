@@ -74,9 +74,6 @@ namespace ExteriorEnergyUse {
     // affect simulation results for the energy usage in a building but may affect the "metered"
     // usage of a facility.
 
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::TimeStepZoneSec;
-
     void ManageExteriorEnergyUse(EnergyPlusData &state)
     {
 
@@ -111,16 +108,14 @@ namespace ExteriorEnergyUse {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
         using ScheduleManager::GetScheduleMinValue;
         using ScheduleManager::GetScheduleName;
         using namespace OutputReportPredefined;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetExteriorEnergyUseInput: ");
+        auto constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
@@ -183,13 +178,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(2) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(2), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(2) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(2), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -212,7 +207,7 @@ namespace ExteriorEnergyUse {
             }
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel = rNumericArgs(1);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ExteriorLights",
                                  state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
                                  "Electricity Rate",
@@ -340,13 +335,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -393,13 +388,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -443,7 +438,7 @@ namespace ExteriorEnergyUse {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
     }
 
@@ -544,9 +539,6 @@ namespace ExteriorEnergyUse {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::SunIsUp;
-        using DataGlobals::DoOutputReporting;
-        using DataGlobals::WarmupFlag;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -569,15 +561,15 @@ namespace ExteriorEnergyUse {
             switch (state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode) {
             case ExteriorEnergyUse::LightControlType::ScheduleOnly:
                     state.dataExteriorEnergyUse->ExteriorLights(Item).Power = state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr);
-                    state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * TimeStepZoneSec;
+                    state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
                     break;
                 case ExteriorEnergyUse::LightControlType::AstroClockOverride:
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         state.dataExteriorEnergyUse->ExteriorLights(Item).Power = 0.0;
                         state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = 0.0;
                     } else {
                         state.dataExteriorEnergyUse->ExteriorLights(Item).Power = state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr);
-                        state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * TimeStepZoneSec;
+                        state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
                     }
                     break;
                 default:
@@ -588,23 +580,23 @@ namespace ExteriorEnergyUse {
             // Reduce lighting power due to demand limiting
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).ManageDemand && (state.dataExteriorEnergyUse->ExteriorLights(Item).Power > state.dataExteriorEnergyUse->ExteriorLights(Item).DemandLimit)) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).Power = state.dataExteriorEnergyUse->ExteriorLights(Item).DemandLimit;
-                state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * TimeStepZoneSec;
+                state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
             }
             // EMS controls
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).PowerActuatorOn) state.dataExteriorEnergyUse->ExteriorLights(Item).Power = state.dataExteriorEnergyUse->ExteriorLights(Item).PowerActuatorValue;
 
-            state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * TimeStepZoneSec;
+            state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
 
             // gather for tabular reports
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 //      IF (DoOutputReporting .AND.  WriteTabularFiles .and. (KindOfSim == ksRunPeriodWeather)) THEN !for weather simulations only
-                if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumua the total electricity used for each ExteriorLights object
                     state.dataExteriorEnergyUse->ExteriorLights(Item).SumConsumption += state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse;
                     // for tabular report, accumulate the time when each ExteriorLights has consumption
                     //(using a very small threshold instead of zero)
                     if (state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse > 0.01) {
-                        state.dataExteriorEnergyUse->ExteriorLights(Item).SumTimeNotZeroCons += TimeStepZone;
+                        state.dataExteriorEnergyUse->ExteriorLights(Item).SumTimeNotZeroCons += state.dataGlobal->TimeStepZone;
                     }
                 }
             }
@@ -612,7 +604,7 @@ namespace ExteriorEnergyUse {
 
         for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorEqs; ++Item) {
             state.dataExteriorEnergyUse->ExteriorEquipment(Item).Power = state.dataExteriorEnergyUse->ExteriorEquipment(Item).DesignLevel * GetCurrentScheduleValue(state, state.dataExteriorEnergyUse->ExteriorEquipment(Item).SchedPtr);
-            state.dataExteriorEnergyUse->ExteriorEquipment(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorEquipment(Item).Power * TimeStepZoneSec;
+            state.dataExteriorEnergyUse->ExteriorEquipment(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorEquipment(Item).Power * state.dataGlobal->TimeStepZoneSec;
         }
     }
 

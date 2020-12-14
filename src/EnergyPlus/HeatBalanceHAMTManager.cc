@@ -112,7 +112,6 @@ namespace HeatBalanceHAMTManager {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataMoistureBalance;
     using namespace DataSurfaces;
     using DataHeatBalSurface::MaxSurfaceTempLimit;
@@ -124,11 +123,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataEnvironment::IsRain;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutEnthalpy;
-    using DataEnvironment::SkyTemp;
-    using DataEnvironment::SunIsUp;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
     using DataHeatBalFanSys::QElecBaseboardSurf;
@@ -229,7 +223,7 @@ namespace HeatBalanceHAMTManager {
 
         if (OneTimeFlag) {
             OneTimeFlag = false;
-            DisplayString("Initialising Heat and Moisture Transfer Model");
+            DisplayString(state, "Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput(state);
             InitHeatBalHAMT(state);
         }
@@ -719,9 +713,8 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::ScanForReports;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -760,13 +753,13 @@ namespace HeatBalanceHAMTManager {
         Real64 waterd; // water density
         bool DoReport;
 
-        deltat = TimeStepZone * 3600.0;
+        deltat = state.dataGlobal->TimeStepZone * 3600.0;
 
         // Check the materials information and work out how many cells are required.
         errorCount = 0;
         TotCellsMax = 0;
         for (sid = 1; sid <= TotSurfaces; ++sid) {
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             conid = Surface(sid).Construction;
             if (conid == 0) continue;
@@ -864,7 +857,7 @@ namespace HeatBalanceHAMTManager {
         // Set up surface cell structure
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             // Boundary Cells
             runor = -0.02;
@@ -1005,7 +998,7 @@ namespace HeatBalanceHAMTManager {
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             cells(Extcell(sid)).origin(1) += cells(Extcell(sid)).length(1) / 2.0;
             cells(Intcell(sid)).origin(1) -= cells(Intcell(sid)).length(1) / 2.0;
@@ -1043,7 +1036,8 @@ namespace HeatBalanceHAMTManager {
             print(state.files.eio, "\n");
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Temperature Cell {}", concell),
                                     OutputProcessor::Unit::C,
                                     cells(cellid).temp,
                                     "Zone",
@@ -1051,7 +1045,8 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Water Content Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Water Content Cell {}", concell),
                                     OutputProcessor::Unit::kg_kg,
                                     cells(cellid).wreport,
                                     "Zone",
@@ -1059,7 +1054,8 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Relative Humidity Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Relative Humidity Cell {}", concell),
                                     OutputProcessor::Unit::Perc,
                                     cells(cellid).rhp,
                                     "Zone",
@@ -1103,7 +1099,6 @@ namespace HeatBalanceHAMTManager {
         using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1198,7 +1193,7 @@ namespace HeatBalanceHAMTManager {
             cells(ExtSkycell(sid)).temp = OSCM(Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
-            cells(ExtSkycell(sid)).temp = SkyTemp;
+            cells(ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
             cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
@@ -1289,7 +1284,7 @@ namespace HeatBalanceHAMTManager {
                 if (matid > 0) {
                     interp(
                         dataMaterial.Material(matid).niso, dataMaterial.Material(matid).isorh, dataMaterial.Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
-                    if (IsRain && rainswitch) {
+                    if (state.dataEnvrn->IsRain && rainswitch) {
                         interp(dataMaterial.Material(matid).nsuc, dataMaterial.Material(matid).sucwater, dataMaterial.Material(matid).sucdata, cells(cid).water, cells(cid).dw);
                     } else {
                         interp(dataMaterial.Material(matid).nred, dataMaterial.Material(matid).redwater, dataMaterial.Material(matid).reddata, cells(cid).water, cells(cid).dw);
@@ -1320,7 +1315,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(cid).vtc > 0) {
                         vaporr1 = 1.0 / (cells(cid).overlap(ii) * cells(cid).vtc);
                     } else if (cells(cid).matid > 0) {
-                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, OutBaroPress));
+                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr1 = 0.0;
                     }
@@ -1336,7 +1331,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(adj).vtc > 0) {
                         vaporr2 = 1.0 / (cells(cid).overlap(ii) * cells(adj).vtc);
                     } else if (cells(adj).matid > 0) {
-                        vaporr2 = cells(adj).mu * cells(adj).dist(adjl) / (WVDC(cells(adj).tempp1, OutBaroPress) * cells(cid).overlap(ii));
+                        vaporr2 = cells(adj).mu * cells(adj).dist(adjl) / (WVDC(cells(adj).tempp1, state.dataEnvrn->OutBaroPress) * cells(cid).overlap(ii));
                     } else {
                         vaporr2 = 0.0;
                     }
@@ -1359,12 +1354,12 @@ namespace HeatBalanceHAMTManager {
                     qvp = vpdiff * whv;
                 }
                 if (std::abs(qvp) > qvplim) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         ++qvpErrCount;
                         if (qvpErrCount < 16) {
                             ShowWarningError(state, "HeatAndMoistureTransfer: Large Latent Heat for Surface " + Surface(sid).Name);
                         } else {
-                            ShowRecurringWarningErrorAtEnd("HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
+                            ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
                         }
                     }
                     qvp = 0.0;
@@ -1378,13 +1373,13 @@ namespace HeatBalanceHAMTManager {
             tempmax = maxval(cells, &subcell::tempp1);
             tempmin = minval(cells, &subcell::tempp1);
             if (tempmax > MaxSurfaceTempLimit) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
-                        ShowSevereMessage(state, "HAMT: Temperature (high) out of bounds (" + RoundSigDigits(tempmax, 2) +
-                                          ") for surface=" + Surface(sid).Name);
+                        ShowSevereMessage(state,
+                                          format("HAMT: Temperature (high) out of bounds ({:.2R}) for surface={}", tempmax, Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
                                                    Surface(sid).HighTempErrCount,
                                                    tempmax,
                                                    tempmax,
@@ -1394,21 +1389,20 @@ namespace HeatBalanceHAMTManager {
                 }
             }
             if (tempmax > MaxSurfaceTempLimitBeforeFatal) {
-                if (!WarmupFlag) {
-                    ShowSevereError(state, "HAMT: HAMT: Temperature (high) out of bounds ( " + RoundSigDigits(tempmax, 2) +
-                                    ") for surface=" + Surface(sid).Name);
+                if (!state.dataGlobal->WarmupFlag) {
+                    ShowSevereError(state,
+                                    format("HAMT: HAMT: Temperature (high) out of bounds ( {:.2R}) for surface={}", tempmax, Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             }
             if (tempmin < MinSurfaceTempLimit) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
-                        ShowSevereMessage(state, "HAMT: Temperature (low) out of bounds (" + RoundSigDigits(tempmin, 2) +
-                                          ") for surface=" + Surface(sid).Name);
+                        ShowSevereMessage(state, format("HAMT: Temperature (low) out of bounds ({:.2R}) for surface={}", tempmin, Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
                                                    Surface(sid).HighTempErrCount,
                                                    tempmin,
                                                    tempmin,
@@ -1418,9 +1412,9 @@ namespace HeatBalanceHAMTManager {
                 }
             }
             if (tempmin < MinSurfaceTempLimitBeforeFatal) {
-                if (!WarmupFlag) {
-                    ShowSevereError(state, "HAMT: HAMT: Temperature (low) out of bounds ( " + RoundSigDigits(tempmin, 2) +
-                                    ") for surface=" + Surface(sid).Name);
+                if (!state.dataGlobal->WarmupFlag) {
+                    ShowSevereError(state,
+                                    format("HAMT: HAMT: Temperature (low) out of bounds ( {:.2R}) for surface={}", tempmin, Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -1441,7 +1435,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(cid).vtc > 0) {
                         vaporr1 = 1.0 / (cells(cid).overlap(ii) * cells(cid).vtc);
                     } else if (cells(cid).matid > 0) {
-                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, OutBaroPress));
+                        vaporr1 = (cells(cid).dist(ii) * cells(cid).mu) / (cells(cid).overlap(ii) * WVDC(cells(cid).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr1 = 0.0;
                     }
@@ -1449,7 +1443,7 @@ namespace HeatBalanceHAMTManager {
                     if (cells(adj).vtc > 0) {
                         vaporr2 = 1.0 / (cells(cid).overlap(ii) * cells(adj).vtc);
                     } else if (cells(adj).matid > 0) {
-                        vaporr2 = (cells(adj).dist(adjl) * cells(adj).mu) / (cells(cid).overlap(ii) * WVDC(cells(adj).tempp1, OutBaroPress));
+                        vaporr2 = (cells(adj).dist(adjl) * cells(adj).mu) / (cells(cid).overlap(ii) * WVDC(cells(adj).tempp1, state.dataEnvrn->OutBaroPress));
                     } else {
                         vaporr2 = 0.0;
                     }

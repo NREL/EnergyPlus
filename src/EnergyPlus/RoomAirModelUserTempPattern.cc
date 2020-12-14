@@ -103,7 +103,6 @@ namespace RoomAirModelUserTempPattern {
     // na
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 
     // Data
@@ -210,8 +209,6 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -229,7 +226,7 @@ namespace RoomAirModelUserTempPattern {
         int SurfNum;                     // do loop counter
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(NumOfZones, true);
+            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             MyOneTimeFlag = false;
         }
 
@@ -352,7 +349,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError(state, "User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
+                ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
                 return;
             }
 
@@ -546,7 +543,6 @@ namespace RoomAirModelUserTempPattern {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::SNLoadCoolRate;
         using DataHeatBalance::SNLoadHeatRate;
         using DataHeatBalance::Zone;
@@ -577,7 +573,7 @@ namespace RoomAirModelUserTempPattern {
         static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
         if (MyOneTimeFlag2) {
-            SetupOutputFlag.dimension(NumOfZones, true); // init
+            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
             MyOneTimeFlag2 = false;
         }
 
@@ -836,10 +832,7 @@ namespace RoomAirModelUserTempPattern {
         using DataErrorTracking::TotalRoomAirPatternTooLow;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Wall;
         using DataVectorTypes::Vector;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FigureNDheightInZone;
@@ -885,14 +878,14 @@ namespace RoomAirModelUserTempPattern {
         ZMin = 0.0;
         Count = 0;
         for (SurfNum = Zone(thisZone).SurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
                 Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                 Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                 ZFlrAvg += (Z1 + Z2) / 2.0;
             }
-            if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
                 // Use Wall calculation in case no floor in zone
                 ++Count;
                 if (Count == 1) {
@@ -917,22 +910,22 @@ namespace RoomAirModelUserTempPattern {
         SurfMaxZ = maxval(Surface(thisHBsurf).Vertex, &Vector::z);
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, "**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
-                ShowContinueError(state, "**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
+                ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
+                ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
                 ++TotalRoomAirPatternTooLow;
             }
         }
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, "**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
-                ShowContinueError(state, "**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
+                ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
+                ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
                 ++TotalRoomAirPatternTooHigh;
             }
@@ -970,8 +963,6 @@ namespace RoomAirModelUserTempPattern {
         // sets values in Heat balance variables
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataGlobals::ZoneSizingCalc;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::TempEffBulkAir;
         using DataHeatBalance::Zone;
@@ -1058,7 +1049,7 @@ namespace RoomAirModelUserTempPattern {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state, OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                      DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -1084,12 +1075,12 @@ namespace RoomAirModelUserTempPattern {
                     TempRetAir += QRetAir / (MassFlowRA * CpAir);
                     if (TempRetAir > RetTempMax) {
                         Node(ReturnNode).Temp = RetTempMax;
-                        if (!ZoneSizingCalc) {
+                        if (!state.dataGlobal->ZoneSizingCalc) {
                             SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                         }
                     } else if (TempRetAir < RetTempMin) {
                         Node(ReturnNode).Temp = RetTempMin;
-                        if (!ZoneSizingCalc) {
+                        if (!state.dataGlobal->ZoneSizingCalc) {
                             SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                         }
                     } else {
@@ -1110,7 +1101,7 @@ namespace RoomAirModelUserTempPattern {
             Node(ReturnNode).Press = Node(ZoneNode).Press;
 
             H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio

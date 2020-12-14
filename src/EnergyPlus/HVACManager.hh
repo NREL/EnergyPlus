@@ -104,7 +104,7 @@ namespace HVACManager {
 
     void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
-    void UpdateZoneInletConvergenceLog();
+    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
 
     void CheckAirLoopFlowBalance(EnergyPlusData &state);
 

@@ -1587,30 +1587,6 @@ namespace General {
         return POLY2F;
     }
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}T}", RealValue, SigDigits);
-    }
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const EP_UNUSED(SigDigits) // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}R}", RealValue, SigDigits);
-    }
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const EP_UNUSED(SigDigits) // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
     std::string RemoveTrailingZeros(std::string const &InputString)
     {
 
@@ -2261,7 +2237,7 @@ namespace General {
         return BetweenDates;
     }
 
-    std::string CreateSysTimeIntervalString()
+    std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -2281,8 +2257,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2312,7 +2286,7 @@ namespace General {
         //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
         // CR6902  ActualTimeS=INT(CurrentTime-TimeStepZone)+SysTimeElapsed
         // [DC] TODO: Improve display accuracy up to fractional seconds using hh:mm:ss.0 format
-        ActualTimeS = CurrentTime - TimeStepZone + SysTimeElapsed;
+        ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
         ActualTimeE = ActualTimeS + TimeStepSys;
         ActualTimeHrS = int(ActualTimeS);
         //  ActualTimeHrE=INT(ActualTimeE)
@@ -2337,14 +2311,15 @@ namespace General {
     }
 
     // returns the Julian date for the first, second, etc. day of week for a given month
-    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     )
     {
         // J. Glazer - August 2017
-        int firstDayOfMonth = OrdinalDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
-        int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
+        int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
+        int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
         int jdatForNth;
         if (dayOfWeek >= dayOfWeekForFirstDay) {
             jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
@@ -2707,7 +2682,7 @@ namespace General {
         Minute = mod(TmpItem, DecHr);
     }
 
-    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
     {
 
         // FUNCTION INFORMATION:
@@ -2727,8 +2702,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2753,12 +2726,12 @@ namespace General {
         int ActualTimeHrS;
 
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-            ActualTimeS = CurrentTime - TimeStepZone + SysTimeElapsed;
+            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
             ActualTimeE = ActualTimeS + TimeStepSys;
             ActualTimeHrS = int(ActualTimeS);
             ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
         } else {
-            ActualTimeMin = (CurrentTime - int(CurrentTime)) * FracToMin;
+            ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
         }
 
         return ActualTimeMin;
@@ -2862,7 +2835,7 @@ namespace General {
         return LogicalToInteger;
     }
 
-    Real64 GetCurrentHVACTime()
+    Real64 GetCurrentHVACTime(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
@@ -2880,8 +2853,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2908,13 +2879,13 @@ namespace General {
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
-        CurrentHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed + TimeStepSys;
+        CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
         GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
 
         return GetCurrentHVACTime;
     }
 
-    Real64 GetPreviousHVACTime()
+    Real64 GetPreviousHVACTime(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
@@ -2932,8 +2903,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
 
         // Return value
@@ -2957,13 +2926,13 @@ namespace General {
 
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
-        PreviousHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed;
+        PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
         GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
 
         return GetPreviousHVACTime;
     }
 
-    std::string CreateHVACTimeIntervalString()
+    std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -3002,7 +2971,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(), GetCurrentHVACTime());
+        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
 
         return OutputString;
     }
@@ -3200,7 +3169,6 @@ namespace General {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataGlobals::ShowDecayCurvesInEIO;
         using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
         using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
         using DataRuntimeLanguage::OutputEMSErrors;
@@ -3270,7 +3238,7 @@ namespace General {
 
                     } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
                                                                                             // load component report appear in the EIO file
-                        ShowDecayCurvesInEIO = true;
+                        state.dataGlobal->ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
@@ -3598,10 +3566,13 @@ namespace General {
             ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
             ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError(state, "Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
-                              "]. You may need to shorten the names.");
-            ShowContinueError(state, "Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
-                              "] characters will assure uniqueness for this ZoneList.");
+            ShowContinueError(state,
+                              format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
+                                     ItemLength,
+                                     DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state,
+                              format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
+                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
             ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
@@ -3610,8 +3581,8 @@ namespace General {
 
         if (FoundItem != 0) {
             ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError(state, "name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
-                              RoundSigDigits(FoundItem) + "].");
+            ShowContinueError(state,
+                              format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
             if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;

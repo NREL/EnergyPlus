@@ -95,7 +95,6 @@ namespace DisplacementVentMgr {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -227,7 +226,7 @@ namespace DisplacementVentMgr {
 
         // Do the one time initializations
         if (InitUCSDDVMyOneTimeFlag) {
-            MyEnvrnFlag.dimension(NumOfZones, true);
+            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             HeightFloorSubzoneTop = 0.2;
             ThickOccupiedSubzoneMin = 0.2;
             HeightIntMassDefault = 2.0;
@@ -674,8 +673,8 @@ namespace DisplacementVentMgr {
 
         // Exact solution or Euler method
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            if (ShortenTimeStepSysRoomAir && TimeStepSys < TimeStepZone) {
-                if (PreviousTimeStep < TimeStepZone) {
+            if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     Zone1Floor(ZoneNum) = ZoneM2Floor(ZoneNum);
                     Zone1OC(ZoneNum) = ZoneM2OC(ZoneNum);
                     Zone1MX(ZoneNum) = ZoneM2MX(ZoneNum);
@@ -861,13 +860,13 @@ namespace DisplacementVentMgr {
                 HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
                 AIRRATFloor(ZoneNum) = Zone(ZoneNum).Volume * min(HeightTransition(ZoneNum), HeightFloorSubzoneTop) / CeilingHeight *
                                        Zone(ZoneNum).ZoneVolCapMultpSens *
-                                       PsyRhoAirFnPbTdbW(state, OutBaroPress, MATFloor(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                       PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATFloor(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                        PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
                 AIRRATOC(ZoneNum) = Zone(ZoneNum).Volume * (HeightTransition(ZoneNum) - min(HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
-                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, OutBaroPress, MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
                 AIRRATMX(ZoneNum) = Zone(ZoneNum).Volume * (CeilingHeight - HeightTransition(ZoneNum)) / CeilingHeight *
-                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, OutBaroPress, MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
                 if (UseZoneTimeStepHistory) {

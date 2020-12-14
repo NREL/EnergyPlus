@@ -86,7 +86,7 @@ namespace PVWatts {
         : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0),
           m_outputDCPower(1000.0)
     {
-        using General::RoundSigDigits;
+
         bool errorsFound(false);
 
         if (name.empty()) {
@@ -147,7 +147,7 @@ namespace PVWatts {
         }
 
         if (systemLosses > 1.0 || systemLosses < 0.0) {
-            ShowSevereError(state, "PVWatts: Invalid system loss value " + RoundSigDigits(systemLosses, 2));
+            ShowSevereError(state, format("PVWatts: Invalid system loss value {:.2R}", systemLosses));
             errorsFound = true;
         }
         m_systemLosses = systemLosses;
@@ -156,17 +156,17 @@ namespace PVWatts {
 
         if (m_geometryType == GeometryType::TILT_AZIMUTH) {
             if (tilt < 0 || tilt > 90) {
-                ShowSevereError(state, "PVWatts: Invalid tilt: " + RoundSigDigits(tilt, 2));
+                ShowSevereError(state, format("PVWatts: Invalid tilt: {:.2R}", tilt));
                 errorsFound = true;
             }
             m_tilt = tilt;
             if (azimuth < 0 || azimuth >= 360) {
-                ShowSevereError(state, "PVWatts: Invalid azimuth: " + RoundSigDigits(azimuth, 2));
+                ShowSevereError(state, format("PVWatts: Invalid azimuth: {:.2R}", azimuth));
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
             if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
-                ShowSevereError(state, "PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
+                ShowSevereError(state, format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
@@ -179,7 +179,7 @@ namespace PVWatts {
         }
 
         if (groundCoverageRatio > 1.0 || groundCoverageRatio < 0.0) {
-            ShowSevereError(state, "PVWatts: Invalid ground coverage ratio: " + RoundSigDigits(groundCoverageRatio, 2));
+            ShowSevereError(state, format("PVWatts: Invalid ground coverage ratio: {:.2R}", groundCoverageRatio));
             errorsFound = true;
         }
         m_groundCoverageRatio = groundCoverageRatio;
@@ -190,7 +190,7 @@ namespace PVWatts {
 
         // Set up the pvwatts cell temperature member
         const Real64 pvwatts_height = 5.0;
-        m_tccalc = std::unique_ptr<pvwatts_celltemp>(new pvwatts_celltemp(m_inoct + 273.15, pvwatts_height, DataGlobals::TimeStepZone));
+        m_tccalc = std::unique_ptr<pvwatts_celltemp>(new pvwatts_celltemp(m_inoct + 273.15, pvwatts_height, state.dataGlobal->TimeStepZone));
     }
 
     void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
@@ -374,9 +374,6 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
@@ -391,33 +388,33 @@ namespace PVWatts {
         // initialize_cell_temp
         m_tccalc->set_last_values(m_lastCellTemperature, m_lastPlaneOfArrayIrradiance);
 
-        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, HourOfDay);
+        Real64 albedo = state.dataWeatherManager->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
 
         // process_irradiance
         IrradianceOutput irr_st = processIrradiance(state,
-                                                    DataEnvironment::Year,
-                                                    DataEnvironment::Month,
-                                                    DataEnvironment::DayOfMonth,
-                                                    HourOfDay - 1,
-                                                    (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
-                                                    TimeStepZone,
+                                                    state.dataEnvrn->Year,
+                                                    state.dataEnvrn->Month,
+                                                    state.dataEnvrn->DayOfMonth,
+                                                    state.dataGlobal->HourOfDay - 1,
+                                                    (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep,
+                                                    state.dataGlobal->TimeStepZone,
                                                     state.dataWeatherManager->WeatherFileLatitude,
                                                     state.dataWeatherManager->WeatherFileLongitude,
                                                     state.dataWeatherManager->WeatherFileTimeZone,
-                                                    DataEnvironment::BeamSolarRad,
-                                                    DataEnvironment::DifSolarRad,
+                                                    state.dataEnvrn->BeamSolarRad,
+                                                    state.dataEnvrn->DifSolarRad,
                                                     albedo);
 
         // powerout
         Real64 shad_beam = 1.0;
         if (m_geometryType == GeometryType::SURFACE) {
-            shad_beam = DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum);
+            shad_beam = DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum);
         }
         DCPowerOutput pwr_st =
-            powerout(state, shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
+            powerout(state, shad_beam, 1.0, state.dataEnvrn->BeamSolarRad, albedo, state.dataEnvrn->WindSpeed, state.dataEnvrn->OutDryBulbTemp, irr_st);
 
         // Report out
         m_cellTemperature = pwr_st.pvt;
@@ -438,9 +435,6 @@ namespace PVWatts {
         int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb)
     {
         IrradianceOutput out;
-
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
 
         irrad irr;
         irr.set_time(year, month, day, hour, minute, ts_hour);
@@ -465,8 +459,6 @@ namespace PVWatts {
     DCPowerOutput
     PVWattsGenerator::powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
-
-        using General::RoundSigDigits;
 
         const Real64 &gcr = m_groundCoverageRatio;
 
@@ -507,14 +499,14 @@ namespace PVWatts {
                     if (Fskydiff >= 0 && Fskydiff <= 1)
                         irr_st.iskydiff *= Fskydiff;
                     else
-                        ShowWarningError(state, "PVWatts: sky diffuse reduction factor invalid: fskydiff=" + RoundSigDigits(Fskydiff, 7) +
-                                         ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
+                        ShowWarningError(
+                            state, format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
 
                     if (Fgnddiff >= 0 && Fgnddiff <= 1)
                         irr_st.ignddiff *= Fgnddiff;
                     else
-                        ShowWarningError(state, "PVWatts: gnd diffuse reduction factor invalid: fgnddiff=" + RoundSigDigits(Fgnddiff, 7) +
-                                         ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
+                        ShowWarningError(
+                            state, format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
                 }
             }
 

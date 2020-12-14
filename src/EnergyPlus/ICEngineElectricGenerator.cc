@@ -175,7 +175,7 @@ namespace ICEngineElectricGenerator {
 
             ICEngineGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), NumArray(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -232,9 +232,9 @@ namespace ICEngineElectricGenerator {
                 Real64 xValue = CurveManager::CurveValue(state, ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
                 if (xValue < ReferenceTemp) {
                     ShowSevereError(state, "GetICEngineGeneratorInput: " + DataIPShortCuts::cAlphaFieldNames(7) + " output has very low value.");
-                    ShowContinueError(state, "...curve generates [" + General::RoundSigDigits(xValue, 3) + " C] at PLR=1.0");
-                    ShowContinueError(state, "...this is less than the Reference Temperature [" + General::RoundSigDigits(ReferenceTemp, 2) +
-                                      " C] and may cause errors.");
+                    ShowContinueError(state, format("...curve generates [{:.3R} C] at PLR=1.0", xValue));
+                    ShowContinueError(state,
+                                      format("...this is less than the Reference Temperature [{:.2R} C] and may cause errors.", ReferenceTemp));
                 }
             }
 
@@ -409,17 +409,19 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void ICEngineGeneratorSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ICEngineGeneratorSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state,
+                                          [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                           bool FirstHVACIteration,
-                                          Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+                                          [[maybe_unused]] Real64 &CurLoad,
+                                          [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the plant nodes.
@@ -578,11 +580,10 @@ namespace ICEngineElectricGenerator {
                 if (this->ErrExhaustTempIndex == 0) {
                     ShowWarningMessage(state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
                                        "\" low Exhaust Temperature from Curve Value");
-                    ShowContinueError(state, "...curve generated temperature=[" + General::RoundSigDigits(exhaustTemp, 3) + " C], PLR=[" +
-                                      General::RoundSigDigits(PLR, 3) + "].");
+                    ShowContinueError(state, format("...curve generated temperature=[{:.3R} C], PLR=[{:.3R}].", exhaustTemp, PLR));
                     ShowContinueError(state, "...simulation will continue with exhaust heat reclaim set to 0.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
                                                    "\" low Exhaust Temperature continues...",
                                                this->ErrExhaustTempIndex,
                                                exhaustTemp,

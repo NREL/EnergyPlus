@@ -119,7 +119,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         getInputFlag_ = false;
     }
 
-    if (DataGlobals::MetersHaveBeenInitialized && setupMeterIndexFlag_) {
+    if (state.dataGlobal->MetersHaveBeenInitialized && setupMeterIndexFlag_) {
         setupMeterIndices(state);
         setupMeterIndexFlag_ = false;
     }
@@ -131,7 +131,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
     if (!state.dataGlobal->BeginEnvrnFlag) newEnvironmentFlag_ = true;
 
     // retrieve data from meters for demand and production
-    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
+    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
     elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
@@ -148,7 +148,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
             facilityPowerInTransformerObj_->manageTransformers(state, 0.0);
         }
 
-        updateWholeBuildingRecords();
+        updateWholeBuildingRecords(state);
         return;
     }
 
@@ -156,7 +156,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         e->manageElecLoadCenter(state, firstHVACIteration, wholeBldgRemainingLoad_);
     }
 
-    updateWholeBuildingRecords();
+    updateWholeBuildingRecords(state);
     // The transformer call should be put outside of the "Load Center" loop because
     // 1) A transformer may be for utility, not for load center
     // 2) A tansformer may be shared by multiple load centers
@@ -164,7 +164,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         facilityPowerInTransformerObj_->manageTransformers(state, 0.0);
     }
 
-    updateWholeBuildingRecords();
+    updateWholeBuildingRecords(state);
     if (powerOutTransformerObj_ != nullptr) {
         powerOutTransformerObj_->manageTransformers(state, electSurplusRate_);
     }
@@ -422,11 +422,11 @@ void ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr(EnergyPlusData 
     }
 }
 
-void ElectricPowerServiceManager::updateWholeBuildingRecords()
+void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &state)
 {
 
     // main panel balancing.
-    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
+    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
     elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
@@ -1002,7 +1002,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     SetupOutputVariable(state, "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, "System", "Sum", name_);
     SetupOutputVariable(state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
 
-    if (DataGlobals::AnyEnergyManagementSystemInModel && storagePresent_) {
+    if (state.dataGlobal->AnyEnergyManagementSystemInModel && storagePresent_) {
         SetupEMSActuator("Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
         SetupEMSActuator("Electrical Storage", name_, "Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
     }
@@ -1273,7 +1273,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         // The TRACK CUSTOM METER scheme tries to have the generators meet all of the
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
-        customMeterDemand = GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+        customMeterDemand = GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                             GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
         remainingLoad = customMeterDemand;
@@ -1510,7 +1510,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
     }
     case StorageOpScheme::meterDemandStoreExcessOnSite: {
         // Get meter rate
-        subpanelFeedInRequest = GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+        subpanelFeedInRequest = GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                                 GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         subpanelDrawRequest = 0.0;
         break;
@@ -2077,7 +2077,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     maxPowerOut = ratedElecPowerOutput, nominalThermElectRatio = thermalToElectRatio;
 
     SetupOutputVariable(state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
-    if (DataGlobals::AnyEnergyManagementSystemInModel) {
+    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
         SetupEMSActuator("On-Site Generator Control", objectName, "Requested Power", "[W]", eMSRequestOn, eMSPowerRequest);
@@ -2233,10 +2233,10 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     if (electricPowerOutput < 0.0) {
         if (errCountNegElectProd_ == 0) {
             ShowWarningMessage(state, typeOfName + " named " + name + " is producing negative electric power, check generator inputs.");
-            ShowContinueError(state, "Electric power production rate =" + General::RoundSigDigits(electricPowerOutput, 4));
+            ShowContinueError(state, format("Electric power production rate ={:.4R}", electricPowerOutput));
             ShowContinueError(state, "The power will be set to zero, and the simulation continues... ");
         }
-        ShowRecurringWarningErrorAtEnd(typeOfName + " named " + name + " is producing negative electric power ",
+        ShowRecurringWarningErrorAtEnd(state, typeOfName + " named " + name + " is producing negative electric power ",
                                        errCountNegElectProd_,
                                        electricPowerOutput,
                                        electricPowerOutput);
@@ -3167,7 +3167,7 @@ ElectricStorage::ElectricStorage( // main constructor
                             "Plant");
         SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
                 SetupEMSInternalVariable(state, "Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
             } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
@@ -3298,11 +3298,11 @@ void ElectricStorage::reinitAtEndWarmup()
 void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 {
 
-    if (myWarmUpFlag_ && !DataGlobals::WarmupFlag) {
+    if (myWarmUpFlag_ && !state.dataGlobal->WarmupFlag) {
         reinitAtEndWarmup();
     }
 
-    Real64 timeElapsedLoc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+    Real64 timeElapsedLoc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
     if (timeElapsed_ != timeElapsedLoc) { // time changed, update last with "current" result from previous time
         if (storageModelMode_ == StorageModelType::kiBaMBattery && lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             //    At this point, the current values, last time step values and last two time step values have not been updated, hence:
@@ -3768,15 +3768,15 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
             // Issue #5301 need more diagnostics for this case
             ShowWarningError(state,
                 "ElectricStorage::determineCurrentForBatteryDischarge, iteration limit exceeded, failed to solve for discharge current.");
-            ShowContinueError(state, "Last timestep charge available, q0 = " + General::RoundSigDigits(q0, 5));
-            ShowContinueError(state, "New Current, Inew = " + General::RoundSigDigits(Inew, 5) + " [Amps]");
-            ShowContinueError(state, "Power discharge per module cell, Pw = " + General::RoundSigDigits(Pw, 5) + " ");
-            ShowContinueError(state, "Charge Conversion Rate, [1/h] change rate from bound charge energy to available charge, parameter k = " +
-                              General::RoundSigDigits(k, 5));
-            ShowContinueError(state, "parameter c = " + General::RoundSigDigits(c, 5));
-            ShowContinueError(state, "parameter qmax = " + General::RoundSigDigits(qmax, 5));
-            ShowContinueError(state, "Fully charged open circuit voltage, parameter E0c  = " + General::RoundSigDigits(E0c, 5));
-            ShowContinueError(state, "parameter InternalR = " + General::RoundSigDigits(InternalR, 5));
+            ShowContinueError(state, format("Last timestep charge available, q0 = {:.5R}", q0));
+            ShowContinueError(state, format("New Current, Inew = {:.5R} [Amps]", Inew));
+            ShowContinueError(state, format("Power discharge per module cell, Pw = {:.5R} ", Pw));
+            ShowContinueError(
+                state, format("Charge Conversion Rate, [1/h] change rate from bound charge energy to available charge, parameter k = {:.5R}", k));
+            ShowContinueError(state, format("parameter c = {:.5R}", c));
+            ShowContinueError(state, format("parameter qmax = {:.5R}", qmax));
+            ShowContinueError(state, format("Fully charged open circuit voltage, parameter E0c  = {:.5R}", E0c));
+            ShowContinueError(state, format("parameter InternalR = {:.5R}", InternalR));
             if (qmaxf == 0.0) {
                 ShowContinueError(state, "qmaxf was zero, would have divided by zero.");
             }
@@ -4009,7 +4009,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             if (performanceInputMode_ == TransformerPerformanceInput::lossesMethod) {
                 ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\".");
                 ShowContinueError(state, "Specified " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
-                ShowContinueError(state, "Specified " + DataIPShortCuts::cNumericFieldNames(2) + " = " + General::RoundSigDigits(ratedCapacity_, 1));
+                ShowContinueError(state, format("Specified {} = {:.1R}", DataIPShortCuts::cNumericFieldNames(2), ratedCapacity_));
                 ShowContinueError(state, "Transformer load and no load losses cannot be calculated with 0.0 rated capacity.");
                 ShowContinueError(state, "Simulation continues but transformer losses will be set to zero.");
             }
@@ -4026,8 +4026,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                 maxPUL_ = ratedPUL_;
             } else if (maxPUL_ <= 0 || maxPUL_ > 1) {
                 ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(11) + "=[" +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(11), 3) + "].");
+                ShowContinueError(state, format("Invalid {}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(11), DataIPShortCuts::rNumericArgs(11)));
                 ShowContinueError(state, "Entered value must be > 0 and <= 1.");
                 errorsFound = true;
             }
@@ -4182,13 +4181,13 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     case TransformerUse::powerInFromGrid: {
         for (std::size_t meterNum = 0; meterNum < wiredMeterPtrs_.size(); ++meterNum) {
 
-            if (DataGlobals::MetersHaveBeenInitialized) {
+            if (state.dataGlobal->MetersHaveBeenInitialized) {
 
-                elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+                elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                             GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
-                pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / DataGlobals::TimeStepZoneSec;
+                pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;
             } else {
                 elecLoad = 0.0;
                 pastElecLoad = 0.0;
@@ -4241,7 +4240,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
                 ShowSevereError(state, "Transformer Overloaded");
                 ShowContinueError(state, "Entered in ElectricLoadCenter:Transformer =" + name_);
             }
-            ShowRecurringSevereErrorAtEnd("Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
+            ShowRecurringSevereErrorAtEnd(state, "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
         }
 
         Real64 tempChange = std::pow(pUL, 1.6) * tempRise_;

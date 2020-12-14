@@ -66,8 +66,6 @@ struct EnergyPlusData;
 namespace DataZoneEquipment {
 
     // Using/Aliasing
-    using DataGlobals::NumOfZones;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -411,7 +409,8 @@ namespace DataZoneEquipment {
         {
         }
 
-        void getPrioritiesforInletNode(int const inletNodeNum, // Zone inlet node number to match
+        void getPrioritiesForInletNode(EnergyPlusData &state,
+                                       int const inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
@@ -493,9 +492,10 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData1(EnergyPlusData &state);
 
-    void SetupZoneEquipmentForConvectionFlowRegime();
+    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
-    bool CheckZoneEquipmentList(std::string const &ComponentType, // Type of component
+    bool CheckZoneEquipmentList(EnergyPlusData &state,
+                                std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 

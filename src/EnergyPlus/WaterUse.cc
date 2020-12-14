@@ -162,13 +162,13 @@ namespace WaterUse {
                 if (state.dataWaterUse->WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
                 } else if (NumIteration > MaxIterations) {
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex == 0) {
                             ShowWarningError(state, "WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                              ":  Heat recovery temperature did not converge");
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, "WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                                            ":  Heat recovery temperature did not converge",
                                                        state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex);
                     }
@@ -203,10 +203,11 @@ namespace WaterUse {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterConnectionsType::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterConnectionsType::simulate(EnergyPlusData &state,
+                                        [[maybe_unused]] const PlantLocation &calledFromLocation,
                                         bool FirstHVACIteration,
-                                        Real64 &EP_UNUSED(CurLoad),
-                                        bool EP_UNUSED(RunFlag))
+                                        [[maybe_unused]] Real64 &CurLoad,
+                                        [[maybe_unused]] bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -257,12 +258,12 @@ namespace WaterUse {
             if (this->TempError < Tolerance) {
                 break;
             } else if (NumIteration > MaxIterations) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->MaxIterationsErrorIndex == 0) {
                         ShowWarningError(state, "WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge",
+                    ShowRecurringWarningErrorAtEnd(state, "WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge",
                                                    this->MaxIterationsErrorIndex);
                 }
                 break;
@@ -826,7 +827,7 @@ namespace WaterUse {
             if (this->ColdTempSchedule > 0) {
                 this->ColdTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
             } else { // If no ColdTempSchedule, use the mains temperature
-                this->ColdTemp = DataEnvironment::WaterMainsTemp;
+                this->ColdTemp = state.dataEnvrn->WaterMainsTemp;
             }
 
             if (this->HotTempSchedule > 0) {
@@ -934,8 +935,8 @@ namespace WaterUse {
             } else {
                 Real64 ZoneHumRat = DataHeatBalFanSys::ZoneAirHumRat(this->Zone);
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
-                    DataHeatBalFanSys::MAT(this->Zone), 1.0, DataEnvironment::OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
-                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
+                    DataHeatBalFanSys::MAT(this->Zone), 1.0, state.dataEnvrn->OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
+                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * DataHeatBalance::Zone(this->Zone).Volume; // Max water that can be evaporated to zone
                 Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // Max water in flow
@@ -1003,7 +1004,7 @@ namespace WaterUse {
             this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
 
         } else {
-            this->ColdSupplyTemp = DataEnvironment::WaterMainsTemp;
+            this->ColdSupplyTemp = state.dataEnvrn->WaterMainsTemp;
         }
 
         // Initially set ColdTemp to the ColdSupplyTemp; with heat recovery, ColdTemp will change during iteration
@@ -1041,7 +1042,7 @@ namespace WaterUse {
             if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
             if (this->InletNode > 0) {
-                if (!DataGlobals::DoingSizing) {
+                if (!state.dataGlobal->DoingSizing) {
                     this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.

@@ -281,7 +281,7 @@ namespace HeatingCoils {
     // Beginning of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void UpdateHeatingCoil(int const CoilNum);
+    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum);
 
     //        End of Update subroutines for the HeatingCoil Module
     // *****************************************************************************

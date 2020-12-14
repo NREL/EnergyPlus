@@ -59,6 +59,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataLoopNode;
@@ -69,11 +70,11 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
 {
 
     DataPlant::TotNumLoops = 4;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
     std::string const idf_objects = delimited_string({
         "  Chiller:ConstantCOP,",
@@ -108,9 +109,9 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ConstCOPChillerSpecs::getInput(state);
+    ConstCOPChillerSpecs::getInput(*state);
 
-    auto &thisChiller = state.dataPlantChillers->ConstCOPChiller(1);
+    auto &thisChiller = state->dataPlantChillers->ConstCOPChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -147,12 +148,12 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size(state);
+    thisChiller.initialize(*state, RunFlag, MyLoad);
+    thisChiller.size(*state);
 
     // run init again after sizing is complete to set mass flow rate
-    state.dataGlobal->BeginEnvrnFlag = true;
-    thisChiller.initialize(state, RunFlag, MyLoad);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisChiller.initialize(*state, RunFlag, MyLoad);
 
     // check autocalculate chiller nominal capacity
     EXPECT_NEAR(thisChiller.NomCap, 20987.5090557, 0.000001);

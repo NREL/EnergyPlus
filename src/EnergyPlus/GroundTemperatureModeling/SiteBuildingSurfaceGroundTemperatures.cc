@@ -77,7 +77,6 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     // Reads input and creates instance of Site:GroundTemperature:BuildingSurface object
 
     // USE STATEMENTS:
-    using DataEnvironment::GroundTempObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -113,7 +112,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
             if (thisModel->buildingSurfaceGroundTemps(i) < 15.0 || thisModel->buildingSurfaceGroundTemps(i) > 25.0) genErrorMessage = true;
         }
 
-        GroundTempObjInput = true;
+        state.dataEnvrn->GroundTempObjInput = true;
 
         if (genErrorMessage) {
             ShowWarningError(state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
@@ -141,7 +140,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,7 +156,8 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(s
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64
+SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -187,7 +187,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDa
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

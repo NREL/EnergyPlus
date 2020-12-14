@@ -503,7 +503,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).AirSup.NumConstituents = NumAirConstit;
 
                     if (NumAirConstit > 5) {
-                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' + General::RoundSigDigits(NumArray(4), 2));
+                        ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(4), NumArray(4)));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                         ShowContinueError(state, "Fuel Cell model not set up for more than 5 air constituents");
                         ErrorsFound = true;
@@ -539,7 +539,7 @@ namespace FuelCellElectricGenerator {
                 if (std::abs(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract) - 1.0) > 0.0001) {
 
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                    ShowContinueError(state, "..Sum was=" + General::RoundSigDigits(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract), 1));
+                    ShowContinueError(state, format("..Sum was={:.1R}", sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract)));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -1134,7 +1134,7 @@ namespace FuelCellElectricGenerator {
                                   &this->Report.SkinLossRadiat);
         }
 
-        if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
+        if (state.dataGlobal->DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
             SetupOutputVariable(state, "Generator Air Inlet Temperature", OutputProcessor::Unit::C, this->Report.TairInlet, "System", "Average", this->Name);
 
             SetupOutputVariable(state, "Generator Power Module Entering Air Temperature",
@@ -1349,7 +1349,10 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::CalcFuelCellGeneratorModel(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcFuelCellGeneratorModel(EnergyPlusData &state,
+                                                  bool const RunFlag,
+                                                  Real64 const MyLoad,
+                                                  [[maybe_unused]] bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1378,7 +1381,7 @@ namespace FuelCellElectricGenerator {
                 // set Day and Time of Last Shut Down
                 this->FCPM.FractionalDayofLastShutDown =
                     double(state.dataGlobal->DayOfSim) +
-                    (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                    (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                         DataGlobalConstants::HoursInDay();
                 this->FCPM.HasBeenOn = false;
 
@@ -1398,7 +1401,7 @@ namespace FuelCellElectricGenerator {
 
             this->FCPM.FractionalDayofLastStartUp =
                 double(state.dataGlobal->DayOfSim) +
-                (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                     DataGlobalConstants::HoursInDay();
 
             this->FCPM.HasBeenOn = true;
@@ -1557,8 +1560,7 @@ namespace FuelCellElectricGenerator {
                 DataGenerators::FuelSupply(this->FuelSupNum).CompPowerLossFactor * DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl;
 
             if (DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss < 0.0) {
-                ShowWarningError(state, "problem in FuelSupply.QskinLoss " +
-                                 General::RoundSigDigits(DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss, 3));
+                ShowWarningError(state, format("problem in FuelSupply.QskinLoss {:.3R}", DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss));
                 DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss = 0.0;
             }
 
@@ -1585,7 +1587,7 @@ namespace FuelCellElectricGenerator {
 
                 if (SELECT_CASE_var == DataGenerators::WaterInReformMains) {
 
-                    this->WaterSup.TwaterIntoCompress = DataEnvironment::WaterMainsTemp;
+                    this->WaterSup.TwaterIntoCompress = state.dataEnvrn->WaterMainsTemp;
 
                 } else if ((SELECT_CASE_var == DataGenerators::WaterInReformAirNode) || (SELECT_CASE_var == DataGenerators::WaterInReformWaterNode)) {
 
@@ -1675,7 +1677,7 @@ namespace FuelCellElectricGenerator {
             this->AirSup.QskinLoss = this->AirSup.BlowerHeatLossFactor * this->AirSup.PairCompEl;
 
             if (this->AirSup.QskinLoss < 0.0) {
-                ShowWarningError(state, "problem in AirSup.QskinLoss " + General::RoundSigDigits(this->AirSup.QskinLoss, 3));
+                ShowWarningError(state, format("problem in AirSup.QskinLoss {:.3R}", this->AirSup.QskinLoss));
                 this->AirSup.QskinLoss = 0.0;
             }
 
@@ -1894,7 +1896,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::ManageElectStorInteractions(EnergyPlusData &state,
                                                    Real64 const Pdemand,
-                                                   Real64 const EP_UNUSED(PpcuLosses),
+                                                   [[maybe_unused]] Real64 const PpcuLosses,
                                                    bool &Constrained,
                                                    Real64 &Pstorage,
                                                    Real64 &PgridOverage // electricity that can't be stored and needs to go out
@@ -2772,7 +2774,7 @@ namespace FuelCellElectricGenerator {
 
         Real64 CurrentFractionalDay =
             double(state.dataGlobal->DayOfSim) +
-            (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+            (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                 DataGlobalConstants::HoursInDay();
 
         // Check if in start up and if it still should be
@@ -3110,17 +3112,22 @@ namespace FuelCellElectricGenerator {
         this->ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(this->ExhaustHX.WaterInNode).Enthalpy + this->ExhaustHX.qHX;
     }
 
-    void FCDataStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void FCDataStruct::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                           [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                           Real64 &MaxLoad,
+                                           Real64 &MinLoad,
+                                           Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &state,
+                                [[maybe_unused]] const PlantLocation &calledFromLocation,
                                 bool FirstHVACIteration,
-                                Real64 &EP_UNUSED(CurLoad),
-                                bool EP_UNUSED(RunFlag))
+                                [[maybe_unused]] Real64 &CurLoad,
+                                [[maybe_unused]] bool RunFlag)
     {
         if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state, this->CWLoopNum,
@@ -3274,7 +3281,7 @@ namespace FuelCellElectricGenerator {
             this->MyEnvrnFlag_Init = true;
         }
 
-        if (this->MyWarmupFlag_Init && (!DataGlobals::WarmupFlag)) {
+        if (this->MyWarmupFlag_Init && (!state.dataGlobal->WarmupFlag)) {
             // need to reset initial state of charge at beginning of environment but after warm up is complete
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
             this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
@@ -3282,7 +3289,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
-        Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (this->TimeElapsed != timeElapsed) {
 
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.ThisTimeStepStateOfCharge;
@@ -3399,7 +3406,7 @@ namespace FuelCellElectricGenerator {
         } // over number of Fuel cells
     }
 
-    void FCDataStruct::CalcUpdateHeatRecovery(bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcUpdateHeatRecovery([[maybe_unused]] bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:

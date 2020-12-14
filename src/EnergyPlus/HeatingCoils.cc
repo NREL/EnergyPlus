@@ -59,7 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -108,7 +107,6 @@ namespace HeatingCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataGlobalConstants;
     using DataHeatBalance::HeatReclaimDXCoil;
@@ -208,7 +206,6 @@ namespace HeatingCoils {
         // This subroutine manages HeatingCoil component simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -239,13 +236,20 @@ namespace HeatingCoils {
             } else {
                 CoilNum = CompIndex;
                 if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                    ShowFatalError(state, "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                   ", Number of Heating Coils=" + TrimSigDigits(NumHeatingCoils) + ", Coil name=" + CompName);
+                    ShowFatalError(state,
+                                   format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                          CoilNum,
+                                          NumHeatingCoils,
+                                          CompName));
                 }
                 if (CheckEquipName(CoilNum)) {
                     if (!CompName.empty() && CompName != HeatingCoil(CoilNum).Name) {
-                        ShowFatalError(state, "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                       ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil(CoilNum).Name);
+                        ShowFatalError(
+                            state,
+                            format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                   CoilNum,
+                                   CompName,
+                                   HeatingCoil(CoilNum).Name));
                     }
                     CheckEquipName(CoilNum) = false;
                 }
@@ -308,7 +312,7 @@ namespace HeatingCoils {
         }
 
         // Update the current HeatingCoil to the outlet nodes
-        UpdateHeatingCoil(CoilNum);
+        UpdateHeatingCoil(state, CoilNum);
 
         // Report the current HeatingCoil
         ReportHeatingCoil(state, CoilNum);
@@ -1248,7 +1252,6 @@ namespace HeatingCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
 
@@ -1278,7 +1281,7 @@ namespace HeatingCoils {
             MySPTestFlag = true;
         }
 
-        if (!SysSizingCalc && MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeHeatingCoil(state, CoilNum);
 
@@ -1315,7 +1318,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingGas_MultiStage) {
 
             //   If the coil is temperature controlled (QCoilReq == -999.0), both a control node and setpoint are required.
-            if (!SysSizingCalc && DoSetPointTest) {
+            if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                 //     3 possibilities here:
                 //     1) TempSetPointNodeNum .GT. 0 and TempSetPoint /= SensedNodeFlagValue, this is correct
                 //     2) TempSetPointNodeNum .EQ. 0, this is not correct, control node is required
@@ -1330,7 +1333,7 @@ namespace HeatingCoils {
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
                     if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                        if (!AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                             ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
@@ -1502,8 +1505,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using namespace OutputReportPredefined;
 
         // Locals
@@ -1616,12 +1618,11 @@ namespace HeatingCoils {
                                                          NominalCapacityDes,
                                                          "User-Specified " + SizingString,
                                                          NominalCapacityUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + RoundSigDigits(NominalCapacityUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + RoundSigDigits(NominalCapacityDes, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1641,11 +1642,15 @@ namespace HeatingCoils {
             // Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
             for (StageNum = 1; StageNum <= HeatingCoil(CoilNum).NumOfStages - 1; ++StageNum) {
                 if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)) {
-                    ShowSevereError(state, "SizeHeatingCoil: " + HeatingCoil(CoilNum).HeatingCoilType + ' ' + HeatingCoil(CoilNum).Name + ", Stage " +
-                                    TrimSigDigits(StageNum) + " Nominal Capacity (" +
-                                    RoundSigDigits(HeatingCoil(CoilNum).MSNominalCapacity(StageNum), 2) + " W) must be less than or equal to Stage " +
-                                    TrimSigDigits(StageNum + 1) + " Nominal Capacity (" +
-                                    RoundSigDigits(HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1), 2) + " W).");
+                    ShowSevereError(state,
+                                    format("SizeHeatingCoil: {} {}, Stage {} Nominal Capacity ({:.2R} W) must be less than or equal to Stage {} "
+                                           "Nominal Capacity ({:.2R} W).",
+                                           HeatingCoil(CoilNum).HeatingCoilType,
+                                           HeatingCoil(CoilNum).Name,
+                                           StageNum,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum),
+                                           StageNum + 1,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)));
                     ShowFatalError(state, "Preceding conditions cause termination.");
                 }
             }
@@ -1712,9 +1717,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
@@ -1749,8 +1751,8 @@ namespace HeatingCoils {
         Control = HeatingCoil(CoilNum).Control;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -1885,12 +1887,10 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -1954,7 +1954,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
@@ -2080,9 +2080,9 @@ namespace HeatingCoils {
     void CalcFuelHeatingCoil(EnergyPlusData &state,
                              int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
-                             Real64 &QCoilActual,                  // coil load actually delivered (W)
-                             int const FanOpMode,                  // fan operating mode
-                             Real64 const EP_UNUSED(PartLoadRatio) // part-load ratio of heating coil
+                             Real64 &QCoilActual,                        // coil load actually delivered (W)
+                             int const FanOpMode,                        // fan operating mode
+                             [[maybe_unused]] Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2100,12 +2100,8 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
-        using General::TrimSigDigits;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2142,8 +2138,8 @@ namespace HeatingCoils {
 
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2228,12 +2224,11 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", PLF curve values");
-                        ShowContinueError(state, "The PLF curve value = " + TrimSigDigits(PLF, 5) +
-                                          " for part-load ratio = " + TrimSigDigits(PartLoadRat, 5));
+                        ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2247,11 +2242,11 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", runtime fraction");
-                        ShowContinueError(state, "The runtime fraction exceeded 1.0. [" + TrimSigDigits(HeatingCoil(CoilNum).RTF, 4) + "].");
+                        ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2318,12 +2313,10 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2389,7 +2382,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
@@ -2524,12 +2517,11 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", PLF curve values");
-                        ShowContinueError(state, "The PLF curve value = " + TrimSigDigits(PLF, 5) +
-                                          " for part-load ratio = " + TrimSigDigits(PartLoadRat, 5));
+                        ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2543,11 +2535,11 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", runtime fraction");
-                        ShowContinueError(state, "The runtime fraction exceeded 1.0. [" + TrimSigDigits(HeatingCoil(CoilNum).RTF, 4) + "].");
+                        ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2598,9 +2590,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using namespace DXCoils;
@@ -2637,8 +2626,8 @@ namespace HeatingCoils {
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2662,7 +2651,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).RTF = 1.0;
                 if (AvailTemp <= TempAirIn) {
                     HeatingCoil(CoilNum).NominalCapacity = 0.0;
-                    ShowRecurringWarningErrorAtEnd("Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
                                                        " - Waste heat source temperature was too low to be useful.",
                                                    HeatingCoil(CoilNum).InsuffTemperatureWarn);
                 } else {
@@ -2787,7 +2776,7 @@ namespace HeatingCoils {
     // Beginning of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void UpdateHeatingCoil(int const CoilNum)
+    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -2805,8 +2794,6 @@ namespace HeatingCoils {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2840,11 +2827,11 @@ namespace HeatingCoils {
         Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
         Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }
@@ -2919,7 +2906,7 @@ namespace HeatingCoils {
             }
         }
         if (HeatingCoil(CoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 coilSelectionReportObj->setCoilFinalSizes(state,
                                                           HeatingCoil(CoilNum).Name,
                                                           coilObjClassName,
@@ -2978,7 +2965,6 @@ namespace HeatingCoils {
         // the heating coil is scheduled to be on.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
@@ -3006,12 +2992,18 @@ namespace HeatingCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                ShowFatalError(state, "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Heating Coils=" + TrimSigDigits(NumHeatingCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      CoilNum,
+                                      NumHeatingCoils,
+                                      CompName));
             }
             if (CompName != HeatingCoil(CoilNum).Name) {
-                ShowSevereError(state, "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                                ", stored Coil Name for that index=" + HeatingCoil(CoilNum).Name);
+                ShowSevereError(state,
+                                format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                       CoilNum,
+                                       CompName,
+                                       HeatingCoil(CoilNum).Name));
                 ShowContinueError(state, "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) +
                                   "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
@@ -3586,7 +3578,6 @@ namespace HeatingCoils {
         // This function sets data to Heating Coil using the coil index and arguments passed
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         if (GetCoilsInputFlag) {
             GetHeatingCoilInput(state);
@@ -3594,8 +3585,8 @@ namespace HeatingCoils {
         }
 
         if (CoilNum <= 0 || CoilNum > NumHeatingCoils) {
-            ShowSevereError(state, "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits(CoilNum) + " should be >0 and <" +
-                            TrimSigDigits(NumHeatingCoils));
+            ShowSevereError(
+                state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, NumHeatingCoils));
             ErrorsFound = true;
             return;
         }

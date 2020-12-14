@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -80,7 +81,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfZones = 2;
+    state->dataGlobal->NumOfZones = 2;
 
     DataHeatBalance::Zone.allocate(2);
     DataHeatBalance::Zone(1).Name = "SOUTH SKIN";
@@ -88,7 +89,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     bool ErrorsFound(false);
 
-    HeatBalanceAirManager::GetRoomAirModelParameters(state, ErrorsFound);
+    HeatBalanceAirManager::GetRoomAirModelParameters(*state, ErrorsFound);
 
     EXPECT_TRUE(ErrorsFound);
 

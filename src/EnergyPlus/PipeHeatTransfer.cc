@@ -196,10 +196,11 @@ namespace PipeHeatTransfer {
         MyEnvrnFlag = true;
     }
 
-    void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &state,
+                              [[maybe_unused]] const PlantLocation &calledFromLocation,
                               bool const FirstHVACIteration,
-                              Real64 &EP_UNUSED(CurLoad),
-                              bool const EP_UNUSED(RunFlag))
+                              [[maybe_unused]] Real64 &CurLoad,
+                              [[maybe_unused]] bool const RunFlag)
     {
         this->InitPipesHeatTransfer(state, FirstHVACIteration);
         // make the calculations
@@ -257,7 +258,7 @@ namespace PipeHeatTransfer {
         using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -396,7 +397,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "GetPipesHeatTransfer: invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 
@@ -405,7 +406,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "GetPipesHeatTransfer: invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -501,7 +502,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -509,7 +510,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -593,7 +594,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -601,7 +602,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -748,7 +749,6 @@ namespace PipeHeatTransfer {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -815,8 +815,9 @@ namespace PipeHeatTransfer {
             this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
         } else {
-            ShowSevereError(state, PipeType + ": invalid " + FieldName + "=\"" + ConstructionName + "\", too many layers=[" + TrimSigDigits(TotalLayers) +
-                            "], only 1 or 2 allowed.");
+            ShowSevereError(
+                state,
+                format("{}: invalid {}=\"{}\", too many layers=[{}], only 1 or 2 allowed.", PipeType, FieldName, ConstructionName, TotalLayers));
             ErrorsFound = true;
         }
     }
@@ -841,10 +842,6 @@ namespace PipeHeatTransfer {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -966,13 +963,13 @@ namespace PipeHeatTransfer {
                 if (SELECT_CASE_var == GroundEnv) {
                     // EnvironmentTemp = GroundTemp
                 } else if (SELECT_CASE_var == OutsideAirEnv) {
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == ZoneEnv) {
                     nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == ScheduleEnv) {
                     nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == None) { // default to outside temp
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
 
@@ -984,7 +981,7 @@ namespace PipeHeatTransfer {
         if (!FirstHVACIteration) this->FirstHVACupdateFlag = true;
 
         // Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (std::abs(this->CurrentSimTime - this->PreviousSimTime) > 1.0e-6) {
             PushArrays = true;
             this->PreviousSimTime = this->CurrentSimTime;
@@ -1264,14 +1261,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::BeamSolarRad;
-        using DataEnvironment::DifSolarRad;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::SkyTemp;
-        using DataEnvironment::SOLCOS;
-        using DataEnvironment::WindSpeed;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
         using DataLoopNode::Node;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1341,7 +1330,7 @@ namespace PipeHeatTransfer {
                             // If on soil boundary, load up local variables and perform calculations
                             NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
                             PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv();
-                            SkyTempAbs = SkyTemp + DataGlobalConstants::KelvinConv();
+                            SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();
                             TopRoughness = this->SoilRoughness;
                             TopThermAbs = this->SoilThermAbs;
                             TopSolarAbs = this->SoilSolarAbs;
@@ -1351,7 +1340,7 @@ namespace PipeHeatTransfer {
                             Cp = this->SoilCp;
 
                             // ASHRAE simple convection coefficient model for external surfaces.
-                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, WindSpeed);
+                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                             ConvCoef = this->OutdoorConvCoef;
 
                             // thermal radiation coefficient using surf temp from past time step
@@ -1362,7 +1351,7 @@ namespace PipeHeatTransfer {
                             }
 
                             // total absorbed solar - no ground solar
-                            QSolAbsorbed = TopSolarAbs * (max(SOLCOS(3), 0.0) * BeamSolarRad + DifSolarRad);
+                            QSolAbsorbed = TopSolarAbs * (max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad);
 
                             // If sun is not exposed, then turn off both solar and thermal radiation
                             if (!this->SolarExposed) {
@@ -1378,7 +1367,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation, basically a detailed energy balance at the surface
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
                                      (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1391,7 +1380,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                      (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1760,7 +1749,6 @@ namespace PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataEnvironment::WindSpeed;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1839,7 +1827,7 @@ namespace PipeHeatTransfer {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == OutsideAirEnv) {
                         AirTemp = Node(this->EnvrAirNodeNum).Temp;
-                        AirVel = WindSpeed;
+                        AirVel = state.dataEnvrn->WindSpeed;
                     }
                 }
             }

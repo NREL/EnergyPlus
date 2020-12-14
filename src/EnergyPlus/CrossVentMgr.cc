@@ -83,7 +83,6 @@ namespace CrossVentMgr {
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
@@ -141,7 +140,7 @@ namespace CrossVentMgr {
 
         // Do the one time initializations
         if (state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag) {
-            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(NumOfZones, true);
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag = false;
         }
 
@@ -382,7 +381,7 @@ namespace CrossVentMgr {
 
         // Check if wind direction is within +/- 90 degrees of the outward normal of the dominant surface
         SurfNorm = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Azimuth;
-        CosPhi = std::cos((WindDir - SurfNorm) * DataGlobalConstants::DegToRadians());
+        CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * DataGlobalConstants::DegToRadians());
         if (CosPhi <= 0) {
             AirModel(ZoneNum).SimAirModel = false;
             auto flows(CVJetRecFlows(_, ZoneNum));
@@ -404,7 +403,7 @@ namespace CrossVentMgr {
                 OPtr = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OSCPtr;
                 OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) +
                                          OSC(OPtr).ExtDryBulbCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
-                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
+                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                          OSC(OPtr).WindSpeedCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
                                              Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
                 Tin(ZoneNum) = OSC(OPtr).OSCTempCalc;
@@ -535,7 +534,7 @@ namespace CrossVentMgr {
                 OPtr = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OSCPtr;
                 OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) +
                                          OSC(OPtr).ExtDryBulbCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
-                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
+                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                          OSC(OPtr).WindSpeedCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
                                              Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
                 Tin(ZoneNum) = OSC(OPtr).OSCTempCalc;
@@ -584,7 +583,7 @@ namespace CrossVentMgr {
                 OPtr = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OSCPtr;
                 OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) +
                                          OSC(OPtr).ExtDryBulbCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
-                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
+                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                          OSC(OPtr).WindSpeedCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
                                              Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
                 Tin(ZoneNum) = OSC(OPtr).OSCTempCalc;
@@ -663,7 +662,7 @@ namespace CrossVentMgr {
                 OPtr = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OSCPtr;
                 OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) +
                                          OSC(OPtr).ExtDryBulbCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp +
-                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
+                                         OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                          OSC(OPtr).WindSpeedCoef * Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).WindSpeed *
                                              Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp);
                 Tin(ZoneNum) = OSC(OPtr).OSCTempCalc;
