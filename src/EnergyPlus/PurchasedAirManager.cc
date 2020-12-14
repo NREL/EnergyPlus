@@ -2809,7 +2809,7 @@ namespace PurchasedAirManager {
 
                 PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
                 PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
-                if (state.dataContaminantBalance.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
 
                     Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                 }
