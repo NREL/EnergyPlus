@@ -276,7 +276,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             }
 
             if (root[obj_name].find(name) != root[obj_name].end()) {
-                errors_.emplace_back("Duplicate name found. name: \"" + name + "\". Overwriting existing object.");
+                errors_.emplace_back("Duplicate name found for object of type \"" + obj_name + "\" named \"" + name + "\". Overwriting existing object.");
             }
 
             root[obj_name][name] = std::move(obj);

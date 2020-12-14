@@ -3981,6 +3981,34 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
 }
 
+TEST_F(InputProcessorFixture, Duplicate_Name_Context)
+{
+    // Test for #8392 - Duplicate name error needs more context
+
+    std::string const idf(delimited_string({
+        "Exterior:Lights,",
+        "  ExtLights,               !- Name",
+        "  AlwaysOn,                !- Schedule Name",
+        "  5250,                    !- Design Level {W}",
+        "  AstronomicalClock,       !- Control Option",
+        "  Grounds Lights;          !- End-Use Subcategory",
+
+        "Exterior:Lights,",
+        "  ExtLights,               !- Name",
+        "  AlwaysOn,                !- Schedule Name",
+        "  525,                     !- Design Level {W}",
+        "  AstronomicalClock,       !- Control Option",
+        "  Grounds Lights;          !- End-Use Subcategory",
+    }));
+
+
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** Duplicate name found for object of type \"Exterior:Lights\" named \"ExtLights\". Overwriting existing object."
+    });
+    compare_err_stream(error_string, true);
+}
+
 TEST_F(InputProcessorFixture, clean_epjson)
 {
     std::string const input("{\"Building\":{"
