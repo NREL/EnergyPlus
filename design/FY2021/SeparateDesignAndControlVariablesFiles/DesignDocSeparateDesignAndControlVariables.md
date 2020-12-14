@@ -225,9 +225,10 @@ All of the fields in the new `ZoneHVAC:Baseboard:RadiantConvective:Water:Design`
 
 This field cannot be blank, and it should point to one `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` object. 
 
-##### *New object* - `ZoneHVAC:Baseboard:RadiantConvective:Design` ####
 
-This `ZoneHVAC:Baseboard:RadiantConvective:Design` object is referenced in the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects and provide additional design parameters to them. Multiple `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` can be mapped to a single `ZoneHVAC:Baseboard:RadiantConvective:Design` object.
+##### *New object* - `ZoneHVAC:Baseboard:RadiantConvective:Steam:Design` ####
+
+This `ZoneHVAC:Baseboard:RadiantConvective:Steam:Design` object is referenced in the `ZoneHVAC:Baseboard:RadiantConvective:Steam` object and provides additional design parameters to it. Multiple `ZoneHVAC:Baseboard:RadiantConvective:Steam` can be mapped to a single `ZoneHVAC:Baseboard:RadiantConvective:Steam:Design` object.
 
 *Field: Name*    
 *Field: Fraction Radiant*    
@@ -237,13 +238,13 @@ This `ZoneHVAC:Baseboard:RadiantConvective:Design` object is referenced in the `
 *Field: Fraction of Autosized Heating Design Capacity*    
 *Field: Convergence Tolerance*    
 
-##### *Modified objects* - `ZoneHVAC:Baseboard:RadiantConvective:Water` and  `ZoneHVAC:Baseboard:RadiantConvective:Steam` ####
+##### *Modified objects* - `ZoneHVAC:Baseboard:RadiantConvective:Steam` ####
 
-All of the fields in `ZoneHVAC:Baseboard:RadiantConvective:Design` will be removed from `ZoneHVAC:Baseboard:RadiantConvective:Water` and  `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects. Additionally, we add the following field and description:
+All of the fields in the new `ZoneHVAC:Baseboard:RadiantConvective:Steam:Design` will be removed from the old `ZoneHVAC:Baseboard:RadiantConvective:Steam` object. Additionally, we add the following field and description:
 
 *Field: Design object*
 
-This field cannot be blank, and it should point to one of the `ZoneHVAC:Baseboard:RadiantConvective:Design` objects. 
+This field cannot be blank, and it should point to one `ZoneHVAC:Baseboard:RadiantConvective:Steam:Design` object. 
 
 ### Outputs Description ###
 
