@@ -1,5 +1,6 @@
 
 
+
 Separate Design and Control Variables
 ================
 
@@ -171,33 +172,44 @@ This `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` object is referenced i
 
 ##### *Modified object* - `ZoneHVAC:LowTemperatureRadiant:VariableFlow` ####
 
-All of the fields in `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` will be removed from the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` objects. Additionally, we add the following field and description:
+All of the fields in the new `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` will be removed from the old `ZoneHVAC:LowTemperatureRadiant:VariableFlow` object. Additionally, we add the following field and description:
 
 *Field: Design object*
 
 This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` object. 
 
-##### *New object* - `ZoneHVAC:LowTemperatureRadiant:Design` ####
+##### *New object* - `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` ####
 
-This `ZoneHVAC:LowTemperatureRadiant:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects and provide additional design parameters to them. Multiple `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:Design` object.
+This `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  object. Multiple `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  objects can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object.
 
-*Field: Name*         
-*Field: Temperature Control Type*    
-*Field: Fluid to Radiant Surface Heat Transfer Model*    
-*Field: Hydronic Tubing Inside Diameter*    
-*Field: Hydronic Tubing Outside Diameter*    
-*Field: Hydronic Tubing Conductivity*    
-*Field: Condensation Control Type*    
-*Field: Condensation Control Dewpoint Offset*    
+*Field: Name*  
+*Field: Fluid to Radiant Surface Heat Transfer Model*  
+*Field: Hydronic Tubing Inside Diameter*  
+*Field: Hydronic Tubing Outside Diameter*  
+*Field: Hydronic Tubing Conductivity*  
+*Field: Temperature Control Type*  
+*Field: Setpoint Control Type*  
+*Field: Heating Design Capacity Method*  
+*Field: Heating Design Capacity Per Floor Area*  
+*Field: Fraction of Autosized Heating Design Capacity*  
+*Field: Heating Control Throttling Range*  
+*Field: Heating Control Temperature Schedule Name*  
+*Field: Cooling Design Capacity Method*  
+*Field: Cooling Design Capacity Per Floor Area*  
+*Field: Fraction of Autosized Cooling Design Capacity*  
+*Field: Cooling Control Throttling Range*  
+*Field: Cooling Control Temperature Schedule Name*  
+*Field: Condensation Control Type*  
+*Field: Condensation Control Dewpoint Offset*  
 *Field: Changeover Delay Time Period Schedule*
 
-##### *Modified objects* - `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` ####
+##### *Modified object* - `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` ####
 
-All of the fields in `ZoneHVAC:LowTemperatureRadiant:Design` will be removed from `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects. Additionally, we add the following field and description:
+All of the fields in the new `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` will be removed from the  old`ZoneHVAC:LowTemperatureRadiant:ConstantFlow` object. Additionally, we add the following field and description:
 
 *Field: Design object*
 
-This field cannot be blank, and it should point to one of the `ZoneHVAC:LowTemperatureRadiant:Design` objects. 
+This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object. 
 
 #### ZoneHVAC:Baseboard:RadiantConvective Objects
 
