@@ -1,6 +1,7 @@
 
 
 
+
 Separate Design and Control Variables
 ================
 
@@ -90,48 +91,6 @@ The proposed approach is to identify the design variables in the LowTemperatureR
 <span style="display:block;text-align:center">![How the design objects will be brokendown](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/SeparateDesignAndControlVariablesFiles/BKDwn3.jpg)
 
 <span style="display:block;text-align:center">**Figure: How the design objects will be brokendown**
-
-#### ZoneHVAC:LowTemperatureRadiant objects ####
-
-We decided to ignore the `ZoneHVAC:LowTemperatureRadiant:Electric` since it only has 12 fields, and therefore does not have a drastic need to reduce inputs like the VariableFlow and ConstantFlow objects do. Also, `ZoneHVAC:LowTemperatureRadiant:Electric` is different from the fluid (`ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`) objects. Therefore, trying to find parameters common to all three would result in very few design parameters (only two in our preliminary study) that could be extracted out. Therefore, the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` were inspected and nine common parameters were identified. The common variables could be set as design variables since it seems like they could be shared between different `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and/or `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects in a model.
-
-The following common variables were decided to be set as control variables/unable to be grouped into the design parameters since they will be specific to every object in a radiant system:
-
- - Name 
- - Zone Name 
- - Surface Name or Radiant Surface Group Name
- - Hydronic Tubing Length  
- - Heating Design Capacity {W} 
- - Heating Water Inlet Node Name  
- - Heating Water Outlet Node Name 
- - Maximum Hot Water Flow
- - Cooling Design Capacity {W} 
- - Maximum Cold Water Flow 
- - Cooling Water Inlet Node Name
- - Cooling Water Outlet Node Name
- - Number of Circuits
- - Circuit Length
-
-##### Comments #####
- - The best way to decide what would be ideal system parameters would be to get feedback in some way from the current users. This would mean that the current users of radiant systems should be identified as well. 
- - Some of the common objects are optional fields or depend on other fields. I just wanted to point out that it should not be assumed that every field has the same importance. 
-
-#### ZoneHVAC:Baseboard:RadiantConvective Objects ####
-
-Common fields for all four ZoneHVAC:Baseboard:RadiantConvective objects were identified, and the following common variables were decided to be set as control variables/unable to be grouped as design parameters since they will be specific to every object in a radiant system:
-
--   Name
--   Inlet Node Name
--   Outlet Node Name
--   Heating & Cooling Design Capacity {W}
--   Maximum Water Flow Rate
--   Surface Name, Fraction of Radiant Energy to Surface
-
-Since only three design objects could be identified as common fields that could be used as design variables to all four baseboard objects, this does not warrant the need to differentiate between design and control variables. Also, it may be that a group of similar baseboard objects may be more commonly used as compared to others. Therefore, different types of baseboard object groupings were explored to find a group that would have a larger number of design variables. Grouping the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` as radiant baseboard  objects that used fluids for heating seemed like a good choice since it enabled grouping six common variables that could to be set as design variables:
-
-##### Comments ######
- - As in the LowTemperatureRadiant objects, some of the common objects are optional fields or depend on other fields. I just wanted to point out that it should not be assumed that every field has the same importance. 
-
 
 ## Testing/Validation/Data Sources ##
 
