@@ -90,7 +90,7 @@ struct EnergyPlusData;
         bool isBSON= false;
         bool preserveIDFOrder = true;
         bool stopSimulation= false;
-        std::function<void (void *)> externalHVACManager;
+        std::function<void (unsigned int)> externalHVACManager;
         bool externalHVACManagerInitialized = false;
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
         bool sizingAnalysisEioHeaderDoneOnce = false;

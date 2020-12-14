@@ -6470,7 +6470,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     // test availability manager operation
     Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
-    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, Node(OutsideAirNode).MassFlowRate);
     EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOn);
     EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
@@ -6478,14 +6478,14 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
     DataHVACGlobals::ZoneCompTurnFansOn = true;
-    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
     EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
     EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
 
     // turn on "Turn Fan Off" flag for availability manager, result should be 0
     DataHVACGlobals::ZoneCompTurnFansOff = true;
-    SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, Node(OutsideAirNode).MassFlowRate);
     EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
     EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOff);
@@ -15583,7 +15583,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
@@ -15595,13 +15595,13 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput(*state);
-    GetCurveInput(*state);
-    GetZoneData(*state, ErrorsFound);
+    ProcessScheduleInput();
+    GetCurveInput();
+    GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
-    GetZoneEquipmentData(*state);
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);
+    GetZoneEquipmentData();
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
@@ -15653,8 +15653,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
 
-    SimulateVRF(*state,
-                VRFTU(VRFTUNum).Name,
+    SimulateVRF(VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
                 ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),

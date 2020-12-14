@@ -55,17 +55,16 @@
 extern "C" {
 #endif
 
-/// \brief This is typedef for an instance that stores the "state" of an EnergyPlus simulation.
+/// \brief This is typedef for an instance that stores a reference to an EnergyPlus simulation.
 /// \details The state of an EnergyPlus simulation is at the center of accessing EnergyPlus through API methods.
-///          All, or nearly all, simulation methods require an active simulation state as an argument.  This is because
-///          those functions may set up data in various nooks and crannies of the state object in order to do its
-///          calculations.  As such, prior to calling any API methods, a state object should be instantiated by calling
-///          the `stateNew` method.  This instance should then be passed through all API methods that require a state
-///          object.  Callback methods that are registered will have a single argument - the current state of the
-///          program.  This allows the client to complete the loop with the current simulation state without having to
-///          keep a state as a global variable in client code.  If the client wants to clear the state and begin a new
-///          simulation process, that is possible by passing the state to `stateReset`.  Alternatively, if the client is
-///          finished with that `state` instance, the value can be freed with a call to `stateDelete`.
+///          All, or nearly all, simulation methods require an active simulation state reference as an argument.  This
+///          is because those functions will set up and access data throughout the simulation code.  As such, prior to
+///          calling any API methods, a state object should be instantiated by calling the `stateNew` method.
+///          An instance will be constructed by EnergyPlus and the API caller will get a reference to that
+///          object.  Callback methods that are registered will have a single argument - a reference to the current
+///          state of the program.  If the client wants to clear the state and begin a new
+///          simulation process, that is possible by passing the state reference to `stateReset`.  Alternatively, if the
+///          client is finished with that `state` instance, the value can be freed with a call to `stateDelete`.
 ///
 ///          The state object is at the heart of accessing EnergyPlus via API, however, the client code should simply be a
 ///          courier of this object, and never attempt to manipulate the object.  State manipulation occurs inside EnergyPlus,
@@ -73,9 +72,9 @@ extern "C" {
 /// \see stateNew
 /// \see stateReset
 /// \see stateDelete
-typedef void * EnergyPlusState;
+typedef unsigned int EnergyPlusState;
 
-/// \brief Creates a new simulation state instance and returns it for the client to store while running simulations
+/// \brief Creates a new simulation state instance and returns a reference to it to the client.
 /// \details This function creates a new instance that is used in running simulations from the API.  The state created
 ///          in this function is used by passing it into most API functions.  When a simulation is complete, the
 ///          state can be reset using the `stateReset` function, or deleted completely with the `stateDelete` function.
@@ -88,12 +87,13 @@ ENERGYPLUSLIB_API EnergyPlusState stateNew();
 ///          second is to be run using the same memory space, the simulation state must be cleared with this function,
 ///          or unexpected errors will occur.  Once the client is fully finished with the state, it can be deleted
 ///          entirely with `stateDelete`.
-/// \param[in] state The simulation state of the simulation to clear.
+/// \param[in] state The simulation state reference of the simulation to clear.
 /// \remark This function will also clear any callback functions, so callback functions must be registered again.
 ENERGYPLUSLIB_API void stateReset(EnergyPlusState state);
 /// \brief Deletes a simulation state instance once the client is fully finished with it.
 /// \details A simulation state is created by calling the `stateNew` function.  After the client is finished, the memory
 ///          can be reset by calling the `stateReset` function, or released entirely by calling this delete function.
+/// \param[in] state The simulation state reference of the simulation to clear.
 /// \see EnergyPlusState
 /// \see stateNew
 /// \see stateReset

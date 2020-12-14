@@ -202,9 +202,9 @@ struct UnitHeatersData : BaseGlobalStruct {
     std::string const WaterHeatingCoil = "WaterHeatingCoil";
     std::string const SteamCoil = "SteamCoil";
 
-    bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
-    int NumOfUnitHeats; // Number of unit heaters in the input file
-    Real64 QZnReq;      // heating or cooling needed by zone [watts]
+    bool HCoilOn = false;       // TRUE if the heating coil (gas or electric especially) should be running
+    int NumOfUnitHeats = 0; // Number of unit heaters in the input file
+    Real64 QZnReq = 0.0;      // heating or cooling needed by zone [watts]
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
 

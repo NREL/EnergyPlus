@@ -72,7 +72,7 @@ namespace EnergyPlus::PluginManagement {
         }
     }
 
-    void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
+    void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void(unsigned int)> &f)
     {
         EnergyPlusData & state = getCurrentState();
         state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
@@ -101,7 +101,7 @@ namespace EnergyPlus::PluginManagement {
         EnergyPlusData & state = getCurrentState();
         if (state.dataGlobal->KickOffSimulation) return;
         for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
-            cb((void *) &state);
+            cb(currentStateHandler);
             anyRan = true;
         }
 #if LINK_WITH_PYTHON == 1

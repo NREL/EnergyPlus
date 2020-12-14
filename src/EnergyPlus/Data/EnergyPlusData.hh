@@ -563,6 +563,7 @@ struct EnergyPlusData : BaseGlobalStruct {
 
 };
 
+extern unsigned int thread_local currentStateHandler;
 EnergyPlusData & getCurrentState();
 void createNewStateVector();
 void deleteCurrentState();

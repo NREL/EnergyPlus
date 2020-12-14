@@ -80,7 +80,7 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void registerNewCallback(EMSManager::EMSCallFrom iCalledFrom, const std::function<void (unsigned int)>& f);
     void runAnyRegisteredCallbacks(EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
@@ -227,7 +227,7 @@ namespace PluginManagement {
 }
 
 struct PluginManagerData : BaseGlobalStruct {
-    std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
+    std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(unsigned int)>>> callbacks;
     std::unique_ptr<PluginManagement::PluginManager> pluginManager;
     std::vector<PluginManagement::PluginTrendVariable> trends;
     std::vector<PluginManagement::PluginInstance> plugins;

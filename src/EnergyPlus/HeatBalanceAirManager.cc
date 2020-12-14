@@ -4261,7 +4261,7 @@ EnergyPlusData & state = getCurrentState();
           if (!state.dataGlobal->externalHVACManagerInitialized) {
               initializeForExternalHVACManager();
           }
-          state.dataGlobal->externalHVACManager(&state);
+          state.dataGlobal->externalHVACManager(currentStateHandler);
         } else {
           ManageHVAC();
         }

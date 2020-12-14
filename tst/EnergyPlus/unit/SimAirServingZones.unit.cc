@@ -2081,7 +2081,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(*state); // run the design days
+    SimulationManager::ManageSimulation(); // run the design days
 
     int returnFanNode = UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     EXPECT_GT(returnFanNode, 0);

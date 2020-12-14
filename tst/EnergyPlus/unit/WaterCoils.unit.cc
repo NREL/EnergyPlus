@@ -1060,7 +1060,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 {
     InitializePsychRoutines();
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1153,11 +1153,11 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     DataWaterLoopNum = 1;
     NumOfGlycols = 1;
 
-    OutputReportPredefined::SetPredefinedTables(*state);
+    OutputReportPredefined::SetPredefinedTables();
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(*state, CoilNum);
+    SizeWaterCoil(CoilNum);
     EXPECT_DOUBLE_EQ(1.0, state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 DesCoilCoolingLoad = 0.0;
@@ -1174,22 +1174,22 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     Real64 rho = 0;
     Real64 DesWaterFlowRate = 0;
 
-    Cp = GetSpecificHeatGlycol(*state, PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(1).FluidIndex, "Unit Test");
-    rho = GetDensityGlycol(*state, PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(1).FluidIndex, "Unit Test");
+    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate / (6.67 * Cp * rho);
     // check cooling coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate);
 
     DataLoopNode::Node.allocate(10);
 
-    InitWaterCoil(*state, 1, false);
+    InitWaterCoil(1, false);
 
     // Force getting the warning
     Real64 PartLoadRatio = 1.0;
     Real64 TempAirIn = state->dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;
     Real64 InletAirHumRat = state->dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
     Real64 TempWaterIn = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
-    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
+    Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
     Real64 MinAirMassFlow = 5.0 * state->dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity;
     state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = 1.1 * MinAirMassFlow;
     Real64 AirMassFlow = state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
@@ -1206,7 +1206,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
         "   **   ~~~   ** Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity",
     });
 
-    CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, 2, 1);
+    CalcDetailFlatFinCoolingCoil(CoilNum, 2, 2, 1);
 
     compare_err_stream(expected_error, true);
 
@@ -1214,7 +1214,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     TempAirIn = state->dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;
     InletAirHumRat = state->dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
     TempWaterIn = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
-    AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
+    AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state->dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, "RoutineName");
     MinAirMassFlow = 44.7 * state->dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity;
     state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = 1.1 * MinAirMassFlow;
     AirMassFlow = state->dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
@@ -1232,7 +1232,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
         "   ..... Last severe error=Coil:Cooling:Water:DetailedGeometry in Coil =Test Detailed Water Cooling Coil",
     });
 
-    EXPECT_ANY_THROW(CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, 2, 1));
+    EXPECT_ANY_THROW(CalcDetailFlatFinCoolingCoil(CoilNum, 2, 2, 1));
 
     compare_err_stream(expected_fatal_error, true);
 }

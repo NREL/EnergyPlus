@@ -55,17 +55,18 @@
 #include <EnergyPlus/StateManagement.hh>
 
 EnergyPlusState stateNew() {
-    auto *state = new EnergyPlus::EnergyPlusData;
-    return reinterpret_cast<EnergyPlusState>(state);
+    EnergyPlus::createNewStateVector();
+    return EnergyPlus::currentStateHandler;
 }
 
 void stateReset(EnergyPlusState state) {
-    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::currentStateHandler = state;
     EnergyPlus::clearAllStates();
     // also clear out the input processor since the clearAllStates does not do that.
     EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
 }
 
 void stateDelete(EnergyPlusState state) {
-    delete reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::currentStateHandler = state;
+    EnergyPlus::clearAllStates();  // TODO: Do we delete this instance?  We can't change the vector indices.
 }
