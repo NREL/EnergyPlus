@@ -55,7 +55,7 @@ University of Illinois at Urbana-Champaign and Center for the Built Environment(
 
 Conversation with E+ Team on Slack:
 1. Create a design object for each radiant temp and baseboard object.
-2. Maybe name the design oobject something else. 
+2. Maybe name the design object to something else. 
  
 ## Approach/Timeline/Design Rationale ##
 
@@ -268,10 +268,8 @@ None.
 
 Get feedback from the EnergyPlus team regarding:
 
- 1. If these groupings make sense. 
- 2. If any design variables need to be moved to control variables and vice versa. 
- 3. Any other recommended changes.
-
+ 1. Maybe name the design object to something else. 
+ 2. Start coding.
 
 ## Changes to IDD file ##
 
