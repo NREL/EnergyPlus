@@ -205,6 +205,26 @@ This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperature
 
 #### ZoneHVAC:Baseboard:RadiantConvective Objects
 
+##### *New object* - `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` ####
+
+This `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` object is referenced in the `ZoneHVAC:Baseboard:RadiantConvective:Water` object and provides additional design parameters to it. Multiple `ZoneHVAC:Baseboard:RadiantConvective:Water` can be mapped to a single `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` object.
+
+*Field: Name*    
+*Field: Fraction Radiant*    
+*Field: Fraction of Radiant Energy Incident on People*    
+*Field: Heating Design Capacity Method*    
+*Field: Heating Design Capacity Per Floor Area {W/m2}*    
+*Field: Fraction of Autosized Heating Design Capacity*    
+*Field: Convergence Tolerance*    
+
+##### *Modified objects* - `ZoneHVAC:Baseboard:RadiantConvective:Water` ####
+
+All of the fields in the new `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` will be removed from the old `ZoneHVAC:Baseboard:RadiantConvective:Water` object. Additionally, we add the following field and description:
+
+*Field: Design object*
+
+This field cannot be blank, and it should point to one `ZoneHVAC:Baseboard:RadiantConvective:Water:Design` object. 
+
 ##### *New object* - `ZoneHVAC:Baseboard:RadiantConvective:Design` ####
 
 This `ZoneHVAC:Baseboard:RadiantConvective:Design` object is referenced in the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects and provide additional design parameters to them. Multiple `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` can be mapped to a single `ZoneHVAC:Baseboard:RadiantConvective:Design` object.
