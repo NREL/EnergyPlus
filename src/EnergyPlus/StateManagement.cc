@@ -49,23 +49,15 @@
 
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -86,12 +78,9 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DaylightingDevices.hh>
-#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
@@ -118,13 +107,11 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
@@ -138,6 +125,8 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -146,9 +135,6 @@
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -169,8 +155,8 @@
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -179,12 +165,10 @@
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
-#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
@@ -195,44 +179,13 @@
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/SizingAnalysisObjects.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarCollectors.hh>
-#include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalChimney.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/TranspiredCollector.hh>
-#include <EnergyPlus/UFADManager.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
-#include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/UserDefinedComponents.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -241,22 +194,11 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // then clear any other remaining global state, the number of these here will reduce over time
     using namespace EnergyPlus;
     // A to Z order
+    autosizing_clear_state();
     CoilCoolingDX::clear_state();
-    CurveManager::clear_state();
     AirflowNetwork::clear_state();
-    dataAirflowNetworkBalanceManager.clear_state();
-    DataAirLoop::clear_state();
-    DataBranchAirLoopPlant::clear_state();
-    DataAirSystems::clear_state();
-    DataBranchNodeConnections::clear_state();
-    dataConstruction.clear_state();
-    DataContaminantBalance::clear_state();
-    DataConvergParams::clear_state();
-    DataDefineEquip::clear_state();
-    DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state(state.files);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
@@ -278,12 +220,9 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
-    DataWater::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
-    DaylightingDevices::clear_state();
-    DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
@@ -339,7 +278,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    //EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new inputprocessor instance
+    // EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new
+    // inputprocessor instance
     IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
@@ -354,7 +294,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
+    OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
@@ -373,7 +313,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
-    PlantValves::clear_state();
     PluginManagement::clear_state();
     PollutionModule::clear_state();
     PondGroundHeatExchanger::clear_state();
@@ -384,44 +323,12 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RefrigeratedCase::clear_state();
-    ReportSizingManager::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelManager::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
-    SetPointManager::clear_state();
     SimAirServingZones::clear_state();
-    SimulationManager::clear_state();
-    SingleDuct::clear_state();
-    SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
-    SizingManager::clear_state();
-    SolarCollectors::clear_state();
-    SolarShading::clear_state();
-    SplitterComponent::clear_state();
-    SteamCoils::clear_state();
-    SurfaceGeometry::clear_state();
-    SurfaceGroundHeatExchanger::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalChimney::clear_state();
-    ThermalComfort::clear_state();
-    TranspiredCollector::clear_state();
-    UFADManager::clear_state();
-    UnitarySystems::clear_state();
-    UnitHeater::clear_state();
-    UnitVentilator::clear_state();
-    UserDefinedComponents::clear_state();
-    UtilityRoutines::clear_state();
-    VariableSpeedCoils::clear_state();
-    VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
-    WaterManager::clear_state();
-    WaterThermalTanks::clear_state();
-    WaterToAirHeatPump::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
-    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
-    WeatherManager::clear_state();
     ResultsFramework::clear_state();
 }

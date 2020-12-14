@@ -51,9 +51,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include "DataSurfaces.hh"
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DXFEarClipping {
 
@@ -78,14 +81,14 @@ namespace DXFEarClipping {
 
     Real64 Modulus(Vector const &point);
 
-    int Triangulate(IOFiles &ioFiles,
+    int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     );
 
     Real64 angle_2dvector(Real64 const xa, // vertex coordinate
@@ -101,7 +104,7 @@ namespace DXFEarClipping {
                                    Vector_2d const &point       // point to be tested
     );
 
-    void generate_ears(IOFiles &ioFiles,
+    void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)

@@ -57,18 +57,14 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
-    class OutputFiles;
+// Forward declarations
+struct EnergyPlusData;
 
-    void GeneralRoutines_clear_state();
+void GeneralRoutines_clear_state();
 
-void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
+void ControlCompOutput(EnergyPlusData &state,
+                       std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
                        int &CompNum,                              // Index of component in component array
                        bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
@@ -92,34 +88,37 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
 
-void CheckSysSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+void CheckSysSizing(EnergyPlusData &state,
+                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
 
-void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+void CheckZoneSizing(EnergyPlusData &state,
+                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized);
 
-void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message
 );
 
-void ValidateComponent(std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
                        std::string const &CallString   // Context of this pair -- for error message
 );
 
-void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                  IOFiles &ioFiles,
+void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
                                   Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
@@ -151,17 +150,45 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
                              Real64 &gNu          // Gap gas Nusselt number
 );
 
-void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
+void CalcBasinHeaterPower(EnergyPlusData &state,
+                          Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
                           int const SchedulePtr,     // Pointer to basin heater schedule
                           Real64 const SetPointTemp, // setpoint temperature for basin heater operation (C)
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths);
+
+void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                       Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
+                                       Real64 const W2,        // humidity ratio at state 2
+                                       Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
+                                       Real64 const W1,        // humidity ratio at state 1
+                                       Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                       Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                       Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+);
+
+void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                  Real64 const TDBEquip,  // dry-bulb temperature at equipment outlet {C}
+                                  Real64 const WEquip,    // humidity ratio at equipment outlet
+                                  Real64 const TDBZone,   // dry-bulb temperature at zone air node {C}
+                                  Real64 const WZone,     // humidity ratio at zone air node
+                                  Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                  Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                  Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+);
+
+void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                            Real64 const WZone,    // humidity ratio at zone air node
+                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
+);
 
 } // namespace EnergyPlus
 

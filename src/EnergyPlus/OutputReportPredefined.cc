@@ -49,8 +49,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 
 namespace EnergyPlus {
@@ -69,8 +68,6 @@ namespace OutputReportPredefined {
     //    None.
     // OTHER NOTES:.
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // The following section initializes the predefined column heading variables
     // The variables get their value in AssignPredefined
@@ -638,8 +635,8 @@ namespace OutputReportPredefined {
     int pdrSensibleGain;
     // annual
     int pdstSHGSannual;
-    int pdchSHGSAnHvacHt;
-    int pdchSHGSAnHvacCl;
+    int pdchSHGSAnZoneEqHt;
+    int pdchSHGSAnZoneEqCl;
     int pdchSHGSAnHvacATUHt;
     int pdchSHGSAnHvacATUCl;
     int pdchSHGSAnSurfHt;
@@ -1487,8 +1484,8 @@ namespace OutputReportPredefined {
         pdchEMotherLmaxvaluetime = 0;
         pdrSensibleGain = 0;
         pdstSHGSannual = 0;
-        pdchSHGSAnHvacHt = 0;
-        pdchSHGSAnHvacCl = 0;
+        pdchSHGSAnZoneEqHt = 0;
+        pdchSHGSAnZoneEqCl = 0;
         pdchSHGSAnSurfHt = 0;
         pdchSHGSAnSurfCl = 0;
         pdchSHGSAnPeoplAdd = 0;
@@ -1783,7 +1780,7 @@ namespace OutputReportPredefined {
         ShadowRelate.deallocate();
     }
 
-    void SetPredefinedTables()
+    void SetPredefinedTables(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1793,7 +1790,7 @@ namespace OutputReportPredefined {
 
         // PURPOSE OF THIS SUBROUTINE:
         //   Creates the structure of the predefined reports
-        //   including the name and abreviation of the report
+        //   including the name and abbreviation of the report
         //   the subtables involved and the column headings.
         //   The variables defined for the columns are then
         //   used throughout the program to assign values
@@ -1801,27 +1798,6 @@ namespace OutputReportPredefined {
 
         // METHODOLOGY EMPLOYED:
         //   Simple assignments to public variables.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::DoSystemSizing;
-        using DataGlobals::DoZoneSizing;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Climate Summary Report
         pdrClim = newPreDefReport("ClimaticDataSummary", "Clim", "Climatic Data Summary");
@@ -2489,8 +2465,8 @@ namespace OutputReportPredefined {
 
         pdstSHGSannual = newPreDefSubTable(pdrSensibleGain, "Annual Building Sensible Heat Gain Components");
 
-        pdchSHGSAnHvacHt = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]");
-        pdchSHGSAnHvacCl = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]");
+        pdchSHGSAnZoneEqHt = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]");
+        pdchSHGSAnZoneEqCl = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]");
         pdchSHGSAnHvacATUHt = newPreDefColumn(pdstSHGSannual, "HVAC Terminal Unit Sensible Air Heating [GJ]");
         pdchSHGSAnHvacATUCl = newPreDefColumn(pdstSHGSannual, "HVAC Terminal Unit Sensible Air Cooling [GJ]");
         pdchSHGSAnSurfHt = newPreDefColumn(pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]");
@@ -2553,7 +2529,7 @@ namespace OutputReportPredefined {
         pdchSHGSHtOtherRem = newPreDefColumn(pdstSHGSpkHt, "Opaque Surface Conduction and Other Heat Removal [W]");
 
         // Standard62Report
-        if (DoZoneSizing || DoSystemSizing) {
+        if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing) {
             pdrStd62 = newPreDefReport("Standard62.1Summary", "Std62", "Standard 62.1 Summary");
 
             pdstS62sysVentReqCool = newPreDefSubTable(pdrStd62, "System Ventilation Requirements for Cooling");
@@ -3041,7 +3017,6 @@ namespace OutputReportPredefined {
         for (int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry) {
             if (tableEntry(iTableEntry).indexColumn == columnIndex && tableEntry(iTableEntry).objectName == objName) {
                 return trimmed(ljustified(tableEntry(iTableEntry).charEntry));
-                break;
             }
         }
         return "NOT FOUND";

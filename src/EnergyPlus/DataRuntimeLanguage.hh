@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -70,6 +71,21 @@ namespace DataRuntimeLanguage {
 
     // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
+
+    enum class ErlKeywordParam // keyword parameters for types of Erl statements
+    {
+        KeywordNone,     // statement type not set
+        KeywordReturn,   // Return statement, as in leave program
+        KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
+        KeywordSet,      // Set statement, as in assign RHS to LHS
+        KeywordRun,      // Run statement, used to call a subroutine from a main program
+        KeywordIf,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
+        KeywordElseIf,   // ElseIf statement, begins an ElseIf block
+        KeywordElse,     // Else statement, begins an Else block
+        KeywordEndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
+        KeywordWhile,    // While statement, begins a While block
+        KeywordEndWhile, // EndWhile statement, terminates a While block
+    };
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const ValueNull;       // Erl entity type, "Null" value
@@ -316,15 +332,16 @@ namespace DataRuntimeLanguage {
         std::string UniqueIDName;      // unique id for actuator, All uppercase
         std::string ControlTypeName;   // control type id for actuator, All uppercase
         std::string Units;             // control value units, used for reporting and checks.
-        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal)
-        // or logical (PntrLogical)
+        int handleCount;               // Number of times you tried to get a handle on this actuator,
+                                       // whether from EMS:Actuator or getActuatorHandle (API)
+        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
         bool * Actuated;     // POINTER to the logical value that signals EMS is actuating
         Real64 * RealValue; // POINTER to the REAL value that is being actuated
         int * IntValue;      // POINTER to the Integer value that is being actuated
         bool * LogValue;     // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+        EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };
@@ -352,12 +369,12 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for Erl program calling managers
         std::string Name;          // user defined name for calling manager
-        int CallingPoint;          // EMS Calling point for this manager, see parameters emsCallFrom*
+        EMSManager::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
         int NumErlPrograms;        // count of total number of Erl programs called by this manager
         Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
-        EMSProgramCallManagementType() : CallingPoint(0), NumErlPrograms(0)
+        EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Unassigned), NumErlPrograms(0)
         {
         }
     };
@@ -419,12 +436,12 @@ namespace DataRuntimeLanguage {
         // Members
         // nested structure inside ErlStack that holds program instructions
         int LineNum;   // Erl program line number reference
-        int Keyword;   // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
+        DataRuntimeLanguage::ErlKeywordParam Keyword; // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
         int Argument1; // Index to a variable, function, expression, or stack
         int Argument2; // Index to a variable, function, expression, or stack
 
         // Default Constructor
-        InstructionType() : LineNum(0), Keyword(0), Argument1(0), Argument2(0)
+        InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
         {
         }
     };
@@ -507,7 +524,7 @@ namespace DataRuntimeLanguage {
 
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
-    struct EMSActuatorKey_hash : public std::unary_function<EMSActuatorKey, std::size_t>
+    struct EMSActuatorKey_hash
     {
         inline static void hash_combine(std::size_t &seed, std::string const &s)
         {
@@ -530,14 +547,16 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state();
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine

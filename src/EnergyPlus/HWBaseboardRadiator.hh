@@ -56,13 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowManagerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HWBaseboardRadiator {
 
@@ -190,7 +186,7 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex);
 
-    void GetHWBaseboardInput();
+    void GetHWBaseboardInput(EnergyPlusData &state);
 
     void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
@@ -198,17 +194,18 @@ namespace HWBaseboardRadiator {
 
     void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateHWBaseboard(int const BaseboardNum);
+    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBRadGains();
+    void DistributeBBRadGains(EnergyPlusData &state);
 
     void ReportHWBaseboard(int const BaseboardNum);
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-    void UpdateHWBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
+    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
+                                          int const BaseboardTypeNum,       // type index
                                           std::string const &BaseboardName, // component name
                                           int const EquipFlowCtrl,          // Flow control mode for the equipment
                                           int const LoopNum,                // Plant loop index for where called from

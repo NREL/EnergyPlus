@@ -57,8 +57,9 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PlantCentralGSHP {
 
@@ -395,34 +396,34 @@ namespace PlantCentralGSHP {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void initialize(BranchInputManagerData &dataBranchInputManager,
+        void initialize(EnergyPlusData &state,
                         Real64 MyLoad, // Demand Load
                         int LoopNum    // Loop Number Index
         );
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void SizeWrapper();
+        void SizeWrapper(EnergyPlusData &state);
 
-        void CalcWrapperModel(Real64 &MyLoad, int LoopNum);
+        void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
 
-        void CalcChillerModel();
+        void CalcChillerModel(EnergyPlusData &state);
 
-        void CalcChillerHeaterModel();
+        void CalcChillerHeaterModel(EnergyPlusData &state);
 
         void UpdateChillerHeaterRecords();
 
         void UpdateChillerRecords();
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
     };
 
@@ -431,9 +432,9 @@ namespace PlantCentralGSHP {
 
     void clear_state();
 
-    void GetWrapperInput();
+    void GetWrapperInput(EnergyPlusData &state);
 
-    void GetChillerHeaterInput();
+    void GetChillerHeaterInput(EnergyPlusData &state);
 
 } // namespace PlantCentralGSHP
 

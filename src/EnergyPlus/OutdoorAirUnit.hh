@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace OutdoorAirUnit {
 
@@ -290,7 +291,7 @@ namespace OutdoorAirUnit {
 
     // END SUBROUTINE UpdateOutdoorAirUnit
 
-    void ReportOutdoorAirUnit(int const OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
+    void ReportOutdoorAirUnit(EnergyPlusData &state, int const OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
 
     int GetOutdoorAirUnitOutAirNode(EnergyPlusData &state, int const OAUnitNum);
 

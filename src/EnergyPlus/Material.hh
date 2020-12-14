@@ -283,15 +283,15 @@ namespace Material {
 
 }   // namespace Material
 
-struct MaterialData : BaseGlobalStruct
-{
-    Array1D<Material::MaterialProperties> Material;
-
-    void clear_state() override
+    struct MaterialData : BaseGlobalStruct
     {
-        Material.deallocate();
-    }
-};
+        Array1D<Material::MaterialProperties> Material;
+
+        void clear_state() override
+        {
+            Material.deallocate();
+        }
+    };
 
 extern MaterialData dataMaterial;
 

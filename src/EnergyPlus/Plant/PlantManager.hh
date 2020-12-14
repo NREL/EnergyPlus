@@ -94,34 +94,34 @@ namespace PlantManager {
 
     void GetPlantInput(EnergyPlusData &state);
 
-    void SetupReports();
+    void SetupReports(EnergyPlusData &state);
 
     void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
 
-    void ReInitPlantLoopsAtFirstHVACIteration();
+    void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state);
 
     void UpdateNodeThermalHistory();
 
-    void CheckPlantOnAbort();
+    void CheckPlantOnAbort(EnergyPlusData &state);
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
     void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
-    void ResizePlantLoopLevelSizes(int LoopNum);
+    void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
 
     void SetupInitialPlantCallingOrder();
 
-    void RevisePlantCallingOrder();
+    void RevisePlantCallingOrder(EnergyPlusData &state);
 
     int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
 
-    void SetupBranchControlTypes();
+    void SetupBranchControlTypes(EnergyPlusData &state);
 
-    void CheckIfAnyPlant();
+    void CheckIfAnyPlant(EnergyPlusData &state);
 
-    void CheckOngoingPlantWarnings();
+    void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
 } // namespace PlantManager
 

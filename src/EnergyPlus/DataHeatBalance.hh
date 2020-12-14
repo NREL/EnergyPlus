@@ -66,8 +66,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataHeatBalance {
 
@@ -79,7 +79,6 @@ namespace DataHeatBalance {
     using DataComplexFenestration::GapSupportPillar;
     using DataComplexFenestration::WindowComplexShade;
     using DataComplexFenestration::WindowThermalModelParams;
-    using DataGlobals::AutoCalculate;
     using DataSurfaces::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
@@ -340,8 +339,7 @@ namespace DataHeatBalance {
     extern bool AnyCondFD;                  // CondFD used
     extern bool AnyHAMT;                    // HAMT used
     extern bool AnyKiva;                    // Kiva used
-    extern bool AnyAirBoundary;             // Construction:AirBoundary used
-    extern bool AnyAirBoundaryGroupedSolar; // Construction:AirBoundary with GroupedZones for solar used somewhere
+    extern bool AnyAirBoundary;             // Construction:AirBoundary used (implies grouped solar and radiant is present)
     extern bool AnyBSDF;                    // True if any WindowModelType == WindowBSDFModel
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
@@ -478,38 +476,7 @@ namespace DataHeatBalance {
     extern Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
     extern Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
     extern Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
-    extern Array1D<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
-    extern Array2D<Real64> QRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
-    extern Array2D<Real64> InitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers
-    // from inside(W/m2)
-    extern Array1D<Real64> QRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
-    extern Array1D<Real64> BmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
-    extern Array1D<Real64> BmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
-    extern Array1D<Real64> IntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
-    extern Array1D<Real64> IntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
-    extern Array1D<Real64> QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
-    // reflection from ground (W/m2)
-    extern Array1D<Real64> QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
-    // reflection from ground (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
-    // reflection from obstructions (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
-    // reflection from obstructions (W/m2)
-    extern Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
-    // reflection from obstructions (W/m2)
-    extern Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    extern Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    extern Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    extern Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
-    extern Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    extern Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-
-    extern Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
-    extern Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
     extern Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
     extern Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
     extern Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
@@ -521,21 +488,44 @@ namespace DataHeatBalance {
     extern Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
     extern Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     extern Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    extern Array1D<Real64> BmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> QRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
-    extern Array1D<Real64> SWwinAbsTotalReport;            // Report - Total interior/exterior shortwave
-    // absorbed in all glass layers of window (W)
-    extern Array1D<Real64> InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
-    // absorbed on inside of surface (W)
-    extern Array1D<Real64> InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
-    // transmitted out through inside of window surface (W)
-    extern Array1D<Real64> SWInAbsTotalReport; // Report - Total interior/exterior shortwave
-    // absorbed on inside of surface (W)
-    extern Array1D<Real64> SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (W)
-    extern Array1D<Real64> SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (j)
+
+    extern Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    extern Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
+    extern Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
+    extern Array1D<Real64> SurfBmIncInsSurfAmountRep;          // Beam sol amount from ext wins incident on inside of surface (W)
+    extern Array1D<Real64> SurfIntBmIncInsSurfIntensRep;       // Beam sol irrad from int wins on inside of surface (W/m2)
+    extern Array1D<Real64> SurfIntBmIncInsSurfAmountRep;       // Beam sol amount from int wins incident on inside of surface (W)
+    extern Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse;    // Exterior sky diffuse solar incident on surface (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse;    // Exterior ground diffuse solar incident on surface (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd;    // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;     // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
+    extern Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
+    extern Array1D<Real64> SurfCosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
+
+    extern Array1D<Real64> SurfSWInAbsTotalReport;                // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
+    extern Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;       // energy of BmIncInsSurfAmountRep [J]
+    extern Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy;     // energy of IntBmIncInsSurfAmountRep [J]
+    extern Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
+
+    extern Array1D_int SurfWinBSDFBeamDirectionRep;               // BSDF beam direction number for given complex fenestration state (for reporting) []
+    extern Array1D<Real64> SurfWinBSDFBeamThetaRep;               // BSDF beam Theta angle (for reporting) [rad]
+    extern Array1D<Real64> SurfWinBSDFBeamPhiRep;                 // BSDF beam Phi angle (for reporting) [rad]
+    extern Array1D<Real64> SurfWinQRadSWwinAbsTot;                // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    extern Array2D<Real64> SurfWinQRadSWwinAbsLayer;              // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    extern Array2D<Real64> SurfWinFenLaySurfTempFront;            // Front surface temperatures of fenestration layers
+    extern Array2D<Real64> SurfWinFenLaySurfTempBack;             // Back surface temperatures of fenestration layers
+    extern Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
+    extern Array1D<Real64> SurfWinSWwinAbsTotalReport;            // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
+    extern Array1D<Real64> SurfWinInitialDifSolInTransReport;     // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
+    extern Array2D<Real64> SurfWinQRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
+    extern Array2D<Real64> SurfWinInitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
+
+    extern Array1D<Real64> SurfOpaqSWOutAbsTotalReport;           // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
+    extern Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;          // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
+
 
     extern Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     extern Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
@@ -691,6 +681,7 @@ namespace DataHeatBalance {
         int PlenumCondNum;                        // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex;              // this is the index number for TempControlledZone structure for lookup
         //            Pointers to Surface Data Structure
+        int AllSurfaceFirst;       // First surface in zone including air boundaries
         int SurfaceFirst;          // First Heat Transfer Surface in Zone
         int SurfaceLast;           // Last  Heat Transfer Surface in Zone
         int NonWindowSurfaceFirst; // First Non-Window Heat Transfer Surface in Zone
@@ -713,6 +704,7 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
         int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
@@ -786,13 +778,14 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneData()
-            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0), CeilingHeight(AutoCalculate),
-              Volume(AutoCalculate), OfType(1), UserEnteredFloorArea(AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0),
-              HasFloor(false), HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0),
-              ExtGrossWallArea(0.0), ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0),
-              ExteriorTotalSurfArea(0.0), ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0),
-              SystemZoneNodeNumber(0), IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0),
-              TempControlledZoneIndex(0), SurfaceFirst(0), SurfaceLast(0), NonWindowSurfaceFirst(0), NonWindowSurfaceLast(0), WindowSurfaceFirst(0),
+            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
+              CeilingHeight(DataGlobalConstants::AutoCalculate()), Volume(DataGlobalConstants::AutoCalculate()), OfType(1),
+              UserEnteredFloorArea(DataGlobalConstants::AutoCalculate()), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
+              HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0),
+              ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
+              ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
+              IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
+              AllSurfaceFirst(0), SurfaceFirst(0), SurfaceLast(0), NonWindowSurfaceFirst(0), NonWindowSurfaceLast(0), WindowSurfaceFirst(0),
               WindowSurfaceLast(0), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
               OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
               MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
@@ -816,9 +809,9 @@ namespace DataHeatBalance {
         {
         }
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
     };
@@ -1873,8 +1866,8 @@ namespace DataHeatBalance {
         Real64 SimpVentVolMin;   // a large number since finding minimum volume
         // for Sensible Heat Gas Component Report
         // annual
-        Real64 SHGSAnHvacHt;    // hvac air heating
-        Real64 SHGSAnHvacCl;    // hvac air cooling
+        Real64 SHGSAnZoneEqHt;    // Zone Eq heating
+        Real64 SHGSAnZoneEqCl;    // Zone Eq cooling
         Real64 SHGSAnHvacATUHt; // heating by Air Terminal Unit [J]
         Real64 SHGSAnHvacATUCl; // cooling by Air Terminal Unit [J]
         Real64 SHGSAnSurfHt;    // heated surface heating
@@ -1946,7 +1939,7 @@ namespace DataHeatBalance {
         ZonePreDefRepType()
             : isOccupied(false), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolMin(9.9e9),
               InfilVolTotal(0.0), InfilVolMin(9.9e9), AFNInfilVolTotal(0.0), AFNInfilVolMin(9.9e9), SimpVentVolTotal(0.0), SimpVentVolMin(9.9e9),
-              SHGSAnHvacHt(0.0), SHGSAnHvacCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),
+              SHGSAnZoneEqHt(0.0), SHGSAnZoneEqCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),
               SHGSAnPeoplAdd(0.0), SHGSAnLiteAdd(0.0), SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0),
               SHGSAnOtherAdd(0.0), SHGSAnEquipRem(0.0), SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0),
               clPtTimeStamp(0), clPeak(0.0), SHGSClHvacHt(0.0), SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0),
@@ -2211,27 +2204,31 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetZoneOutBulbTempAt();
+    void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void CheckZoneOutBulbTempAt();
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void SetZoneWindSpeedAt();
+    void SetZoneWindSpeedAt(EnergyPlusData &state);
 
-    void SetZoneWindDirAt();
+    void SetZoneWindDirAt(EnergyPlusData &state);
 
-    void CheckAndSetConstructionProperties(int ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(EnergyPlusData &state,
+                                           int ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     );
 
-    int AssignReverseConstructionNumber(int ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(EnergyPlusData &state,
+                                        int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number
@@ -2243,7 +2240,7 @@ namespace DataHeatBalance {
                                          bool &isValid      // returns true if result is valid
     );
 
-    void SetFlagForWindowConstructionWithShadeOrBlindLayer();
+    void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
 

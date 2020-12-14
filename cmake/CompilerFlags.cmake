@@ -10,6 +10,15 @@ endif()
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
+SET(CMAKE_CXX_STANDARD 17)
+
+if ( APPLE )
+  # Force no auto ptr
+  # TODO remove this after kiva/boost is updated to a version that supports
+  # C++17
+  ADD_DEFINITIONS("-DBOOST_NO_AUTO_PTR")
+endif()
+
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # COMPILER FLAGS
@@ -93,9 +102,9 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
-    ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
+    ADD_CXX_DEFINITIONS("-Werror") # Treat warnings as errors
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
       ADD_CXX_DEFINITIONS("-Wno-deprecated-copy")
@@ -141,7 +150,6 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("/nologo") # Skip banner text
-    ADD_CXX_DEFINITIONS("/Qstd=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("/Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
@@ -187,7 +195,6 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     # 11075 Inlining inhibited
 
     # COMPILER FLAGS
-    ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
 

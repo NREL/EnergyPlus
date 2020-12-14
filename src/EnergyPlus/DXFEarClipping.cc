@@ -53,10 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -87,12 +86,7 @@ namespace DXFEarClipping {
 
     // Use statements:
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::Pi;
-    using DataGlobals::RadToDeg;
-    using DataGlobals::TwoPi;
-
     // Data
 
     // Derived type definitions:
@@ -162,7 +156,7 @@ namespace DXFEarClipping {
             }
         }
 
-        if (std::abs(anglesum - TwoPi) <= epsilon) {
+        if (std::abs(anglesum - DataGlobalConstants::TwoPi()) <= epsilon) {
             InPolygon = true;
         }
 
@@ -181,14 +175,14 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(IOFiles &ioFiles,
+    int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
 
@@ -211,11 +205,8 @@ namespace DXFEarClipping {
 
         // Use statements:
         // Using/Aliasing
-        using DataGlobals::DisplayExtraWarnings;
         using DataSurfaces::cSurfaceClass;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Overhang;
-        using DataSurfaces::SurfaceClass_Roof;
+        using DataSurfaces::SurfaceClass;
 
         // Return value
         int Triangulate;
@@ -278,7 +269,7 @@ namespace DXFEarClipping {
         //  else
         //    trackit=.FALSE.
         //  endif
-        if (surfclass == SurfaceClass_Floor || surfclass == SurfaceClass_Roof || surfclass == SurfaceClass_Overhang) {
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
             for (svert = 1; svert <= nsides; ++svert) {
                 for (mvert = svert + 1; mvert <= nsides; ++mvert) {
@@ -313,23 +304,23 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(ioFiles, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
-                ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
-                if (errcount == 1 && !DisplayExtraWarnings) {
-                    ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
-                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
+                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ShowMessage(format(" number of triangles found={:12}", ncount));
+                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * RadToDeg));
+                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg()));
                     }
                 }
                 break; // while loop
@@ -446,7 +437,7 @@ namespace DXFEarClipping {
         angle = std::acos(t);
 
         if (x2 * y1 - y2 * x1 < 0.0E+00) {
-            angle = 2.0E+00 * Pi - angle;
+            angle = 2.0E+00 * DataGlobalConstants::Pi() - angle;
         }
 
         return angle;
@@ -519,7 +510,7 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(IOFiles &ioFiles,
+    void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
@@ -624,7 +615,7 @@ namespace DXFEarClipping {
 
             ang = angle_2dvector(vertex(svert).x, vertex(svert).y, vertex(mvert).x, vertex(mvert).y, vertex(evert).x, vertex(evert).y);
 
-            if (ang > Pi) { // sufficiently close to 180 degrees.
+            if (ang > DataGlobalConstants::Pi()) { // sufficiently close to 180 degrees.
                 ++nrverts;
                 r_vertices(nrverts) = mvert;
                 rangles(nrverts) = ang;
@@ -665,7 +656,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    print(ioFiles.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
+                    print(state.files.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }
@@ -674,7 +665,7 @@ namespace DXFEarClipping {
     void CalcWallCoordinateTransformation(int const nsides,
                                           Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
-                                          Real64 const EP_UNUSED(surftilt), // unused1208
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
                                           Array1D<Real64> &xvt,
                                           Array1D<Real64> &yvt,
                                           Array1D<Real64> &zvt)
@@ -724,7 +715,7 @@ namespace DXFEarClipping {
         Real64 const alpha = surfazimuth;
 
         Real64 const alpha180 = 180.0 - alpha; // amount to rotate
-        Real64 const alphrad = alpha180 / RadToDeg;
+        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg();
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -737,7 +728,7 @@ namespace DXFEarClipping {
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
                                            Array1D<Vector> &polygon,
-                                           Real64 const EP_UNUSED(surfazimuth), // unused1208
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
                                            Array1D<Real64> &xvt,
                                            Array1D<Real64> &yvt,
@@ -784,7 +775,7 @@ namespace DXFEarClipping {
         // Subroutine local variable declarations:
 
         Real64 const alpha = -surftilt;
-        Real64 const alphrad = alpha / RadToDeg;
+        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg();
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -795,7 +786,7 @@ namespace DXFEarClipping {
         }
     }
 
-    void reorder(int &EP_UNUSED(nvert)) // unused1208
+    void reorder([[maybe_unused]] int &nvert) // unused1208
     {
 
         // Locals

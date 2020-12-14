@@ -56,6 +56,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace OutAirNodeManager {
 
     // Data
@@ -77,18 +80,19 @@ namespace OutAirNodeManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetOutAirNodes();
+    void SetOutAirNodes(EnergyPlusData &state);
 
-    void GetOutAirNodesInput();
+    void GetOutAirNodesInput(EnergyPlusData &state);
 
-    void InitOutAirNodes();
+    void InitOutAirNodes(EnergyPlusData &state);
 
-    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber); // Number of node to check to see if in Outside Air list
 
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+    void CheckAndAddAirNodeNumber(EnergyPlusData &state,
+                                  int const NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay            // True if found, false if not
     );
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
+    void SetOANodeValues(EnergyPlusData &state, int const NodeNum, // Number of node to check to see if in Outside Air list
                          bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
     );
 } // namespace OutAirNodeManager

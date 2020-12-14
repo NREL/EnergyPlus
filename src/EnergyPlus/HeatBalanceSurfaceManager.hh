@@ -56,15 +56,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    class IOFiles;
-    struct ChilledCeilingPanelSimpleData;
-    struct ConvectionCoefficientsData;
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData; 
-    struct WindowManagerData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -96,25 +89,25 @@ namespace HeatBalanceSurfaceManager {
 
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
-    void GatherForPredefinedReport(WindowManagerData &dataWindowManager);
+    void GatherForPredefinedReport(EnergyPlusData &state);
 
-    void AllocateSurfaceHeatBalArrays();
+    void AllocateSurfaceHeatBalArrays(EnergyPlusData &state);
 
-    void InitThermalAndFluxHistories();
+    void InitThermalAndFluxHistories(EnergyPlusData &state);
 
-    void InitSolarHeatGains(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
+    void InitSolarHeatGains(EnergyPlusData &state);
 
-    void InitIntSolarDistribution();
+    void InitIntSolarDistribution(EnergyPlusData &state);
 
-    void ComputeIntThermalAbsorpFactors();
+    void ComputeIntThermalAbsorpFactors(EnergyPlusData &state);
 
-    void ComputeIntSWAbsorpFactors();
+    void ComputeIntSWAbsorpFactors(EnergyPlusData &state);
 
-    void ComputeDifSolExcZonesWIZWindows(int NumberOfEnclosures); // Number of solar enclosures
+    void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int NumberOfEnclosures); // Number of solar enclosures
 
-    void InitEMSControlledSurfaceProperties();
+    void InitEMSControlledSurfaceProperties(EnergyPlusData &state);
 
-    void InitEMSControlledConstructions();
+    void InitEMSControlledConstructions(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -127,9 +120,9 @@ namespace HeatBalanceSurfaceManager {
 
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
-    void UpdateThermalHistories();
+    void UpdateThermalHistories(EnergyPlusData &state);
 
-    void CalculateZoneMRT(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalculateZoneMRT(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     // End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -137,58 +130,51 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportSurfaceHeatBalance();
+    void ReportSurfaceHeatBalance(EnergyPlusData &state);
 
-    void ReportIntMovInsInsideSurfTemp();
+    void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
-    void CalcThermalResilience();
+    void CalcThermalResilience(EnergyPlusData &state);
 
-    void ReportThermalResilience();
+    void ReportThermalResilience(EnergyPlusData &state);
 
-    void ReportCO2Resilience();
+    void ReportCO2Resilience(EnergyPlusData &state);
 
-    void ReportVisualResilience();
+    void ReportVisualResilience(EnergyPlusData &state);
 
     // End of Reporting subroutines for the HB Module
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
-    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                    IOFiles &ioFiles,
+    void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetQdotConvOutRepPerArea(int SurfNum);
+    Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int SurfNum);
 
-    void CalcHeatBalanceInsideSurf(EnergyPlusData& state,
+    void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                    WindowComplexManagerData &dataWindowComplexManager,
-                                    WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                    WindowManagerData &dataWindowManager,
-                                    IOFiles &ioFiles,
+    void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
                                     Optional_int_const ZoneToResimulate = _);
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                           WindowComplexManagerData &dataWindowComplexManager,
-                                           WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                           WindowManagerData &dataWindowManager,
-                                           IOFiles &ioFiles,
+    void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12,
+    void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state,
+                                               Real64 TH12,
                                                DataSurfaces::SurfaceData &surface,
                                                DataHeatBalance::ZoneData &zone,
                                                int WarmupSurfTemp);
 
-    void CalcOutsideSurfTemp(int SurfNum,      // Surface number DO loop counter
+    void CalcOutsideSurfTemp(EnergyPlusData &state,
+                             int SurfNum,      // Surface number DO loop counter
                              int ZoneNum,      // Zone number the current surface is attached to
                              int ConstrNum,    // Construction index for the current surface
                              Real64 HMovInsul, // "Convection" coefficient of movable insulation
@@ -196,9 +182,9 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
-    void GatherComponentLoadsSurfAbsFact();
+    void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
 } // namespace HeatBalanceSurfaceManager
 

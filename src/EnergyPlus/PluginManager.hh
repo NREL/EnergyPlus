@@ -48,25 +48,42 @@
 #ifndef EPLUS_PLUGIN_MANAGER_HH
 #define EPLUS_PLUGIN_MANAGER_HH
 
+// C++ Headers
 #include <iomanip>
 #include <queue>
 #include <utility>
 #include <vector>
+
+// EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-typedef void* PyObjectWrap;
+#if LINK_WITH_PYTHON
+#ifdef _DEBUG
+// We don't want to try to import a debug build of Python here
+// so if we are building a Debug build of the C++ code, we need
+// to undefine _DEBUG during the #include command for Python.h.
+// Otherwise it will fail
+#undef _DEBUG
+  #include <Python.h>
+  #define _DEBUG
+#else
+#include <Python.h>
+#endif
+#endif
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
-    std::string pythonStringForUsage();
+    std::string pythonStringForUsage(EnergyPlusData &state);
 
     void clear_state();
 
@@ -90,12 +107,12 @@ namespace PluginManagement {
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
         // inside setup() and shutdown() are related to un-managed memory, and it's tricky to manage inside existing constructor/move operations, so they
         // are split out into these explicitly called methods.
-        void setup();
+        void setup(EnergyPlusData &state);
         void shutdown() const;
 
         // methods
-        static void reportPythonError();
-        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
+        static void reportPythonError(EnergyPlusData &state);
+        bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -135,45 +152,45 @@ namespace PluginManagement {
         bool bHasUserDefinedComponentModel = false;
         bool bHasUnitarySystemSizing = false;
 #if LINK_WITH_PYTHON
-        PyObjectWrap pModule = nullptr;  // reference to module
-        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        PyObject *pModule = nullptr;  // reference to module
+        PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
         // precalculated function names as PyObjects
-        PyObjectWrap pBeginNewEnvironment = nullptr;
-        PyObjectWrap pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
-        PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
-        PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
-        PyObjectWrap pBeginZoneTimestepAfterInitHeatBalance = nullptr;
-        PyObjectWrap pBeginTimestepBeforePredictor = nullptr;
-        PyObjectWrap pAfterPredictorBeforeHVACManagers = nullptr;
-        PyObjectWrap pAfterPredictorAfterHVACManagers = nullptr;
-        PyObjectWrap pInsideHVACSystemIterationLoop = nullptr;
-        PyObjectWrap pEndOfZoneTimestepBeforeZoneReporting = nullptr;
-        PyObjectWrap pEndOfZoneTimestepAfterZoneReporting = nullptr;
-        PyObjectWrap pEndOfSystemTimestepBeforeHVACReporting = nullptr;
-        PyObjectWrap pEndOfSystemTimestepAfterHVACReporting = nullptr;
-        PyObjectWrap pEndOfZoneSizing = nullptr;
-        PyObjectWrap pEndOfSystemSizing = nullptr;
-        PyObjectWrap pAfterComponentInputReadIn = nullptr;
-        PyObjectWrap pUserDefinedComponentModel = nullptr;
-        PyObjectWrap pUnitarySystemSizing = nullptr;
-#endif        
+        PyObject *pBeginNewEnvironment = nullptr;
+        PyObject *pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
+        PyObject *pAfterNewEnvironmentWarmUpIsComplete = nullptr;
+        PyObject *pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
+        PyObject *pBeginZoneTimestepAfterInitHeatBalance = nullptr;
+        PyObject *pBeginTimestepBeforePredictor = nullptr;
+        PyObject *pAfterPredictorBeforeHVACManagers = nullptr;
+        PyObject *pAfterPredictorAfterHVACManagers = nullptr;
+        PyObject *pInsideHVACSystemIterationLoop = nullptr;
+        PyObject *pEndOfZoneTimestepBeforeZoneReporting = nullptr;
+        PyObject *pEndOfZoneTimestepAfterZoneReporting = nullptr;
+        PyObject *pEndOfSystemTimestepBeforeHVACReporting = nullptr;
+        PyObject *pEndOfSystemTimestepAfterHVACReporting = nullptr;
+        PyObject *pEndOfZoneSizing = nullptr;
+        PyObject *pEndOfSystemSizing = nullptr;
+        PyObject *pAfterComponentInputReadIn = nullptr;
+        PyObject *pUserDefinedComponentModel = nullptr;
+        PyObject *pUnitarySystemSizing = nullptr;
+#endif
     };
 
     class PluginManager {
     public:
-        PluginManager();
+        PluginManager(EnergyPlusData &state);
         ~PluginManager();
 
         static int numActiveCallbacks();
-        static void addToPythonPath(const std::string& path, bool userDefinedPath);
+        static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static void setupOutputVariables();
+        static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);
-        static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
-        static Real64 getGlobalVariableValue(int handle);
-        static void setGlobalVariableValue(int handle, Real64 value);
+        static int getGlobalVariableHandle(EnergyPlusData &state, const std::string& name, bool suppress_warning = false);
+        static Real64 getGlobalVariableValue(EnergyPlusData &state, int handle);
+        static void setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value);
 
         int maxTrendVariableIndex = -1;
         static int getTrendVariableHandle(const std::string& name);
@@ -185,11 +202,11 @@ namespace PluginManagement {
         static Real64 getTrendVariableSum(int handle, int count);
         static Real64 getTrendVariableDirection(int handle, int count);
 
-        static void updatePluginValues();
+        static void updatePluginValues(EnergyPlusData &state);
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
-        static bool anyUnexpectedPluginObjects();
+        static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
     };
 
     struct PluginTrendVariable {
@@ -198,17 +215,7 @@ namespace PluginManagement {
         std::deque<Real64> values;
         std::deque<Real64> times;
         int indexOfPluginVariable;
-        PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable) :
-            name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
-        {
-            // initialize the deque so it can be queried immediately, even with just zeroes
-            for (int i = 1; i <= this->numValues; i++) {
-                this->values.push_back(0);
-            }
-            for (int loop = 1; loop <= _numValues; ++loop) {
-                this->times.push_back(-loop * DataGlobals::TimeStepZone);
-            }
-        }
+        PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable);
         void reset() {
             this->values.clear();
             for (int i = 1; i <= this->numValues; i++) {

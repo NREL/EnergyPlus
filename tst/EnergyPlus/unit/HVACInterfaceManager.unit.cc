@@ -60,6 +60,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
@@ -91,7 +92,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
     // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
-    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory();
     EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
@@ -103,7 +104,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
     // Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
-    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory();
     EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, .001);
