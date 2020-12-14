@@ -122,6 +122,7 @@ namespace DataWater {
         int OverflowTankSupplyARRID;
         Real64 ValveOnCapacity;  // tank capacity at lower control range [m3]
         Real64 ValveOffCapacity; // tank capacity at upper control range [m3]
+        bool LastTimeStepFilling; // Indicates that tank was filling up at last timestep, to determine whether to continue until ValveOffCapacity
         ControlSupplyType ControlSupply;   // mode for tank controlled resupply
         int GroundWellID;        // index "pointer" to well if present
         std::string SupplyTankName;
@@ -173,8 +174,10 @@ namespace DataWater {
 
         // Default Constructor
         StorageTankDataStruct()
-            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0), ValveOffCapacity(0.0), ControlSupply(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0), SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0),
-              MaxInFlowRate(0.0), MaxOutFlowRate(0.0), ThermalMode(TankThermalMode::Unassigned), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Unassigned),
+            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
+              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0),
+              SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0), MaxInFlowRate(0.0), MaxOutFlowRate(0.0),
+              ThermalMode(TankThermalMode::Unassigned), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Unassigned),
               AmbientTempSchedule(0), ZoneID(0), UValue(0.0), SurfArea(0.0), InternalMassID(0), ThisTimeStepVolume(0.0), LastTimeStepVolume(0.0),
               LastTimeStepTemp(0.0), NumWaterSupplies(0), NumWaterDemands(0), VdotFromTank(0.0), VdotToTank(0.0), VdotOverflow(0.0), VolOverflow(0.0),
               NetVdot(0.0), Twater(0.0), TouterSkin(0.0), TwaterOverflow(0.0), MainsDrawVdot(0.0), MainsDrawVol(0.0), SkinLossPower(0.0),

@@ -3434,7 +3434,7 @@ namespace OutputProcessor {
 
         ReportingFrequency report_freq = ReportingFrequency::EachCall;
 
-        for (auto const option : valid_options) {
+        for (auto const &option : valid_options) {
             report_freq = determineFrequency(*state, option.first);
             EXPECT_EQ(option.second, report_freq);
         }
@@ -4032,7 +4032,7 @@ namespace OutputProcessor {
             {17, std::make_tuple(2, "MYBUILDINGOTHER", "Electricity", "", "", "", "J")},
         });
 
-        for (auto const result : meters_result) {
+        for (auto const &result : meters_result) {
             EXPECT_EQ(std::get<0>(result.second), EnergyMeters(result.first).TypeOfMeter);
             EXPECT_EQ(std::get<1>(result.second), EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), EnergyMeters(result.first).ResourceType);
@@ -4082,7 +4082,7 @@ namespace OutputProcessor {
             {6, std::make_tuple(0, "GeneralLights:InteriorLights:Electricity", "Electricity", "InteriorLights", "GeneralLights", "", "J")},
         });
 
-        for (auto const result : meters_result) {
+        for (auto const &result : meters_result) {
             EXPECT_EQ(std::get<0>(result.second), EnergyMeters(result.first).TypeOfMeter);
             EXPECT_EQ(std::get<1>(result.second), EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), EnergyMeters(result.first).ResourceType);

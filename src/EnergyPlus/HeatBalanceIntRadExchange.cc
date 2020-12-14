@@ -851,15 +851,8 @@ namespace HeatBalanceIntRadExchange {
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
-                    if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !state.dataConstruction->Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
-                            continue;
-                        }
-                    } else if (!Surface(surfNum).HeatTransSurf) {
-                        continue;
-                    }
-                    ++numEnclosureSurfaces;
+                    // Include only heat transfer surfaces
+                    if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
@@ -878,14 +871,8 @@ namespace HeatBalanceIntRadExchange {
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
-                    if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !state.dataConstruction->Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
-                            continue;
-                        }
-                    } else if (!Surface(surfNum).HeatTransSurf) {
-                        continue;
-                    }
+                    // Do not include non-heat transfer surfaces
+                    if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here

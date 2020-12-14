@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -198,7 +198,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -1780,22 +1780,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
         "Construction:AirBoundary,",
         "Grouped Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "None;                    !- Air Exchange Method",
 
         "Construction:AirBoundary,",
-        "Non-Grouped Air Boundary, !- Name",
-        "InteriorWindow,          !- Solar and Daylighting Method",
-        "IRTSurface,              !- Radiant Exchange Method",
-        "SimpleMixing,            !- Air Exchange Method",
-        ",                        !- Simple Mixing Air Changes per Hour {1 / hr}",
-        ";                        !- Simple Mixing Schedule Name",
-
-        "Construction:AirBoundary,",
         "Air Boundary with Good Mixing Schedule, !- Name",
-        "InteriorWindow,          !- Solar and Daylighting Method",
-        "IRTSurface,              !- Radiant Exchange Method",
         "SimpleMixing,            !- Air Exchange Method",
         "0.4,                     !- Simple Mixing Air Changes per Hour {1 / hr}",
         "Always2;                 !- Simple Mixing Schedule Name",
@@ -1809,54 +1797,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     bool ErrorsFound(false);
     ProcessScheduleInput(*state);
 
-    // call get material data to auto-generate IRTSurface material
-    ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
-    int MaterNum = 1;
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).ROnly, true);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Resistance, 0.01);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpThermal, 0.9999);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpThermalInput, 0.9999);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpSolar, 0.0);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpSolarInput, 0.0);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpVisible, 0.0);
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpVisibleInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), state->dataMaterial->Material(MaterNum).Resistance);
-
     // get constructions
     ErrorsFound = false;
     GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
+    EXPECT_EQ(DataHeatBalance::TotConstructs, 2);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Non-Grouped Air Boundary"));
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataMaterial->Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
-    EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, -1);
-    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
-
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
@@ -1866,17 +1817,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataMaterial->Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 1);
-    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
+    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
 
@@ -1887,8 +1833,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
         "Construction:AirBoundary,",
         "Air Boundary with Bad Mixing Schedule, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "SimpleMixing,            !- Air Exchange Method",
         "0.1,                     !- Simple Mixing Air Changes per Hour {1 / hr}",
         "xyz;                     !- Simple Mixing Schedule Name",
@@ -1924,44 +1868,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.1);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
-
-}
-
-TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
-{
-    std::string const idf_objects = delimited_string({
-        "Material:InfraredTransparent,",
-        "IRTMaterial1;            !- Name",
-    });
-
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    bool ErrorsFound(false); // If errors detected in input
-
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-
-    ASSERT_FALSE(ErrorsFound);
-
-    int MaterNum = 1;
-
-    EXPECT_EQ(state->dataMaterial->Material(MaterNum).ROnly, true);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).Resistance, 0.01, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
-    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
 
 }
 

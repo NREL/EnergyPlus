@@ -291,9 +291,10 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
             while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
-                if (ReportDuringHVACSizingSimulation) {
+                // Let's always do a transaction, except we'll roll it back if need be
+                // if (ReportDuringHVACSizingSimulation) {
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
-                }
+                // }
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!state.dataGlobal->WarmupFlag) {
@@ -364,8 +365,12 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                 } // ... End hour loop.
-                if (ReportDuringHVACSizingSimulation) {
-                    if (sqlite) sqlite->sqliteCommit(); // one transaction per day
+                if (sqlite) {
+                    if (ReportDuringHVACSizingSimulation) {
+                        sqlite->sqliteCommit(); // one transaction per day
+                    } else {
+                        sqlite->sqliteRollback(); // Cancel transaction
+                    }
                 }
             } // ... End day loop.
 

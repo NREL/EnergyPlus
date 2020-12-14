@@ -687,8 +687,10 @@ namespace HVACVariableRefrigerantFlow {
         Real64 ParasiticElec;                // parasitic electric for VRF terminal unit
         Real64 ParasiticOffElec;             // parasitic electric for VRF terminal unit when off
         Real64 HeatingSpeedRatio;            // Fan speed ratio in heating mode
+        Real64 NoHeatingSpeedRatio;          // Fan speed ratio when no heating
         Real64 HeatingCapacitySizeRatio;     // Ratio of heating to cooling when autosizing
         Real64 CoolingSpeedRatio;            // Fan speed ratio in cooling mode
+        Real64 NoCoolingSpeedRatio;          // Fan speed ratio when no cooling
         Real64 ParasiticCoolElecPower;       // Terminal unit cooling parasitic electric power [W]
         Real64 ParasiticHeatElecPower;       // Terminal unit heating parasitic electric power [W]
         Real64 ParasiticElecCoolConsumption; // Terminal unit parasitic electric consumption in cooling [J]
@@ -767,20 +769,20 @@ namespace HVACVariableRefrigerantFlow {
               SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0),
               FanPower(0.0), OpMode(0), FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0),
               HeatCoilIndex(0), SuppHeatCoilIndex(0), DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0),
-              ParasiticOffElec(0.0), HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0),
-              ParasiticHeatElecPower(0.0), ParasiticElecCoolConsumption(0.0), ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true),
-              HeatingCoilPresent(true), SuppHeatingCoilPresent(false), AvailStatus(0), TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0),
-              TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0),
-              LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0),
-              LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0),
-              FirstIterfailed(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0),
-              SuppHeatCoilFluidOutletNode(0), firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(),
-              SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true),
-              airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false),
-              heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
-              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0),
-              heatCoilAirOutNode(0)
+              ParasiticOffElec(0.0), HeatingSpeedRatio(1.0), NoHeatingSpeedRatio(0.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0),
+              NoCoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0), ParasiticHeatElecPower(0.0), ParasiticElecCoolConsumption(0.0),
+              ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true), HeatingCoilPresent(true), SuppHeatingCoilPresent(false), AvailStatus(0),
+              TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0), TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0),
+              SensibleHeatingRate(0.0), LatentCoolingRate(0.0), LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0),
+              SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0), LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0),
+              EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0), HVACSizingIndex(0),
+              ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0),
+              SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
+              firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0),
+              coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false),
+              isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0),
+              heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0),
+              zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0), heatCoilAirOutNode(0)
         {
         }
 

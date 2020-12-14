@@ -1038,8 +1038,13 @@ namespace WaterManager {
 
         // is tank lower than float valve on capacity and requesting fill from controlled supplier?
         FillVolRequest = 0.0;
-        if ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).ValveOnCapacity) { // turn on supply to fill tank
+
+        if ( ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).ValveOnCapacity) ||
+              state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling )
+        { // turn on supply to fill tank
             FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
+
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = true;
 
             // set mains draws for float on (all the way to Float off)
             if (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::MainsFloatValve) {
@@ -1069,6 +1074,11 @@ namespace WaterManager {
         }
 
         state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
+        if (state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume >= state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity) {
+            state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = false;
+        }
+
+
         state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour);
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
         state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;

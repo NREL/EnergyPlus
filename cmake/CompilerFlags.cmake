@@ -104,6 +104,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
+#    ADD_CXX_DEFINITIONS("-Werror") # Treat warnings as errors
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
       ADD_CXX_DEFINITIONS("-Wno-deprecated-copy")
