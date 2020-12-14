@@ -225,6 +225,9 @@ namespace FourPipeBeam {
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     extern Array1D<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
 
+    // temporary
+    void clear_state();
+
 } // namespace FourPipeBeam
 
 struct FourPipeBeamData : BaseGlobalStruct {

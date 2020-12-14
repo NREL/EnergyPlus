@@ -251,7 +251,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 }
 
-TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
+TEST_F(EnergyPlusFixture, DISABLED_Beam_sizeandSimulateOneZone)
 {
     std::string const idf_objects = delimited_string({
         "    SimulationControl,",

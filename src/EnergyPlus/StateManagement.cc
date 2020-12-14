@@ -106,6 +106,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
@@ -224,6 +225,7 @@ void EnergyPlus::clearAllStates()
     FaultsManager::clear_state();
     FluidCoolers::clear_state();
     FluidProperties::clear_state();
+    FourPipeBeam::clear_state();
     FuelCellElectricGenerator::clear_state();
     Furnaces::clear_state();
     General::clear_state();

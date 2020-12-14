@@ -1491,6 +1491,10 @@ EnergyPlusData & state = getCurrentState();
         }
     }
 
+    void clear_state() {
+        FourPipeBeams.clear();
+    }
+
 } // namespace FourPipeBeam
 
 } // namespace EnergyPlus
