@@ -7039,11 +7039,7 @@ namespace SolarShading {
                                     // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                     // or interior window WITHOUT SHADING this timestep
 
-                                    if (state.dataConstruction->Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
-                                        TransBeamWin = 1.0;
-                                        AbsBeamWinEQL = 0.0;
-                                        AbsBeamTotWin = 0.0;
-                                    } else if (ShadeFlagBack <= 0) {
+                                    if (ShadeFlagBack <= 0) {
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
                                         }
@@ -7630,9 +7626,6 @@ namespace SolarShading {
                             if (state.dataConstruction->Construct(FlConstrNum).TransDiff <= 0.0) {
                                 // Opaque surface
                                 SurfOpaqAI(FloorNum) += BTOTWinZone * state.dataSolarShading->ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
-                            } else if (state.dataConstruction->Construct(FlConstrNum).TypeIsAirBoundaryInteriorWindow) {
-                                AbsBeamWinEQL = 0.0;
-                                AbsBeamTotWin = 0.0;
                             } else {
                                 // Window
 
