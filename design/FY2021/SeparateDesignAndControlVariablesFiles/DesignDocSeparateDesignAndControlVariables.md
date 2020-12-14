@@ -182,26 +182,18 @@ This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperature
 
 This `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  object. Multiple `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  objects can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object.
 
-*Field: Name*  
-*Field: Fluid to Radiant Surface Heat Transfer Model*  
-*Field: Hydronic Tubing Inside Diameter*  
-*Field: Hydronic Tubing Outside Diameter*  
-*Field: Hydronic Tubing Conductivity*  
-*Field: Temperature Control Type*  
-*Field: Setpoint Control Type*  
-*Field: Heating Design Capacity Method*  
-*Field: Heating Design Capacity Per Floor Area*  
-*Field: Fraction of Autosized Heating Design Capacity*  
-*Field: Heating Control Throttling Range*  
-*Field: Heating Control Temperature Schedule Name*  
-*Field: Cooling Design Capacity Method*  
-*Field: Cooling Design Capacity Per Floor Area*  
-*Field: Fraction of Autosized Cooling Design Capacity*  
-*Field: Cooling Control Throttling Range*  
-*Field: Cooling Control Temperature Schedule Name*  
-*Field: Condensation Control Type*  
-*Field: Condensation Control Dewpoint Offset*  
-*Field: Changeover Delay Time Period Schedule*
+*Field: ame*  
+*Field: luid to Radiant Surface Heat Transfer Model*  
+*Field: emperature Control Type*  
+*Field: unning Mean Outdoor Dry-Bulb Temperature Weighting Factor*  
+*Field: ydronic Tubing Inside Diameter*  
+*Field: ydronic Tubing Outside Diameter*  
+*Field: ydronic Tubing Conductivity*  
+*Field: otor Efficiency*  
+*Field: raction of Motor Inefficiencies to Fluid Stream*  
+*Field: ondensation Control Type*  
+*Field: ondensation Control Dewpoint Offset*  
+*Field: hangeover Delay Time Period Schedule*
 
 ##### *Modified object* - `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` ####
 
