@@ -31,6 +31,7 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   #  4102 Unreferenced label
   #  4244 Narrowing conversions
   #  4258 Definition from the loop is ignored
+  #  4267 Narrowing conversions
   #  4355 Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
   #  4996 Deprecated functions (/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
   #  4503 The decorated name was longer than the compiler limit (4096), and was truncated.
@@ -40,12 +41,13 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
     /wd4102
     /wd4244
     /wd4258
+    /wd4267
     /wd4355
     /wd4996
     /wd4503) # Disables warning messages listed above
 
-  target_compile_definitions(project_options INTERFACE /DNOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
-  target_compile_definitions(project_options INTERFACE /DWIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
+  target_compile_definitions(project_options INTERFACE NOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
+  target_compile_definitions(project_options INTERFACE WIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
   #    ADD_CXX_DEFINITIONS("-d2SSAOptimizer-") # this disables this optimizer which has known major issues
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS

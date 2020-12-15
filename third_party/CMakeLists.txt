@@ -7,7 +7,10 @@
 # we link the project_options in here for every library in this
 # subdirectory
 link_libraries(project_options)
-add_compile_options(-Wno-pedantic -Wno-unused-parameter)
+
+if (NOT MSVC)
+  add_compile_options(-Wno-pedantic -Wno-unused-parameter)
+endif()
 
 set(INSTALL_GTEST OFF)
 

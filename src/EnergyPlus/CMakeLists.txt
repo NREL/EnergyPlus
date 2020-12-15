@@ -793,7 +793,7 @@ add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
 target_link_libraries(energyplusparser PUBLIC re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_warnings)
 if(WIN32)
-  target_link_libraries(energyplusparser Shlwapi)
+  target_link_libraries(energyplusparser PUBLIC Shlwapi)
 endif()
 
 # first we will create a static library of EnergyPlus this will be linked
