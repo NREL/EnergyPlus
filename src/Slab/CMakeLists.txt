@@ -54,7 +54,7 @@ add_executable(Slab ${SRC})
 target_link_libraries(Slab PRIVATE SlabOptions)
 set_target_properties(Slab PROPERTIES FOLDER Auxiliary)
 
-set_target_properties(Slab PROPERTIES COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}")
+set_target_properties(Slab PROPERTIES COMPILE_FLAGS "-ffree-line-length-200")
 
 install(TARGETS Slab DESTINATION PreProcess/GrndTempCalc)
 if(NOT ${STATIC_EXE})

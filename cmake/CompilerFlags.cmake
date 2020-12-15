@@ -1,27 +1,27 @@
 # Compiler-agnostic compiler flags first
-target_compile_definitions(project_options INTERFACE "-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
-target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-DOBJEXXFCL_ARRAY_INIT_DEBUG">) # Initialize ObjexxFCL arrays to aid debugging
+target_compile_definitions(project_options INTERFACE -DOBJEXXFCL_ALIGN=64) # Align ObjexxFCL arrays to 64B
+target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-DOBJEXXFCL_ARRAY_INIT_DEBUG>) # Initialize ObjexxFCL arrays to aid debugging
 
 if(NOT OPENGL_FOUND)
-  target_compile_definitions(project_options INTERFACE "-DEP_NO_OPENGL")
+  target_compile_definitions(project_options INTERFACE -DEP_NO_OPENGL)
 endif()
 
 # Make sure expat is compiled as a static library
-target_compile_definitions(project_options INTERFACE "-DXML_STATIC")
+target_compile_definitions(project_options INTERFACE -DXML_STATIC)
 
 if(APPLE)
   # Force no auto ptr
   # TODO remove this after kiva/boost is updated to a version that supports
   # C++17
-  target_compile_definitions(project_options INTERFACE "-DBOOST_NO_AUTO_PTR")
+  target_compile_definitions(project_options INTERFACE -DBOOST_NO_AUTO_PTR)
 endif()
 
 if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 2013)
 
   # COMPILER FLAGS
-  target_compile_options(project_options INTERFACE "/nologo")
-  target_compile_options(project_options INTERFACE "/EHsc")
-  target_compile_options(project_options INTERFACE "/MP") # Enables multi-processor compilation of source within a single project
+  target_compile_options(project_options INTERFACE /nologo)
+  target_compile_options(project_options INTERFACE /EHsc)
+  target_compile_options(project_options INTERFACE /MP) # Enables multi-processor compilation of source within a single project
   # string(REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
   # )# Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
 
@@ -49,54 +49,48 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   #    ADD_CXX_DEFINITIONS("-d2SSAOptimizer-") # this disables this optimizer which has known major issues
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/GS-">) # Disable buffer overrun checks for performance in release mode
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS->) # Disable buffer overrun checks for performance in release mode
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/Ob0">) # Disable inlining
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/RTCsu">) # Runtime checks
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/fp:strict">) # Floating point model
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/DMSVC_DEBUG">) # Triggers code in main.cc to catch floating point NaNs
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Ob0>) # Disable inlining
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
 
 elseif(
   CMAKE_COMPILER_IS_GNUCXX
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
-  option(ENABLE_COVERAGE "Enable Coverage Reporting in GCC" FALSE)
-  if(ENABLE_COVERAGE)
-    target_compile_definitions(project_options INTERFACE --coverage -O0 -g)
-    target_link_libraries(project_options INTERFACE --coverage)
-  endif()
 
   # COMPILER FLAGS
-  target_compile_options(project_options INTERFACE "-pipe") # Faster compiler processing
-  target_compile_options(project_warnings INTERFACE "-Wpedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+  target_compile_options(project_options INTERFACE -pipe) # Faster compiler processing
+  target_compile_options(project_warnings INTERFACE -Wpedantic) # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
   target_compile_options(project_warnings INTERFACE -Wall -Wextra) # Turn on warnings
-  target_compile_options(project_warnings INTERFACE "-Wno-unknown-pragmas")
+  target_compile_options(project_warnings INTERFACE -Wno-unknown-pragmas)
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
-    target_compile_options(project_warnings INTERFACE "-Wno-deprecated-copy")
+    target_compile_options(project_warnings INTERFACE -Wno-deprecated-copy)
   endif()
-  target_compile_options(project_warnings INTERFACE "-Wno-attributes") # Don't warn on attributes Clang doesn't know
-  target_compile_options(project_warnings INTERFACE "-Wno-delete-non-virtual-dtor")
-  target_compile_options(project_warnings INTERFACE "-Wno-missing-braces")
+  target_compile_options(project_warnings INTERFACE -Wno-attributes) # Don't warn on attributes Clang doesn't know
+  target_compile_options(project_warnings INTERFACE -Wno-delete-non-virtual-dtor)
+  target_compile_options(project_warnings INTERFACE -Wno-missing-braces)
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_warnings INTERFACE "-Wno-unused-but-set-parameter" "-Wno-unused-but-set-variable")
+    target_compile_options(project_warnings INTERFACE -Wno-unused-but-set-parameter -Wno-unused-but-set-variable)
     # Suppress unused-but-set warnings until more serious ones are addressed
-    target_compile_options(project_warnings INTERFACE "-Wno-maybe-uninitialized")
-    target_compile_options(project_warnings INTERFACE "-Wno-aggressive-loop-optimizations")
+    target_compile_options(project_warnings INTERFACE -Wno-maybe-uninitialized)
+    target_compile_options(project_warnings INTERFACE -Wno-aggressive-loop-optimizations)
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-    target_compile_options(project_warnings INTERFACE "-Wno-vexing-parse")
-    target_compile_options(project_warnings INTERFACE "-Wno-invalid-source-encoding")
+    target_compile_options(project_warnings INTERFACE -Wno-vexing-parse)
+    target_compile_options(project_warnings INTERFACE -Wno-invalid-source-encoding)
   endif()
 
   # ADDITIONAL GCC-SPECIFIC FLAGS
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-ffloat-store">) # Improve debug run solution stability
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-fsignaling-nans">) # Disable optimizations that may have concealed NaN behavior
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-D_GLIBCXX_DEBUG">) # Standard container debug mode (bounds checking, ...>)
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ffloat-store>) # Improve debug run solution stability
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
+    target_compile_definitions(project_options INTERFACE $<$<CONFIG:Debug>:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
     # ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
   endif()
 
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-ggdb">) # Produces debugging information specifically for gdb
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-fno-stack-protector>)
   # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
 
@@ -116,12 +110,12 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # 11075 Inlining inhibited
 
   # COMPILER FLAGS
-  target_compile_options(project_options INTERFACE "/nologo") # Skip banner text
-  target_compile_options(project_options INTERFACE "/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
-  target_compile_options(project_options INTERFACE "/Wall") # Enable "all" warnings
-  target_compile_options(project_options INTERFACE "/Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
-  target_compile_definitions(project_options INTERFACE "/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-  target_compile_definitions(project_options INTERFACE "/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+  target_compile_options(project_options INTERFACE /nologo) # Skip banner text
+  target_compile_options(project_options INTERFACE /Qcxx-features) # Enables standard C++ features without disabling Microsoft extensions
+  target_compile_options(project_options INTERFACE /Wall) # Enable all warnings
+  target_compile_options(project_options INTERFACE /Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075) # Disable warnings listed above
+  target_compile_definitions(project_options INTERFACE /DNOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
+  target_compile_definitions(project_options INTERFACE /DWIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
 
   # Optimization options that had no significant benefit for EnergyPlus
   #  /Qipo instead of /Qip
@@ -130,21 +124,21 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   #  /Qunroll-aggressive
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/O3">) # Agressive optimization
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/Qprec-div-">) # Faster division
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/Qansi-alias">) # Better optimization via strict aliasing rules
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/Qip">) # Inter-procedural optimnization within a single file
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"/Qinline-factor:225">) # Aggressive inlining
-  # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast=2") # Aggressive optimizations on floating-point data
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/O3>) # Agressive optimization
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qprec-div->) # Faster division
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qansi-alias>) # Better optimization via strict aliasing rules
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qip>) # Inter-procedural optimnization within a single file
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qinline-factor:225>) # Aggressive inlining
+  # ADD_CXX_RELEASE_DEFINITIONS(/fp:fast=2) # Aggressive optimizations on floating-point data
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/fp:source">) # Use source-specified floating point precision
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/Qtrapuv">) # Initialize local variables to unusual values to help detect use uninitialized
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/check:stack,uninit")# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/Gs0">) # Enable stack checking for all functions
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/GS">) # Buffer overrun detection
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/Qfp-stack-check">)# Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"/traceback">) # Enables traceback on error
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/fp:source>) # Use source-specified floating point precision
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qtrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/check:stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Gs0>) # Enable stack checking for all functions
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/GS>) # Buffer overrun detection
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)# Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/traceback>) # Enables traceback on error
 
 elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
@@ -162,8 +156,8 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # 11075 Inlining inhibited
 
   # COMPILER FLAGS
-  target_compile_options(project_warnings INTERFACE "-Wall") # Enable "all" warnings
-  target_compile_options(project_warnings INTERFACE "-diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
+  target_compile_options(project_warnings INTERFACE -Wall) # Enable all warnings
+  target_compile_options(project_warnings INTERFACE -diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075) # Disable warnings listed above
 
   # Optimization options that had no significant benefit for EnergyPlus
   #  -ipo instead of -ip
@@ -172,21 +166,21 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   #  -unroll-aggressive
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"-O3">) # Agressive optimization
-  # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # More aggressive optimizations (instead of -O3) (enables -no-prec-div and -fp-model fast=2)
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"-no-prec-div") # Faster division (enabled by -Ofast>)
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"-ansi-alias">) # Enables more aggressive optimizations on floating-point data
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"-ip">) # Enables inter-procedural optimnization within a single file
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:"-inline-factor=225">) # Enables more aggressive inlining
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-O3>) # Agressive optimization
+  # ADD_CXX_RELEASE_DEFINITIONS(-Ofast) # More aggressive optimizations (instead of -O3) (enables -no-prec-div and -fp-model fast=2)
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-no-prec-div) # Faster division (enabled by -Ofast>)
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-ansi-alias>) # Enables more aggressive optimizations on floating-point data
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-ip>) # Enables inter-procedural optimnization within a single file
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-inline-factor=225>) # Enables more aggressive inlining
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-strict-ansi">) # Strict language conformance: Performance impact so limit to debug build
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-fp-model source">) # Use source-specified floating point precision
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-ftrapuv">) # Initialize local variables to unusual values to help detect use uninitialized
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-check=stack,uninit")# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-fstack-security-check">) # Buffer overrun detection
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-fp-stack-check">) # Check the floating point stack after every function call
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:"-traceback">) # Enables traceback on error
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-strict-ansi>) # Strict language conformance: Performance impact so limit to debug build
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fp-model source>) # Use source-specified floating point precision
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ftrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-check=stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fstack-security-check>) # Buffer overrun detection
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fp-stack-check>) # Check the floating point stack after every function call
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-traceback>) # Enables traceback on error
 
 endif() # COMPILER TYPE
 

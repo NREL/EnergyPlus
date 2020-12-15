@@ -44,22 +44,20 @@ function(enable_sanitizers project_name)
         list(APPEND SANITIZERS "memory")
       endif()
     endif()
-
-    list(
-      JOIN
-      SANITIZERS
-      ","
-      LIST_OF_SANITIZERS)
-
   endif()
 
-  if(LIST_OF_SANITIZERS)
+  if(SANITIZERS)
     if(NOT
-       "${LIST_OF_SANITIZERS}"
+       "${SANITIZERS}"
        STREQUAL
        "")
-      target_compile_options(${project_name} INTERFACE -fsanitize=${LIST_OF_SANITIZERS})
-      target_link_libraries(${project_name} INTERFACE -fsanitize=${LIST_OF_SANITIZERS})
+
+      target_compile_options(${project_name} INTERFACE -g)
+
+      foreach(sanitizer IN LISTS SANITIZERS)
+        target_compile_options(${project_name} INTERFACE -fsanitize=${sanitizer})
+        target_link_libraries(${project_name} INTERFACE -fsanitize=${sanitizer})
+      endforeach()
     endif()
   endif()
 
