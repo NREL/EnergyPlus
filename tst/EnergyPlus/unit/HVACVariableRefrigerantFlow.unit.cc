@@ -5755,7 +5755,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_VRFTest_TU_NoLoad_OAMassFlowRateTest)
+TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 {
 
     // static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );

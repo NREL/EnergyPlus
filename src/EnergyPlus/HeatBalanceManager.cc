@@ -1597,7 +1597,7 @@ namespace HeatBalanceManager {
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
-        state->dataMaterial.Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
+        state.dataMaterial->Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
 
         NominalR.dimension(TotMaterials, 0.0);
