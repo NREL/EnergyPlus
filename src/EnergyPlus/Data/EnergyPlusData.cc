@@ -569,6 +569,7 @@ namespace EnergyPlus {
 
     // return a reference to the currently running state, using the thread_local index
     EnergyPlusData & getCurrentState() {
+        assert(currentStateHandler < size(stateVector));
         return *stateVector[currentStateHandler];
     }
 

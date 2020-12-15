@@ -136,8 +136,8 @@ int main(int argc, const char * argv[]) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
-    stateReset(state);
-    registerExternalHVACManager(state, externalHVAC);
-    energyplus(state, argc, argv);
+//    stateReset(state);
+//    registerExternalHVACManager(state, externalHVAC);
+//    energyplus(state, argc, argv);
     return 0;
 }

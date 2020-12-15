@@ -1017,7 +1017,7 @@ namespace EnergyPlus::PluginManagement {
 
         // then call the main function
         //static const PyObject oneArgObjFormat = Py_BuildValue)("O");
-        PyObject *pStateInstance = PyLong_FromVoidPtr((void*)&state);
+        PyObject *pStateInstance = PyLong_FromUnsignedLong(currentStateHandler);
         PyObject *pFunctionResponse = PyObject_CallMethodObjArgs(this->pClassInstance, pFunctionName, pStateInstance, nullptr);
         Py_DECREF(pStateInstance);
         if (!pFunctionResponse) {

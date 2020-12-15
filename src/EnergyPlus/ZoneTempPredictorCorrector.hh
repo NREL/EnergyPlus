@@ -457,6 +457,16 @@ namespace ZoneTempPredictorCorrector {
             this->MyDayFlag = true;
             this->ErrorsFound = false;
             this->ControlledZonesChecked = false;
+            HumidityControlZoneUniqueNames.clear();
+            SetPointSingleHeating.clear();
+            SetPointSingleCooling.clear();
+            SetPointSingleHeatCool.clear();
+            SetPointDualHeatCool.clear();
+            SetPointSingleHeatingFanger.clear();
+            SetPointSingleCoolingFanger.clear();
+            SetPointSingleHeatCoolFanger.clear();
+            SetPointDualHeatCoolFanger.clear();
+            AdapComfortDailySetPointSchedule = ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule();
         }
 
         // Default Constructor
