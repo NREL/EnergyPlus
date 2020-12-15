@@ -1204,8 +1204,8 @@ namespace HeatBalanceSurfaceManager {
                             PreDefTableEntry(pdchIntOpDir, surfName, "W");
                         }
                     }
-                // interior window report
-                } else if (((Surface(iSurf).Class == SurfaceClass::Window) || (Surface(iSurf).Class == SurfaceClass::TDD_Dome)) && (!state.dataConstruction->Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow)) {
+                    // interior window report
+                } else if ((Surface(iSurf).Class == SurfaceClass::Window) || (Surface(iSurf).Class == SurfaceClass::TDD_Dome)) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
@@ -7406,14 +7406,6 @@ namespace HeatBalanceSurfaceManager {
 
                 // Loop over non-window surfaces (includes TubularDaylightingDomes)
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
-                    if (Surface(surfNum).HeatTransferAlgorithm == HeatTransferModel_AirBoundaryNoHT) {
-                        // This is a temporary band-aid to get the same results with airboundary surfaces
-                        // 1. Air boundary surfaces shouldn't be part of HT surf lists, I don't think
-                        // 2. And even if it is, it shouldn't be impacting other surface temps, but it is somehow
-                        // 3. So, once that's fixed in develop, this can go away here.
-                        TempSurfIn(surfNum) = TempSurfInTmp(surfNum) = 23.0;
-                        continue;
-                    }
                     Real64 HMovInsul = 0.0; // "Convection" coefficient of movable insulation
                     if (Surface(surfNum).MaterialMovInsulInt > 0) {
                         Real64 AbsInt = 0.0; // Solar absorptance of inside movable insulation (not used here)
