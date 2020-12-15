@@ -22,42 +22,14 @@ set(SRC
     InputProcessor.f90
     SimData.f90)
 
-set(STATIC_EXE FALSE)
-
-add_library(SlabOptions INTERFACE)
-
-if(APPLE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    target_compile_options(SlabOptions INTERFACE -static-intel)
-  endif()
-elseif(UNIX)
-  set(CMAKE_SKIP_RPATH TRUE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    target_compile_options(SlabOptions INTERFACE -static-intel)
-  else()
-    target_compile_options(SlabOptions INTERFACE -static)
-    set(STATIC_EXE TRUE)
-  endif()
-else()
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    # Set release flags to be empty
-    set(CMAKE_Fortran_FLAGS_RELEASE "")
-    target_compile_options(SlabOptions INTERFACE /libs:static)
-  else()
-    target_compile_options(SlabOptions INTERFACE -static)
-    set(STATIC_EXE TRUE)
-  endif()
-endif()
-
 set(SKIP_BUILD_RPATH TRUE)
+set(CMAKE_SKIP_RPATH ${CMAKE_SKIP_RPATH})
 add_executable(Slab ${SRC})
-target_link_libraries(Slab PRIVATE SlabOptions)
+target_link_libraries(Slab PRIVATE fortran_project_options)
 set_target_properties(Slab PROPERTIES FOLDER Auxiliary)
 
-set_target_properties(Slab PROPERTIES COMPILE_FLAGS "-ffree-line-length-200")
-
 install(TARGETS Slab DESTINATION PreProcess/GrndTempCalc)
-if(NOT ${STATIC_EXE})
+if(NOT ${FORTRAN_STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(Slab PreProcess/GrndTempCalc)
 endif()
