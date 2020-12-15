@@ -65,6 +65,8 @@ list(APPEND VERSIONS 9_1_0)
 list(APPEND VERSIONS 9_2_0)
 list(APPEND VERSIONS 9_3_0)
 list(APPEND VERSIONS 9_4_0)
+list(APPEND VERSIONS 9_5_0)
+
 
 target_compile_options(TransitionLib PUBLIC -fbounds-check)
 target_link_libraries(TransitionLib PUBLIC fortran_project_options)
@@ -133,6 +135,7 @@ install(FILES "OutputRulesFiles/OutputChanges9-0-0-to-9-1-0.md" DESTINATION "Pre
 install(FILES "OutputRulesFiles/OutputChanges9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-2-0-to-9-3-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-3-0-to-9-4-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "OutputRulesFiles/OutputChanges9-4-0-to-9-5-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
 install(FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -149,3 +152,4 @@ install(FILES "SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "Pr
 install(FILES "SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 9-4-0 to 9-5-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
