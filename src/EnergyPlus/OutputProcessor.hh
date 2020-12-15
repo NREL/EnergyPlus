@@ -59,6 +59,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -98,7 +99,6 @@ namespace OutputProcessor {
     extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
     extern Array1D_string const DayTypes;
-    extern int const UnitsStringLength;
 
     extern int const RVarAllocInc;
     extern int const LVarAllocInc;
@@ -1061,6 +1061,14 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
 );
 
 int initErrorFile(EnergyPlusData &state);
+
+struct OutputProcessorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

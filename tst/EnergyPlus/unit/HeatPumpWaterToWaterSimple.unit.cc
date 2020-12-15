@@ -1494,15 +1494,15 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 }
 } // namespace EnergyPlus

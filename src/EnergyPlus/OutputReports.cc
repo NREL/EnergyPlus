@@ -55,11 +55,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
@@ -89,25 +88,9 @@ void ReportSurfaces(EnergyPlusData &state)
     // Use a REPORT command to determine if there should be
     // a file created.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    using DataErrorTracking::AskForSurfacesReport;
     using namespace DataSurfaceColors;
     using General::ScanForReports;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SurfDetails;
@@ -119,7 +102,7 @@ void ReportSurfaces(EnergyPlusData &state)
     std::string Option2;
     bool DoReport;
 
-    AskForSurfacesReport = false;
+    state.dataErrTracking->AskForSurfacesReport = false;
 
     SurfDetails = 0;
     SurfVert = false;

@@ -290,6 +290,14 @@ namespace PipeHeatTransfer {
 
 } // namespace PipeHeatTransfer
 
+struct PipeHeatTransferData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

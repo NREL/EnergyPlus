@@ -281,8 +281,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             DDNameFanPeak = "Scaled size, not from any peak";
             dateTimeFanPeak = "Scaled size, not from any peak";
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanDesDay, this->compName, DDNameFanPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanPkTime, this->compName, dateTimeFanPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDesDay, this->compName, DDNameFanPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPkTime, this->compName, dateTimeFanPeak);
     }
     return this->autoSizedValue;
 }

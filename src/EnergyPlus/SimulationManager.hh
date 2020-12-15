@@ -49,6 +49,7 @@
 #define SimulationManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 

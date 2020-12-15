@@ -54,8 +54,8 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 

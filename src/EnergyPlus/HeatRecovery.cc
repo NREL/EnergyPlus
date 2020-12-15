@@ -58,7 +58,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -418,7 +417,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -501,7 +500,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -634,7 +633,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -1288,20 +1287,6 @@ namespace HeatRecovery {
 
         //  USE DataZoneEquipment,  ONLY: ZoneEquipInputsFilled,CheckZoneEquipmentList
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
-        using EMSManager::iTemperatureSetPoint;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ExIndex;   // do loop index
@@ -1476,7 +1461,7 @@ namespace HeatRecovery {
                                 ShowFatalError(state, " Previous condition causes program termination.");
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExIndex).SupOutletNode, iTemperatureSetPoint, FatalError);
+                                CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExIndex).SupOutletNode, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
                                 if (FatalError) {
                                     ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(ExchCond(ExIndex).ExchTypeNum) + " \"" +
                                                     ExchCond(ExIndex).Name + "\" :");
@@ -1562,7 +1547,7 @@ namespace HeatRecovery {
                                                       "desiccant Heat Exchanger if control is desired.");
                                 } else {
                                     // need call to EMS to check node
-                                    CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExchNum).SecOutletNode, iHumidityRatioMaxSetPoint, LocalWarningError);
+                                    CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExchNum).SecOutletNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalWarningError);
                                     DataLoopNode::NodeSetpointCheck(ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
                                     if (LocalWarningError) {
                                         ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) +
@@ -3291,7 +3276,7 @@ namespace HeatRecovery {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
         ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
         ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;

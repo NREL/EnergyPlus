@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -339,6 +340,14 @@ namespace SystemReports {
     // *****************************************************************************
 
 } // namespace SystemReports
+
+struct SystemReportsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
