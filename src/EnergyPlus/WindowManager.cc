@@ -1522,7 +1522,6 @@ namespace WindowManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).FromWindow5DataFile) continue;
             if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) continue;
-            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundaryInteriorWindow) continue;
             state.dataConstruction->Construct(ConstrNum).TransDiff = 0.0;
             state.dataConstruction->Construct(ConstrNum).TransDiffVis = 0.0;
             state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = 0.0;
