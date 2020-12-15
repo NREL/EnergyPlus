@@ -482,11 +482,7 @@ def parse_field(data, token):
             next_token(data)
             root['retaincase'] = True
 
-        elif token == TOKEN_GROUP:
-            next_token(data)
-            eat_comment(data)
-
-        elif token == TOKEN_A or token == TOKEN_N or token == TOKEN_END or token == TOKEN_STRING:
+        elif token in [TOKEN_A, TOKEN_N, TOKEN_END, TOKEN_STRING, TOKEN_GROUP]:
             has_default = 'default' in root
             if is_autocalculatable:
                 create_any_of(root, TOKEN_AUTOCALCULATABLE, has_default)
