@@ -336,14 +336,14 @@ The metadata to remain same, so it was taken out to improve readability.
 **ZoneHVAC:Baseboard:RadiantConvective:Water**
 
       A1, \field Name
-      A2, \field Availability Schedule Name
-      A3, \field Inlet Node Name
-      A4, \field Outlet Node Name
+      A2, \field Design Object Name
+      A3, \field Availability Schedule Name
+      A4, \field Inlet Node Name
+      A5, \field Outlet Node Name
       N1, \field Rated Average Water Temperature
       N2, \field Rated Water Mass Flow Rate
       N3, \field Heating Design Capacity
-      N4, \field Maximum Water Flow Rate
-      A5, \field Design Object Name
+      N4, \field Maximum Water Flow Rate      
       A6, \field Surface 1 Name
       N5, \field Fraction of Radiant Energy to Surface 1
       A7, \field Surface 2 Name
@@ -369,13 +369,13 @@ The metadata to remain same, so it was taken out to improve readability.
 **ZoneHVAC:Baseboard:RadiantConvective:Steam**
 
       A1,  \field Name
-      A2,  \field Availability Schedule Name
-      A3,  \field Inlet Node Name
-      A4,  \field Outlet Node Name
+      A2,  \field Design Object Name
+      A3,  \field Availability Schedule Name
+      A4,  \field Inlet Node Name
+      A5,  \field Outlet Node Name
       N1,  \field Heating Design Capacity
       N2,  \field Degree of SubCooling
-      N3,  \field Maximum Steam Flow Rate
-      A5,  \field Design Object Name
+      N3,  \field Maximum Steam Flow Rate      
       A6,  \field Surface 1 Name
       N4,  \field Fraction of Radiant Energy to Surface 1
       A7,  \field Surface 2 Name
