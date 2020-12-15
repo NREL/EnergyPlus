@@ -159,6 +159,8 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
+    void clear_state();
+
     void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void GetHeatBalHAMTInput();

@@ -180,8 +180,42 @@ namespace HeatBalanceHAMTManager {
 
     // Object Data
     Array1D<subcell> cells;
+    bool OneTimeFlag(true);
+    int qvpErrCount(0);
+    int qvpErrReport(0);
 
     // Functions
+
+    void clear_state() {
+        firstcell.clear();
+        lastcell.clear();
+        Extcell.clear();
+        ExtRadcell.clear();
+        ExtConcell.clear();
+        ExtSkycell.clear();
+        ExtGrncell.clear();
+        Intcell.clear();
+        IntConcell.clear();
+        watertot.clear();
+        surfrh.clear();
+        surfextrh.clear();
+        surftemp.clear();
+        surfexttemp.clear();
+        surfvp.clear();
+        extvtc.clear();   // External Surface vapor transfer coefficient
+        intvtc.clear();   // Internal Surface Vapor Transfer Coefficient
+        extvtcflag.clear();  // External Surface vapor transfer coefficient flag
+        intvtcflag.clear();  // Internal Surface Vapor Transfer Coefficient flag
+        MyEnvrnFlag.clear(); // Flag to reset surface properties.
+        deltat = 0.0; // time step in seconds
+        TotCellsMax = 0; // Maximum number of cells per material
+        latswitch = false;  // latent heat switch,
+        rainswitch = false; // rain switch,
+        cells.clear();
+        OneTimeFlag = true;
+        qvpErrCount = 0;
+        qvpErrReport = 0;
+    }
 
     void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
@@ -194,31 +228,6 @@ namespace HeatBalanceHAMTManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Manages the Heat and Moisture Transfer calculations.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        static bool OneTimeFlag(true);
 
         if (OneTimeFlag) {
             OneTimeFlag = false;
@@ -1128,14 +1137,9 @@ namespace HeatBalanceHAMTManager {
         int matid;
         int itter;
         int cid;
-        // unused1208    INTEGER :: cid1
         int adj;
         int adjl;
 
-        //    INTEGER, SAVE :: tempErrCount=0
-        static int qvpErrCount(0);
-        //    INTEGER, SAVE :: tempErrReport=0
-        static int qvpErrReport(0);
         Real64 denominator;
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(sid)) {
