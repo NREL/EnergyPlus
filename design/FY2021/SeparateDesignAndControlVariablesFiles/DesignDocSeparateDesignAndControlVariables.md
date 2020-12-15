@@ -2,6 +2,7 @@
 
 
 
+
 Separate Design and Control Variables
 ================
 
@@ -43,8 +44,7 @@ LowTemperatureRadiant and BaseBoard objects in EnergyPlus currently has design a
 Splitting the objects into design and control variables may result in 
 
  1. Increased ease of creating new objects, with fewer fields to fill in. 
- 2. Decreased confusion from too many fields and may result in fewer errors from having too many variables. 
- 3. If there is a case where different radiant systems (for example, LowTemperatureRadiant:VariableFlow and LowTemperatureRadiant:ConstantFlow) exist together in a model, a design object could provide common information to both these systems.
+ 2. Decreased confusion from too many fields. This may also result in fewer errors caused by decreasing the many variables. 
  
  (*The number of fields will increase with the number of surfaces) 
 
@@ -108,11 +108,11 @@ The new objects will have the fields that were removed from the old/modified obj
 
 This `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:VariableFlow`  object. Multiple `ZoneHVAC:LowTemperatureRadiant:VariableFlow`  objects can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design` object.
 
-*Field: Name*  
-*Field: Fluid to Radiant Surface Heat Transfer Model*  
-*Field: Hydronic Tubing Inside Diameter*  
-*Field: Hydronic Tubing Outside Diameter*  
-*Field: Hydronic Tubing Conductivity*  
+*Field: Name*
+*Field: Fluid to Radiant Surface Heat Transfer Model*
+*Field: Hydronic Tubing Inside Diameter*
+*Field: Hydronic Tubing Outside Diameter*
+*Field: Hydronic Tubing Conductivity*
 *Field: Temperature Control Type*  
 *Field: Setpoint Control Type*  
 *Field: Heating Design Capacity Method*  
@@ -141,18 +141,18 @@ This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperature
 
 This `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  object. Multiple `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  objects can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object.
 
-*Field: ame*  
-*Field: luid to Radiant Surface Heat Transfer Model*  
-*Field: emperature Control Type*  
-*Field: unning Mean Outdoor Dry-Bulb Temperature Weighting Factor*  
-*Field: ydronic Tubing Inside Diameter*  
-*Field: ydronic Tubing Outside Diameter*  
-*Field: ydronic Tubing Conductivity*  
-*Field: otor Efficiency*  
-*Field: raction of Motor Inefficiencies to Fluid Stream*  
-*Field: ondensation Control Type*  
-*Field: ondensation Control Dewpoint Offset*  
-*Field: hangeover Delay Time Period Schedule*
+*Field: Name*
+*Field: Fluid to Radiant Surface Heat Transfer Model*  
+*Field: Temperature Control Type*  
+*Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor*  
+*Field: Hydronic Tubing Inside Diameter*  
+*Field: Hydronic Tubing Outside Diameter*  
+*Field: Hydronic Tubing Conductivity*  
+*Field: Motor Efficiency*  
+*Field: Fraction of Motor Inefficiencies to Fluid Stream*  
+*Field: Condensation Control Type*  
+*Field: Condensation Control Dewpoint Offset*  
+*Field: Changeover Delay Time Period Schedule*
 
 ##### *Modified object* - `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` ####
 
@@ -225,19 +225,14 @@ None.
 
 ## Next Steps ##
 
-Get feedback from the EnergyPlus team regarding:
-
- 1. Maybe name the design object to something else. 
+ 1. Get feedback from the EnergyPlus team regarding naming the design object to something else. 
  2. Start coding.
 
-## Changes to IDD file ##
+## Proposed changes to the IDD file ##
 
 The metadata to remain same, so it was taken out to improve readability. 
 
-### New IDD Objects ####
-
-## LowTemperatureRadiant:VariableFlow Objects ##
-
+### LowTemperatureRadiant:VariableFlow Objects ###
 
 **ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,**
 
@@ -281,7 +276,7 @@ The metadata to remain same, so it was taken out to improve readability.
     A10, \field Number of Circuits
     N6 ; \field Circuit Length
 
-## LowTemperatureRadiant:ConstantFlow Objects ####
+### LowTemperatureRadiant:ConstantFlow Objects #####
 
 **ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,**
 
@@ -326,11 +321,10 @@ The metadata to remain same, so it was taken out to improve readability.
        N5 ; \field Circuit Length
 
 
-## Baseboard:RadiantConvective:Water Objects ####
+### Baseboard:RadiantConvective:Water Objects ####
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
 
-           \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1 ,  \field Name
       A2 ,  \field Heating Design Capacity Method
       N1 ,  \field Heating Design Capacity Per Floor Area
@@ -341,7 +335,6 @@ The metadata to remain same, so it was taken out to improve readability.
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
 
-          \min-fields 8
       A1, \field Name
       A2, \field Availability Schedule Name
       A3, \field Inlet Node Name
@@ -361,13 +354,10 @@ The metadata to remain same, so it was taken out to improve readability.
      A105, \field Surface 100 Name
      N104; \field Fraction of Radiant Energy to Surface 100
 
-## Baseboard:RadiantConvective:Steam Objects ####
-
-### Proposed
+### Baseboard:RadiantConvective:Steam Objects ####
 
 **ZoneHVAC:Baseboard:RadiantConvective:Steam,**
 
-           \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1 ,  \field Name
       A2 ,  \field Heating Design Capacity Method
       N1 ,  \field Heating Design Capacity Per Floor Area
@@ -378,7 +368,6 @@ The metadata to remain same, so it was taken out to improve readability.
 
 **ZoneHVAC:Baseboard:RadiantConvective:Steam,**
 
-           \min-fields 7
       A1,  \field Name
       A2,  \field Availability Schedule Name
       A3,  \field Inlet Node Name
