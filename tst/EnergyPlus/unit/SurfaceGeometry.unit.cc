@@ -5839,7 +5839,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetMaterialData(ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);           // expect no errors
 
-    GetConstructData ErrorsFound); // read construction data
+    GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);            // expect no errors
 
     GetZoneData(ErrorsFound);  // read zone data
