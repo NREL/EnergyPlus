@@ -4839,7 +4839,7 @@ namespace CondenserLoopTowers {
                             format("{} \"{}\" - Liquid to gas ratio (L/G) is out of range at {:5.2F}.", this->TowerType, this->Name, FlowFraction);
                         state.dataCondenserLoopTowers->towers(this->VSTower).LGBuffer2 =
                             format(" ...Valid maximum ratio = {:5.2F}. Occurrence info = {}, {} {}",
-//                                   state.dataCondenserLoopTowers->towers(this->VSTower).MaxLiquidToGasRatio,
+                                   state.dataCondenserLoopTowers->towers(this->VSTower).MaxLiquidToGasRatio,
                                    state.dataEnvrn->EnvironmentName,
                                    state.dataEnvrn->CurMnDy,
                                    General::CreateSysTimeIntervalString(state));
