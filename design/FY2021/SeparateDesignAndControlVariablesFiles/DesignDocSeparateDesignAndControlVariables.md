@@ -234,7 +234,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ### LowTemperatureRadiant:VariableFlow Objects ###
 
-**ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,**
+**ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design**
 
     A1 , \field Name
     A2 , \field Fluid to Radiant Surface Heat Transfer Model
@@ -257,7 +257,7 @@ The metadata to remain same, so it was taken out to improve readability.
     N10, \field Condensation Control Dewpoint Offset
     A10; \field Changeover Delay Time Period Schedule
 
-**ZoneHVAC:LowTemperatureRadiant:VariableFlow,**
+**ZoneHVAC:LowTemperatureRadiant:VariableFlow**
 
     A1 , \field Name
     A2 , \field Design Object Name
@@ -278,7 +278,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ### LowTemperatureRadiant:ConstantFlow Objects #####
 
-**ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,**
+**ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design**
 
        A1 , \field Name
        A2 , \field Fluid to Radiant Surface Heat Transfer Model
@@ -293,7 +293,7 @@ The metadata to remain same, so it was taken out to improve readability.
        N7 , \field Condensation Control Dewpoint Offset
        A5 ; \field Changeover Delay Time Period Schedule
 
-**ZoneHVAC:LowTemperatureRadiant:ConstantFlow,**
+**ZoneHVAC:LowTemperatureRadiant:ConstantFlow**
 
        A1 , \field Name
        A2 , \field Design Object Name
@@ -323,7 +323,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ### Baseboard:RadiantConvective:Water Objects ####
 
-**ZoneHVAC:Baseboard:RadiantConvective:Water,**
+**ZoneHVAC:Baseboard:RadiantConvective:Water:Design**
 
       A1 ,  \field Name
       A2 ,  \field Heating Design Capacity Method
@@ -333,7 +333,7 @@ The metadata to remain same, so it was taken out to improve readability.
       N4 ,  \field Fraction Radiant
       N5 ;  \field Fraction of Radiant Energy Incident on People
 
-**ZoneHVAC:Baseboard:RadiantConvective:Water,**
+**ZoneHVAC:Baseboard:RadiantConvective:Water**
 
       A1, \field Name
       A2, \field Availability Schedule Name
@@ -356,7 +356,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ### Baseboard:RadiantConvective:Steam Objects ####
 
-**ZoneHVAC:Baseboard:RadiantConvective:Steam,**
+**ZoneHVAC:Baseboard:RadiantConvective:Steam:Design**
 
       A1 ,  \field Name
       A2 ,  \field Heating Design Capacity Method
@@ -366,7 +366,7 @@ The metadata to remain same, so it was taken out to improve readability.
       N4 ,  \field Fraction Radiant
       N5 ;  \field Fraction of Radiant Energy Incident on People
 
-**ZoneHVAC:Baseboard:RadiantConvective:Steam,**
+**ZoneHVAC:Baseboard:RadiantConvective:Steam**
 
       A1,  \field Name
       A2,  \field Availability Schedule Name
