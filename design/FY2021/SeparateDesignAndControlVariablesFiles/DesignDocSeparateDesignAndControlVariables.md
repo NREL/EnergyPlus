@@ -65,7 +65,7 @@ Conversation with E+ Team on Slack:
 
  - Design document:   
 	 - Send for reviews------------------ Nov 18 2020   
-	 - Finalize design document-------- Dec 18 2020
+	 - Finalize design document-------- Dec x 2020
  - Implementation:   
 	 - First draft of Implementation---- Jan 31 2021
 	 - Final Implementation------------- Feb 28 2021
