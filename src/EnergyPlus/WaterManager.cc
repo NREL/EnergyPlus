@@ -1078,7 +1078,6 @@ namespace WaterManager {
             state.dataWaterData->WaterStorage(TankNum).LastTimeStepFilling = false;
         }
 
-
         state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour);
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
         state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;

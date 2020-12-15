@@ -10119,7 +10119,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                    reinterpret_cast<int &>(this->FlowType));
+                    this->NoFlowWarnIndex);
             }
                     }
         // Check outlet water temp for max value
@@ -10142,158 +10142,159 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->GetRefrigerationInputFlag) {
             CheckRefrigerationInput(state);
             state.dataRefrigCase->GetRefrigerationInputFlag = false;
-                    }
+        }
         // Now look for this particular object in list
         for (auto &obj : state.dataRefrigCase->RefrigRack) {
             if (obj.Name == objectName) {
                 return &obj;
-                }
             }
+        }
         // If we didn't find it, fatal
         ShowFatalError(state, "LocalRefrigRackFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
-        }
+    }
 
-        void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
-        {
-            InitRefrigeration(state);
-            InitRefrigerationPlantConnections(state);
-        }
+    void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
+        InitRefrigeration(state);
+        InitRefrigerationPlantConnections(state);
+    }
 
-        void RefrigRackData::simulate(EnergyPlusData &state,
-                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
-                                      bool const FirstHVACIteration,
-                                      [[maybe_unused]] Real64 &CurLoad,
-                                      [[maybe_unused]] bool const RunFlag)
-        {
+    void RefrigRackData::simulate(EnergyPlusData &state,
+                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                  bool const FirstHVACIteration,
+                                  [[maybe_unused]] Real64 &CurLoad,
+                                  [[maybe_unused]] bool const RunFlag)
+    {
 
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Randy Hudson, ORNL
-            //       DATE WRITTEN   July 2007
-            //       MODIFIED       Therese Stovall, ORNL May 2008
-            //                      Brent Griffith, NREL Oct 2010, generalize fluid properties
-            //                        plant upgrades, moved where called from to SimPlantEquip from ManageNonZoneEquipment
-            //       RE-ENGINEERED  na
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Randy Hudson, ORNL
+        //       DATE WRITTEN   July 2007
+        //       MODIFIED       Therese Stovall, ORNL May 2008
+        //                      Brent Griffith, NREL Oct 2010, generalize fluid properties
+        //                        plant upgrades, moved where called from to SimPlantEquip from ManageNonZoneEquipment
+        //       RE-ENGINEERED  na
 
-            // PURPOSE OF THIS SUBROUTINE:
-            // Simulates the water-cooled refrigeration condenser object.
-            // Modified to add condensers for detailed refrigeration systems and to
-            // avoid double-counting heat rejection that has been used in desuperheater
-            // hvac coils or water heaters.
+        // PURPOSE OF THIS SUBROUTINE:
+        // Simulates the water-cooled refrigeration condenser object.
+        // Modified to add condensers for detailed refrigeration systems and to
+        // avoid double-counting heat rejection that has been used in desuperheater
+        // hvac coils or water heaters.
 
-            // METHODOLOGY EMPLOYED:
-            // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
-            // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
+        // METHODOLOGY EMPLOYED:
+        // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
+        // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-            static std::string const RoutineName("SimRefrigCondenser");
-            int PlantInletNode(0);
-            int PlantOutletNode(0);
-            int PlantLoopIndex(0);
-            int PlantLoopSideIndex(0);
-            int PlantBranchIndex(0);
-            int PlantCompIndex(0);
+        static std::string const RoutineName("SimRefrigCondenser");
+        int PlantInletNode(0);
+        int PlantOutletNode(0);
+        int PlantLoopIndex(0);
+        int PlantLoopSideIndex(0);
+        int PlantBranchIndex(0);
+        int PlantCompIndex(0);
 
-            InitRefrigerationPlantConnections(state);
+        InitRefrigerationPlantConnections(state);
 
-            std::string TypeName;
-            std::string ErrIntro;
+        std::string TypeName;
+        std::string ErrIntro;
 
-            // set variables depending upon system type
-            PlantInletNode = this->InletNode;
-            PlantOutletNode = this->OutletNode;
-            PlantLoopIndex = this->PlantLoopNum;
-            PlantLoopSideIndex = this->PlantLoopSideNum;
-            PlantBranchIndex = this->PlantBranchNum;
-            PlantCompIndex = this->PlantCompNum;
+        // set variables depending upon system type
+        PlantInletNode = this->InletNode;
+        PlantOutletNode = this->OutletNode;
+        PlantLoopIndex = this->PlantLoopNum;
+        PlantLoopSideIndex = this->PlantLoopSideNum;
+        PlantBranchIndex = this->PlantBranchNum;
+        PlantCompIndex = this->PlantCompNum;
 
-            state.dataRefrigCase->TotalCondenserHeat =
-                DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
-            TypeName = "Refrigeration:CompressorRack:";
-            ErrIntro = "Condenser for refrigeration rack ";
+        state.dataRefrigCase->TotalCondenserHeat =
+            DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
+        TypeName = "Refrigeration:CompressorRack:";
+        ErrIntro = "Condenser for refrigeration rack ";
 
-            // Current condenser is water cooled
-            // Make demand request on first HVAC iteration
+        // Current condenser is water cooled
+        // Make demand request on first HVAC iteration
 
-            // get cooling fluid properties
-            Real64 rho = FluidProperties::GetDensityGlycol(
-                state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        // get cooling fluid properties
+        Real64 rho = FluidProperties::GetDensityGlycol(
+            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-            if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
-                this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
+        if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+            this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
-                if (this->OutletTemp == this->InletTemp) {
+            if (this->OutletTemp == this->InletTemp) {
 
-                    if (this->HighInletWarnIndex == 0) {
-                        ShowSevereError(state,
-                                        ErrIntro + ", \"" + this->Name +
-                                            "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
-                        ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
-                    }
-                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
-                                                       "\" : has inlet water temp equal to desired outlet temp.... continues. ",
-                                                   this->HighInletWarnIndex);
-                    this->VolFlowRate = 9999.0;
-                    this->MassFlowRate = this->VolFlowRate * rho;
-                } else {
-                    Real64 DeltaT = this->OutletTemp - this->InletTemp;
-                    this->MassFlowRate = state.dataRefrigCase->TotalCondenserHeat / Cp / DeltaT;
-                    // Check for maximum flow in the component
-                    if (this->MassFlowRate > this->MassFlowRateMax) {
-                        if (this->HighFlowWarnIndex == 0) {
-                            ShowWarningMessage(state, TypeName + this->Name);
-                            ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
-                            ShowContinueError(state, "Flow reset to maximum value.");
-                        } // HighFlowWarnIndex
-                        ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
-                                                       this->HighFlowWarnIndex);
-                        // END IF
-                        this->MassFlowRate = this->MassFlowRateMax;
-                    }
-                } // compare outlet T to inlet T
-
-            } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
-                // this part for constant flow condition
-                this->VolFlowRate = this->DesVolFlowRate;
+                if (this->HighInletWarnIndex == 0) {
+                    ShowSevereError(
+                        state, ErrIntro + ", \"" + this->Name + "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
+                    ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
+                }
+                ShowRecurringWarningErrorAtEnd(state,
+                                               ErrIntro + ", \"" + this->Name +
+                                                   "\" : has inlet water temp equal to desired outlet temp.... continues. ",
+                                               this->HighInletWarnIndex);
+                this->VolFlowRate = 9999.0;
                 this->MassFlowRate = this->VolFlowRate * rho;
-
-            } else if (state.dataRefrigCase->TotalCondenserHeat == 0.0) {
-                this->MassFlowRate = 0.0;
-
-            } // on flow type
-            // check against plant, might get changed.
-            PlantUtilities::SetComponentFlowRate(
-                state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
-
-            this->VolFlowRate = this->MassFlowRate / rho;
-
-            if (this->MassFlowRate > 0) {
-                this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
             } else {
-                this->OutletTemp = this->InletTemp;
-                if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
-
-                    ShowRecurringWarningErrorAtEnd(state,
-                        TypeName + this->Name +
-                            "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                        this->NoFlowWarnIndex);
+                Real64 DeltaT = this->OutletTemp - this->InletTemp;
+                this->MassFlowRate = state.dataRefrigCase->TotalCondenserHeat / Cp / DeltaT;
+                // Check for maximum flow in the component
+                if (this->MassFlowRate > this->MassFlowRateMax) {
+                    if (this->HighFlowWarnIndex == 0) {
+                        ShowWarningMessage(state, TypeName + this->Name);
+                        ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
+                        ShowContinueError(state, "Flow reset to maximum value.");
+                    } // HighFlowWarnIndex
+                    ShowRecurringWarningErrorAtEnd(
+                        state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues", this->HighFlowWarnIndex);
+                    // END IF
+                    this->MassFlowRate = this->MassFlowRateMax;
                 }
-            }
-            // Check outlet water temp for max value
-            if (this->OutletTemp > this->OutletTempMax) {
-                if (this->HighTempWarnIndex == 0) {
-                    ShowWarningMessage(state, TypeName + this->Name);
-                    ShowContinueError(
-                        state, "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
-                }
-                ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
-                                               HighTempWarnIndex);
-            }
+            } // compare outlet T to inlet T
 
-            this->UpdateCondenser();
+        } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+            // this part for constant flow condition
+            this->VolFlowRate = this->DesVolFlowRate;
+            this->MassFlowRate = this->VolFlowRate * rho;
+
+        } else if (state.dataRefrigCase->TotalCondenserHeat == 0.0) {
+            this->MassFlowRate = 0.0;
+
+        } // on flow type
+        // check against plant, might get changed.
+        PlantUtilities::SetComponentFlowRate(
+            state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+
+        this->VolFlowRate = this->MassFlowRate / rho;
+
+        if (this->MassFlowRate > 0) {
+            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+        } else {
+            this->OutletTemp = this->InletTemp;
+            if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
+
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    TypeName + this->Name +
+                        "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
+                    this->NoFlowWarnIndex);
+            }
         }
+        // Check outlet water temp for max value
+        if (this->OutletTemp > this->OutletTempMax) {
+            if (this->HighTempWarnIndex == 0) {
+                ShowWarningMessage(state, TypeName + this->Name);
+                ShowContinueError(
+                    state, "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", HighTempWarnIndex);
+        }
+
+        this->UpdateCondenser();
+    }
 
     void RefrigCondenserData::UpdateCondenser()
     {
