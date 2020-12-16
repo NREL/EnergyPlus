@@ -57,7 +57,7 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Ob0>) # Disable inlining
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
 elseif(
   CMAKE_COMPILER_IS_GNUCXX
@@ -131,15 +131,16 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qansi-alias>) # Better optimization via strict aliasing rules
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qip>) # Inter-procedural optimnization within a single file
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/Qinline-factor:225>) # Aggressive inlining
-  # ADD_CXX_RELEASE_DEFINITIONS(/fp:fast=2) # Aggressive optimizations on floating-point data
+  # target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/fp:fast=2>) # Aggressive optimizations on floating-point data
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/fp:source>) # Use source-specified floating point precision
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:source>) # Use source-specified floating point precision
+  
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qtrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/check:stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Gs0>) # Enable stack checking for all functions
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/GS>) # Buffer overrun detection
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)# Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)# Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/traceback>) # Enables traceback on error
 
 elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
@@ -177,11 +178,11 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-strict-ansi>) # Strict language conformance: Performance impact so limit to debug build
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fp-model source>) # Use source-specified floating point precision
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:-fp-model source>) # Use source-specified floating point precision
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ftrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-check=stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fstack-security-check>) # Buffer overrun detection
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fp-stack-check>) # Check the floating point stack after every function call
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:-fp-stack-check>) # Check the floating point stack after every function call
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-traceback>) # Enables traceback on error
 
 endif() # COMPILER TYPE

@@ -6,7 +6,6 @@
 # To avoid modifying every third_party library
 # we link the project_options in here for every library in this
 # subdirectory
-link_libraries(project_options)
 
 if (NOT MSVC)
   add_compile_options(-Wno-pedantic -Wno-unused-parameter)
@@ -23,6 +22,15 @@ if(OPENGL_FOUND)
       ${BUILD_TESTING}
       CACHE BOOL "" FORCE)
 endif()
+
+# We don't want to enable the global warnings for any of the third party projects
+link_libraries(project_options)
+add_subdirectory(SQLite)
+set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
+
+# Then add in the FP options after SQLite project
+# because it cannot compile with any of the checked FP options
+link_libraries(project_fp_options)
 
 if(BUILD_TESTING)
   set(gtest_force_shared_crt
@@ -43,8 +51,7 @@ if(BUILD_TESTING)
   set_target_properties(gmock_main PROPERTIES FOLDER ThirdParty/gtest)
 endif()
 
-add_subdirectory(SQLite)
-set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
+
 add_subdirectory(ObjexxFCL)
 set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
 add_subdirectory(BCVTB)
