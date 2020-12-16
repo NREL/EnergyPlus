@@ -2506,8 +2506,7 @@ namespace OutputProcessor {
         }
     }
 
-    void DetermineMeterIPUnits(EnergyPlusData &state,
-                               iRT_IPUnits &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine
@@ -2538,24 +2537,24 @@ namespace OutputProcessor {
         ErrorsFound = false;
         UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
 
-        CodeForIPUnits = iRT_IPUnits::OtherJ;
+        CodeForIPUnits = RT_IPUnits_OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
-            CodeForIPUnits = iRT_IPUnits::Electricity;
+            CodeForIPUnits = RT_IPUnits_Electricity;
         } else if (has(UC_ResourceType, "GAS")) {
-            CodeForIPUnits = iRT_IPUnits::Gas;
+            CodeForIPUnits = RT_IPUnits_Gas;
         } else if (has(UC_ResourceType, "COOL")) {
-            CodeForIPUnits = iRT_IPUnits::Cooling;
+            CodeForIPUnits = RT_IPUnits_Cooling;
         }
         if (MtrUnits == OutputProcessor::Unit::m3 && has(UC_ResourceType, "WATER")) {
-            CodeForIPUnits = iRT_IPUnits::Water;
+            CodeForIPUnits = RT_IPUnits_Water;
         } else if (MtrUnits == OutputProcessor::Unit::m3) {
-            CodeForIPUnits = iRT_IPUnits::OtherM3;
+            CodeForIPUnits = RT_IPUnits_OtherM3;
         }
         if (MtrUnits == OutputProcessor::Unit::kg) {
-            CodeForIPUnits = iRT_IPUnits::OtherKG;
+            CodeForIPUnits = RT_IPUnits_OtherKG;
         }
         if (MtrUnits == OutputProcessor::Unit::L) {
-            CodeForIPUnits = iRT_IPUnits::OtherL;
+            CodeForIPUnits = RT_IPUnits_OtherL;
         }
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
@@ -3596,58 +3595,55 @@ namespace OutputProcessor {
         int Loop; // Loop Control
 
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
-            auto const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
-            switch (RT_forIPUnits) {
-            case iRT_IPUnits::Electricity:
+            int const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
+            if (RT_forIPUnits == RT_IPUnits_Electricity) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::Gas:
+            } else if (RT_forIPUnits == RT_IPUnits_Gas) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::Cooling:
+            } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::Water:
+            } else if (RT_forIPUnits == RT_IPUnits_Water) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::OtherKG:
+            } else if (RT_forIPUnits == RT_IPUnits_OtherKG) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::OtherM3:
+            } else if (RT_forIPUnits == RT_IPUnits_OtherM3) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3annual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::OtherL:
+            } else if (RT_forIPUnits == RT_IPUnits_OtherL) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            case iRT_IPUnits::OtherJ:
+            } else {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
-            default:
-                assert(false);
             }
         }
     }

@@ -1386,47 +1386,47 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
     {
-        iRT_IPUnits ipUnits = iRT_IPUnits::OtherJ;
+        int ipUnits = -999999;
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(iRT_IPUnits::Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(iRT_IPUnits::Gas, ipUnits);
+        EXPECT_EQ(RT_IPUnits_Gas, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(iRT_IPUnits::Cooling, ipUnits);
+        EXPECT_EQ(RT_IPUnits_Cooling, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(iRT_IPUnits::Water, ipUnits);
+        EXPECT_EQ(RT_IPUnits_Water, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(iRT_IPUnits::OtherM3, ipUnits);
+        EXPECT_EQ(RT_IPUnits_OtherM3, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
-        EXPECT_EQ(iRT_IPUnits::OtherKG, ipUnits);
+        EXPECT_EQ(RT_IPUnits_OtherKG, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
-        EXPECT_EQ(iRT_IPUnits::OtherL, ipUnits);
+        EXPECT_EQ(RT_IPUnits_OtherL, ipUnits);
         EXPECT_FALSE(errorFound);
 
         EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-        ipUnits = iRT_IPUnits::OtherJ;
+        ipUnits = -999999;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
-        EXPECT_EQ(iRT_IPUnits::OtherJ, ipUnits);
+        EXPECT_EQ(RT_IPUnits_OtherJ, ipUnits);
         EXPECT_TRUE(errorFound);
 
-        ipUnits = iRT_IPUnits::OtherJ;
+        ipUnits = -999999;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
-        EXPECT_EQ(iRT_IPUnits::Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");

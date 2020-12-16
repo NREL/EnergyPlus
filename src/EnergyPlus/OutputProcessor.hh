@@ -154,17 +154,15 @@ namespace OutputProcessor {
     constexpr int IVarAllocInc(10);
 
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
-    enum class iRT_IPUnits
-    {
-        Electricity,
-        Gas,
-        Cooling,
-        Water,
-        OtherKG,
-        OtherM3,
-        OtherL,
-        OtherJ,
-    };
+    // INTEGER, PARAMETER :: RT_IPUnits_Consumption=0
+    constexpr int RT_IPUnits_Electricity(1);
+    constexpr int RT_IPUnits_Gas(2);
+    constexpr int RT_IPUnits_Cooling(3);
+    constexpr int RT_IPUnits_Water(4);
+    constexpr int RT_IPUnits_OtherKG(5);
+    constexpr int RT_IPUnits_OtherM3(6);
+    constexpr int RT_IPUnits_OtherL(7);
+    constexpr int RT_IPUnits_OtherJ(0);
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -493,7 +491,7 @@ namespace OutputProcessor {
         std::string EndUseSub;       // End Use subcategory of the meter
         std::string Group;           // Group of the meter
         OutputProcessor::Unit Units; // Units for the Meter
-        iRT_IPUnits RT_forIPUnits;           // Resource type number for IP Units (tabular) reporting
+        int RT_forIPUnits;           // Resource type number for IP Units (tabular) reporting
         int TypeOfMeter;             // type of meter
         int SourceMeter;             // for custom decrement meters, this is the meter number for the subtraction
 
@@ -587,7 +585,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         MeterType()
-            : Units(OutputProcessor::Unit::None), RT_forIPUnits(iRT_IPUnits::OtherJ), TypeOfMeter(MeterType_Normal), SourceMeter(0), TSValue(0.0), CurTSValue(0.0),
+            : Units(OutputProcessor::Unit::None), RT_forIPUnits(0), TypeOfMeter(MeterType_Normal), SourceMeter(0), TSValue(0.0), CurTSValue(0.0),
               RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false), HRMaxVal(-99999.0), HRMaxValDate(0),
               HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0),
               DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0),
@@ -743,8 +741,7 @@ namespace OutputProcessor {
                                          Optional_string_const ZoneName = _     // ZoneName when Group=Building
     );
 
-    void DetermineMeterIPUnits(EnergyPlusData &state,
-                               iRT_IPUnits &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine
