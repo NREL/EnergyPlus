@@ -19,6 +19,7 @@ endif()
 if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 2013)
 
   # COMPILER FLAGS
+  target_compile_options(project_options INTERFACE /bigobj)
   target_compile_options(project_options INTERFACE /nologo)
   target_compile_options(project_options INTERFACE /EHsc)
   target_compile_options(project_options INTERFACE /MP) # Enables multi-processor compilation of source within a single project
@@ -58,7 +59,6 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
-
 elseif(
   CMAKE_COMPILER_IS_GNUCXX
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
