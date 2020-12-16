@@ -11,7 +11,8 @@ if (NOT MSVC)
   add_compile_options(-Wno-pedantic -Wno-unused-parameter)
 endif()
 
-set(INSTALL_GTEST OFF)
+set(INSTALL_GTEST CACHE BOOL OFF)
+mark_as_advanced(INSTALL_GTEST)
 
 set(RE2_BUILD_TESTING
     OFF
