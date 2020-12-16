@@ -413,11 +413,11 @@ namespace Vectors {
         }
 
         tlt = std::acos(NewellSurfaceNormalVector.z);
-        tlt /= DataGlobalConstants::DegToRadians();
+        tlt /= DataGlobalConstants::DegToRadians;
 
         az = rotang_0;
 
-        az /= DataGlobalConstants::DegToRadians();
+        az /= DataGlobalConstants::DegToRadians;
         az = mod(450.0 - az, 360.0);
         az += 90.0;
         if (az < 0.0) az += 360.0;

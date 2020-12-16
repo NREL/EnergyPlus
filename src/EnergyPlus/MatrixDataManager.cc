@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

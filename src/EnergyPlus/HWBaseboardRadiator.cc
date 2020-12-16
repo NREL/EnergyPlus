@@ -380,7 +380,7 @@ namespace HWBaseboardRadiator {
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -863,7 +863,7 @@ namespace HWBaseboardRadiator {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                   DataGlobalConstants::HWInitConvTemp(),
+                                   DataGlobalConstants::HWInitConvTemp,
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
 
@@ -1096,12 +1096,12 @@ namespace HWBaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp(),
+                                                   DataGlobalConstants::HWInitConvTemp,
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp(),
+                                               DataGlobalConstants::HWInitConvTemp,
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1149,7 +1149,7 @@ namespace HWBaseboardRadiator {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp(),
+                                           DataGlobalConstants::HWInitConvTemp,
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
@@ -1692,10 +1692,10 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
-        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

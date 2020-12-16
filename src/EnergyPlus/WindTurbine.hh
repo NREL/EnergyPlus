@@ -175,9 +175,10 @@ namespace WindTurbine {
 
     struct WindTurbineData : BaseGlobalStruct {
 
-        int NumWindTurbines; // Total wind turbine statements in inputs
+        int NumWindTurbines;        // Total wind turbine statements in inputs
         bool GetInputFlag;
         bool MyOneTimeFlag;
+        Real64 AnnualTMYWS = 0.0;   // Annual average wind speed in stat file
         Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
 
         void clear_state() override
@@ -185,11 +186,12 @@ namespace WindTurbine {
             this->NumWindTurbines = 0;
             this->GetInputFlag = true;
             this->MyOneTimeFlag = true;
+            this->AnnualTMYWS = 0.0;
             this->WindTurbineSys.deallocate();
         }
 
         // Default Constructor
-        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true)
+        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true), AnnualTMYWS(0.0)
         {
         }
     };
