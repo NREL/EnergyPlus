@@ -501,10 +501,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_EQ(Groups(7), "HVAC");
 
     // Check that unit is included in Component Sizing Summary Report
-    EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", OutputReportPredefined::CompSizeTableEntry(1).typeField);
-    EXPECT_EQ("MUNTERSEPX5000", OutputReportPredefined::CompSizeTableEntry(1).nameField);
-    EXPECT_EQ("Scaled Maximum Supply Air Volume Flow Rate [m3/s]", OutputReportPredefined::CompSizeTableEntry(1).description);
-    EXPECT_EQ(MaxFlow, OutputReportPredefined::CompSizeTableEntry(1).valField);
+    EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", state->dataOutRptPredefined->CompSizeTableEntry(1).typeField);
+    EXPECT_EQ("MUNTERSEPX5000", state->dataOutRptPredefined->CompSizeTableEntry(1).nameField);
+    EXPECT_EQ("Scaled Maximum Supply Air Volume Flow Rate [m3/s]", state->dataOutRptPredefined->CompSizeTableEntry(1).description);
+    EXPECT_EQ(MaxFlow, state->dataOutRptPredefined->CompSizeTableEntry(1).valField);
 
 }
 

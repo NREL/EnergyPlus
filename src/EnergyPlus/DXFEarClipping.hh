@@ -49,9 +49,10 @@
 #define DXFEarClipping_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "DataSurfaces.hh"
 
 namespace EnergyPlus {
 
@@ -136,6 +137,14 @@ namespace DXFEarClipping {
     void reorder(int &nvert); // unused1208
 
 } // namespace DXFEarClipping
+
+struct DXFEarClippingData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

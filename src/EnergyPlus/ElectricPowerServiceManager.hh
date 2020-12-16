@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -710,7 +711,7 @@ private: // Methods
 
     void updateWholeBuildingRecords(EnergyPlusData &state);
 
-    void reportPVandWindCapacity();
+    void reportPVandWindCapacity(EnergyPlusData &state);
 
     void sumUpNumberOfStorageDevices();
 
@@ -767,6 +768,14 @@ extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 void createFacilityElectricPowerServiceObject();
 
 void clearFacilityElectricPowerServiceObject();
+
+struct ElectPwrSvcMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ElectricPowerServiceManager_hh_INCLUDED

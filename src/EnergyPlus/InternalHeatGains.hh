@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -176,6 +177,13 @@ namespace InternalHeatGains {
     void GatherComponentLoadsIntGain(EnergyPlusData &state);
 
 } // namespace InternalHeatGains
+
+struct InternalHeatGainsData : BaseGlobalStruct {
+
+    void clear_state() override {
+
+    }
+};
 
 } // namespace EnergyPlus
 

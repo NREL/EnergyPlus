@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -323,7 +323,7 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
-        bool isGlazingConstruction() const;
+        bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 

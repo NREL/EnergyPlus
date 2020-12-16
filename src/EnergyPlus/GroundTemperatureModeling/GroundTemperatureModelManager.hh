@@ -85,6 +85,14 @@ namespace GroundTemperatureManager {
 
 } // namespace GroundTemperatureManager
 
+struct GroundTemperatureManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

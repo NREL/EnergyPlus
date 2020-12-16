@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -269,6 +270,14 @@ namespace HeatBalanceManager {
     void InitConductionTransferFunctions(EnergyPlusData &state);
 
 } // namespace HeatBalanceManager
+
+struct HeatBalanceMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -271,7 +271,7 @@ namespace OutsideEnergySources {
                     ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
                 }
             } else {
-                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
         }
 
@@ -420,12 +420,12 @@ namespace OutsideEnergySources {
         if (PltSizNum > 0) {
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp(),
+                                                                 DataGlobalConstants::InitConvTemp,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobalConstants::InitConvTemp(),
+                                                                     DataGlobalConstants::InitConvTemp,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
             Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
@@ -528,7 +528,7 @@ namespace OutsideEnergySources {
         int const OutletNode = this->OutletNodeNum;
         DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace OutsideEnergySources
