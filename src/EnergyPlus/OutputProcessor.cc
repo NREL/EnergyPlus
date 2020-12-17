@@ -636,7 +636,7 @@ namespace OutputProcessor {
         int NumAlpha;
         int NumNumbers;
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         std::string cCurrentModuleObject;
         Array1D_string cAlphaArgs(4);
         Array1D_string cAlphaFieldNames(4);
@@ -895,8 +895,8 @@ namespace OutputProcessor {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         // TODO: , "HEATBALANCE", "HEAT BALANCE" are used nowhere aside from tests. Should we remove them?
-        static std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
-        static std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
+        std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
+        std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
         std::string uppercase(UtilityRoutines::MakeUPPERCase(TimeStepTypeKey));
 
         if (std::find(zoneIndexes.begin(), zoneIndexes.end(), uppercase) != zoneIndexes.end()) {
@@ -986,10 +986,8 @@ namespace OutputProcessor {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_string StateVariables(3);
-        static std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
-        static Array1D_string NonStateVariables(4);
-        static std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
+        std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
+        std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
         std::string uppercase(UtilityRoutines::MakeUPPERCase(VariableTypeKey));
 
         auto iter = std::find(stateVariables.begin(), stateVariables.end(), uppercase);
@@ -5244,7 +5242,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string EndUseSub;          // Will hold value of EndUseSubKey
     std::string Group;              // Will hold value of GroupKey
     std::string ZoneName;           // Will hold value of ZoneKey
-    static bool ErrorsFound(false); // True if Errors Found
     int localIndexGroupKey;
     auto &op(state.dataOutputProcessor);
 
@@ -5383,10 +5380,9 @@ void SetupOutputVariable(EnergyPlusData &state,
                 if (VariableType == StoreType::Averaged) {
                     ShowSevereError(state, "Meters can only be \"Summed\" variables");
                     ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
-                    ErrorsFound = true;
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
-                    ErrorsFound = false;
+                    bool ErrorsFound = false;
                     AttachMeters(state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
                         ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
@@ -5729,7 +5725,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
     // static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
     ////////////////////////////////////////////////////////////////////////////////////
-    static bool EndTimeStepFlag(false); // True when it's the end of the Zone Time Step
+    bool EndTimeStepFlag(false); // True when it's the end of the Zone Time Step
     Real64 rxTime;                      // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
     auto &op(state.dataOutputProcessor);
 
