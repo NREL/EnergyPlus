@@ -236,7 +236,6 @@ namespace HVACManager {
         using OutAirNodeManager::SetOutAirNodes;
         using OutputReportTabular::GatherComponentLoadsHVAC;
         using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
-        using PlantManager::UpdateNodeThermalHistory;
         using PollutionModule::CalculatePollution;
         using RefrigeratedCase::ManageRefrigeratedCaseRacks;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -462,7 +461,7 @@ namespace HVACManager {
             facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
             // Update the plant and condenser loop capacitance model temperature history.
-            UpdateNodeThermalHistory();
+            PlantManager::UpdateNodeThermalHistory(state);
 
             if (OutputReportTabular::displayHeatEmissionsSummary) {
                 OutputReportTabular::CalcHeatEmissionReport(state);

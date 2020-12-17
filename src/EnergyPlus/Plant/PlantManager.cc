@@ -2720,7 +2720,8 @@ namespace EnergyPlus {
             }
         }
 
-        void UpdateNodeThermalHistory() {
+        void UpdateNodeThermalHistory(EnergyPlusData &state)
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -2741,7 +2742,7 @@ namespace EnergyPlus {
             if (DataPlant::TotNumLoops > 0) {
                 for (auto &loop : PlantLoop) {
                     for (auto &side : loop.LoopSide) {
-                        if (!DataGlobals::WarmupFlag && (loop.OutletNodeFlowrate > 0.0)) {
+                        if (!state.dataGlobal->WarmupFlag && (loop.OutletNodeFlowrate > 0.0)) {
                             // Accumulate total time loop is active
                             side.LoopSideInlet_TotalTime += TimeStepSys;
                             // Determine excessive storage
