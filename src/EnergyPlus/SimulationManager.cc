@@ -1839,7 +1839,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataOutputs;
-        using OutputProcessor::InstMeterCacheSize;
         using OutputProcessor::MaxIVariable;
         using OutputProcessor::MaxRVariable;
         using OutputProcessor::NumEnergyMeters;
@@ -1847,12 +1846,8 @@ namespace SimulationManager {
         using OutputProcessor::NumOfIVariable_Setup;
         using OutputProcessor::NumOfIVariable_Sum;
         using OutputProcessor::NumOfRVariable;
-        using OutputProcessor::NumOfRVariable_Meter;
-        using OutputProcessor::NumOfRVariable_Setup;
-        using OutputProcessor::NumOfRVariable_Sum;
         using OutputProcessor::NumReportList;
         using OutputProcessor::NumTotalIVariable;
-        using OutputProcessor::NumTotalRVariable;
         using OutputProcessor::NumVarMeterArrays;
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
@@ -1884,11 +1879,11 @@ namespace SimulationManager {
         state.files.audit.ensure_open(state, "CloseOutputFiles", state.files.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        print(state.files.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable", state.dataOutputProcessor->NumOfRVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", state.dataOutputProcessor->NumTotalRVariable);
         print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", state.dataOutputProcessor->NumOfRVariable_Sum);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", state.dataOutputProcessor->NumOfRVariable_Meter);
         print(state.files.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
         print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
         print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
@@ -1902,7 +1897,7 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
-        print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
+        print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");

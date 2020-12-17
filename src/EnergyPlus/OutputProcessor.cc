@@ -100,28 +100,6 @@ namespace OutputProcessor {
     // METHODOLOGY EMPLOYED:
     // Lots of pointers and other fancy data stuff.
 
-    // REFERENCES:
-    // EnergyPlus OutputProcessor specifications.
-
-    // DERIVED TYPE DEFINITIONS:
-
-    int InstMeterCacheSize(1000);    // the maximum size of the instant meter cache used in GetInstantMeterValue
-    int InstMeterCacheSizeInc(1000); // the increment for the instant meter cache used in GetInstantMeterValue
-    Array1D_int InstMeterCache;      // contains a list of RVariableTypes that make up a specific meter
-    int InstMeterCacheLastUsed(0);   // the last item in the instant meter cache used
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int CurrentReportNumber(0);
-    int NumVariablesForOutput(0);
-    int MaxVariablesForOutput(0);
-    int NumOfRVariable_Setup(0);
-    int NumTotalRVariable(0);
-    int NumOfRVariable_Sum(0);
-    int NumOfRVariable_Meter(0);
     int NumOfRVariable(0);
     int MaxRVariable(0);
     int NumOfIVariable_Setup(0);
@@ -236,17 +214,6 @@ namespace OutputProcessor {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        InstMeterCacheSize = 1000;
-        InstMeterCacheSizeInc = 1000;
-        InstMeterCache.deallocate();
-        InstMeterCacheLastUsed = 0;
-        CurrentReportNumber = 0;
-        NumVariablesForOutput = 0;
-        MaxVariablesForOutput = 0;
-        NumOfRVariable_Setup = 0;
-        NumTotalRVariable = 0;
-        NumOfRVariable_Sum = 0;
-        NumOfRVariable_Meter = 0;
         NumOfRVariable = 0;
         MaxRVariable = 0;
         NumOfIVariable_Setup = 0;
@@ -5418,7 +5385,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
-        if (Loop == 1) ++NumOfRVariable_Setup;
+        if (Loop == 1) ++state.dataOutputProcessor->NumOfRVariable_Setup;
 
         if (Loop == 1) {
             OnMeter = false;
@@ -5463,19 +5430,19 @@ void SetupOutputVariable(EnergyPlusData &state,
         VariableType = validateVariableType(state, VariableTypeKey);
 
         if (present(customUnitName)) {
-            AddToOutputVariableList(VarName, TimeStepType, VariableType, VarType_Real, VariableUnit, customUnitName);
+            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarType_Real, VariableUnit, customUnitName);
         } else {
-            AddToOutputVariableList(VarName, TimeStepType, VariableType, VarType_Real, VariableUnit);
+            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarType_Real, VariableUnit);
         }
-        ++NumTotalRVariable;
+        ++state.dataOutputProcessor->NumTotalRVariable;
 
         if (!OnMeter && !ThisOneOnTheList) continue;
 
         ++NumOfRVariable;
         if (Loop == 1 && VariableType == StoreType::Summed) {
-            ++NumOfRVariable_Sum;
+            ++state.dataOutputProcessor->NumOfRVariable_Sum;
             if (present(ResourceTypeKey)) {
-                if (!ResourceTypeKey().empty()) ++NumOfRVariable_Meter;
+                if (!ResourceTypeKey().empty()) ++state.dataOutputProcessor->NumOfRVariable_Meter;
             }
         }
         if (NumOfRVariable > MaxRVariable) {
@@ -5494,9 +5461,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
             thisRvar.unitNameCustomEMS = customUnitName;
         }
-        AssignReportNumber(CurrentReportNumber);
-        const auto IDOut = fmt::to_string(CurrentReportNumber);
-        thisRvar.ReportID = CurrentReportNumber;
+        AssignReportNumber(state.dataOutputProcessor->CurrentReportNumber);
+        const auto IDOut = fmt::to_string(state.dataOutputProcessor->CurrentReportNumber);
+        thisRvar.ReportID = state.dataOutputProcessor->CurrentReportNumber;
         auto &thisVarPtr = thisRvar.VarPtr;
         thisVarPtr.Value = 0.0;
         thisVarPtr.TSValue = 0.0;
@@ -5507,7 +5474,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisVarPtr.MinValue = MinSetValue;
         thisVarPtr.minValueDate = 0;
         thisVarPtr.Which = &ActualVariable;
-        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportID = state.dataOutputProcessor->CurrentReportNumber;
         thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
         thisVarPtr.storeType = VariableType;
         thisVarPtr.Stored = false;
@@ -5657,7 +5624,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
         VariableType = validateVariableType(state, VariableTypeKey);
 
-        AddToOutputVariableList(VarName, TimeStepType, VariableType, VarType_Integer, VariableUnit);
+        AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarType_Integer, VariableUnit);
         ++NumTotalIVariable;
 
         if (!ThisOneOnTheList) continue;
@@ -5680,9 +5647,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
         thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         thisIVar.units = VariableUnit;
-        AssignReportNumber(CurrentReportNumber);
-        const auto IDOut = fmt::to_string(CurrentReportNumber);
-        thisIVar.ReportID = CurrentReportNumber;
+        AssignReportNumber(state.dataOutputProcessor->CurrentReportNumber);
+        const auto IDOut = fmt::to_string(state.dataOutputProcessor->CurrentReportNumber);
+        thisIVar.ReportID = state.dataOutputProcessor->CurrentReportNumber;
         auto &thisVarPtr = thisIVar.VarPtr;
         thisVarPtr.Value = 0.0;
         thisVarPtr.StoreValue = 0.0;
@@ -5694,7 +5661,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisVarPtr.MinValue = IMinSetValue;
         thisVarPtr.minValueDate = 0;
         thisVarPtr.Which = &ActualVariable;
-        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportID = state.dataOutputProcessor->CurrentReportNumber;
         thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
         thisVarPtr.storeType = VariableType;
         thisVarPtr.Stored = false;
@@ -7387,7 +7354,8 @@ Real64 GetCurrentMeterValue(int const MeterNumber) // Which Meter Number (from G
     return CurrentMeterValue;
 }
 
-Real64 GetInstantMeterValue(int const MeterNumber,                             // Which Meter Number (from GetMeterIndex)
+Real64 GetInstantMeterValue(EnergyPlusData &state,
+                            int const MeterNumber,                             // Which Meter Number (from GetMeterIndex)
                             OutputProcessor::TimeStepType const t_timeStepType // Whether this is zone of HVAC
 )
 {
@@ -7445,27 +7413,27 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                 auto const &var_meter_on(VarMeterArrays(Loop).OnMeters);
                 for (int Meter = 1, Meter_end = VarMeterArrays(Loop).NumOnMeters; Meter <= Meter_end; ++Meter) {
                     if (var_meter_on(Meter) == MeterNumber) {
-                        IncrementInstMeterCache();
-                        cache_end = InstMeterCacheLastUsed;
-                        if (cache_beg == 0) cache_beg = InstMeterCacheLastUsed;
-                        InstMeterCache(InstMeterCacheLastUsed) = VarMeterArrays(Loop).RepVariable;
+                        IncrementInstMeterCache(state);
+                        cache_end = state.dataOutputProcessor->InstMeterCacheLastUsed;
+                        if (cache_beg == 0) cache_beg = state.dataOutputProcessor->InstMeterCacheLastUsed;
+                        state.dataOutputProcessor->InstMeterCache(state.dataOutputProcessor->InstMeterCacheLastUsed) = VarMeterArrays(Loop).RepVariable;
                         break;
                     }
                 }
                 auto const &var_meter_on_custom(VarMeterArrays(Loop).OnCustomMeters);
                 for (int Meter = 1, Meter_end = VarMeterArrays(Loop).NumOnCustomMeters; Meter <= Meter_end; ++Meter) {
                     if (var_meter_on_custom(Meter) == MeterNumber) {
-                        IncrementInstMeterCache();
-                        cache_end = InstMeterCacheLastUsed;
-                        if (cache_beg == 0) cache_beg = InstMeterCacheLastUsed;
-                        InstMeterCache(InstMeterCacheLastUsed) = VarMeterArrays(Loop).RepVariable;
+                        IncrementInstMeterCache(state);
+                        cache_end = state.dataOutputProcessor->InstMeterCacheLastUsed;
+                        if (cache_beg == 0) cache_beg = state.dataOutputProcessor->InstMeterCacheLastUsed;
+                        state.dataOutputProcessor->InstMeterCache(state.dataOutputProcessor->InstMeterCacheLastUsed) = VarMeterArrays(Loop).RepVariable;
                         break;
                     }
                 } // End Number of Meters Loop
             }
         }
         for (int Loop = cache_beg; Loop <= cache_end; ++Loop) {
-            auto &r_var_loop(RVariableTypes(InstMeterCache(Loop)));
+            auto &r_var_loop(RVariableTypes(state.dataOutputProcessor->InstMeterCache(Loop)));
             // Separate the Zone variables from the HVAC variables using TimeStepType
             if (r_var_loop.timeStepType == t_timeStepType) {
                 auto &rVar(r_var_loop.VarPtr);
@@ -7541,7 +7509,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
     return InstantMeterValue;
 }
 
-void IncrementInstMeterCache()
+void IncrementInstMeterCache(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -7561,14 +7529,14 @@ void IncrementInstMeterCache()
     // Using/Aliasing
     using namespace OutputProcessor;
 
-    if (!allocated(InstMeterCache)) {
-        InstMeterCache.dimension(InstMeterCacheSizeInc, 0); // zero the entire array
-        InstMeterCacheLastUsed = 1;
+    if (!allocated(state.dataOutputProcessor->InstMeterCache)) {
+        state.dataOutputProcessor->InstMeterCache.dimension(state.dataOutputProcessor->InstMeterCacheSizeInc, 0); // zero the entire array
+        state.dataOutputProcessor->InstMeterCacheLastUsed = 1;
     } else {
-        ++InstMeterCacheLastUsed;
+        ++state.dataOutputProcessor->InstMeterCacheLastUsed;
         // if larger than current size grow the array
-        if (InstMeterCacheLastUsed > InstMeterCacheSize) {
-            InstMeterCache.redimension(InstMeterCacheSize += InstMeterCacheSizeInc, 0);
+        if (state.dataOutputProcessor->InstMeterCacheLastUsed > state.dataOutputProcessor->InstMeterCacheSize) {
+            state.dataOutputProcessor->InstMeterCache.redimension(state.dataOutputProcessor->InstMeterCacheSize += state.dataOutputProcessor->InstMeterCacheSizeInc, 0);
         }
     }
 }
@@ -8024,9 +7992,9 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     if (InitFlag) {
         curKeyVarIndexLimit = 1000;
         keyVarIndexes.allocate(curKeyVarIndexLimit);
-        numVarNames = NumVariablesForOutput;
+        numVarNames = state.dataOutputProcessor->NumVariablesForOutput;
         varNames.allocate(numVarNames);
-        for (Loop = 1; Loop <= NumVariablesForOutput; ++Loop) {
+        for (Loop = 1; Loop <= state.dataOutputProcessor->NumVariablesForOutput; ++Loop) {
             varNames(Loop) = UtilityRoutines::MakeUPPERCase(DDVariableTypes(Loop).VarNameOnly);
         }
         ivarNames.allocate(numVarNames);
@@ -8034,10 +8002,10 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         InitFlag = false;
     }
 
-    if (numVarNames != NumVariablesForOutput) {
-        numVarNames = NumVariablesForOutput;
+    if (numVarNames != state.dataOutputProcessor->NumVariablesForOutput) {
+        numVarNames = state.dataOutputProcessor->NumVariablesForOutput;
         varNames.allocate(numVarNames);
-        for (Loop = 1; Loop <= NumVariablesForOutput; ++Loop) {
+        for (Loop = 1; Loop <= state.dataOutputProcessor->NumVariablesForOutput; ++Loop) {
             varNames(Loop) = UtilityRoutines::MakeUPPERCase(DDVariableTypes(Loop).VarNameOnly);
         }
         ivarNames.allocate(numVarNames);
@@ -8626,20 +8594,20 @@ void ProduceRDDMDD(EnergyPlusData &state)
         print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", '\n');
     }
 
-    Array1D_string VariableNames(NumVariablesForOutput);
-    for (int i = 1; i <= NumVariablesForOutput; ++i)
+    Array1D_string VariableNames(state.dataOutputProcessor->NumVariablesForOutput);
+    for (int i = 1; i <= state.dataOutputProcessor->NumVariablesForOutput; ++i)
         VariableNames(i) = DDVariableTypes(i).VarNameOnly;
-    Array1D_int iVariableNames(NumVariablesForOutput);
+    Array1D_int iVariableNames(state.dataOutputProcessor->NumVariablesForOutput);
 
     if (SortByName) {
         SetupAndSort(VariableNames, iVariableNames);
     } else {
-        for (Item = 1; Item <= NumVariablesForOutput; ++Item) {
+        for (Item = 1; Item <= state.dataOutputProcessor->NumVariablesForOutput; ++Item) {
             iVariableNames(Item) = Item;
         }
     }
 
-    for (Item = 1; Item <= NumVariablesForOutput; ++Item) {
+    for (Item = 1; Item <= state.dataOutputProcessor->NumVariablesForOutput; ++Item) {
         if (ProduceReportVDD == iReportVDD::Yes) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
@@ -8719,7 +8687,8 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.mdd.close();
 }
 
-void AddToOutputVariableList(std::string const &VarName, // Variable Name
+void AddToOutputVariableList(EnergyPlusData &state,
+                             std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
                              int const VariableType,
@@ -8762,24 +8731,24 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int dup = 0; // for duplicate variable name
-    if (NumVariablesForOutput > 0) {
-        dup = UtilityRoutines::FindItemInList(VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, NumVariablesForOutput);
+    if (state.dataOutputProcessor->NumVariablesForOutput > 0) {
+        dup = UtilityRoutines::FindItemInList(VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, state.dataOutputProcessor->NumVariablesForOutput);
     } else {
         DDVariableTypes.allocate(LVarAllocInc);
-        MaxVariablesForOutput = LVarAllocInc;
+        state.dataOutputProcessor->MaxVariablesForOutput = LVarAllocInc;
     }
     if (dup == 0) {
-        ++NumVariablesForOutput;
-        if (NumVariablesForOutput > MaxVariablesForOutput) {
-            DDVariableTypes.redimension(MaxVariablesForOutput += LVarAllocInc);
+        ++state.dataOutputProcessor->NumVariablesForOutput;
+        if (state.dataOutputProcessor->NumVariablesForOutput > state.dataOutputProcessor->MaxVariablesForOutput) {
+            DDVariableTypes.redimension(state.dataOutputProcessor->MaxVariablesForOutput += LVarAllocInc);
         }
-        DDVariableTypes(NumVariablesForOutput).timeStepType = TimeStepType;
-        DDVariableTypes(NumVariablesForOutput).storeType = StateType;
-        DDVariableTypes(NumVariablesForOutput).VariableType = VariableType;
-        DDVariableTypes(NumVariablesForOutput).VarNameOnly = VarName;
-        DDVariableTypes(NumVariablesForOutput).units = unitsForVar;
+        DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).timeStepType = TimeStepType;
+        DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).storeType = StateType;
+        DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).VariableType = VariableType;
+        DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).VarNameOnly = VarName;
+        DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).units = unitsForVar;
         if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
-            DDVariableTypes(NumVariablesForOutput).unitNameCustomEMS = customUnitName;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
         }
     } else if (unitsForVar != DDVariableTypes(dup).units) { // not the same as first units
         int dup2 = 0;                                       // for duplicate variable name
@@ -8792,19 +8761,19 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
             break;
         }
         if (dup2 == 0) {
-            ++NumVariablesForOutput;
-            if (NumVariablesForOutput > MaxVariablesForOutput) {
-                DDVariableTypes.redimension(MaxVariablesForOutput += LVarAllocInc);
+            ++state.dataOutputProcessor->NumVariablesForOutput;
+            if (state.dataOutputProcessor->NumVariablesForOutput > state.dataOutputProcessor->MaxVariablesForOutput) {
+                DDVariableTypes.redimension(state.dataOutputProcessor->MaxVariablesForOutput += LVarAllocInc);
             }
-            DDVariableTypes(NumVariablesForOutput).timeStepType = TimeStepType;
-            DDVariableTypes(NumVariablesForOutput).storeType = StateType;
-            DDVariableTypes(NumVariablesForOutput).VariableType = VariableType;
-            DDVariableTypes(NumVariablesForOutput).VarNameOnly = VarName;
-            DDVariableTypes(NumVariablesForOutput).units = unitsForVar;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).timeStepType = TimeStepType;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).storeType = StateType;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).VariableType = VariableType;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).VarNameOnly = VarName;
+            DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).units = unitsForVar;
             if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
-                DDVariableTypes(NumVariablesForOutput).unitNameCustomEMS = customUnitName;
+                DDVariableTypes(state.dataOutputProcessor->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
             }
-            DDVariableTypes(dup).Next = NumVariablesForOutput;
+            DDVariableTypes(dup).Next = state.dataOutputProcessor->NumVariablesForOutput;
         }
     }
 }

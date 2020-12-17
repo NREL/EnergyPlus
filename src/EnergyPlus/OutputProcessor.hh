@@ -164,25 +164,6 @@ namespace OutputProcessor {
     constexpr int RT_IPUnits_OtherL(7);
     constexpr int RT_IPUnits_OtherJ(0);
 
-    // DERIVED TYPE DEFINITIONS:
-
-    extern int InstMeterCacheSize;     // the maximum size of the instant meter cache used in GetInstantMeterValue
-    extern int InstMeterCacheSizeInc;  // the increment for the instant meter cache used in GetInstantMeterValue
-    extern Array1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
-    extern int InstMeterCacheLastUsed; // the last item in the instant meter cache used
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int CurrentReportNumber;
-    extern int NumVariablesForOutput;
-    extern int MaxVariablesForOutput;
-    extern int NumOfRVariable_Setup;
-    extern int NumTotalRVariable;
-    extern int NumOfRVariable_Sum;
-    extern int NumOfRVariable_Meter;
     extern int NumOfRVariable;
     extern int MaxRVariable;
     extern int NumOfIVariable_Setup;
@@ -1034,11 +1015,12 @@ std::string GetMeterResourceType(int const MeterNumber); // Which Meter Number (
 
 Real64 GetCurrentMeterValue(int const MeterNumber); // Which Meter Number (from GetMeterIndex)
 
-Real64 GetInstantMeterValue(int const MeterNumber, // Which Meter Number (from GetMeterIndex)
+Real64 GetInstantMeterValue(EnergyPlusData &state,
+                            int const MeterNumber, // Which Meter Number (from GetMeterIndex)
                             OutputProcessor::TimeStepType const TimeStepType    // Whether this is zone of HVAC
 );
 
-void IncrementInstMeterCache();
+void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
                                 int const varType,    // 1=integer, 2=real, 3=meter
@@ -1101,7 +1083,8 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
 
 void ProduceRDDMDD(EnergyPlusData &state);
 
-void AddToOutputVariableList(std::string const &VarName, // Variable Name
+void AddToOutputVariableList(EnergyPlusData &state,
+                             std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
                              int const VariableType,
@@ -1113,9 +1096,31 @@ int initErrorFile(EnergyPlusData &state);
 
 struct OutputProcessorData : BaseGlobalStruct {
 
+    int InstMeterCacheSize = 1000;              // the maximum size of the instant meter cache used in GetInstantMeterValue
+    int InstMeterCacheSizeInc = 1000;           // the increment for the instant meter cache used in GetInstantMeterValue
+    Array1D_int InstMeterCache;                 // contains a list of RVariableTypes that make up a specific meter
+    int InstMeterCacheLastUsed = 0;             // the last item in the instant meter cache used
+    int CurrentReportNumber = 0;
+    int NumVariablesForOutput = 0;
+    int MaxVariablesForOutput = 0;
+    int NumOfRVariable_Setup = 0;
+    int NumTotalRVariable = 0;
+    int NumOfRVariable_Sum = 0;
+    int NumOfRVariable_Meter = 0;
+
     void clear_state() override
     {
-
+        this->InstMeterCacheSize = 1000;
+        this->InstMeterCacheSizeInc = 1000;
+        this->InstMeterCache.deallocate();
+        this->InstMeterCacheLastUsed = 0;
+        this->CurrentReportNumber = 0;
+        this->NumVariablesForOutput = 0;
+        this->MaxVariablesForOutput = 0;
+        this->NumOfRVariable_Setup = 0;
+        this->NumTotalRVariable = 0;
+        this->NumOfRVariable_Sum = 0;
+        this->NumOfRVariable_Meter = 0;
     }
 };
 
