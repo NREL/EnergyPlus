@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(ConvertInputFormat)
 
-# set(CMAKE_CXX_STANDARD 11)
-
 # Set the CFLAGS and CXXFLAGS depending on the options the user specified.
 # Only GCC-like compilers support -Wextra, and other compilers give tons of
 # output for -Wall, so only -Wall and -Wextra on GCC.

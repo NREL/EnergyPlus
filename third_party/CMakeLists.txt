@@ -7,8 +7,12 @@
 # we link the project_options in here for every library in this
 # subdirectory
 
+set(CMAKE_CXX_STANDARD 17)
+
 if (NOT MSVC)
   add_compile_options(-Wno-pedantic -Wno-unused-parameter)
+else()
+  add_compile_options(/wd4267 /wd4996 /wd4068 /wd4244 )
 endif()
 
 set(INSTALL_GTEST CACHE BOOL OFF)
