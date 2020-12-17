@@ -1946,7 +1946,6 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharTab;
 
         using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2287,7 +2286,7 @@ namespace OutputReportTabular {
             endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
             // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-            meterNumEndUseSubBEPS.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             meterNumEndUseSubBEPS = 0;
 
             // loop through all of the resources and end uses and sub end uses for the entire facility
@@ -2323,11 +2322,11 @@ namespace OutputReportTabular {
             gatherEndUseBEPS = 0.0;
             gatherEndUseBySourceBEPS = 0.0;
             // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-            gatherEndUseSubBEPS.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherEndUseSubBEPS = 0.0;
-            gatherDemandEndUseSub.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherDemandEndUseSub = 0.0;
-            gatherDemandIndEndUseSub.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
@@ -7432,7 +7431,6 @@ namespace OutputReportTabular {
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
         using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
         using ScheduleManager::GetScheduleName;
 
         // Locals
@@ -7466,7 +7464,7 @@ namespace OutputReportTabular {
         Array2D<Real64> normalVal(13, 4);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
         Real64 totalOnsiteHeat;
         Real64 totalOnsiteWater;
@@ -9118,7 +9116,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9145,7 +9142,7 @@ namespace OutputReportTabular {
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         int iResource;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
@@ -9480,7 +9477,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9508,8 +9504,8 @@ namespace OutputReportTabular {
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
         Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstants::iEndUse.size());
         Array1D_int collapsedTimeStep(13);
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array3D<Real64> collapsedIndEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
         int iResource;
         int kEndUseSub;
@@ -15285,8 +15281,6 @@ namespace OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        using OutputProcessor::isFinalYear;
-
         gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering();
         OutputReportTabularAnnual::ResetAnnualGathering();
@@ -15299,7 +15293,7 @@ namespace OutputReportTabular {
         ThermalComfort::ResetThermalComfortSimpleASH55(state);
         ThermalComfort::ResetSetPointMet(state);
         ResetAdaptiveComfort();
-        isFinalYear = true;
+        state.dataOutputProcessor->isFinalYear = true;
     }
 
     void ResetMonthlyGathering()

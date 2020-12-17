@@ -151,8 +151,8 @@ namespace OutputProcessor {
         EnergyMeters(2).TSAccRptNum = 2;
         EnergyMeters(2).SMValue = 9999.9;
 
-        TimeStepStampReportNbr = 1;
-        TimeStepStampReportChr = "1";
+        state->dataOutputProcessor->TimeStepStampReportNbr = 1;
+        state->dataOutputProcessor->TimeStepStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -217,8 +217,8 @@ namespace OutputProcessor {
         EnergyMeters(2).TSAccRptNum = 2;
         EnergyMeters(2).SMValue = 9999.9;
 
-        TimeStepStampReportNbr = 1;
-        TimeStepStampReportChr = "1";
+        state->dataOutputProcessor->TimeStepStampReportNbr = 1;
+        state->dataOutputProcessor->TimeStepStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -281,8 +281,8 @@ namespace OutputProcessor {
         EnergyMeters(2).HRAccRptNum = 2;
         EnergyMeters(2).SMValue = 9999.9;
 
-        TimeStepStampReportNbr = 1;
-        TimeStepStampReportChr = "1";
+        state->dataOutputProcessor->TimeStepStampReportNbr = 1;
+        state->dataOutputProcessor->TimeStepStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -349,8 +349,8 @@ namespace OutputProcessor {
         EnergyMeters(2).DYMinVal = 4283136.2516839253;
         EnergyMeters(2).DYMinValDate = 12210110;
 
-        DailyStampReportNbr = 1;
-        DailyStampReportChr = "1";
+        state->dataOutputProcessor->DailyStampReportNbr = 1;
+        state->dataOutputProcessor->DailyStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -421,8 +421,8 @@ namespace OutputProcessor {
         EnergyMeters(2).MNMinVal = 4283136.2516839253;
         EnergyMeters(2).MNMinValDate = 12210110;
 
-        MonthlyStampReportNbr = 1;
-        MonthlyStampReportChr = "1";
+        state->dataOutputProcessor->MonthlyStampReportNbr = 1;
+        state->dataOutputProcessor->MonthlyStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -493,8 +493,8 @@ namespace OutputProcessor {
         EnergyMeters(2).SMMinVal = 4283136.2516839253;
         EnergyMeters(2).SMMinValDate = 12210110;
 
-        RunPeriodStampReportNbr = 1;
-        RunPeriodStampReportChr = "1";
+        state->dataOutputProcessor->RunPeriodStampReportNbr = 1;
+        state->dataOutputProcessor->RunPeriodStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -565,8 +565,8 @@ namespace OutputProcessor {
         EnergyMeters(2).YRMinVal = 4283136.2516839253;
         EnergyMeters(2).YRMinValDate = 12210110;
 
-        YearlyStampReportNbr = 1;
-        YearlyStampReportChr = "1";
+        state->dataOutputProcessor->YearlyStampReportNbr = 1;
+        state->dataOutputProcessor->YearlyStampReportChr = "1";
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
@@ -605,8 +605,8 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeTimeStampFormatData)
     {
-        int TimeStepStampReportNbr = 1;
-        std::string TimeStepStampReportChr = "1";
+        state->dataOutputProcessor->TimeStepStampReportNbr = 1;
+        state->dataOutputProcessor->TimeStepStampReportChr = "1";
 
         int DailyStampReportNbr = 1;
         std::string DailyStampReportChr = "1";
@@ -632,8 +632,8 @@ namespace OutputProcessor {
         WriteTimeStampFormatData(*state,
                                  state->files.mtr,
                                  ReportingFrequency::TimeStep,
-                                 TimeStepStampReportNbr,
-                                 TimeStepStampReportChr,
+                                 state->dataOutputProcessor->TimeStepStampReportNbr,
+                                 state->dataOutputProcessor->TimeStepStampReportChr,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -649,8 +649,8 @@ namespace OutputProcessor {
         WriteTimeStampFormatData(*state,
                                  state->files.mtr,
                                  ReportingFrequency::EachCall,
-                                 TimeStepStampReportNbr,
-                                 TimeStepStampReportChr,
+                                 state->dataOutputProcessor->TimeStepStampReportNbr,
+                                 state->dataOutputProcessor->TimeStepStampReportChr,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -666,8 +666,8 @@ namespace OutputProcessor {
         WriteTimeStampFormatData(*state,
                                  state->files.mtr,
                                  ReportingFrequency::Hourly,
-                                 TimeStepStampReportNbr,
-                                 TimeStepStampReportChr,
+                                 state->dataOutputProcessor->TimeStepStampReportNbr,
+                                 state->dataOutputProcessor->TimeStepStampReportChr,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -2112,8 +2112,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingHourlyVariables);
-        TrackingHourlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
+        state->dataOutputProcessor->TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2129,8 +2129,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingHourlyVariables);
-        TrackingHourlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
+        state->dataOutputProcessor->TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2146,8 +2146,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
-        EXPECT_TRUE(TrackingHourlyVariables);
-        TrackingHourlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
+        state->dataOutputProcessor->TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2163,8 +2163,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingHourlyVariables);
-        TrackingHourlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
+        state->dataOutputProcessor->TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"14,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2180,8 +2180,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingHourlyVariables);
-        TrackingHourlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingHourlyVariables);
+        state->dataOutputProcessor->TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"15,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2197,8 +2197,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingDailyVariables);
-        TrackingDailyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
+        state->dataOutputProcessor->TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2214,8 +2214,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingDailyVariables);
-        TrackingDailyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
+        state->dataOutputProcessor->TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2231,8 +2231,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
-        EXPECT_TRUE(TrackingDailyVariables);
-        TrackingDailyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
+        state->dataOutputProcessor->TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"}, "\n")));
 
@@ -2249,8 +2249,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingDailyVariables);
-        TrackingDailyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
+        state->dataOutputProcessor->TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2266,8 +2266,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingDailyVariables);
-        TrackingDailyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingDailyVariables);
+        state->dataOutputProcessor->TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(*state,
@@ -2283,8 +2283,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingMonthlyVariables);
-        TrackingMonthlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
+        state->dataOutputProcessor->TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
@@ -2301,8 +2301,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingMonthlyVariables);
-        TrackingMonthlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
+        state->dataOutputProcessor->TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
@@ -2319,8 +2319,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
-        EXPECT_TRUE(TrackingMonthlyVariables);
-        TrackingMonthlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
+        state->dataOutputProcessor->TrackingMonthlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"}, "\n")));
 
@@ -2337,8 +2337,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingMonthlyVariables);
-        TrackingMonthlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
+        state->dataOutputProcessor->TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
@@ -2355,8 +2355,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingMonthlyVariables);
-        TrackingMonthlyVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingMonthlyVariables);
+        state->dataOutputProcessor->TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
@@ -2373,8 +2373,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingRunPeriodVariables);
-        TrackingRunPeriodVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
+        state->dataOutputProcessor->TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
@@ -2391,8 +2391,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingRunPeriodVariables);
-        TrackingRunPeriodVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
+        state->dataOutputProcessor->TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
@@ -2409,8 +2409,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
-        EXPECT_TRUE(TrackingRunPeriodVariables);
-        TrackingRunPeriodVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
+        state->dataOutputProcessor->TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string(
             {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"}, "\n")));
 
@@ -2427,8 +2427,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingRunPeriodVariables);
-        TrackingRunPeriodVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
+        state->dataOutputProcessor->TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
@@ -2445,8 +2445,8 @@ namespace OutputProcessor {
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
-        EXPECT_TRUE(TrackingRunPeriodVariables);
-        TrackingRunPeriodVariables = false;
+        EXPECT_TRUE(state->dataOutputProcessor->TrackingRunPeriodVariables);
+        state->dataOutputProcessor->TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 

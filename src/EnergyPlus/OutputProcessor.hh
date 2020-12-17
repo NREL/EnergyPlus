@@ -164,28 +164,6 @@ namespace OutputProcessor {
     constexpr int RT_IPUnits_OtherL(7);
     constexpr int RT_IPUnits_OtherJ(0);
 
-    extern int TimeStepStampReportNbr;          // TimeStep and Hourly Report number
-    extern std::string TimeStepStampReportChr;  // TimeStep and Hourly Report number (character -- for printing)
-    extern bool TrackingHourlyVariables;        // Requested Hourly Report Variables
-    extern int DailyStampReportNbr;             // Daily Report number
-    extern std::string DailyStampReportChr;     // Daily Report number (character -- for printing)
-    extern bool TrackingDailyVariables;         // Requested Daily Report Variables
-    extern int MonthlyStampReportNbr;           // Monthly Report number
-    extern std::string MonthlyStampReportChr;   // Monthly Report number (character -- for printing)
-    extern bool TrackingMonthlyVariables;       // Requested Monthly Report Variables
-    extern int YearlyStampReportNbr;            // Monthly Report number
-    extern std::string YearlyStampReportChr;    // Monthly Report number (character -- for printing)
-    extern bool TrackingYearlyVariables;        // Requested Yearly Report Variables
-    extern int RunPeriodStampReportNbr;         // RunPeriod Report number
-    extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
-    extern bool TrackingRunPeriodVariables;     // Requested RunPeriod Report Variables
-    extern bool ErrorsLogged;
-
-    extern int MaxNumSubcategories;
-    extern bool isFinalYear;
-
-    extern bool GetOutputInputFlag; // First time, input is "gotten"
-
     // Types
     enum class Unit
     {
@@ -251,8 +229,6 @@ namespace OutputProcessor {
         Simulation,    // Write out once per environment 'EndEnvrnFlag'
         Yearly         // Write out at 'EndYearFlag'
     };
-
-    extern ReportingFrequency minimumReportFrequency;
 
     enum class StoreType
     {
@@ -914,7 +890,6 @@ namespace OutputProcessor {
         std::string varName = "";
         std::string varKey = "";
     };
-    extern std::vector<APIOutputVariableRequest> apiVarRequests;
 
 } // namespace OutputProcessor
 
@@ -1105,6 +1080,29 @@ struct OutputProcessorData : BaseGlobalStruct {
     int NumVarMeterArrays = 0;                  // Current number of Arrays pointing to meters
     int NumEnergyMeters = 0;                    // Current number of Energy Meters
     Array1D<Real64> MeterValue;                 // This holds the current timestep value for each meter.
+    int TimeStepStampReportNbr = 0;             // TimeStep and Hourly Report number
+    std::string TimeStepStampReportChr;         // TimeStep and Hourly Report number (character -- for printing)
+    bool TrackingHourlyVariables = false;       // Requested Hourly Report Variables
+    int DailyStampReportNbr = 0;                // Daily Report number
+    std::string DailyStampReportChr;            // Daily Report number (character -- for printing)
+    bool TrackingDailyVariables = false;        // Requested Daily Report Variables
+    int MonthlyStampReportNbr = 0;              // Monthly Report number
+    std::string MonthlyStampReportChr;          // Monthly Report number (character -- for printing)
+    bool TrackingMonthlyVariables = false;      // Requested Monthly Report Variables
+    int YearlyStampReportNbr = 0;               // Yearly Report number
+    std::string YearlyStampReportChr;           // Yearly Report number (character -- for printing)
+    bool TrackingYearlyVariables = false;       // Requested Yearly Report Variables
+    int RunPeriodStampReportNbr;                // RunPeriod Report number
+    std::string RunPeriodStampReportChr;        // RunPeriod Report number (character -- for printing)
+    bool TrackingRunPeriodVariables = false;    // Requested RunPeriod Report Variables
+    Real64 TimeStepZoneSec = 0;                 // Seconds from NumTimeStepInHour
+    bool ErrorsLogged = false;
+    bool ProduceVariableDictionary = false;
+    int MaxNumSubcategories = 1;
+    bool isFinalYear = false;
+    bool GetOutputInputFlag = true;
+    OutputProcessor::ReportingFrequency minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
+    std::vector<OutputProcessor::APIOutputVariableRequest> apiVarRequests;
 
     void clear_state() override
     {
@@ -1137,6 +1135,29 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->NumVarMeterArrays = 0;
         this->NumEnergyMeters = 0;
         this->MeterValue.deallocate();
+        this->TimeStepStampReportNbr = 0;
+        this->TimeStepStampReportChr.clear();
+        this->TrackingHourlyVariables = false;
+        this->DailyStampReportNbr = 0;
+        this->DailyStampReportChr.clear();
+        this->TrackingDailyVariables = false;
+        this->MonthlyStampReportNbr = 0;
+        this->MonthlyStampReportChr.clear();
+        this->TrackingMonthlyVariables = false;
+        this->YearlyStampReportNbr = 0;
+        this->YearlyStampReportChr.clear();
+        this->TrackingYearlyVariables = false;
+        this->RunPeriodStampReportNbr = 0;
+        this->RunPeriodStampReportChr.clear();
+        this->TrackingRunPeriodVariables = false;
+        this->TimeStepZoneSec = 0;
+        this->ErrorsLogged = false;
+        this->ProduceVariableDictionary = false;
+        this->MaxNumSubcategories = 1;
+        this->isFinalYear = false;
+        this->GetOutputInputFlag = true;
+        this->minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
+        this->apiVarRequests.clear();
     }
 };
 

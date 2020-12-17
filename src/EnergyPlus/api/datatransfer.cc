@@ -142,14 +142,15 @@ void resetErrorFlag(EnergyPlusState state) {
 }
 
 
-void requestVariable(EnergyPlusState, const char* type, const char* key) {
+void requestVariable(EnergyPlusState state, const char* type, const char* key) {
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
     // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
     request.varName = type;
     request.varKey = key;
-    EnergyPlus::OutputProcessor::apiVarRequests.push_back(request);
+    thisState->dataOutputProcessor->apiVarRequests.push_back(request);
 }
 
 int getVariableHandle(EnergyPlusState state, const char* type, const char* key) {

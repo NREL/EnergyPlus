@@ -228,7 +228,6 @@ namespace SimulationManager {
         using SystemReports::ReportAirLoopConnections;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::isFinalYear;
         using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
@@ -483,11 +482,11 @@ namespace SimulationManager {
             NumOfWarmupDays = 0;
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             } else {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 365) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             }
 
