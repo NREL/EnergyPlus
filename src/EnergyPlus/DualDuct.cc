@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -67,9 +68,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -328,7 +327,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_ConstantVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -469,7 +468,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_VariableVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -632,7 +631,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_OutdoorAir;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {

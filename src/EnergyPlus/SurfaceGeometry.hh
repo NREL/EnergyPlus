@@ -347,7 +347,7 @@ namespace SurfaceGeometry {
 
     void CreateStormWindowConstructions(EnergyPlusData &state);
 
-    int createAirMaterialFromDistance(Real64 distance, std::string namePrefix); //return new material number
+    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); //return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);

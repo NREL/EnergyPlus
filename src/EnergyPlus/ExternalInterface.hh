@@ -54,6 +54,7 @@ extern "C" {
 }
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 
@@ -371,6 +372,14 @@ namespace ExternalInterface {
     std::string trim(std::string const &str);
 
 } // namespace ExternalInterface
+
+struct ExternalInterfaceData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

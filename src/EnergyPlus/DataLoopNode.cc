@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataLoopNode.hh>
+
 namespace EnergyPlus {
 
 namespace DataLoopNode {
