@@ -49,9 +49,11 @@
 #define DataHVACControllers_hh_INCLUDED
 
 // ObjexxFCL Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -98,6 +100,14 @@ namespace DataHVACControllers {
     extern int const iControllerWarmRestartSuccess; // Indicates that warm restart was successful
 
 } // namespace DataHVACControllers
+
+struct HVACCtrlData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

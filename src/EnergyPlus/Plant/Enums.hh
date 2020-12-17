@@ -48,8 +48,7 @@
 #ifndef PlantOperationEnums_hh_INCLUDED
 #define PlantOperationEnums_hh_INCLUDED
 
-namespace EnergyPlus {
-namespace DataPlant {
+namespace EnergyPlus::DataPlant {
 
     // Parameters for loop flow request priority,
     //     used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
@@ -103,8 +102,6 @@ namespace DataPlant {
     int const HowMet_ByNominalCapHiOutLimit(55);               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
     int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
     int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
-
-} // namespace DataPlant
 
 } // namespace EnergyPlus
 

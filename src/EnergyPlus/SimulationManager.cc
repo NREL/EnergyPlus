@@ -69,12 +69,9 @@ extern "C" {
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -99,7 +96,6 @@ extern "C" {
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
@@ -203,8 +199,6 @@ namespace SimulationManager {
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using CostEstimateManager::SimCostEstimate;
         using CurveManager::InitCurveReporting;
-        using DataErrorTracking::AskForConnectionsReport;
-        using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
@@ -289,7 +283,7 @@ namespace SimulationManager {
         DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
-        AskForConnectionsReport = false; // set to false until sizing is finished
+        state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
         GetProjectData(state);
@@ -316,7 +310,7 @@ namespace SimulationManager {
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
         if (!state.dataGlobal->eplusRunningViaAPI) {
-            EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
+            state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
             bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
@@ -361,7 +355,7 @@ namespace SimulationManager {
 
         InitCurveReporting(state);
 
-        AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
+        state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;
         state.dataGlobal->WarmupFlag = false;
         DoWeatherInitReporting = true;
@@ -377,7 +371,7 @@ namespace SimulationManager {
             state.dataGlobal->MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
-            if (EnergyPlus::PluginManagement::pluginManager) {
+            if (state.dataPluginManager->pluginManager) {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
@@ -421,7 +415,7 @@ namespace SimulationManager {
         }
 
         // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
-        PluginManagement::fullyReady = true;
+        state.dataPluginManager->fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -468,7 +462,7 @@ namespace SimulationManager {
                 sqlite->sqliteCommit();
             }
 
-            ExitDuringSimulations = true;
+            state.dataErrTracking->ExitDuringSimulations = true;
             SimsDone = true;
             DisplayString(state, "Initializing New Environment Parameters");
 
@@ -949,7 +943,7 @@ namespace SimulationManager {
 
         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1286,7 +1280,7 @@ namespace SimulationManager {
                         state.dataGlobal->NumOfTimeStepInHour = 1;
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
@@ -1922,12 +1916,12 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
         print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        print(state.files.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
-        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
-        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "numActuatorsUsed", state.dataRuntimeLang->numActuatorsUsed);
+        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", state.dataRuntimeLang->numEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", state.dataRuntimeLang->maxEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", state.dataRuntimeLang->NumInternalVariablesUsed);
+        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", state.dataRuntimeLang->numEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", state.dataRuntimeLang->maxEMSInternalVarsAvailable);
 
         print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
         print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);
@@ -2279,8 +2273,6 @@ namespace SimulationManager {
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataZoneEquipment;
-        using DataErrorTracking::AbortProcessing; // used here to turn off Node Connection Error reporting
-        using DataErrorTracking::AskForConnectionsReport;
         using DualDuct::ReportDualDuctConnections;
         using OutAirNodeManager::NumOutsideAirNodes;
         using OutAirNodeManager::OutsideAirNodeList;
@@ -2328,7 +2320,7 @@ namespace SimulationManager {
 
             if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2343,7 +2335,7 @@ namespace SimulationManager {
                 }
             }
             if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2362,7 +2354,7 @@ namespace SimulationManager {
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2776,7 +2768,7 @@ namespace SimulationManager {
             }
         }
 
-        AskForConnectionsReport = false;
+        state.dataErrTracking->AskForConnectionsReport = false;
     }
 
     void ReportParentChildren(EnergyPlusData &state)
@@ -3094,9 +3086,6 @@ void Resimulate(EnergyPlusData &state,
     // Using/Aliasing
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
-    using DemandManager::DemandManagerExtIterations;
-    using DemandManager::DemandManagerHBIterations;
-    using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3115,7 +3104,7 @@ void Resimulate(EnergyPlusData &state,
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 
-        ++DemandManagerExtIterations;
+        ++state.dataDemandManager->DemandManagerExtIterations;
     }
 
     if (ResimHB) {
@@ -3128,7 +3117,7 @@ void Resimulate(EnergyPlusData &state,
         InitAirHeatBalance(state);
         ManageRefrigeratedCaseRacks(state);
 
-        ++DemandManagerHBIterations;
+        ++state.dataDemandManager->DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
     }
 
@@ -3141,7 +3130,7 @@ void Resimulate(EnergyPlusData &state,
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
-        ++DemandManagerHVACIterations;
+        ++state.dataDemandManager->DemandManagerHVACIterations;
     }
 }
 

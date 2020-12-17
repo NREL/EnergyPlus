@@ -56,8 +56,9 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -337,6 +338,14 @@ namespace EconomicLifeCycleCost {
     void clear_state();
 
 } // namespace EconomicLifeCycleCost
+
+struct EconomicLifeCycleCostData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

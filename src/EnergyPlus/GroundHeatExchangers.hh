@@ -473,6 +473,14 @@ namespace GroundHeatExchangers {
 
 } // namespace GroundHeatExchangers
 
+struct GroundHeatExchangerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

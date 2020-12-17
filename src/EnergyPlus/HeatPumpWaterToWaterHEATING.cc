@@ -53,20 +53,20 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -497,7 +497,7 @@ namespace HeatPumpWaterToWaterHEATING {
             this->beginEnvironFlag = false;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp(),
+                                                           DataGlobalConstants::CWInitConvTemp,
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex,
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -513,7 +513,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp(),
+                                                    DataGlobalConstants::CWInitConvTemp,
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -893,7 +893,7 @@ namespace HeatPumpWaterToWaterHEATING {
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;

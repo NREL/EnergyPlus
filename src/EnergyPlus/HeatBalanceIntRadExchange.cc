@@ -57,7 +57,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -300,7 +299,7 @@ namespace HeatBalanceIntRadExchange {
                         }
                         if (Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-                            zone_info.Emissivity(ZoneSurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
+                            zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
@@ -343,7 +342,7 @@ namespace HeatBalanceIntRadExchange {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - DataGlobalConstants::KelvinConv();
+                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - DataGlobalConstants::KelvinConv;
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
@@ -363,12 +362,12 @@ namespace HeatBalanceIntRadExchange {
                     CarrollMRTNumerator += SurfaceTempRad[ZoneSurfNum]*zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                 }
-                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv());
+                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv);
             }
 
             if (CarrollMethod) {
                 if (CarrollMRTDenominator > 0.0) {
-                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv());
+                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv);
                 } else {
                     // Likely only one surface in this enclosure
                     CarrollMRTInKTo4th = 293.15;  // arbitrary value, IR will be zero
@@ -396,7 +395,7 @@ namespace HeatBalanceIntRadExchange {
                             }
                         }
                         if (CarrollMRTDenominatorWin > 0.0) {
-                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + DataGlobalConstants::KelvinConv());
+                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + DataGlobalConstants::KelvinConv);
                         }
                         SurfWinIRfromParentZone(RecSurfNum) += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
                     }
@@ -482,7 +481,7 @@ namespace HeatBalanceIntRadExchange {
         }
         if ((Surface(SurfNum).MovInsulIntPresent != Surface(SurfNum).MovInsulIntPresentPrevTS)) {
             auto const &thissurf(Surface(SurfNum));
-            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal - dataMaterial.Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
+            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal - state.dataMaterial->Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }
@@ -2005,7 +2004,7 @@ namespace HeatBalanceIntRadExchange {
                 Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
-        Real64 SB = DataGlobalConstants::StefanBoltzmann();
+        Real64 SB = DataGlobalConstants::StefanBoltzmann;
         for (int iS = 0; iS < N; iS++) {
             Fp[iS] = SB*EMISS[iS]/(EMISS[iS]/FMRT[iS] + 1. - EMISS[iS]);  // actually sigma *
         }

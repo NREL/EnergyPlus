@@ -483,8 +483,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -935,8 +935,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_FALSE(ErrorsFound);
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
@@ -2834,8 +2834,8 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(zoneNum);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(zoneNum);
-    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
 
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
@@ -3643,19 +3643,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
     TotMaterials = 0;
-    createAirMaterialFromDistance(0.008, "test_air_");
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
     EXPECT_EQ(TotMaterials, 1);
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).Name, "test_air_8MM");
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).Thickness, 0.008);
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_8MM");
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.008);
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(1, 1), 2.873e-3);
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(2, 1), 7.760e-5);
 
-    createAirMaterialFromDistance(0.012, "test_air_");
+    createAirMaterialFromDistance(*state, 0.012, "test_air_");
     EXPECT_EQ(TotMaterials, 2);
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).Name, "test_air_12MM");
-    EXPECT_EQ(dataMaterial.Material(TotMaterials).Thickness, 0.012);
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_12MM");
+    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.012);
 
-    createAirMaterialFromDistance(0.008, "test_air_");
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
     EXPECT_EQ(TotMaterials, 2);
 }
 
@@ -3665,8 +3665,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
     TotConstructs = 1;
     state->dataConstruction->Construct.allocate(TotConstructs);
 
-    dataMaterial.Material.allocate(60);
-    dataMaterial.Material(47).AbsorpThermalFront = 0.11;
+    state->dataMaterial->Material.allocate(60);
+    state->dataMaterial->Material(47).AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(TotConstructs).TotLayers = 3;
@@ -3889,8 +3889,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosZoneRelNorth(2) = state->dataSurfaceGeometry->CosZoneRelNorth(1);
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = state->dataSurfaceGeometry->SinZoneRelNorth(1);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
@@ -4871,7 +4871,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
     state->dataConstruction->Construct.allocate(6);
-    dataMaterial.Material.allocate(7);
+    state->dataMaterial->Material.allocate(7);
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
     state->dataConstruction->Construct(1).TotLayers = 3;
@@ -4890,9 +4890,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     state->dataConstruction->Construct(2).LayerPoint(1) = 1;
     state->dataConstruction->Construct(2).LayerPoint(3) = 3;
-    dataMaterial.Material(1).Group = RegularMaterial;
-    dataMaterial.Material(2).Group = RegularMaterial;
-    dataMaterial.Material(3).Group = RegularMaterial;
+    state->dataMaterial->Material(1).Group = RegularMaterial;
+    state->dataMaterial->Material(2).Group = RegularMaterial;
+    state->dataMaterial->Material(3).Group = RegularMaterial;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
@@ -4907,44 +4907,44 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(4).LayerPoint(1) = 4;
     state->dataConstruction->Construct(4).LayerPoint(2) = 2;
     state->dataConstruction->Construct(4).LayerPoint(3) = 5;
-    dataMaterial.Material(4).Group = WindowGlass;
-    dataMaterial.Material(4).Thickness = 0.15;
-    dataMaterial.Material(4).ReflectSolBeamFront = 0.35;
-    dataMaterial.Material(4).ReflectSolBeamBack = 0.25;
-    dataMaterial.Material(4).TransVis = 0.45;
-    dataMaterial.Material(4).ReflectVisBeamFront = 0.34;
-    dataMaterial.Material(4).ReflectVisBeamBack = 0.24;
-    dataMaterial.Material(4).TransThermal = 0.44;
-    dataMaterial.Material(4).AbsorpThermalFront = 0.33;
-    dataMaterial.Material(4).AbsorpThermalBack = 0.23;
-    dataMaterial.Material(4).Conductivity = 0.43;
-    dataMaterial.Material(4).GlassTransDirtFactor = 0.67;
-    dataMaterial.Material(4).SolarDiffusing = true;
-    dataMaterial.Material(4).YoungModulus = 0.89;
-    dataMaterial.Material(4).PoissonsRatio = 1.11;
-    dataMaterial.Material(5).Group = WindowGlass;
-    dataMaterial.Material(5).Thickness = 0.15;
-    dataMaterial.Material(5).ReflectSolBeamFront = 0.25;
-    dataMaterial.Material(5).ReflectSolBeamBack = 0.35;
-    dataMaterial.Material(5).TransVis = 0.45;
-    dataMaterial.Material(5).ReflectVisBeamFront = 0.24;
-    dataMaterial.Material(5).ReflectVisBeamBack = 0.34;
-    dataMaterial.Material(5).TransThermal = 0.44;
-    dataMaterial.Material(5).AbsorpThermalFront = 0.23;
-    dataMaterial.Material(5).AbsorpThermalBack = 0.33;
-    dataMaterial.Material(5).Conductivity = 0.43;
-    dataMaterial.Material(5).GlassTransDirtFactor = 0.67;
-    dataMaterial.Material(5).SolarDiffusing = true;
-    dataMaterial.Material(5).YoungModulus = 0.89;
-    dataMaterial.Material(5).PoissonsRatio = 1.11;
+    state->dataMaterial->Material(4).Group = WindowGlass;
+    state->dataMaterial->Material(4).Thickness = 0.15;
+    state->dataMaterial->Material(4).ReflectSolBeamFront = 0.35;
+    state->dataMaterial->Material(4).ReflectSolBeamBack = 0.25;
+    state->dataMaterial->Material(4).TransVis = 0.45;
+    state->dataMaterial->Material(4).ReflectVisBeamFront = 0.34;
+    state->dataMaterial->Material(4).ReflectVisBeamBack = 0.24;
+    state->dataMaterial->Material(4).TransThermal = 0.44;
+    state->dataMaterial->Material(4).AbsorpThermalFront = 0.33;
+    state->dataMaterial->Material(4).AbsorpThermalBack = 0.23;
+    state->dataMaterial->Material(4).Conductivity = 0.43;
+    state->dataMaterial->Material(4).GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(4).SolarDiffusing = true;
+    state->dataMaterial->Material(4).YoungModulus = 0.89;
+    state->dataMaterial->Material(4).PoissonsRatio = 1.11;
+    state->dataMaterial->Material(5).Group = WindowGlass;
+    state->dataMaterial->Material(5).Thickness = 0.15;
+    state->dataMaterial->Material(5).ReflectSolBeamFront = 0.25;
+    state->dataMaterial->Material(5).ReflectSolBeamBack = 0.35;
+    state->dataMaterial->Material(5).TransVis = 0.45;
+    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.24;
+    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.34;
+    state->dataMaterial->Material(5).TransThermal = 0.44;
+    state->dataMaterial->Material(5).AbsorpThermalFront = 0.23;
+    state->dataMaterial->Material(5).AbsorpThermalBack = 0.33;
+    state->dataMaterial->Material(5).Conductivity = 0.43;
+    state->dataMaterial->Material(5).GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(5).SolarDiffusing = true;
+    state->dataMaterial->Material(5).YoungModulus = 0.89;
+    state->dataMaterial->Material(5).PoissonsRatio = 1.11;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
-    dataMaterial.Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
-    dataMaterial.Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
+    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
+    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
@@ -4955,67 +4955,67 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     state->dataConstruction->Construct(5).LayerPoint(1) = 6;
     state->dataConstruction->Construct(6).TotLayers = 1;
     state->dataConstruction->Construct(6).LayerPoint(1) = 7;
-    dataMaterial.Material(6).Group = GlassEquivalentLayer;
-    dataMaterial.Material(6).TausFrontBeamBeam = 0.39;
-    dataMaterial.Material(6).TausBackBeamBeam = 0.29;
-    dataMaterial.Material(6).ReflFrontBeamBeam = 0.38;
-    dataMaterial.Material(6).ReflBackBeamBeam = 0.28;
-    dataMaterial.Material(6).TausFrontBeamBeamVis = 0.37;
-    dataMaterial.Material(6).TausBackBeamBeamVis = 0.27;
-    dataMaterial.Material(6).ReflFrontBeamBeamVis = 0.36;
-    dataMaterial.Material(6).ReflBackBeamBeamVis = 0.26;
-    dataMaterial.Material(6).TausFrontBeamDiff = 0.35;
-    dataMaterial.Material(6).TausBackBeamDiff = 0.25;
-    dataMaterial.Material(6).ReflFrontBeamDiff = 0.34;
-    dataMaterial.Material(6).ReflBackBeamDiff = 0.24;
-    dataMaterial.Material(6).TausFrontBeamDiffVis = 0.33;
-    dataMaterial.Material(6).TausBackBeamDiffVis = 0.23;
-    dataMaterial.Material(6).ReflFrontBeamDiffVis = 0.32;
-    dataMaterial.Material(6).ReflBackBeamDiffVis = 0.22;
-    dataMaterial.Material(6).TausDiffDiff = 0.456;
-    dataMaterial.Material(6).ReflFrontDiffDiff = 0.31;
-    dataMaterial.Material(6).ReflBackDiffDiff = 0.21;
-    dataMaterial.Material(6).TausDiffDiffVis = 0.345;
-    dataMaterial.Material(6).ReflFrontDiffDiffVis = 0.30;
-    dataMaterial.Material(6).ReflBackDiffDiffVis = 0.20;
-    dataMaterial.Material(6).TausThermal = 0.234;
-    dataMaterial.Material(6).EmissThermalFront = 0.888;
-    dataMaterial.Material(6).EmissThermalBack = 0.777;
-    dataMaterial.Material(6).Resistance = 1.234;
-    dataMaterial.Material(7).Group = GlassEquivalentLayer;
-    dataMaterial.Material(7).TausFrontBeamBeam = 0.29;
-    dataMaterial.Material(7).TausBackBeamBeam = 0.39;
-    dataMaterial.Material(7).ReflFrontBeamBeam = 0.28;
-    dataMaterial.Material(7).ReflBackBeamBeam = 0.38;
-    dataMaterial.Material(7).TausFrontBeamBeamVis = 0.27;
-    dataMaterial.Material(7).TausBackBeamBeamVis = 0.37;
-    dataMaterial.Material(7).ReflFrontBeamBeamVis = 0.26;
-    dataMaterial.Material(7).ReflBackBeamBeamVis = 0.36;
-    dataMaterial.Material(7).TausFrontBeamDiff = 0.25;
-    dataMaterial.Material(7).TausBackBeamDiff = 0.35;
-    dataMaterial.Material(7).ReflFrontBeamDiff = 0.24;
-    dataMaterial.Material(7).ReflBackBeamDiff = 0.34;
-    dataMaterial.Material(7).TausFrontBeamDiffVis = 0.23;
-    dataMaterial.Material(7).TausBackBeamDiffVis = 0.33;
-    dataMaterial.Material(7).ReflFrontBeamDiffVis = 0.22;
-    dataMaterial.Material(7).ReflBackBeamDiffVis = 0.32;
-    dataMaterial.Material(7).TausDiffDiff = 0.456;
-    dataMaterial.Material(7).ReflFrontDiffDiff = 0.21;
-    dataMaterial.Material(7).ReflBackDiffDiff = 0.31;
-    dataMaterial.Material(7).TausDiffDiffVis = 0.345;
-    dataMaterial.Material(7).ReflFrontDiffDiffVis = 0.20;
-    dataMaterial.Material(7).ReflBackDiffDiffVis = 0.30;
-    dataMaterial.Material(7).TausThermal = 0.234;
-    dataMaterial.Material(7).EmissThermalFront = 0.777;
-    dataMaterial.Material(7).EmissThermalBack = 0.888;
-    dataMaterial.Material(7).Resistance = 1.234;
+    state->dataMaterial->Material(6).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(6).TausFrontBeamBeam = 0.39;
+    state->dataMaterial->Material(6).TausBackBeamBeam = 0.29;
+    state->dataMaterial->Material(6).ReflFrontBeamBeam = 0.38;
+    state->dataMaterial->Material(6).ReflBackBeamBeam = 0.28;
+    state->dataMaterial->Material(6).TausFrontBeamBeamVis = 0.37;
+    state->dataMaterial->Material(6).TausBackBeamBeamVis = 0.27;
+    state->dataMaterial->Material(6).ReflFrontBeamBeamVis = 0.36;
+    state->dataMaterial->Material(6).ReflBackBeamBeamVis = 0.26;
+    state->dataMaterial->Material(6).TausFrontBeamDiff = 0.35;
+    state->dataMaterial->Material(6).TausBackBeamDiff = 0.25;
+    state->dataMaterial->Material(6).ReflFrontBeamDiff = 0.34;
+    state->dataMaterial->Material(6).ReflBackBeamDiff = 0.24;
+    state->dataMaterial->Material(6).TausFrontBeamDiffVis = 0.33;
+    state->dataMaterial->Material(6).TausBackBeamDiffVis = 0.23;
+    state->dataMaterial->Material(6).ReflFrontBeamDiffVis = 0.32;
+    state->dataMaterial->Material(6).ReflBackBeamDiffVis = 0.22;
+    state->dataMaterial->Material(6).TausDiffDiff = 0.456;
+    state->dataMaterial->Material(6).ReflFrontDiffDiff = 0.31;
+    state->dataMaterial->Material(6).ReflBackDiffDiff = 0.21;
+    state->dataMaterial->Material(6).TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(6).ReflFrontDiffDiffVis = 0.30;
+    state->dataMaterial->Material(6).ReflBackDiffDiffVis = 0.20;
+    state->dataMaterial->Material(6).TausThermal = 0.234;
+    state->dataMaterial->Material(6).EmissThermalFront = 0.888;
+    state->dataMaterial->Material(6).EmissThermalBack = 0.777;
+    state->dataMaterial->Material(6).Resistance = 1.234;
+    state->dataMaterial->Material(7).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(7).TausFrontBeamBeam = 0.29;
+    state->dataMaterial->Material(7).TausBackBeamBeam = 0.39;
+    state->dataMaterial->Material(7).ReflFrontBeamBeam = 0.28;
+    state->dataMaterial->Material(7).ReflBackBeamBeam = 0.38;
+    state->dataMaterial->Material(7).TausFrontBeamBeamVis = 0.27;
+    state->dataMaterial->Material(7).TausBackBeamBeamVis = 0.37;
+    state->dataMaterial->Material(7).ReflFrontBeamBeamVis = 0.26;
+    state->dataMaterial->Material(7).ReflBackBeamBeamVis = 0.36;
+    state->dataMaterial->Material(7).TausFrontBeamDiff = 0.25;
+    state->dataMaterial->Material(7).TausBackBeamDiff = 0.35;
+    state->dataMaterial->Material(7).ReflFrontBeamDiff = 0.24;
+    state->dataMaterial->Material(7).ReflBackBeamDiff = 0.34;
+    state->dataMaterial->Material(7).TausFrontBeamDiffVis = 0.23;
+    state->dataMaterial->Material(7).TausBackBeamDiffVis = 0.33;
+    state->dataMaterial->Material(7).ReflFrontBeamDiffVis = 0.22;
+    state->dataMaterial->Material(7).ReflBackBeamDiffVis = 0.32;
+    state->dataMaterial->Material(7).TausDiffDiff = 0.456;
+    state->dataMaterial->Material(7).ReflFrontDiffDiff = 0.21;
+    state->dataMaterial->Material(7).ReflBackDiffDiff = 0.31;
+    state->dataMaterial->Material(7).TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(7).ReflFrontDiffDiffVis = 0.20;
+    state->dataMaterial->Material(7).ReflBackDiffDiffVis = 0.30;
+    state->dataMaterial->Material(7).TausThermal = 0.234;
+    state->dataMaterial->Material(7).EmissThermalFront = 0.777;
+    state->dataMaterial->Material(7).EmissThermalBack = 0.888;
+    state->dataMaterial->Material(7).Resistance = 1.234;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
-    dataMaterial.Material(7).EmissThermalFront = 0.888;
+    state->dataMaterial->Material(7).EmissThermalFront = 0.888;
     RevLayerDiffs = false;
     // ExpectResult = true;
     CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);

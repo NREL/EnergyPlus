@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -158,6 +159,14 @@ namespace HVACInterfaceManager {
     void SetupCommonPipes(EnergyPlusData &state);
 
 } // namespace HVACInterfaceManager
+
+struct HVACInterfaceManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

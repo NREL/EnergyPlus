@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyEMSRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());

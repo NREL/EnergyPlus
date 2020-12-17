@@ -61,6 +61,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputReportData.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -177,6 +178,14 @@ namespace OutputReportTabularAnnual {
     extern std::vector<AnnualTable> annualTables;
 
 } // namespace OutputReportTabularAnnual
+
+struct OutputReportTabularAnnualData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

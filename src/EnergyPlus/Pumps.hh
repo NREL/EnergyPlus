@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -314,7 +315,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void PumpDataForTable(int const NumPump);
+    void PumpDataForTable(EnergyPlusData &state, int const NumPump);
 
     //*************************************************************************!
 
@@ -329,6 +330,14 @@ namespace Pumps {
     //=================================================================================================!
 
 } // namespace Pumps
+
+struct PumpsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

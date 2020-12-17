@@ -55,6 +55,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -313,6 +314,14 @@ namespace Photovoltaics {
     //     Tel: (608) 274-2577
 
 } // namespace Photovoltaics
+
+struct PhotovoltaicStateData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

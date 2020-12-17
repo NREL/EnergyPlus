@@ -67,7 +67,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -460,7 +459,7 @@ namespace EnergyPlus::Boilers {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::HWInitConvTemp(),
+                                                                 DataGlobalConstants::HWInitConvTemp,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
             this->DesMassFlowRate = this->VolFlowRate * rho;
@@ -488,7 +487,7 @@ namespace EnergyPlus::Boilers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -561,12 +560,12 @@ namespace EnergyPlus::Boilers {
 
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobalConstants::HWInitConvTemp(),
+                                                                     DataGlobalConstants::HWInitConvTemp,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      RoutineName);
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobalConstants::HWInitConvTemp(),
+                                                                         DataGlobalConstants::HWInitConvTemp,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                 tmpNomCap = Cp * rho * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
@@ -675,9 +674,9 @@ namespace EnergyPlus::Boilers {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             std::string const equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, "Boiler:HotWater");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, this->NomEffic);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, "Boiler:HotWater");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, this->NomEffic);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
         }
 
         if (ErrorsFound) {
@@ -922,7 +921,7 @@ namespace EnergyPlus::Boilers {
         // PURPOSE OF THIS SUBROUTINE:
         // boiler simulation reporting
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         int const BoilerInletNode = this->BoilerInletNodeNum;
         int const BoilerOutletNode = this->BoilerOutletNodeNum;
 
