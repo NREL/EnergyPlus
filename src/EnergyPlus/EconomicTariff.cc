@@ -140,7 +140,6 @@ namespace EnergyPlus::EconomicTariff {
         // meaning if "CCF" is picked, the conversion factor isn't the same whether it's a water meter or a fuel meter.
 
         using DataGlobalConstants::AssignResourceTypeNum;
-        using OutputProcessor::EnergyMeters;
         using OutputReportTabular::AddTOCEntry;
         using OutputReportTabular::displayTariffReport;
         using namespace DataIPShortCuts;
@@ -240,7 +239,7 @@ namespace EnergyPlus::EconomicTariff {
             // Determine whether this meter is related to electricity, or water, or gas
             if (tariff(iInObj).reportMeterIndx != 0) {
 
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
+                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
 
                 // Various types of electricity meters
                 if (SELECT_CASE_var == "ELECTRICITY") {
@@ -606,7 +605,7 @@ namespace EnergyPlus::EconomicTariff {
             }
             // associate the resource number with each tariff
             if (tariff(iInObj).reportMeterIndx >= 1) {
-                tariff(iInObj).resourceNum = AssignResourceTypeNum(EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
+                tariff(iInObj).resourceNum = AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
             }
         }
     }
@@ -2543,7 +2542,7 @@ namespace EnergyPlus::EconomicTariff {
                 isGood = false;
                 // if the meter is defined get the value
                 if (tariff(iTariff).reportMeterIndx != 0) {
-                    curInstantValue = GetCurrentMeterValue(tariff(iTariff).reportMeterIndx);
+                    curInstantValue = GetCurrentMeterValue(state, tariff(iTariff).reportMeterIndx);
                 } else {
                     curInstantValue = 0.0;
                 }
@@ -4699,8 +4698,6 @@ namespace EnergyPlus::EconomicTariff {
         //    netmetering, they need to be combined more carefully.
         //    Multiple meters are used but buy + sell might be more or
         //    less expensive than netmeter.
-
-        using OutputProcessor::EnergyMeters;
 
         int totalVarPt;
         int totEneVarPt;

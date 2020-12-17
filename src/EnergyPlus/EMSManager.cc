@@ -233,7 +233,6 @@ namespace EMSManager {
         using OutputProcessor::MeterType;
         using OutputProcessor::RealVariables;
         using OutputProcessor::RealVariableType;
-        using OutputProcessor::RVariableTypes;
         using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::EvaluateStack;
 

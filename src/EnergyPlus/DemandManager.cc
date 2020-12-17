@@ -317,7 +317,6 @@ namespace EnergyPlus::DemandManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using OutputProcessor::EnergyMeters;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -374,7 +373,7 @@ namespace EnergyPlus::DemandManager {
 
                 } else {
                     {
-                        auto const SELECT_CASE_var(EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType);
+                        auto const SELECT_CASE_var(state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType);
                         if ((SELECT_CASE_var == "Electricity") || (SELECT_CASE_var == "ElectricityNet")) {
                             Units = "[W]"; // For setup of report variables
 

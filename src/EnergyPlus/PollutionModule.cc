@@ -3798,10 +3798,10 @@ namespace PollutionModule {
 
         // in progress
         if (NumFuelFactors == 0 || NumEnvImpactFactors == 0) {
-            if (ReportingThisVariable("Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
-                ReportingThisVariable("Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
-                ReportingThisVariable("Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
-                ReportingThisVariable("Carbon Equivalent:Facility") || ReportingThisVariable("CarbonEquivalentEmissions:Carbon Equivalent")) {
+            if (ReportingThisVariable(state, "Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
+                ReportingThisVariable(state, "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
+                ReportingThisVariable(state, "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
+                ReportingThisVariable(state, "Carbon Equivalent:Facility") || ReportingThisVariable(state, "CarbonEquivalentEmissions:Carbon Equivalent")) {
                 ShowWarningError(state,
                     "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
                 ShowContinueError(state,

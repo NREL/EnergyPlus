@@ -4185,7 +4185,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
                             GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
-                pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;
+                pastElecLoad += GetCurrentMeterValue(state, wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;
             } else {
                 elecLoad = 0.0;
                 pastElecLoad = 0.0;
@@ -4337,7 +4337,7 @@ void ElectricTransformer::setupMeterIndices(EnergyPlusData &state)
             // Index function is used here because some resource types are not Electricity but strings containing
             // Electricity such as ElectricityPurchased and ElectricityProduced.
             // It is not proper to have this check in GetInput routine because the meter index may have not been defined
-            if (!has(GetMeterResourceType(wiredMeterPtrs_[meterNum]), "Electricity")) {
+            if (!has(GetMeterResourceType(state, wiredMeterPtrs_[meterNum]), "Electricity")) {
                 EnergyPlus::ShowFatalError(state, "Non-electricity meter used for " + name_);
             }
         }

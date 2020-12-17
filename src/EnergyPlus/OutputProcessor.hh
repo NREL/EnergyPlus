@@ -51,6 +51,7 @@
 // C++ Headers
 #include <iosfwd>
 #include <map>
+#include <unordered_map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -548,22 +549,6 @@ namespace OutputProcessor {
         }
     };
 
-    // Object Data
-    extern std::map<TimeStepType, TimeSteps> TimeValue;      // Pointers to the actual TimeStep variables
-    extern Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
-    extern Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
-    extern Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
-    extern Array1D<ReqReportVariables> ReqRepVars;
-    extern Array1D<MeterArrayType> VarMeterArrays;
-    extern Array1D<MeterType> EnergyMeters;
-    extern Array1D<EndUseCategoryType> EndUseCategory;
-
-    // Functions
-
-    // Clears the global data in OutputProcessor.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state, std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
@@ -869,7 +854,8 @@ namespace OutputProcessor {
 
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
-    void SetInternalVariableValue(int const varType,       // 1=integer, 2=real, 3=meter
+    void SetInternalVariableValue(EnergyPlusData &state,
+                                  int const varType,       // 1=integer, 2=real, 3=meter
                                   int const keyVarIndex,   // Array index
                                   Real64 const SetRealVal, // real value to set, if type is real or meter
                                   int const SetIntVal      // integer value to set if type is integer
@@ -881,7 +867,7 @@ namespace OutputProcessor {
 
     OutputProcessor::Unit unitStringToEnum(std::string const &unitIn);
 
-    std::string unitStringFromDDitem(int const ddItemPtr // index provided for DDVariableTypes
+    std::string unitStringFromDDitem(EnergyPlusData &state, int const ddItemPtr // index provided for DDVariableTypes
     );
 
     std::string timeStepTypeEnumToString(OutputProcessor::TimeStepType const &t_timeStepType);
@@ -965,9 +951,9 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
 
 int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName);
 
-std::string GetMeterResourceType(int const MeterNumber); // Which Meter Number (from GetMeterIndex)
+std::string GetMeterResourceType(EnergyPlusData &state, int const MeterNumber); // Which Meter Number (from GetMeterIndex)
 
-Real64 GetCurrentMeterValue(int const MeterNumber); // Which Meter Number (from GetMeterIndex)
+Real64 GetCurrentMeterValue(EnergyPlusData &state, int const MeterNumber); // Which Meter Number (from GetMeterIndex)
 
 Real64 GetInstantMeterValue(EnergyPlusData &state,
                             int const MeterNumber, // Which Meter Number (from GetMeterIndex)
@@ -1032,7 +1018,7 @@ void GetVariableKeys(EnergyPlusData &state,
                      Array1D_int &keyVarIndexes  // Array index for
 );
 
-bool ReportingThisVariable(std::string const &RepVarName);
+bool ReportingThisVariable(EnergyPlusData &state, std::string const &RepVarName);
 
 void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &ReportFreqName);
 
@@ -1113,6 +1099,15 @@ struct OutputProcessorData : BaseGlobalStruct {
     Array1D_string varNames;                    // stored variable names
     Array1D_int ivarNames;                      // pointers for sorted information
     int numVarNames = 0;                        // number of variable names
+    std::map<OutputProcessor::TimeStepType, OutputProcessor::TimeSteps> TimeValue;      // Pointers to the actual TimeStep variables
+    Array1D<OutputProcessor::RealVariableType> RVariableTypes;                          // Variable Types structure (use NumOfRVariables to traverse)
+    Array1D<OutputProcessor::IntegerVariableType> IVariableTypes;                       // Variable Types structure (use NumOfIVariables to traverse)
+    Array1D<OutputProcessor::VariableTypeForDDOutput> DDVariableTypes;                  // Variable Types structure (use NumVariablesForOutput to traverse)
+    Array1D<OutputProcessor::ReqReportVariables> ReqRepVars;
+    Array1D<OutputProcessor::MeterArrayType> VarMeterArrays;
+    Array1D<OutputProcessor::MeterType> EnergyMeters;
+    Array1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
+    std::unordered_map<std::string, std::string> UniqueMeterNames;
 
     void clear_state() override
     {
@@ -1178,6 +1173,15 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->varNames.deallocate();
         this->ivarNames.deallocate();
         this->numVarNames = 0;
+        this->TimeValue.clear();
+        this->RVariableTypes.deallocate();
+        this->IVariableTypes.deallocate();
+        this->DDVariableTypes.deallocate();
+        this->ReqRepVars.deallocate();
+        this->VarMeterArrays.deallocate();
+        this->EnergyMeters.deallocate();
+        this->EndUseCategory.deallocate();
+        this->UniqueMeterNames.clear();
     }
 };
 

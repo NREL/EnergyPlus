@@ -378,7 +378,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
         locDayOfSim,
         state.dataGlobal->HourOfDay,
         state.dataGlobal->TimeStep,
-        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
+        *state.dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         state.dataGlobal->NumOfTimeStepInHour);
 
     return tmpztStepStamp;
@@ -403,13 +403,13 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData& stat
 
     tmpztStepStamp = PrepareZoneTimestepStamp(state);
 
-    // pepare system timestep stamp
-    tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute;
+    // prepare system timestep stamp
+    tmpSysStepStamp.CurMinuteEnd = state.dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute;
     if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
-    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * MinutesPerHour;
-    tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*state.dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * MinutesPerHour;
+    tmpSysStepStamp.TimeStepDuration = *state.dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
 
     for (auto &l : logObjs) {
         l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);

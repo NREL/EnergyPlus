@@ -1085,7 +1085,6 @@ namespace NodeInputManager {
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::NumOfGlycols;
         using OutputProcessor::ReqReportVariables;
-        using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -1152,19 +1151,19 @@ namespace NodeInputManager {
                 nodeReportingStrings.push_back(std::string(NodeReportingCalc + NodeID(iNode)));
                 nodeFluidNames.push_back(GetGlycolNameByIndex(Node(iNode).FluidIndex));
                 for (iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
-                    if (UtilityRoutines::SameString(ReqRepVars(iReq).Key, NodeID(iNode)) || ReqRepVars(iReq).Key.empty()) {
-                        if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
+                    if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, NodeID(iNode)) || state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
+                        if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
                             NodeWetBulbRepReq(iNode) = true;
-                            NodeWetBulbSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
+                            NodeWetBulbSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
                             NodeRelHumidityRepReq(iNode) = true;
-                            NodeRelHumiditySchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
+                            NodeRelHumiditySchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
                             NodeDewPointRepReq(iNode) = true;
-                            NodeDewPointSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
+                            NodeDewPointSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
                             NodeSpecificHeatRepReq(iNode) = true;
-                            NodeSpecificHeatSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
+                            NodeSpecificHeatSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
                         }
                     }
                 }

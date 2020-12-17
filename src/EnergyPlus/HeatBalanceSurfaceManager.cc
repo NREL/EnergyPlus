@@ -5023,10 +5023,10 @@ namespace HeatBalanceSurfaceManager {
                                     "State", Zone(ZoneNum).Name);
             }
             for (int Loop = 1; Loop <= state.dataOutputProcessor->NumOfReqVariables; ++Loop) {
-                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Heat Index") {
+                if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Heat Index") {
                     reportVarHeatIndex = true;
                 }
-                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Humidity") {
+                if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Humidity") {
                     reportVarHumidex = true;
                 }
             }
