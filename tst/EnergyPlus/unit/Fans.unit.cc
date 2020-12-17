@@ -57,11 +57,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Fans;
@@ -71,10 +70,10 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     CurZoneEqNum = 0;
     CurSysNum = 0;
     CurOASysNum = 0;
-    state.dataFans->NumFans = 1;
-    Fan.allocate(state.dataFans->NumFans);
-    FanNumericFields.allocate(state.dataFans->NumFans);
-    FanNumericFields(state.dataFans->NumFans).FieldNames.allocate(3);
+    state->dataFans->NumFans = 1;
+    Fan.allocate(state->dataFans->NumFans);
+    FanNumericFields.allocate(state->dataFans->NumFans);
+    FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(3);
 
     int FanNum = 1;
     Fan(FanNum).FanName = "Test Fan";
@@ -84,7 +83,7 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     Fan(FanNum).DeltaPress = 500.0;
     Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
 
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 
@@ -94,7 +93,7 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 
     // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
     DataNonZoneNonAirloopValue = 1.00635;
-    SizeFan(state, FanNum);
+    SizeFan(*state, FanNum);
     EXPECT_DOUBLE_EQ(1.00635, Fan(FanNum).MaxAirFlowRate);
     DataNonZoneNonAirloopValue = 0.0;
     EXPECT_NEAR(1.0371, Fan(FanNum).DesignPointFEI, 0.0001);
@@ -103,12 +102,12 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 {
 
-    state.dataFans->NumFans = 1;
-    Fans::Fan.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields(state.dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->NumFans = 1;
+    Fans::Fan.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
     FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
@@ -127,13 +126,13 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     thisFan.MinAirMassFlowRate = 0.0;
     thisFan.MaxAirMassFlowRate = thisFan.MaxAirFlowRate;
     thisFan.InletAirMassFlowRate = thisFan.MaxAirMassFlowRate;
-    thisFan.RhoAirStdInit = DataEnvironment::StdRhoAir;
+    thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state.dataFans->LocalTurnFansOn = true;
-    state.dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    state->dataFans->LocalTurnFansOff = false;
     // simulate the fan
-    Fans::SimSimpleFan(state, FanNum);
+    Fans::SimSimpleFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
     Real64 Result_FanPower = max(0.0, thisFan.MaxAirMassFlowRate * thisFan.DeltaPress / (thisFan.FanEff * thisFan.RhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result_FanPower, thisFan.FanPower); // expects 300 W
@@ -143,19 +142,19 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     thisFan.EMSFanPressureValue = -300.0;
     // simulate the fan with negative pressure rise
     // set using fans EMS actuator for Pressure Rise
-    Fans::SimSimpleFan(state, FanNum);
+    Fans::SimSimpleFan(*state, FanNum);
     Real64 Result2_FanPower = max(0.0, thisFan.MaxAirMassFlowRate * thisFan.EMSFanPressureValue / (thisFan.FanEff * thisFan.RhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result2_FanPower, thisFan.FanPower); // expects zero
 }
 TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 {
 
-    state.dataFans->NumFans = 1;
-    Fans::Fan.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields(state.dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->NumFans = 1;
+    Fans::Fan.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
     FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
@@ -174,13 +173,13 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     thisFan.MinAirMassFlowRate = 0.0;
     thisFan.MaxAirMassFlowRate = thisFan.MaxAirFlowRate;
     thisFan.InletAirMassFlowRate = thisFan.MaxAirMassFlowRate;
-    thisFan.RhoAirStdInit = DataEnvironment::StdRhoAir;
+    thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state.dataFans->LocalTurnFansOn = true;
-    state.dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    state->dataFans->LocalTurnFansOff = false;
     // simulate the fan
-    Fans::SimOnOffFan(state, FanNum);
+    Fans::SimOnOffFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
     Real64 Result_FanPower = max(0.0, thisFan.MaxAirMassFlowRate * thisFan.DeltaPress / (thisFan.FanEff * thisFan.RhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result_FanPower, thisFan.FanPower); // expects 300 W
@@ -190,19 +189,19 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     thisFan.EMSFanPressureValue = -300.0;
     // simulate the fan with negative pressure rise
     // set using fans EMS actuator for Pressure Rise
-    Fans::SimOnOffFan(state, FanNum);
+    Fans::SimOnOffFan(*state, FanNum);
     Real64 Result2_FanPower = max(0.0, thisFan.MaxAirMassFlowRate * thisFan.EMSFanPressureValue / (thisFan.FanEff * thisFan.RhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result2_FanPower, thisFan.FanPower); // expects zero
 }
 TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 {
 
-    state.dataFans->NumFans = 1;
-    Fans::Fan.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields.allocate(state.dataFans->NumFans);
-    Fans::FanNumericFields(state.dataFans->NumFans).FieldNames.allocate(2);
+    state->dataFans->NumFans = 1;
+    Fans::Fan.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields.allocate(state->dataFans->NumFans);
+    Fans::FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(2);
     // set standard air density
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     int FanNum(1);
     FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
@@ -221,7 +220,7 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.MinAirMassFlowRate = 0.0;
     thisFan.MaxAirMassFlowRate = thisFan.MaxAirFlowRate;
     thisFan.InletAirMassFlowRate = thisFan.MaxAirMassFlowRate;
-    thisFan.RhoAirStdInit = DataEnvironment::StdRhoAir;
+    thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     // VAV Fan Power Coefficients
     thisFan.FanCoeff(1) = 0.06990146;
     thisFan.FanCoeff(2) = 1.39500612;
@@ -230,10 +229,10 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.FanCoeff(5) = 0.000;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state.dataFans->LocalTurnFansOn = true;
-    state.dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
+    state->dataFans->LocalTurnFansOff = false;
     // simulate the fan
-    Fans::SimVariableVolumeFan(state, FanNum);
+    Fans::SimVariableVolumeFan(*state, FanNum);
     // fan power = PartLoadFrac * MassFlow * DeltaPress / (FanEff * RhoAir)
     Real64 FlowRatio = 1.0;
     Real64 PartLoadFrac = thisFan.FanCoeff(1) + thisFan.FanCoeff(2) * FlowRatio + thisFan.FanCoeff(3) * FlowRatio * FlowRatio +
@@ -247,7 +246,7 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.EMSFanPressureValue = -300.0;
     // simulate the fan with negative pressure rise
     // set using fans EMS actuator for Pressure Rise
-    Fans::SimVariableVolumeFan(state, FanNum);
+    Fans::SimVariableVolumeFan(*state, FanNum);
     Real64 Result2_FanPower =
         max(0.0, PartLoadFrac * thisFan.MaxAirMassFlowRate * thisFan.EMSFanPressureValue / (thisFan.FanEff * thisFan.RhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result2_FanPower, thisFan.FanPower); // expects zero

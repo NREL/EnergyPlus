@@ -159,12 +159,12 @@ namespace SurfaceGroundHeatExchanger {
               LoopSideNum(0), BranchNum(0), CompNum(0),
 
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFflux({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
+              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -173,7 +173,7 @@ namespace SurfaceGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
@@ -260,7 +260,7 @@ namespace SurfaceGroundHeatExchanger {
 
 } // namespace SurfaceGroundHeatExchanger
 
-struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {     
+struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
 
     // utility variables initialized once
     bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground

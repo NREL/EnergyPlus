@@ -48,8 +48,6 @@
 #ifndef WindowManagerExteriorThermal_hh_INCLUDED
 #define WindowManagerExteriorThermal_hh_INCLUDED
 
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 namespace EnergyPlus {
 
 namespace DataSurfaces {
@@ -108,7 +106,7 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
-        std::shared_ptr<Tarcog::CEnvironment> getIndoor() const;
+        std::shared_ptr<Tarcog::CEnvironment> getIndoor(EnergyPlusData &state) const;
         std::shared_ptr<Tarcog::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         std::shared_ptr<Tarcog::CIGU> getIGU();
 
@@ -143,7 +141,7 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
         std::shared_ptr<Gases::CGas> getAir() const;

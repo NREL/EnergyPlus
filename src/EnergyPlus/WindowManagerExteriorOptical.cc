@@ -51,7 +51,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
@@ -72,8 +71,6 @@ using namespace SingleLayerOptics;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
-
 namespace WindowManager {
 
     std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
@@ -178,7 +175,7 @@ namespace WindowManager {
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
         // Calculation from this is used for IR properties. Need to make sure that properties
         // are calculated with new WCE optical engine (for both blinds and screens)
-        if (TotBlinds > 0) CalcWindowBlindProperties();
+        if (TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
         NumSurfaceScreens = TotScreens;
@@ -187,9 +184,9 @@ namespace WindowManager {
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
-            if (construction.isGlazingConstruction()) {
+            if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
-                    auto &material(dataMaterial.Material(construction.LayerPoint(LayNum)));
+                    auto &material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     if (material.Group != WindowGas && material.Group != WindowGasMixture && material.Group != ComplexWindowGap &&
                         material.Group != ComplexWindowShade) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
@@ -225,13 +222,13 @@ namespace WindowManager {
             auto IntBlind = false;
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
-            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
                 IntBlind = true;
-                BlNum = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
+                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
@@ -239,12 +236,12 @@ namespace WindowManager {
                     auto EpsGlIR = 0.0;
                     auto RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
-                        EpsGlIR = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                        EpsGlIR = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        auto TauShIR = dataMaterial.Material(ShadeLayPtr).TransThermal;
-                        auto EpsShIR = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
+                        auto TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
+                        auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                         SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -327,7 +324,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init(EnergyPlusData &EP_UNUSED(state))
+    void CWCEMaterialDualBandFactory::init([[maybe_unused]] EnergyPlusData &state)
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();

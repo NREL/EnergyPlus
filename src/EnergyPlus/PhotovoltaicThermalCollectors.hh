@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
@@ -163,15 +164,15 @@ namespace PhotovoltaicThermalCollectors {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupReportVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void size();
+        void size(EnergyPlusData &state);
 
         void control();
 
@@ -197,6 +198,14 @@ namespace PhotovoltaicThermalCollectors {
     int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
+
+struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

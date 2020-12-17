@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -208,7 +207,7 @@ namespace DataSurfaceColors {
         // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurrentModuleObject("OutputControl:SurfaceColorScheme");
+        constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -229,7 +228,7 @@ namespace DataSurfaceColors {
 
         if (numptr > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, numargs, NumAlphas, numNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
             cAlphas.allocate(NumAlphas);
             cAlphaFields.allocate(NumAlphas);
@@ -257,13 +256,13 @@ namespace DataSurfaceColors {
                 numptr = rNumerics(numargs); // set to integer
                 if (lNumericBlanks(numargs)) {
                     if (!lAlphaBlanks(numargs + 1)) {
-                        ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                        ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                          cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
                     }
                     continue;
                 }
                 if (!MatchAndSetColorTextString(cAlphas(numargs + 1), numptr, ColorType)) {
-                    ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                    ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                      cAlphas(numargs + 1) + ", is invalid.  No color set.");
                 }
             }
@@ -276,7 +275,7 @@ namespace DataSurfaceColors {
             lNumericBlanks.deallocate();
 
         } else {
-            ShowWarningError("SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+            ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
         }
     }
 

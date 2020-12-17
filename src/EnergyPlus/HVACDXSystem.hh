@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -314,7 +315,8 @@ namespace HVACDXSystem {
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
-    void FrostControlSetPointLimit(int const DXSystemNum,      // dx cooling coil system index
+    void FrostControlSetPointLimit(EnergyPlusData &state,
+                                   int const DXSystemNum,      // dx cooling coil system index
                                    Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                    Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
                                    Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
@@ -357,6 +359,14 @@ namespace HVACDXSystem {
     // *****************************************************************************
 
 } // namespace HVACDXSystem
+
+struct HVACDXSystemData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

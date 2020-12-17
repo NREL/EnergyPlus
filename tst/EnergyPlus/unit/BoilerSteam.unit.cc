@@ -55,8 +55,10 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -90,8 +92,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
-    GetBoilerInput(state);
-    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
+    GetBoilerInput(*state);
+    auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
     EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
@@ -118,11 +120,11 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     Real64 MyLoad(1000000.0);
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -158,8 +160,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetBoilerInput(state);
-    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
+    GetBoilerInput(*state);
+    auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
 
     DataPlant::PlantLoop(1).Name = "SteamLoop";
     DataPlant::PlantLoop(1).FluidName = "Steam";
@@ -179,9 +181,9 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    state.dataGlobal->BeginEnvrnFlag = true;
-    thisBoiler.initialize(state);
-    thisBoiler.calculate(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
+    state->dataGlobal->BeginEnvrnFlag = true;
+    thisBoiler.initialize(*state);
+    thisBoiler.calculate(*state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive);
 
     // check boiler fuel used and the resultant boiler efficiency
     EXPECT_EQ(thisBoiler.BoilerLoad, 1000000);

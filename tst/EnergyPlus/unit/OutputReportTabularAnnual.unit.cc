@@ -59,6 +59,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputReportTabularAnnual;
@@ -82,9 +83,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
-    GetInputTabularAnnual(state);
+    GetInputTabularAnnual(*state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
@@ -130,7 +131,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -140,7 +141,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -150,7 +151,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -160,13 +161,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
-    GetInputTabularAnnual(state); // this also calls setupGathering
+    GetInputTabularAnnual(*state); // this also calls setupGathering
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
@@ -201,7 +202,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -211,7 +212,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -221,7 +222,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Energy",
+    SetupOutputVariable(*state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -231,21 +232,21 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
+    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 0.25;
 
-    GetInputTabularAnnual(state);
+    GetInputTabularAnnual(*state);
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
     extLitPow = 2.01;
     extLitUse = 1.01;
 
     // UpdateDataandReport( 1 ); not sure if this is needed
-    GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherAnnualResultsForTimeStep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
@@ -255,7 +256,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown)
 {
-    DataGlobals::TimeStepZone = 1.0;
+    state->dataGlobal->TimeStepZone = 1.0;
     DataHVACGlobals::TimeStepSys = 1.0;
 
 
@@ -266,14 +267,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
 
     std::vector<AnnualTable> annualTables;
-    annualTables.push_back(AnnualTable(state, "PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
+    annualTables.push_back(AnnualTable(*state, "PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
     annualTables.back().addFieldSet("HEATING:MYTH:VARIABLE", AnnualFieldSet::AggregationKind::hoursPositive, 2);
     annualTables.back().addFieldSet("ELECTRICITY:MYTH", AnnualFieldSet::AggregationKind::maximumDuringHoursShown, 2);
-    annualTables.back().setupGathering(state);
+    annualTables.back().setupGathering(*state);
 
     OutputProcessor::EnergyMeters(1).CurTSValue = -10.;
     OutputProcessor::EnergyMeters(2).CurTSValue = 50.;
-    annualTables.back().gatherForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     std::vector<std::string> fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -285,7 +286,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     OutputProcessor::EnergyMeters(1).CurTSValue = 15.;
     OutputProcessor::EnergyMeters(2).CurTSValue = 55.;
-    annualTables.back().gatherForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -329,7 +330,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable(state, "Misc Facility Electric Energy",
+    SetupOutputVariable(*state, "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
                         "Zone",
@@ -345,9 +346,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
-    OutputReportTabularAnnual::GetInputTabularAnnual(state);
+    OutputReportTabularAnnual::GetInputTabularAnnual(*state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
@@ -386,7 +387,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable(state, "Misc Facility Electric Energy",
+    SetupOutputVariable(*state, "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
                         "Zone",
@@ -402,13 +403,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
-    OutputReportTabularAnnual::GetInputTabularAnnual(state);
+    OutputReportTabularAnnual::GetInputTabularAnnual(*state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 
-    EXPECT_TRUE(firstTable->invalidAggregationOrder());
+    EXPECT_TRUE(firstTable->invalidAggregationOrder(*state));
 }

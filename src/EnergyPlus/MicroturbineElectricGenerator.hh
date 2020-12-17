@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -198,13 +199,13 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
         void InitMTGenerators(EnergyPlusData &state,
                               bool RunFlag,
@@ -228,6 +229,14 @@ namespace MicroturbineElectricGenerator {
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
+
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

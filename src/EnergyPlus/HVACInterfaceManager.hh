@@ -52,6 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -123,7 +125,7 @@ namespace HVACInterfaceManager {
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int const AirLoopNum, // airloop number for which air loop this is
-                             int const CalledFrom,
+                             DataConvergParams::iCalledFrom const CalledFrom,
                              int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                              int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
@@ -157,6 +159,14 @@ namespace HVACInterfaceManager {
     void SetupCommonPipes(EnergyPlusData &state);
 
 } // namespace HVACInterfaceManager
+
+struct HVACInterfaceManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

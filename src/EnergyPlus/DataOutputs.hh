@@ -48,16 +48,19 @@
 #ifndef DataOutputs_hh_INCLUDED
 #define DataOutputs_hh_INCLUDED
 
+// C++ Headers
+#include <cstddef>
+#include <unordered_map>
+#include <vector>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include "re2/re2.h"
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <cstddef>
-#include <unordered_map>
-#include <vector>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -87,7 +90,7 @@ namespace DataOutputs {
     // Types
     struct OutputReportingVariables
     {
-        OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName);
+        OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
 
         std::string const key;
         std::string const variableName;
@@ -116,6 +119,14 @@ namespace DataOutputs {
     bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName);
 
 } // namespace DataOutputs
+
+struct OutputsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

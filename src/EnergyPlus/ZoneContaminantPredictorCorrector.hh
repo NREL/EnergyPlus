@@ -79,13 +79,13 @@ namespace ZoneContaminantPredictorCorrector {
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void PushZoneTimestepHistories();
+    void PushZoneTimestepHistories(EnergyPlusData &state);
 
-    void PushSystemTimestepHistories();
+    void PushSystemTimestepHistories(EnergyPlusData &state);
 
-    void RevertZoneTimestepHistories();
+    void RevertZoneTimestepHistories(EnergyPlusData &state);
 
-    void InverseModelCO2(int const ZoneNum,           // Zone number
+    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -126,8 +126,6 @@ namespace ZoneContaminantPredictorCorrector {
             this->TotGCBLDiff = 0;
             this->TotGCDVS = 0;
             this->TotGCDRS = 0;
-            DataContaminantBalance::Contaminant.CO2Simulation = false;
-            DataContaminantBalance::Contaminant.GenericContamSimulation = false;
             this->MyOneTimeFlag = true;
             this->MyEnvrnFlag = true;
             this->MyDayFlag = true;

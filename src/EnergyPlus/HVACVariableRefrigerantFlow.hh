@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -431,11 +432,11 @@ namespace HVACVariableRefrigerantFlow {
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -445,7 +446,8 @@ namespace HVACVariableRefrigerantFlow {
 
         void CalcVRFIUTeTc_FluidTCtrl();
 
-        void VRFOU_TeTc(int OperationMode,      // Flag for hex operation
+        void VRFOU_TeTc(EnergyPlusData &state,
+                        int OperationMode,      // Flag for hex operation
                         Real64 Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                         Real64 SHSC,            // SH at cooling or SC at heating [C]
                         Real64 m_air,           // OU coil air mass flow rate [kg/s]
@@ -456,7 +458,8 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &TeTc                  // VRF Tc at cooling mode, or Te at heating mode [C]
         );
 
-        Real64 VRFOU_FlowRate(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_FlowRate(EnergyPlusData &state,
+                              int OperationMode, // Flag for hex operation
                               Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                               Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                               Real64 Q_coil,     // absolute value of OU coil heat release or heat extract [W]
@@ -464,7 +467,8 @@ namespace HVACVariableRefrigerantFlow {
                               Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         ) const;
 
-        Real64 VRFOU_Cap(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_Cap(EnergyPlusData &state,
+                         int OperationMode, // Flag for hex operation
                          Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                          Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                          Real64 m_air,      // OU coil air mass flow rate [kg/s]
@@ -472,7 +476,8 @@ namespace HVACVariableRefrigerantFlow {
                          Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         );
 
-        Real64 VRFOU_SCSH(int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
+        Real64 VRFOU_SCSH(EnergyPlusData &state,
+                          int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
                           Real64 Q_coil,         // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                           Real64 TeTc,           // VRF Tc at cooling mode, or Te at heating mode [C]
                           Real64 m_air,          // OU coil air mass flow rate [kg/s]
@@ -682,8 +687,10 @@ namespace HVACVariableRefrigerantFlow {
         Real64 ParasiticElec;                // parasitic electric for VRF terminal unit
         Real64 ParasiticOffElec;             // parasitic electric for VRF terminal unit when off
         Real64 HeatingSpeedRatio;            // Fan speed ratio in heating mode
+        Real64 NoHeatingSpeedRatio;          // Fan speed ratio when no heating
         Real64 HeatingCapacitySizeRatio;     // Ratio of heating to cooling when autosizing
         Real64 CoolingSpeedRatio;            // Fan speed ratio in cooling mode
+        Real64 NoCoolingSpeedRatio;          // Fan speed ratio when no cooling
         Real64 ParasiticCoolElecPower;       // Terminal unit cooling parasitic electric power [W]
         Real64 ParasiticHeatElecPower;       // Terminal unit heating parasitic electric power [W]
         Real64 ParasiticElecCoolConsumption; // Terminal unit parasitic electric consumption in cooling [J]
@@ -762,20 +769,20 @@ namespace HVACVariableRefrigerantFlow {
               SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0),
               FanPower(0.0), OpMode(0), FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0),
               HeatCoilIndex(0), SuppHeatCoilIndex(0), DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0),
-              ParasiticOffElec(0.0), HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0),
-              ParasiticHeatElecPower(0.0), ParasiticElecCoolConsumption(0.0), ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true),
-              HeatingCoilPresent(true), SuppHeatingCoilPresent(false), AvailStatus(0), TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0),
-              TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0),
-              LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0),
-              LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0),
-              FirstIterfailed(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0),
-              SuppHeatCoilFluidOutletNode(0), firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(),
-              SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true),
-              airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false),
-              heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
-              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0),
-              heatCoilAirOutNode(0)
+              ParasiticOffElec(0.0), HeatingSpeedRatio(1.0), NoHeatingSpeedRatio(0.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0),
+              NoCoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0), ParasiticHeatElecPower(0.0), ParasiticElecCoolConsumption(0.0),
+              ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true), HeatingCoilPresent(true), SuppHeatingCoilPresent(false), AvailStatus(0),
+              TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0), TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0),
+              SensibleHeatingRate(0.0), LatentCoolingRate(0.0), LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0),
+              SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0), LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0),
+              EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0), HVACSizingIndex(0),
+              ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0),
+              SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
+              firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0),
+              coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false),
+              isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0),
+              heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0),
+              zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0), heatCoilAirOutNode(0)
         {
         }
 
@@ -932,7 +939,8 @@ namespace HVACVariableRefrigerantFlow {
                        Array1D<Real64> const &Par   // par(1) = VRFTUNum
     );
 
-    void SetAverageAirFlow(int VRFTUNum,         // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int VRFTUNum,         // Unit index
                            Real64 PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );
@@ -976,6 +984,14 @@ namespace HVACVariableRefrigerantFlow {
     );
 
 } // namespace HVACVariableRefrigerantFlow
+
+struct HVACVarRefFlowData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -52,10 +52,10 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
 #include "EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
@@ -77,15 +77,15 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 
-    EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 0.0), 0.01);      // Jan 1
-    EXPECT_NEAR(20.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 15768000), 0.01); // June 1
-    EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 31449600), 0.01); // Dec 30
-    EXPECT_NEAR(15.0, thisModel->getGroundTempAtTimeInSeconds(state, 100.0, 0.0), 0.01);    // Very deep
+    EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 0.0), 0.01);      // Jan 1
+    EXPECT_NEAR(20.0, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 15768000), 0.01); // June 1
+    EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 31449600), 0.01); // Dec 30
+    EXPECT_NEAR(15.0, thisModel->getGroundTempAtTimeInSeconds(*state, 100.0, 0.0), 0.01);    // Very deep
 
-    EXPECT_NEAR(10.15, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 1), 0.01); // January
-    EXPECT_NEAR(19.75, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 6), 0.01); // June
+    EXPECT_NEAR(10.15, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 1), 0.01); // January
+    EXPECT_NEAR(19.75, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 6), 0.01); // June
 }
 
 TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2) // lNumericFieldBlanks not working correctly for this test
@@ -119,12 +119,12 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2) // lNumericFieldB
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 
-    EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 0.0), 0.01);      // Jan 1
-    EXPECT_NEAR(17.17, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 11664000), 0.01); // May 15
-    EXPECT_NEAR(20.12, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 24883200), 0.01); // Oct 15
-    EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 31536000), 0.01); // Dec 31
+    EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 0.0), 0.01);      // Jan 1
+    EXPECT_NEAR(17.17, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 11664000), 0.01); // May 15
+    EXPECT_NEAR(20.12, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 24883200), 0.01); // Oct 15
+    EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 31536000), 0.01); // Dec 31
 
-    EXPECT_NEAR(18.0, thisModel->getGroundTempAtTimeInSeconds(state, 100.0, 24883200), 0.01); // Oct 15--deep
+    EXPECT_NEAR(18.0, thisModel->getGroundTempAtTimeInSeconds(*state, 100.0, 24883200), 0.01); // Oct 15--deep
 }

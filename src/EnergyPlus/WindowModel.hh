@@ -48,8 +48,11 @@
 #ifndef WindowModel_H
 #define WindowModel_H
 
+// C++ headers
 #include <map>
 #include <memory>
+
+// EnergyPlus headers
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -64,11 +67,11 @@ template <typename T> class EnumParser
 public:
     EnumParser(){};
 
-    T StringToEnum(const std::string &value)
+    T StringToEnum(EnergyPlusData &state, const std::string &value)
     {
         auto iValue = m_Map.find(value);
         if (iValue == m_Map.end()) {
-            ShowFatalError("Incorrect enumerator assigned.");
+            ShowFatalError(state, "Incorrect enumerator assigned.");
         }
         return iValue->second;
     }
@@ -109,7 +112,7 @@ namespace WindowManager {
     public:
         CWindowOpticalModel();
 
-        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory();
+        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory(EnergyPlusData &state);
 
         WindowsOpticalModel getWindowsOpticalModel() const;
         bool isSimplifiedModel() const;

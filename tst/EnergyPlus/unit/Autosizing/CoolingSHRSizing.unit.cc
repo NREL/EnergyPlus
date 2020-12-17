@@ -49,8 +49,8 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +69,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     bool printFlag = false;
 
     // uninitialized sizing type
-    Real64 sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    Real64 sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(errorsFound);
     EXPECT_EQ(AutoSizingResultType::ErrorType2, sizer.errorType);
     EXPECT_NEAR(0.0, sizedValue, 0.01); // unitialized sizing types always return 0
@@ -87,8 +87,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // Test #1 - Zone Equipment, no autosizing, missing input data
     DataSizing::DataFlowUsedForSizing = 0.5; // DataCapacityUsedForSizing not initialized
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // no sizing error since not autosized
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.85, sizedValue, 0.01); // default value on error
@@ -103,8 +103,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     printFlag = true;
     inputValue = 0.85;
     DataSizing::DataCapacityUsedForSizing = 10000.0;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.85, sizedValue, 0.01); // hard-sized value
@@ -131,8 +131,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     DataSizing::ZoneSizingInput.allocate(1);
     DataSizing::ZoneSizingInput(1).ZoneNum = 1;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.7763, sizedValue, 0.000001);
@@ -146,8 +146,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // Test #4 - Zone Equipment, repeat with autosized and no initialized DataCapacityUsedForSizing
     inputValue = EnergyPlus::DataSizing::AutoSize;
     DataSizing::DataCapacityUsedForSizing = 0.0;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
     EXPECT_TRUE(errorsFound);
     EXPECT_TRUE(sizer.wasAutoSized);
@@ -156,8 +156,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // Test #5 - Zone Equipment, flow to capacity ratio high
     DataSizing::DataCapacityUsedForSizing = 10000.0;
     DataSizing::DataFlowUsedForSizing = 1.0;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800655, sizedValue, 0.000001); // includes impact of ValidateADP
@@ -171,8 +171,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
@@ -190,8 +190,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     DataHVACGlobals::DXCT = DataHVACGlobals::DOASDXCoil;
     // do sizing
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     RatedVolFlowPerRatedTotCap = DataSizing::DataFlowUsedForSizing / DataSizing::DataCapacityUsedForSizing;
@@ -207,8 +207,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // Test #8 - Zone Equipment, flow to capacity ratio high
     DataSizing::DataFlowUsedForSizing = 1.0;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800798, sizedValue, 0.000001); // includes impact of ValidateADP
@@ -222,8 +222,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     initialSHR = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT); // does not include impact of ValidateADP, which increases SHR
@@ -251,8 +251,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.67, sizedValue, 0.001); // hard-sized value
@@ -273,8 +273,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.77630, sizedValue, 0.000001);
@@ -293,8 +293,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800160, sizedValue, 0.000001);
@@ -308,8 +308,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.675083, sizedValue, 0.000001);
@@ -330,8 +330,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
-    sizedValue = sizer.size(this->state, inputValue, errorsFound);
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.52, sizedValue, 0.000001);

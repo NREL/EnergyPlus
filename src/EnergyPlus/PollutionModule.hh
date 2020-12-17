@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -428,7 +429,7 @@ namespace PollutionModule {
 
     void clear_state();
 
-    void CalculatePollution();
+    void CalculatePollution(EnergyPlusData &state);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -439,7 +440,7 @@ namespace PollutionModule {
 
     void SetupPollutionMeterReporting(EnergyPlusData &state);
 
-    void CheckPollutionMeterReporting();
+    void CheckPollutionMeterReporting(EnergyPlusData &state);
 
     void CheckFFSchedule(EnergyPlusData &state,
                          std::string const &currentModuleObject, // the module Object
@@ -453,7 +454,7 @@ namespace PollutionModule {
     // End of Get Input subroutines for the Pollution Module
     //******************************************************************************
 
-    void CalcPollution();
+    void CalcPollution(EnergyPlusData &state);
 
     void ReadEnergyMeters();
 
@@ -476,6 +477,14 @@ namespace PollutionModule {
     );
 
 } // namespace PollutionModule
+
+struct PollutionModuleData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

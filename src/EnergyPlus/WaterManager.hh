@@ -68,11 +68,9 @@ namespace WaterManager {
 
     void GetWaterManagerInput(EnergyPlusData &state);
 
-    void UpdatePrecipitation();
+    void UpdatePrecipitation(EnergyPlusData &state);
 
-    void UpdateIrrigation();
-
-    void SizeWaterManager();
+    void UpdateIrrigation(EnergyPlusData &state);
 
     void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
@@ -83,34 +81,35 @@ namespace WaterManager {
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
-    void InternalSetupTankSupplyComponent(std::string const &CompName,
+    void InternalSetupTankSupplyComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
-    void SetupTankDemandComponent(EnergyPlusData &state, std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
-    void InternalSetupTankDemandComponent(std::string const &CompName,
+    void InternalSetupTankDemandComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);
 
-    void CalcRainCollector(int const RainColNum); // Index of rain collector
+    void CalcRainCollector(EnergyPlusData &state, int const RainColNum); // Index of rain collector
 
-    void CalcGroundwaterWell(int const WellNum); // Index of well
+    void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum); // Index of well
 
     void UpdateWaterManager(EnergyPlusData &state);
-
-    void ReportWaterManager();
 
 } // namespace WaterManager
 
@@ -121,6 +120,7 @@ namespace WaterManager {
         bool MyEnvrnFlag;   // flag for init once at start of environment
         bool MyWarmupFlag; // flag for init after warmup complete
         bool MyTankDemandCheckFlag;
+        Real64 overflowTwater = 0.0;
 
         void clear_state() override
         {
@@ -129,11 +129,12 @@ namespace WaterManager {
             this->MyEnvrnFlag = true;
             this->MyWarmupFlag = false;
             this->MyTankDemandCheckFlag = true;
+            this->overflowTwater = 0.0;
         }
 
         // Default Constructor
         WaterManagerData()
-            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
+            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
         {
         }
     };

@@ -168,7 +168,8 @@ namespace PVWatts {
     public:
         static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
-        PVWattsGenerator(const std::string &name,
+        PVWattsGenerator(EnergyPlusData &state,
+                         const std::string &name,
                          const Real64 dcSystemCapacity,
                          ModuleType moduleType,
                          ArrayType arrayType,
@@ -200,7 +201,7 @@ namespace PVWatts {
         void setDCtoACRatio(Real64 dc2ac);
         void setInverterEfficiency(Real64 inverterEfficiency);
 
-        void calc(EnergyPlusData& state);
+        void calc(EnergyPlusData &state);
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
     };
 
@@ -211,6 +212,14 @@ namespace PVWatts {
     void clear_state();
 
 } // namespace PVWatts
+
+struct PVWattsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

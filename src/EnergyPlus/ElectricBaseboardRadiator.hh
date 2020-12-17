@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -173,17 +174,25 @@ namespace ElectricBaseboardRadiator {
     void UpdateElectricBaseboardOn(
         Real64 &AirOutletTemp, Real64 &ElecUseRate, Real64 const AirInletTemp, Real64 const QBBCap, Real64 const CapacitanceAir, Real64 const Effic);
 
-    void UpdateElectricBaseboard(int const BaseboardNum);
+    void UpdateElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBElecRadGains();
+    void DistributeBBElecRadGains(EnergyPlusData &state);
 
     void ReportElectricBaseboard(int const BaseboardNum);
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
 } // namespace ElectricBaseboardRadiator
+
+struct ElectricBaseboardRadiatorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

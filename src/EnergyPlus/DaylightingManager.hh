@@ -57,7 +57,9 @@
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -67,64 +69,18 @@ struct EnergyPlusData;
 
 namespace DaylightingManager {
 
-    // Using/Aliasing
-    using DataBSDFWindow::BSDFRefPoints;
-    using DataBSDFWindow::BSDFRefPointsGeomDescr;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const octreeCrossover; // Surface count crossover for switching to octree algorithm
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
-    extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
-    extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
-    extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
-    extern Real64 PHSUN;              // Solar altitude (radians)
-    extern Real64 SPHSUN;             // Sine of solar altitude
-    extern Real64 CPHSUN;             // Cosine of solar altitude
-    extern Real64 THSUN;              // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    extern Array1D<Real64> PHSUNHR;   // Hourly values of PHSUN
-    extern Array1D<Real64> SPHSUNHR;  // Hourly values of the sine of PHSUN
-    extern Array1D<Real64> CPHSUNHR;  // Hourly values of the cosine of PHSUN
-    extern Array1D<Real64> THSUNHR;   // Hourly values of THSUN
-
-    // In the following I,J,K arrays:
-    // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
-    // J = 1 for bare window, 2 - 12 for shaded;
-    // K = sun position index.
-    extern Array3D<Real64> EINTSK; // Sky-related portion of internally reflected illuminance
-    extern Array2D<Real64> EINTSU; // Sun-related portion of internally reflected illuminance,
-    // excluding entering beam
-    extern Array2D<Real64> EINTSUdisk; // Sun-related portion of internally reflected illuminance
-    // due to entering beam
-    extern Array3D<Real64> WLUMSK;     // Sky-related window luminance
-    extern Array2D<Real64> WLUMSU;     // Sun-related window luminance, excluding view of solar disk
-    extern Array2D<Real64> WLUMSUdisk; // Sun-related window luminance, due to view of solar disk
-
-    extern Array2D<Real64> GILSK; // Horizontal illuminance from sky, by sky type, for each hour of the day
-    extern Array1D<Real64> GILSU; // Horizontal illuminance from sun for each hour of the day
-
-    extern Array3D<Real64> EDIRSK;     // Sky-related component of direct illuminance
-    extern Array2D<Real64> EDIRSU;     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
-    extern Array2D<Real64> EDIRSUdisk; // Sun-related component of direct illuminance due to beam solar at ref pt
-    extern Array3D<Real64> AVWLSK;     // Sky-related average window luminance
-    extern Array2D<Real64> AVWLSU;     // Sun-related average window luminance, excluding view of solar disk
-    extern Array2D<Real64> AVWLSUdisk; // Sun-related average window luminance due to view of solar disk
-
-    // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
-
-    extern Array2D<Real64> TDDTransVisBeam;
-    extern Array3D<Real64> TDDFluxInc;
-    extern Array3D<Real64> TDDFluxTrans;
-
-    extern Array2D_int MapErrIndex;
-    extern Array2D_int RefErrIndex;
-
-    extern Array1D_bool CheckTDDZone;
-
-    // Functions
-    void clear_state();
+    // Surface count crossover for using octree algorithm
+    // The octree gives lower computational complexity for much higher performance
+    //  as the surface count increases but has some overhead such that the direct
+    //  algorithm can be more efficient at small surface counts.
+    // Testing to date shows that the octree performance is close to that of the
+    //  direct algorithm even with small surface counts and that there is no single
+    //  crossover that is ideal for all models: some cases with 10-30 surfaces were
+    //  faster with the octree but another with 80 surfaces was faster with the
+    //  direct algorithm.
+    // A reasonable, conservative crossover is selected but may be refined as more
+    //  experience is gained.
+    constexpr int octreeCrossover(100); // Octree surface count crossover
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -140,7 +96,7 @@ namespace DaylightingManager {
                                                   int const ZoneNum,
                                                   int const iRefPoint,
                                                   int const loopwin,
-                                                  int const CalledFrom,          // indicate  which type of routine called this routine
+                                                  DataDaylighting::iCalledFor const CalledFrom,          // indicate  which type of routine called this routine
                                                   Vector3<Real64> const &RREF,   // Location of a reference point in absolute coordinate system
                                                   Vector3<Real64> const &VIEWVC, // View vector in absolute coordinate system
                                                   int &IWin,
@@ -157,7 +113,7 @@ namespace DaylightingManager {
                                                   int &ShType,      // Window shading type
                                                   int &BlNum,       // Window blind number
                                                   Vector3<Real64> &WNORM2, // Unit vector normal to window
-                                                  int &ExtWinType,         // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+                                                  DataDaylighting::iExtWinType &ExtWinType,         // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
                                                   int &IConst,             // Construction counter
                                                   Vector3<Real64> &RREF2,  // Location of virtual reference point in absolute coordinate system
                                                   Real64 &DWX,             // Horizontal dimension of window element (m)
@@ -178,7 +134,7 @@ namespace DaylightingManager {
         int const ZoneNum,
         int const iRefPoint,
         int const loopwin,
-        int const CalledFrom, // indicate  which type of routine called this routine
+        DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
         int const WinEl,      // Current window element number
         int const IWin,
         int const IWin2,
@@ -210,7 +166,7 @@ namespace DaylightingManager {
         bool &hitIntObs,                // True iff interior obstruction hit
         bool &hitExtObs,                // True iff ray from ref pt to ext win hits an exterior obstruction
         Vector3<Real64> const &WNORM2,  // Unit vector normal to window
-        int const ExtWinType,           // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        DataDaylighting::iExtWinType const ExtWinType,           // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
         int const IConst,               // Construction counter
         Vector3<Real64> const &RREF2,   // Location of virtual reference point in absolute coordinate system
         bool const Triangle,
@@ -220,18 +176,20 @@ namespace DaylightingManager {
         //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
-    void InitializeCFSDaylighting(int const ZoneNum,               // Current zone number
+    void InitializeCFSDaylighting(EnergyPlusData &state,
+                                  int const ZoneNum,               // Current zone number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
                                   Vector3<Real64> const &RefPoint, // reference point coordinates
                                   int const NRefPts,               // Number of reference points
                                   int const iRefPoint,             // Reference points counter
-                                  int const CalledFrom,
+                                  DataDaylighting::iCalledFor const CalledFrom,
                                   Optional_int_const MapNum = _);
 
-    void InitializeCFSStateData(BSDFRefPoints &StateRefPoint,
-                                BSDFRefPointsGeomDescr &DaylghtGeomDescr,
+    void InitializeCFSStateData(EnergyPlusData &state,
+                                DataBSDFWindow::BSDFRefPoints &StateRefPoint,
+                                DataBSDFWindow::BSDFRefPointsGeomDescr &DaylghtGeomDescr,
                                 int const ZoneNum, // Current zone number
                                 int const iWin,
                                 Vector3<Real64> const &RefPoint, // reference point
@@ -248,26 +206,27 @@ namespace DaylightingManager {
                                 Real64 const DWY,
                                 Vector3<Real64> const &WNorm, // unit vector from window (point towards outside)
                                 Real64 const WinElArea,
-                                int const CalledFrom,
+                                DataDaylighting::iCalledFor const CalledFrom,
                                 Optional_int_const MapNum = _);
 
-    void AllocateForCFSRefPointsState(BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
+    void AllocateForCFSRefPointsState(DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
 
-    void AllocateForCFSRefPointsGeometry(BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
+    void AllocateForCFSRefPointsGeometry(DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
 
-    void CFSRefPointSolidAngle(Vector3<Real64> const &RefPoint,
+    void CFSRefPointSolidAngle(EnergyPlusData &state,
+                               Vector3<Real64> const &RefPoint,
                                Vector3<Real64> const &RWin,
                                Vector3<Real64> const &WNorm,
-                               BSDFRefPoints &RefPointMap,
-                               BSDFRefPointsGeomDescr &RefPointGeomMap,
+                               DataBSDFWindow::BSDFRefPoints &RefPointMap,
+                               DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointGeomMap,
                                int const iWin,
                                int const CurFenState,
                                int const NTrnBasis,
                                int const curWinEl,
                                Real64 const WinElArea);
 
-    void CFSRefPointPosFactor(
-        Vector3<Real64> const &RefPoint, BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
+    void CFSRefPointPosFactor(EnergyPlusData &state,
+        Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
 
     Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
                                int const AltSteps,                 // Number of steps in altitude angle for solar reflection calc
@@ -302,19 +261,20 @@ namespace DaylightingManager {
         int const BlNum,      // Window blind number
         Real64 const THRAY,   // Azimuth of ray from reference point to window element (radians)
         Vector3<Real64> const &WNORM2, // Unit vector normal to window
-        int const ExtWinType,          // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        DataDaylighting::iExtWinType const ExtWinType,          // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
         int const IConst,              // Construction counter
         Real64 const AZVIEW,           // Azimuth of view vector in absolute coord system for glare calculation (radians)
         Vector3<Real64> const &RREF2,  // Location of virtual reference point in absolute coordinate system
         bool const hitIntObs,          // True iff interior obstruction hit
         bool const hitExtObs,          // True iff ray from ref pt to ext win hits an exterior obstruction
-        int const CalledFrom,          // indicate  which type of routine called this routine
+        DataDaylighting::iCalledFor const CalledFrom,          // indicate  which type of routine called this routine
         Real64 &TVISIntWin,            // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk,        // Visible transmittance of int win at COSBIntWin for sun
         Optional_int_const MapNum = _,
         Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
 
-    void FigureRefPointDayltgFactorsToAddIllums(int const ZoneNum,
+    void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
+                                                int const ZoneNum,
                                                 int const iRefPoint,
                                                 int const iHour,
                                                 int &ISunPos,
@@ -325,7 +285,8 @@ namespace DaylightingManager {
                                                 int const ICtrl // Window control counter
     );
 
-    void FigureMapPointDayltgFactorsToAddIllums(int const ZoneNum,
+    void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
+                                                int const ZoneNum,
                                                 int const MapNum,
                                                 int const iMapPoint,
                                                 int const iHour,
@@ -348,25 +309,28 @@ namespace DaylightingManager {
 
     void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool doesDayLightingUseDElight();
+    bool doesDayLightingUseDElight(EnergyPlusData &state);
 
-    void CheckTDDsAndLightShelvesInDaylitZones();
+    void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state);
 
-    void AssociateWindowShadingControlWithDaylighting();
+    void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state);
 
     void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void DayltgGlare(int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
+    void DayltgGlare(EnergyPlusData &state,
+                     int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
                      Real64 &BLUM,   // Window background (surround) luminance (cd/m2)
                      Real64 &GLINDX, // Glare index
                      int &ZoneNum    // Zone number
     );
 
-    void DayltgGlareWithIntWins(Array1D<Real64> &GLINDX, // Glare index
+    void DayltgGlareWithIntWins(EnergyPlusData &state,
+                                Array1D<Real64> &GLINDX, // Glare index
                                 int const ZoneNum        // Zone number
     );
 
-    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
+    void DayltgExtHorizIllum(EnergyPlusData &state,
+                             Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
                              Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
     );
 
@@ -393,7 +357,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void DayltgInteriorTDDIllum();
+    void DayltgInteriorTDDIllum(EnergyPlusData &state);
 
     void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -407,7 +371,8 @@ namespace DaylightingManager {
                                    int const IWin     // Window index
     );
 
-    void ComplexFenestrationLuminances(int const IWin,
+    void ComplexFenestrationLuminances(EnergyPlusData &state,
+                                       int const IWin,
                                        int const WinEl,
                                        int const NBasis,
                                        int const IHR,
@@ -415,7 +380,7 @@ namespace DaylightingManager {
                                        Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
                                        Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
                                        Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
-                                       int const CalledFrom,
+                                       DataDaylighting::iCalledFor const CalledFrom,
                                        Optional_int_const MapNum = _);
 
     void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
@@ -424,7 +389,7 @@ namespace DaylightingManager {
                                                       int const IHR,       // Hour of day
                                                       int const ZoneNum,   // Zone number
                                                       int const iRefPoint, // reference point counter
-                                                      int const CalledFrom,
+                                                      DataDaylighting::iCalledFor const CalledFrom,
                                                       Optional_int_const MapNum = _);
 
     void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
@@ -433,7 +398,7 @@ namespace DaylightingManager {
                                               int const IHR,       // Hour of day
                                               int const ZoneNum,   // Zone number
                                               int const iRefPoint, // reference point index
-                                              int const CalledFrom,
+                                              DataDaylighting::iCalledFor const CalledFrom,
                                               Optional_int_const MapNum = _);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
@@ -443,11 +408,12 @@ namespace DaylightingManager {
                                                 int const iRefPoint,
                                                 int const NumEl,      // Total number of window elements
                                                 Real64 const AZVIEW,  // Azimuth of view vector in absolute coord system for
-                                                int const CalledFrom, // indicate  which type of routine called this routine
+                                                DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
                                                 Optional_int_const MapNum = _,
                                                 Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
 
-    Real64 DayltgSkyLuminance(int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
+    Real64 DayltgSkyLuminance(EnergyPlusData &state,
+                              int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);
 
@@ -481,17 +447,18 @@ namespace DaylightingManager {
 
     void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state);
 
-    void CreateShadeDeploymentOrder(int &ZoneNum);
+    void CreateShadeDeploymentOrder(EnergyPlusData &state, int &ZoneNum);
 
-    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
+    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int &ZoneNum);
 
     void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void CalcMinIntWinSolidAngs();
+    void CalcMinIntWinSolidAngs(EnergyPlusData &state);
 
     void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
-    void WriteDaylightMapTitle(int const mapNum,
+    void WriteDaylightMapTitle(EnergyPlusData &state,
+                               int const mapNum,
                                InputOutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
@@ -501,6 +468,116 @@ namespace DaylightingManager {
                                Real64 const zcoord);
 
 } // namespace DaylightingManager
+
+struct DaylightingManagerData : BaseGlobalStruct {
+
+    bool CalcDayltghCoefficients_firstTime = true;
+    bool refFirstTime = true;
+    bool DayltgInteriorIllum_firstTime = true; // true first time routine is called
+    bool FirstTimeDaylFacCalc = true;
+    bool VeryFirstTime = true;
+    bool mapFirstTime = true;
+    bool CheckTDDs_firstTime = true;
+    bool DayltgExtHorizIllum_firstTime = true; // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag = true;
+    bool ReportIllumMap_firstTime = true;
+    bool SQFirstTime = true;
+    bool doSkyReporting = true;
+    bool CreateDFSReportFile = true;
+
+    int TotWindowsWithDayl = 0;         // Total number of exterior windows in all daylit zones
+    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    int maxNumRefPtInAnyZone = 0;       // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyEncl = 0;       // The most number of reference points that any single enclosure has
+    Real64 PHSUN = 0.0;                 // Solar altitude (radians)
+    Real64 SPHSUN = 0.0;                // Sine of solar altitude
+    Real64 CPHSUN = 0.0;                // Cosine of solar altitude
+    Real64 THSUN = 0.0;                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    Array1D<Real64> PHSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of THSUN
+
+    // In the following I,J,K arrays:
+    // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
+    // J = 1 for bare window, 2 - 12 for shaded;
+    // K = sun position index.
+    Array3D<Real64> EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0); // Sky-related portion of internally reflected illuminance
+    Array2D<Real64> EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);    // Sun-related portion of internally reflected illuminance,
+    // excluding entering beam
+    Array2D<Real64> EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related portion of internally reflected illuminance
+    // due to entering beam
+    Array3D<Real64> WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);  // Sky-related window luminance
+    Array2D<Real64> WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);     // Sun-related window luminance, excluding view of solar disk
+    Array2D<Real64> WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related window luminance, due to view of solar disk
+
+    Array2D<Real64> GILSK = Array2D<Real64>(24, 4, 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
+    Array1D<Real64> GILSU = Array1D<Real64>(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
+
+    Array3D<Real64> EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related component of direct illuminance
+    Array2D<Real64> EDIRSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
+    Array2D<Real64> EDIRSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related component of direct illuminance due to beam solar at ref pt
+    Array3D<Real64> AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related average window luminance
+    Array2D<Real64> AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);     // Sun-related average window luminance, excluding view of solar disk
+    Array2D<Real64> AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related average window luminance due to view of solar disk
+
+    // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
+
+    Array2D<Real64> TDDTransVisBeam;
+    Array3D<Real64> TDDFluxInc;
+    Array3D<Real64> TDDFluxTrans;
+
+    Array2D_int MapErrIndex;
+    Array2D_int RefErrIndex;
+
+    void clear_state() override
+    {
+        this->CalcDayltghCoefficients_firstTime = true;
+        this->refFirstTime = true;
+        this->DayltgInteriorIllum_firstTime = true;
+        this->FirstTimeDaylFacCalc = true;
+        this->VeryFirstTime = true;
+        this->mapFirstTime = true;
+        this->CheckTDDs_firstTime = true;
+        this->DayltgExtHorizIllum_firstTime = true;
+        this->DayltgInteriorMapIllum_FirstTimeFlag = true;
+        this->ReportIllumMap_firstTime = true;
+        this->SQFirstTime = true;
+        this->doSkyReporting = true;
+        this->CreateDFSReportFile = true;
+        this->TotWindowsWithDayl = 0;
+        this->DaylIllum.deallocate();
+        this->maxNumRefPtInAnyZone = 0;
+        this->maxNumRefPtInAnyEncl = 0;
+        this->PHSUN = 0.0;
+        this->SPHSUN = 0.0;
+        this->CPHSUN = 0.0;
+        this->THSUN = 0.0;
+        this->PHSUNHR = Array1D<Real64>(24, 0.0);
+        this->SPHSUNHR = Array1D<Real64>(24, 0.0);
+        this->CPHSUNHR = Array1D<Real64>(24, 0.0);
+        this->THSUNHR = Array1D<Real64>(24, 0.0);
+        this->EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
+        this->EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
+        this->WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->GILSK = Array2D<Real64>(24, 4, 0.0);
+        this->GILSU = Array1D<Real64>(24, 0.0);
+        this->EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
+        this->EDIRSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->EDIRSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
+        this->AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->TDDTransVisBeam.deallocate();
+        this->TDDFluxInc.deallocate();
+        this->TDDFluxTrans.deallocate();
+        this->MapErrIndex.deallocate();
+        this->RefErrIndex.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

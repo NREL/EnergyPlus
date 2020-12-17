@@ -53,6 +53,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingCapacitySizer : BaseSizerWithScalableInputs
 {
     CoolingCapacitySizer()

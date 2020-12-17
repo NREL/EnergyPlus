@@ -52,10 +52,8 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -79,7 +77,8 @@ namespace PVWatts {
 
     std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator::PVWattsGenerator(const std::string &name,
+    PVWattsGenerator::PVWattsGenerator(EnergyPlusData &state,
+                                       const std::string &name,
                                        const Real64 dcSystemCapacity,
                                        ModuleType moduleType,
                                        ArrayType arrayType,
@@ -99,40 +98,40 @@ namespace PVWatts {
           m_planeOfArrayIrradiance(-9999)
 
     {
-        using General::RoundSigDigits;
+
         bool errorsFound(false);
 
         if (name.empty()) {
-            ShowSevereError("PVWatts: name cannot be blank.");
+            ShowSevereError(state, "PVWatts: name cannot be blank.");
             errorsFound = true;
         }
         m_name = name;
 
         if (dcSystemCapacity <= 0) {
-            ShowSevereError("PVWatts: DC system capacity must be greater than zero.");
+            ShowSevereError(state, "PVWatts: DC system capacity must be greater than zero.");
             errorsFound = true;
         }
         m_dcSystemCapacity = dcSystemCapacity;
 
         if (systemLosses > 1.0 || systemLosses < 0.0) {
-            ShowSevereError("PVWatts: Invalid system loss value " + RoundSigDigits(systemLosses, 2));
+            ShowSevereError(state, format("PVWatts: Invalid system loss value {:.2R}", systemLosses));
             errorsFound = true;
         }
         m_systemLosses = systemLosses;
 
         if (m_geometryType == GeometryType::TILT_AZIMUTH) {
             if (tilt < 0 || tilt > 90) {
-                ShowSevereError("PVWatts: Invalid tilt: " + RoundSigDigits(tilt, 2));
+                ShowSevereError(state, format("PVWatts: Invalid tilt: {:.2R}", tilt));
                 errorsFound = true;
             }
             m_tilt = tilt;
             if (azimuth < 0 || azimuth >= 360) {
-                ShowSevereError("PVWatts: Invalid azimuth: " + RoundSigDigits(azimuth, 2));
+                ShowSevereError(state, format("PVWatts: Invalid azimuth: {:.2R}", azimuth));
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
             if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
-                ShowSevereError("PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
+                ShowSevereError(state, format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
@@ -145,13 +144,13 @@ namespace PVWatts {
         }
 
         if (groundCoverageRatio > 1.0 || groundCoverageRatio < 0.0) {
-            ShowSevereError("PVWatts: Invalid ground coverage ratio: " + RoundSigDigits(groundCoverageRatio, 2));
+            ShowSevereError(state, format("PVWatts: Invalid ground coverage ratio: {:.2R}", groundCoverageRatio));
             errorsFound = true;
         }
         m_groundCoverageRatio = groundCoverageRatio;
 
         if (errorsFound) {
-            ShowFatalError("Errors found in getting PVWatts input");
+            ShowFatalError(state, "Errors found in getting PVWatts input");
         }
 
     }
@@ -216,7 +215,7 @@ namespace PVWatts {
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
             errorsFound = true;
         } else {
             moduleType = moduleTypeIt->second;
@@ -230,7 +229,7 @@ namespace PVWatts {
         ArrayType arrayType;
         auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
         if (arrayTypeIt == arrayTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
             errorsFound = true;
         } else {
             arrayType = arrayTypeIt->second;
@@ -241,7 +240,7 @@ namespace PVWatts {
         GeometryType geometryType;
         auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
         if (geometryTypeIt == geometryTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
             errorsFound = true;
         } else {
             geometryType = geometryTypeIt->second;
@@ -257,15 +256,15 @@ namespace PVWatts {
         }
 
         if (errorsFound) {
-            ShowFatalError("Errors found in getting PVWatts input");
+            ShowFatalError(state, "Errors found in getting PVWatts input");
         }
 
         if (NumNums < NumFields::GROUND_COVERAGE_RATIO) {
-            return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
+            return PVWattsGenerator(state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(
+        PVWattsGenerator pvwattsGenerator(state,
             name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
         return pvwattsGenerator;
     }
@@ -347,15 +346,12 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
         if (!state.dataGlobal->BeginTimeStepFlag) {
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
-            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
+            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour;
             return;
         }
         ssc_module_t pvwattsModule = ssc_module_create("pvwattsv5_1ts");
@@ -364,28 +360,28 @@ namespace PVWatts {
 
         // SSC Inputs
         // Time
-        ssc_data_set_number(pvwattsData, "year", DataEnvironment::Year);
-        ssc_data_set_number(pvwattsData, "month", DataEnvironment::Month);
-        ssc_data_set_number(pvwattsData, "day", DataEnvironment::DayOfMonth);
-        ssc_data_set_number(pvwattsData, "hour", DataGlobals::HourOfDay - 1);
-        ssc_data_set_number(pvwattsData, "minute", (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep);
+        ssc_data_set_number(pvwattsData, "year", state.dataEnvrn->Year);
+        ssc_data_set_number(pvwattsData, "month", state.dataEnvrn->Month);
+        ssc_data_set_number(pvwattsData, "day", state.dataEnvrn->DayOfMonth);
+        ssc_data_set_number(pvwattsData, "hour", state.dataGlobal->HourOfDay - 1);
+        ssc_data_set_number(pvwattsData, "minute", (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep);
         ssc_data_set_number(pvwattsData, "lat", state.dataWeatherManager->WeatherFileLatitude);
         ssc_data_set_number(pvwattsData, "lon", state.dataWeatherManager->WeatherFileLongitude);
         ssc_data_set_number(pvwattsData, "tz", state.dataWeatherManager->WeatherFileTimeZone);
 
         // Weather Conditions
-        ssc_data_set_number(pvwattsData, "beam", DataEnvironment::BeamSolarRad);
-        ssc_data_set_number(pvwattsData, "diffuse", DataEnvironment::DifSolarRad);
-        ssc_data_set_number(pvwattsData, "tamb", DataEnvironment::OutDryBulbTemp);
-        ssc_data_set_number(pvwattsData, "wspd", DataEnvironment::WindSpeed);
-        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, HourOfDay);
+        ssc_data_set_number(pvwattsData, "beam", state.dataEnvrn->BeamSolarRad);
+        ssc_data_set_number(pvwattsData, "diffuse", state.dataEnvrn->DifSolarRad);
+        ssc_data_set_number(pvwattsData, "tamb", state.dataEnvrn->OutDryBulbTemp);
+        ssc_data_set_number(pvwattsData, "wspd", state.dataEnvrn->WindSpeed);
+        Real64 albedo = state.dataWeatherManager->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
         ssc_data_set_number(pvwattsData, "alb", albedo);
 
         // System Properties
-        ssc_data_set_number(pvwattsData, "time_step", DataGlobals::TimeStepZone);
+        ssc_data_set_number(pvwattsData, "time_step", state.dataGlobal->TimeStepZone);
         ssc_data_set_number(pvwattsData, "system_capacity", m_dcSystemCapacity * 0.001);
         ssc_data_set_number(pvwattsData, "module_type", static_cast<int>(m_moduleType));
         ssc_data_set_number(pvwattsData, "dc_ac_ratio", m_DCtoACRatio);
@@ -402,7 +398,7 @@ namespace PVWatts {
 
         // Get the shading from the geometry, if applicable
         if (m_geometryType == GeometryType::SURFACE) {
-            ssc_data_set_number(pvwattsData, "shaded_percent", DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum) * 100.0);
+            ssc_data_set_number(pvwattsData, "shaded_percent", DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum) * 100.0);
         }
 
         if ( ssc_module_exec(pvwattsModule, pvwattsData) == 0) {
@@ -417,11 +413,11 @@ namespace PVWatts {
                 {
                 case SSC_WARNING:
                     err.append(errtext);
-                    ShowWarningMessage(err);
+                    ShowWarningMessage(state, err);
                     break;
                 case SSC_ERROR:
                     err.append(errtext);
-                    ShowErrorMessage(err);
+                    ShowErrorMessage(state, err);
                     break;
                 default:
                     break;
@@ -430,9 +426,9 @@ namespace PVWatts {
         } else {
             // Report Out
             ssc_data_get_number(pvwattsData, "dc", &m_outputDCPower);
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
             ssc_data_get_number(pvwattsData, "ac", &m_outputACPower);
-            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour;
             ssc_data_get_number(pvwattsData, "tcell", &m_cellTemperature);
             ssc_data_get_number(pvwattsData, "poa", &m_planeOfArrayIrradiance);
         }
@@ -455,7 +451,7 @@ namespace PVWatts {
         int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
-            ShowFatalError("Cannot find Generator:PVWatts " + GeneratorName);
+            ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
         }
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {

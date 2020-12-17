@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
@@ -92,7 +93,8 @@ namespace MoistureBalanceEMPDManager {
     // SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
     // Functions
-    Real64 CalcDepthFromPeriod(Real64 const period,                           // in seconds
+    Real64 CalcDepthFromPeriod(EnergyPlusData &state,
+                               Real64 const period,                           // in seconds
                                Material::MaterialProperties const &mat // material
     );
 
@@ -114,6 +116,14 @@ namespace MoistureBalanceEMPDManager {
     void ReportMoistureBalanceEMPD(EnergyPlusData &state);
 
 } // namespace MoistureBalanceEMPDManager
+
+struct MoistureBalanceEMPDManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

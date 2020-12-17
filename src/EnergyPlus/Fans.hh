@@ -292,7 +292,7 @@ namespace Fans {
     // Beginning of Update subroutines for the Fan Module
     // *****************************************************************************
 
-    void UpdateFan(int const FanNum);
+    void UpdateFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Update subroutines for the Fan Module
     // *****************************************************************************
@@ -366,7 +366,8 @@ namespace Fans {
                     Optional<Real64 const> MinAirVolFlow = _  // Fan air volumetric flow rate    [m3/s]
     );
 
-    Real64 FanDesDT(int const FanNum,       // index of fan in Fan array
+    Real64 FanDesDT(EnergyPlusData &state,
+                    int const FanNum,       // index of fan in Fan array
                     Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 

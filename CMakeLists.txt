@@ -42,6 +42,10 @@ endif()
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+option( USE_PSYCHROMETRICS_CACHING "Use psychrometrics cashing routines" ON )
+option( USE_GLYCOL_CACHING "Use glycol cashing routines" ON )
+option( USE_PSYCH_STATS "Compute psychrometric stats" OFF )
+option( USE_PSYCH_ERRORS "Report psychrometric errors " ON )
 
 #######################################################################
 
@@ -197,7 +201,7 @@ set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 
 if( OPENGL_FOUND )
-  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+  set(BUILD_PENUMBRA_TESTING OFF CACHE BOOL "")
 endif()
 
 if( BUILD_TESTING )
@@ -328,7 +332,7 @@ if( BUILD_TESTING )
 
   set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
   set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if( OPENGL_FOUND )
+  if( OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
     set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
   endif()
 endif()
@@ -411,3 +415,7 @@ mark_as_advanced(BUILD_GMOCK)
 mark_as_advanced(BUILD_GTEST)
 mark_as_advanced(gmock_build_tests)
 mark_as_advanced(BUILD_WCE_TESTING)
+mark_as_advanced(USE_PSYCHROMETRICS_CACHING)
+mark_as_advanced(USE_GLYCOL_CACHING)
+mark_as_advanced(USE_PSYCH_STATS)
+mark_as_advanced(USE_PSYCH_ERRORS)

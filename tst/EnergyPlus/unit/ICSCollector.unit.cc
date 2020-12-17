@@ -62,6 +62,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -87,10 +88,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     InitializePsychRoutines();
 
-    state.dataGlobal->BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
-    SkyTemp = 24.0;
-    IsRain = false;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->SkyTemp = 24.0;
+    state->dataEnvrn->IsRain = false;
     MatNum = 1;
     ZoneNum = 1;
     SurfNum = 1;
@@ -108,11 +109,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface(SurfNum).ExtConvCoeff = 0;
     Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
-    state.dataConstruction->Construct.allocate(ConstrNum);
-    state.dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
-    state.dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    dataMaterial.Material.allocate(MatNum);
-    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
+    state->dataConstruction->Construct.allocate(ConstrNum);
+    state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
+    state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
+    state->dataMaterial->Material.allocate(MatNum);
+    state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -127,7 +128,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     SurfQRadSWOutIncident.allocate(1);
     SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
+    state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
@@ -151,7 +152,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+    CalcPassiveExteriorBaffleGap(*state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
                                  AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
                                  MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
@@ -162,9 +163,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // deallocated variables
     Surface.deallocate();
-    state.dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
-    state.dataConstruction->Construct.deallocate();
-    dataMaterial.Material.deallocate();
+    state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
+    state->dataConstruction->Construct.deallocate();
+    state->dataMaterial->Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();

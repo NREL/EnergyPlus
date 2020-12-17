@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -253,7 +254,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost(state);
+    GetInputForLifeCycleCost(*state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
@@ -390,7 +391,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost(state);
+    GetInputForLifeCycleCost(*state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
@@ -516,25 +517,25 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     lengthStudyTotalMonths = lengthStudyYears * 12;
 
 
-    numTariff = 1;
-    tariff.allocate(1);
-    tariff(1).isSelected = true;
-    tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
-    tariff(1).ptTotal = 1;
-    econVar.allocate(1);
-    econVar(1).values.allocate(12);
-    econVar(1).values(1) = 101.;
-    econVar(1).values(2) = 102.;
-    econVar(1).values(3) = 103.;
-    econVar(1).values(4) = 104.;
-    econVar(1).values(5) = 105.;
-    econVar(1).values(6) = 106.;
-    econVar(1).values(7) = 107.;
-    econVar(1).values(8) = 108.;
-    econVar(1).values(9) = 109.;
-    econVar(1).values(10) = 110.;
-    econVar(1).values(11) = 111.;
-    econVar(1).values(12) = 112.;
+    state->dataEconTariff->numTariff = 1;
+    state->dataEconTariff->tariff.allocate(1);
+    state->dataEconTariff->tariff(1).isSelected = true;
+    state->dataEconTariff->tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconTariff->tariff(1).ptTotal = 1;
+    state->dataEconTariff->econVar.allocate(1);
+    state->dataEconTariff->econVar(1).values.allocate(12);
+    state->dataEconTariff->econVar(1).values(1) = 101.;
+    state->dataEconTariff->econVar(1).values(2) = 102.;
+    state->dataEconTariff->econVar(1).values(3) = 103.;
+    state->dataEconTariff->econVar(1).values(4) = 104.;
+    state->dataEconTariff->econVar(1).values(5) = 105.;
+    state->dataEconTariff->econVar(1).values(6) = 106.;
+    state->dataEconTariff->econVar(1).values(7) = 107.;
+    state->dataEconTariff->econVar(1).values(8) = 108.;
+    state->dataEconTariff->econVar(1).values(9) = 109.;
+    state->dataEconTariff->econVar(1).values(10) = 110.;
+    state->dataEconTariff->econVar(1).values(11) = 111.;
+    state->dataEconTariff->econVar(1).values(12) = 112.;
 
     numNonrecurringCost = 1;
     NonrecurringCost.allocate(1);
@@ -545,7 +546,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     NonrecurringCost(1).startOfCosts = startServicePeriod;
     NonrecurringCost(1).totalMonthsFromStart = 10;
 
-    ExpressAsCashFlows(state);
+    ExpressAsCashFlows(*state);
 
     EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month
 

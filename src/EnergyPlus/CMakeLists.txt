@@ -15,7 +15,27 @@ else()
   add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
+if(USE_PSYCHROMETRICS_CACHING)
+  # Caching defaulted ON
+else()
+  add_definitions("-DEP_nocache_Psychrometrics")
+endif()
+
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_STATS)
+  add_definitions("-DEP_psych_stats")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 SET( SRC
+  StateManagement.cc
+  StateManagement.hh
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
@@ -140,37 +160,24 @@ SET( SRC
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh
-  DataBSDFWindow.cc
   DataBSDFWindow.hh
-  DataBranchAirLoopPlant.cc
   DataBranchAirLoopPlant.hh
-  DataBranchNodeConnections.cc
   DataBranchNodeConnections.hh
-  DataComplexFenestration.cc
   DataComplexFenestration.hh
-  DataContaminantBalance.cc
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
-  DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
   DataErrorTracking.cc
   DataErrorTracking.hh
-  DataGenerators.cc
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
-  DataGlobals.cc
   DataGlobals.hh
   DataHVACControllers.cc
   DataHVACControllers.hh
@@ -226,7 +233,6 @@ SET( SRC
   DataVectorTypes.hh
   DataViewFactorInformation.cc
   DataViewFactorInformation.hh
-  DataWater.cc
   DataWater.hh
   DataWindowEquivalentLayer.cc
   DataWindowEquivalentLayer.hh
@@ -409,7 +415,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  Material.cc
   Material.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
@@ -579,8 +584,6 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
-  StateManagement.cc
-  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -737,12 +740,24 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
-#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
-#    endif()
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
-#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
-#    endif()
+    # PYTHON_BIT_SIZE will be either "32" or "64"
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:x64
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:X86
+    if("${PYTHON_BIT_SIZE}" EQUAL "32")
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "86" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 32-bit")
+      else()
+        message(FATAL_ERROR "Python is 32-bit while EnergyPlus architecture appears to be 64-bit!")
+      endif()
+    else()  # assuming 64 bit
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "64" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 64-bit")
+      else()
+        message(FATAL_ERROR "Python is 64-bit while EnergyPlus architecture appears to be 32-bit!")
+      endif()
+    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
@@ -752,7 +767,7 @@ endif()
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
 add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
-target_link_libraries( energyplusparser re2 )
+target_link_libraries( energyplusparser re2 fmt::fmt)
 if(UNIX AND NOT APPLE)
   target_link_libraries( energyplusparser dl )
 endif()
@@ -774,6 +789,9 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )

@@ -66,11 +66,11 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataEnvironment::OutBaroPress;
 using DataHeatBalFanSys::ZT;
 using DataHeatBalFanSys::ZoneAirHumRat;
 using DataLoopNode::Node;
@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilSingleSpeed_Test1)
     DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-    CalcSecondaryDXCoils(state, DXCoilNum);
+    CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
     // cleanup
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilTwoSpeed_Test2)
     DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-    CalcSecondaryDXCoils(state, DXCoilNum);
+    CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
     // cleanup
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXCoolingCoilMultiSpeed_Test3)
     DXCoil(DXCoilNum).ElecCoolingPower = 500.0;
     DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate = 0.0;
 
-    CalcSecondaryDXCoils(state, DXCoilNum);
+    CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(5500.0, DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
 
     // cleanup
@@ -168,12 +168,12 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DXCoil(DXCoilNum).AirInNode = 2;
     Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();
 
-    CalcSecondaryDXCoils(state, DXCoilNum);
+    CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
     EXPECT_DOUBLE_EQ(1.0, DXCoil(DXCoilNum).SecCoilSHR);
 
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     // make the call
     SHRTest =
-        CalcSecondaryDXCoilsSHR(state, DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
+        CalcSecondaryDXCoilsSHR(*state, DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat,
                                 EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
 
     EXPECT_DOUBLE_EQ(1.0, SHRTest);
@@ -249,12 +249,12 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     DXCoil(DXCoilNum).MSSpeedNumHS = 1;
     DXCoil(DXCoilNum).MSSpeedNumLS = 1;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DXCoil(DXCoilNum).AirInNode = 2;
     Node(DXCoil(DXCoilNum).AirInNode).Temp = 20.0;
     InitializePsychRoutines();
 
-    CalcSecondaryDXCoils(state, DXCoilNum);
+    CalcSecondaryDXCoils(*state, DXCoilNum);
     EXPECT_DOUBLE_EQ(-5000.0, DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate);
     EXPECT_DOUBLE_EQ(1.0, DXCoil(DXCoilNum).SecCoilSHR);
 

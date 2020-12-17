@@ -49,6 +49,7 @@
 #define UFADManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -60,15 +61,15 @@ namespace UFADManager {
 
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,      // index number for the specified zone
-                            int const ZoneModelType // type of zone model; UCSDUFI = 6
+                            DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+    void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);

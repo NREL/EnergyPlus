@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -70,13 +69,13 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DesiccantDehumidifiers;
 using namespace EnergyPlus::BranchInputManager;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -2813,34 +2812,34 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
     createFacilityElectricPowerServiceObject();
-    SetPreConstructionInputParameters(state); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput(state);
-    state.dataGlobal->BeginSimFlag = true;
-    state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SysSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 1;
 
-    GetDesiccantDehumidifierInput(state);
+    GetDesiccantDehumidifierInput(*state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("OA DESICCANT SYSTEM", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("OA DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatRetTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {
@@ -3993,34 +3992,34 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
     createFacilityElectricPowerServiceObject();
-    SetPreConstructionInputParameters(state); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput(state);
-    state.dataGlobal->BeginSimFlag = true;
-    state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SysSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput(state);
+    GetDesiccantDehumidifierInput(*state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {
@@ -5411,23 +5410,23 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
     createFacilityElectricPowerServiceObject();
-    SetPreConstructionInputParameters(state); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput(state);
-    state.dataGlobal->BeginSimFlag = true;
-    state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SysSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput(state);
+    GetDesiccantDehumidifierInput(*state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ(1, NumGenericDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
@@ -5441,18 +5440,18 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp = RegCoilDesInletTemp;
     RegCoilDesOutletTemp = DesiccantDehumidifiers::DesicDehum(DesicDehumNum).RegenSetPointTemp;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow = 1.07;
-    RegCoilInletAirMassFlowRate = DataEnvironment::StdRhoAir * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+    RegCoilInletAirMassFlowRate = state->dataEnvrn->StdRhoAir * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     // simulate to determine HW coil design capacity
-    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
-    for (loop = 1; loop <= state.dataWaterCoils->NumWaterCoils; ++loop) {
-        if (state.dataWaterCoils->WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
+    for (loop = 1; loop <= state->dataWaterCoils->NumWaterCoils; ++loop) {
+        if (state->dataWaterCoils->WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
     // verify results
-    EXPECT_EQ(RegCoilCapacity, state.dataWaterCoils->WaterCoil(CoilIndex).DesWaterHeatingCoilRate);
+    EXPECT_EQ(RegCoilCapacity, state->dataWaterCoils->WaterCoil(CoilIndex).DesWaterHeatingCoilRate);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
@@ -6654,23 +6653,23 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    state.dataGlobal->DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
     createFacilityElectricPowerServiceObject();
-    SetPreConstructionInputParameters(state); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput(state);
-    state.dataGlobal->BeginSimFlag = true;
-    state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SysSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput(state);
+    GetDesiccantDehumidifierInput(*state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
@@ -6681,11 +6680,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(*state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {

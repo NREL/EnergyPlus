@@ -57,11 +57,9 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -88,7 +86,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -100,7 +97,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestOtherSideCoefficients
 
     int i = 2;
 
-    state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces = 2;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces = 2;
     AirflowNetwork::AirflowNetworkNumOfSurfaces = 2;
 
     AirflowNetwork::MultizoneSurfaceData.allocate(i);
@@ -117,7 +114,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestOtherSideCoefficients
     AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 1;
     AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 2;
 
-    state.dataAirflowNetworkBalanceManager->calculateWindPressureCoeffs(state);
+    state->dataAirflowNetworkBalanceManager->calculateWindPressureCoeffs(*state);
     EXPECT_EQ(1, AirflowNetwork::MultizoneSurfaceData(1).NodeNums[1]);
     EXPECT_EQ(2, AirflowNetwork::MultizoneSurfaceData(2).NodeNums[1]);
     EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(1).curve);
@@ -155,9 +152,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -222,7 +219,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
@@ -278,10 +275,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(3).z = 1.0;
 
     SurfaceGeometry::AllocateSurfaceWindows(3);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    SurfWinOriginalClass(3) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -345,7 +342,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2237,26 +2234,26 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     Real64 PressureSet = 0.5;
 
@@ -2269,11 +2266,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
-    DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
-    DataEnvironment::WindSpeed = 4.9;
-    DataEnvironment::WindDir = 270.0;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutHumRat = 0.0008389;
+    state->dataEnvrn->OutBaroPress = 99063.0;
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
 
     int index = UtilityRoutines::FindItemInList("OA INLET NODE", AirflowNetwork::AirflowNetworkNodeData);
     for (i = 1; i <= 36; ++i) {
@@ -2281,8 +2278,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == index) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL are always at indexes 5 through 9
             AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
+                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
@@ -2313,13 +2310,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     AirflowNetwork::AirflowNetworkNodeData(3).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
-    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
-    //    state.dataAirLoop->LoopOnOffFanPartLoadRatio.allocate(1);
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo.allocate(1);
+    //    state->dataAirLoop->LoopOnOffFanPartLoadRatio.allocate(1);
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     AirflowNetwork::PressureControllerData(1).OANodeNum = AirflowNetwork::DisSysCompReliefAirData(1).OutletNode;
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
 
     // Check indoor pressure and mass flow rate
     EXPECT_NEAR(PressureSet, AirflowNetwork::AirflowNetworkNodeSimu(3).PZ, 0.0001);
@@ -2328,21 +2325,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
-    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(NumOfZones);
+    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
-    UpdateAirflowNetwork(state);
+    UpdateAirflowNetwork(*state);
 
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(20).PZ, 0.0001);
-    EXPECT_NEAR(0.0, state.dataAirflowNetworkBalanceManager->linkReport(20).FLOW, 0.0001);
-    EXPECT_NEAR(0.0, state.dataAirflowNetworkBalanceManager->linkReport(50).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(20).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
     AirflowNetwork::ANZT = 26.0;
     AirflowNetwork::MultizoneSurfaceData(2).HybridVentClose = true;
     AirflowNetwork::MultizoneSurfaceData(5).HybridVentClose = true;
     AirflowNetwork::MultizoneSurfaceData(14).HybridVentClose = true;
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(2).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(5).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(14).OpenFactor);
@@ -2353,7 +2350,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Test for #7162
     DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
     DataHeatBalFanSys::MAT.allocate(4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalFanSys::MAT(2) = 23.0;
@@ -2375,7 +2372,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     AirflowNetwork::AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
     AirflowNetwork::AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
 
-    ReportAirflowNetwork(state);
+    ReportAirflowNetwork(*state);
 
     // Original results
     // EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
@@ -2388,13 +2385,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
     Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
-    Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, DataEnvironment::OutHumRat);
+    Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
     Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum =
         AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
     // Existing code uses T_average to calculate hg, get close results
     EXPECT_NEAR(hdiff, sum, 0.4);
-    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - DataEnvironment::OutHumRat);
+    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
     // when hg is calculated with indoor temperature, get exact results
     sum = AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
     EXPECT_NEAR(hdiff, sum, 0.001);
@@ -2427,9 +2424,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -2487,7 +2484,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -2844,16 +2841,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(3).z = 2.4384;
 
     SurfaceGeometry::AllocateSurfaceWindows(14);
-    SurfWinOriginalClass(4) = 11;
-    SurfWinOriginalClass(5) = 11;
-    SurfWinOriginalClass(6) = 11;
-    SurfWinOriginalClass(9) = 11;
-    SurfWinOriginalClass(10) = 11;
-    SurfWinOriginalClass(11) = 11;
-    SurfWinOriginalClass(12) = 11;
-    SurfWinOriginalClass(13) = 11;
-    SurfWinOriginalClass(14) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -3029,7 +3026,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
@@ -4418,32 +4415,32 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state);
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    SimulationManager::GetProjectData(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput(state);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    state->dataEnvrn->OutBaroPress = 101000;
+    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
-    state.dataAirflowNetworkBalanceManager->initialize(state);
+    GetAirflowNetworkInput(*state);
+    state->dataAirflowNetworkBalanceManager->initialize(*state);
 
     // Check inputs
     EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
@@ -4464,18 +4461,18 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     // Outside convection coefficients
     // Calculate convection resistance given a convection coefficient
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
 
     //// Calculate convection resistance from correlation
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
 
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
 
     // Calculate convection resistance given a convection coefficient
     EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 5), 0.2, tol);
@@ -4494,14 +4491,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 
     Real64 const tol = 0.00001;
 
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(-30), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(-20), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(0), 0.02364, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(20), 0.02514, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(40), 0.02662, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(60), 0.02808, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(70), 0.02881, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(80), 0.02881, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02212, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02212, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 0), 0.02364, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 20), 0.02514, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 40), 0.02662, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 60), 0.02808, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 70), 0.02881, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 80), 0.02881, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
@@ -4524,14 +4521,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 
     Real64 const tol = 0.000001;
 
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(-30, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(-20, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(0, 0.001, 101000), 1.338e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(20, 0.001, 101000), 1.516e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(40, 0.001, 101000), 1.702e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(60, 0.001, 101000), 1.896e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(70, 0.001, 101000), 1.995e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(80, 0.001, 101000), 1.995e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -30, 0.001, 101000), 1.169e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -20, 0.001, 101000), 1.169e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 0, 0.001, 101000), 1.338e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 20, 0.001, 101000), 1.516e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 40, 0.001, 101000), 1.702e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 60, 0.001, 101000), 1.896e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 70, 0.001, 101000), 1.995e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 80, 0.001, 101000), 1.995e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
@@ -4539,14 +4536,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 
     Real64 const tol = 0.000001;
 
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(-30, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(-20, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(0, 0.001, 101000), 1.818e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(20, 0.001, 101000), 2.074e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(40, 0.001, 101000), 2.346e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(60, 0.001, 101000), 2.632e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(70, 0.001, 101000), 2.780e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(80, 0.001, 101000), 2.780e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -30, 0.001, 101000), 1.578e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -20, 0.001, 101000), 1.578e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 0, 0.001, 101000), 1.818e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 20, 0.001, 101000), 2.074e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 40, 0.001, 101000), 2.346e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 60, 0.001, 101000), 2.632e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 70, 0.001, 101000), 2.780e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 80, 0.001, 101000), 2.780e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
@@ -4554,14 +4551,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 
     Real64 const tol = 0.0001;
 
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(-30, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(-20, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(0, 0.001, 101000), 0.7300, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(20, 0.001, 101000), 0.7251, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(40, 0.001, 101000), 0.7213, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(60, 0.001, 101000), 0.7184, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(70, 0.001, 101000), 0.7172, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(80, 0.001, 101000), 0.7172, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -30, 0.001, 101000), 0.7362, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -20, 0.001, 101000), 0.7362, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 0, 0.001, 101000), 0.7300, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 20, 0.001, 101000), 0.7251, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 40, 0.001, 101000), 0.7213, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 60, 0.001, 101000), 0.7184, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 70, 0.001, 101000), 0.7172, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 80, 0.001, 101000), 0.7172, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
@@ -4623,29 +4620,29 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(state);
-    state.dataCurveManager->GetCurvesInputFlag = false;
-    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state.dataCurveManager->PerfCurve(1).NumDims);
-    EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(state, 1));
-    EXPECT_EQ(1, CurveManager::GetCurveIndex(state, "EFACADE_WPCCURVE"));
-    EXPECT_EQ("Table:Lookup", state.dataCurveManager->PerfCurve(1).ObjectType);
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(state, 1, 0.0));   // In-range value
-    EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(state, 1, 105.0));  // In-range value
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(state, 1, -10.0)); // Minimum x
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(state, 1, 5000));  // Maximum x
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).NumDims);
+    EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(*state, 1));
+    EXPECT_EQ(1, CurveManager::GetCurveIndex(*state, "EFACADE_WPCCURVE"));
+    EXPECT_EQ("Table:Lookup", state->dataCurveManager->PerfCurve(1).ObjectType);
+    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 0.0));   // In-range value
+    EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(*state, 1, 105.0));  // In-range value
+    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, -10.0)); // Minimum x
+    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 5000));  // Maximum x
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     // CalcWindPressure(MultizoneExternalNodeData(i).curve, 1
     //	Vref, 1
@@ -4654,19 +4651,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     // MultizoneExternalNodeData(i).symmetricCurve, MultizoneExternalNodeData(i).useRelativeAngle);
     // Compute wind pressure with current defaults
     Real64 windSpeed = 1.0;
-    Real64 dryBulb = DataEnvironment::OutDryBulbTempAt(10.0);
+    Real64 dryBulb = DataEnvironment::OutDryBulbTempAt(*state, 10.0);
     Real64 azimuth = 0.0;
-    Real64 windDir = DataEnvironment::WindDir;
-    Real64 humRat = DataEnvironment::OutHumRat;
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 windDir = state->dataEnvrn->WindDir;
+    Real64 humRat = state->dataEnvrn->OutHumRat;
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -4705,47 +4702,47 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
-    CurveManager::GetCurveInput(state);
-    state.dataCurveManager->GetCurvesInputFlag = false;
-    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
-    EXPECT_EQ(1, state.dataCurveManager->PerfCurve(1).NumDims);
-    EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(state, 1));
-    EXPECT_EQ(1, CurveManager::GetCurveIndex(state, "NFACADE_WPCVALUE"));
-    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", state.dataCurveManager->PerfCurve(1).ObjectType);
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(state, 1, 0.0));     // In-range value
-    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(state, 1, 105.0)); // In-range value
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(state, 1, -10.0));   // Minimum x
-    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(state, 1, 5000));    // Maximum x
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
+    EXPECT_EQ(1, state->dataCurveManager->PerfCurve(1).NumDims);
+    EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(*state, 1));
+    EXPECT_EQ(1, CurveManager::GetCurveIndex(*state, "NFACADE_WPCVALUE"));
+    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", state->dataCurveManager->PerfCurve(1).ObjectType);
+    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, 0.0));     // In-range value
+    EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(*state, 1, 105.0)); // In-range value
+    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, -10.0));   // Minimum x
+    EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(*state, 1, 5000));    // Maximum x
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
 
     Real64 windSpeed = 1.0;
-    Real64 dryBulb = DataEnvironment::OutDryBulbTempAt(10.0);
+    Real64 dryBulb = DataEnvironment::OutDryBulbTempAt(*state, 10.0);
     Real64 azimuth = 0.0;
-    Real64 windDir = DataEnvironment::WindDir;
-    Real64 humRat = DataEnvironment::OutHumRat;
+    Real64 windDir = state->dataEnvrn->WindDir;
+    Real64 humRat = state->dataEnvrn->OutHumRat;
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
 
     // Compute wind pressure with current defaults
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = AirflowNetworkBalanceManager::CalcWindPressure(state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.6 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -5694,27 +5691,27 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 2);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -5733,34 +5730,34 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
                                                               1.0,
-                                                              DataEnvironment::WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(10.0),
-                                                              DataEnvironment::OutHumRat);
+                                                              state->dataEnvrn->WindDir,
+                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                              state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
 
     EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
@@ -6398,27 +6395,27 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 2);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6437,34 +6434,34 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
                                                               1.0,
-                                                              DataEnvironment::WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(10.0),
-                                                              DataEnvironment::OutHumRat);
+                                                              state->dataEnvrn->WindDir,
+                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                              state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
 
     EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
@@ -7021,39 +7018,39 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 1);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 6);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 6);
 
     // Check the curves
     Real64 cp105N = -0.5 * (0.44267457181949038 + 0.68051108580039887);
     Real64 cp105S = 0.5 * (0.11880548415819636 - 0.44267457181949038);
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(state, 2, 0));     // In-range value
-    EXPECT_DOUBLE_EQ(cp105N, CurveManager::CurveValue(state, 2, 105));                // In-range value
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(state, 2, -10.0)); // Minimum x
-    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(state, 2, 5000));  // Maximum x
+    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, 0));     // In-range value
+    EXPECT_DOUBLE_EQ(cp105N, CurveManager::CurveValue(*state, 2, 105));                // In-range value
+    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, -10.0)); // Minimum x
+    EXPECT_DOUBLE_EQ(0.60345944298105458, CurveManager::CurveValue(*state, 2, 5000));  // Maximum x
     // Check the other curve
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(state, 1, 0)); // In-range value
+    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, 0)); // In-range value
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -7072,43 +7069,43 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(2).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(2).curve,
                                                               false,
                                                               false,
                                                               0.0,
                                                               1.0,
-                                                              DataEnvironment::WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(10.0),
-                                                              DataEnvironment::OutHumRat);
+                                                              state->dataEnvrn->WindDir,
+                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                              state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
-    p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                        false,
                                                        false,
                                                        0.0,
                                                        1.0,
-                                                       DataEnvironment::WindDir,
-                                                       DataEnvironment::OutDryBulbTempAt(10.0),
-                                                       DataEnvironment::OutHumRat);
+                                                       state->dataEnvrn->WindDir,
+                                                       DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                       state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
 
     EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
@@ -7710,27 +7707,27 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 1);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -7749,34 +7746,34 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
                                                               1.0,
-                                                              DataEnvironment::WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(10.0),
-                                                              DataEnvironment::OutHumRat);
+                                                              state->dataEnvrn->WindDir,
+                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                              state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
 
     EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
@@ -8344,27 +8341,27 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 1);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8385,41 +8382,41 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     // Check the curves
     Real64 cp105N = -0.590653062499999;
     Real64 cp105S = -0.298039062499999;
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(state, 1, 0));                   // In-range value
-    EXPECT_NEAR(cp105N, CurveManager::CurveValue(state, 1, 105), 1e-14);              // In-range value
-    EXPECT_NEAR(cp105S, CurveManager::CurveValue(state, 1, 75), 1e-14);               // In-range value
-    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(state, 1, -10.0));               // Minimum x
-    EXPECT_NEAR(-0.403903999999994, CurveManager::CurveValue(state, 1, 5000), 1e-14); // Maximum x
+    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, 0));                   // In-range value
+    EXPECT_NEAR(cp105N, CurveManager::CurveValue(*state, 1, 105), 1e-14);              // In-range value
+    EXPECT_NEAR(cp105S, CurveManager::CurveValue(*state, 1, 75), 1e-14);               // In-range value
+    EXPECT_DOUBLE_EQ(0.592, CurveManager::CurveValue(*state, 1, -10.0));               // Minimum x
+    EXPECT_NEAR(-0.403903999999994, CurveManager::CurveValue(*state, 1, 5000), 1e-14); // Maximum x
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
                                                               1.0,
-                                                              DataEnvironment::WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(10.0),
-                                                              DataEnvironment::OutHumRat);
+                                                              state->dataEnvrn->WindDir,
+                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                              state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
-    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(AirflowNetwork::MultizoneExternalNodeData(1).height));
+    EXPECT_DOUBLE_EQ(10.0, DataEnvironment::WindSpeedAt(*state, AirflowNetwork::MultizoneExternalNodeData(1).height));
 
     EXPECT_EQ(5u, AirflowNetwork::AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
 
     EXPECT_NEAR(cp105N * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ, 1e-13);
     EXPECT_NEAR(cp105S * 0.5 * 118.41123742118911, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ, 1e-13);
@@ -9060,46 +9057,46 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     bool errors = false;
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::WindDir = 105.0;
-    DataEnvironment::OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
-    DataEnvironment::WindSpeed = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->WindDir = 105.0;
+    state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->WindSpeed = 10.0;
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state);
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    SimulationManager::GetProjectData(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput(state);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(state.dataCurveManager->NumCurves, 2);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    DataGlobals::AnyLocalEnvironmentsInModel = true;
-    OutAirNodeManager::SetOutAirNodes(state);
-    GetAirflowNetworkInput(state);
+    state->dataGlobal->AnyLocalEnvironmentsInModel = true;
+    OutAirNodeManager::SetOutAirNodes(*state);
+    GetAirflowNetworkInput(*state);
     // Issue 7656
     std::string const error_string = delimited_string({
         "   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
@@ -9107,7 +9104,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    state.dataAirflowNetworkBalanceManager->initialize(state);
+    state->dataAirflowNetworkBalanceManager->initialize(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -9129,12 +9126,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     Node(1).OutAirWindSpeed = 1.0;
     Node(1).OutAirDryBulb = 15.0;
     Real64 rho_1 =
-        Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataLoopNode::Node(1).OutAirDryBulb, DataLoopNode::Node(1).HumRat);
-    Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, DataLoopNode::Node(1).OutAirDryBulb, DataLoopNode::Node(1).HumRat);
+    Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho_2);
 
-    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
+    Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -9146,11 +9143,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
 
-    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(state);
+    AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance(*state);
     // Make sure we set the right temperature
     EXPECT_DOUBLE_EQ(25.0, AirflowNetwork::AirflowNetworkNodeSimu(4).TZ);
     EXPECT_DOUBLE_EQ(15.0, AirflowNetwork::AirflowNetworkNodeSimu(5).TZ);
-    EXPECT_DOUBLE_EQ(4.7384645696854548, DataEnvironment::WindSpeedAt(1.524));
+    EXPECT_DOUBLE_EQ(4.7384645696854548, DataEnvironment::WindSpeedAt(*state, 1.524));
     // Global wind speed 10 m/s, temp 25 C; Local wind speed 1 m/s, temp 15 C;
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * rho_2 * 4.7384645696854548 * 4.7384645696854548, AirflowNetwork::AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * rho_1, AirflowNetwork::AirflowNetworkNodeSimu(5).PZ);
@@ -9552,30 +9549,30 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
-    EXPECT_EQ(7, state.dataCurveManager->NumCurves);
+    EXPECT_EQ(7, state->dataCurveManager->NumCurves);
 
     // Check the airflow elements
     ASSERT_EQ(3u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -9591,15 +9588,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
         Real64 angle = i * 10.0;
-        Real64 value = CurveManager::CurveValue(state, 7, angle);
-        EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+        Real64 value = CurveManager::CurveValue(*state, 7, angle);
+        EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << (format("Issue at index: {}", i));
     }
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
         Real64 angle = i * 10.0;
-        Real64 value = CurveManager::CurveValue(state, 6, angle);
-        EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+        Real64 value = CurveManager::CurveValue(*state, 6, angle);
+        EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << (format("Issue at index: {}", i));
     }
 }
 
@@ -13096,26 +13093,26 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -13127,18 +13124,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
-    DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
-    DataEnvironment::WindSpeed = 4.9;
-    DataEnvironment::WindDir = 270.0;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutHumRat = 0.0008389;
+    state->dataEnvrn->OutBaroPress = 99063.0;
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
 
     for (int i = 1; i <= 50; ++i) {
         AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
+            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
+            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
@@ -13167,14 +13164,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     AirflowNetwork::AirflowNetworkLinkageData(42).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
-    state.dataAirLoop->AirLoopAFNInfo.allocate(2);
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    state.dataAirLoop->AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    state.dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
-    state.dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
+    state->dataAirLoop->AirLoopAFNInfo.allocate(2);
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
+    state->dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
 
     // Check mass flow rate
     EXPECT_NEAR(1.40, AirflowNetwork::AirflowNetworkLinkSimu(42).FLOW, 0.0001);
@@ -13185,7 +13182,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
     // #7977
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
     DataHeatBalFanSys::MAT.allocate(5);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(5);
@@ -13193,25 +13190,25 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.001;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(2).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(3).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(4).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(5).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(5).IsControlled = false;
-    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
+    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
     AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
-    ReportAirflowNetwork(state);
+    ReportAirflowNetwork(*state);
 
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
     AirflowNetwork::AirflowNetworkCompData(AirflowNetwork::AirflowNetworkLinkageData(2).CompNum).CompTypeNum = 1;
-    ReportAirflowNetwork(state);
+    ReportAirflowNetwork(*state);
 
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
@@ -13219,17 +13216,17 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
 {
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).Name = "VAV";
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 3;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(3);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CVF";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VAV";
 
-    ASSERT_THROW(ValidateDistributionSystem(state), std::runtime_error);
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
@@ -13641,45 +13638,45 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, errors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, errors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, errors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, errors); // read zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
-    CurveManager::GetCurveInput(state);
-    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     // #6912
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
-    DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
-    DataEnvironment::WindSpeed = 4.9;
-    DataEnvironment::WindDir = 270.0;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutHumRat = 0.0008389;
+    state->dataEnvrn->OutBaroPress = 99063.0;
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
     bool First = false;
     int iter = 1;
     bool resimu = false;
 
-    Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
-    state.dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
-    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
-    ManageAirflowNetworkBalance(state, First, iter, resimu);
+    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
+    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    ManageAirflowNetworkBalance(*state, First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
 
@@ -15569,26 +15566,26 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     Schedule(1).CurrentValue = 1.0;
     Schedule(2).CurrentValue = 100.0;
@@ -15606,29 +15603,29 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     Schedule(14).CurrentValue = 1.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
-    DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
-    DataEnvironment::WindSpeed = 4.9;
-    DataEnvironment::WindDir = 270.0;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutHumRat = 0.0008389;
+    state->dataEnvrn->OutBaroPress = 99063.0;
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
 
     for (i = 1; i <= 21; ++i) {
         AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
             AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
+                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
-    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 1;
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
+    state->dataAirLoop->AirLoopAFNInfo.allocate(1);
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 1;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
     Node(4).MassFlowRate = 1.23;
 
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
     // Fan:SystemModel
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
     EXPECT_TRUE(AirflowNetwork::DisSysCompCVFData(1).FanModelFlag);
@@ -15638,22 +15635,22 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
             AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
+                DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
     // Fan:OnOff
     AirflowNetwork::DisSysCompCVFData(1).FanModelFlag = false;
-    CalcAirflowNetworkAirBalance(state);
+    CalcAirflowNetworkAirBalance(*state);
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
-    state.dataAirLoop->AirLoopAFNInfo.deallocate();
+    state->dataAirLoop->AirLoopAFNInfo.deallocate();
 }
 
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -15676,14 +15673,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataSurfaces::Surface(1).Sides = 4;
 
     DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
     DataLoopNode::NumOfNodes = 1;
     DataLoopNode::Node.allocate(1);
@@ -15691,7 +15688,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataLoopNode::NodeID.allocate(1);
     DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -15703,7 +15700,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
 
-    ASSERT_THROW(ValidateDistributionSystem(state), std::runtime_error);
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -15721,7 +15718,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 // Can't find an inlet node for a Zone referenced in AirflowNetwork:MultiZone:Zone object
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -15744,14 +15741,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataSurfaces::Surface(1).Sides = 4;
 
     DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
     DataLoopNode::NumOfNodes = 1;
     DataLoopNode::Node.allocate(2);
@@ -15759,7 +15756,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataLoopNode::NodeID.allocate(1);
     DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -15783,12 +15780,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     AirflowNetwork::AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
     AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
 
     // MixedAir::NumOAMixers.allocate(1);
-    ValidateDistributionSystem(state);
+    ValidateDistributionSystem(*state);
 
     EXPECT_TRUE(compare_err_stream("", true));
 }
@@ -17147,31 +17144,31 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state);
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    SimulationManager::GetProjectData(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput(state);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    state->dataEnvrn->OutBaroPress = 101000;
+    DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    ASSERT_THROW(GetAirflowNetworkInput(state), std::runtime_error);
+    ASSERT_THROW(GetAirflowNetworkInput(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",
@@ -19926,40 +19923,40 @@ std::string const idf_objects = delimited_string({
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(state, ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
-    DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
-    DataEnvironment::WindSpeed = 4.9;
-    DataEnvironment::WindDir = 270.0;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutHumRat = 0.0008389;
+    state->dataEnvrn->OutBaroPress = 99063.0;
+    state->dataEnvrn->WindSpeed = 4.9;
+    state->dataEnvrn->WindDir = 270.0;
 
     for (int i = 1; i <= 32; ++i) {
         AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
-            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
+            AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight);
+            AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
 
@@ -19976,9 +19973,9 @@ std::string const idf_objects = delimited_string({
         AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
-    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo.allocate(1);
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
@@ -19995,21 +19992,21 @@ std::string const idf_objects = delimited_string({
     DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
-    DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
-    SimAirServingZones::GetAirPathData(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    SimAirServingZones::GetAirPathData(*state);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
-    state.dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
     DataZoneEquipment::ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     AirflowNetwork::DisSysNodeData(9).EPlusNodeNum = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
-    ManageAirflowNetworkBalance(state, true);
+    ManageAirflowNetworkBalance(*state, true);
     EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
 
 }
@@ -20051,9 +20048,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     Surface(3).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -20118,7 +20115,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
     // Expect warnings about the air boundary surface
     EXPECT_TRUE(has_err_output(false));
     std::string const expectedErrString = delimited_string({

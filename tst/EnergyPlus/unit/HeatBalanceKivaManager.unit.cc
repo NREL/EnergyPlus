@@ -65,6 +65,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 
 namespace EnergyPlus {
@@ -176,20 +177,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     int DualZoneNum(1);
 
-    DataEnvironment::DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
-    DataEnvironment::DayOfWeek = 1;             // must initialize this to get schedules initialized
-    DataGlobals::HourOfDay = 1;                 // must initialize this to get schedules initialized
-    DataGlobals::TimeStep = 1;                  // must initialize this to get schedules initialized
-    DataGlobals::NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);    // read schedules
+    state->dataEnvrn->DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;             // must initialize this to get schedules initialized
+    state->dataGlobal->HourOfDay = 1;                 // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStep = 1;                  // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 
@@ -201,11 +202,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
 
-    kv1.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
+    kv1.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
@@ -216,16 +217,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
 
-    kv2.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
+    kv2.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
-    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
@@ -234,16 +235,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
 
-    kv3.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
+    kv3.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
-    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
     HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
@@ -251,11 +252,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature
 
-    kv4.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
+    kv4.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
 }
 
 } // namespace EnergyPlus

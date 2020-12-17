@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -409,7 +410,7 @@ namespace PlantCentralGSHP {
                         int LoopNum    // Loop Number Index
         );
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void SizeWrapper(EnergyPlusData &state);
 
@@ -423,7 +424,7 @@ namespace PlantCentralGSHP {
 
         void UpdateChillerRecords();
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
     };
 
@@ -437,6 +438,14 @@ namespace PlantCentralGSHP {
     void GetChillerHeaterInput(EnergyPlusData &state);
 
 } // namespace PlantCentralGSHP
+
+struct PlantCentralGSHPData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

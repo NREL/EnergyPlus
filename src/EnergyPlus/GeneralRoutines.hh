@@ -53,8 +53,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -63,7 +64,8 @@ struct EnergyPlusData;
 
 void GeneralRoutines_clear_state();
 
-void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
+void ControlCompOutput(EnergyPlusData &state,
+                       std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
                        int &CompNum,                              // Index of component in component array
                        bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
@@ -87,13 +89,15 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
 bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
 
-void CheckSysSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+void CheckSysSizing(EnergyPlusData &state,
+                    std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
 
-void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+void CheckZoneSizing(EnergyPlusData &state,
+                     std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
@@ -147,7 +151,8 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
                              Real64 &gNu          // Gap gas Nusselt number
 );
 
-void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
+void CalcBasinHeaterPower(EnergyPlusData &state,
+                          Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
                           int const SchedulePtr,     // Pointer to basin heater schedule
                           Real64 const SetPointTemp, // setpoint temperature for basin heater operation (C)
                           Real64 &Power              // Basin heater power (W)
@@ -185,6 +190,14 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
                             Real64 const WZone,    // humidity ratio at zone air node
                             Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
 );
+
+struct GeneralRoutinesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

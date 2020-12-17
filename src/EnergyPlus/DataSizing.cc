@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -859,7 +860,8 @@ namespace DataSizing {
         firstPassFlag = false;
     }
 
-    void GetCoilDesFlowT(int SysNum,           // central air system index
+    void GetCoilDesFlowT(EnergyPlusData &state,
+                         int SysNum,           // central air system index
                          Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
                          Real64 &DesFlow,      // returned design mass flow [kg/s]
                          Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
@@ -915,16 +917,16 @@ namespace DataSizing {
             }
         } else {
             if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
-                ShowWarningError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
                                  "has no time of peak cooling load for sizing.");
-                ShowContinueError("Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
+                ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
                 CoolCapCtrl = VAV;
             }
         }
 
         if (CoolCapCtrl == VAV) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
-            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / DataEnvironment::StdRhoAir;
+            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
             DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
@@ -939,9 +941,9 @@ namespace DataSizing {
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
             DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
-                              AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
+                              AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
             DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
@@ -950,7 +952,7 @@ namespace DataSizing {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
-            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
+            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
             TotFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
             MixTemp = CalcSysSizing(SysNum).MixTempAtCoolPeak;
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
@@ -959,7 +961,7 @@ namespace DataSizing {
             } else {
                 DesFlow = TotFlow;
             }
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         }
     }
 

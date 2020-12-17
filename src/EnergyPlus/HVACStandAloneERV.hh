@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -195,19 +196,21 @@ namespace HVACStandAloneERV {
 
     void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum);
 
-    void CalcStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,    // Unit index in ERV data structure
+    void CalcStandAloneERV(EnergyPlusData &state,
+                           int const StandAloneERVNum,    // Unit index in ERV data structure
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            Real64 &SensLoadMet,           // sensible zone load met by unit (W)
                            Real64 &LatentMassLoadMet      // latent zone load met by unit (kg/s), dehumid = negative
     );
 
-    void ReportStandAloneERV(int const StandAloneERVNum); // number of the current Stand Alone ERV being simulated
+    void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum); // number of the current Stand Alone ERV being simulated
 
     //        End of Reporting subroutines for the Module
 
     //        Utility subroutines/functions for the HeatingCoil Module
 
-    Real64 GetSupplyAirFlowRate(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
+                                std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                 std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                 bool &ErrorsFound               // set to true if problem
     );
@@ -229,6 +232,14 @@ namespace HVACStandAloneERV {
     int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum);
 
 } // namespace HVACStandAloneERV
+
+struct HVACStandAloneERVData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

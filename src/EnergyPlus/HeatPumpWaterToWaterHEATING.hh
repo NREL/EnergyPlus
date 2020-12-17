@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -153,7 +154,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         static PlantComponent *factory(EnergyPlusData &state, const std::string& objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
@@ -162,7 +163,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         void initialize(EnergyPlusData &state);
 
@@ -179,6 +180,14 @@ namespace HeatPumpWaterToWaterHEATING {
     void clear_state();
 
 } // namespace HeatPumpWaterToWaterHEATING
+
+struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

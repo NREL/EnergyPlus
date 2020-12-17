@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -66,8 +67,6 @@ struct EnergyPlusData;
 namespace DataZoneEquipment {
 
     // Using/Aliasing
-    using DataGlobals::NumOfZones;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -411,14 +410,15 @@ namespace DataZoneEquipment {
         {
         }
 
-        void getPrioritiesforInletNode(int const inletNodeNum, // Zone inlet node number to match
+        void getPrioritiesForInletNode(EnergyPlusData &state,
+                                       int const inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
 
-        Real64 SequentialHeatingFraction(int equipNum);
+        Real64 SequentialHeatingFraction(EnergyPlusData &state, int equipNum);
 
-        Real64 SequentialCoolingFraction(int equipNum);
+        Real64 SequentialCoolingFraction(EnergyPlusData &state, int equipNum);
     };
 
     struct ControlList
@@ -493,9 +493,10 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData1(EnergyPlusData &state);
 
-    void SetupZoneEquipmentForConvectionFlowRegime();
+    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
-    bool CheckZoneEquipmentList(std::string const &ComponentType, // Type of component
+    bool CheckZoneEquipmentList(EnergyPlusData &state,
+                                std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
@@ -510,12 +511,14 @@ namespace DataZoneEquipment {
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state,
+                            std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
     Real64
-    CalcDesignSpecificationOutdoorAir(int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                       int const ActualZoneNum,    // Zone index
                                       bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
@@ -524,6 +527,14 @@ namespace DataZoneEquipment {
     );
 
 } // namespace DataZoneEquipment
+
+struct DataZoneEquipmentData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

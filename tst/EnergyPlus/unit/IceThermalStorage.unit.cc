@@ -57,11 +57,11 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::IceThermalStorage;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace CurveManager;
 using namespace EnergyPlus::General;
 
@@ -69,7 +69,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
 {
 
     IceThermalStorage::clear_state();
-    state.dataCurveManager->clear_state();
+    state->dataCurveManager->clear_state();
 
     int TotDetailedIce = 4;
     int TotCurves = 4;
@@ -80,83 +80,83 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     Real64 Tolerance = 0.001;
 
     IceThermalStorage::DetailedIceStorage.allocate(TotDetailedIce);
-    state.dataCurveManager->PerfCurve.allocate(TotCurves);
-    state.dataCurveManager->NumCurves = TotCurves;
-    state.dataGlobal->BeginEnvrnFlag = false;
+    state->dataCurveManager->PerfCurve.allocate(TotCurves);
+    state->dataCurveManager->NumCurves = TotCurves;
+    state->dataGlobal->BeginEnvrnFlag = false;
 
     // Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
     TestNum = 1;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracChargedLMTD;
-    state.dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::QuadraticLinear;
-    state.dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(state, TestNum, IceStorageCurveType, 0.5, 1.5, 0.25);
+    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::QuadraticLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
+    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.5, 1.5, 0.25);
     ExpectedValue = 1.475;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
     // Test 2: CurveVarsFracDischargedLMTD Curve is BiQuadratic
     TestNum = 2;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracDischargedLMTD;
-    state.dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::BiQuadratic;
-    state.dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
+    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.960;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
     // Test 3: CurveVarsLMTDMassFlow Curve is CubicLinear
     TestNum = 3;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDMassFlow;
-    state.dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    state.dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
+    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.768;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
     // Test 4: CurveVarsFracLMTDFracCharged Curve is CubicLinear
     TestNum = 4;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDFracCharged;
-    state.dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    state.dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;
-    state.dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
-    state.dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
-    CurveAnswer = IceThermalStorage::CalcQstar(state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
+    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;
+    state->dataCurveManager->PerfCurve(TestNum).Var2Min = 0.0;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff1 = 0.1;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff2 = 0.2;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff3 = 0.3;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff4 = 0.4;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff5 = 0.5;
+    state->dataCurveManager->PerfCurve(TestNum).Coeff6 = 0.6;
+    CurveAnswer = IceThermalStorage::CalcQstar(*state, TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.951;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 }

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -152,7 +153,7 @@ namespace ICEngineElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitICEngineGenerators(EnergyPlusData &state, bool RunFlag, bool FirstHVACIteration);
 
@@ -164,7 +165,7 @@ namespace ICEngineElectricGenerator {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
@@ -174,6 +175,14 @@ namespace ICEngineElectricGenerator {
     void GetICEngineGeneratorInput(EnergyPlusData &state);
 
 } // namespace ICEngineElectricGenerator
+
+struct ICEngineElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

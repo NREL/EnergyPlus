@@ -62,8 +62,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-void SizingAnalysisObjects_clear_state();
-
 class SystemTimestepObject
 {
 public:
@@ -129,7 +127,7 @@ public:
 
     void ProcessRunningAverage();
 
-    ZoneTimestepObject GetLogVariableDataMax();
+    ZoneTimestepObject GetLogVariableDataMax(EnergyPlusData &state);
 
     Real64 GetLogVariableDataAtTimestamp(ZoneTimestepObject tmpztStepStamp);
 
