@@ -950,7 +950,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
-void AssignReportNumber(int &ReportNumber);
+void AssignReportNumber(EnergyPlusData &state, int &ReportNumber);
 
 void GenOutputVariablesAuditReport(EnergyPlusData &state);
 
@@ -1097,12 +1097,22 @@ struct OutputProcessorData : BaseGlobalStruct {
     bool TrackingRunPeriodVariables = false;    // Requested RunPeriod Report Variables
     Real64 TimeStepZoneSec = 0;                 // Seconds from NumTimeStepInHour
     bool ErrorsLogged = false;
-    bool ProduceVariableDictionary = false;
     int MaxNumSubcategories = 1;
     bool isFinalYear = false;
     bool GetOutputInputFlag = true;
     OutputProcessor::ReportingFrequency minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
     std::vector<OutputProcessor::APIOutputVariableRequest> apiVarRequests;
+    int ReportNumberCounter = 0;                // The report number is used in output reports as a key.
+    int LHourP = -1;                            // Helps set hours for timestamp output
+    Real64 LStartMin = -1.0;                    // Helps set minutes for timestamp output
+    Real64 LEndMin = -1.0;                      // Helps set minutes for timestamp output
+    bool GetMeterIndexFirstCall = true;         // trigger setup in GetMeterIndex
+    bool InitFlag = true;
+    Array1D_int keyVarIndexes;                  // Array index for specific key name
+    int curKeyVarIndexLimit = 0;                // current limit for keyVarIndexes
+    Array1D_string varNames;                    // stored variable names
+    Array1D_int ivarNames;                      // pointers for sorted information
+    int numVarNames = 0;                        // number of variable names
 
     void clear_state() override
     {
@@ -1152,12 +1162,22 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->TrackingRunPeriodVariables = false;
         this->TimeStepZoneSec = 0;
         this->ErrorsLogged = false;
-        this->ProduceVariableDictionary = false;
         this->MaxNumSubcategories = 1;
         this->isFinalYear = false;
         this->GetOutputInputFlag = true;
         this->minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
         this->apiVarRequests.clear();
+        this->ReportNumberCounter = 0;
+        this->LHourP = -1;
+        this->LStartMin = -1.0;
+        this->LEndMin = -1.0;
+        this->GetMeterIndexFirstCall = true;
+        this->InitFlag = true;
+        this->keyVarIndexes.deallocate();
+        this->curKeyVarIndexLimit = 0;
+        this->varNames.deallocate();
+        this->ivarNames.deallocate();
+        this->numVarNames = 0;
     }
 };
 

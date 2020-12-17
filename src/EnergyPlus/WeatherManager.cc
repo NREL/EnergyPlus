@@ -4558,7 +4558,7 @@ namespace WeatherManager {
         static std::string const RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
         static std::string const YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
 
-        AssignReportNumber(state.dataWeatherManager->EnvironmentReportNbr);
+        AssignReportNumber(state, state.dataWeatherManager->EnvironmentReportNbr);
         if (state.dataWeatherManager->EnvironmentReportNbr != 1) { //  problem
             ShowFatalError(state, "ReportOutputFileHeaders: Assigned report number for Environment title is not 1.  Contact Support.");
         }
@@ -4567,31 +4567,31 @@ namespace WeatherManager {
         print(state.files.eso, "{}{}\n", state.dataWeatherManager->EnvironmentReportChr, EnvironmentString);
         print(state.files.mtr, "{}{}\n", state.dataWeatherManager->EnvironmentReportChr, EnvironmentString);
 
-        AssignReportNumber(state.dataOutputProcessor->TimeStepStampReportNbr);
+        AssignReportNumber(state, state.dataOutputProcessor->TimeStepStampReportNbr);
         state.dataOutputProcessor->TimeStepStampReportChr = fmt::to_string(state.dataOutputProcessor->TimeStepStampReportNbr);
         strip(state.dataOutputProcessor->TimeStepStampReportChr);
         print(state.files.eso, "{}{}\n", state.dataOutputProcessor->TimeStepStampReportChr, TimeStepString);
         print(state.files.mtr, "{}{}\n", state.dataOutputProcessor->TimeStepStampReportChr, TimeStepString);
 
-        AssignReportNumber(state.dataOutputProcessor->DailyStampReportNbr);
+        AssignReportNumber(state, state.dataOutputProcessor->DailyStampReportNbr);
         state.dataOutputProcessor->DailyStampReportChr = fmt::to_string(state.dataOutputProcessor->DailyStampReportNbr);
         strip(state.dataOutputProcessor->DailyStampReportChr);
         print(state.files.eso, "{}{}{}\n", state.dataOutputProcessor->DailyStampReportChr, DailyString, "Report Variables Requested");
         print(state.files.mtr, "{}{}{}\n", state.dataOutputProcessor->DailyStampReportChr, DailyString, "Meters Requested");
 
-        AssignReportNumber(state.dataOutputProcessor->MonthlyStampReportNbr);
+        AssignReportNumber(state, state.dataOutputProcessor->MonthlyStampReportNbr);
         state.dataOutputProcessor->MonthlyStampReportChr = fmt::to_string(state.dataOutputProcessor->MonthlyStampReportNbr);
         strip(state.dataOutputProcessor->MonthlyStampReportChr);
         print(state.files.eso, "{}{}{}\n", state.dataOutputProcessor->MonthlyStampReportChr, MonthlyString, "Report Variables Requested");
         print(state.files.mtr, "{}{}{}\n", state.dataOutputProcessor->MonthlyStampReportChr, MonthlyString, "Meters Requested");
 
-        AssignReportNumber(state.dataOutputProcessor->RunPeriodStampReportNbr);
+        AssignReportNumber(state, state.dataOutputProcessor->RunPeriodStampReportNbr);
         state.dataOutputProcessor->RunPeriodStampReportChr = fmt::to_string(state.dataOutputProcessor->RunPeriodStampReportNbr);
         strip(state.dataOutputProcessor->RunPeriodStampReportChr);
         print(state.files.eso, "{}{}{}\n", state.dataOutputProcessor->RunPeriodStampReportChr, RunPeriodString, "Report Variables Requested");
         print(state.files.mtr, "{}{}{}\n", state.dataOutputProcessor->RunPeriodStampReportChr, RunPeriodString, "Meters Requested");
 
-        AssignReportNumber(state.dataOutputProcessor->YearlyStampReportNbr);
+        AssignReportNumber(state, state.dataOutputProcessor->YearlyStampReportNbr);
         state.dataOutputProcessor->YearlyStampReportChr = fmt::to_string(state.dataOutputProcessor->YearlyStampReportNbr);
         strip(state.dataOutputProcessor->YearlyStampReportChr);
         print(state.files.eso, "{}{}{}\n", state.dataOutputProcessor->YearlyStampReportChr, YearlyString, "Report Variables Requested");
