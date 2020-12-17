@@ -49,6 +49,7 @@
 #define EcoRoofManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -97,6 +98,14 @@ namespace EcoRoofManager {
     );
 
 } // namespace EcoRoofManager
+
+struct EcoRoofManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

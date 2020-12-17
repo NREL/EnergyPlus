@@ -49,8 +49,8 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

@@ -1233,7 +1233,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
         extension_key = key.value().get<std::string>();
     }
 
-    for (auto const obj : *objects) {
+    for (auto const &obj : *objects) {
         if (obj.find(extension_key) != obj.end()) {
             auto const size = obj[extension_key].size();
             if (size > max_size) max_size = size;
@@ -1609,7 +1609,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
-                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength()) {
+                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
                     ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {

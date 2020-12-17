@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -738,7 +737,7 @@ namespace FluidCoolers {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp(),
+                                                                 DataGlobalConstants::InitConvTemp,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
@@ -878,7 +877,7 @@ namespace FluidCoolers {
             if (PltSizCondNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
+                                                        DataGlobalConstants::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -922,7 +921,7 @@ namespace FluidCoolers {
                         }
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp(),
+                                                                DataGlobalConstants::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -996,7 +995,7 @@ namespace FluidCoolers {
                         }
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp(),
+                                                                DataGlobalConstants::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1062,7 +1061,7 @@ namespace FluidCoolers {
                     }
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                            DataGlobalConstants::InitConvTemp(),
+                                                            DataGlobalConstants::InitConvTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                             CalledFrom);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1170,7 +1169,7 @@ namespace FluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
+                                                        DataGlobalConstants::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1322,7 +1321,7 @@ namespace FluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
+                                                        DataGlobalConstants::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1401,8 +1400,8 @@ namespace FluidCoolers {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, this->FluidCoolerType);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, this->FluidCoolerNominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, this->FluidCoolerType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->FluidCoolerNominalCapacity);
         }
 
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd && DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -1847,7 +1846,7 @@ namespace FluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the fluid cooler.
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         auto &waterInletNode = this->WaterInletNodeNum;
         if (!RunFlag) {
             this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;

@@ -49,6 +49,7 @@
 #define HeatBalanceInternalHeatGains_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -67,6 +68,14 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            Real64 *GenericContamGainRate = nullptr,
                            int RetNodeNum = 0 // for return air heat gains
 );
+
+struct HeatBalInternalHeatGainsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
