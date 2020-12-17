@@ -7228,7 +7228,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     }
 
     // Variables aren't going to be output to SQL/ESO anyways
-    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 0);
+    EXPECT_EQ(state->dataOutputProcessor->NumOfReqVariables, 0);
 
     EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
     // If everything worked, we should have 2 tables, one for each zone.

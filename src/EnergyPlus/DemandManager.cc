@@ -365,7 +365,7 @@ namespace EnergyPlus::DemandManager {
 
                 DemandManagerList(ListNum).Name = AlphArray(1);
 
-                DemandManagerList(ListNum).Meter = GetMeterIndex(AlphArray(2));
+                DemandManagerList(ListNum).Meter = GetMeterIndex(state, AlphArray(2));
 
                 if (DemandManagerList(ListNum).Meter == 0) {
                     ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));

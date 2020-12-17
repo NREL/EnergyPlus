@@ -259,8 +259,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
@@ -302,8 +302,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
@@ -342,8 +342,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     EnergyMeters(1).Name = "NATURALGAS:FACILITY";
     EnergyMeters(1).ResourceType = "NATURALGAS";
 
@@ -383,8 +383,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     EnergyMeters(1).ResourceType = "ELECTRICITY";
 
@@ -407,8 +407,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
 {
-    NumEnergyMeters = 4;
-    EnergyMeters.allocate(NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 4;
+    EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     EnergyMeters(2).Name = "NATURALGAS:FACILITY";
     EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";

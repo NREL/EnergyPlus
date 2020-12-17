@@ -3913,10 +3913,10 @@ namespace EnergyPlus::EconomicTariff {
         auto &tariff(state.dataEconTariff->tariff);
 
         if (state.dataEconTariff->numTariff > 0) {
-            elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
-            distCoolFacilMeter = GetMeterIndex("DISTRICTCOOLING:FACILITY");
-            distHeatFacilMeter = GetMeterIndex("DISTRICTHEATING:FACILITY");
+            elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
+            gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
+            distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
+            distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
             elecTotalEne = 0.0;
             gasTotalEne = 0.0;
             distCoolTotalEne = 0.0;
@@ -4094,8 +4094,8 @@ namespace EnergyPlus::EconomicTariff {
                 // Economics Results Summary Report
                 //---------------------------------
                 WriteReportHeaders("Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-                gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
+                elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
+                gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
                 //---- Annual Summary
                 rowHead.allocate(3);
                 columnHead.allocate(4);

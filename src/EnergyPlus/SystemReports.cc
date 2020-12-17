@@ -2365,7 +2365,7 @@ namespace EnergyPlus::SystemReports {
                         auto &thisComp(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum));
                         TypeOfComp = thisComp.TypeOf;
                         NameOfComp = thisComp.Name;
-                        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                         if (NumVariables > 0) {
                             VarIndexes.allocate(NumVariables);
                             VarTypes.allocate(NumVariables);
@@ -2433,7 +2433,7 @@ namespace EnergyPlus::SystemReports {
                             // Get complete list of components for complex branches
                             TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
                             NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                             if (NumVariables > 0) {
                                 VarIndexes.allocate(NumVariables);
                                 VarTypes.allocate(NumVariables);
@@ -2503,7 +2503,7 @@ namespace EnergyPlus::SystemReports {
                                 // Get complete list of components for complex branches
                                 TypeOfComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).TypeOf;
                                 NameOfComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).Name;
-                                NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                                NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                                 if (NumVariables > 0) {
                                     VarIndexes.allocate(NumVariables);
                                     VarTypes.allocate(NumVariables);
@@ -2606,7 +2606,7 @@ namespace EnergyPlus::SystemReports {
                     thisEquipData.NumInlets = NumInlets;
                     thisEquipData.InletNodeNums = InletNodeNumbers;
                     thisEquipData.Parent = IsParent;
-                    NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                    NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                     thisEquipData.NumMeteredVars = NumVariables;
                     if (NumVariables > 0) {
                         InletNodeNames.deallocate();
@@ -2764,7 +2764,7 @@ namespace EnergyPlus::SystemReports {
                         TypeOfComp = thisSubEquipData.TypeOf;
                         NameOfComp = thisSubEquipData.Name;
 
-                        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                         thisSubEquipData.NumMeteredVars = NumVariables; // Sankar added this line
                         if (NumVariables > 0) {
                             VarIndexes.allocate(NumVariables);
@@ -2833,7 +2833,7 @@ namespace EnergyPlus::SystemReports {
                             TypeOfComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).TypeOf;
                             NameOfComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).Name;
 
-                            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                             thisSubEquipData.SubSubEquipData(SubSubCompNum).NumMeteredVars = NumVariables; // Sankar added this line
                             if (NumVariables > 0) {
                                 VarIndexes.allocate(NumVariables);
@@ -3093,7 +3093,7 @@ namespace EnergyPlus::SystemReports {
                             auto &thisComp(ThisReportData.Branch(BranchNum).Comp(CompNum));
                             TypeOfComp = thisComp.TypeOf;
                             NameOfComp = thisComp.Name;
-                            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                             if (NumVariables > 0) {
                                 VarIndexes.allocate(NumVariables);
                                 VarTypes.allocate(NumVariables);
@@ -3161,7 +3161,7 @@ namespace EnergyPlus::SystemReports {
                                 // Get complete list of components for complex branches
                                 TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
                                 NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                                NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+                                NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                                 if (NumVariables > 0) {
                                     VarIndexes.allocate(NumVariables);
                                     VarTypes.allocate(NumVariables);

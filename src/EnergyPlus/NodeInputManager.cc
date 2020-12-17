@@ -1084,7 +1084,6 @@ namespace NodeInputManager {
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::NumOfGlycols;
-        using OutputProcessor::NumOfReqVariables;
         using OutputProcessor::ReqReportVariables;
         using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
@@ -1152,7 +1151,7 @@ namespace NodeInputManager {
             for (iNode = 1; iNode <= NumOfNodes; ++iNode) {
                 nodeReportingStrings.push_back(std::string(NodeReportingCalc + NodeID(iNode)));
                 nodeFluidNames.push_back(GetGlycolNameByIndex(Node(iNode).FluidIndex));
-                for (iReq = 1; iReq <= NumOfReqVariables; ++iReq) {
+                for (iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
                     if (UtilityRoutines::SameString(ReqRepVars(iReq).Key, NodeID(iNode)) || ReqRepVars(iReq).Key.empty()) {
                         if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
                             NodeWetBulbRepReq(iNode) = true;

@@ -2293,25 +2293,25 @@ namespace OutputReportTabular {
             // loop through all of the resources and end uses and sub end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 meterName = resourceTypeNames(iResource) + ":FACILITY";
-                meterNumber = GetMeterIndex(meterName);
+                meterNumber = GetMeterIndex(state, meterName);
                 meterNumTotalsBEPS(iResource) = meterNumber;
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     meterName = endUseNames(jEndUse) + ':' + resourceTypeNames(iResource); //// ':FACILITY'
-                    meterNumber = GetMeterIndex(meterName);
+                    meterNumber = GetMeterIndex(state, meterName);
                     meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
                     for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         meterName =
                             EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + endUseNames(jEndUse) + ':' + resourceTypeNames(iResource);
-                        meterNumber = GetMeterIndex(meterName);
+                        meterNumber = GetMeterIndex(state, meterName);
                         meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                     }
                 }
             }
 
             for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-                meterNumber = GetMeterIndex(sourceTypeNames(iResource) + "Emissions:Source");
+                meterNumber = GetMeterIndex(state, sourceTypeNames(iResource) + "Emissions:Source");
                 meterNumTotalsSource(iResource) = meterNumber;
             }
 
@@ -2331,20 +2331,20 @@ namespace OutputReportTabular {
             gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
-            meterNumPowerFuelFireGen = GetMeterIndex("Cogeneration:ElectricityProduced");
-            meterNumPowerPV = GetMeterIndex("Photovoltaic:ElectricityProduced");
-            meterNumPowerWind = GetMeterIndex("WindTurbine:ElectricityProduced");
-            meterNumPowerHTGeothermal = GetMeterIndex("HTGeothermal:ElectricityProduced");
-            meterNumElecStorage = GetMeterIndex("ElectricStorage:ElectricityProduced");
-            meterNumPowerConversion = GetMeterIndex("PowerConversion:ElectricityProduced");
-            meterNumElecProduced = GetMeterIndex("ElectricityProduced:Facility");
-            meterNumElecPurchased = GetMeterIndex("ElectricityPurchased:Facility");
-            meterNumElecSurplusSold = GetMeterIndex("ElectricitySurplusSold:Facility");
+            meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
+            meterNumPowerPV = GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
+            meterNumPowerWind = GetMeterIndex(state, "WindTurbine:ElectricityProduced");
+            meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGeothermal:ElectricityProduced");
+            meterNumElecStorage = GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
+            meterNumPowerConversion = GetMeterIndex(state, "PowerConversion:ElectricityProduced");
+            meterNumElecProduced = GetMeterIndex(state, "ElectricityProduced:Facility");
+            meterNumElecPurchased = GetMeterIndex(state, "ElectricityPurchased:Facility");
+            meterNumElecSurplusSold = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
             // if no ElectricityPurchased:Facility meter is defined then no electric load center
             // was created by the user and no power generation will occur in the plant. The amount
             // purchased would be the total end use.
             if (meterNumElecPurchased == 0) {
-                meterNumElecPurchased = GetMeterIndex("Electricity:Facility");
+                meterNumElecPurchased = GetMeterIndex(state, "Electricity:Facility");
             }
 
             // initialize the gathering variables for the electric load components
@@ -2359,12 +2359,12 @@ namespace OutputReportTabular {
             gatherPowerConversion = 0.0;
 
             // get meter numbers for onsite thermal components on BEPS report
-            meterNumWaterHeatRecovery = GetMeterIndex("HeatRecovery:EnergyTransfer");
-            meterNumAirHeatRecoveryCool = GetMeterIndex("HeatRecoveryForCooling:EnergyTransfer");
-            meterNumAirHeatRecoveryHeat = GetMeterIndex("HeatRecoveryForHeating:EnergyTransfer");
-            meterNumHeatHTGeothermal = GetMeterIndex("HTGeothermal:HeatProduced");
-            meterNumHeatSolarWater = GetMeterIndex("SolarWater:Facility");
-            meterNumHeatSolarAir = GetMeterIndex("HeatProduced:SolarAir");
+            meterNumWaterHeatRecovery = GetMeterIndex(state, "HeatRecovery:EnergyTransfer");
+            meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HeatRecoveryForCooling:EnergyTransfer");
+            meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HeatRecoveryForHeating:EnergyTransfer");
+            meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGeothermal:HeatProduced");
+            meterNumHeatSolarWater = GetMeterIndex(state, "SolarWater:Facility");
+            meterNumHeatSolarAir = GetMeterIndex(state, "HeatProduced:SolarAir");
             // initialize the gathering variables for onsite thermal components on BEPS report
             gatherWaterHeatRecovery = 0.0;
             gatherAirHeatRecoveryCool = 0.0;
@@ -2374,11 +2374,11 @@ namespace OutputReportTabular {
             gatherHeatSolarAir = 0.0;
 
             // get meter numbers for water components on BEPS report
-            meterNumRainWater = GetMeterIndex("Rainwater:OnSiteWater");
-            meterNumCondensate = GetMeterIndex("Condensate:OnSiteWater");
-            meterNumGroundwater = GetMeterIndex("Wellwater:OnSiteWater");
-            meterNumMains = GetMeterIndex("MainsWater:Facility");
-            meterNumWaterEndUseTotal = GetMeterIndex("Water:Facility");
+            meterNumRainWater = GetMeterIndex(state, "Rainwater:OnSiteWater");
+            meterNumCondensate = GetMeterIndex(state, "Condensate:OnSiteWater");
+            meterNumGroundwater = GetMeterIndex(state, "Wellwater:OnSiteWater");
+            meterNumMains = GetMeterIndex(state, "MainsWater:Facility");
+            meterNumWaterEndUseTotal = GetMeterIndex(state, "Water:Facility");
 
             // initialize the gathering variables for water components on BEPS report
             gatherRainWater = 0.0;

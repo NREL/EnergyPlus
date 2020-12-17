@@ -242,7 +242,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 
         // if user input did not include an Electric Load center, create a simple default one here for reporting purposes
         //   but only if there are any other electricity components set up (yet) for metering
-        int anyElectricityPresent = GetMeterIndex("ELECTRICITY:FACILITY");
+        int anyElectricityPresent = GetMeterIndex(state, "ELECTRICITY:FACILITY");
         int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant");
         if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, 0));
@@ -364,12 +364,12 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 
 void ElectricPowerServiceManager::setupMeterIndices(EnergyPlusData &state)
 {
-    elecFacilityIndex_ = EnergyPlus::GetMeterIndex("Electricity:Facility");
-    elecProducedCoGenIndex_ = EnergyPlus::GetMeterIndex("Cogeneration:ElectricityProduced");
-    elecProducedPVIndex_ = EnergyPlus::GetMeterIndex("Photovoltaic:ElectricityProduced");
-    elecProducedWTIndex_ = EnergyPlus::GetMeterIndex("WindTurbine:ElectricityProduced");
-    elecProducedStorageIndex_ = EnergyPlus::GetMeterIndex("ElectricStorage:ElectricityProduced");
-    elecProducedPowerConversionIndex_ = EnergyPlus::GetMeterIndex("PowerConversion:ElectricityProduced");
+    elecFacilityIndex_ = EnergyPlus::GetMeterIndex(state, "Electricity:Facility");
+    elecProducedCoGenIndex_ = EnergyPlus::GetMeterIndex(state, "Cogeneration:ElectricityProduced");
+    elecProducedPVIndex_ = EnergyPlus::GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
+    elecProducedWTIndex_ = EnergyPlus::GetMeterIndex(state, "WindTurbine:ElectricityProduced");
+    elecProducedStorageIndex_ = EnergyPlus::GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
+    elecProducedPowerConversionIndex_ = EnergyPlus::GetMeterIndex(state, "PowerConversion:ElectricityProduced");
 
     if (numLoadCenters_ > 0) {
         for (auto &e : elecLoadCenterObjs) {
@@ -1739,14 +1739,14 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
 
 void ElectPowerLoadCenter::setupLoadCenterMeterIndices(EnergyPlusData &state)
 {
-    demandMeterPtr_ = EnergyPlus::GetMeterIndex(demandMeterName_);
+    demandMeterPtr_ = EnergyPlus::GetMeterIndex(state, demandMeterName_);
     if ((demandMeterPtr_ == 0) && (genOperationScheme_ == GeneratorOpScheme::trackMeter)) { // throw error
         ShowFatalError(state, "ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: " + demandMeterName_ +
                        " in ElectricLoadCenter:Distribution named " + name_);
     }
 
     if (storageScheme_ == StorageOpScheme::meterDemandStoreExcessOnSite) {
-        trackStorageOpMeterIndex_ = EnergyPlus::GetMeterIndex(trackSorageOpMeterName_);
+        trackStorageOpMeterIndex_ = EnergyPlus::GetMeterIndex(state, trackSorageOpMeterName_);
         if (trackStorageOpMeterIndex_ == 0) { //
             ShowFatalError(state, "ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: " + trackSorageOpMeterName_ +
                            " in ElectricLoadCenter:Distribution named " + name_);
@@ -4331,7 +4331,7 @@ void ElectricTransformer::setupMeterIndices(EnergyPlusData &state)
     if (usageMode_ == TransformerUse::powerInFromGrid) {
         for (std::size_t meterNum = 0; meterNum < wiredMeterNames_.size(); ++meterNum) {
 
-            wiredMeterPtrs_[meterNum] = GetMeterIndex(wiredMeterNames_[meterNum]);
+            wiredMeterPtrs_[meterNum] = GetMeterIndex(state, wiredMeterNames_[meterNum]);
 
             // Check whether the meter is an electricity meter
             // Index function is used here because some resource types are not Electricity but strings containing

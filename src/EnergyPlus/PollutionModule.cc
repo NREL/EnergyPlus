@@ -1716,22 +1716,22 @@ namespace PollutionModule {
 
         } // End of the NumEnergyTypes Do Loop
 
-        FuelType.ElecFacilityIndex = GetMeterIndex("Electricity:Facility");
-        FuelType.DieselFacilityIndex = GetMeterIndex("Diesel:Facility");
-        FuelType.PurchCoolFacilityIndex = GetMeterIndex("DistrictCooling:Facility");
-        FuelType.PurchHeatFacilityIndex = GetMeterIndex("DistrictHeating:Facility");
-        FuelType.NatGasFacilityIndex = GetMeterIndex("NaturalGas:Facility");
-        FuelType.GasolineFacilityIndex = GetMeterIndex("Gasoline:Facility");
-        FuelType.CoalFacilityIndex = GetMeterIndex("Coal:Facility");
-        FuelType.FuelOil1FacilityIndex = GetMeterIndex("FuelOilNo1:Facility");
-        FuelType.FuelOil2FacilityIndex = GetMeterIndex("FuelOilNo2:Facility");
-        FuelType.PropaneFacilityIndex = GetMeterIndex("Propane:Facility");
-        FuelType.OtherFuel1FacilityIndex = GetMeterIndex("OtherFuel1:Facility");
-        FuelType.OtherFuel2FacilityIndex = GetMeterIndex("OtherFuel2:Facility");
-        FuelType.ElecProducedFacilityIndex = GetMeterIndex("ElectricityProduced:Facility");
-        FuelType.SteamFacilityIndex = GetMeterIndex("Steam:Facility");
-        FuelType.ElecPurchasedFacilityIndex = GetMeterIndex("ElectricityPurchased:Facility");
-        FuelType.ElecSurplusSoldFacilityIndex = GetMeterIndex("ElectricitySurplusSold:Facility");
+        FuelType.ElecFacilityIndex = GetMeterIndex(state, "Electricity:Facility");
+        FuelType.DieselFacilityIndex = GetMeterIndex(state, "Diesel:Facility");
+        FuelType.PurchCoolFacilityIndex = GetMeterIndex(state, "DistrictCooling:Facility");
+        FuelType.PurchHeatFacilityIndex = GetMeterIndex(state, "DistrictHeating:Facility");
+        FuelType.NatGasFacilityIndex = GetMeterIndex(state, "NaturalGas:Facility");
+        FuelType.GasolineFacilityIndex = GetMeterIndex(state, "Gasoline:Facility");
+        FuelType.CoalFacilityIndex = GetMeterIndex(state, "Coal:Facility");
+        FuelType.FuelOil1FacilityIndex = GetMeterIndex(state, "FuelOilNo1:Facility");
+        FuelType.FuelOil2FacilityIndex = GetMeterIndex(state, "FuelOilNo2:Facility");
+        FuelType.PropaneFacilityIndex = GetMeterIndex(state, "Propane:Facility");
+        FuelType.OtherFuel1FacilityIndex = GetMeterIndex(state, "OtherFuel1:Facility");
+        FuelType.OtherFuel2FacilityIndex = GetMeterIndex(state, "OtherFuel2:Facility");
+        FuelType.ElecProducedFacilityIndex = GetMeterIndex(state, "ElectricityProduced:Facility");
+        FuelType.SteamFacilityIndex = GetMeterIndex(state, "Steam:Facility");
+        FuelType.ElecPurchasedFacilityIndex = GetMeterIndex(state, "ElectricityPurchased:Facility");
+        FuelType.ElecSurplusSoldFacilityIndex = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
 
         if (PollutionReportSetup) { // only do this if reporting on the pollution
             // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated

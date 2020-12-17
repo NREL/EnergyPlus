@@ -452,7 +452,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     std::string TypeOfComp = "ZoneHVAC:HybridUnitaryHVAC";
     std::string NameOfComp = pZoneHybridUnitaryAirConditioner->Name;
-    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(

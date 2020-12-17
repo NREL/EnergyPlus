@@ -164,29 +164,6 @@ namespace OutputProcessor {
     constexpr int RT_IPUnits_OtherL(7);
     constexpr int RT_IPUnits_OtherJ(0);
 
-    extern int NumOfRVariable;
-    extern int MaxRVariable;
-    extern int NumOfIVariable_Setup;
-    extern int NumTotalIVariable;
-    extern int NumOfIVariable_Sum;
-    extern int NumOfIVariable;
-    extern int MaxIVariable;
-    extern bool OutputInitialized;
-    extern iReportVDD ProduceReportVDD;
-    extern int NumHoursInDay;
-    extern int NumHoursInMonth;
-    extern int NumHoursInSim;
-    extern Array1D_int ReportList;
-    extern int NumReportList;
-    extern int NumExtraVars;
-
-    extern int NumOfReqVariables; // Current number of Requested Report Variables
-
-    extern int NumVarMeterArrays; // Current number of Arrays pointing to meters
-
-    extern int NumEnergyMeters;        // Current number of Energy Meters
-    extern Array1D<Real64> MeterValue; // This holds the current timestep value for each meter.
-
     extern int TimeStepStampReportNbr;          // TimeStep and Hourly Report number
     extern std::string TimeStepStampReportChr;  // TimeStep and Hourly Report number (character -- for printing)
     extern bool TrackingHourlyVariables;        // Requested Hourly Report Variables
@@ -622,13 +599,15 @@ namespace OutputProcessor {
                              std::string const &VarName     // String Name of variable (without units)
     );
 
-    void BuildKeyVarList(std::string const &KeyedValue,   // Associated Key for this variable
+    void BuildKeyVarList(EnergyPlusData &state,
+                         std::string const &KeyedValue,   // Associated Key for this variable
                          std::string const &VariableName, // String Name of variable
                          int const MinIndx,               // Min number (from previous routine) for this variable
                          int const MaxIndx                // Max number (from previous routine) for this variable
     );
 
-    void AddBlankKeys(std::string const &VariableName, // String Name of variable
+    void AddBlankKeys(EnergyPlusData &state,
+                      std::string const &VariableName, // String Name of variable
                       int const MinIndx,               // Min number (from previous routine) for this variable
                       int const MaxIndx                // Max number (from previous routine) for this variable
     );
@@ -659,15 +638,9 @@ namespace OutputProcessor {
         Array.redimension(ArrayMax += ArrayInc, 0);
     }
 
-    inline void ReallocateRVar()
-    {
-        RVariableTypes.redimension(MaxRVariable += RVarAllocInc);
-    }
+    inline void ReallocateRVar(EnergyPlusData &state);
 
-    inline void ReallocateIVar()
-    {
-        IVariableTypes.redimension(MaxIVariable += IVarAllocInc);
-    }
+    inline void ReallocateIVar(EnergyPlusData &state);
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state, std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string const &CalledFrom    // Routine called from (for error messages)
@@ -708,12 +681,14 @@ namespace OutputProcessor {
                       bool &ErrorsFound            // True if errors in this call
     );
 
-    void AttachCustomMeters(int const RepVarNum, // Number of this report variable
+    void AttachCustomMeters(EnergyPlusData &state,
+                            int const RepVarNum, // Number of this report variable
                             int &MeterArrayPtr,  // Input/Output set of Pointers to Meters
                             int const MeterIndex // Which meter this is
     );
 
-    void ValidateNStandardizeMeterTitles(EnergyPlusData &state, OutputProcessor::Unit const &MtrUnits, // Units for the meter
+    void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
+                                         OutputProcessor::Unit const &MtrUnits, // Units for the meter
                                          std::string &ResourceType,             // Electricity, Gas, etc.
                                          std::string &EndUse,                   // End Use Type (Lights, Heating, etc.)
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
@@ -722,27 +697,30 @@ namespace OutputProcessor {
                                          Optional_string_const ZoneName = _     // ZoneName when Group=Building
     );
 
-    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state,
+                               int &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine
     );
 
-    void UpdateMeterValues(Real64 const TimeStepValue,                    // Value of this variable at the current time step.
+    void UpdateMeterValues(EnergyPlusData &state,
+                           Real64 const TimeStepValue,                    // Value of this variable at the current time step.
                            int const NumOnMeters,                         // Number of meters this variable is "on".
                            const Array1D_int &OnMeters                     // Which meters this variable is on (index values)
     );
 
-    void UpdateMeterValues(Real64 const TimeStepValue,                    // Value of this variable at the current time step.
+    void UpdateMeterValues(EnergyPlusData &state,
+                           Real64 const TimeStepValue,                    // Value of this variable at the current time step.
                            int const NumOnMeters,                         // Number of meters this variable is "on".
                            const Array1D_int &OnMeters,                    // Which meters this variable is on (index values)
                            int const NumOnCustomMeters,                   // Number of custom meters this variable is "on".
                            const Array1D_int &OnCustomMeters              // Which custom meters this variable is on (index values)
     );
 
-    void UpdateMeters(int const TimeStamp); // Current TimeStamp (for max/min)
+    void UpdateMeters(EnergyPlusData &state, int const TimeStamp); // Current TimeStamp (for max/min)
 
-    void ResetAccumulationWhenWarmupComplete();
+    void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state);
 
     void SetMinMax(Real64 const TestValue, // Candidate new value
                    int const TimeStamp,    // TimeStamp to be stored if applicable
@@ -752,7 +730,8 @@ namespace OutputProcessor {
                    int &CurMinValDate      // Current Minimum Value Date Stamp
     );
 
-    void ReportTSMeters(EnergyPlusData &state, Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(EnergyPlusData &state,
+                        Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
@@ -1009,7 +988,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                             bool const CumulativeIndicator // true if this is a Cumulative meter reporting
 );
 
-int GetMeterIndex(std::string const &MeterName);
+int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName);
 
 std::string GetMeterResourceType(int const MeterNumber); // Which Meter Number (from GetMeterIndex)
 
@@ -1031,7 +1010,8 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state, int cons
                                                  int const keyVarIndex // Array index
 );
 
-int GetNumMeteredVariables(std::string const &ComponentType, // Given Component Type
+int GetNumMeteredVariables(EnergyPlusData &state,
+                           std::string const &ComponentType, // Given Component Type
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
@@ -1107,6 +1087,24 @@ struct OutputProcessorData : BaseGlobalStruct {
     int NumTotalRVariable = 0;
     int NumOfRVariable_Sum = 0;
     int NumOfRVariable_Meter = 0;
+    int NumOfRVariable = 0;
+    int MaxRVariable = 0;
+    int NumOfIVariable_Setup = 0;
+    int NumTotalIVariable = 0;
+    int NumOfIVariable_Sum = 0;
+    int NumOfIVariable = 0;
+    int MaxIVariable = 0;
+    bool OutputInitialized = false;
+    OutputProcessor::iReportVDD ProduceReportVDD = OutputProcessor::iReportVDD::No;
+    int NumHoursInMonth = 0;
+    int NumHoursInSim = 0;
+    Array1D_int ReportList;
+    int NumReportList = 0;
+    int NumExtraVars = 0;
+    int NumOfReqVariables = 0;                  // Current number of Requested Report Variables
+    int NumVarMeterArrays = 0;                  // Current number of Arrays pointing to meters
+    int NumEnergyMeters = 0;                    // Current number of Energy Meters
+    Array1D<Real64> MeterValue;                 // This holds the current timestep value for each meter.
 
     void clear_state() override
     {
@@ -1121,6 +1119,24 @@ struct OutputProcessorData : BaseGlobalStruct {
         this->NumTotalRVariable = 0;
         this->NumOfRVariable_Sum = 0;
         this->NumOfRVariable_Meter = 0;
+        this->NumOfRVariable = 0;
+        this->MaxRVariable = 0;
+        this->NumOfIVariable_Setup = 0;
+        this->NumTotalIVariable = 0;
+        this->NumOfIVariable_Sum = 0;
+        this->NumOfIVariable = 0;
+        this->MaxIVariable = 0;
+        this->OutputInitialized = false;
+        this->ProduceReportVDD = OutputProcessor::iReportVDD::No;
+        this->NumHoursInMonth = 0;
+        this->NumHoursInSim = 0;
+        this->ReportList.deallocate();
+        this->NumReportList = 0;
+        this->NumExtraVars = 0;
+        this->NumOfReqVariables = 0;
+        this->NumVarMeterArrays = 0;
+        this->NumEnergyMeters = 0;
+        this->MeterValue.deallocate();
     }
 };
 

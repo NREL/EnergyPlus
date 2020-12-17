@@ -260,8 +260,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
     DataHVACGlobals::TimeStepSys = 1.0;
 
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    OutputProcessor::EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     OutputProcessor::EnergyMeters(1).Name = "HEATING:MYTH:VARIABLE";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:MYTH";
 
@@ -341,8 +341,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Facility",
                         "General"); // create an electric meter
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    OutputProcessor::EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
@@ -398,8 +398,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Facility",
                         "General"); // create an electric meter
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    OutputProcessor::EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
