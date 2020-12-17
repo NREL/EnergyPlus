@@ -99,7 +99,7 @@ class Data:
 def parse_idd(data):
     root = {'$schema': "http://json-schema.org/draft-04/schema#", 'properties': {}}
     data.file_size = len(data.file)
-    current_group_name = "**ungrouped**"
+    current_group_name = None
 
     while data.index < data.file_size:
         token = look_ahead(data)
@@ -111,7 +111,8 @@ def parse_idd(data):
         elif token == TOKEN_EXCLAMATION:
             eat_comment(data)
         elif token == TOKEN_GROUP:
-            current_group_name = parse_group(data).replace('\\group ', '')
+            next_token(data)
+            current_group_name = parse_line(data)
         else:
             obj_name = parse_string(data)
             if obj_name is None or obj_name == "":
@@ -119,7 +120,9 @@ def parse_idd(data):
             obj_data = parse_obj(data)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
-            root['properties'][obj_name]['group'] = current_group_name
+            if current_group_name is not None:
+                root['properties'][obj_name]['group'] = current_group_name
+                current_group_name = None
 
             name_pattern_properties = '.*'
             if 'name' in obj_data:
@@ -720,18 +723,6 @@ def eat_whitespace(data):
             data.index += 1
         else:
             break
-
-
-def parse_group(data):
-    eat_whitespace(data)
-    s = ""
-    while data.index < data.file_size:
-        c = data.file[data.index]
-        if c == '\n':
-            data.index += 1
-            return s
-        s += c
-        data.index += 1
 
 
 def eat_comment(data):
