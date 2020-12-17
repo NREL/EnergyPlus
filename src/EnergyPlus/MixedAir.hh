@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -424,13 +425,13 @@ namespace MixedAir {
 
     // Functions
 
-    Real64 OAGetFlowRate(int OAPtr);
+    Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr);
 
     Real64 OAGetMinFlowRate(int OAPtr);
 
     void OASetDemandManagerVentilationState(int OAPtr, bool aState);
 
-    void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow);
+    void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow);
 
     int GetOAController(std::string const &OAName);
 
@@ -598,6 +599,14 @@ namespace MixedAir {
     //******************************************************************************
 
 } // namespace MixedAir
+
+struct MixedAirData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

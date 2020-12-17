@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -141,7 +142,7 @@ namespace PondGroundHeatExchanger {
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux() const;
+        Real64 CalcSolarFlux(EnergyPlusData &state) const;
 
         void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
 
@@ -157,6 +158,14 @@ namespace PondGroundHeatExchanger {
     void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
+
+struct PondGroundHeatExchangerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

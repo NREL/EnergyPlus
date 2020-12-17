@@ -340,8 +340,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
     // a few constants for convenience
@@ -403,7 +403,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     DataPlant::PlantLoop(1).CoolingDemand = 4000;
 
     // switch: OAWB>MinWb && DesignWB>MinDesignWB && CurLift>MinLift
-    DataEnvironment::OutWetBulbTemp = 40;
+    state->dataEnvrn->OutWetBulbTemp = 40;
     thisSPM.TowerDsnInletAirWetBulb = 35;
     thisSPM.MinimumLiftTD = 2;
 
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     EXPECT_NEAR(32, thisSPM.SetPt, 0.001);
 
     // switch: ELSE
-    DataEnvironment::OutWetBulbTemp = 30;
+    state->dataEnvrn->OutWetBulbTemp = 30;
     thisSPM.TowerDsnInletAirWetBulb = 20;
     thisSPM.MinimumLiftTD = 5;
 
@@ -549,8 +549,8 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
@@ -1278,7 +1278,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
     EXPECT_EQ(21.11, state->dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = -20.0;
+    state->dataEnvrn->OutDryBulbTemp = -20.0;
     // do init
     SetPointManager::InitSetPointManagers(*state);
     // check OA Reset Set Point Manager run
@@ -1295,7 +1295,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     EXPECT_EQ(60.0, DataLoopNode::Node(1).TempSetPointHi);
 
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = 2.0;
+    state->dataEnvrn->OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
     SetPointManager::SimSetPointManagers(*state);
     SetPointManager::UpdateSetPointManagers(*state);
@@ -1334,7 +1334,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
     EXPECT_EQ(21.11, state->dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = 22.0;
+    state->dataEnvrn->OutDryBulbTemp = 22.0;
     // do init
     SetPointManager::InitSetPointManagers(*state);
     // check OA Reset Set Point Manager run
@@ -1351,7 +1351,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     EXPECT_EQ(35.0, DataLoopNode::Node(1).TempSetPointLo);
 
     // set out door dry bulb temp
-    DataEnvironment::OutDryBulbTemp = 2.0;
+    state->dataEnvrn->OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
     SetPointManager::SimSetPointManagers(*state);
     SetPointManager::UpdateSetPointManagers(*state);

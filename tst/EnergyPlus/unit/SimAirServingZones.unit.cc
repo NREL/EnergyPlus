@@ -72,6 +72,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -180,7 +181,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     Real64 SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right
                                                  // before call to LimitZoneVentEff)
     Real64 StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(StartingSysCoolingEv, SysCoolingEv);
     EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
     EXPECT_EQ(StartingDesCoolVolFlowMin, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin);
@@ -200,7 +201,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
     EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
     EXPECT_NEAR(0.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
@@ -220,7 +221,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
     EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 0.001);
     EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
@@ -1566,6 +1567,532 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
     EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
     EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(2), 2);
+}
+
+TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
+{
+
+    // Test for #6050 - Return Fan 'Fan Power Minimum Flow Fraction' enforces loop flow, while it should not
+    // I am simulating a very simple shoebox building with 1 zone.
+    // There is an airLoopHVAC with a Return Fan:VariableVolume, with a 'Fan Power Minimum Flow Fraction' = 0.3
+    // The Supply fan has a fraction of zero
+    //
+    // The supply side of the loop is has follows: only has a Return Fan, a Mixing box, and a SupplyFan
+    //                        o   o
+    //                        |   |
+    //  --- (Return Fan) ---- o-/-o ---- (SupplyFan) ----
+    //  |                                               |
+    //  o                                               o
+    //
+    //  The Demand side has only one ATU:VAV:NoReheat with a Minimum flow Fraction of 0 so that it doesn't drive the airlfow either
+
+    std::string const idf_objects = delimited_string({
+
+        "Timestep,",
+        "  4;                                      !- Number of Timesteps per Hour",
+
+        "SimulationControl,",
+        "  No,                                     !- Do Zone Sizing Calculation",
+        "  No,                                     !- Do System Sizing Calculation",
+        "  No,                                     !- Do Plant Sizing Calculation",
+        "  Yes,                                    !- Run Simulation for Sizing Periods",
+        "  No,                                    !- Run Simulation for Weather File Run Periods",
+        "  No,                                     !- Do HVAC Sizing Simulation for Sizing Periods",
+        "  ;                                       !- Maximum Number of HVAC Sizing Simulation Passes",
+
+        "Building,",
+        "  Building 1,                             !- Name",
+        "  ,                                       !- North Axis {deg}",
+        "  ,                                       !- Terrain",
+        "  ,                                       !- Loads Convergence Tolerance Value {W}",
+        "  ,                                       !- Temperature Convergence Tolerance Value {deltaC}",
+        "  ,                                       !- Solar Distribution",
+        "  ,                                       !- Maximum Number of Warmup Days",
+        "  ;                                       !- Minimum Number of Warmup Days",
+
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,                        !- Starting Vertex Position",
+        "  Counterclockwise,                       !- Vertex Entry Direction",
+        "  Relative,                               !- Coordinate System",
+        "  Relative,                               !- Daylighting Reference Point Coordinate System",
+        "  Relative;                               !- Rectangular Surface Coordinate System",
+
+        "Site:Location,",
+        "  Chicago Ohare Intl Ap,                  !- Name",
+        "  41.98,                                  !- Latitude {deg}",
+        "  -87.92,                                 !- Longitude {deg}",
+        "  -6,                                     !- Time Zone {hr}",
+        "  201;                                    !- Elevation {m}",
+
+        "SizingPeriod:DesignDay,",
+        "  Chicago Ohare Intl Ap Ann Clg .4% Condns DB=>MWB, !- Name",
+        "  7,                                      !- Month",
+        "  21,                                     !- Day of Month",
+        "  SummerDesignDay,                        !- Day Type",
+        "  33.3,                                   !- Maximum Dry-Bulb Temperature {C}",
+        "  10.5,                                   !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Wetbulb,                                !- Humidity Condition Type",
+        "  23.7,                                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                                       !- Humidity Condition Day Schedule Name",
+        "  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  98934,                                  !- Barometric Pressure {Pa}",
+        "  5.2,                                    !- Wind Speed {m/s}",
+        "  230,                                    !- Wind Direction {deg}",
+        "  No,                                     !- Rain Indicator",
+        "  No,                                     !- Snow Indicator",
+        "  No,                                     !- Daylight Saving Time Indicator",
+        "  ASHRAETau,                              !- Solar Model Indicator",
+        "  ,                                       !- Beam Solar Day Schedule Name",
+        "  ,                                       !- Diffuse Solar Day Schedule Name",
+        "  0.455,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  2.05;                                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+
+        "ScheduleTypeLimits,",
+        "  Any Number;                             !- Name",
+
+        "Schedule:Constant,",
+        "  Always On Discrete,                     !- Name",
+        "  Any Number,                             !- Schedule Type Limits Name",
+        "  1;                                      !- Hourly Value",
+
+        "Zone,",
+        "  Zone1;                                  !- Name",
+
+        "ZoneControl:Thermostat,",
+        "  Zone1 Thermostat,                       !- Name",
+        "  Zone1,                                  !- Zone or ZoneList Name",
+        "  Zone1 Thermostat Schedule,              !- Control Type Schedule Name",
+        "  ThermostatSetpoint:DualSetpoint,        !- Control 1 Object Type",
+        "  Thermostat Setpoint Dual Setpoint 1;    !- Control 1 Name",
+
+        "Schedule:Compact,",
+        "  Zone1 Thermostat Schedule,              !- Name",
+        "  Zone1 Thermostat Schedule Type Limits,  !- Schedule Type Limits Name",
+        "  Through: 12/31,                         !- Field 1",
+        "  For: AllDays,                           !- Field 2",
+        "  Until: 24:00,                           !- Field 3",
+        "  4;                                      !- Field 4",
+
+        "ScheduleTypeLimits,",
+        "  Zone1 Thermostat Schedule Type Limits,  !- Name",
+        "  0,                                      !- Lower Limit Value {BasedOnField A3}",
+        "  4,                                      !- Upper Limit Value {BasedOnField A3}",
+        "  DISCRETE;                               !- Numeric Type",
+
+        "ThermostatSetpoint:DualSetpoint,",
+        "  Thermostat Setpoint Dual Setpoint 1,    !- Name",
+        "  Schedule 19C,                           !- Heating Setpoint Temperature Schedule Name",
+        "  Schedule 26C;                           !- Cooling Setpoint Temperature Schedule Name",
+
+        "Schedule:Constant,",
+        "  Schedule 19C,                           !- Name",
+        "  Any Number,                             !- Schedule Type Limits Name",
+        "  19;                                     !- Hourly Value",
+
+        "Schedule:Constant,",
+        "  Schedule 26C,                           !- Name",
+        "  Any Number,                             !- Schedule Type Limits Name",
+        "  26;                                     !- Hourly Value",
+
+        "Material,",
+        "  MAT-CC05 8 HW CONCRETE,                 !- Name",
+        "  Rough,                                  !- Roughness",
+        "  0.2032,                                 !- Thickness {m}",
+        "  1.311,                                  !- Conductivity {W/m-K}",
+        "  2240,                                   !- Density {kg/m3}",
+        "  836.8,                                  !- Specific Heat {J/kg-K}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Material:NoMass,",
+        "  CP02 CARPET PAD,                        !- Name",
+        "  VeryRough,                              !- Roughness",
+        "  0.2165,                                 !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.8;                                    !- Visible Absorptance",
+
+        "Construction,",
+        "  Concrete_and_carpet_Construction,                                   !- Name",
+        "  MAT-CC05 8 HW CONCRETE,                 !- Layer 1",
+        "  CP02 CARPET PAD;                        !- Layer 2",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 1,                              !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 1 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 0, 0;                               !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 2,                              !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 10, 2.5,                             !- X,Y,Z Vertex 1 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 3 {m}",
+        "  0, 0, 2.5;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 3,                              !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 10, 2.5,                            !- X,Y,Z Vertex 1 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  0, 10, 2.5;                             !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 4,                              !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 0, 2.5,                             !- X,Y,Z Vertex 1 {m}",
+        "  10, 0, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 10, 2.5;                            !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 5,                              !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 0, 2.5,                              !- X,Y,Z Vertex 1 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 2 {m}",
+        "  10, 0, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  10, 0, 2.5;                             !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Surface 6,                              !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  Concrete_and_carpet_Construction,                                   !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 0, 2.5,                             !- X,Y,Z Vertex 1 {m}",
+        "  10, 10, 2.5,                            !- X,Y,Z Vertex 2 {m}",
+        "  0, 10, 2.5,                             !- X,Y,Z Vertex 3 {m}",
+        "  0, 0, 2.5;                              !- X,Y,Z Vertex 4 {m}",
+
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  Zone1,                                  !- Zone Name",
+        "  Zone1 Equipment List,                   !- Zone Conditioning Equipment List Name",
+        "  Zone1 Inlet Node List,                  !- Zone Air Inlet Node or NodeList Name",
+        "  ,                                       !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone1 Air Node,                         !- Zone Air Node Name",
+        "  Zone1 Return Node List;                 !- Zone Return Air Node or NodeList Name",
+
+        "NodeList,",
+        "  Zone1 Inlet Node List,                  !- Name",
+        "  Zone1 ATU Inlet Node;                   !- Node Name 1",
+
+        "NodeList,",
+        "  Zone1 Return Node List,                 !- Name",
+        "  Zone1 Return Air Node;                  !- Node Name 1",
+
+        "ZoneHVAC:EquipmentList,",
+        "  Zone1 Equipment List,                   !- Name",
+        "  SequentialLoad,                         !- Load Distribution Scheme",
+        "  ZoneHVAC:AirDistributionUnit,           !- Zone Equipment Object Type 1",
+        "  ADU VAV No Rht,                         !- Zone Equipment Name 1",
+        "  1,                                      !- Zone Equipment Cooling Sequence 1",
+        "  1,                                      !- Zone Equipment Heating or No-Load Sequence 1",
+        "  ,                                       !- Zone Equipment Sequential Cooling Fraction Schedule Name 1",
+        "  ;                                       !- Zone Equipment Sequential Heating Fraction Schedule Name 1",
+
+        "ZoneHVAC:AirDistributionUnit,",
+        "  ADU VAV No Rht,                         !- Name",
+        "  Zone1 ATU Inlet Node,                   !- Air Distribution Unit Outlet Node Name",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,    !- Air Terminal Object Type",
+        "  VAV No Rht;                             !- Air Terminal Name",
+
+        // NOTE: Terminal has a min flow of 0
+        "AirTerminal:SingleDuct:VAV:NoReheat,",
+        "  VAV No Rht,                             !- Name",
+        "  Always On Discrete,                     !- Availability Schedule Name",
+        "  Zone1 ATU Inlet Node,                   !- Air Outlet Node Name",
+        "  ATU VAV No Reheat Inlet Node,           !- Air Inlet Node Name",
+        "  1.0,                                    !- Maximum Air Flow Rate {m3/s}",
+        "  Constant,                               !- Zone Minimum Air Flow Input Method",
+        "  0;                                      !- Constant Minimum Air Flow Fraction",               // IMPORTANT
+
+        "OutdoorAir:Node,",
+        "  Model Outdoor Air Node;                 !- Name",
+
+        "AirLoopHVAC,",
+        "  Air Loop HVAC,                          !- Name",
+        "  ,                                       !- Controller List Name",
+        "  Air Loop HVACAvailability Manager List, !- Availability Manager List Name",
+        "  1.0,                                    !- Design Supply Air Flow Rate {m3/s}",
+        "  Air Loop HVAC Supply Branches,          !- Branch List Name",
+        "  ,                                       !- Connector List Name",
+        "  Supply Side Inlet Node,                 !- Supply Side Inlet Node Name",
+        "  Demand Outlet Node,                     !- Demand Side Outlet Node Name",
+        "  Air Loop HVAC Demand Inlet Nodes,       !- Demand Side Inlet Node Names",
+        "  Air Loop HVAC Supply Outlet Nodes,      !- Supply Side Outlet Node Names",
+        "  1;                                      !- Design Return Air Flow Fraction of Supply Air Flow",
+
+        "NodeList,",
+        "  Air Loop HVAC Supply Outlet Nodes,      !- Name",
+        "  Supply Side Outlet Node;                !- Node Name 1",
+
+        "NodeList,",
+        "  Air Loop HVAC Demand Inlet Nodes,       !- Name",
+        "  Demand Inlet Node;                      !- Node Name 1",
+
+        "AvailabilityManagerAssignmentList,",
+        "  Air Loop HVACAvailability Manager List, !- Name",
+        "  AvailabilityManager:Scheduled,          !- Availability Manager Object Type 1",
+        "  Air Loop HVAC Availability Manager;     !- Availability Manager Name 1",
+
+        "AvailabilityManager:Scheduled,",
+        "  Air Loop HVAC Availability Manager,     !- Name",
+        "  Always On Discrete;                     !- Schedule Name",
+
+        "BranchList,",
+        "  Air Loop HVAC Supply Branches,          !- Name",
+        "  Air Loop HVAC Main Branch;              !- Branch Name 1",
+
+        "Branch,",
+        "  Air Loop HVAC Main Branch,              !- Name",
+        "  ,                                       !- Pressure Drop Curve Name",
+        "  Fan:VariableVolume,                     !- Component Object Type 1",
+        "  VSD Return Fan,                         !- Component Name 1",
+        "  Supply Side Inlet Node,                 !- Component Inlet Node Name 1",
+        "  VSD Return Fan Outlet to Mixing Box Node, !- Component Outlet Node Name 1",
+        "  AirLoopHVAC:OutdoorAirSystem,           !- Component Object Type 2",
+        "  Mixing Box,                             !- Component Name 2",
+        "  VSD Return Fan Outlet to Mixing Box Node, !- Component Inlet Node Name 2",
+        "  Supply Side Mixed Air Node,             !- Component Outlet Node Name 2",
+        "  Fan:VariableVolume,                     !- Component Object Type 3",
+        "  VSD Supply Fan,                         !- Component Name 3",
+        "  Supply Side Mixed Air Node,             !- Component Inlet Node Name 3",
+        "  Supply Side Outlet Node;                !- Component Outlet Node Name 3",
+
+        // NOTE: The supply has as a min flow fraction of of 0.3
+        "Fan:VariableVolume,",
+        "  VSD Return Fan,                         !- Name",
+        "  Always On Discrete,                     !- Availability Schedule Name",
+        "  0.6045,                                 !- Fan Total Efficiency",
+        "  1017.592,                               !- Pressure Rise {Pa}",
+        "  1.0,                                    !- Maximum Flow Rate {m3/s}",
+        "  Fraction,                               !- Fan Power Minimum Flow Rate Input Method",         // IMPORTANT
+        "  0.3,                                    !- Fan Power Minimum Flow Fraction",                  // IMPORTANT
+        "  0,                                      !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "  0.93,                                   !- Motor Efficiency",
+        "  1,                                      !- Motor In Airstream Fraction",
+        "  0.040759894,                            !- Fan Power Coefficient 1",
+        "  0.08804497,                             !- Fan Power Coefficient 2",
+        "  -0.07292612,                            !- Fan Power Coefficient 3",
+        "  0.943739823,                            !- Fan Power Coefficient 4",
+        "  0,                                      !- Fan Power Coefficient 5",
+        "  Supply Side Inlet Node,                 !- Air Inlet Node Name",
+        "  VSD Return Fan Outlet to Mixing Box Node, !- Air Outlet Node Name",
+        "  General;                                !- End-Use Subcategory",
+
+        "SetpointManager:MixedAir,",
+        "  VSD Return Fan Outlet to Mixing Box Node OS Default SPM, !- Name",
+        "  Temperature,                            !- Control Variable",
+        "  Supply Side Outlet Node,                !- Reference Setpoint Node Name",
+        "  Supply Side Mixed Air Node,             !- Fan Inlet Node Name",
+        "  Supply Side Outlet Node,                !- Fan Outlet Node Name",
+        "  VSD Return Fan Outlet to Mixing Box Node; !- Setpoint Node or NodeList Name",
+
+        "AirLoopHVAC:OutdoorAirSystem,",
+        "  Mixing Box,                             !- Name",
+        "  Mixing Box Controller List,             !- Controller List Name",
+        "  Mixing Box Equipment List,              !- Outdoor Air Equipment List Name",
+        "  Mixing Box Availability Manager List;   !- Availability Manager List Name",
+
+        "AirLoopHVAC:ControllerList,",
+        "  Mixing Box Controller List,             !- Name",
+        "  Controller:OutdoorAir,                  !- Controller Object Type 1",
+        "  Controller Outdoor Air 1;               !- Controller Name 1",
+
+        "Controller:OutdoorAir,",
+        "  Controller Outdoor Air 1,               !- Name",
+        "  Relief Air Node,                        !- Relief Air Outlet Node Name",
+        "  VSD Return Fan Outlet to Mixing Box Node, !- Return Air Node Name",
+        "  Supply Side Mixed Air Node,             !- Mixed Air Node Name",
+        "  OA Intake Air Node,                     !- Actuator Node Name",
+        "  0,                                      !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "  0.5,                                    !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "  NoEconomizer,                           !- Economizer Control Type",
+        "  ModulateFlow,                           !- Economizer Control Action Type",
+        "  28,                                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "  64000,                                  !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "  ,                                       !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "  ,                                       !- Electronic Enthalpy Limit Curve Name",
+        "  -100,                                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "  NoLockout,                              !- Lockout Type",
+        "  FixedMinimum,                           !- Minimum Limit Type",
+        "  ,                                       !- Minimum Outdoor Air Schedule Name",
+        "  ,                                       !- Minimum Fraction of Outdoor Air Schedule Name",
+        "  ,                                       !- Maximum Fraction of Outdoor Air Schedule Name",
+        "  Controller Mechanical Ventilation 1,    !- Mechanical Ventilation Controller Name",
+        "  ,                                       !- Time of Day Economizer Control Schedule Name",
+        "  No,                                     !- High Humidity Control",
+        "  ,                                       !- Humidistat Control Zone Name",
+        "  ,                                       !- High Humidity Outdoor Air Flow Ratio",
+        "  Yes,                                    !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+        "  BypassWhenWithinEconomizerLimits;       !- Heat Recovery Bypass Control Type",
+
+        "AvailabilityManagerAssignmentList,",
+        "  Mixing Box Availability Manager List,   !- Name",
+        "  AvailabilityManager:Scheduled,          !- Availability Manager Object Type 1",
+        "  Mixing Box Availability Manager;        !- Availability Manager Name 1",
+
+        "AvailabilityManager:Scheduled,",
+        "  Mixing Box Availability Manager,        !- Name",
+        "  Always On Discrete;                     !- Schedule Name",
+
+        "OutdoorAir:NodeList,",
+        "  OA Intake Air Node;                     !- Node or NodeList Name 1",
+
+        "AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "  Mixing Box Equipment List,              !- Name",
+        "  OutdoorAir:Mixer,                       !- Component Object Type 1",
+        "  Mixing Box Outdoor Air Mixer;           !- Component Name 1",
+
+        "OutdoorAir:Mixer,",
+        "  Mixing Box Outdoor Air Mixer,           !- Name",
+        "  Supply Side Mixed Air Node,             !- Mixed Air Node Name",
+        "  OA Intake Air Node,                     !- Outdoor Air Stream Node Name",
+        "  Relief Air Node,                        !- Relief Air Stream Node Name",
+        "  VSD Return Fan Outlet to Mixing Box Node; !- Return Air Stream Node Name",
+
+        "SetpointManager:MixedAir,",
+        "  Supply Side Mixed Air Node OS Default SPM, !- Name",
+        "  Temperature,                            !- Control Variable",
+        "  Supply Side Outlet Node,                !- Reference Setpoint Node Name",
+        "  Supply Side Mixed Air Node,             !- Fan Inlet Node Name",
+        "  Supply Side Outlet Node,                !- Fan Outlet Node Name",
+        "  Supply Side Mixed Air Node;             !- Setpoint Node or NodeList Name",
+
+        // NOTE: The supply has as a min flow of 0
+        "Fan:VariableVolume,",
+        "  VSD Supply Fan,                         !- Name",
+        "  Always On Discrete,                     !- Availability Schedule Name",
+        "  0.6045,                                 !- Fan Total Efficiency",
+        "  1017.592,                               !- Pressure Rise {Pa}",
+        "  1.0,                                    !- Maximum Flow Rate {m3/s}",
+        "  FixedFlowRate,                          !- Fan Power Minimum Flow Rate Input Method",
+        "  0,                                      !- Fan Power Minimum Flow Fraction",
+        "  0,                                      !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "  0.93,                                   !- Motor Efficiency",
+        "  1,                                      !- Motor In Airstream Fraction",
+        "  0.040759894,                            !- Fan Power Coefficient 1",
+        "  0.08804497,                             !- Fan Power Coefficient 2",
+        "  -0.07292612,                            !- Fan Power Coefficient 3",
+        "  0.943739823,                            !- Fan Power Coefficient 4",
+        "  0,                                      !- Fan Power Coefficient 5",
+        "  Supply Side Mixed Air Node,             !- Air Inlet Node Name",
+        "  Supply Side Outlet Node,                !- Air Outlet Node Name",
+        "  General;                                !- End-Use Subcategory",
+
+        "SetpointManager:Scheduled,",
+        "  Scheduled Deck Temp,                    !- Name",
+        "  Temperature,                            !- Control Variable",
+        "  Deck Temperature,                       !- Schedule Name",
+        "  Supply Side Outlet Node;                !- Setpoint Node or NodeList Name",
+
+        "Schedule:Constant,",
+        "  Deck Temperature,                       !- Name",
+        "  Any Number,                             !- Schedule Type Limits Name",
+        "  14;                                     !- Hourly Value",
+
+        "AirLoopHVAC:SupplyPath,",
+        "  Air Loop HVAC Demand Inlet Node Supply Path, !- Name",
+        "  Demand Inlet Node,                      !- Supply Air Path Inlet Node Name",
+        "  AirLoopHVAC:ZoneSplitter,               !- Component Object Type 1",
+        "  Air Loop HVAC Zone Splitter;            !- Component Name 1",
+
+        "AirLoopHVAC:ZoneSplitter,",
+        "  Air Loop HVAC Zone Splitter,            !- Name",
+        "  Demand Inlet Node,                      !- Inlet Node Name",
+        "  ATU VAV No Reheat Inlet Node;           !- Outlet Node Name 1",
+
+        "AirLoopHVAC:ReturnPath,",
+        "  Air Loop HVAC Return Path,              !- Name",
+        "  Demand Outlet Node,                     !- Return Air Path Outlet Node Name",
+        "  AirLoopHVAC:ZoneMixer,                  !- Component Object Type 1",
+        "  Air Loop HVAC Zone Mixer;               !- Component Name 1",
+
+        "AirLoopHVAC:ZoneMixer,",
+        "  Air Loop HVAC Zone Mixer,               !- Name",
+        "  Demand Outlet Node,                     !- Outlet Node Name",
+        "  Zone1 Return Air Node;                  !- Inlet Node Name 1",
+
+        "Output:Variable,",
+        "  *,                                      !- Key Value",
+        "  System Node Mass Flow Rate,             !- Variable Name",
+        "  Detailed;                               !- Reporting Frequency",
+
+        "Output:SQLite,",
+        "  SimpleAndTabular;                       !- Option Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(*state); // run the design days
+
+    int returnFanNode = UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    EXPECT_GT(returnFanNode, 0);
+    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
+    EXPECT_GT(returnFanNode, 0);
+    EXPECT_GT(supplyOutletNode, 0);
+
+    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRateMin);
+    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRateMin);
+    EXPECT_EQ(0, DataLoopNode::Node(returnFanNode).MassFlowRate);
+    EXPECT_EQ(0, DataLoopNode::Node(supplyOutletNode).MassFlowRate);
 }
 
 } // namespace EnergyPlus

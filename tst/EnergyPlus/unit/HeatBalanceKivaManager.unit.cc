@@ -182,8 +182,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     int DualZoneNum(1);
 
-    DataEnvironment::DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
-    DataEnvironment::DayOfWeek = 1;             // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;             // must initialize this to get schedules initialized
     state->dataGlobal->HourOfDay = 1;                 // must initialize this to get schedules initialized
     state->dataGlobal->TimeStep = 1;                  // must initialize this to get schedules initialized
     state->dataGlobal->NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
 }
 
 } // namespace EnergyPlus

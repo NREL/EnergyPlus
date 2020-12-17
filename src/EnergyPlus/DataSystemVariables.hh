@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
 
@@ -182,6 +183,14 @@ namespace DataSystemVariables {
     void processEnvironmentVariables(EnergyPlusData &state);
 
 } // namespace DataSystemVariables
+
+struct SystemVarsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

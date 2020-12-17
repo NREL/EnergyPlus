@@ -63,7 +63,6 @@
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -355,7 +354,7 @@ namespace OutputReportTabularAnnual {
                         // the current timestamp
                         int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
                         General::EncodeMonDayHrMin(
-                            timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                            timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
                         // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
@@ -616,7 +615,7 @@ namespace OutputReportTabularAnnual {
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }

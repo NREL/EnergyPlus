@@ -55,19 +55,18 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "StringUtilities.hh"
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -96,17 +95,6 @@ namespace ScheduleManager {
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
-    // OTHER NOTES:
-
-    // Using/Aliasing
-    using DataEnvironment::DayOfMonthTomorrow;
-    using DataEnvironment::DayOfWeek;
-    using DataEnvironment::DayOfWeekTomorrow;
-    using DataEnvironment::DSTIndicator;
-    using DataEnvironment::HolidayIndex;
-    using DataEnvironment::HolidayIndexTomorrow;
-    using DataEnvironment::MonthTomorrow;
-    // Data
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
     static std::string const BlankString;
@@ -557,7 +545,7 @@ namespace ScheduleManager {
 
             rowCnt = 0;
             firstLine = true;
-            if (DataEnvironment::CurrentYearIsLeapYear) {
+            if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 rowLimitCount = 366 * 24 * state.dataGlobal->NumOfTimeStepInHour;
             } else {
                 rowLimitCount = 365 * 24 * state.dataGlobal->NumOfTimeStepInHour;
@@ -1286,7 +1274,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:Year",
+                SetupEMSActuator(state, "Schedule:Year",
                                  Schedule(LoopIndex).Name,
                                  "Schedule Value",
                                  "[ ]",
@@ -1579,7 +1567,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
@@ -1963,7 +1951,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
@@ -2013,7 +2001,7 @@ namespace ScheduleManager {
                         DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                     }
                 }
-                if (iDay == 59 && !DataEnvironment::CurrentYearIsLeapYear) { // 28 Feb
+                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
                     // Dup 28 Feb to 29 Feb (60)
                     ++iDay;
                     Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);
@@ -2075,7 +2063,7 @@ namespace ScheduleManager {
             DaySchedule(AddDaySch).TSValue = Numbers(1);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
@@ -2720,7 +2708,7 @@ namespace ScheduleManager {
         // na
 
         if (!ScheduleDSTSFileWarningIssued) {
-            if (DSTIndicator == 1) {
+            if (state.dataEnvrn->DSTIndicator == 1) {
                 if (Schedule(ScheduleIndex).SchType == ScheduleInput_file) {
                     ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + Schedule(ScheduleIndex).Name + "\" is a Schedule:File");
                     ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
@@ -2857,15 +2845,15 @@ namespace ScheduleManager {
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
-        int thisHour = ThisHour + DSTIndicator;
-        int thisDayOfYear = DataEnvironment::DayOfYear_Schedule;
-        int thisDayOfWeek = DataEnvironment::DayOfWeek;
-        int thisHolidayIndex = DataEnvironment::HolidayIndex;
+        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
+        int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
+        int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
+        int thisHolidayIndex = state.dataEnvrn->HolidayIndex;
         if (thisHour > 24) { // In case HourOfDay is 24 and DSTIndicator is 1, you're actually the next day
             thisDayOfYear += 1;
             thisHour -= 24;
-            thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
-            thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
+            thisDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
+            thisHolidayIndex = state.dataEnvrn->HolidayIndexTomorrow;
         }
 
         // In the case where DST is applied on 12/31 at 24:00, which is the case for a Southern Hemisphere location for eg
@@ -3042,26 +3030,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
         int DaySchedulePointer;
@@ -3081,20 +3049,20 @@ namespace ScheduleManager {
 
         // Determine which Week Schedule is used
         if (!present(JDay)) {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(state.dataEnvrn->DayOfYear_Schedule);
         } else {
             WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
         }
 
         // Now, which day?
         if (!present(CurDayofWeek)) {
-            if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+            if (state.dataEnvrn->DayOfWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
+                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
             } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
+                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
             }
-        } else if (CurDayofWeek <= 7 && HolidayIndex > 0) {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+        } else if (CurDayofWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
         } else {
             DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(CurDayofWeek);
         }
@@ -4809,30 +4777,6 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);

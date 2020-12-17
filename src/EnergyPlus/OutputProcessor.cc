@@ -103,28 +103,11 @@ namespace OutputProcessor {
     // REFERENCES:
     // EnergyPlus OutputProcessor specifications.
 
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using DataEnvironment::DayOfMonth;
-    using DataEnvironment::DayOfWeek;
-    using DataEnvironment::DSTIndicator;
-    using DataEnvironment::HolidayIndex;
-    using DataEnvironment::Month;
-    using DataEnvironment::Year;
-    using namespace DataGlobalConstants;
-
-    // Data
-    // in this file should obey a USE OutputProcessor, ONLY: rule.
-
     // MODULE PARAMETER DEFINITIONS:
     int const ReportVDD_No(0);  // Don't report the variable dictionaries in any form
     int const ReportVDD_Yes(1); // Report the variable dictionaries in "report format"
     int const ReportVDD_IDF(2); // Report the variable dictionaries in "IDF format"
 
-    Real64 const MinSetValue(99999999999999.0);
-    Real64 const MaxSetValue(-99999999999999.0);
     int const IMinSetValue(999999);
     int const IMaxSetValue(-999999);
 
@@ -167,9 +150,6 @@ namespace OutputProcessor {
                                                           "WATERSYSTEMS",
                                                           "REFRIGERATION",
                                                           "COGENERATION"};
-
-    static std::string const BlankString;
-    int const UnitsStringLength(16);
 
     int const RVarAllocInc(1000);
     int const LVarAllocInc(1000);
@@ -935,7 +915,7 @@ namespace OutputProcessor {
 
             ReqRepVars(Loop).Key = cAlphaArgs(1);
             if (ReqRepVars(Loop).Key == "*") {
-                ReqRepVars(Loop).Key = BlankString;
+                ReqRepVars(Loop).Key = std::string();
             }
 
             std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
@@ -1030,7 +1010,7 @@ namespace OutputProcessor {
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
         default: // Each, TimeStep, Hourly dont have this
-            StrOut = BlankString;
+            StrOut = std::string();
             break;
         }
 
@@ -1117,7 +1097,7 @@ namespace OutputProcessor {
             break;
 
         default: // Each, TimeStep, Hourly dont have this
-            StrOut = BlankString;
+            StrOut = std::string();
             break;
         }
 
@@ -1570,7 +1550,7 @@ namespace OutputProcessor {
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar; // meter units are same as first variable on custom meter
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, BlankString, BlankString, BlankString, BlankString);
+                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     EnergyMeters(NumEnergyMeters).TypeOfMeter = MeterType_Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(state, EnergyMeters(NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
@@ -1774,7 +1754,7 @@ namespace OutputProcessor {
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar;
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, BlankString, BlankString, BlankString, BlankString);
+                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     EnergyMeters(NumEnergyMeters).TypeOfMeter = MeterType_CustomDec;
                     EnergyMeters(NumEnergyMeters).SourceMeter = WhichMeter;
 
@@ -3107,9 +3087,9 @@ namespace OutputProcessor {
             EnergyMeters(Loop).CurTSValue = EnergyMeters(Loop).TSValue;
             if (!EnergyMeters(Loop).RptTS && !EnergyMeters(Loop).RptAccTS) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
-                if (HolidayIndex > 0) {
-                    CurDayType = 7 + HolidayIndex;
+                CurDayType = state.dataEnvrn->DayOfWeek;
+                if (state.dataEnvrn->HolidayIndex > 0) {
+                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -3118,24 +3098,24 @@ namespace OutputProcessor {
                                          TimeStepStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
-                                         Month,
-                                         DayOfMonth,
+                                         state.dataEnvrn->Month,
+                                         state.dataEnvrn->DayOfMonth,
                                          state.dataGlobal->HourOfDay,
                                          EndMinute,
                                          StartMinute,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->TSMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->TSMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
+                    ResultsFramework::resultsFramework->TSMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
             }
 
             if (PrintESOTimeStamp && !EnergyMeters(Loop).RptTSFO && !EnergyMeters(Loop).RptAccTSFO) {
-                CurDayType = DayOfWeek;
-                if (HolidayIndex > 0) {
-                    CurDayType = 7 + HolidayIndex;
+                CurDayType = state.dataEnvrn->DayOfWeek;
+                if (state.dataEnvrn->HolidayIndex > 0) {
+                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.eso,
@@ -3144,12 +3124,12 @@ namespace OutputProcessor {
                                          TimeStepStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
-                                         Month,
-                                         DayOfMonth,
+                                         state.dataEnvrn->Month,
+                                         state.dataEnvrn->DayOfMonth,
                                          state.dataGlobal->HourOfDay,
                                          EndMinute,
                                          StartMinute,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 PrintESOTimeStamp = false;
             }
@@ -3234,9 +3214,9 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptHR && !EnergyMeters(Loop).RptAccHR) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
-                if (HolidayIndex > 0) {
-                    CurDayType = 7 + HolidayIndex;
+                CurDayType = state.dataEnvrn->DayOfWeek;
+                if (state.dataEnvrn->HolidayIndex > 0) {
+                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -3245,15 +3225,15 @@ namespace OutputProcessor {
                                          TimeStepStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
-                                         Month,
-                                         DayOfMonth,
+                                         state.dataEnvrn->Month,
+                                         state.dataEnvrn->DayOfMonth,
                                          state.dataGlobal->HourOfDay,
                                          _,
                                          _,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->HRMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->HRMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                    ResultsFramework::resultsFramework->HRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3334,9 +3314,9 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptDY && !EnergyMeters(Loop).RptAccDY) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
-                if (HolidayIndex > 0) {
-                    CurDayType = 7 + HolidayIndex;
+                CurDayType = state.dataEnvrn->DayOfWeek;
+                if (state.dataEnvrn->HolidayIndex > 0) {
+                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -3345,15 +3325,15 @@ namespace OutputProcessor {
                                          DailyStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
-                                         Month,
-                                         DayOfMonth,
+                                         state.dataEnvrn->Month,
+                                         state.dataEnvrn->DayOfMonth,
                                          _,
                                          _,
                                          _,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->DYMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                    ResultsFramework::resultsFramework->DYMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3440,9 +3420,9 @@ namespace OutputProcessor {
                                          MonthlyStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
-                                         Month);
+                                         state.dataEnvrn->Month);
                 if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->MNMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                    ResultsFramework::resultsFramework->MNMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3523,7 +3503,7 @@ namespace OutputProcessor {
                 WriteYearlyTimeStamp(
                     state, state.files.mtr, YearlyStampReportChr, state.dataGlobal->CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->YRMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->YRMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                    ResultsFramework::resultsFramework->YRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3617,7 +3597,7 @@ namespace OutputProcessor {
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->SMMeters.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                    ResultsFramework::resultsFramework->SMMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3680,53 +3660,53 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             int const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
             if (RT_forIPUnits == RT_IPUnits_Electricity) {
-                PreDefTableEntry(pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Gas) {
-                PreDefTableEntry(pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
-                PreDefTableEntry(pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMcoolmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMcoolmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Water) {
-                PreDefTableEntry(pdchEMwaterannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMwaterminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMwatermaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwaterminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMwatermaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherKG) {
-                PreDefTableEntry(pdchEMotherKGannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherKGminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherKGmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherM3) {
-                PreDefTableEntry(pdchEMotherM3annual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherM3minvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherM3maxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3annual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3minvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherM3maxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherL) {
-                PreDefTableEntry(pdchEMotherLannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherLminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
-                PreDefTableEntry(pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else {
-                PreDefTableEntry(pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
-                PreDefTableEntry(pdchEMotherJmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEMotherJmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             }
         }
     }
@@ -4066,7 +4046,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4095,7 +4075,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4114,7 +4094,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4131,7 +4111,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear, Month);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
@@ -4139,7 +4119,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
             }
             break;
         default:
@@ -4159,7 +4139,7 @@ namespace OutputProcessor {
     {
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
         if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, DataEnvironment::CurEnvirNum);
+            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
         }
     }
 
@@ -5923,8 +5903,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using DataEnvironment::EndMonthFlag;
-    using DataEnvironment::EndYearFlag;
     using General::EncodeMonDayHrMin;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -5975,7 +5953,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     }
     MinuteNow = TimeValue.at(t_TimeStepTypeKey).CurMinute;
 
-    EncodeMonDayHrMin(MDHM, Month, DayOfMonth, state.dataGlobal->HourOfDay, int(MinuteNow));
+    EncodeMonDayHrMin(MDHM, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, int(MinuteNow));
     TimePrint = true;
 
     rxTime = (MinuteNow - StartMinute) / double(state.dataGlobal->MinutesPerTimeStep);
@@ -6005,12 +5983,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
         if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
             ResultsFramework::resultsFramework->RIDetailedZoneTSData.newRow(state,
-                Month, DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
+                                                                            state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
         if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
             // TODO this was an error probably, was using TimeValue(1)
             ResultsFramework::resultsFramework->RIDetailedHVACTSData.newRow(state,
-                Month, DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
+                                                                            state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
         }
     }
 
@@ -6063,9 +6041,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (TimePrint) {
                 if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                     std::abs(LEndMin - TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
-                    CurDayType = DayOfWeek;
-                    if (HolidayIndex > 0) {
-                        CurDayType = 7 + HolidayIndex;
+                    CurDayType = state.dataEnvrn->DayOfWeek;
+                    if (state.dataEnvrn->HolidayIndex > 0) {
+                        CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                     }
                     WriteTimeStampFormatData(state,
                                              state.files.eso,
@@ -6074,12 +6052,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportChr,
                                              state.dataGlobal->DayOfSimChr,
                                              true,
-                                             Month,
-                                             DayOfMonth,
+                                             state.dataEnvrn->Month,
+                                             state.dataEnvrn->DayOfMonth,
                                              state.dataGlobal->HourOfDay,
                                              TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
-                                             DSTIndicator,
+                                             state.dataEnvrn->DSTIndicator,
                                              DayTypes(CurDayType));
                     LHourP = state.dataGlobal->HourOfDay;
                     LStartMin = StartMinute;
@@ -6147,9 +6125,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (TimePrint) {
                 if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                     std::abs(LEndMin - TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
-                    CurDayType = DayOfWeek;
-                    if (HolidayIndex > 0) {
-                        CurDayType = 7 + HolidayIndex;
+                    CurDayType = state.dataEnvrn->DayOfWeek;
+                    if (state.dataEnvrn->HolidayIndex > 0) {
+                        CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                     }
                     WriteTimeStampFormatData(state,
                                              state.files.eso,
@@ -6158,12 +6136,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportChr,
                                              state.dataGlobal->DayOfSimChr,
                                              true,
-                                             Month,
-                                             DayOfMonth,
+                                             state.dataEnvrn->Month,
+                                             state.dataEnvrn->DayOfMonth,
                                              state.dataGlobal->HourOfDay,
                                              TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
-                                             DSTIndicator,
+                                             state.dataEnvrn->DSTIndicator,
                                              DayTypes(CurDayType));
                     LHourP = state.dataGlobal->HourOfDay;
                     LStartMin = StartMinute;
@@ -6198,7 +6176,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RITimestepTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::TimeStep, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RITimestepTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
+            ResultsFramework::resultsFramework->RITimestepTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
@@ -6236,9 +6214,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (TimePrint) {
                         if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                             std::abs(LEndMin - TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
-                            CurDayType = DayOfWeek;
-                            if (HolidayIndex > 0) {
-                                CurDayType = 7 + HolidayIndex;
+                            CurDayType = state.dataEnvrn->DayOfWeek;
+                            if (state.dataEnvrn->HolidayIndex > 0) {
+                                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                             }
                             WriteTimeStampFormatData(state,
                                                      state.files.eso,
@@ -6247,12 +6225,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportChr,
                                                      state.dataGlobal->DayOfSimChr,
                                                      true,
-                                                     Month,
-                                                     DayOfMonth,
+                                                     state.dataEnvrn->Month,
+                                                     state.dataEnvrn->DayOfMonth,
                                                      state.dataGlobal->HourOfDay,
                                                      TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
-                                                     DSTIndicator,
+                                                     state.dataEnvrn->DSTIndicator,
                                                      DayTypes(CurDayType));
                             LHourP = state.dataGlobal->HourOfDay;
                             LStartMin = StartMinute;
@@ -6292,9 +6270,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (TimePrint) {
                         if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                             std::abs(LEndMin - TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
-                            CurDayType = DayOfWeek;
-                            if (HolidayIndex > 0) {
-                                CurDayType = 7 + HolidayIndex;
+                            CurDayType = state.dataEnvrn->DayOfWeek;
+                            if (state.dataEnvrn->HolidayIndex > 0) {
+                                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
                             }
                             WriteTimeStampFormatData(state,
                                                      state.files.eso,
@@ -6303,12 +6281,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportChr,
                                                      state.dataGlobal->DayOfSimChr,
                                                      true,
-                                                     Month,
-                                                     DayOfMonth,
+                                                     state.dataEnvrn->Month,
+                                                     state.dataEnvrn->DayOfMonth,
                                                      state.dataGlobal->HourOfDay,
                                                      TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
-                                                     DSTIndicator,
+                                                     state.dataEnvrn->DSTIndicator,
                                                      DayTypes(CurDayType));
                             LHourP = state.dataGlobal->HourOfDay;
                             LStartMin = StartMinute;
@@ -6338,9 +6316,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // Hour Block
     if (state.dataGlobal->EndHourFlag) {
         if (TrackingHourlyVariables) {
-            CurDayType = DayOfWeek;
-            if (HolidayIndex > 0) {
-                CurDayType = 7 + HolidayIndex;
+            CurDayType = state.dataEnvrn->DayOfWeek;
+            if (state.dataEnvrn->HolidayIndex > 0) {
+                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
             }
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -6349,12 +6327,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      TimeStepStampReportChr,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
-                                     Month,
-                                     DayOfMonth,
+                                     state.dataEnvrn->Month,
+                                     state.dataEnvrn->DayOfMonth,
                                      state.dataGlobal->HourOfDay,
                                      _,
                                      _,
-                                     DSTIndicator,
+                                     state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
         }
@@ -6366,7 +6344,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RIHourlyTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Hourly, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIHourlyTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            ResultsFramework::resultsFramework->RIHourlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
@@ -6439,9 +6417,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // Day Block
     if (state.dataGlobal->EndDayFlag) {
         if (TrackingDailyVariables) {
-            CurDayType = DayOfWeek;
-            if (HolidayIndex > 0) {
-                CurDayType = 7 + HolidayIndex;
+            CurDayType = state.dataEnvrn->DayOfWeek;
+            if (state.dataEnvrn->HolidayIndex > 0) {
+                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
             }
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -6450,12 +6428,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      DailyStampReportChr,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
-                                     Month,
-                                     DayOfMonth,
+                                     state.dataEnvrn->Month,
+                                     state.dataEnvrn->DayOfMonth,
                                      _,
                                      _,
                                      _,
-                                     DSTIndicator,
+                                     state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
         }
@@ -6466,7 +6444,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RIDailyTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Daily, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIDailyTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            ResultsFramework::resultsFramework->RIDailyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         NumHoursInMonth += 24;
@@ -6492,7 +6470,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (!state.dataGlobal->EndDayFlag) return;
 
     // Month Block
-    if (EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {
+    if (state.dataEnvrn->EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -6501,7 +6479,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      MonthlyStampReportChr,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
-                                     Month);
+                                     state.dataEnvrn->Month);
             TimePrint = false;
         }
 
@@ -6512,11 +6490,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RIMonthlyTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Monthly, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIMonthlyTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            ResultsFramework::resultsFramework->RIMonthlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         NumHoursInSim += NumHoursInMonth;
-        EndMonthFlag = false;
+        state.dataEnvrn->EndMonthFlag = false;
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
@@ -6556,7 +6534,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RIRunPeriodTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Simulation, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIRunPeriodTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            ResultsFramework::resultsFramework->RIRunPeriodTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
@@ -6578,7 +6556,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     }
 
     // Yearly Block
-    if (EndYearFlag) {
+    if (state.dataEnvrn->EndYearFlag) {
         if (TrackingYearlyVariables) {
             WriteYearlyTimeStamp(state, state.files.eso, YearlyStampReportChr, state.dataGlobal->CalendarYearChr, true);
             TimePrint = false;
@@ -6590,7 +6568,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (!ResultsFramework::resultsFramework->RIYearlyTSData.iVariablesScanned()) {
                 ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Yearly, IVariableTypes, NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIYearlyTSData.newRow(state, Month, DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            ResultsFramework::resultsFramework->RIYearlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {

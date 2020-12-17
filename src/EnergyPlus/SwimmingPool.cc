@@ -56,7 +56,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -567,7 +566,7 @@ namespace SwimmingPool {
             this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(state, this->MakeupWaterSupplySchedPtr);
         } else {
             // use water main temperaure if no schedule present in input
-            this->CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
+            this->CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
         }
 
         // determine the current heat gain from people
@@ -847,7 +846,7 @@ namespace SwimmingPool {
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour())) *
+        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour)) *
                               ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > this->WaterMassFlowRateMax) {
             MassFlowRate = this->WaterMassFlowRateMax;
@@ -887,7 +886,7 @@ namespace SwimmingPool {
         // Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
 
         Real64 PSatPool = Psychrometrics::PsyPsatFnTemp(state, this->PoolWaterTemp, RoutineName);
-        Real64 PParAir = Psychrometrics::PsyPsatFnTemp(state, MAT, RoutineName) * Psychrometrics::PsyRhFnTdbWPb(state, MAT, HumRat, DataEnvironment::OutBaroPress);
+        Real64 PParAir = Psychrometrics::PsyPsatFnTemp(state, MAT, RoutineName) * Psychrometrics::PsyRhFnTdbWPb(state, MAT, HumRat, state.dataEnvrn->OutBaroPress);
         if (PSatPool < PParAir) PSatPool = PParAir;
         this->SatPressPoolWaterTemp = PSatPool;
         this->PartPressZoneAirTemp = PParAir;
@@ -1094,10 +1093,10 @@ namespace SwimmingPool {
             state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep = state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * DataSurfaces::Surface(SurfNum).Area;
 
             // Finally calculate the summed up report variables
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass = state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss = state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass = state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss = state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
             state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
             state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass, Density);

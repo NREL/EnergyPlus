@@ -56,7 +56,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -111,7 +110,6 @@ namespace MoistureBalanceEMPDManager {
     // USE STATEMENTS:
     // Use statements for data used in the module
     // Using/Aliasing
-    using DataEnvironment::OutBaroPress;
     using namespace DataHeatBalance;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
@@ -162,7 +160,7 @@ namespace MoistureBalanceEMPDManager {
         Real64 const EMPDdiffusivity = diffusivity_air / mat.EMPDmu;
 
         // Calculate penetration depth
-        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobalConstants::Pi()));
+        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobalConstants::Pi));
 
         return PenetrationDepth;
     }
@@ -228,7 +226,7 @@ namespace MoistureBalanceEMPDManager {
                                           cNumericFieldNames);
 
             // Load the material derived type from the input data.
-            MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), dataMaterial.Material);
+            MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
             if (MaterNum == 0) {
                 ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                 ", must match to a valid Material name.");
@@ -238,37 +236,37 @@ namespace MoistureBalanceEMPDManager {
 
             // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
             //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-            if (dataMaterial.Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
-                if (dataMaterial.Material(MaterNum).ROnly) {
+            if (state.dataMaterial->Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
+                if (state.dataMaterial->Material(MaterNum).ROnly) {
                     //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                     //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
                     ShowContinueError(state, "..Only Material base materials are allowed to have EMPD properties.");
                     ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                    dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                    state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
             }
-            if (dataMaterial.Material(MaterNum).Group != RegularMaterial) {
+            if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
                 //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
                 //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
                 ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                 ErrorsFound = true;
             }
 
             // Once the material derived type number is found then load the additional moisture material properties
-            auto &material(dataMaterial.Material(MaterNum));
+            auto &material(state.dataMaterial->Material(MaterNum));
             material.EMPDmu = MaterialProps(1);
             material.MoistACoeff = MaterialProps(2);
             material.MoistBCoeff = MaterialProps(3);
             material.MoistCCoeff = MaterialProps(4);
             material.MoistDCoeff = MaterialProps(5);
-            if (lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate()) {
+            if (lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate) {
                 material.EMPDSurfaceDepth = CalcDepthFromPeriod(state, 24 * 3600, material); // 1 day
             } else {
                 material.EMPDSurfaceDepth = MaterialProps(6);
             }
-            if (lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate()) {
+            if (lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate) {
                 material.EMPDDeepDepth = CalcDepthFromPeriod(state, 21 * 24 * 3600, material); // 3 weeks
             } else {
                 material.EMPDDeepDepth = MaterialProps(7);
@@ -290,7 +288,7 @@ namespace MoistureBalanceEMPDManager {
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
             ConstrNum = Surface(SurfNum).Construction;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            if (dataMaterial.Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
+            if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
                 EMPDzone(Surface(SurfNum).Zone) = true;
             } else {
                 ++ErrCount;
@@ -307,19 +305,19 @@ namespace MoistureBalanceEMPDManager {
             if (state.dataConstruction->Construct(ConstrNum).TotLayers == 1) { // One layer construction
                 continue;
             } else { // Multiple layer construction
-                if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
+                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
                     Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                     ShowSevereError(state, "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
                                     state.dataConstruction->Construct(ConstrNum).Name);
-                    ShowContinueError(state, "..Outside layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
+                    ShowContinueError(state, "..Outside layer material with EMPD properties = " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }
                 for (Layer = 2; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers - 1; ++Layer) {
-                    if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
+                    if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
                         ShowSevereError(state, "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
                                         state.dataConstruction->Construct(ConstrNum).Name);
-                        ShowContinueError(state, "..Middle layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
+                        ShowContinueError(state, "..Middle layer material with EMPD properties = " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
                         ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                         ErrorsFound = true;
                     }
@@ -396,7 +394,7 @@ namespace MoistureBalanceEMPDManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), OutBaroPress),
+            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
                                                  PsyRhovFnTdbRh(state, MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
             RVSurfaceOld(SurfNum) = rv_air_in_initval;
             RVSurface(SurfNum) = rv_air_in_initval;
@@ -548,34 +546,34 @@ namespace MoistureBalanceEMPDManager {
         ConstrNum = surface.Construction;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers); // Then find the material pointer
 
-        auto const &material(dataMaterial.Material(MatNum));
+        auto const &material(state.dataMaterial->Material(MatNum));
         if (material.EMPDmu <= 0.0) {
-            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), OutBaroPress);
+            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
             return;
         }
 
         Taver = TempSurfIn;
         // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
         RVaver = rv_surface_old;
-        RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+        RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
 
         // Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
         PVsat = PsyPsatFnTemp(state, Taver, RoutineName);
         PVsurf = RHaver * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
-        TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - DataGlobalConstants::KelvinConv();
+        TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - DataGlobalConstants::KelvinConv;
 
         // Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature.
         // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
         // 461.52 = universal gas constant for water [J/kg-K]
         // EMPDdiffusivity = [m^2/s]
-        EMPDdiffusivity = (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver + DataGlobalConstants::KelvinConv());
+        EMPDdiffusivity = (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv, 0.81) / state.dataEnvrn->OutBaroPress) / material.EMPDmu * 461.52 * (Taver + DataGlobalConstants::KelvinConv);
 
         // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
         dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
                  material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 
         // Convert vapor density and temperature of zone air to RH
-        RHZone = rho_vapor_air_in * 461.52 * (TempZone + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / ((TempZone + DataGlobalConstants::KelvinConv()) - 35.45));
+        RHZone = rho_vapor_air_in * 461.52 * (TempZone + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + DataGlobalConstants::KelvinConv) - 35.45));
 
         // Convert stored vapor density from previous timestep to RH.
         RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, rv_deep_old);
@@ -586,8 +584,8 @@ namespace MoistureBalanceEMPDManager {
         if (material.EMPDmuCoating <= 0.0) {
             Rcoating = 0;
         } else {
-            Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress /
-                       (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) * 461.52 * (Taver + DataGlobalConstants::KelvinConv()));
+            Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * state.dataEnvrn->OutBaroPress /
+                       (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv, 0.81) * 461.52 * (Taver + DataGlobalConstants::KelvinConv));
         }
 
         // Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]
@@ -699,8 +697,8 @@ namespace MoistureBalanceEMPDManager {
         rvd.rv_surface = rv_surface;
         rvd.RH_surface_layer = RH_surf_layer * 100.0;
         rvd.RH_deep_layer = RH_deep_layer * 100.0;
-        rvd.w_surface_layer = 0.622 * PV_surf_layer / (OutBaroPress - PV_surf_layer);
-        rvd.w_deep_layer = 0.622 * PV_deep_layer / (OutBaroPress - PV_deep_layer);
+        rvd.w_surface_layer = 0.622 * PV_surf_layer / (state.dataEnvrn->OutBaroPress - PV_surf_layer);
+        rvd.w_deep_layer = 0.622 * PV_deep_layer / (state.dataEnvrn->OutBaroPress - PV_deep_layer);
         rvd.mass_flux_zone = mass_flux_zone;
         rvd.mass_flux_deep = mass_flux_deep_layer;
         rvd.u_surface_layer =
@@ -798,22 +796,22 @@ namespace MoistureBalanceEMPDManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            if (dataMaterial.Material(MatNum).EMPDMaterialProps) {
+            if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
                 print(state.files.eio,
                       Format_700,
                       state.dataConstruction->Construct(ConstrNum).Name,
-                      dataMaterial.Material(MatNum).Name,
-                      dataMaterial.Material(MatNum).EMPDmu,
-                      dataMaterial.Material(MatNum).MoistACoeff,
-                      dataMaterial.Material(MatNum).MoistBCoeff,
-                      dataMaterial.Material(MatNum).MoistCCoeff,
-                      dataMaterial.Material(MatNum).MoistDCoeff,
-                      dataMaterial.Material(MatNum).EMPDSurfaceDepth,
-                      dataMaterial.Material(MatNum).EMPDDeepDepth,
-                      dataMaterial.Material(MatNum).EMPDmuCoating,
-                      dataMaterial.Material(MatNum).EMPDCoatingThickness);
+                      state.dataMaterial->Material(MatNum).Name,
+                      state.dataMaterial->Material(MatNum).EMPDmu,
+                      state.dataMaterial->Material(MatNum).MoistACoeff,
+                      state.dataMaterial->Material(MatNum).MoistBCoeff,
+                      state.dataMaterial->Material(MatNum).MoistCCoeff,
+                      state.dataMaterial->Material(MatNum).MoistDCoeff,
+                      state.dataMaterial->Material(MatNum).EMPDSurfaceDepth,
+                      state.dataMaterial->Material(MatNum).EMPDDeepDepth,
+                      state.dataMaterial->Material(MatNum).EMPDmuCoating,
+                      state.dataMaterial->Material(MatNum).EMPDCoatingThickness);
             }
         }
     }

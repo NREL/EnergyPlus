@@ -221,11 +221,11 @@ namespace DElightManagerF {
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
         cNameWOBlanks = ReplaceBlanksWithUnderscores(BuildingName);
-        print(delightInFile, Format_902, cNameWOBlanks, Latitude, Longitude, Elevation * M2FT, BuildingAzimuth, TimeZoneNumber);
+        print(delightInFile, Format_902, cNameWOBlanks, state.dataEnvrn->Latitude, state.dataEnvrn->Longitude, state.dataEnvrn->Elevation * M2FT, BuildingAzimuth, state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
-        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
+        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
@@ -294,8 +294,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians());
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians());
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians);
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians);
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
@@ -333,7 +333,7 @@ namespace DElightManagerF {
                                 iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
+                                rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer).AbsorpVisible;
                             } else {
                                 rExtVisRefl = 0.0;
                             }

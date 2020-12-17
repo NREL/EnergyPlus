@@ -59,9 +59,9 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -170,7 +170,6 @@ namespace EnergyPlus::PlantPressureSystem {
         // On FirstHVAC, updates the demand inlet node pressure
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
         using DataLoopNode::Node;
         using DataPlant::CommonPipe_No;
         using DataPlant::DemandSide;
@@ -332,8 +331,8 @@ namespace EnergyPlus::PlantPressureSystem {
                     auto const &branch(loop_side.Branch(BranchNum));
                     for (int CompNum = 1, CompNum_end = isize(branch.Comp); CompNum <= CompNum_end; ++CompNum) {
                         auto const &component(branch.Comp(CompNum));
-                        Node(component.NodeNumIn).Press = StdBaroPress;
-                        Node(component.NodeNumOut).Press = StdBaroPress;
+                        Node(component.NodeNumIn).Press = state.dataEnvrn->StdBaroPress;
+                        Node(component.NodeNumOut).Press = state.dataEnvrn->StdBaroPress;
                     }
                 }
             }

@@ -1047,6 +1047,14 @@ namespace OutputReportTabular {
 
 } // namespace OutputReportTabular
 
+struct OutputReportTabularData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

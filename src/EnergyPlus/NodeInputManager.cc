@@ -285,32 +285,8 @@ namespace NodeInputManager {
         // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
         // complete, whichever condition is reached first.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (!NodeVarsSetup) {
-            if (!AbortProcessing) {
+            if (!state.dataErrTracking->AbortProcessing) {
                 MoreNodeInfo.allocate(NumOfUniqueNodeNames);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
@@ -1102,9 +1078,6 @@ namespace NodeInputManager {
         // stored in MoreNodeInfo.
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::StdBaroPress;
-        using DataEnvironment::StdRhoAir;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetGlycolNameByIndex;
         using FluidProperties::GetSatDensityRefrig;
@@ -1155,8 +1128,8 @@ namespace NodeInputManager {
         Real64 rhoStd;
 
         if (CalcMoreNodeInfoMyOneTimeFlag) {
-            RhoAirStdInit = StdRhoAir;
-            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp);
             NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
             NodeRelHumidityRepReq.allocate(NumOfNodes);
@@ -1196,19 +1169,19 @@ namespace NodeInputManager {
                         }
                     }
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Wetbulb Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
                     NodeWetBulbRepReq(iNode) = true;
                     NodeWetBulbSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Relative Humidity")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
                     NodeRelHumidityRepReq(iNode) = true;
                     NodeRelHumiditySchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Dewpoint Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
                     NodeDewPointRepReq(iNode) = true;
                     NodeDewPointSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Specific Heat")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
                     NodeSpecificHeatRepReq(iNode) = true;
                     NodeSpecificHeatSchedPtr(iNode) = 0;
                 }
@@ -1247,19 +1220,19 @@ namespace NodeInputManager {
             if (Node(iNode).FluidType == NodeType_Air) {
                 MoreNodeInfo(iNode).VolFlowRateStdRho = Node(iNode).MassFlowRate / RhoAirStdInit;
                 // if Node%Press was reliable could be used here.
-                RhoAirCurrent = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
+                RhoAirCurrent = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
                 MoreNodeInfo(iNode).Density = RhoAirCurrent;
                 if (RhoAirCurrent != 0.0) MoreNodeInfo(iNode).VolFlowRateCrntRho = Node(iNode).MassFlowRate / RhoAirCurrent;
                 MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                 if (ReportWetBulb) {
                     // if Node%Press was reliable could be used here.
                     MoreNodeInfo(iNode).WetBulbTemp =
-                        PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
+                        PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                 }
                 if (ReportDewPoint) {
-                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(state, Node(iNode).HumRat, OutBaroPress);
+                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(state, Node(iNode).HumRat, state.dataEnvrn->OutBaroPress);
                 } else {
                     MoreNodeInfo(iNode).AirDewPointTemp = 0.0;
                 }
@@ -1267,7 +1240,7 @@ namespace NodeInputManager {
                     // if Node%Press was reliable could be used here.
                     // following routines don't issue psych errors and may be more reliable.
                     MoreNodeInfo(iNode).RelHumidity =
-                        100.0 * PsyRhFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
+                        100.0 * PsyRhFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
@@ -1285,7 +1258,7 @@ namespace NodeInputManager {
                 } else {
                     Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rhoStd = GetDensityGlycol(
-                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp(), Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                 }
 
@@ -1321,7 +1294,7 @@ namespace NodeInputManager {
                 if (Node(iNode).HumRat > 0.0) {
                     MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                     if (ReportWetBulb) {
-                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
+                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, state.dataEnvrn->StdBaroPress);
                     } else {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }

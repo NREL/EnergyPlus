@@ -1308,11 +1308,11 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).FlowFraction = 1.0;
     ScheduleManager::Schedule(17).CurrentValue = 1.0;
     ScheduleManager::Schedule(9).CurrentValue = 1.0;
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.012;
-    DataEnvironment::StdBaroPress = 101325.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.012;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // InitMSHeatPump resets the current MSHeatPumpNum only
     HVACMultiSpeedHeatPump::InitMSHeatPump(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio);
@@ -1338,9 +1338,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     DataLoopNode::Node(24).MassFlowRateMax = DataLoopNode::Node(16).MassFlowRateMaxAvail;
 
     Fans::Fan(2).MaxAirMassFlowRate = DataLoopNode::Node(16).MassFlowRateMaxAvail;
-    Fans::Fan(2).RhoAirStdInit = DataEnvironment::StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(1) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(1) * DataEnvironment::StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(2) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(2) * DataEnvironment::StdRhoAir;
+    Fans::Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(1) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(2) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
     DXCoils::DXCoil(2).MSRatedCBF(1) = 0.2;
     DXCoils::DXCoil(2).MSRatedCBF(2) = 0.2;
 
@@ -1381,9 +1381,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     // Heating
     QZnReq = 10000.00;
-    MSHeatPump(2).HeatCoolMode = HeatingMode;
-    DataEnvironment::OutDryBulbTemp = 5.0;
-    DataEnvironment::OutHumRat = 0.008;
+    MSHeatPump(2).HeatCoolMode = EnergyPlus::HVACMultiSpeedHeatPump::ModeOfOperation::HeatingMode;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);

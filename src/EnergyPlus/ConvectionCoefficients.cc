@@ -64,6 +64,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
@@ -358,7 +358,6 @@ namespace ConvectionCoefficients {
         // TARP Reference Manual, "Surface Outside Heat Balances", pp 71ff
 
         // Using/Aliasing
-        using DataEnvironment::SkyTempKelvin;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -380,18 +379,18 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
         }
 
-        TAir = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
-        TSurf = TempExt + DataGlobalConstants::KelvinConv();
-        TSky = SkyTempKelvin;
+        TAir = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+        TSurf = TempExt + DataGlobalConstants::KelvinConv;
+        TSky = state.dataEnvrn->SkyTempKelvin;
         TGround = TAir;
 
         if (Surface(SurfNum).HasSurroundingSurfProperties) {
             SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
             if (SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv();
+                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv;
             }
             if (SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv();
+                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv;
             }
         }
 
@@ -600,7 +599,7 @@ namespace ConvectionCoefficients {
         } else {
             // Compute sky radiation coefficient
             HSky =
-                DataGlobalConstants::StefanBoltzmann() * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
+                DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
         }
 
         if (TSurf == TAir || algoNum == ASHRAESimple) {
@@ -608,10 +607,10 @@ namespace ConvectionCoefficients {
             HAir = 0.0;
         } else {
             // Compute ground radiation coefficient
-            HGround = DataGlobalConstants::StefanBoltzmann() * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+            HGround = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
 
             // Compute air radiation coefficient
-            HAir = DataGlobalConstants::StefanBoltzmann() * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
+            HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
                    (TSurf - TAir);
         }
     }
@@ -803,7 +802,6 @@ namespace ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using DataErrorTracking::TotalSevereErrors;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
 
@@ -1196,30 +1194,11 @@ namespace ConvectionCoefficients {
             }
         }
 
-        // Reserve space for air boundary IRT inside convection override
-        if (DataHeatBalance::AnyAirBoundary) ++TotIntConvCoeff;
-
         UserIntConvectionCoeffs.allocate(TotIntConvCoeff);
         UserExtConvectionCoeffs.allocate(TotExtConvCoeff);
 
         TotIntConvCoeff = 0;
         TotExtConvCoeff = 0;
-
-        // Preset inside convection coefficient override for air boundary IRT surfaces
-        // Doing this here rather than try to add a new convection type for this
-        if (DataHeatBalance::AnyAirBoundary) {
-            ++TotIntConvCoeff;
-            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = LowHConvLimit;
-            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = "Air Boundary IRT Surfaces";
-            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-            for (int surfNum : DataSurfaces::AllHTSurfaceList) {
-                auto &surf = Surface(surfNum);
-                if (state.dataConstruction->Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
-                    surf.IntConvCoeff = TotIntConvCoeff;
-                }
-            }
-        }
 
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -1716,7 +1695,7 @@ namespace ConvectionCoefficients {
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
                 if (!state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances.");
-                    TotalSevereErrors += Count;
+                    state.dataErrTracking->TotalSevereErrors += Count;
                 }
             }
         }
@@ -2557,11 +2536,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
-        using DataRoomAirModel::AirModel;
-        using DataRoomAirModel::RoomAirModel_UCSDCV;
-        using DataRoomAirModel::RoomAirModel_UCSDDV;
-        using DataRoomAirModel::RoomAirModel_UCSDUFE;
-        using DataRoomAirModel::RoomAirModel_UCSDUFI;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TAirConv;
@@ -2580,9 +2554,9 @@ namespace ConvectionCoefficients {
                 }
             }
 
-            if (AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDDV ||
-                AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDUFI ||
-                AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDUFE) {
+            if (state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
+                    state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                    state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
                 // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
                 if (Surface(SurfNum).IntConvCoeff != 0) {
@@ -2595,7 +2569,7 @@ namespace ConvectionCoefficients {
                                                           -Surface(SurfNum).CosTilt); // negative CosTilt because CosTilt is relative to exterior
                 }
 
-            } else if (AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDCV) {
+            } else if (state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
 
                 Hf = 4.3 * Vhc()(Surface(SurfNum).Zone);
 
@@ -2628,7 +2602,7 @@ namespace ConvectionCoefficients {
             Real64 ZoneVolFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
             // Calculate ACH
-            return ZoneVolFlowRate / ZoneVolume * DataGlobalConstants::SecInHour();
+            return ZoneVolFlowRate / ZoneVolume * DataGlobalConstants::SecInHour;
         }
     }
 
@@ -2666,14 +2640,13 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int const ZoneNum)
     {
-        using DataEnvironment::OutBaroPress;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
             int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
             return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
         } else {
             return 0.0;
@@ -2813,7 +2786,6 @@ namespace ConvectionCoefficients {
         //   Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.137
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
@@ -2838,14 +2810,14 @@ namespace ConvectionCoefficients {
             ZoneVolume = Zone(ZoneNum).Volume;
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
+            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
             ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
 
             if (ZoneMassFlowRate < MinFlow) {
                 ACH = 0.0;
             } else {
                 // Calculate ACH
-                ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * DataGlobalConstants::SecInHour();
+                ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * DataGlobalConstants::SecInHour;
                 // Limit ACH to range of correlation
                 ACH = min(ACH, MaxACH);
                 ACH = max(ACH, 0.0);
@@ -2983,11 +2955,11 @@ namespace ConvectionCoefficients {
             // make sure inside surface is hot, outside is cold
             // NOTE: this is not ideal.  could have circumstances that reverse this?
             if (SurfaceTemperatures(Surf1) > SurfaceTemperatures(Surf2)) {
-                Tsi = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv();
-                Tso = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv();
+                Tsi = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv;
+                Tso = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv;
             } else {
-                Tso = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv();
-                Tsi = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv();
+                Tso = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv;
+                Tsi = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv;
             }
 
             beta = 2.0 / (Tso + Tsi);
@@ -3073,7 +3045,7 @@ namespace ConvectionCoefficients {
         Real64 sintilt;
 
         tilt = Surface(SurfNum).Tilt;
-        tiltr = tilt * DataGlobalConstants::DegToRadians();
+        tiltr = tilt * DataGlobalConstants::DegToRadians;
         costilt = Surface(SurfNum).CosTilt;
         sintilt = Surface(SurfNum).SinTilt;
         ra = gr * pr;
@@ -3265,7 +3237,6 @@ namespace ConvectionCoefficients {
         // First Edition 2003-11-15. ISO 15099:2003(E)
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -3307,7 +3278,7 @@ namespace ConvectionCoefficients {
         TmeanFilmKelvin = AirTempKelvin + 0.25 * (SurfTempKelvin - AirTempKelvin); // eq. 133 in ISO 15099
         TmeanFilm = TmeanFilmKelvin - 273.15;
 
-        rho = PsyRhoAirFnPbTdbW(state, OutBaroPress, TmeanFilm, AirHumRat, RoutineName);
+        rho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TmeanFilm, AirHumRat, RoutineName);
         g = 9.81;
 
         // the following properties are probably for dry air, should maybe be remade for moist-air
@@ -3377,7 +3348,7 @@ namespace ConvectionCoefficients {
         if (Surface(SurfNum).Zone > 0) {
             AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(Surface(SurfNum).Zone);
         } else {
-            AirHumRat = DataEnvironment::OutHumRat;
+            AirHumRat = state.dataEnvrn->OutHumRat;
         }
 
         Real64 Height = Surface(SurfNum).Height;
@@ -4577,7 +4548,7 @@ namespace ConvectionCoefficients {
                     HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                         return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                                Surface(SurfNum).IntConvZoneWallHeight,
-                                                               Tsurf - DataGlobalConstants::KelvinConv(), // Kiva already uses Kelvin, but algorithm expects C
+                                                               Tsurf - DataGlobalConstants::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
                                                                -QdotConvInRepPerArea(SurfNum));
                     };
                 } else {
@@ -4657,8 +4628,6 @@ namespace ConvectionCoefficients {
         // separated out long case statement for selecting models.
 
         // Using/Aliasing
-        using DataEnvironment::WindDir;
-        using DataEnvironment::WindSpeed;
         using DataHeatBalSurface::QdotConvOutRepPerArea;
         using DataHeatBalSurface::TH;
 
@@ -4748,7 +4717,7 @@ namespace ConvectionCoefficients {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
             }
 
-            int Roughness = dataMaterial.Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+            int Roughness = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
 
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
@@ -4912,19 +4881,19 @@ namespace ConvectionCoefficients {
                     }
                 }
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
-                Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
+                Hf = CalcBlockenWindward(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
-                Hf = CalcEmmelVertical(state, WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
+                Hf = CalcEmmelVertical(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
-                Hf = CalcEmmelRoof(state, WindSpeed, WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
+                Hf = CalcEmmelRoof(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
@@ -5074,7 +5043,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using namespace DataZoneEquipment;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -5293,11 +5261,11 @@ namespace ConvectionCoefficients {
             // Grashof for zone air based on largest delta T between surfaces and zone height
             Tmin = minval(TH(2, 1, {Zone(ZoneNum).SurfaceFirst, Zone(ZoneNum).SurfaceLast}));
             Tmax = maxval(TH(2, 1, {Zone(ZoneNum).SurfaceFirst, Zone(ZoneNum).SurfaceLast}));
-            GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv()) * pow_2(v));
+            GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
             if (Node(ZoneNode).MassFlowRate > 0.0) {
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
                 Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
             } else {
                 Re = 0.0;
@@ -6065,7 +6033,6 @@ namespace ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataZoneEquipment;
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -6089,8 +6056,8 @@ namespace ConvectionCoefficients {
         SupplyAirTemp = MAT(ZoneNum);
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
-            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour()) / (AirDensity * Zone(ZoneNum).Volume);
+            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
             if (ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                     if (allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
@@ -6178,8 +6145,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::WindDir;
-        using DataEnvironment::WindSpeed;
         using DataHeatBalSurface::TH;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6193,18 +6158,18 @@ namespace ConvectionCoefficients {
             auto const SELECT_CASE_var(UserCurve.WindSpeedType);
 
             if (SELECT_CASE_var == RefWindWeatherFile) {
-                windVel = WindSpeed;
+                windVel = state.dataEnvrn->WindSpeed;
             } else if (SELECT_CASE_var == RefWindAtZ) {
                 windVel = Surface(SurfNum).WindSpeed;
             } else if (SELECT_CASE_var == RefWindParallComp) {
                 // WindSpeed , WindDir, surface Azimuth
-                Theta = WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-                ThetaRad = Theta * DataGlobalConstants::DegToRadians();
-                windVel = std::cos(ThetaRad) * WindSpeed;
+                Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+                ThetaRad = Theta * DataGlobalConstants::DegToRadians;
+                windVel = std::cos(ThetaRad) * state.dataEnvrn->WindSpeed;
             } else if (SELECT_CASE_var == RefWindParallCompAtZ) {
                 // Surface WindSpeed , Surface WindDir, surface Azimuth
                 Theta = Surface(SurfNum).WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-                ThetaRad = Theta * DataGlobalConstants::DegToRadians();
+                ThetaRad = Theta * DataGlobalConstants::DegToRadians;
                 windVel = std::cos(ThetaRad) * Surface(SurfNum).WindSpeed;
             }
         }
@@ -7325,7 +7290,7 @@ namespace ConvectionCoefficients {
         Real64 RaH(0.0);
         Real64 BetaFilm(0.0);
 
-        BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv() + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
+        BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
         RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
         if (RaH <= 6.3e09) {
@@ -8098,8 +8063,6 @@ namespace ConvectionCoefficients {
                          int const RoughnessIndex)
     {
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // FUNCTION PARAMETER DEFINITIONS:
@@ -8129,8 +8092,8 @@ namespace ConvectionCoefficients {
             Ln = std::sqrt(RoofArea);
         }
         DeltaTemp = SurfTemp - AirTemp;
-        BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv() + SurfTemp + 0.5 * DeltaTemp);
-        AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, AirTemp, OutHumRat);
+        BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv + SurfTemp + 0.5 * DeltaTemp);
+        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, state.dataEnvrn->OutHumRat);
 
         GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);
         RaLn = GrLn * Pr;
@@ -8160,7 +8123,7 @@ namespace ConvectionCoefficients {
 
         Real64 x; // distance to roof edge toward wind direction
 
-        int const RoughnessIndex = dataMaterial.Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        int const RoughnessIndex = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 
