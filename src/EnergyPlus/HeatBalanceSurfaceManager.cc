@@ -2320,7 +2320,6 @@ namespace HeatBalanceSurfaceManager {
         Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
-
         // Always initialize the shortwave quantities
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
@@ -2329,7 +2328,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            InitialZoneDifSolReflW(zoneNum) = 0.0; // Sun is up
+            InitialZoneDifSolReflW(zoneNum) = 0.0;
             ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
             ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
             ZnOpqSurfInsFaceCondGnRepEnrg(zoneNum) = 0.0;
@@ -2355,12 +2354,12 @@ namespace HeatBalanceSurfaceManager {
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
                 SurfOpaqQRadSWInAbs(SurfNum) = 0.0;
                 SurfOpaqQRadSWLightsInAbs(SurfNum) = 0.0;
-                SurfOpaqQRadSWOutAbs(SurfNum) = 0.0; // Sun is up
-                SurfOpaqInitialDifSolInAbs(SurfNum) = 0.0; // Sun is up
+                SurfOpaqQRadSWOutAbs(SurfNum) = 0.0;
+                SurfOpaqInitialDifSolInAbs(SurfNum) = 0.0;
 
-                SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0; // Sun is up
-                SurfOpaqSWOutAbsTotalReport(SurfNum) = 0.0; // Sun is up
-                SurfOpaqSWOutAbsEnergyReport(SurfNum) = 0.0; // Sun is up
+                SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+                SurfOpaqSWOutAbsTotalReport(SurfNum) = 0.0;
+                SurfOpaqSWOutAbsEnergyReport(SurfNum) = 0.0;
             }
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
@@ -2411,7 +2410,7 @@ namespace HeatBalanceSurfaceManager {
             }
             for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinQRadSWwinAbs(Lay, SurfNum) = 0.0; // Sun is up
+                    SurfWinQRadSWwinAbs(Lay, SurfNum) = 0.0;
                 }
             }
         }
@@ -2429,113 +2428,113 @@ namespace HeatBalanceSurfaceManager {
 
         if (currSolRadPositive || resetSolar) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;  // Sun is up
-                SurfBmIncInsSurfAmountRep(SurfNum) = 0.0; // Sun is up
-                SurfIntBmIncInsSurfIntensRep(SurfNum) = 0.0; // Sun is up
-                SurfIntBmIncInsSurfAmountRep(SurfNum) = 0.0; // Sun is up
-                SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0; // Sun is up
+                SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;
+                SurfBmIncInsSurfAmountRep(SurfNum) = 0.0;
+                SurfIntBmIncInsSurfIntensRep(SurfNum) = 0.0;
+                SurfIntBmIncInsSurfAmountRep(SurfNum) = 0.0;
+                SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
 
-                SurfQRadSWOutIncident(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncidentBeam(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncidentGndDiffuse(SurfNum) = 0.0; // Sun is up
+                SurfQRadSWOutIncident(SurfNum) = 0.0;
+                SurfQRadSWOutIncidentBeam(SurfNum) = 0.0;
+                SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0;
+                SurfQRadSWOutIncidentGndDiffuse(SurfNum) = 0.0;
 
-                SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncBmToBmReflObs(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0; // Sun is up
-                SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0; // Sun is up
+                SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0;
+                SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0;
+                SurfQRadSWOutIncBmToBmReflObs(SurfNum) = 0.0;
+                SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0;
+                SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0;
 
-                SurfSkySolarInc(SurfNum) = 0.0; // Sun is up
-                SurfGndSolarInc(SurfNum) = 0.0; // Sun is up
+                SurfSkySolarInc(SurfNum) = 0.0;
+                SurfGndSolarInc(SurfNum) = 0.0;
             }
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                ZoneTransSolar(zoneNum) = 0.0; // Sun is up
-                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0; // Sun is up
-                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0; // Sun is up
-                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0; // Sun is up
-                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0; // Sun is up
-                ZoneTransSolarEnergy(zoneNum) = 0.0; // Sun is up
-                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0; // Sun is up
-                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0; // Sun is up
-                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0; // Sun is up
-                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0; // Sun is up
+                ZoneTransSolar(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+                ZoneTransSolarEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             }
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinExtBeamAbsByShade(SurfNum) = 0.0; // Sun is up
-                    SurfWinExtDiffAbsByShade(SurfNum) = 0.0; // Sun is up
-                    SurfWinIntBeamAbsByShade(SurfNum) = 0.0; // Sun is up
-                    SurfWinInitialDifSolAbsByShade(SurfNum) = 0.0; // Sun is up
-                    SurfWinQRadSWwinAbsTot(SurfNum) = 0.0; // Sun is up
-                    SurfWinQRadSWwinAbsTotEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinSWwinAbsTotalReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinInitialDifSolInTrans(SurfNum) = 0.0; // Sun is up
-                    SurfWinInitialDifSolInTransReport(SurfNum) = 0.0; // Sun is up
+                    SurfWinExtBeamAbsByShade(SurfNum) = 0.0;
+                    SurfWinExtDiffAbsByShade(SurfNum) = 0.0;
+                    SurfWinIntBeamAbsByShade(SurfNum) = 0.0;
+                    SurfWinInitialDifSolAbsByShade(SurfNum) = 0.0;
+                    SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
+                    SurfWinQRadSWwinAbsTotEnergy(SurfNum) = 0.0;
+                    SurfWinSWwinAbsTotalReport(SurfNum) = 0.0;
+                    SurfWinInitialDifSolInTrans(SurfNum) = 0.0;
+                    SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBlTsolBmBm(SurfNum) = 0.0; // Sun is up
-                    SurfWinBlTsolBmDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinBlTsolDifDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinBlGlSysTsolBmBm(SurfNum) = 0.0; // Sun is up
-                    SurfWinBlGlSysTsolDifDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinScTsolBmBm(SurfNum) = 0.0; // Sun is up
-                    SurfWinScTsolBmDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinScTsolDifDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinScGlSysTsolBmBm(SurfNum) = 0.0; // Sun is up
-                    SurfWinScGlSysTsolDifDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinGlTsolBmBm(SurfNum) = 0.0; // Sun is up
-                    SurfWinGlTsolBmDif(SurfNum) = 0.0; // Sun is up
-                    SurfWinGlTsolDifDif(SurfNum) = 0.0; // Sun is up
+                    SurfWinBlTsolBmBm(SurfNum) = 0.0;
+                    SurfWinBlTsolBmDif(SurfNum) = 0.0;
+                    SurfWinBlTsolDifDif(SurfNum) = 0.0;
+                    SurfWinBlGlSysTsolBmBm(SurfNum) = 0.0;
+                    SurfWinBlGlSysTsolDifDif(SurfNum) = 0.0;
+                    SurfWinScTsolBmBm(SurfNum) = 0.0;
+                    SurfWinScTsolBmDif(SurfNum) = 0.0;
+                    SurfWinScTsolDifDif(SurfNum) = 0.0;
+                    SurfWinScGlSysTsolBmBm(SurfNum) = 0.0;
+                    SurfWinScGlSysTsolDifDif(SurfNum) = 0.0;
+                    SurfWinGlTsolBmBm(SurfNum) = 0.0;
+                    SurfWinGlTsolBmDif(SurfNum) = 0.0;
+                    SurfWinGlTsolDifDif(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolAbsdInsReveal(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolRefldInsReveal(SurfNum) = 0.0; // Sun is up
-                    SurfWinOutsRevealDiffOntoGlazing(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffOntoGlazing(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffIntoZone(SurfNum) = 0.0; // Sun is up
-                    SurfWinOutsRevealDiffOntoFrame(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffOntoFrame(SurfNum) = 0.0; // Sun is up
+                    SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
+                    SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0;
+                    SurfWinBmSolAbsdInsReveal(SurfNum) = 0.0;
+                    SurfWinBmSolRefldInsReveal(SurfNum) = 0.0;
+                    SurfWinOutsRevealDiffOntoGlazing(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffOntoGlazing(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffIntoZone(SurfNum) = 0.0;
+                    SurfWinOutsRevealDiffOntoFrame(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffOntoFrame(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolRefldInsRevealReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffOntoGlazingReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolRefldOutsRevealRepEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0; // Sun is up
+                    SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0;
+                    SurfWinBmSolRefldInsRevealReport(SurfNum) = 0.0;
+                    SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffOntoGlazingReport(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
+                    SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
+                    SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+                    SurfWinBmSolRefldOutsRevealRepEnergy(SurfNum) = 0.0;
+                    SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0;
                 }
 
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinTransSolar(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolar(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmBmSolar(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmDifSolar(SurfNum) = 0.0; // Sun is up
-                    SurfWinDifSolar(SurfNum) = 0.0; // Sun is up
-                    SurfWinTransSolarEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmSolarEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinDifSolarEnergy(SurfNum) = 0.0; // Sun is up
-                    SurfWinBSDFBeamDirectionRep(SurfNum) = 0; // Sun is up
-                    SurfWinBSDFBeamThetaRep(SurfNum) = 0.0; // Sun is up
-                    SurfWinBSDFBeamPhiRep(SurfNum) = 0.0; // Sun is up
+                    SurfWinTransSolar(SurfNum) = 0.0;
+                    SurfWinBmSolar(SurfNum) = 0.0;
+                    SurfWinBmBmSolar(SurfNum) = 0.0;
+                    SurfWinBmDifSolar(SurfNum) = 0.0;
+                    SurfWinDifSolar(SurfNum) = 0.0;
+                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBSDFBeamDirectionRep(SurfNum) = 0;
+                    SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
+                    SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
                 }
                 for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                        SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = 0.0; // Sun is up
+                        SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
                     }
                 }
                 for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                        SurfWinInitialDifSolwinAbs(Lay, SurfNum) = 0.0; // Sun is up
+                        SurfWinInitialDifSolwinAbs(Lay, SurfNum) = 0.0;
                     }
                 }
             }

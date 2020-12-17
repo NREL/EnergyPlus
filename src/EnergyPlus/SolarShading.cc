@@ -6878,12 +6878,12 @@ namespace SolarShading {
                                     // The layer order for interior windows is "outside" to "inside," where "outside" refers to
                                     // the adjacent zone and "inside" refers to the current zone.
                                     int ShadeFlagBack = SurfWinShadingFlag(BackSurfNum);
-                                    int ConstrNum = Surface(SurfNum).Construction;
-                                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                                    if (SurfWinStormWinFlag(SurfNum) == 1) {
-                                        ConstrNum = Surface(SurfNum).StormWinConstruction;
-                                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                                    }
+//                                    int ConstrNum = Surface(SurfNum).Construction;
+//                                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+//                                    if (SurfWinStormWinFlag(SurfNum) == 1) {
+//                                        ConstrNum = Surface(SurfNum).StormWinConstruction;
+//                                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+//                                    }
                                     bool VarSlatsBack = SurfWinMovableSlats(BackSurfNum);
                                     Real64 SlatAngBack = SurfWinSlatAngThisTS(BackSurfNum);
                                     Real64 CosIncBack = std::abs(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, BackSurfNum));
@@ -10606,21 +10606,21 @@ namespace SolarShading {
         //  REAL(r64)    :: TransGl,ReflGl,AbsGl ! Glass layer solar transmittance, reflectance, absorptance
 
         Real64 ViewFactor;                  // temp var for view factor
-        Real64 ViewFactorTotal;             // debug var for view factor total
+//        Real64 ViewFactorTotal;             // debug var for view factor total
         Real64 WinDifSolarTrans;            // debug var for WinDifSolar() [W]
-        Real64 WinDifSolarDistTotl;         // debug var for window total distributed diffuse solar [W]
-        Real64 WinDifSolarDistAbsorbedTotl; // debug var for individual exterior window total distributed
+//        Real64 WinDifSolarDistTotl;         // debug var for window total distributed diffuse solar [W]
+//        Real64 WinDifSolarDistAbsorbedTotl; // debug var for individual exterior window total distributed
         //    diffuse solar absorbed [W]
-        Real64 WinDifSolarDistReflectedTotl; // debug var for individual exterior window total distributed
+//        Real64 WinDifSolarDistReflectedTotl; // debug var for individual exterior window total distributed
         //    diffuse solar reflected [W]
-        Real64 WinDifSolarDistTransmittedTotl; // debug var for individual exterior window total distributed
+//        Real64 WinDifSolarDistTransmittedTotl; // debug var for individual exterior window total distributed
         //    diffuse solar transmitted [W]
         Real64 WinDifSolLayAbsW;                // temp var for diffuse solar absorbed by individual glass layer [W]
-        Real64 ZoneDifSolarTrans;               // debug var for WinDifSolar() [W]
-        Real64 ZoneDifSolarDistTotl;            // debug var for zone total distributed diffuse solar [W]
-        Real64 ZoneDifSolarDistAbsorbedTotl;    // debug var for zone total distributed diffuse solar absorbed [W]
-        Real64 ZoneDifSolarDistReflectedTotl;   // debug var for zone total distributed diffuse solar reflected [W]
-        Real64 ZoneDifSolarDistTransmittedTotl; // debug var for zone total distributed diffuse solar transmitted [W]
+//        Real64 ZoneDifSolarTrans;               // debug var for WinDifSolar() [W]
+//        Real64 ZoneDifSolarDistTotl;            // debug var for zone total distributed diffuse solar [W]
+//        Real64 ZoneDifSolarDistAbsorbedTotl;    // debug var for zone total distributed diffuse solar absorbed [W]
+//        Real64 ZoneDifSolarDistReflectedTotl;   // debug var for zone total distributed diffuse solar reflected [W]
+//        Real64 ZoneDifSolarDistTransmittedTotl; // debug var for zone total distributed diffuse solar transmitted [W]
 
         Real64 DifSolarAbsW;     // temp var for diffuse solar absorbed by surface [W]
         Real64 DifSolarAbs;      // temp var for diffuse solar absorbed by surface [W/m2]
@@ -10649,10 +10649,10 @@ namespace SolarShading {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Init Zone accumulators for debugging
-            ZoneDifSolarTrans = 0.0;
-            ZoneDifSolarDistAbsorbedTotl = 0.0;
-            ZoneDifSolarDistReflectedTotl = 0.0;
-            ZoneDifSolarDistTransmittedTotl = 0.0;
+//            ZoneDifSolarTrans = 0.0;
+//            ZoneDifSolarDistAbsorbedTotl = 0.0;
+//            ZoneDifSolarDistReflectedTotl = 0.0;
+//            ZoneDifSolarDistTransmittedTotl = 0.0;
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
             for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
@@ -10676,14 +10676,14 @@ namespace SolarShading {
                 //----------------------------------------------------------------------------------------------------------
 
                 // Init transmitted solar debug vars
-                ViewFactorTotal = 0.0;
+//                ViewFactorTotal = 0.0;
                 WinDifSolarTrans = SurfWinDifSolar(DifTransSurfNum);
-                ZoneDifSolarTrans += WinDifSolarTrans;
+//                ZoneDifSolarTrans += WinDifSolarTrans;
 
                 // Init Exterior Window accumulators for debugging
-                WinDifSolarDistAbsorbedTotl = 0.0;
-                WinDifSolarDistReflectedTotl = 0.0;
-                WinDifSolarDistTransmittedTotl = 0.0;
+//                WinDifSolarDistAbsorbedTotl = 0.0;
+//                WinDifSolarDistReflectedTotl = 0.0;
+//                WinDifSolarDistTransmittedTotl = 0.0;
 
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
                 for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
@@ -10698,7 +10698,7 @@ namespace SolarShading {
 
                     ViewFactor = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
                     // debug ViewFactorTotal
-                    ViewFactorTotal += ViewFactor; // debug
+//                    ViewFactorTotal += ViewFactor; // debug
 
                     // Skip receiving surfaces with 0.0 view factor
                     if (ViewFactor <= 0.0) continue;
@@ -10756,10 +10756,10 @@ namespace SolarShading {
 
                         // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
                         // For opaque surfaces all incident diffuse is either absorbed or reflected
-                        WinDifSolarDistAbsorbedTotl += DifSolarAbsW;    // debug [W]
-                        WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug [W]
-                        ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW;   // debug [W]
-                        ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
+//                        WinDifSolarDistAbsorbedTotl += DifSolarAbsW;    // debug [W]
+//                        WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug [W]
+//                        ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW;   // debug [W]
+//                        ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
                     } else { // Exterior or Interior Window
 
                         int ConstrNumSh = Surface(HeatTransSurfNum).activeShadedConstruction;
@@ -10787,8 +10787,8 @@ namespace SolarShading {
                                     DifSolarAbsW += WinDifSolLayAbsW;
 
                                     // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
-                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
+//                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
+//                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
 
                                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
                                     SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
@@ -10807,8 +10807,8 @@ namespace SolarShading {
                                 InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
-                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
+//                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
                                 //------------------------------------------------------------------------------
                                 // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -10856,8 +10856,8 @@ namespace SolarShading {
                                 } // this is an interior window surface
 
                                 // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
-                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
+//                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
                                 SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
@@ -10889,8 +10889,8 @@ namespace SolarShading {
                                     DifSolarAbsW += WinDifSolLayAbsW;
 
                                     // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
-                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
+//                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
+//                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
 
                                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
                                     SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
@@ -10910,8 +10910,8 @@ namespace SolarShading {
                                 InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
-                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
+//                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
                                 // Now calc diffuse solar absorbed by shade/blind itself
                                 BlNum = SurfWinBlindNumber(HeatTransSurfNum);
@@ -10935,15 +10935,15 @@ namespace SolarShading {
                                 DifSolarAbsW += ShBlDifSolarAbsW;
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW;  // debug
-                                ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+//                                WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW;  // debug
+//                                ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
 
                                 // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
                                 // This is not very effective since it assigns whatever distributed diffuse solar has not been
                                 // absorbed or reflected to transmitted.
                                 DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
-                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
-                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
+//                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
                                 SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
@@ -10965,8 +10965,8 @@ namespace SolarShading {
                                     DifSolarAbsW += WinDifSolLayAbsW;
 
                                     // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
-                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
+//                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
+//                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
 
                                     // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
                                     SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
@@ -10980,15 +10980,15 @@ namespace SolarShading {
                                 InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
-                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
+//                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
                                 // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
                                 // This is not very effective since it assigns whatever distributed diffuse solar has not been
                                 // absorbed or reflected to transmitted.
                                 DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
-                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
-                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
+//                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
                                 // Accumulate transmitted diffuse solar for reporting
                                 SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
@@ -11012,8 +11012,8 @@ namespace SolarShading {
                                 DifSolarAbsW += WinDifSolLayAbsW;
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                                WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
-                                ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
+//                                WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
+//                                ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
 
                                 // Accumulate diffuse solar absorbed from the inside by each window layer [W/m2] for heat balance calcs
                                 SurfWinInitialDifSolwinAbs(Lay, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
@@ -11035,8 +11035,8 @@ namespace SolarShading {
                             InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                             // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                            WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
-                            ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//                            WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
+//                            ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
                             //------------------------------------------------------------------------------
                             // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO ADJACENT ZONE
@@ -11072,8 +11072,8 @@ namespace SolarShading {
                             } // this is an interior window surface
 
                             // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
-                            WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
-                            ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//                            WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
+//                            ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
                             // Accumulate transmitted diffuse solar for reporting
                             SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
@@ -11116,13 +11116,13 @@ namespace SolarShading {
                 // Check debug var for view factors here
                 // ViewFactorTotal
                 // Check debug vars for individual transmitting surfaces here
-                WinDifSolarDistTotl = WinDifSolarDistAbsorbedTotl + WinDifSolarDistReflectedTotl + WinDifSolarDistTransmittedTotl;
+//                WinDifSolarDistTotl = WinDifSolarDistAbsorbedTotl + WinDifSolarDistReflectedTotl + WinDifSolarDistTransmittedTotl;
                 // WinDifSolarTrans
 
             } // DifTransSurfNum = Zone(ZoneNum)%SurfaceFirst, Zone(ZoneNum)%SurfaceLast
 
             // Check debug vars for zone totals here
-            ZoneDifSolarDistTotl = ZoneDifSolarDistAbsorbedTotl + ZoneDifSolarDistReflectedTotl + ZoneDifSolarDistTransmittedTotl;
+//            ZoneDifSolarDistTotl = ZoneDifSolarDistAbsorbedTotl + ZoneDifSolarDistReflectedTotl + ZoneDifSolarDistTransmittedTotl;
             // ZoneDifSolarTrans
             // ZoneDifSolarDistAbsorbedTotl
             // ZoneDifSolarDistReflectedTotl
