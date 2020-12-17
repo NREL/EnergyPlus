@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -62,54 +63,69 @@ struct EnergyPlusData;
 
 namespace PurchasedAirManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // MODULE PARAMETER DEFINITIONS:
     // Heating and Cooling Limit type parameters
-    extern int const NoLimit;
-    extern int const LimitFlowRate;
-    extern int const LimitCapacity;
-    extern int const LimitFlowRateAndCapacity;
-    extern Array1D_string const cLimitType;
+    enum class LimitType {
+        Unassigned,
+        NoLimit,
+        LimitFlowRate,
+        LimitCapacity,
+        LimitFlowRateAndCapacity
+    };
+    constexpr const char * cLimitType(LimitType l) {
+        switch (l) {
+            case LimitType::NoLimit:
+                return "NoLimit";
+            case LimitType::LimitFlowRate:
+                return "LimitFlowRate";
+            case LimitType::LimitCapacity:
+                return "LimitCapacity";
+            case LimitType::LimitFlowRateAndCapacity:
+                return "LimitFlowRateAndCapacity";
+            default:
+                return "UNKNOWN!";
+        }
+    }
+
     // Dehumidification and Humidification control type parameters
-    extern int const None;
-    extern int const ConstantSensibleHeatRatio;
-    extern int const Humidistat;
-    extern int const ConstantSupplyHumidityRatio;
+    enum class HumControl {
+        Unassigned,
+        None,
+        ConstantSensibleHeatRatio,
+        Humidistat,
+        ConstantSupplyHumidityRatio,
+    };
+
     // Demand controlled ventilation type parameters
-    extern int const NoDCV;
-    extern int const OccupancySchedule;
-    extern int const CO2SetPoint;
+    enum class DCV {
+        Unassigned,
+        NoDCV,
+        OccupancySchedule,
+        CO2SetPoint
+    };
+
     // Outdoor air economizer type parameters
-    extern int const NoEconomizer;
-    extern int const DifferentialDryBulb;
-    extern int const DifferentialEnthalpy;
+    enum class Econ {
+        Unassigned,
+        NoEconomizer,
+        DifferentialDryBulb,
+        DifferentialEnthalpy
+    };
+
     // Heat recovery type parameters
-    extern int const NoHeatRecovery;
-    extern int const Sensible;
-    extern int const Enthalpy;
+    enum class HeatRecovery {
+        Unassigned,
+        NoHeatRecovery,
+        Sensible,
+        Enthalpy
+    };
+
     // Operating mode parameters
-    extern int const Off;
-    extern int const Heat;
-    extern int const Cool;
-    extern int const DeadBand;
-    // Delta humidity ratio limit, 0.00025 equals delta between 45F dewpoint and 46F dewpoint
-    // used to prevent dividing by near zero
-    extern Real64 const SmallDeltaHumRat;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumPurchAir;
-    extern int NumPlenumArrays; // total number of plenum arrays
-    extern bool GetPurchAirInputFlag;
-    extern Array1D_bool CheckEquipName;
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
-
-    // Types
+    enum class OpMode {
+        Off,
+        Heat,
+        Cool,
+        DeadBand
+    };
 
     struct ZonePurchasedAir
     {
@@ -122,7 +138,6 @@ namespace PurchasedAirManager {
         int ZoneExhaustAirNodeNum;   // Node number of zone exhaust air node for purchased air
         int PlenumExhaustAirNodeNum; // Node number of plenum exhaust air node
         int ReturnPlenumIndex;       // Index of return plenum
-        int PlenumArrayIndex;        // Index to array that links to all ideal loads air systems connected to a plenum
         int PurchAirArrayIndex;      // Index to sub-array that links ideal loads air system to index of sub-array
         std::string ReturnPlenumName;
         int ZoneRecircAirNodeNum; // Node number of recirculation air node for purchased air
@@ -131,11 +146,11 @@ namespace PurchasedAirManager {
         Real64 MinCoolSuppAirTemp;   // Minimum supply air temperature for cooling [C]
         Real64 MaxHeatSuppAirHumRat; // Maximum supply heating air humidity ratio [kg water/kg dry air]
         Real64 MinCoolSuppAirHumRat; // Minimum supply cooling air humidity ratio [kg water/kg dry air]
-        int HeatingLimit;            // Heating capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
+        LimitType HeatingLimit;            // Heating capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
         //       or LimitFlowRateAndCapacity
         Real64 MaxHeatVolFlowRate; // Maximum heating supply air flow[m3/s]
         Real64 MaxHeatSensCap;     // Maximum heating sensible capacity [W]
-        int CoolingLimit;          // Cooling capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
+        LimitType CoolingLimit;          // Cooling capacity limit type - NoLimit, LimitFlowRate, LimitCapacity,
         //       or LimitFlowRateAndCapacity
         Real64 MaxCoolVolFlowRate; // Maximum cooling supply air flow [m3/s]
         Real64 MaxCoolTotCap;      // Maximum cooling total capacity [W]
@@ -143,19 +158,19 @@ namespace PurchasedAirManager {
         int HeatSchedPtr;          // Index to heating availability schedule
         std::string CoolSched;     // Cooling availability schedule
         int CoolSchedPtr;          // Index to the cooling availability schedule
-        int DehumidCtrlType;       // Dehumidification control type - ConstantSensibleHeatRatio,
+        HumControl DehumidCtrlType;       // Dehumidification control type - ConstantSensibleHeatRatio,
         //      Humidistat, or ConstantSupplyHumidityRatio
         Real64 CoolSHR;    // Cooling sensible heat ratio
-        int HumidCtrlType; // Humidification control type - None,
+        HumControl HumidCtrlType; // Humidification control type - None,
         //      Humidistat, or ConstantSupplyHumidityRatio
         int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
-        int DCVType;           // Demand controlled ventilation type - None,
+        DCV DCVType;           // Demand controlled ventilation type - None,
         //      OccupancySchedule, or CO2SetPoint
-        int EconomizerType; // Outdoor air economizer type - NoEconomizer,
+        Econ EconomizerType; // Outdoor air economizer type - NoEconomizer,
         //      DifferentialDryBulb, or DifferentialEnthalpy
         bool OutdoorAir;                    // Is there outdoor air?
         int OutdoorAirNodeNum;              // Node number of the outdoor air inlet node
-        int HtRecType;                      // Outdoor air heat recovery type - None, Sensible, Enthalpy
+        HeatRecovery HtRecType;                      // Outdoor air heat recovery type - None, Sensible, Enthalpy
         Real64 HtRecSenEff;                 // Sensible heat recovery effectiveness
         Real64 HtRecLatEff;                 // Latent heat recovery effectiveness
         int OAFlowFracSchPtr;               // Fraction schedule applied to total OA requirement
@@ -251,10 +266,10 @@ namespace PurchasedAirManager {
         // Default Constructor
         ZonePurchasedAir()
             : AvailSchedPtr(0), ZoneSupplyAirNodeNum(0), ZoneExhaustAirNodeNum(0), PlenumExhaustAirNodeNum(0), ReturnPlenumIndex(0),
-              PlenumArrayIndex(0), PurchAirArrayIndex(0), ZoneRecircAirNodeNum(0), MaxHeatSuppAirTemp(0.0), MinCoolSuppAirTemp(0.0),
-              MaxHeatSuppAirHumRat(0.0), MinCoolSuppAirHumRat(0.0), HeatingLimit(0), MaxHeatVolFlowRate(0.0), MaxHeatSensCap(0.0), CoolingLimit(0),
-              MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0), DehumidCtrlType(0), CoolSHR(0.0), HumidCtrlType(0),
-              OARequirementsPtr(0), DCVType(0), EconomizerType(0), OutdoorAir(false), OutdoorAirNodeNum(0), HtRecType(0), HtRecSenEff(0.0),
+              PurchAirArrayIndex(0), ZoneRecircAirNodeNum(0), MaxHeatSuppAirTemp(0.0), MinCoolSuppAirTemp(0.0),
+              MaxHeatSuppAirHumRat(0.0), MinCoolSuppAirHumRat(0.0), HeatingLimit(LimitType::Unassigned), MaxHeatVolFlowRate(0.0), MaxHeatSensCap(0.0), CoolingLimit(LimitType::Unassigned),
+              MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0), DehumidCtrlType(HumControl::Unassigned), CoolSHR(0.0), HumidCtrlType(HumControl::Unassigned),
+              OARequirementsPtr(0), DCVType(DCV::Unassigned), EconomizerType(Econ::Unassigned), OutdoorAir(false), OutdoorAirNodeNum(0), HtRecType(HeatRecovery::Unassigned), HtRecSenEff(0.0),
               HtRecLatEff(0.0), OAFlowFracSchPtr(0), MaxHeatMassFlowRate(0.0), MaxCoolMassFlowRate(0.0), EMSOverrideMdotOn(false),
               EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
               EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false),
@@ -283,9 +298,7 @@ namespace PurchasedAirManager {
         Array1D_string FieldNames;
 
         // Default Constructor
-        PurchAirNumericFieldData()
-        {
-        }
+        PurchAirNumericFieldData() = default;
     };
 
     struct PurchAirPlenumArrayData
@@ -303,73 +316,98 @@ namespace PurchasedAirManager {
     };
 
     // Object Data
-    extern Array1D<ZonePurchasedAir> PurchAir;                      // Used to specify purchased air parameters
-    extern Array1D<PurchAirNumericFieldData> PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
-    extern Array1D<PurchAirPlenumArrayData> PurchAirPlenumArrays;   // Used to save the indices of scalable sizing object for zone HVAC
-
-    // Functions
 
     void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
-                         bool const FirstHVACIteration,
-                         int const ControlledZoneNum,
-                         int const ActualZoneNum,
+                         bool  FirstHVACIteration,
+                         int ControlledZoneNum,
+                         int ActualZoneNum,
                          int &CompIndex);
 
     void GetPurchasedAir(EnergyPlusData &state);
 
-    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
-                          bool const FirstHVACIteration, // unused1208
-                          int const ControlledZoneNum,
-                          int const ActualZoneNum);
+    void InitPurchasedAir(EnergyPlusData &state, int PurchAirNum,
+                          bool FirstHVACIteration, // unused1208
+                          int ControlledZoneNum,
+                          int ActualZoneNum);
 
-    void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
+    void SizePurchasedAir(EnergyPlusData &state, int PurchAirNum);
 
     void CalcPurchAirLoads(EnergyPlusData &state,
-                           int const PurchAirNum,
+                           int PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
-                           int const ControlledZoneNum,
-                           int const ActualZoneNum);
+                           int ControlledZoneNum,
+                           int ActualZoneNum);
 
     void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                                   int const PurchAirNum,   // index to ideal loads unit
-                                   int const ActualZoneNum, // index to actual zone number
+                                   int PurchAirNum,   // index to ideal loads unit
+                                   int ActualZoneNum, // index to actual zone number
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     );
 
     void CalcPurchAirMixedAir(EnergyPlusData &state,
-                              int const PurchAirNum,           // index to ideal loads unit
-                              Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
-                              Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
+                              int PurchAirNum,           // index to ideal loads unit
+                              Real64 OAMassFlowRate,     // outside air mass flow rate [kg/s]
+                              Real64 SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
                               Real64 &MixedAirHumRat,          // Mixed air humidity ratio [kgWater/kgDryAir]
                               Real64 &MixedAirEnthalpy,        // Mixed air enthalpy [J/kg]
-                              int const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
+                              OpMode OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     );
 
-    void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration);
+    void UpdatePurchasedAir(EnergyPlusData &state, int PurchAirNum, bool FirstHVACIteration);
 
-    void ReportPurchasedAir(int const PurchAirNum);
+    void ReportPurchasedAir(EnergyPlusData &state, int PurchAirNum);
 
-    Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum);
+    Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int PurchAirNum);
 
-    int GetPurchasedAirZoneInletAirNode(EnergyPlusData &state, int const PurchAirNum);
+    int GetPurchasedAirZoneInletAirNode(EnergyPlusData &state, int PurchAirNum);
 
-    int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum);
+    int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
 
     bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
 
-    void InitializePlenumArrays(int const PurchAirNum);
-
-    void clear_state();
+    void InitializePlenumArrays(EnergyPlusData &state, int PurchAirNum);
 
 } // namespace PurchasedAirManager
+
+struct PurchasedAirManagerData : BaseGlobalStruct {
+    int NumPurchAir = 0;
+    int NumPlenumArrays = 0; // total number of plenum arrays
+    bool GetPurchAirInputFlag = true;
+    Array1D_bool CheckEquipName;
+    Array1D<PurchasedAirManager::ZonePurchasedAir> PurchAir;                      // Used to specify purchased air parameters
+    Array1D<PurchasedAirManager::PurchAirNumericFieldData> PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
+    Array1D<PurchasedAirManager::PurchAirPlenumArrayData> PurchAirPlenumArrays;   // Used to save the indices of scalable sizing object for zone HVAC
+    bool InitPurchasedAirMyOneTimeFlag = true;
+    bool InitPurchasedAirZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool InitPurchasedAirMyEnvrnFlag;
+    Array1D_bool InitPurchasedAirMySizeFlag;
+    Array1D_bool InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
+    Array1D<PurchasedAirManager::PurchAirPlenumArrayData> TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
+
+    void clear_state() override
+    {
+        NumPurchAir = 0;
+        NumPlenumArrays = 0;
+        GetPurchAirInputFlag = true;
+        CheckEquipName.deallocate();
+        PurchAir.deallocate();
+        PurchAirNumericFields.deallocate();
+        InitPurchasedAirMyOneTimeFlag = true;
+        InitPurchasedAirZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+        InitPurchasedAirMyEnvrnFlag.deallocate();
+        InitPurchasedAirMySizeFlag.deallocate();
+        InitPurchasedAirOneTimeUnitInitsDone.deallocate(); // True if one-time inits for PurchAirNum are completed
+        TempPurchAirPlenumArrays.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

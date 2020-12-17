@@ -69,7 +69,6 @@ extern "C" {
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -572,7 +571,7 @@ namespace ExternalInterface {
             StopExternalInterfaceIfError(state);
 
             // make a single length here for all strings to be passed to getepvariables
-            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength()); // Length of strings being passed to getepvariables
+            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength); // Length of strings being passed to getepvariables
 
             // initialize all the strings to this length with blanks
             xmlStrOut = std::string(lenXmlStr, ' ');
@@ -682,9 +681,9 @@ namespace ExternalInterface {
                 if (inpVarTypes(i) == indexSchedule) {
                     varInd(i) = GetDayScheduleIndex(state, inpVarNames(i));
                 } else if (inpVarTypes(i) == indexVariable) {
-                    varInd(i) = FindEMSVariable(inpVarNames(i), 0);
+                    varInd(i) = FindEMSVariable(state, inpVarNames(i), 0);
                 } else if (inpVarTypes(i) == indexActuator) {
-                    varInd(i) = FindEMSVariable(inpVarNames(i), 0);
+                    varInd(i) = FindEMSVariable(state, inpVarNames(i), 0);
                 }
                 if (varInd(i) <= 0) {
                     ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
@@ -697,7 +696,7 @@ namespace ExternalInterface {
             for (i = 1; i <= nInpVar; ++i) {
                 if (inpVarTypes(i) == indexVariable) { // ems-globalvariable
                     useEMS = true;
-                    if (!isExternalInterfaceErlVariable(varInd(i))) {
+                    if (!isExternalInterfaceErlVariable(state, varInd(i))) {
                         ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
                         ShowContinueError(state, "But this variable is an ordinary Erl variable, not an ExternalInterface variable.");
                         ShowContinueError(state, "You must specify a variable of type \"ExternalInterface:Variable\".");
@@ -705,7 +704,7 @@ namespace ExternalInterface {
                     }
                 } else if (inpVarTypes(i) == indexActuator) { // ems-actuator
                     useEMS = true;
-                    if (!isExternalInterfaceErlVariable(varInd(i))) {
+                    if (!isExternalInterfaceErlVariable(state, varInd(i))) {
                         ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
                         ShowContinueError(state, "But this variable is an ordinary Erl actuator, not an ExternalInterface actuator.");
                         ShowContinueError(state, "You must specify a variable of type \"ExternalInterface:Actuator\".");
@@ -868,13 +867,13 @@ namespace ExternalInterface {
 
                 // Set in EnergyPlus the values of the variables
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesVariable; ++k) {
-                    ExternalInterfaceSetErlVariable(FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex,
+                    ExternalInterfaceSetErlVariable(state, FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex,
                                                     FMU(i).Instance(j).fmuOutputVariableVariable(k).RealVarValue);
                 }
 
                 // Set in EnergyPlus the values of the actuators
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesActuator; ++k) {
-                    ExternalInterfaceSetErlVariable(FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex,
+                    ExternalInterfaceSetErlVariable(state, FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex,
                                                     FMU(i).Instance(j).fmuOutputVariableActuator(k).RealVarValue);
                 }
 
@@ -1695,7 +1694,7 @@ namespace ExternalInterface {
                             }
 
                             FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex =
-                                FindEMSVariable(FMU(i).Instance(j).eplusInputVariableVariable(k).Name, 0);
+                                FindEMSVariable(state, FMU(i).Instance(j).eplusInputVariableVariable(k).Name, 0);
                             FMU(i).Instance(j).NumOutputVariablesVariable = k;
                             if (FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex <= 0) {
                                 ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:declares variable \"" +
@@ -1794,7 +1793,7 @@ namespace ExternalInterface {
                             }
 
                             FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex =
-                                FindEMSVariable(FMU(i).Instance(j).eplusInputVariableActuator(k).Name, 0);
+                                FindEMSVariable(state, FMU(i).Instance(j).eplusInputVariableActuator(k).Name, 0);
                             FMU(i).Instance(j).NumOutputVariablesActuator = k;
                             if (FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex <= 0) {
                                 ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:declares variable \"" +
@@ -2388,7 +2387,7 @@ namespace ExternalInterface {
                     if (inpVarTypes(i) == indexSchedule) {
                         ExternalInterfaceSetSchedule(state, varInd(i), dblValRea(i));
                     } else if ((inpVarTypes(i) == indexVariable) || (inpVarTypes(i) == indexActuator)) {
-                        ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i));
+                        ExternalInterfaceSetErlVariable(state, varInd(i), dblValRea(i));
                     } else {
                         ShowContinueError(state, "ExternalInterface: Error in finding the type of the input variable for EnergyPlus");
                         ShowContinueError(state, format("variable index: {}. Variable will not be updated.", i));

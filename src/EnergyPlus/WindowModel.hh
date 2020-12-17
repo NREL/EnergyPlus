@@ -48,8 +48,11 @@
 #ifndef WindowModel_H
 #define WindowModel_H
 
+// C++ headers
 #include <map>
 #include <memory>
+
+// EnergyPlus headers
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {

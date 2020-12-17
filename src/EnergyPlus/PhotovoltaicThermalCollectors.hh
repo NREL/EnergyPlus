@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
@@ -197,6 +198,14 @@ namespace PhotovoltaicThermalCollectors {
     int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
+
+struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

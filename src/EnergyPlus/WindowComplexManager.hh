@@ -267,7 +267,8 @@ namespace WindowComplexManager {
 
         bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
         bool InitBSDFWindowsOnce = true;
-        bool resetAbunchOfStuff = true;
+        int NumBasis = 0; // Number of unique bases (No. in BasisList)
+        int MatrixNo = 0; // Index of Basis matrix
 
         void clear_state() //override
         {
@@ -277,14 +278,15 @@ namespace WindowComplexManager {
             this->WindowStateList.deallocate();
             this->InitComplexWindowsOnce = true;
             this->InitBSDFWindowsOnce = true;
-            this->resetAbunchOfStuff = true;
+            this->NumBasis = 0;
+            this->MatrixNo = 0;
         }
 
         // Default Constructor
         WindowComplexManagerData()
             : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
-            TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
-            Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0)
+              TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
+              Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
         {
         }
 

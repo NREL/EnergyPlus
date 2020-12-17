@@ -405,7 +405,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.DXCoilType = "Coil:Heating:DX:MultiSpeed";
     Coil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     DXCoilNumericFields.allocate(NumDXCoils);
     DataHeatBalance::HeatReclaimDXCoil.allocate(NumDXCoils);
@@ -784,7 +784,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     DataLoopNode::Node.allocate(1);
     Coil.AirOutNode = 1;
 
@@ -3122,10 +3122,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     Real64 RatedSensCapacity = DXCoil(1).RatedTotCap(1) * DXCoil(1).RatedSHR(1);
     EXPECT_EQ(10237.271253024948, RatedSensCapacity);
     // check tabular outputs
-    PreDefTableEntry(pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]", DXCoil(1).RatedTotCap(1), 3);
-    PreDefTableEntry(pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]", DXCoil(1).RatedTotCap(1) * DXCoil(1).RatedSHR(1), 3);
-    EXPECT_EQ("14067.411", RetrievePreDefTableEntry(pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]"));
-    EXPECT_EQ("10237.271", RetrievePreDefTableEntry(pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]"));
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]", DXCoil(1).RatedTotCap(1), 3);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]", DXCoil(1).RatedTotCap(1) * DXCoil(1).RatedSHR(1), 3);
+    EXPECT_EQ("14067.411", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalTotalCap, "Coil Final Gross Total Capacity [W]"));
+    EXPECT_EQ("10237.271", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilFinalSensCap, "Coil Final Gross Sensible Capacity [W]"));
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
@@ -3985,7 +3985,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &AirOutletNode = DataLoopNode::Node(2);
     // set coil parameters
     Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.RatedTotCap(1) = 17580.0;
     Coil.RatedCOP(1) = 3.0;
     Coil.RatedEIR(1) = 1.0 / Coil.RatedCOP(1);
@@ -4124,7 +4124,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
 
     Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
     Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -174,6 +175,14 @@ namespace ICEngineElectricGenerator {
     void GetICEngineGeneratorInput(EnergyPlusData &state);
 
 } // namespace ICEngineElectricGenerator
+
+struct ICEngineElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

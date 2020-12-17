@@ -55,19 +55,19 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -434,7 +434,7 @@ namespace PondGroundHeatExchanger {
                                                                DataPrecisionGlobals::constant_zero,
                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                RoutineName);
-            this->DesignMassFlowRate = DataGlobalConstants::Pi() / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
+            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignMassFlowRate,
@@ -514,17 +514,17 @@ namespace PondGroundHeatExchanger {
 
         Real64 Flux = this->CalcTotalFLux(state, this->PondTemp);
         Real64 PondTempStar =
-            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
 
         Real64 FluxStar = this->CalcTotalFLux(state, PondTempStar);
         Real64 PondTempStarStar =
-            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
 
         Real64 FluxStarStar = this->CalcTotalFLux(state, PondTempStarStar);
         Real64 PondTempStarStarStar =
-            this->PastBulkTemperature + DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
 
-        this->PondTemp = this->PastBulkTemperature + DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys *
+        this->PondTemp = this->PastBulkTemperature + DataGlobalConstants::SecInHour * DataHVACGlobals::TimeStepSys *
                                                          (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(state, PondTempStarStarStar)) /
                                                          (6.0 * SpecificHeat * PondMass);
     }
@@ -591,8 +591,8 @@ namespace PondGroundHeatExchanger {
         }
 
         // absolute temperatures
-        Real64 SurfTempAbs = PondBulkTemp + DataGlobalConstants::KelvinConv();            // absolute value of surface temp
-        Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv(); // absolute value of sky temp
+        Real64 SurfTempAbs = PondBulkTemp + DataGlobalConstants::KelvinConv;            // absolute value of surface temp
+        Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv; // absolute value of sky temp
 
         // ASHRAE simple convection coefficient model for external surfaces.
         Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));
@@ -755,7 +755,7 @@ namespace PondGroundHeatExchanger {
             state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobalConstants::Pi() * Viscosity * this->TubeInDiameter * this->NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobalConstants::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -814,7 +814,7 @@ namespace PondGroundHeatExchanger {
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = DataGlobalConstants::Pi() * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
+            NTU = DataGlobalConstants::Pi * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }
@@ -886,7 +886,7 @@ namespace PondGroundHeatExchanger {
         // compute pond heat transfer
         Real64 effectiveness = this->CalcEffectiveness(state, this->InletTemp, this->PondTemp, this->MassFlowRate);
         this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
-        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // keep track of the bulk temperature
         this->BulkTemperature = this->PondTemp;

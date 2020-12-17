@@ -59,12 +59,12 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -73,12 +73,12 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1875,7 +1875,7 @@ namespace CondenserLoopTowers {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp(),
+                                                                 DataGlobalConstants::InitConvTemp,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
 
@@ -2377,7 +2377,7 @@ namespace CondenserLoopTowers {
                     if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                              DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                             DataGlobalConstants::InitConvTemp(),
+                                                                             DataGlobalConstants::InitConvTemp,
                                                                              DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                              RoutineName);
                         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2449,7 +2449,7 @@ namespace CondenserLoopTowers {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobalConstants::InitConvTemp(),
+                                                                         DataGlobalConstants::InitConvTemp,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2535,7 +2535,7 @@ namespace CondenserLoopTowers {
 
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobalConstants::InitConvTemp(),
+                                                                         DataGlobalConstants::InitConvTemp,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -3039,8 +3039,8 @@ namespace CondenserLoopTowers {
         }
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, this->TowerType);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->TowerNominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, this->TowerType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->TowerNominalCapacity);
         }
 
         // input error checking
@@ -3437,14 +3437,14 @@ namespace CondenserLoopTowers {
                 } else { // probably no plant sizing object
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp(),
+                                                                DataGlobalConstants::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);
                     this->WaterTemp = DesTowerInletWaterTemp; // 35.0; // design condition
                 }
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
+                                                        DataGlobalConstants::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -3702,7 +3702,7 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                            DataGlobalConstants::InitConvTemp(),
+                                                            DataGlobalConstants::InitConvTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                             RoutineName);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -5250,7 +5250,7 @@ namespace CondenserLoopTowers {
             DeltaTwb = std::abs(OutletAirWetBulb - InletAirWetBulb);
             // Add KelvinConv to denominator below convert OutletAirWetBulbLast to Kelvin to avoid divide by zero.
             // Wet bulb error units are delta K/K
-            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + DataGlobalConstants::KelvinConv()));
+            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + DataGlobalConstants::KelvinConv));
         }
 
         if (QactualLocal >= 0.0) {
@@ -5874,17 +5874,17 @@ namespace CondenserLoopTowers {
         //   total water usage
         // update report variables
         this->EvaporationVdot = EvapVdot;
-        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
         this->DriftVdot = driftVdot;
-        this->DriftVol = driftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->DriftVol = driftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
         this->BlowdownVdot = BlowDownVdot;
-        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
         this->MakeUpVdot = makeUpVdot;
-        this->MakeUpVol = makeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->MakeUpVol = makeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
         this->TankSupplyVdot = tankSupplyVdot;
-        this->TankSupplyVol = tankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->TankSupplyVol = tankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
         this->StarvedMakeUpVdot = StarvedVdot;
-        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
     }
 
     void CoolingTower::update(EnergyPlusData &state)
@@ -5980,7 +5980,7 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the tower.
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (!RunFlag) {
             this->InletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;

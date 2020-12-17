@@ -48,14 +48,17 @@
 #ifndef GlobalNames_hh_INCLUDED
 #define GlobalNames_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <unordered_map>
-#include <unordered_set>
 
 namespace EnergyPlus {
 
@@ -171,6 +174,14 @@ namespace GlobalNames {
     void clear_state();
 
 } // namespace GlobalNames
+
+struct GlobalNamesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

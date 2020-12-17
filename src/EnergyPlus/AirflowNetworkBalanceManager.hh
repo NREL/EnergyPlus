@@ -56,10 +56,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "AirflowNetwork/Elements.hpp"
+#include "AirflowNetwork/Solver.hpp"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "AirflowNetwork/Solver.hpp"
-#include "AirflowNetwork/Elements.hpp"
 
 namespace EnergyPlus {
 
