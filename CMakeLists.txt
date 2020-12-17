@@ -163,6 +163,8 @@ if(BUILD_TESTING)
         "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}"
         CACHE STRING "Identifier for this device configuration")
   endif()
+
+  enable_testing()
 endif()
 
 if(ENABLE_REGRESSION_TESTING)
