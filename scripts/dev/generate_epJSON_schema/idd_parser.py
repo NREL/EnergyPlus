@@ -99,7 +99,7 @@ class Data:
 def parse_idd(data):
     root = {'$schema': "http://json-schema.org/draft-04/schema#", 'properties': {}}
     data.file_size = len(data.file)
-    current_group_name = None
+    current_group_name = '**ungrouped**'
 
     while data.index < data.file_size:
         token = look_ahead(data)
@@ -120,9 +120,7 @@ def parse_idd(data):
             obj_data = parse_obj(data)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
-            if current_group_name is not None:
-                root['properties'][obj_name]['group'] = current_group_name
-                current_group_name = None
+            root['properties'][obj_name]['group'] = current_group_name
 
             name_pattern_properties = '.*'
             if 'name' in obj_data:
