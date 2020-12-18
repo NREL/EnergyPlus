@@ -78,19 +78,22 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    extern int const aggTypeSumOrAvg;
-    extern int const aggTypeMaximum;
-    extern int const aggTypeMinimum;
-    extern int const aggTypeValueWhenMaxMin;
-    extern int const aggTypeHoursZero;
-    extern int const aggTypeHoursNonZero;
-    extern int const aggTypeHoursPositive;
-    extern int const aggTypeHoursNonPositive;
-    extern int const aggTypeHoursNegative;
-    extern int const aggTypeHoursNonNegative;
-    extern int const aggTypeSumOrAverageHoursShown;
-    extern int const aggTypeMaximumDuringHoursShown;
-    extern int const aggTypeMinimumDuringHoursShown;
+    enum class iAggType {
+        Unassigned,
+        SumOrAvg,
+        Maximum,
+        Minimum,
+        ValueWhenMaxMin,
+        HoursZero,
+        HoursNonZero,
+        HoursPositive,
+        HoursNonPositive,
+        HoursNegative,
+        HoursNonNegative,
+        SumOrAverageHoursShown,
+        MaximumDuringHoursShown,
+        MinimumDuringHoursShown,
+    };
 
     enum class iTableStyle {
         Unassigned,
@@ -533,7 +536,7 @@ namespace OutputReportTabular {
         // Members
         std::string variMeter;                // the name of the variable or meter
         std::string colHead;                  // the column header to use instead of the variable name (only for predefined)
-        int aggregate;                        // the type of aggregation for the variable (see aggType parameters)
+        iAggType aggregate;                        // the type of aggregation for the variable (see aggType parameters)
         OutputProcessor::Unit varUnits;       // Units enumeration
         std::string variMeterUpper;           // the name of the variable or meter uppercased
         int typeOfVar;                        // 0=not found, 1=integer, 2=real, 3=meter
@@ -545,8 +548,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(0), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0), varAvgSum(OutputProcessor::StoreType::Averaged),
-              varStepType(OutputProcessor::TimeStepType::TimeStepZone)
+            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0),
+              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
     };
@@ -574,7 +577,7 @@ namespace OutputReportTabular {
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units string, may be blank
-        int aggType;                       // index to the type of aggregation (see list of parameters)
+        iAggType aggType;                       // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;             // monthly results
         Array1D<Real64> duration;          // the time during which results are summed for use in averages
         Array1D_int timeStamp;             // encoded timestamp of max or min
@@ -583,8 +586,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(0),
-              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone),
+              units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned), reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -724,7 +727,7 @@ namespace OutputReportTabular {
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
-    void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, int const inAggregate);
+    void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
 
     void InitializeTabularMonthly(EnergyPlusData &state);
 
