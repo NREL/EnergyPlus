@@ -129,8 +129,8 @@ void lifetime_cycle_t::rainflow(double DOD) {
 }
 
 void lifetime_cycle_t::rainflow_ranges() {
-    state->rainflow_Ylt = fabs(state->rainflow_peaks[state->rainflow_jlt - 1] - state->rainflow_peaks[state->rainflow_jlt - 2]);
-    state->rainflow_Xlt = fabs(state->rainflow_peaks[state->rainflow_jlt] - state->rainflow_peaks[state->rainflow_jlt - 1]);
+    state->rainflow_Ylt = fabs(state->rainflow_peaks[state->rainflow_jlt - (size_t) 1] - state->rainflow_peaks[state->rainflow_jlt - (size_t) 2]);
+    state->rainflow_Xlt = fabs(state->rainflow_peaks[state->rainflow_jlt] - state->rainflow_peaks[state->rainflow_jlt - (size_t) 1]);
 }
 
 void lifetime_cycle_t::rainflow_ranges_circular(int index) {
@@ -158,7 +158,7 @@ int lifetime_cycle_t::rainflow_compareRanges() {
     // Step 5: Count range Y, discard peak & valley of Y, go to Step 2
     if (!contained) {
         state->range = state->rainflow_Ylt;
-        state->average_range = (state->average_range * state->n_cycles + state->range) / (state->n_cycles + 1);
+        state->average_range = (state->average_range * state->n_cycles + state->range) / (state->n_cycles + (size_t) 1);
         state->n_cycles++;
 
         // the capacity percent cannot increase
@@ -221,16 +221,16 @@ double lifetime_cycle_t::bilinear(double DOD, int cycle_number) {
     std::vector<double> C_n_low_vect;
     std::vector<double> D_high_vect;
     std::vector<double> C_n_high_vect;
-    std::vector<int> low_indices;
-    std::vector<int> high_indices;
+    std::vector<size_t> low_indices;
+    std::vector<size_t> high_indices;
     double D = 0.;
     size_t n = 0;
     double C = 100;
-    int n_rows = params->cycling_matrix.nrows();
+    size_t n_rows = params->cycling_matrix.nrows();
 
     // get unique values of D
     D_unique_vect.push_back(params->cycling_matrix.at(0, lifetime_params::DOD));
-    for (int i = 0; i < n_rows; i++) {
+    for (size_t i = 0; i < n_rows; i++) {
         bool contained = false;
         for (int j = 0; j < (int) D_unique_vect.size(); j++) {
             if (params->cycling_matrix.at(i, lifetime_params::DOD) == D_unique_vect[j]) {
@@ -249,7 +249,7 @@ double lifetime_cycle_t::bilinear(double DOD, int cycle_number) {
         double D_lo = 0;
         double D_hi = 100;
 
-        for (int i = 0; i < n_rows; i++) {
+        for (size_t i = 0; i < n_rows; i++) {
             D = params->cycling_matrix.at(i, lifetime_params::DOD);
             if (D < DOD && D > D_lo)
                 D_lo = D;
@@ -261,7 +261,7 @@ double lifetime_cycle_t::bilinear(double DOD, int cycle_number) {
         double D_min = 100.;
         double D_max = 0.;
 
-        for (int i = 0; i < n_rows; i++) {
+        for (size_t i = 0; i < n_rows; i++) {
             D = params->cycling_matrix.at(i, lifetime_params::DOD);
             if (D == D_lo)
                 low_indices.push_back(i);
@@ -274,7 +274,7 @@ double lifetime_cycle_t::bilinear(double DOD, int cycle_number) {
 
         // if we're out of the bounds, just make the upper bound equal to the highest input
         if (high_indices.empty()) {
-            for (int i = 0; i != n_rows; i++) {
+            for (size_t i = 0; i != n_rows; i++) {
                 if (params->cycling_matrix.at(i, lifetime_params::DOD) == D_max)
                     high_indices.push_back(i);
             }
@@ -287,7 +287,7 @@ double lifetime_cycle_t::bilinear(double DOD, int cycle_number) {
         // If we aren't bounded, fill in values
         if (n_rows_lo == 0) {
             // Assumes 0% DOD
-            for (int i = 0; i < (int) n_rows_hi; i++) {
+            for (double i = 0; i < n_rows_hi; i++) {
                 C_n_low_vect.push_back(0. + i * 500); // cycles
                 C_n_low_vect.push_back(100.); // 100 % capacity
             }
@@ -412,12 +412,14 @@ double lifetime_calendar_t::capacity_percent() { return state->q_relative_calend
 calendar_state lifetime_calendar_t::get_state() { return *state; }
 
 double lifetime_calendar_t::runLifetimeCalendarModel(size_t lifetimeIndex, double T, double SOC) {
-    state->day_age_of_battery = (size_t)(lifetimeIndex / (util::hours_per_day / params->dt_hour));
+    state->day_age_of_battery = (int)(lifetimeIndex / (util::hours_per_day / params->dt_hour));
 
     if (params->calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL)
         runLithiumIonModel(T, SOC);
     else if (params->calendar_choice == lifetime_params::CALENDAR_CHOICE::TABLE)
         runTableModel();
+    else
+        state->q_relative_calendar = 100;
 
     return state->q_relative_calendar;
 }
@@ -439,14 +441,14 @@ void lifetime_calendar_t::runLithiumIonModel(double temp, double SOC) {
 void lifetime_calendar_t::runTableModel() {
     size_t n_rows = params->calendar_matrix.nrows();
     size_t n = n_rows - 1;
-    int day_lo = 0;
-    int day_hi = (int) params->calendar_matrix.at(n, lifetime_params::DAYS);
+    size_t day_lo = 0;
+    size_t day_hi = (size_t) params->calendar_matrix.at(n, lifetime_params::DAYS);
     double capacity_lo = 100;
     double capacity_hi = 0;
 
     // interpolation mode
-    for (int i = 0; i != (int) n_rows; i++) {
-        int day = (int) params->calendar_matrix.at(i, lifetime_params::DAYS);
+    for (size_t i = 0; i != n_rows; i++) {
+        int day = (int)params->calendar_matrix.at(i, lifetime_params::DAYS);
         double capacity = (int) params->calendar_matrix.at(i, lifetime_params::CAPACITY_CAL);
         if (day <= state->day_age_of_battery) {
             day_lo = day;
@@ -465,7 +467,7 @@ void lifetime_calendar_t::runTableModel() {
         capacity_hi = (int) params->calendar_matrix.at(n, lifetime_params::CAPACITY_CAL);
     }
 
-    state->q_relative_calendar = util::interpolate(day_lo, capacity_lo, day_hi, capacity_hi, state->day_age_of_battery);
+    state->q_relative_calendar = util::interpolate((double) day_lo, capacity_lo, (double) day_hi, capacity_hi, (double) state->day_age_of_battery);
 }
 
 void lifetime_calendar_t::replaceBattery(double replacement_percent) {

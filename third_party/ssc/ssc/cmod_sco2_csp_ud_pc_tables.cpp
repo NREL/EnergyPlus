@@ -159,12 +159,16 @@ public:
 		int out_type = -1;
 		std::string out_msg = "";
 
+        double od_opt_tol = 1.E-3;
+        double od_tol = 1.E-3;
+
 		try
 		{
 			c_sco2_cycle.generate_ud_pc_tables(T_htf_hot_low, T_htf_hot_high, n_T_htf_hot_in,
 							T_amb_low, T_amb_high, n_T_amb_in,
 							m_dot_htf_ND_low, m_dot_htf_ND_high, n_m_dot_htf_ND_in,
-							T_htf_parametrics, T_amb_parametrics, m_dot_htf_ND_parametrics);
+							T_htf_parametrics, T_amb_parametrics, m_dot_htf_ND_parametrics,
+                            od_opt_tol, od_tol);
 		}
 		catch( C_csp_exception &csp_exception )
 		{

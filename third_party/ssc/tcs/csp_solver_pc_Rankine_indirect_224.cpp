@@ -2208,6 +2208,7 @@ int split_ind_tbl(util::matrix_t<double> &cmbd_ind, util::matrix_t<double> &T_ht
     std::vector<double> T_amb_pars = v_T_amb_unique;
 
     // convert combined matrix_t to a vector of vectors
+    // inner vector: single row, outer vector: rows
     std::vector<std::vector<double>> cmbd_tbl;
     double *row_start = cmbd_ind.data();
     double *row_end;

@@ -835,34 +835,37 @@ public:
 				// 3.) Solar field energy exceeds maximum TES charging rate
 				//------------------------------------------------------------
 				double EtesA = max(0.0, etes0 - dispatch.at(touperiod));
-				if ((q_sf + EtesA >= qdisp[touperiod]) || (q_sf > ptsmax)){
+                if (EtesA >= m_q_startup / dt && q_sf + max(EtesA - m_q_startup / dt, 0.0) >= qdisp[touperiod]) {
 
-					// Assumes Operator started plant during previous time period
-					// But TRNSYS cannot do this, so start-up energy is deducted during current timestep.     
-					pbmode = 1;
-					q_startup = m_q_startup / dt;
+                    // Assumes Operator started plant during previous time period
+                    // But TRNSYS cannot do this, so start-up energy is deducted during current timestep.     
+                    pbmode = 1;
+                    q_startup = m_q_startup / dt;
 
-					q_to_pb = qdisp[touperiod];       // set the energy to powerblock equal to the load for this TOU period
+                    q_to_pb = qdisp[touperiod];       // set the energy to powerblock equal to the load for this TOU period
 
-					if (q_sf>q_to_pb){             // if solar field output is greater than what the necessary load ?
-						q_to_tes = q_sf - q_to_pb;           // the extra goes to thermal storage
-						q_from_tes = q_startup;               // Use the energy from thermal storage to startup the power cycle
-						if (q_to_tes>ptsmax){       // if q to thermal storage exceeds thermal storage max rate Added 9-10-02
-							q_dump_teschg = q_to_tes - ptsmax;   // then dump the excess for this period Added 9-10-02
-							q_to_tes = ptsmax;
-						}                     
-					}
-					else{ // q_sf less than the powerblock requirement
-						q_to_tes = 0.0;
-						q_from_tes = q_startup + (1 - q_sf / q_to_pb) * min(pfsmax, m_q_des);
-						if (q_from_tes>pfsmax) q_from_tes = pfsmax;
-						q_to_pb = q_sf + (1 - q_sf / q_to_pb) * min(pfsmax, m_q_des);
-					}
-                
-					m_e_in_tes = etes0 - q_startup + (q_sf - q_to_pb) * dt;   // thermal storage energy is initial + what was left 
-					pbmode = 2;   // powerblock is now running
-					pbstartf = 1; // the powerblock turns on during this timeperiod.
-				}
+                    double q_to_cycle_total = q_startup + q_to_pb;
+
+                    if (q_sf > q_to_pb) {             // if solar field output is greater than what the necessary load ?
+                        q_to_tes = q_sf - q_to_pb;           // the extra goes to thermal storage
+                        q_from_tes = q_startup;               // Use the energy from thermal storage to startup the power cycle
+                        if (q_to_tes > ptsmax) {       // if q to thermal storage exceeds thermal storage max rate Added 9-10-02
+                            q_dump_teschg = q_to_tes - ptsmax;   // then dump the excess for this period Added 9-10-02
+                            q_to_tes = ptsmax;
+                        }
+                    }
+                    else { // q_sf less than the powerblock requirement
+                        q_to_tes = 0.0;
+                        q_from_tes = q_startup + (1 - q_sf / q_to_pb) * min(pfsmax, m_q_des);
+                        if (q_from_tes > pfsmax) q_from_tes = pfsmax;
+                        q_to_pb = q_sf + (1 - q_sf / q_to_pb) * min(pfsmax, m_q_des);
+                    }
+
+                    m_e_in_tes = etes0 - q_startup + (q_sf - q_to_pb) * dt;   // thermal storage energy is initial + what was left 
+                    pbmode = 2;   // powerblock is now running
+                    pbstartf = 1; // the powerblock turns on during this timeperiod.
+
+                }
 				else{ //Store energy not enough stored to start plant
 					q_to_tes = q_sf; // everything goes to thermal storage
 					q_from_tes = 0;   // nothing from thermal storage

@@ -109,12 +109,13 @@ public:
 		ms_rc_autodes_par.m_eta_rc = eta_rc;
 		ms_rc_autodes_par.m_eta_t = eta_t;
 
-		ms_rc_autodes_par.m_N_sub_hxrs = N_sub_hxrs;
+        ms_rc_autodes_par.m_LTR_N_sub_hxrs = N_sub_hxrs;
+        ms_rc_autodes_par.m_HTR_N_sub_hxrs = N_sub_hxrs;
 		ms_rc_autodes_par.m_N_turbine = N_t_des;
 
-		ms_rc_autodes_par.m_opt_tol = opt_tol;
+		ms_rc_autodes_par.m_des_opt_tol = opt_tol;
 		ms_rc_autodes_par.m_P_high_limit = P_high_limit;
-		ms_rc_autodes_par.m_tol = tol;
+		ms_rc_autodes_par.m_des_tol = tol;
 		ms_rc_autodes_par.m_T_mc_in = T_mc_in_des;
 		ms_rc_autodes_par.m_T_t_in = T_t_in_des;
 		ms_rc_autodes_par.m_UA_rec_total = UA_total_des;

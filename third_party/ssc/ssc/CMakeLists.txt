@@ -205,7 +205,7 @@ if(UNIX)
 			add_custom_command(
 				TARGET ssc
 				POST_BUILD
-				COMMAND install_name_tool -id @rpath/libssc.so $<TARGET_FILE:ssc>
+				COMMAND install_name_tool -id @rpath/libssc$<$<CONFIG:Debug>:d>.so $<TARGET_FILE:ssc>
 			)
 		endif()
 	endif()
@@ -282,7 +282,7 @@ if (MSVC)
 			)
 	endif()
 
-	if (NOT skip_api)
+	if (SAMAPI_EXPORT)
 		if (${CMAKE_PROJECT_NAME} STREQUAL system_advisor_model)
 			set(APIGENDIR ${CMAKE_CURRENT_BINARY_DIR}/../../sam/api/api_autogen/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 			add_custom_command(

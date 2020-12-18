@@ -469,8 +469,9 @@ bool setup_python() {
     auto python_dir = std::string(std::getenv("SAMNTDIR")) + "\\deploy\\runtime\\python\\";
 #else
     if (!std::getenv("CMAKEBLDDIR")) return false;
-    auto python_dir = std::string(std::getenv("CMAKEBULDDIR")) + "/sam/SAM.app/Contents/runtime/python/";
-    if (!util::file_exists(python_dir.c_str())){
+    auto python_dir = std::string(std::getenv("CMAKEBLDDIR")) + "/sam/SAM.app/Contents/runtime/python/";
+
+    if (!util::dir_exists(std::string(python_dir + "Miniconda-4.8.2/").c_str())){
         std::cerr << "Python not configured.";
         return false;
     }
@@ -567,12 +568,12 @@ TEST(windpower_landbosse, RunSuccess) {
     ASSERT_EQ(vd->lookup("errors")->str, "0");
     EXPECT_NEAR(vd->lookup("total_collection_cost")->num[0], 4202342, 1e2);
     EXPECT_NEAR(vd->lookup("total_development_cost")->num[0], 150000, 1e2);
-    EXPECT_NEAR(vd->lookup("total_erection_cost")->num[0], 5132656, 1e2);
-    EXPECT_NEAR(vd->lookup("total_foundation_cost")->num[0], 10411261, 1e2);
+    EXPECT_NEAR(vd->lookup("total_erection_cost")->num[0], 6057403, 1e2);
+    EXPECT_NEAR(vd->lookup("total_foundation_cost")->num[0], 10036157, 1e2);
     EXPECT_NEAR(vd->lookup("total_gridconnection_cost")->num[0], 5.61774e+06, 1e2);
-    EXPECT_NEAR(vd->lookup("total_management_cost")->num[0], 10426434, 1e2);
-    EXPECT_NEAR(vd->lookup("total_bos_cost")->num[0], 43186861, 1e2);
-    EXPECT_NEAR(vd->lookup("total_sitepreparation_cost")->num[0], 2688634, 1e2);
+    EXPECT_NEAR(vd->lookup("total_management_cost")->num[0], 10516516, 1e2);
+    EXPECT_NEAR(vd->lookup("total_bos_cost")->num[0], 43836161, 1e2);
+    EXPECT_NEAR(vd->lookup("total_sitepreparation_cost")->num[0], 2698209, 1e2);
     EXPECT_NEAR(vd->lookup("total_substation_cost")->num[0], 4940746, 1e2);
 
     std::vector<std::string> all_outputs = {"bonding_usd", "collection_equipment_rental_usd", "collection_labor_usd",

@@ -404,8 +404,8 @@ public:
 		
 		int air_cooler_error_code = 0;
 
-		air_cooler.off_design_hx(32.0 + 273.15, 101325.0, 100.0 + 273.15, 8000.0,
-			938.9, 48.0 + 273.15, W_dot_od, air_cooler_error_code);
+		//air_cooler.off_design_hx(32.0 + 273.15, 101325.0, 100.0 + 273.15, 8000.0,
+		//	938.9, 48.0 + 273.15, W_dot_od, air_cooler_error_code);
 
 		//double adfadf = 1.23;
 

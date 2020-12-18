@@ -1,6 +1,8 @@
 #include "lib_battery_dispatch_manual.h"
 #include "lib_battery_powerflow.h"
 
+#include <math.h>
+
 /*
 Manual Dispatch
 */
@@ -69,7 +71,7 @@ void dispatch_manual_t::prepareDispatch(size_t hour_of_year, size_t )
 	else
 		iprofile = _sched(m - 1, column);  // 1-based
 
-	m_batteryPower->canPVCharge = _charge_array[iprofile - 1];
+	m_batteryPower->canSystemCharge = _charge_array[iprofile - 1];
 	m_batteryPower->canDischarge = _discharge_array[iprofile - 1];
 	m_batteryPower->canGridCharge = _gridcharge_array[iprofile - 1];
 
@@ -81,7 +83,7 @@ void dispatch_manual_t::prepareDispatch(size_t hour_of_year, size_t )
 	_percent_charge = 0.;
 
 	if (m_batteryPower->canDischarge){ _percent_discharge = _percent_discharge_array[iprofile]; }
-	if (m_batteryPower->canPVCharge || m_batteryPower->canFuelCellCharge){ _percent_charge = 100.; }
+	if (m_batteryPower->canSystemCharge || m_batteryPower->canFuelCellCharge){ _percent_charge = 100.; }
 	if (m_batteryPower->canGridCharge){ _percent_charge = _percent_charge_array[iprofile]; }
 }
 void dispatch_manual_t::dispatch(size_t year,
@@ -108,9 +110,9 @@ bool dispatch_manual_t::check_constraints(double &I, size_t count)
 		double I_initial = I;
 		iterate = true;
 
-		// Don't let PV export to grid if can still charge battery (increase charging)
-		if (m_batteryPower->powerPVToGrid > low_tolerance &&
-            m_batteryPower->canPVCharge &&					// only do if battery is allowed to charge
+		// Don't let system (PV) export to grid if can still charge battery (increase charging)
+		if (m_batteryPower->powerSystemToGrid > low_tolerance &&
+            m_batteryPower->canSystemCharge &&					// only do if battery is allowed to charge
                                                               _Battery->SOC() < m_batteryPower->stateOfChargeMax - 1.0 &&		// and battery SOC is less than max
 			fabs(I) < fabs(m_batteryPower->currentChargeMax) &&						// and battery current is less than max charge current
 			fabs(m_batteryPower->powerBatteryDC) < (m_batteryPower->powerBatteryChargeMaxDC - 1.0) &&// and battery power is less than max charge power
@@ -118,9 +120,9 @@ bool dispatch_manual_t::check_constraints(double &I, size_t count)
 		{
 			double dI = 0;
 			if (fabs(m_batteryPower->powerBatteryDC) < tolerance)
-				dI = (m_batteryPower->powerPVToGrid  * util::kilowatt_to_watt / _Battery->V());
+				dI = (m_batteryPower->powerSystemToGrid  * util::kilowatt_to_watt / _Battery->V());
 			else
-				dI = (m_batteryPower->powerPVToGrid  / fabs(m_batteryPower->powerBatteryAC)) *fabs(I);
+				dI = (m_batteryPower->powerSystemToGrid  / fabs(m_batteryPower->powerBatteryAC)) *fabs(I);
 
 			// Main problem will be that this tends to overcharge battery maximum SOC, so check
 			double dQ = 0.01 * (m_batteryPower->stateOfChargeMax - _Battery->SOC()) *
@@ -130,11 +132,11 @@ bool dispatch_manual_t::check_constraints(double &I, size_t count)
 		}
 		// Don't let PV serve battery before load (decrease charging)
 		else if (m_batteryPower->meterPosition == dispatch_t::BEHIND && I < 0 && m_batteryPower->powerGridToLoad > tolerance &&
-			m_batteryPower->powerPVToBattery > 0) {
+			m_batteryPower->powerSystemToBattery > 0) {
 
 			double dP = m_batteryPower->powerGridToLoad;
-			if (dP > m_batteryPower->powerPVToBattery) {
-				dP = m_batteryPower->powerPVToBattery;
+			if (dP > m_batteryPower->powerSystemToBattery) {
+				dP = m_batteryPower->powerSystemToBattery;
 			}
 
 			double dI = 0;
@@ -181,7 +183,7 @@ bool dispatch_manual_t::check_constraints(double &I, size_t count)
 			m_batteryPower->powerBatteryAC = 0;
 			m_batteryPower->powerGridToBattery = 0;
 			m_batteryPower->powerBatteryToGrid = 0;
-			m_batteryPower->powerPVToGrid  = 0;
+			m_batteryPower->powerSystemToGrid  = 0;
 		}
 	}
 	return iterate;

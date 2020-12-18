@@ -63,7 +63,11 @@ static var_info _cm_vtab_mhk_wave[] = {
 	{ SSC_INPUT,			SSC_NUMBER,			"system_capacity",						"System Nameplate Capacity",										"kW",			"",				"MHKWave",			"?=0",						"",							"" },
 	
 	{ SSC_INPUT,			SSC_NUMBER,			"device_rated_power",				"Rated capacity of device",													"kW",			"",				"MHKWave",			"*",		"",						"" },
-
+    { SSC_INPUT,			SSC_NUMBER,			"fixed_charge_rate",						"FCR from LCOE Cost page",									"",				"",             "MHKWave",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"device_costs_total",						"Device costs",									"$",				"",             "MHKWave",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"balance_of_system_cost_total",						"BOS costs",									"$",				"",             "MHKWave",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"financial_cost_total",						"Financial costs",									"$",				"",             "MHKWave",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"total_operating_cost",						"O&M costs",									"$",				"",             "MHKWave",         "?=1",                      "",				"" },
 	// losses
 	{ SSC_INPUT,			SSC_NUMBER,			"loss_array_spacing",				"Array spacing loss",													"%",			"",				"MHKWave",			"*",		"",						"" },
 	{ SSC_INPUT,			SSC_NUMBER,			"loss_resource_overprediction",				"Resource overprediction loss",													"%",			"",				"MHKWave",			"*",		"",						"" },
@@ -77,7 +81,25 @@ static var_info _cm_vtab_mhk_wave[] = {
 	{ SSC_OUTPUT,			SSC_NUMBER,			"annual_energy",						"Annual energy production of array",											"kWh",			"",				"MHKWave",			"*",						"",							"" },
 	{ SSC_OUTPUT,			SSC_NUMBER,			"capacity_factor",						"Capacity Factor",													"%",			"",				"MHKWave",			"*",						"",							"" },
 	{ SSC_OUTPUT,			SSC_MATRIX,			"annual_energy_distribution",			"Annual energy production as function of Hs and Te",				"",				"",				"MHKWave",			"*",						"",							"" },
-	var_info_invalid
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_resource_start_height",			"Wave height at which first non-zero wave resource value occurs (m)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_resource_start_period",			"Wave period at which first non-zero wave resource value occurs (s)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_resource_end_height",			"Wave height at which last non-zero wave resource value occurs (m)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_resource_end_period",			"Wave period at which last non-zero wave resource value occurs (s)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_power_start_height",			"Wave height at which first non-zero WEC power output occurs (m)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_power_start_period",			"Wave period at which first non-zero WEC power output occurs (s)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_power_end_height",			"Wave height at which last non-zero WEC power output occurs (m)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"wave_power_end_period",			"Wave period at which last non-zero WEC power output occurs (s)",				"",				"",				"MHKWave",			"*",						"",							"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_capital_cost_kwh",           "Capital costs per unit annual energy",		"$/kWh",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_device_cost_kwh",            "Device costs per unit annual energy",		"$/kWh",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_bos_cost_kwh",               "Balance of system costs per unit annual energy",		"$/kWh",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_financial_cost_kwh",         "Financial costs per unit annual energy",		"$/kWh",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_om_cost_kwh",                "O&M costs per unit annual energy",		"$/kWh",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_capital_cost_lcoe",          "Capital cost as percentage of overall LCOE",		"%",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_device_cost_lcoe",           "Device cost",		"%",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_bos_cost_lcoe",              "BOS cost",		"%",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_financial_cost_lcoe",        "Financial cost",		"%",			"",				"MHKWave",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_om_cost_lcoe",               "O&M cost (annual)",		"%",			"",				"MHKWave",			"*",						"",						"" },
+    var_info_invalid
 };
 
 class cm_mhk_wave : public compute_module
@@ -154,6 +176,88 @@ public:
 			if (_check_column[i] != wave_power_matrix.at(i,0))
 				throw compute_module::exec_error("mhk_wave", "Wave height bins of power matrix don't match. Reset bins to default");*/
 		}
+        double wave_resource_start_period = 0;
+        double wave_resource_start_height = 0;
+        double wave_resource_end_period = 0;
+        double wave_resource_end_height = 0;
+        double row_check = 0;
+
+        for (size_t l = 0; l < (size_t)wave_power_matrix.nrows(); l++) {
+            for (size_t m = 0; m < (size_t)wave_power_matrix.ncols(); m++) {
+
+                //Store max power if not set in UI:
+                /*if(as_integer("calculate_capacity") > 0)
+                    if (_power_vect[i][j] > system_capacity)
+                        system_capacity = _power_vect[i][j];*/
+                
+                        //Calculate and allocate annual_energy_distribution:
+                if ((ssc_number_t)wave_resource_matrix.at(l, m) != 0 && (ssc_number_t)wave_resource_matrix.at(l, m - 1) == 0 && (ssc_number_t)wave_resource_matrix.at(l, m + 1) != 0 && (m-1)!=0)
+                { 
+                    if (wave_resource_start_period ==0)
+                    { 
+                        wave_resource_start_period = wave_resource_matrix.at(0, m);
+                        wave_resource_start_height = wave_resource_matrix.at(l, 0);
+                    }
+                }
+                else if ((ssc_number_t)wave_resource_matrix.at(l, m) != 0 && (ssc_number_t)wave_resource_matrix.at(l, m - 1) != 0 && (ssc_number_t)wave_resource_matrix.at(l, m + 1) == 0 && (m-1)!=0)
+                {
+                    wave_resource_end_period = wave_resource_matrix.at(0, m);
+                    wave_resource_end_height = wave_resource_matrix.at(l, 0);
+                }
+                else
+                {
+
+                }
+                
+
+            }
+
+            /*//Throw exception if default header column (of power curve and resource) does not match user input header row:
+            if (_check_column[i] != wave_resource_matrix.at(i, 0))
+                throw compute_module::exec_error("mhk_wave", "Wave height bins of resource matrix don't match. Reset bins to default");
+            if (_check_column[i] != wave_power_matrix.at(i,0))
+                throw compute_module::exec_error("mhk_wave", "Wave height bins of power matrix don't match. Reset bins to default");*/
+        }
+        double wave_power_start_period = 0;
+        double wave_power_start_height = 0;
+        double wave_power_end_period = 0;
+        double wave_power_end_height = 0;
+        for (size_t n = 0; n < (size_t)wave_power_matrix.nrows(); n++) {
+            for (size_t p = 0; p < (size_t)wave_power_matrix.ncols(); p++) {
+
+                //Store max power if not set in UI:
+                /*if(as_integer("calculate_capacity") > 0)
+                    if (_power_vect[i][j] > system_capacity)
+                        system_capacity = _power_vect[i][j];*/
+
+                        //Calculate and allocate annual_energy_distribution:
+                if ((ssc_number_t)wave_power_matrix.at(n, p) != 0 && (ssc_number_t)wave_power_matrix.at(n, p - 1) == 0 && (ssc_number_t)wave_power_matrix.at(n, p + 1) != 0 && (p-1)!=0)
+                {
+                    if (wave_power_start_period == 0)
+                    { 
+                        wave_power_start_period = wave_power_matrix.at(0, p);
+                        wave_power_start_height = wave_power_matrix.at(n, 0);
+                    }
+                }
+                else if ((ssc_number_t)wave_power_matrix.at(n, p) != 0 && (ssc_number_t)wave_power_matrix.at(n, p - 1) != 0 && (p-1)!=0 && (ssc_number_t)wave_power_matrix.at(n, p + 1) == 0)
+                {
+                    wave_power_end_period = wave_power_matrix.at(0, p);
+                    wave_power_end_height = wave_power_matrix.at(n, 0);
+                }
+                else
+                {
+
+                }
+
+
+            }
+
+            /*//Throw exception if default header column (of power curve and resource) does not match user input header row:
+            if (_check_column[i] != wave_resource_matrix.at(i, 0))
+                throw compute_module::exec_error("mhk_wave", "Wave height bins of resource matrix don't match. Reset bins to default");
+            if (_check_column[i] != wave_power_matrix.at(i,0))
+                throw compute_module::exec_error("mhk_wave", "Wave height bins of power matrix don't match. Reset bins to default");*/
+        }
 
 		/*
 		//Throw exception if default header row (of power curve and resource) does not match user input header column:
@@ -174,6 +278,33 @@ public:
 		// leave device average power without losses
 		annual_energy *= number_devices;
 
+        //TEST cost metrics in tidal page rather than cost page
+        double device_cost = as_double("device_costs_total");
+        double bos_cost = as_double("balance_of_system_cost_total");
+        double financial_cost = as_double("financial_cost_total");
+        double om_cost = as_double("total_operating_cost");
+        double fcr = as_double("fixed_charge_rate");
+        double total_capital_cost_kwh = fcr*(device_cost + bos_cost + financial_cost) / annual_energy;
+        double total_device_cost_kwh = fcr*device_cost / annual_energy;
+        double total_bos_cost_kwh = fcr*bos_cost / annual_energy;
+        double total_financial_cost_kwh = fcr*financial_cost / annual_energy;
+        double total_om_cost_kwh = om_cost / annual_energy;
+        double total_capital_cost_lcoe = (fcr * (device_cost + bos_cost + financial_cost)) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost) * 100;
+        double total_device_cost_lcoe = (fcr * device_cost) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost) * 100;
+        double total_bos_cost_lcoe = (fcr * bos_cost) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost) * 100;
+        double total_financial_cost_lcoe = (fcr * financial_cost) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost) * 100;
+        double total_om_cost_lcoe = (om_cost) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost) * 100;
+        assign("total_capital_cost_kwh", var_data((ssc_number_t)total_capital_cost_kwh));
+        assign("total_device_cost_kwh", var_data((ssc_number_t)total_device_cost_kwh));
+        assign("total_bos_cost_kwh", var_data((ssc_number_t)total_bos_cost_kwh));
+        assign("total_financial_cost_kwh", var_data((ssc_number_t)total_financial_cost_kwh));
+        assign("total_om_cost_kwh", var_data((ssc_number_t)total_om_cost_kwh));
+        assign("total_capital_cost_lcoe", var_data((ssc_number_t)total_capital_cost_lcoe));
+        assign("total_device_cost_lcoe", var_data((ssc_number_t)total_device_cost_lcoe));
+        assign("total_bos_cost_lcoe", var_data((ssc_number_t)total_bos_cost_lcoe));
+        assign("total_financial_cost_lcoe", var_data((ssc_number_t)total_financial_cost_lcoe));
+        assign("total_om_cost_lcoe", var_data((ssc_number_t)total_om_cost_lcoe));
+
 		//Calculating capacity factor:
 		capacity_factor = annual_energy / (device_rated_capacity * number_devices * 8760);
 		
@@ -183,6 +314,15 @@ public:
 		//assign("system_capacity", var_data((ssc_number_t)system_capacity));
 		assign("capacity_factor", var_data((ssc_number_t)capacity_factor * 100));
 		assign("device_average_power", var_data((ssc_number_t)device_average_power));
+        assign("wave_resource_start_height", var_data((ssc_number_t)wave_resource_start_height));
+        assign("wave_resource_end_height", var_data((ssc_number_t)wave_resource_end_height));
+        assign("wave_resource_start_period", var_data((ssc_number_t)wave_resource_start_period));
+        assign("wave_resource_end_period", var_data((ssc_number_t)wave_resource_end_period));
+        assign("wave_power_start_height", var_data((ssc_number_t)wave_power_start_height));
+        assign("wave_power_end_height", var_data((ssc_number_t)wave_power_end_height));
+        assign("wave_power_start_period", var_data((ssc_number_t)wave_power_start_period));
+        assign("wave_power_end_period", var_data((ssc_number_t)wave_power_end_period));
+
 
 	}
 };

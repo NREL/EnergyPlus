@@ -24,6 +24,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_battery_powerflow.h"
 #include "lib_shared_inverter.h"
 
+#include <math.h>
+
 dispatch_automatic_behind_the_meter_t::dispatch_automatic_behind_the_meter_t(
 	battery_t * Battery,
 	double dt_hour,
@@ -145,7 +147,7 @@ void dispatch_automatic_behind_the_meter_t::setup_rate_forecast()
         // Load here is every step for the full analysis period. Load escalation has already been applied (TODO in compute modules)
         size_t num_recs = util::hours_per_year * _steps_per_hour * _nyears;
         size_t step = 0; size_t hour_of_year = 0;
-        size_t curr_month = 1;
+        int curr_month = 1;
         double load_during_month = 0.0; double gen_during_month = 0.0; double peak_during_month = 0.0;
         size_t array_size = std::min(_P_pv_ac.size(), _P_load_ac.size()); // Cover smaller arrays to make testing easier
         for (size_t idx = 0; idx < num_recs && idx < array_size; idx++)
@@ -174,7 +176,7 @@ void dispatch_automatic_behind_the_meter_t::setup_rate_forecast()
                     hour_of_year = 0;
                 }
             }
-            if (util::month_of(hour_of_year) != curr_month || (idx == array_size - 1))
+            if (util::month_of((double) hour_of_year) != curr_month || (idx == array_size - (size_t) 1))
             {
                 // Push back vectors
                 // Note: this is a net-billing approach. To be accurate for net metering, we'd have to invoke tou periods here, this overestimates costs for NM
@@ -223,7 +225,7 @@ void dispatch_automatic_behind_the_meter_t::update_dispatch(size_t year, size_t 
             cost_based_target_power(idx, year, hour_of_year, no_dispatch_cost, E_max, p, debug);
 
             // Set battery power profile
-            set_battery_power(p, debug);            
+            set_battery_power(idx, p, debug);            
         }
         m_batteryPower->powerBatteryTarget = _P_battery_use[step];
     }
@@ -245,7 +247,7 @@ void dispatch_automatic_behind_the_meter_t::update_dispatch(size_t year, size_t 
 			target_power(E_max, idx, p, debug);
 
 			// Set battery power profile
-			set_battery_power(p, debug);
+			set_battery_power(idx, p, debug);
 		}
 		// save for extraction
 		_P_target_current = _P_target_use[_day_index];
@@ -253,12 +255,15 @@ void dispatch_automatic_behind_the_meter_t::update_dispatch(size_t year, size_t 
 	}
 	else
 	{
-		m_batteryPower->powerBatteryTarget = _P_battery_use[idx % (8760 *_steps_per_hour)];
-        if (m_batteryPower->connectionMode == AC_CONNECTED){
-            if (m_batteryPower->powerBatteryTarget < 0)
-                m_batteryPower->powerBatteryTarget *= m_batteryPower->singlePointEfficiencyDCToAC;
-            else
-                m_batteryPower->powerBatteryTarget /= m_batteryPower->singlePointEfficiencyDCToAC;
+        // extract input power by modifying lifetime index to year 1
+        m_batteryPower->powerBatteryTarget = _P_battery_use[idx % (8760 * _steps_per_hour)];
+        double loss_kw = _Battery->calculate_loss(m_batteryPower->powerBatteryTarget, idx); // Battery is responsible for covering discharge losses
+        if (m_batteryPower->connectionMode == AC_CONNECTED) {
+            m_batteryPower->powerBatteryTarget = m_batteryPower->adjustForACEfficiencies(m_batteryPower->powerBatteryTarget, loss_kw);
+        }
+        else if (m_batteryPower->powerBatteryTarget > 0) {
+            // Adjust for DC discharge losses
+            m_batteryPower->powerBatteryTarget += loss_kw;
         }
 	}
 
@@ -555,16 +560,16 @@ void dispatch_automatic_behind_the_meter_t::cost_based_target_power(size_t idx, 
     plans[0].cost = no_dispatch_cost;
 
     double lowest_cost = no_dispatch_cost;
-    int lowest_index = 0;
+    size_t lowest_index = 0;
 
-    for (int i = 1; i < plans.size(); i++)
+    for (size_t i = 1; i < plans.size(); i++)
     {
         plans[i].dispatch_hours = i;
         plans[i].plannedDispatch.resize(_num_steps);
         plans[i].plannedGridUse.clear();
         plans[i].plannedDispatch = std::vector<double>(plans[i].plannedDispatch.size());
         plans[i].num_cycles = 0;
-        plan_dispatch_for_cost(plans[i], idx, E_max, startingEnergy, p, debug);
+        plan_dispatch_for_cost(plans[i], idx, E_max, startingEnergy);
         UtilityRateForecast midDispatchForecast(*rate_forecast);
         plans[i].cost = midDispatchForecast.forecastCost(plans[i].plannedGridUse, year, hour_of_year, 0) + cost_to_cycle() * plans[i].num_cycles - plans[i].kWhRemaining * plans[i].lowestMarginalCost;
 
@@ -580,16 +585,16 @@ void dispatch_automatic_behind_the_meter_t::cost_based_target_power(size_t idx, 
 
 }
 
-void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan& plan, size_t idx, double E_max, double startingEnergy, FILE* p, const bool debug)
+void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan& plan, size_t idx, double E_max, double startingEnergy)
 {
-    size_t i = 0;
+    size_t i = 0, index = 0;
 
     std::sort(sorted_grid.begin(), sorted_grid.end(), byCost());
     // Iterating over sorted grid
     double costDuringDispatchHours = 0.0;
     double costAtStep = 0.0;
     // Sum no-dispatch cost of top n grid points (dispatch hours * steps per hour). Units: % of cost -> don't need to record this, can re-compute after iteration
-    for (int i = 0; (i < plan.dispatch_hours * _steps_per_hour) && (i < sorted_grid.size()); i++)
+    for (i = 0; (i < plan.dispatch_hours * _steps_per_hour) && (i < sorted_grid.size()); i++)
     {
         costAtStep = sorted_grid[i].Cost();
         // In case forecast is testing hours that include negative cost, don't dispatch during those
@@ -619,7 +624,7 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
             costDuringDispatchHours -= costAtStep;
 
             // Add to dispatch plan
-            int index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step(); // Assumes we're always running this function on the hour
+            index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step(); // Assumes we're always running this function on the hour
             plan.plannedDispatch[index] = desiredPower;
 
             if (sorted_grid[i].MarginalCost() < plan.lowestMarginalCost)
@@ -661,7 +666,7 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
     i = _num_steps / 4;
     while (lookingForGridUse && i < _num_steps)
     {
-        size_t index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step();
+        index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step();
         if (plan.plannedDispatch[index] < 0)
         {
             i++;
@@ -683,7 +688,7 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
     i = 0;
     while (requiredEnergy > 0 && i < _num_steps)
     {
-        int index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step();
+        index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step();
         // Don't plan to charge if we were already planning to discharge. 0 is no plan, negative is clipped energy
         if (plan.plannedDispatch[index] <= 0.0)
         {
@@ -700,9 +705,22 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
                     requiredPower = -requiredEnergy / _dt_hour;
                 }
             }
-            else if (m_batteryPower->canPVCharge && sorted_grid[i].Grid() < 0)
+            else if (m_batteryPower->canSystemCharge)
             {
-                requiredPower = sorted_grid[i].Grid();
+                // Powerflow considerations are different between AC and DC connected batteries for system charging
+                if (m_batteryPower->connectionMode == m_batteryPower->AC_CONNECTED) {
+                    // AC connected assumes PV goes to load first. Need net generation in this case
+                    if (sorted_grid[i].Grid() < 0) {
+                        requiredPower = sorted_grid[i].Grid();
+                    }
+                }
+                else {
+                    // DC connected can charge the battery before sending power to load
+                    if (idx + index < _P_pv_ac.size() && _P_pv_ac[idx + index] > 0) {
+                        requiredPower = -_P_pv_ac[idx + index];
+                    }
+                }
+                
             }
 
             if (requiredPower < 0)
@@ -804,15 +822,18 @@ void dispatch_automatic_behind_the_meter_t::check_power_restrictions(double& pow
     power = desiredCurrent * _Battery->V() * util::watt_to_kilowatt;
 }
 
-void dispatch_automatic_behind_the_meter_t::set_battery_power(FILE *p, const bool debug)
+void dispatch_automatic_behind_the_meter_t::set_battery_power(size_t idx, FILE *p, const bool debug)
 {
 	for (size_t i = 0; i != _P_target_use.size(); i++) {
+
+        double loss_kw = _Battery->calculate_loss(_P_battery_use[i], idx + i); // Units are kWac for AC connected batteries, and kWdc for DC connected
+
 		// At this point the target power is expressed in AC, must convert to DC for battery
 		if (m_batteryPower->connectionMode == m_batteryPower->AC_CONNECTED) {
-            _P_battery_use[i] = m_batteryPower->adjustForACEfficiencies(_P_battery_use[i]);
+            _P_battery_use[i] = m_batteryPower->adjustForACEfficiencies(_P_battery_use[i], loss_kw);
 		}
         else {
-            _P_battery_use[i] = m_batteryPower->adjustForDCEfficiencies(_P_battery_use[i]);
+            _P_battery_use[i] = m_batteryPower->adjustForDCEfficiencies(_P_battery_use[i], loss_kw);
         }
 	}
 
@@ -841,4 +862,9 @@ void dispatch_automatic_behind_the_meter_t::costToCycle()
     {
         m_cycleCost = cycle_costs_by_year[curr_year] * _Battery->get_params().nominal_energy;
     }
+}
+
+double dispatch_automatic_behind_the_meter_t::cost_to_cycle_per_kwh()
+{
+    return m_cycleCost / _Battery->get_params().nominal_energy;
 }

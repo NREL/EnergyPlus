@@ -57,7 +57,11 @@ static var_info _cm_vtab_mhk_tidal[] = {
 	{ SSC_INPUT,			SSC_MATRIX,			"tidal_power_curve",					"Power curve of tidal energy device as function of stream speeds",			"kW",			"",             "MHKTidal",			"*",						"",						"" },	
 	//{ SSC_INPUT,			SSC_NUMBER,			"calculate_capacity",					"Calculate device rated capacity from power curve",							"0/1",			"",             "MHKTidal",         "?=1",                      "INTEGER,MIN=0,MAX=1",	"" },
 	{ SSC_INPUT,			SSC_NUMBER,			"number_devices",						"Number of tidal devices in the system",									"",				"",             "MHKTidal",         "?=1",                      "INTEGER",				"" },
-
+    { SSC_INPUT,			SSC_NUMBER,			"fixed_charge_rate",						"FCR from LCOE Cost page",									"",				"",             "MHKTidal",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"device_costs_total",						"Device costs",									"$",				"",             "MHKTidal",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"balance_of_system_cost_total",						"BOS costs",									"$",				"",             "MHKTidal",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"financial_cost_total",						"Financial costs",									"$",				"",             "MHKTidal",         "?=1",                      "",				"" },
+    { SSC_INPUT,			SSC_NUMBER,			"total_operating_cost",						"O&M costs",									"$",				"",             "MHKTidal",         "?=1",                      "",				"" },
 
 
 	// losses
@@ -75,8 +79,22 @@ static var_info _cm_vtab_mhk_tidal[] = {
 	{ SSC_OUTPUT,			SSC_NUMBER,			"capacity_factor",						"Capacity Factor of array",													"%",			"",				"MHKTidal",			"*",						"",						"" },
 	{ SSC_OUTPUT,			SSC_ARRAY,			"annual_energy_distribution",			"Annual energy production of array as function of speed",					"kWh",			"",				"MHKTidal",			"*",						"",						"" },
 	{ SSC_OUTPUT,			SSC_ARRAY,			"annual_cumulative_energy_distribution","Cumulative annual energy production of array as function of speed",		"kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"tidal_resource_start_velocity",        "First tidal velocity where probability distribution is greater than 0 ",   "m/s",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"tidal_resource_end_velocity",          "Last tidal velocity where probability distribution is greater than 0 ",	"m/s",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"tidal_power_start_velocity",           "First tidal velocity where power curve is greater than 0 ",		        "m/s",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"tidal_power_end_velocity",             "Last tidal velocity where power curve is greater than 0 ",		            "m/s",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_capital_cost_kwh",               "Capital costs per unit annual energy",		"$/kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_device_cost_kwh",                "Device costs per unit annual energy",		"$/kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_bos_cost_kwh",                   "Balance of system costs per unit annual energy",		"$/kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_financial_cost_kwh",             "Financial costs per unit annual energy",		"$/kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_om_cost_kwh",                    "O&M costs per unit annual energy",		"$/kWh",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_capital_cost_lcoe",              "Capital cost as percentage of overall LCOE",		"%",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_device_cost_lcoe",               "Device cost",		"%",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_bos_cost_lcoe",                  "BOS cost",		"%",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_financial_cost_lcoe",            "Financial cost",		"%",			"",				"MHKTidal",			"*",						"",						"" },
+    { SSC_OUTPUT,			SSC_NUMBER,			"total_om_cost_lcoe",                   "O&M cost (annual)",		"%",			"",				"MHKTidal",			"*",						"",						"" },
 
-	var_info_invalid
+    var_info_invalid
 };
 
 
@@ -143,8 +161,37 @@ public:
 
 
 		//Storing each column of the tidal_resource_matrix and tidal_power_curve as vectors:
+        double tidal_resource_start_velocity, tidal_power_start_velocity, tidal_resource_end_velocity, tidal_power_end_velocity = 0;
+        double min_velocity, max_velocity = 0;
+        min_velocity = tidal_resource_matrix.at(0, 0);
+        max_velocity = tidal_resource_matrix.at(number_rows - 1, 0);
+
 		for (int i = 0; i < number_rows; i++) {
-			
+            size_t n = i;
+            if (tidal_resource_matrix.at(n, 1) != 0 && tidal_resource_matrix.at(n - 1, 1) == 0 && n != 0)
+            {
+                tidal_resource_start_velocity = tidal_resource_matrix.at(n, 0);
+            }
+            if (tidal_power_curve.at(n, 1) != 0 && tidal_power_curve.at(n - 1, 1) == 0 && n != 0)
+            {
+                tidal_power_start_velocity = tidal_power_curve.at(n, 0);
+            }
+            if (tidal_resource_matrix.at(n, 1) != 0 && tidal_resource_matrix.at(n + 1, 1) == 0 && n != 0)
+            {
+                tidal_resource_end_velocity = tidal_resource_matrix.at(n, 0);
+            }
+            if (i == number_rows - 1 && tidal_resource_end_velocity == 0)
+            {
+                tidal_resource_end_velocity = tidal_resource_matrix.at(n, 0);
+            }
+            if (tidal_power_curve.at(n, 1) != 0 && tidal_power_curve.at(n + 1, 1) == 0 && n != 0)
+            {
+                tidal_power_end_velocity = tidal_power_curve.at(n, 0);
+            }
+            if (i == number_rows - 1 && tidal_power_end_velocity == 0)
+            {
+                tidal_power_end_velocity = tidal_power_curve.at(n, 0);
+            }
 			_speed_vect[i] = tidal_resource_matrix.at(i, 0);	
 			_probability_vect[i] = tidal_resource_matrix.at(i, 1); //*******************again need to modify to handle different depths
 			_power_vect[i] = tidal_power_curve.at(i, 1);
@@ -172,6 +219,8 @@ public:
 			//Contribution to Average Power from this speed bin 
 			device_average_power += _power_vect[i] * _probability_vect[i];
 		}
+
+
 				
 		//Throw exception if frequency distribution vector sums to < 99.5%
 		double probability_tolerance = 0.005;
@@ -182,6 +231,33 @@ public:
 		annual_energy *= (1 - (total_loss / 100 ));
 		// leave device power without losses
 
+        //TEST cost metrics in tidal page rather than cost page
+        double device_cost = as_double("device_costs_total");
+        double bos_cost = as_double("balance_of_system_cost_total");
+        double financial_cost = as_double("financial_cost_total");
+        double om_cost = as_double("total_operating_cost");
+        double fcr = as_double("fixed_charge_rate");
+        double total_capital_cost_kwh = fcr*(device_cost + bos_cost + financial_cost) / annual_energy;
+        double total_device_cost_kwh = fcr*device_cost / annual_energy;
+        double total_bos_cost_kwh = fcr*bos_cost / annual_energy;
+        double total_financial_cost_kwh = fcr*financial_cost / annual_energy;
+        double total_om_cost_kwh = om_cost / annual_energy;
+        double total_capital_cost_lcoe = (fcr * (device_cost + bos_cost + financial_cost)) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost)*100;
+        double total_device_cost_lcoe = (fcr*device_cost)/ (fcr * (device_cost + bos_cost + financial_cost) + om_cost)*100;
+        double total_bos_cost_lcoe = (fcr*bos_cost)/ (fcr * (device_cost + bos_cost + financial_cost) + om_cost)*100;
+        double total_financial_cost_lcoe = (fcr * financial_cost) / (fcr * (device_cost + bos_cost + financial_cost) + om_cost)*100;
+        double total_om_cost_lcoe = (om_cost)/ (fcr * (device_cost + bos_cost + financial_cost) + om_cost)*100;
+        assign("total_capital_cost_kwh", var_data((ssc_number_t)total_capital_cost_kwh));
+        assign("total_device_cost_kwh", var_data((ssc_number_t)total_device_cost_kwh));
+        assign("total_bos_cost_kwh", var_data((ssc_number_t)total_bos_cost_kwh));
+        assign("total_financial_cost_kwh", var_data((ssc_number_t)total_financial_cost_kwh));
+        assign("total_om_cost_kwh", var_data((ssc_number_t)total_om_cost_kwh));
+        assign("total_capital_cost_lcoe", var_data((ssc_number_t)total_capital_cost_lcoe));
+        assign("total_device_cost_lcoe", var_data((ssc_number_t)total_device_cost_lcoe));
+        assign("total_bos_cost_lcoe", var_data((ssc_number_t)total_bos_cost_lcoe));
+        assign("total_financial_cost_lcoe", var_data((ssc_number_t)total_financial_cost_lcoe));
+        assign("total_om_cost_lcoe", var_data((ssc_number_t)total_om_cost_lcoe));
+
 		//Calculating capacity factor:
 		capacity_factor = annual_energy / (device_rated_capacity * number_devices * 8760);
 
@@ -190,6 +266,12 @@ public:
 		assign("device_average_power", var_data((ssc_number_t)device_average_power));
 		assign("device_rated_capacity", var_data((ssc_number_t)device_rated_capacity));
 		assign("capacity_factor", var_data((ssc_number_t)capacity_factor * 100));
+        assign("tidal_resource_start_velocity", var_data((ssc_number_t)tidal_resource_start_velocity));
+        assign("tidal_resource_end_velocity", var_data((ssc_number_t)tidal_resource_end_velocity));
+        assign("tidal_power_start_velocity", var_data((ssc_number_t)tidal_power_start_velocity));
+        assign("tidal_power_end_velocity", var_data((ssc_number_t)tidal_power_end_velocity));
+        //assign("tidal_min_velocity", var_data((ssc_number_t)min_velocity));
+        //assign("tidal_max_velocity", var_data((ssc_number_t)max_velocity));
 	}
 }; 
 

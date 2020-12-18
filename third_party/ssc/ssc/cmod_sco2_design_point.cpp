@@ -88,6 +88,8 @@ public:
 		C_CO2_to_air_cooler::S_des_par_ind s_des_weather;
 		s_des_weather.m_T_amb_des = 30.0 + 273.15;		//[K]
 		s_des_weather.m_elev = 300.0;					//[m]
+        s_des_weather.m_eta_fan = 0.5;
+        s_des_weather.m_N_nodes_pass = 10;
 
 		C_CO2_to_air_cooler::S_des_par_cycle_dep s_des_cycle;
 		s_des_cycle.m_m_dot_total = 0.0;		//[kg/s] Use q_dot to design
@@ -98,7 +100,7 @@ public:
 		s_des_cycle.m_T_hot_out_des = 40.0 + 273.15;	//[K]
 		s_des_cycle.m_W_dot_fan_des = 10 * 0.02;	//[MWe]
 
-		c_ac.design_hx(s_des_weather, s_des_cycle);
+		c_ac.design_hx(s_des_weather, s_des_cycle, 1.E-3);
 
 		double T_amb_od = c_ac.get_des_par_ind()->m_T_amb_des;		//[K]
 		double P_amb_od = c_ac.get_design_solved()->m_P_amb_des;	//[Pa]
@@ -107,9 +109,10 @@ public:
 		double m_dot_hot = c_ac.get_des_par_cycle_dep()->m_m_dot_total;		//[kg/s]
 		double T_hot_out = c_ac.get_des_par_cycle_dep()->m_T_hot_out_des;
 		double W_dot_fan = std::numeric_limits<double>::quiet_NaN();	//[MWe]
+        double P_hot_out = std::numeric_limits<double>::quiet_NaN();    //[kPa]
 		int ac_od_code = -1;
 
-		c_ac.off_design_hx(T_amb_od, P_amb_od, T_hot_in, P_hot_in, m_dot_hot, T_hot_out, W_dot_fan, ac_od_code);
+        ac_od_code = c_ac.off_design_given_T_out(T_amb_od, T_hot_in, P_hot_in, m_dot_hot, T_hot_out, 1.E-4, 1.E-3, W_dot_fan, P_hot_out);
 
 		// Test out multi-stage compressor model
 		CO2_state co2_props;
@@ -200,7 +203,7 @@ public:
 
 
 		C_comp_multi_stage c_rc_ms;
-		c_rc_ms.design_given_outlet_state(C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby, T_rc_in, P_rc_in, m_dot_rc, T_rc_out, P_rc_out);
+		c_rc_ms.design_given_outlet_state(C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby, T_rc_in, P_rc_in, m_dot_rc, T_rc_out, P_rc_out, 1.E-3);
 
 
 
@@ -213,13 +216,13 @@ public:
 
 
 		double T_rc_out_od_ms = std::numeric_limits<double>::quiet_NaN();
-		c_rc_ms.off_design_given_P_out(T_rc_in_od, P_rc_in_od, m_dot_rc_od, P_rc_out, rc_od_err_code, T_rc_out_od_ms);
+		c_rc_ms.off_design_given_P_out(T_rc_in_od, P_rc_in_od, m_dot_rc_od, P_rc_out, 1.E-3, rc_od_err_code, T_rc_out_od_ms);
 
 
 
 
 		C_comp_multi_stage c_comp_ms;
-		c_comp_ms.design_given_outlet_state(C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby, T_in, P_in, m_dot_mc, T_out, P_out);
+		c_comp_ms.design_given_outlet_state(C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby, T_in, P_in, m_dot_mc, T_out, P_out, 1.E-3);
 
 		double P_in_od = 1.15*P_in;
 		double T_in_od = T_in + 5.0;
@@ -320,20 +323,22 @@ public:
 		double m_dot_water = (q_dot_reject) / (h_water_hot - h_water_cold);
 
 		// Test C_HX_counterflow model as a sCO2-water heat exchanger
-		C_HX_counterflow mc_sco2_water_hx;
-		C_HX_counterflow::S_init_par ms_hx_init;
+		C_HX_counterflow_CRM mc_sco2_water_hx;
+		C_HX_counterflow_CRM::S_init_par ms_hx_init;
 		ms_hx_init.m_N_sub_hx = 20;
 		ms_hx_init.m_hot_fl = NS_HX_counterflow_eqs::CO2;
 		ms_hx_init.m_cold_fl = NS_HX_counterflow_eqs::WATER;
 		// Initialize
 		mc_sco2_water_hx.initialize(ms_hx_init);
 
+        std::vector<NS_HX_counterflow_eqs::S_hx_node_info> v_s_node_info;
+
 		double UA_cooler, min_DT_cooler, eff_cooler, NTU_cooler, h_co2_cold_calc, h_water_hot_calc, q_dot_reject_calc;
 		try
 		{
 		mc_sco2_water_hx.calc_req_UA_enth(q_dot_reject, m_dot_water, m_dot_co2,
 			h_water_cold, h_co2_hot, P_water, P_water, P_co2, P_co2,
-			UA_cooler, min_DT_cooler, eff_cooler, NTU_cooler, h_co2_cold_calc, h_water_hot_calc, q_dot_reject_calc);
+			UA_cooler, min_DT_cooler, eff_cooler, NTU_cooler, h_co2_cold_calc, h_water_hot_calc, q_dot_reject_calc, v_s_node_info);
 		}
 		catch (C_csp_exception &csp_except)
 		{
@@ -462,7 +467,7 @@ public:
 				{
 					mc_sco2_water_hx.calc_req_UA(q_dot_hx, m_dot_water, m_dot_co2,
 						T_water_in, T_co2_in, P_water_in, P_water_out, P_co2_in, P_co2_out,
-						UA_calc, min_DT_calc, eff_calc, NTU_calc, T_co2_out_calc, T_water_out_calc, q_dot_calc);
+						UA_calc, min_DT_calc, eff_calc, NTU_calc, T_co2_out_calc, T_water_out_calc, q_dot_calc, v_s_node_info);
 				}
 				catch (C_csp_exception &csp_except)
 				{
@@ -645,10 +650,11 @@ public:
 			rc_params_max_eta.m_eta_mc = eta_c;
 			rc_params_max_eta.m_eta_rc = eta_c;
 			rc_params_max_eta.m_eta_t = eta_t;
-			rc_params_max_eta.m_N_sub_hxrs = N_sub_hxrs;
+            rc_params_max_eta.m_LTR_N_sub_hxrs = N_sub_hxrs;
+            rc_params_max_eta.m_HTR_N_sub_hxrs = N_sub_hxrs;
 			rc_params_max_eta.m_P_high_limit = P_high_limit;
-			rc_params_max_eta.m_tol = tol;
-			rc_params_max_eta.m_opt_tol = opt_tol;
+			rc_params_max_eta.m_des_tol = tol;
+			rc_params_max_eta.m_des_opt_tol = opt_tol;
 			rc_params_max_eta.m_N_turbine = N_t_des;
 
 			error_code = rc_cycle.auto_opt_design(rc_params_max_eta);
@@ -674,10 +680,11 @@ public:
 		rc_params.m_eta_mc = eta_c;
 		rc_params.m_eta_rc = eta_c;
 		rc_params.m_eta_t = eta_t;
-		rc_params.m_N_sub_hxrs = N_sub_hxrs;
+        rc_params.m_LTR_N_sub_hxrs = N_sub_hxrs;
+        rc_params.m_HTR_N_sub_hxrs = N_sub_hxrs;
 		rc_params.m_P_high_limit = P_high_limit;
-		rc_params.m_tol = tol;
-		rc_params.m_opt_tol = opt_tol;
+		rc_params.m_des_tol = tol;
+		rc_params.m_des_opt_tol = opt_tol;
 		rc_params.m_N_turbine = N_t_des;
 		
 		C_sco2_phx_air_cooler::S_des_par sco2_rc_des_par;
@@ -700,13 +707,15 @@ public:
 		sco2_rc_des_par.m_eta_mc = eta_c;
 		sco2_rc_des_par.m_eta_rc = eta_c;
 		sco2_rc_des_par.m_eta_t = eta_t;
-		sco2_rc_des_par.m_N_sub_hxrs = N_sub_hxrs;
+        sco2_rc_des_par.m_LTR_N_sub_hxrs = N_sub_hxrs;
+        sco2_rc_des_par.m_HTR_N_sub_hxrs = N_sub_hxrs;
 		sco2_rc_des_par.m_P_high_limit = P_high_limit;
-		sco2_rc_des_par.m_tol = tol;
-		sco2_rc_des_par.m_opt_tol = opt_tol;
+		sco2_rc_des_par.m_des_tol = tol;
+		sco2_rc_des_par.m_des_opt_tol = opt_tol;
 		sco2_rc_des_par.m_N_turbine = N_t_des;
 			// PHX design parameters
 		sco2_rc_des_par.m_phx_dt_cold_approach = delta_T_t;
+        sco2_rc_des_par.m_phx_N_sub_hx = 10;
 			// Air cooler parameters
 		sco2_rc_des_par.m_frac_fan_power = 0.01;
 		sco2_rc_des_par.m_deltaP_cooler_frac = 0.002;

@@ -876,6 +876,8 @@ void C_turbine::turbine_sizing(const S_design_parameters & des_par_in, int & err
 	double U_tip = ms_des_solved.m_nu_design*C_s;		//[m/s] Tip speed
 	ms_des_solved.m_D_rotor = U_tip / (0.5*ms_des_solved.m_N_design*0.104719755);	//[m]
 	ms_des_solved.m_A_nozzle = (ms_des_par.m_m_dot / m_r_W_dot_scale) / (C_s*ms_des_par.m_D_in);		//[m^2]
+	ms_des_solved.m_rho_in = ms_des_par.m_D_in;	//[kg/m3]
+	ms_des_solved.m_delta_h_isen = w_i;		//[kJ/kg]
 
 	// Set other turbine variables
 	ms_des_solved.m_w_tip_ratio = U_tip / ssnd_in;				//[-]
@@ -955,6 +957,9 @@ void C_turbine::off_design_turbine(double T_in, double P_in, double P_out, doubl
 	m_dot_cycle = m_dot_basis * m_r_W_dot_scale;				//[kg/s]
 	ms_od_solved.m_W_dot_out = m_dot_cycle*(h_in - h_out);		//[kW] Turbine power output
     ms_od_solved.m_m_dot = m_dot_cycle;     //[kg/s]
+
+	ms_od_solved.m_delta_h_isen = h_in - h_s_out;		//[kJ/kg]
+	ms_od_solved.m_rho_in = D_in;						//[kg/m3]
 }
 
 void C_turbine::od_turbine_at_N_des(double T_in, double P_in, double P_out, int & error_code, double & m_dot_cycle, double & T_out)
@@ -1040,6 +1045,7 @@ int C_comp__psi_eta_vs_phi::design_given_shaft_speed(double T_in /*K*/, double P
     ms_des_solved.m_phi_des = phi_design;
     ms_des_solved.m_phi_surge = calc_phi_min(T_in, P_in);
     ms_des_solved.m_phi_max = calc_phi_max(T_in, P_in);
+    set_design_solution(phi_design, T_in, P_in);
 
     ms_des_solved.m_psi_des = psi_design;   //[-] ideal head coefficient
     ms_des_solved.m_psi_max_at_N_des = calc_psi_isen(ms_des_solved.m_phi_surge, 1.0, T_in, P_in);  //[-] max ideal head coefficient at design shaft speed
@@ -1112,6 +1118,7 @@ int C_comp__psi_eta_vs_phi::design_given_performance(double T_in /*K*/, double P
     ms_des_solved.m_phi_des = calc_phi_design(T_in, P_in);
     ms_des_solved.m_phi_surge = calc_phi_min(T_in, P_in);
     ms_des_solved.m_phi_max = calc_phi_max(T_in, P_in);
+    set_design_solution(phi_design, T_in, P_in);
 
     ms_des_solved.m_psi_des = psi_design;   //[-] ideal head coefficient
     ms_des_solved.m_psi_max_at_N_des = calc_psi_isen(ms_des_solved.m_phi_surge, 1.0, T_in, P_in);  //[-] max ideal head coefficient at design shaft speed
@@ -1153,7 +1160,7 @@ int C_comp__psi_eta_vs_phi::off_design_given_N(double T_in /*K*/, double P_in /*
 
     double psi = calc_psi_isen(phi, N_des_over_N_od, T_in, P_in);		//[-]
 
-    double eta_ND_od = calc_eta_normalized(phi, N_des_over_N_od, T_in, P_in);
+    double eta_ND_od = calc_eta_OD_normalized(phi, N_des_over_N_od, T_in, P_in);
 
     ms_od_solved.m_eta = std::max(eta_ND_od*ms_des_solved.m_eta_design, 0.0);		//[-] Actual compressor efficiency, not allowed to go negative
 
@@ -1256,6 +1263,36 @@ std::unique_ptr<C_comp__psi_eta_vs_phi> C_comp__psi_eta_vs_phi::construct_derive
     }
 }
 
+void C_comp__snl_radial_via_Dyreby::set_design_solution(double phi /*-*/, double T_comp_in_des /*K*/, double P_comp_in /*kPa*/)
+{}
+
+void C_comp__snl_radial_via_Dyreby::report_phi_psi_eta_vectors(std::vector<double> & phi, 
+    std::vector<double> & psi, std::vector<double> & eta, double & eta_norm_design)
+{
+    double T_comp_dummy = std::numeric_limits<double>::quiet_NaN();
+    double P_comp_dummy = std::numeric_limits<double>::quiet_NaN();
+
+    double phi_min = calc_phi_min(T_comp_dummy, P_comp_dummy);
+    double phi_max = calc_phi_max(T_comp_dummy, P_comp_dummy);
+
+    size_t n_phi = 20;
+    phi.resize(n_phi, 0.0);
+    psi.resize(n_phi, 0.0);
+    eta.resize(n_phi, 0.0);
+
+    double delta_phi = (phi_max - phi_min) / (double)(n_phi - 1);
+    double i_phi = 0.0;
+    for (size_t i = 0; i < n_phi; i++)
+    {
+        i_phi = phi_min + i * delta_phi;
+        phi[i] = i_phi;
+        psi[i] = calc_psi_isen(i_phi, 1.0, T_comp_dummy, P_comp_dummy);
+        eta[i] = calc_eta_OD_normalized(i_phi, 1.0, T_comp_dummy, P_comp_dummy);
+    }
+
+    eta_norm_design = 1.0;
+}
+
 double C_comp__snl_radial_via_Dyreby::adjust_phi_for_N(double phi /*-*/, double N_des_over_N_od /*-*/)
 {
     return phi*pow(1.0 / N_des_over_N_od, 0.2);		//[-] modified flow coefficient
@@ -1302,13 +1339,63 @@ double C_comp__snl_radial_via_Dyreby::calc_psi_isen(double phi_in /*-*/, double 
     return psi / pow(N_des_over_N_od, pow(20.0*phi, 3.0));
 }
 
-double C_comp__snl_radial_via_Dyreby::calc_eta_normalized(double phi_in /*-*/, double N_des_over_N_od /*-*/, double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+double C_comp__snl_radial_via_Dyreby::calc_eta_OD_normalized(double phi_in /*-*/, double N_des_over_N_od /*-*/, double T_comp_in /*K*/, double P_comp_in /*kPa*/)
 {
     double phi = adjust_phi_for_N(phi_in, N_des_over_N_od);
     
     double eta_star = ((((-1.638e6*phi) + 182725.0)*phi - 8089.0)*phi + 168.6)*phi - 0.7069;	// from dimensionless modified efficiency curve
 
     return eta_star * 1.47528 / pow(N_des_over_N_od, pow(20.0*phi, 5.0));
+}
+
+void C_comp__compA__PT_map_template::set_design_solution(double phi /*-*/, double T_comp_in_des /*K*/, double P_comp_in /*kPa*/)
+{}
+
+void C_comp__compA__PT_map_template::report_phi_psi_eta_vectors(std::vector<double> & phi, 
+    std::vector<double> & psi, std::vector<double> & eta, double & eta_norm_design)
+{
+    std::vector<double> phi_temp = mc_data_at_PT.get_column_data(0);
+    int n_pts = phi_temp.size() - 1;        //[-] Don't want first value, which only helps converge during surge conditions
+    phi.resize(n_pts);
+    psi.resize(n_pts);
+    eta.resize(n_pts);
+    std::copy_n(phi_temp.begin() + 1, n_pts, phi.begin());
+    copy_n(mc_data_at_PT.get_column_data(1).begin() + 1, n_pts, psi.begin());
+    copy_n(mc_data_at_PT.get_column_data(2).begin() + 1, n_pts, eta.begin());
+
+    eta_norm_design = m_eta_isen_norm;
+}
+
+double C_comp__compA__PT_map_template::calc_phi_min(double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    return m_phi_min;
+}
+
+double C_comp__compA__PT_map_template::calc_phi_design(double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    return m_phi_design;
+}
+
+double C_comp__compA__PT_map_template::calc_phi_max(double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    return m_phi_max;
+}
+
+double C_comp__compA__PT_map_template::calc_psi_isen_design(double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    double phi_design = calc_phi_design(T_comp_in, P_comp_in);
+
+    return calc_psi_isen(phi_design, 1.0, T_comp_in, P_comp_in);
+}
+
+double C_comp__compA__PT_map_template::calc_psi_isen(double phi /*-*/, double N_des_over_N_od /*-*/, double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    return mc_data_at_PT.linear_1D_interp(0, 1, phi);
+}
+
+double C_comp__compA__PT_map_template::calc_eta_OD_normalized(double phi /*-*/, double N_des_over_N_od /*-*/, double T_comp_in /*K*/, double P_comp_in /*kPa*/)
+{
+    return mc_data_at_PT.linear_1D_interp(0, 2, phi);
 }
 
 int C_comp_multi_stage::C_MEQ_eta_isen__h_out::operator()(double eta_isen /*-*/, double *h_comp_out /*kJ/kg*/)
@@ -1324,7 +1411,8 @@ int C_comp_multi_stage::C_MEQ_eta_isen__h_out::operator()(double eta_isen /*-*/,
 	double N_rpm_guess_1 = 3000.0;
 	double N_rpm_guess_2 = 30000.0;
 
-	c_solver.settings(1.E-4, 50, N_rpm_lower, N_rpm_upper, true);
+    double tol = m_tol_in / 10.0;
+	c_solver.settings(tol, 50, N_rpm_lower, N_rpm_upper, true);
 
 	// Now solve for the shaft speed
 	double N_rpm_solved = std::numeric_limits<double>::quiet_NaN();
@@ -1405,7 +1493,7 @@ double C_comp_multi_stage::calculate_cost(double T_in /*K*/, double P_in /*kPa*/
 }
 
 int C_comp_multi_stage::design_given_outlet_state(int comp_model_code, double T_in /*K*/, double P_in /*kPa*/, double m_dot_cycle /*kg/s*/,
-	double T_out /*K*/, double P_out /*K*/)
+	double T_out /*K*/, double P_out /*K*/, double tol /*-*/)
 {
     m_compressor_model = comp_model_code;   //[-]
 
@@ -1451,7 +1539,7 @@ int C_comp_multi_stage::design_given_outlet_state(int comp_model_code, double T_
 
 			//mv_stages.resize(n_stages);
 
-			C_MEQ_eta_isen__h_out c_stages(this, T_in, P_in, P_out, m_dot_basis);
+			C_MEQ_eta_isen__h_out c_stages(this, T_in, P_in, P_out, m_dot_basis, tol);
 			C_monotonic_eq_solver c_solver(c_stages);
 
 			// Set bounds on isentropic efficiency
@@ -1462,7 +1550,7 @@ int C_comp_multi_stage::design_given_outlet_state(int comp_model_code, double T_
 			double eta_isen_guess_1 = eta_isen_total;
 			double eta_isen_guess_2 = 0.95*eta_isen_total;
 
-			c_solver.settings(1.E-4, 50, eta_isen_lower, eta_isen_upper, true);
+			c_solver.settings(tol/10.0, 50, eta_isen_lower, eta_isen_upper, true);
 
 			// Now solve for the isentropic efficiency for each stage that results in the total compressor design isentropic efficiency
 			double eta_isen_solved = std::numeric_limits<double>::quiet_NaN();
@@ -1701,7 +1789,7 @@ int C_comp_multi_stage::C_MEQ_phi_od__P_out::operator()(double phi_od /*-*/, dou
 }
 
 void C_comp_multi_stage::off_design_given_P_out(double T_in /*K*/, double P_in /*kPa*/, double m_dot_cycle /*kg/s*/,
-	double P_out /*kPa*/, int & error_code, double & T_out /*K*/)
+	double P_out /*kPa*/, double tol /*-*/, int & error_code, double & T_out /*K*/)
 {
 	// Apply 1 var solver to find the phi that results in a converged recompressor
 	C_MEQ_phi_od__P_out c_rc_od(this, T_in, P_in, m_dot_cycle);
@@ -1771,7 +1859,7 @@ void C_comp_multi_stage::off_design_given_P_out(double T_in /*K*/, double P_in /
 	phi_pair_upper.y = P_solved_phi_guess_upper;
 
 	// Set solver settings
-	c_rd_od_solver.settings(0.001, 50, phi_lower, phi_upper, true);
+	c_rd_od_solver.settings(tol, 50, phi_lower, phi_upper, true);
 
 	// Now, solve for the flow coefficient
 	double phi_solved, tol_solved;

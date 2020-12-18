@@ -143,7 +143,7 @@ Define Losses
 */
 void losses_t::initialize() {
     state = std::make_shared<losses_state>();
-    state->loss_percent = 0;
+    state->loss_kw = 0;
     if (params->loss_choice == losses_params::MONTHLY) {
         if (params->monthly_charge_loss.size() == 1) {
             params->monthly_charge_loss = std::vector<double>(12, params->monthly_charge_loss[0]);
@@ -216,18 +216,18 @@ void losses_t::run_losses(size_t lifetimeIndex, double dtHour, double charge_ope
     // update system losses depending on user input
     if (params->loss_choice == losses_params::MONTHLY) {
         if (charge_operation == capacity_state::CHARGE)
-            state->loss_percent = params->monthly_charge_loss[monthIndex];
+            state->loss_kw = params->monthly_charge_loss[monthIndex];
         if (charge_operation == capacity_state::DISCHARGE)
-            state->loss_percent = params->monthly_discharge_loss[monthIndex];
+            state->loss_kw = params->monthly_discharge_loss[monthIndex];
         if (charge_operation == capacity_state::NO_CHARGE)
-            state->loss_percent = params->monthly_idle_loss[monthIndex];
+            state->loss_kw = params->monthly_idle_loss[monthIndex];
     }
     else if (params->loss_choice == losses_params::SCHEDULE)  {
-        state->loss_percent = params->schedule_loss[lifetimeIndex % params->schedule_loss.size()];
+        state->loss_kw = params->schedule_loss[lifetimeIndex % params->schedule_loss.size()];
     }
 }
 
-double losses_t::getLoss() { return state->loss_percent; }
+double losses_t::getLoss() { return state->loss_kw; }
 
 losses_state losses_t::get_state() { return *state; }
 
@@ -462,10 +462,9 @@ void battery_t::setupReplacements(double capacity_percent) {
     params->replacement->replacement_capacity = capacity_percent;
 }
 
-void battery_t::setupReplacements(std::vector<int> schedule, std::vector<double> replacement_percents) {
+void battery_t::setupReplacements(std::vector<double> replacement_percents) {
     params->replacement = std::make_shared<replacement_params>();
     params->replacement->replacement_option = replacement_params::SCHEDULE;
-    params->replacement->replacement_schedule = std::move(schedule);
     params->replacement->replacement_schedule_percent = std::move(replacement_percents);
 }
 
@@ -537,7 +536,7 @@ double battery_t::calculate_max_discharge_kw(double *max_current_A) {
     return power_W / 1000.;
 }
 
-double battery_t::run(size_t lifetimeIndex, double &I, bool stateful) {
+double battery_t::run(size_t lifetimeIndex, double &I) {
     // Temperature affects capacity, but capacity model can reduce current, which reduces temperature, need to iterate
     double I_initial = I;
     size_t iterate_count = 0;
@@ -567,12 +566,12 @@ double battery_t::run(size_t lifetimeIndex, double &I, bool stateful) {
 }
 
 void battery_t::runCurrent(double I) {
-    run(++state->last_idx, I, true);
+    run(++state->last_idx, I);
         }
 
 void battery_t::runPower(double P) {
     double I = calculate_current_for_power_kw(P);
-    run(++state->last_idx, I, true);
+    run(++state->last_idx, I);
 }
 
 void battery_t::runThermalModel(double I, size_t lifetimeIndex) {
@@ -620,17 +619,11 @@ void battery_t::runReplacement(size_t year, size_t hour, size_t step) {
     bool replace = false;
     double percent = 0;
     if (params->replacement->replacement_option == replacement_params::OPTIONS::SCHEDULE) {
-        if (year < params->replacement->replacement_schedule.size()) {
-            auto num_repl = (size_t) params->replacement->replacement_schedule[year];
-            for (size_t j_repl = 0; j_repl < num_repl; j_repl++) {
-                if ((hour == (j_repl * 8760 / num_repl)) && step == 0) {
-                    replace = true;
-                    break;
-                }
-            }
-        }
-        if (replace) {
+        if (year < params->replacement->replacement_schedule_percent.size()) {
             percent = params->replacement->replacement_schedule_percent[year];
+            if (percent > 0 && hour == 0 && step == 0) {
+                replace = true;
+            }
         }
     } else if (params->replacement->replacement_option == replacement_params::OPTIONS::CAPACITY_PERCENT) {
         if ((lifetime->capacity_percent() - tolerance) <= params->replacement->replacement_capacity) {
@@ -716,6 +709,32 @@ double battery_t::V_nominal() { return voltage->battery_voltage_nominal(); }
 double battery_t::SOC() { return capacity->SOC(); }
 
 double battery_t::I() { return capacity->I(); }
+
+double battery_t::calculate_loss(double power, size_t lifetimeIndex) {
+    size_t indexYearOne = util::yearOneIndex(params->dt_hour, lifetimeIndex);
+    auto hourOfYear = (size_t)std::floor(indexYearOne * params->dt_hour);
+    size_t monthIndex = (size_t) util::month_of((double)(hourOfYear)) - 1;
+
+    if (params->losses->loss_choice == losses_params::MONTHLY) {
+        if (power > 0) {
+            return params->losses->monthly_discharge_loss[monthIndex];
+        }
+        else if (power < 0) {
+            return params->losses->monthly_charge_loss[monthIndex];
+        }
+        else {
+            return params->losses->monthly_idle_loss[monthIndex];
+        }
+
+    }
+    else if (params->losses->loss_choice == losses_params::SCHEDULE) {
+        return params->losses->schedule_loss[lifetimeIndex % params->losses->schedule_loss.size()];
+    }
+}
+
+double battery_t::getLoss() {
+    return losses->getLoss();
+}
 
 battery_state battery_t::get_state() { return *state; }
 

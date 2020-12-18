@@ -306,16 +306,17 @@ void C_pc_sco2::call(const C_csp_weatherreader::S_outputs &weather,
 			sco2_rc_od_par.m_T_amb = weather.m_tdry+273.15;		//[K]
             sco2_rc_od_par.m_T_t_in_mode = C_sco2_cycle_core::E_SOLVE_PHX;  //[-]
 
-			int od_strategy = C_sco2_phx_air_cooler::E_TARGET_POWER_ETA_MAX;
+			C_sco2_phx_air_cooler::E_off_design_strategies od_strategy = C_sco2_phx_air_cooler::E_TARGET_POWER_ETA_MAX;
 
 			int off_design_code = 0;
 			try
 			{
-				off_design_code = mc_sco2_recomp.optimize_off_design(sco2_rc_od_par, 
+				off_design_code = mc_sco2_recomp.off_design__constant_N__T_mc_in_P_LP_in__objective(sco2_rc_od_par,
+                                                            true, 1.0,
                                                             true, 1.0,
                                                             true, 1.0,
                                                             false, std::numeric_limits<double>::quiet_NaN(),
-                                                            od_strategy);
+                                                            od_strategy, 1.E-3, 1.E-3);
 			}
 			catch( C_csp_exception &csp_exception )
 			{

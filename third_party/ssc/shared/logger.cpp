@@ -135,7 +135,7 @@ std::ostream &operator<<(std::ostream &os, const replacement_params &p) {
     char buf[256];
     sprintf(buf, R"("replacement_params": {"replacement_option": %d, "replacement_capacity": %.3f, )", p.replacement_option, p.replacement_capacity);
     os << buf;
-    os << R"("replacement_schedule": )" << p.replacement_schedule << R"(, "replacement_schedule_percent": )" << p.replacement_schedule_percent;
+    os << R"("replacement_schedule_percent": )" << p.replacement_schedule_percent;
     os << " }";
     return os;
 }
@@ -163,7 +163,7 @@ std::ostream &operator<<(std::ostream &os, const thermal_params &p) {
 
 std::ostream &operator<<(std::ostream& os, const losses_state &p) {
     char buf[256];
-    sprintf(buf, R"("losses_state": { "loss_percent": %.3f })", p.loss_percent);
+    sprintf(buf, R"("losses_state": { "loss_percent": %.3f })", p.loss_kw);
     os << buf;
     return os;
 }

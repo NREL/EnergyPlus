@@ -84,7 +84,7 @@ public:
 	int MC; // Mounting configuration (1=rack,2=flush,3=integrated,4=gap)
 	int HTD; // Heat transfer dimension (1=Module,2=Array)
 	int MSO; // Mounting structure orientation (1=does not impede flow beneath, 2=vertical supports, 3=horizontal supports)
-	int Nrows, Ncols; // number of modules in rows and columns, when using array heat transfer dimensions
+	size_t Nrows, Ncols; // number of modules in rows and columns, when using array heat transfer dimensions
 	double Length; // module length, along horizontal dimension, (m)
 	double Width; // module width, along vertical dimension, (m)
 	double Wgap;  // gap width spacing (m)

@@ -80,6 +80,11 @@ public:
 
 	//! Check the inverter size and the associated clipping
 	void inverter_size_check();
+
+private:
+
+    double transformerLoss(double powerkW, double transformerLoadLossFraction, double transformerRatingkW, double& xfmr_ll, double xfmr_nll);
+
 };
 
 #endif // !_CMOD_PVAMV1_H_

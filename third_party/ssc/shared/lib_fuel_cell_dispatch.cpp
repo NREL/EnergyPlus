@@ -176,7 +176,7 @@ void FuelCellDispatch::runSingleTimeStep(size_t hour_of_year, size_t year_idx, d
 			m_powerThermalTotal_kW += m_fuelCellVector[fc]->getPowerThermal();
 		}
 	}
-	m_batteryPower->powerPV = powerSystem_kWac;
+	m_batteryPower->powerSystem = powerSystem_kWac;
 	m_batteryPower->powerLoad = powerLoad_kWac;
 	m_batteryPower->powerFuelCell = m_powerTotal_kW;
 	m_batteryPowerFlow->calculate();

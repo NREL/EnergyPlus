@@ -71,7 +71,7 @@ TEST_F(CMBattwatts_cmod_battwatts, ResidentialDefaults) {
     int errors = run_module(ssc_dat, "battwatts");
     EXPECT_FALSE(errors);
 
-    double charge_percent = data.as_number("batt_pv_charge_percent");
+    double charge_percent = data.as_number("batt_system_charge_percent");
     EXPECT_NEAR(charge_percent, 70.8, 0.1);
 
     auto batt_power_data = data.as_vector_ssc_number_t("batt_power");
@@ -101,7 +101,7 @@ TEST_F(CMBattwatts_cmod_battwatts, ResidentialDefaultsLeadAcid) {
     int errors = run_module(ssc_dat, "battwatts");
     EXPECT_FALSE(errors);
 
-    double charge_percent = data.as_number("batt_pv_charge_percent");
+    double charge_percent = data.as_number("batt_system_charge_percent");
     EXPECT_NEAR(charge_percent, 76.4, 0.1);
 
     auto batt_power_data = data.as_vector_ssc_number_t("batt_power");
@@ -131,7 +131,7 @@ TEST_F(CMBattwatts_cmod_battwatts, NoPV) {
     int errors = run_module(ssc_dat, "battwatts");
     EXPECT_FALSE(errors);
 
-    double charge_percent = data.as_number("batt_pv_charge_percent");
+    double charge_percent = data.as_number("batt_system_charge_percent");
     EXPECT_NEAR(charge_percent, 0.0, 0.1);
 
     auto batt_power_data = data.as_vector_ssc_number_t("batt_power");

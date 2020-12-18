@@ -58,7 +58,7 @@ C_csp_gen_collector_receiver::C_csp_gen_collector_receiver()
 	
 	mpc_optical_table_uns = 0;		// NULL
 
-	m_eff_scale = m_f_qsf = std::numeric_limits<double>::quiet_NaN();
+	m_eff_scale = m_A_sf_calc = std::numeric_limits<double>::quiet_NaN();
 	
 	m_mode = -1;
 	m_mode_prev = -1;
@@ -316,8 +316,9 @@ void C_csp_gen_collector_receiver::init_sf()
 	}
 
 	double eta_opt_ref = ms_params.m_eta_opt_soil*ms_params.m_eta_opt_gen*opt_des;
-    //calculate normalized field production at design per unit DNI
-	m_f_qsf = ms_params.m_qsf_des/(ms_params.m_irr_des*eta_opt_ref/**(1.0-ms_params.m_f_sfhl_ref)*/);    //[MWt/([W/m2] * [-] * [-])]
+
+    // Calculate solar field area required to achieve 'delivered' solar field power using design optical and thermal losses
+    m_A_sf_calc = (ms_params.m_qsf_des*(1.+ms_params.m_f_sfhl_ref))/(ms_params.m_irr_des*eta_opt_ref)*1.E6;    //[m2]
 
 	return;
 }
@@ -511,9 +512,10 @@ void C_csp_gen_collector_receiver::call(const C_csp_weatherreader::S_outputs &we
 	double f_sfhl = 1.0 - ms_params.m_f_sfhl_ref * (f_sfhl_qdni + f_sfhl_tamb + f_sfhl_vwind);  //sf thermal efficiency
     double q_hl_sf = (1. - f_sfhl) * ms_params.m_qsf_des;       //[MWt]
 
-	//Calculate the total solar field thermal output 
-	//double q_sf = m_f_qsf * f_sfhl * eta_opt_sf * irr_used;    //[MWt]
-	double q_sf = m_f_qsf * eta_opt_sf * irr_used - q_hl_sf;    //[MWt]
+	//Calculate the total solar field thermal output
+    double q_dot_field_inc = m_A_sf_calc * irr_used * 1.E-6;    //[MWt]
+    double q_dot_rec_inc = q_dot_field_inc * eta_opt_sf;    //[MWt]
+    double q_sf = q_dot_rec_inc - q_hl_sf;  //[MWt]
     if( q_sf < 0. )
         q_sf = 0.;
 
@@ -527,24 +529,13 @@ void C_csp_gen_collector_receiver::call(const C_csp_weatherreader::S_outputs &we
 	cr_out_solver.m_W_dot_col_tracking = 0.0;		//[MWe]
 	cr_out_solver.m_W_dot_htf_pump = 0.0;			//[MWe]
 
-	double q_dot_rec_inc = m_f_qsf * eta_opt_sf * irr_used;
-
-	mc_reported_outputs.value(E_Q_DOT_FIELD_INC, m_f_qsf * irr_used);	//[MWt]
+    mc_reported_outputs.value(E_Q_DOT_FIELD_INC, q_dot_field_inc);  //[MWt]
 	mc_reported_outputs.value(E_ETA_FIELD, eta_opt_sf);		//[-]
 	mc_reported_outputs.value(E_Q_DOT_REC_INC, q_dot_rec_inc);	//[-]
 	mc_reported_outputs.value(E_ETA_THERMAL, q_sf / q_dot_rec_inc);		//[-]
 	mc_reported_outputs.value(E_F_SFHL_QDNI, f_sfhl_qdni);	//[-]
 	mc_reported_outputs.value(E_F_SFHL_QWSPD, f_sfhl_vwind);	//[-]
 	mc_reported_outputs.value(E_F_SFHL_QTDRY, f_sfhl_tamb);	//[-]
-
-	// Set collector-receiver class outputs for reporting
-	//cr_out_report.m_q_dot_field_inc = m_f_qsf * irr_used;	//[MWt]
-	//cr_out_report.m_eta_field = eta_opt_sf;					//[-]
-
-	//cr_out_report.m_q_dot_rec_inc = m_f_qsf * eta_opt_sf * irr_used;	//[MWt]
-	//cr_out_report.m_eta_thermal = q_sf / cr_out_report.m_q_dot_rec_inc;	//[-]
-	//cr_out_report.m_q_dot_piping_loss = 0.0;		//[MWt]
-
 }
 
 void C_csp_gen_collector_receiver::startup(const C_csp_weatherreader::S_outputs &weather,

@@ -135,6 +135,7 @@ const PoaIrradianceComponents FlatPlateCollector::IncidentIrradiance(const TimeA
     tt.set_location(time_and_position.collector_location.latitude,
         time_and_position.collector_location.longitude,
         time_and_position.collector_location.timezone);
+    tt.set_optional(0, 1013.25, weather.ambient_temp);
 
     //double ts_hour = 1.0 / step_per_hour;
     //double delt = instantaneous ? IRRADPROC_NO_INTERPOLATE_SUNRISE_SUNSET : ts_hour;

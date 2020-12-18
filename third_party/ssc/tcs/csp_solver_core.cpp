@@ -298,7 +298,8 @@ C_csp_solver::C_csp_solver(C_csp_weatherreader &weather,
 		m_cycle_W_dot_des = m_cycle_eta_des = m_cycle_q_dot_des = m_cycle_max_frac = m_cycle_cutoff_frac =
 		m_cycle_sb_frac_des = m_cycle_T_htf_hot_des =
 		m_cycle_P_hot_des = m_cycle_x_hot_des = 
-		m_m_dot_pc_des = m_m_dot_pc_min = m_m_dot_pc_max = m_T_htf_pc_cold_est = std::numeric_limits<double>::quiet_NaN();
+		m_m_dot_pc_des = m_m_dot_pc_min =
+        m_m_dot_pc_max = m_m_dot_pc_max_startup = m_T_htf_pc_cold_est = std::numeric_limits<double>::quiet_NaN();
 
     m_is_cr_config_recirc = true;
 
@@ -496,7 +497,7 @@ void C_csp_solver::init()
 	m_m_dot_pc_des = pc_solved_params.m_m_dot_design;					//[kg/hr]
 				
 	m_m_dot_pc_min = 0.0 * pc_solved_params.m_m_dot_min;		//[kg/hr]
-	m_m_dot_pc_max = pc_solved_params.m_m_dot_max;		//[kg/hr]				
+	m_m_dot_pc_max_startup = pc_solved_params.m_m_dot_max;		//[kg/hr]				
 	
 	m_cycle_P_hot_des = pc_solved_params.m_P_hot_des;					//[kPa]
 	m_cycle_x_hot_des = pc_solved_params.m_x_hot_des;					//[-]
@@ -520,6 +521,7 @@ void C_csp_solver::init()
     // Value helps solver get out of T_field_htf_cold iteration when weird conditions cause the solution to be a very cold value
     // Should update with technology-specific htf freeze protection values
     m_T_field_cold_limit = -100.0;      //[C]
+    m_T_field_in_hot_limit = (0.9*m_cycle_T_htf_hot_des + 0.1*m_T_htf_cold_des) - 273.15;   //[C]
 
 
 	if( mc_collector_receiver.m_is_sensible_htf != mc_power_cycle.m_is_sensible_htf )
@@ -2063,7 +2065,7 @@ void C_csp_solver::Ssimulate(C_csp_solver::S_sim_setup & sim_setup)
                 }
 
                 // Compare q_dot_to_pc to q_dot_pc_su_max
-                if (mc_cr_out_solver.m_q_thermal > q_dot_pc_su_max || mc_cr_out_solver.m_m_dot_salt_tot > m_m_dot_pc_max)
+                if (mc_cr_out_solver.m_q_thermal > q_dot_pc_su_max || mc_cr_out_solver.m_m_dot_salt_tot > m_m_dot_pc_max_startup)
                 {
                     if (mc_cr_out_solver.m_q_thermal > q_dot_pc_su_max)
                     {
@@ -2075,7 +2077,7 @@ void C_csp_solver::Ssimulate(C_csp_solver::S_sim_setup & sim_setup)
                     {
                         error_msg = util::format("At time = %lg CR_ON__PC_SU__TES_OFF__AUX_OFF method converged to a power cycle"
                             " mass flow rate input, %lg [kg/s], greater than the maximum allowable %lg [kg/s].",
-                            mc_kernel.mc_sim_info.ms_ts.m_time / 3600.0, mc_cr_out_solver.m_m_dot_salt_tot / 3600.0, m_m_dot_pc_max / 3600.0);
+                            mc_kernel.mc_sim_info.ms_ts.m_time / 3600.0, mc_cr_out_solver.m_m_dot_salt_tot / 3600.0, m_m_dot_pc_max_startup / 3600.0);
                     }
                     mc_csp_messages.add_message(C_csp_messages::NOTICE, error_msg);
                 }
