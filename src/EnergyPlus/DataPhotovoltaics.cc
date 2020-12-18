@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataPhotovoltaics.hh>
+
 namespace EnergyPlus {
 
 namespace DataPhotovoltaics {

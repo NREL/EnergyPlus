@@ -49,6 +49,7 @@
 #define HeatBalanceAirManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -118,6 +119,14 @@ namespace HeatBalanceAirManager {
     void ReportZoneMeanAirTemp(EnergyPlusData &state);
 
 } // namespace HeatBalanceAirManager
+
+struct HeatBalanceAirMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

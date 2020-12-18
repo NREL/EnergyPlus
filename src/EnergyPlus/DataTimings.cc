@@ -318,9 +318,6 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
 
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
-
         // Return value
         Real64 totalTimeUsed;
 
@@ -334,7 +331,7 @@ namespace DataTimings {
             found = loop;
         }
 
-        if (found == 0 && !AbortProcessing) {
+        if (found == 0 && !state.dataErrTracking->AbortProcessing) {
             ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
             ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
@@ -357,9 +354,6 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
         // per Call.
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
 
         // Return value
         Real64 averageTimeUsed;

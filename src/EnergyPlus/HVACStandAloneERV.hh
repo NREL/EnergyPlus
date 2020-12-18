@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -231,6 +232,14 @@ namespace HVACStandAloneERV {
     int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum);
 
 } // namespace HVACStandAloneERV
+
+struct HVACStandAloneERVData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

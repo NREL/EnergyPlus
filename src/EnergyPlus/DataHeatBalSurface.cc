@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalSurface.hh>
+
 namespace EnergyPlus {
 
 namespace DataHeatBalSurface {

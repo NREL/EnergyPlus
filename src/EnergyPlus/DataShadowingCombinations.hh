@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -89,6 +90,14 @@ namespace DataShadowingCombinations {
     extern Array1D<ShadowingCombinations> ShadowComb;
 
 } // namespace DataShadowingCombinations
+
+struct ShadowCombData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

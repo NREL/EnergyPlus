@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -185,6 +186,14 @@ namespace PlantHeatExchangerFluidToFluid {
     void clear_state();
 
 } // namespace PlantHeatExchangerFluidToFluid
+
+struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

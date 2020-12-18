@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
-    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour();
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour;
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     state->dataWaterData->WaterStorage(TankNum).NumWaterDemands = 1;
     state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand.allocate(1);
     Real64 draw = 0.025;
-    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
 
 
     // First call, should bring predicted volume above the ValveOnCapacity
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     // Third call: Predicted volume is below ValveOnCapacity, it kicks on
     WaterManager::ManageWater(*state);
     calcVolume -= draw;
-    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(1.985, calcVolume);
     EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     // Fourth call: it should keep on filling, until it hits ValveOffCapacity
     WaterManager::ManageWater(*state);
     calcVolume -= draw;
-    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
     EXPECT_DOUBLE_EQ(3.76, calcVolume);
     calcVolume = min(calcVolume, state->dataWaterData->WaterStorage(TankNum).MaxCapacity);
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);

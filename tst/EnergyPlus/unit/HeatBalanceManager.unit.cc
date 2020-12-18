@@ -337,15 +337,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     bool ErrorsFound(false); // If errors detected in input
 
     TotMaterials = 3;
-    dataMaterial.Material.allocate(TotMaterials);
-    dataMaterial.Material(1).Name = "GLASS";
-    dataMaterial.Material(2).Name = "AIRGAP";
-    dataMaterial.Material(3).Name = "GLASS";
+    state->dataMaterial->Material.allocate(TotMaterials);
+    state->dataMaterial->Material(1).Name = "GLASS";
+    state->dataMaterial->Material(2).Name = "AIRGAP";
+    state->dataMaterial->Material(3).Name = "GLASS";
 
     // Material layer group index
-    dataMaterial.Material(1).Group = 3; // WindowGlass
-    dataMaterial.Material(2).Group = 4; // WindowGas
-    dataMaterial.Material(3).Group = 3; // WindowGlass
+    state->dataMaterial->Material(1).Group = 3; // WindowGlass
+    state->dataMaterial->Material(2).Group = 4; // WindowGas
+    state->dataMaterial->Material(3).Group = 3; // WindowGlass
 
     NominalRforNominalUCalculation.allocate(1);
     NominalRforNominalUCalculation(1) = 0.0;
@@ -494,7 +494,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).ReturnNode(1) = 4;
     ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
-    ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+    ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).ReturnNode(1) = 8;
     ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
-    ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+    ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
     ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
     ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
@@ -716,11 +716,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(dataMaterial.Material(1).Name, "THICKSOIL");
+    EXPECT_EQ(state->dataMaterial->Material(1).Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, dataMaterial.Material(1).Porosity);
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1).Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, dataMaterial.Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -1769,7 +1769,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     HeatBalanceManager::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
+    EXPECT_NEAR(state->dataMaterial->Material(1).Resistance,0.158,0.0001);
 
 }
 

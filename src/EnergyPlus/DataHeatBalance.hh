@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -779,8 +780,8 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneData()
             : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
-              CeilingHeight(DataGlobalConstants::AutoCalculate()), Volume(DataGlobalConstants::AutoCalculate()), OfType(1),
-              UserEnteredFloorArea(DataGlobalConstants::AutoCalculate()), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
+              CeilingHeight(DataGlobalConstants::AutoCalculate), Volume(DataGlobalConstants::AutoCalculate), OfType(1),
+              UserEnteredFloorArea(DataGlobalConstants::AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
               HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0),
               ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
               ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
@@ -2243,6 +2244,14 @@ namespace DataHeatBalance {
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
+
+struct HeatBalanceData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
