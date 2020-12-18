@@ -176,22 +176,8 @@ namespace OutputReportTabular {
     // The Binned table type is different and only references one variable and its structure is very
     // different from the others so it is has its own type.
 
-    // arrays for time binned results
-
-    extern int OutputTableBinnedCount;
-    extern int BinResultsTableCount;
-    extern int BinResultsIntervalCount;
-
     constexpr int numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
-
-    extern int MonthlyInputCount;
-    extern int sizeMonthlyInput;
-    extern int MonthlyFieldSetInputCount;
-    extern int sizeMonthlyFieldSetInput;
-    extern int MonthlyTablesCount;
-    extern int MonthlyColumnsCount;
-    extern Array1D_bool IsMonthGathered; // shown as true for any month used
 
     extern int TOCEntriesCount;
     extern int TOCEntriesSize;
@@ -737,9 +723,9 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
 
-    void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
+    void AddMonthlyFieldSetInput(EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
 
     void InitializeTabularMonthly(EnergyPlusData &state);
 
@@ -761,7 +747,7 @@ namespace OutputReportTabular {
 
     void InitializePredefinedMonthlyTitles(EnergyPlusData &state);
 
-    void CreatePredefinedMonthlyReports();
+    void CreatePredefinedMonthlyReports(EnergyPlusData &state);
 
     void GetInputFuelAndPollutionFactors(EnergyPlusData &state);
 
@@ -985,7 +971,7 @@ namespace OutputReportTabular {
 
     void ResetTabularReports(EnergyPlusData &state);
 
-    void ResetMonthlyGathering();
+    void ResetMonthlyGathering(EnergyPlusData &state);
 
     void ResetBinGathering();
 
@@ -1068,10 +1054,30 @@ namespace OutputReportTabular {
 struct OutputReportTabularData : BaseGlobalStruct {
 
     OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
+    int OutputTableBinnedCount = 0;
+    int BinResultsTableCount = 0;
+    int BinResultsIntervalCount = 0;
+    int MonthlyInputCount = 0;
+    int sizeMonthlyInput = 0;
+    int MonthlyFieldSetInputCount = 0;
+    int sizeMonthlyFieldSetInput = 0;
+    int MonthlyTablesCount = 0;
+    int MonthlyColumnsCount = 0;
+    Array1D_bool IsMonthGathered = Array1D_bool(12, false); // shown as true for any month used
 
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
+        this->OutputTableBinnedCount = 0;
+        this->BinResultsTableCount = 0;
+        this->BinResultsIntervalCount = 0;
+        this->MonthlyInputCount = 0;
+        this->sizeMonthlyInput = 0;
+        this->MonthlyFieldSetInputCount = 0;
+        this->sizeMonthlyFieldSetInput = 0;
+        this->MonthlyTablesCount = 0;
+        this->MonthlyColumnsCount = 0;
+        this->IsMonthGathered = Array1D_bool(12, false);
     }
 };
 

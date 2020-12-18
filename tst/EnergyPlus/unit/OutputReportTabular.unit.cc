@@ -3501,7 +3501,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(*state);
-    EXPECT_EQ(MonthlyInputCount, 1);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
     InitializeTabularMonthly(*state);
 
     extLitUse = 1.01;
@@ -3517,7 +3517,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, MonthlyColumns(1).reslt(12));
 
-    ResetMonthlyGathering();
+    ResetMonthlyGathering(*state);
 
     EXPECT_EQ(0., MonthlyColumns(1).reslt(12));
 
@@ -6437,7 +6437,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(*state);
-    EXPECT_EQ(MonthlyInputCount, 1);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
     InitializeTabularMonthly(*state);
 
     EXPECT_TRUE(isInvalidAggregationOrder(*state));
@@ -7230,7 +7230,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // Variables aren't going to be output to SQL/ESO anyways
     EXPECT_EQ(state->dataOutputProcessor->NumOfReqVariables, 0);
 
-    EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
     // If everything worked, we should have 2 tables, one for each zone.
     // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
     // and so the numTables was zero

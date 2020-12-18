@@ -1839,7 +1839,6 @@ namespace SimulationManager {
         // Using/Aliasing
         using namespace DataOutputs;
         using OutputReportTabular::maxUniqueKeyCount;
-        using OutputReportTabular::MonthlyFieldSetInputCount;
         using namespace DataRuntimeLanguage;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
@@ -1896,7 +1895,7 @@ namespace SimulationManager {
         } else {
             print(state.files.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
         }
-        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", state.dataOutRptTab->MonthlyFieldSetInputCount);
         print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
         print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 

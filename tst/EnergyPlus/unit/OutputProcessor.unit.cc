@@ -3285,7 +3285,7 @@ namespace OutputProcessor {
         state->dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(*state);
-        EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+        EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly(*state);
 
         GetReportVariableInput(*state);
@@ -3342,7 +3342,7 @@ namespace OutputProcessor {
         state->dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(*state);
-        EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+        EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly(*state);
 
         GetReportVariableInput(*state);

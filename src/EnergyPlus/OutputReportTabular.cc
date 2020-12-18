@@ -177,18 +177,6 @@ namespace EnergyPlus::OutputReportTabular {
 
     // arrays for time binned results
 
-    int OutputTableBinnedCount(0);
-    int BinResultsTableCount(0);
-    int BinResultsIntervalCount(0);
-
-    int MonthlyInputCount(0);
-    int sizeMonthlyInput(0);
-    int MonthlyFieldSetInputCount(0);
-    int sizeMonthlyFieldSetInput(0);
-    int MonthlyTablesCount(0);
-    int MonthlyColumnsCount(0);
-    Array1D_bool IsMonthGathered(12, false); // shown as true for any month used
-
     int TOCEntriesCount(0);
     int TOCEntriesSize(0);
 
@@ -196,7 +184,6 @@ namespace EnergyPlus::OutputReportTabular {
 
     bool WriteTabularFiles(false);
     bool GetInput(true);
-    bool firstTimeGatherHGReport(true);
 
     // From Report:Table:Style
     int numStyles(0);
@@ -214,8 +201,8 @@ namespace EnergyPlus::OutputReportTabular {
     // Flags for predefined tabular reports
     bool displayTabularBEPS(false);
     bool displayLEEDSummary(false);
-    bool displayTabularCompCosts(false); // added BTG 5/6/04 for component cost summary
-    bool displayTabularVeriSum(false);   // added JG 2006-06-28 for input verification and summary report
+    bool displayTabularCompCosts(false);
+    bool displayTabularVeriSum(false);
     bool displayComponentSizing(false);
     bool displaySurfaceShadowing(false);
     bool displayDemandEndUse(false);
@@ -442,16 +429,6 @@ namespace EnergyPlus::OutputReportTabular {
         GatherHeatGainReportfirstTime = true;
         AllocateLoadComponentArraysDoAllocate = true;
         initAdjFenDone = false;
-        OutputTableBinnedCount = 0;
-        BinResultsTableCount = 0;
-        BinResultsIntervalCount = 0;
-        MonthlyInputCount = 0;
-        sizeMonthlyInput = 0;
-        MonthlyFieldSetInputCount = 0;
-        sizeMonthlyFieldSetInput = 0;
-        MonthlyTablesCount = 0;
-        MonthlyColumnsCount = 0;
-        IsMonthGathered = Array1D_bool(12, false);
         TOCEntriesCount = 0;
         TOCEntriesSize = 0;
         UnitConvSize = 0;
@@ -749,8 +726,8 @@ namespace EnergyPlus::OutputReportTabular {
             return;
         }
 
-        MonthlyInputCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        if (MonthlyInputCount > 0) {
+        state.dataOutRptTab->MonthlyInputCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        if (state.dataOutRptTab->MonthlyInputCount > 0) {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
             if (!state.dataGlobal->DoWeathSim) {
@@ -762,7 +739,7 @@ namespace EnergyPlus::OutputReportTabular {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
-        for (int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum) { // MonthlyInputCount is modified in the loop
+        for (int TabNum = 1, TabNum_end = state.dataOutRptTab->MonthlyInputCount; TabNum <= TabNum_end; ++TabNum) { // MonthlyInputCount is modified in the loop
             inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
             if (TabNum - 1 > 0) {
@@ -772,7 +749,7 @@ namespace EnergyPlus::OutputReportTabular {
                 ShowSevereError(state, CurrentModuleObject + ": No fields specified.");
             }
             // add to the data structure
-            curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
+            curTable = AddMonthlyReport(state, AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
                 if (AlphArray(jField).empty()) {
                     ShowFatalError(state, "Blank report name in Output:Table:Monthly");
@@ -810,12 +787,12 @@ namespace EnergyPlus::OutputReportTabular {
                     ShowWarningError(state, CurrentModuleObject + '=' + MonthlyInput(TabNum).name + ", Variable name=" + AlphArray(jField));
                     ShowContinueError(state, "Invalid aggregation type=\"" + curAggString + "\"  Defaulting to SumOrAverage.");
                 }
-                AddMonthlyFieldSetInput(curTable, AlphArray(jField), "", curAggType);
+                AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
             }
         }
     }
 
-    int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown)
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -853,22 +830,22 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!allocated(MonthlyInput)) {
             MonthlyInput.allocate(SizeAdder);
-            sizeMonthlyInput = SizeAdder;
-            MonthlyInputCount = 1;
+            state.dataOutRptTab->sizeMonthlyInput = SizeAdder;
+            state.dataOutRptTab->MonthlyInputCount = 1;
         } else {
-            ++MonthlyInputCount;
+            ++state.dataOutRptTab->MonthlyInputCount;
             // if larger than current size grow the array
-            if (MonthlyInputCount > sizeMonthlyInput) {
-                MonthlyInput.redimension(sizeMonthlyInput += SizeAdder);
+            if (state.dataOutRptTab->MonthlyInputCount > state.dataOutRptTab->sizeMonthlyInput) {
+                MonthlyInput.redimension(state.dataOutRptTab->sizeMonthlyInput += SizeAdder);
             }
         }
         // initialize new record
-        MonthlyInput(MonthlyInputCount).name = inReportName;
-        MonthlyInput(MonthlyInputCount).showDigits = inNumDigitsShown;
-        return MonthlyInputCount;
+        MonthlyInput(state.dataOutRptTab->MonthlyInputCount).name = inReportName;
+        MonthlyInput(state.dataOutRptTab->MonthlyInputCount).showDigits = inNumDigitsShown;
+        return state.dataOutRptTab->MonthlyInputCount;
     }
 
-    void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate)
+    void AddMonthlyFieldSetInput(EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -905,24 +882,24 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!allocated(MonthlyFieldSetInput)) {
             MonthlyFieldSetInput.allocate(sizeIncrement);
-            sizeMonthlyFieldSetInput = sizeIncrement;
-            MonthlyFieldSetInputCount = 1;
+            state.dataOutRptTab->sizeMonthlyFieldSetInput = sizeIncrement;
+            state.dataOutRptTab->MonthlyFieldSetInputCount = 1;
         } else {
-            ++MonthlyFieldSetInputCount;
+            ++state.dataOutRptTab->MonthlyFieldSetInputCount;
             // if larger than current size grow the array
-            if (MonthlyFieldSetInputCount > sizeMonthlyFieldSetInput) {
-                MonthlyFieldSetInput.redimension(sizeMonthlyFieldSetInput *=
+            if (state.dataOutRptTab->MonthlyFieldSetInputCount > state.dataOutRptTab->sizeMonthlyFieldSetInput) {
+                MonthlyFieldSetInput.redimension(state.dataOutRptTab->sizeMonthlyFieldSetInput *=
                                                  2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)
-        MonthlyFieldSetInput(MonthlyFieldSetInputCount).variMeter = inVariMeter;
-        MonthlyFieldSetInput(MonthlyFieldSetInputCount).colHead = inColHead;
-        MonthlyFieldSetInput(MonthlyFieldSetInputCount).aggregate = inAggregate;
+        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).variMeter = inVariMeter;
+        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).colHead = inColHead;
+        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).aggregate = inAggregate;
         // update the references from the MonthlyInput array
-        if ((inMonthReport > 0) && (inMonthReport <= MonthlyInputCount)) {
+        if ((inMonthReport > 0) && (inMonthReport <= state.dataOutRptTab->MonthlyInputCount)) {
             if (MonthlyInput(inMonthReport).firstFieldSet == 0) {
-                MonthlyInput(inMonthReport).firstFieldSet = MonthlyFieldSetInputCount;
+                MonthlyInput(inMonthReport).firstFieldSet = state.dataOutRptTab->MonthlyFieldSetInputCount;
                 MonthlyInput(inMonthReport).numFieldSet = 1;
             } else {
                 ++MonthlyInput(inMonthReport).numFieldSet;
@@ -1021,9 +998,9 @@ namespace EnergyPlus::OutputReportTabular {
         // ALLOCATE(IndexesForKeyVar(maxKeyCount))
         //#endif
 
-        MonthlyColumnsCount = 0;
-        MonthlyTablesCount = 0;
-        for (TabNum = 1; TabNum <= MonthlyInputCount; ++TabNum) {
+        state.dataOutRptTab->MonthlyColumnsCount = 0;
+        state.dataOutRptTab->MonthlyTablesCount = 0;
+        for (TabNum = 1; TabNum <= state.dataOutRptTab->MonthlyInputCount; ++TabNum) {
             // the number of columns based on number of alpha fields
             NumColumns = MonthlyInput(TabNum).numFieldSet;
             FirstColumn = MonthlyInput(TabNum).firstFieldSet;
@@ -1109,14 +1086,14 @@ namespace EnergyPlus::OutputReportTabular {
                 UniqueKeyCount = 1;
             }
             // increment the number of tables based on the number of unique keys
-            MonthlyTablesCount += UniqueKeyCount;
-            MonthlyColumnsCount += UniqueKeyCount * NumColumns;
+            state.dataOutRptTab->MonthlyTablesCount += UniqueKeyCount;
+            state.dataOutRptTab->MonthlyColumnsCount += UniqueKeyCount * NumColumns;
         } // TabNum the end of the loop through the inputs objects
         // Now that we have the maximum size of the number of tables (each table is
         // repeated for the number of keys found) and the number of total columns
         // of all of the tables, allocate the arrays to store this information.
-        MonthlyTables.allocate(MonthlyTablesCount);
-        MonthlyColumns.allocate(MonthlyColumnsCount);
+        MonthlyTables.allocate(state.dataOutRptTab->MonthlyTablesCount);
+        MonthlyColumns.allocate(state.dataOutRptTab->MonthlyColumnsCount);
         // Initialize tables and results
         for (auto &e : MonthlyTables) {
             e.keyValue.clear();
@@ -1133,7 +1110,7 @@ namespace EnergyPlus::OutputReportTabular {
             e.units = OutputProcessor::Unit::None;
             e.aggType = iAggType::Unassigned;
         }
-        for (colNum = 1; colNum <= MonthlyColumnsCount; ++colNum) {
+        for (colNum = 1; colNum <= state.dataOutRptTab->MonthlyColumnsCount; ++colNum) {
             MonthlyColumns(colNum).reslt = 0.0;
             MonthlyColumns(colNum).timeStamp = 0;
             MonthlyColumns(colNum).duration = 0.0;
@@ -1141,7 +1118,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         ColumnsRecount = 0;
         TablesRecount = 0;
-        for (TabNum = 1; TabNum <= MonthlyInputCount; ++TabNum) {
+        for (TabNum = 1; TabNum <= state.dataOutRptTab->MonthlyInputCount; ++TabNum) {
             // the number of columns based on number of alpha fields
             NumColumns = MonthlyInput(TabNum).numFieldSet;
             FirstColumn = MonthlyInput(TabNum).firstFieldSet;
@@ -1369,7 +1346,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return foundError;
         }
-        for (int iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
+        for (int iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
             bool foundMinOrMax = false;
             bool foundHourAgg = false;
             bool missingMaxOrMinError = false;
@@ -1479,9 +1456,9 @@ namespace EnergyPlus::OutputReportTabular {
 
         timeInYear = 0.0; // intialize the time in year counter
         // determine size of array that holds the IDF description
-        OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        OutputTableBinned.allocate(OutputTableBinnedCount);
-        if (OutputTableBinnedCount > 0) {
+        state.dataOutRptTab->OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        OutputTableBinned.allocate(state.dataOutRptTab->OutputTableBinnedCount);
+        if (state.dataOutRptTab->OutputTableBinnedCount > 0) {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
             if (!state.dataGlobal->DoWeathSim) {
@@ -1491,9 +1468,9 @@ namespace EnergyPlus::OutputReportTabular {
             }
         }
         // looking for maximum number of intervals for sizing
-        BinResultsIntervalCount = 0;
-        BinResultsTableCount = 0;
-        for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
+        state.dataOutRptTab->BinResultsIntervalCount = 0;
+        state.dataOutRptTab->BinResultsTableCount = 0;
+        for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -1539,10 +1516,10 @@ namespace EnergyPlus::OutputReportTabular {
             if (OutputTableBinned(iInObj).intervalSize < 0) {
                 OutputTableBinned(iInObj).intervalSize = 1000.0;
             }
-            OutputTableBinned(iInObj).resIndex = BinResultsTableCount + 1; // the next results report
+            OutputTableBinned(iInObj).resIndex = state.dataOutRptTab->BinResultsTableCount + 1; // the next results report
             // find maximum number of intervals
-            if (OutputTableBinned(iInObj).intervalCount > BinResultsIntervalCount) {
-                BinResultsIntervalCount = OutputTableBinned(iInObj).intervalCount;
+            if (OutputTableBinned(iInObj).intervalCount > state.dataOutRptTab->BinResultsIntervalCount) {
+                state.dataOutRptTab->BinResultsIntervalCount = OutputTableBinned(iInObj).intervalCount;
             }
             GetVariableKeyCountandType(state, OutputTableBinned(iInObj).varOrMeter,
                                        OutputTableBinned(iInObj).numTables,
@@ -1557,20 +1534,20 @@ namespace EnergyPlus::OutputReportTabular {
             // later will reset the numTables array pointer but for now use it to know
             // how many items to scan through
             if (OutputTableBinned(iInObj).keyValue == "*") {
-                BinResultsTableCount += OutputTableBinned(iInObj).numTables;
+                state.dataOutRptTab->BinResultsTableCount += OutputTableBinned(iInObj).numTables;
             } else {
-                ++BinResultsTableCount; // if a particular key is requested then only one more report
+                ++state.dataOutRptTab->BinResultsTableCount; // if a particular key is requested then only one more report
             }
         }
         // size the arrays that holds the bin results
-        BinResults.allocate(BinResultsIntervalCount, BinResultsTableCount);
-        BinResultsBelow.allocate(BinResultsTableCount);
-        BinResultsAbove.allocate(BinResultsTableCount);
-        BinStatistics.allocate(BinResultsTableCount);
-        BinObjVarID.allocate(BinResultsTableCount);
+        BinResults.allocate(state.dataOutRptTab->BinResultsIntervalCount, state.dataOutRptTab->BinResultsTableCount);
+        BinResultsBelow.allocate(state.dataOutRptTab->BinResultsTableCount);
+        BinResultsAbove.allocate(state.dataOutRptTab->BinResultsTableCount);
+        BinStatistics.allocate(state.dataOutRptTab->BinResultsTableCount);
+        BinObjVarID.allocate(state.dataOutRptTab->BinResultsTableCount);
         // now that the arrays are sized go back and fill in
         // what ID numbers are used for each table
-        for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
+        for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             firstReport = OutputTableBinned(iInObj).resIndex;
             // allocate the arrays to the number of objects
             objNames.allocate(OutputTableBinned(iInObj).numTables);
@@ -2127,7 +2104,7 @@ namespace EnergyPlus::OutputReportTabular {
                     //      ErrorsFound=.TRUE.
                 }
             }
-            CreatePredefinedMonthlyReports();
+            CreatePredefinedMonthlyReports(state);
         } else if (NumTabularPredefined > 1) {
             ShowSevereError(state, CurrentModuleObject + ": Only one instance of this object is allowed.");
             ErrorsFound = true;
@@ -2492,7 +2469,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
-    void CreatePredefinedMonthlyReports()
+    void CreatePredefinedMonthlyReports(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2532,635 +2509,635 @@ namespace EnergyPlus::OutputReportTabular {
         // ----------------------------------------------------------------------------------------
 
         if (namedMonthly(1).show) {
-            curReport = AddMonthlyReport("ZoneCoolingSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Air System Sensible Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Total Internal Latent Gain Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Total Internal Latent Gain Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "ZoneCoolingSummaryMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Total Internal Latent Gain Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Total Internal Latent Gain Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(2).show) {
-            curReport = AddMonthlyReport("ZoneHeatingSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Air System Sensible Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Air System Sensible Heating Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "ZoneHeatingSummaryMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(3).show) {
-            curReport = AddMonthlyReport("ZoneElectricSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Electricity Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "ZoneElectricSummaryMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::Maximum);
         }
         if (namedMonthly(4).show) {
-            curReport = AddMonthlyReport("SpaceGainsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone People Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "SpaceGainsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(5).show) {
-            curReport = AddMonthlyReport("PeakSpaceGainsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone People Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakSpaceGainsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::Maximum);
         }
         if (namedMonthly(6).show) {
-            curReport = AddMonthlyReport("SpaceGainComponentsAtCoolingPeakMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone People Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "SpaceGainComponentsAtCoolingPeakMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Gas Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Hot Water Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Steam Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Other Equipment Total Heating Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(7).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionElectricityNaturalGasMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Electricity:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Electricity:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "NaturalGas:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "NaturalGas:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityNaturalGasMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(8).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionElectricityGeneratedPropaneMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ElectricityProduced:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ElectricityProduced:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Propane:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Propane:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityGeneratedPropaneMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(9).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionDieselFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionDieselFuelOilMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "FuelOilNo1:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "FuelOilNo1:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "FuelOilNo2:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "FuelOilNo2:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(10).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "DistrictCooling:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "DistrictCooling:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "DistrictHeating:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "DistrictHeating:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(11).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionCoalGasolineMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Coal:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Coal:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Gasoline:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Gasoline:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionCoalGasolineMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(12).show) {
-            curReport = AddMonthlyReport("EnergyConsumptionOtherFuelsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "OtherFuel1:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "OtherFuel1:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "OtherFuel2:Facility", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "OtherFuel2:Facility", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "EnergyConsumptionOtherFuelsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", iAggType::Maximum);
         }
         if (namedMonthly(13).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionElectricityMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorLights:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorLights:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Fans:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Pumps:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "HeatRejection:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Humidifier:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "HeatRecovery:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Electricity", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Electricity", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionElectricityMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Fans:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Pumps:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Humidifier:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "HeatRecovery:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Electricity", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(14).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionNaturalGasMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:NaturalGas", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Humidifier:NaturalGas", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionNaturalGasMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:NaturalGas", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Humidifier:NaturalGas", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(15).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionDieselMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Diesel", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Diesel", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Diesel", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Diesel", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Diesel", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionDieselMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Diesel", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Diesel", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(16).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionFuelOilMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(17).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionCoalMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Coal", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Coal", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Coal", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionCoalMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(18).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionPropaneMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Propane", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Propane", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Propane", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Propane", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Propane", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Humidifier:Propane", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionPropaneMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Propane", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Propane", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Propane", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Humidifier:Propane", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(19).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionGasolineMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Gasoline", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Gasoline", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Gasoline", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Gasoline", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Gasoline", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionGasolineMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Gasoline", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Gasoline", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(20).show) {
-            curReport = AddMonthlyReport("EndUseEnergyConsumptionOtherFuelsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:OtherFuel1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:OtherFuel1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:OtherFuel1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:OtherFuel1", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:OtherFuel2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:OtherFuel2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:OtherFuel2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:OtherFuel2", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:OtherFuel2", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionOtherFuelsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel1", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel2", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(21).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseElectricityPart1Monthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorLights:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorLights:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Fans:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Pumps:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Electricity", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart1Monthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Fans:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Pumps:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Electricity", "", iAggType::Maximum);
         }
         if (namedMonthly(22).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseElectricityPart2Monthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "HeatRejection:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Humidifier:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "HeatRecovery:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Electricity", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Electricity", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart2Monthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Humidifier:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "HeatRecovery:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Electricity", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", iAggType::Maximum);
         }
         if (namedMonthly(23).show) {
-            curReport = AddMonthlyReport("ElectricComponentsOfPeakDemandMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Electricity:Facility", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "InteriorLights:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "ExteriorLights:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Fans:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Pumps:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Heating:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Electricity", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "HeatRejection:Electricity", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "ElectricComponentsOfPeakDemandMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Fans:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Pumps:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(24).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseNaturalGasMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:NaturalGas", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:NaturalGas", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:NaturalGas", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:NaturalGas", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:NaturalGas", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:NaturalGas", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseNaturalGasMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:NaturalGas", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:NaturalGas", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:NaturalGas", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:NaturalGas", "", iAggType::Maximum);
         }
         if (namedMonthly(25).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseDieselMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Diesel", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Diesel", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Diesel", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Diesel", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Diesel", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseDieselMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Diesel", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Diesel", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", iAggType::Maximum);
         }
         if (namedMonthly(26).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseFuelOilMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", iAggType::Maximum);
         }
         if (namedMonthly(27).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseCoalMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Coal", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Coal", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Coal", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseCoalMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", iAggType::Maximum);
         }
         if (namedMonthly(28).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUsePropaneMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Propane", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Propane", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Propane", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Propane", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Propane", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUsePropaneMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Propane", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Propane", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Propane", "", iAggType::Maximum);
         }
         if (namedMonthly(29).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseGasolineMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Gasoline", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Gasoline", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Gasoline", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Gasoline", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Gasoline", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseGasolineMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:Gasoline", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Gasoline", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", iAggType::Maximum);
         }
         if (namedMonthly(30).show) {
-            curReport = AddMonthlyReport("PeakEnergyEndUseOtherFuelsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:OtherFuel1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:OtherFuel1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:OtherFuel1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:OtherFuel1", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:OtherFuel2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:OtherFuel2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:OtherFuel2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:OtherFuel2", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:OtherFuel2", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PeakEnergyEndUseOtherFuelsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel1", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel2", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", iAggType::Maximum);
         }
         if (namedMonthly(31).show) {
-            curReport = AddMonthlyReport("SetpointsNotMetWithTemperaturesMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Heating Setpoint Not Met Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Heating Setpoint Not Met While Occupied Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Cooling Setpoint Not Met Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Cooling Setpoint Not Met While Occupied Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            curReport = AddMonthlyReport(state, "SetpointsNotMetWithTemperaturesMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Heating Setpoint Not Met Time", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Heating Setpoint Not Met While Occupied Time", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Cooling Setpoint Not Met Time", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Cooling Setpoint Not Met While Occupied Time", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
         }
         if (namedMonthly(32).show) {
-            curReport = AddMonthlyReport("ComfortReportSimple55Monthly", 2);
-            AddMonthlyFieldSetInput(
+            curReport = AddMonthlyReport(state, "ComfortReportSimple55Monthly", 2);
+            AddMonthlyFieldSetInput(state,
                 curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state,
                 curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state,
                 curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
         }
         if (namedMonthly(33).show) {
-            curReport = AddMonthlyReport("UnglazedTranspiredSolarCollectorSummaryMonthly", 5);
-            AddMonthlyFieldSetInput(curReport, "Solar Collector System Efficiency", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Solar Collector System Efficiency", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Solar Collector Outside Face Suction Velocity", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Solar Collector Sensible Heating Rate", "", iAggType::SumOrAverageHoursShown);
+            curReport = AddMonthlyReport(state, "UnglazedTranspiredSolarCollectorSummaryMonthly", 5);
+            AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Solar Collector Outside Face Suction Velocity", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Solar Collector Sensible Heating Rate", "", iAggType::SumOrAverageHoursShown);
         }
         if (namedMonthly(34).show) {
-            curReport = AddMonthlyReport("OccupantComfortDataSummaryMonthly", 5);
-            AddMonthlyFieldSetInput(curReport, "People Occupant Count", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "People Air Temperature", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "People Air Relative Humidity", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Thermal Comfort Fanger Model PMV", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Thermal Comfort Fanger Model PPD", "", iAggType::SumOrAverageHoursShown);
+            curReport = AddMonthlyReport(state, "OccupantComfortDataSummaryMonthly", 5);
+            AddMonthlyFieldSetInput(state, curReport, "People Occupant Count", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "People Air Temperature", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "People Air Relative Humidity", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Thermal Comfort Fanger Model PMV", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Thermal Comfort Fanger Model PPD", "", iAggType::SumOrAverageHoursShown);
         }
         if (namedMonthly(35).show) {
-            curReport = AddMonthlyReport("ChillerReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Chiller Condenser Heat Transfer Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller COP", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller COP", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Chiller Part Load Ratio", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller Part Load Ratio", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "ChillerReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Evaporator Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Evaporator Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Condenser Heat Transfer Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller COP", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller COP", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Part Load Ratio", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Chiller Part Load Ratio", "", iAggType::Maximum);
         }
         if (namedMonthly(36).show) {
-            curReport = AddMonthlyReport("TowerReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Heat Transfer Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Inlet Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Outlet Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Mass Flow Rate", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "TowerReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Heat Transfer Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Inlet Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Outlet Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Mass Flow Rate", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(37).show) {
-            curReport = AddMonthlyReport("BoilerReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Boiler Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Gas Consumption", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Heating Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Boiler Heating Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Boiler Gas Consumption Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Boiler Inlet Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Outlet Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Mass Flow Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Ancillary Electricity Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "BoilerReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Gas Consumption", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Gas Consumption Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Inlet Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Outlet Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Mass Flow Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Ancillary Electricity Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Part Load Ratio", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Boiler Part Load Ratio", "", iAggType::Maximum);
         }
         if (namedMonthly(38).show) {
-            curReport = AddMonthlyReport("DXReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Latent Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Runtime Fraction", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Runtime Fraction", "", iAggType::Minimum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Latent Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "DXReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Sensible Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Latent Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Crankcase Heater Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Runtime Fraction", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Runtime Fraction", "", iAggType::Minimum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Sensible Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Latent Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Electricity Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", iAggType::Maximum);
         }
         if (namedMonthly(39).show) {
-            curReport = AddMonthlyReport("WindowReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Heat Gain Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Heat Loss Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Inside Face Glazing Condensation Status", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Surface Shading Device Is On Time Fraction", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Surface Storm Window On Off Status", "", iAggType::HoursNonZero);
+            curReport = AddMonthlyReport(state, "WindowReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Gain Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Loss Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Inside Face Glazing Condensation Status", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Shading Device Is On Time Fraction", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Storm Window On Off Status", "", iAggType::HoursNonZero);
         }
         if (namedMonthly(40).show) {
-            curReport = AddMonthlyReport("WindowEnergyReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Heat Gain Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Surface Window Heat Loss Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "WindowEnergyReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Gain Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Loss Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(41).show) {
-            curReport = AddMonthlyReport("WindowZoneSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Heat Gain Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Heat Loss Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(42).show) {
-            curReport = AddMonthlyReport("WindowEnergyZoneSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Heat Gain Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Heat Loss Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(43).show) {
-            curReport = AddMonthlyReport("AverageOutdoorConditionsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Wind Speed", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Sky Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Rain Status", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Wind Speed", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Sky Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Rain Status", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(44).show) {
-            curReport = AddMonthlyReport("OutdoorConditionsMaximumDryBulbMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDryBulbMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(45).show) {
-            curReport = AddMonthlyReport("OutdoorConditionsMinimumDryBulbMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Minimum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "OutdoorConditionsMinimumDryBulbMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Minimum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(46).show) {
-            curReport = AddMonthlyReport("OutdoorConditionsMaximumWetBulbMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumWetBulbMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(47).show) {
-            curReport = AddMonthlyReport("OutdoorConditionsMaximumDewPointMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDewPointMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Wind Speed", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Sky Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(48).show) {
-            curReport = AddMonthlyReport("OutdoorGroundConditionsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Ground Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Surface Ground Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Deep Ground Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Mains Water Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Ground Reflected Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Snow on Ground Status", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "OutdoorGroundConditionsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Ground Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Surface Ground Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Deep Ground Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Mains Water Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Ground Reflected Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Snow on Ground Status", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(49).show) {
-            curReport = AddMonthlyReport("WindowACReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Sensible Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Latent Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Sensible Cooling Rate", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Latent Cooling Rate", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Rate", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "WindowACReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Sensible Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Latent Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Sensible Cooling Rate", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Latent Cooling Rate", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Rate", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(50).show) {
-            curReport = AddMonthlyReport("WaterHeaterReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Total Demand Heat Transfer Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Use Side Heat Transfer Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Burner Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Gas Consumption", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Total Demand Heat Transfer Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Loss Demand Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Heat Loss Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Tank Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Heat Recovery Supply Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Water Heater Source Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "WaterHeaterReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Total Demand Heat Transfer Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Use Side Heat Transfer Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Burner Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Gas Consumption", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Total Demand Heat Transfer Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Loss Demand Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Loss Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Tank Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Recovery Supply Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(51).show) {
-            curReport = AddMonthlyReport("GeneratorReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Diesel Consumption", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Gas Consumption", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Generator Total Heat Recovery", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Jacket Heat Recovery Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Lube Heat Recovery", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Exhaust Heat Recovery Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Exhaust Air Temperature", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "GeneratorReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Produced AC Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Diesel Consumption", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Gas Consumption", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Produced AC Electricity Energy", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Total Heat Recovery", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Jacket Heat Recovery Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Lube Heat Recovery", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Exhaust Heat Recovery Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Generator Exhaust Air Temperature", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(52).show) {
-            curReport = AddMonthlyReport("DaylightingReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Site Exterior Beam Normal Illuminance", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Lighting Power Multiplier", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Lighting Power Multiplier", "", iAggType::MinimumDuringHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 1 Illuminance", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 1 Glare Index", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 2 Illuminance", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 2 Glare Index", "", iAggType::SumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "DaylightingReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Site Exterior Beam Normal Illuminance", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Lighting Power Multiplier", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Lighting Power Multiplier", "", iAggType::MinimumDuringHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 1 Illuminance", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 1 Glare Index", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Illuminance", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Glare Index", "", iAggType::SumOrAverageHoursShown);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(53).show) {
-            curReport = AddMonthlyReport("CoilReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Heating Coil Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating Coil Heating Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Rate", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Wetted Area Fraction", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "CoilReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Sensible Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Sensible Cooling Rate", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Wetted Area Fraction", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(54).show) {
-            curReport = AddMonthlyReport("PlantLoopDemandReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "PlantLoopDemandReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
         }
         if (namedMonthly(55).show) {
-            curReport = AddMonthlyReport("FanReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Fan Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Fan Electricity Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "FanReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(56).show) {
-            curReport = AddMonthlyReport("PumpReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Pump Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Pump Electricity Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Pump Shaft Power", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Rate", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Pump Outlet Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Pump Mass Flow Rate", "", iAggType::ValueWhenMaxMin);
+            curReport = AddMonthlyReport(state, "PumpReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Fluid Heat Gain Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Electricity Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Shaft Power", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Fluid Heat Gain Rate", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Outlet Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Pump Mass Flow Rate", "", iAggType::ValueWhenMaxMin);
         }
         if (namedMonthly(57).show) {
-            curReport = AddMonthlyReport("CondLoopDemandReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Inlet Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Outlet Temperature", "", iAggType::ValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
+            curReport = AddMonthlyReport(state, "CondLoopDemandReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Inlet Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Outlet Temperature", "", iAggType::ValueWhenMaxMin);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
         }
         if (namedMonthly(58).show) {
-            curReport = AddMonthlyReport("ZoneTemperatureOscillationReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Oscillating Temperatures Time", "", iAggType::HoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Zone People Occupant Count", "", iAggType::SumOrAverageHoursShown);
+            curReport = AddMonthlyReport(state, "ZoneTemperatureOscillationReportMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Oscillating Temperatures Time", "", iAggType::HoursNonZero);
+            AddMonthlyFieldSetInput(state, curReport, "Zone People Occupant Count", "", iAggType::SumOrAverageHoursShown);
         }
         if (namedMonthly(59).show) {
-            curReport = AddMonthlyReport("AirLoopSystemEnergyAndWaterUseMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Air System Hot Water Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Steam Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Chilled Water Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Natural Gas Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Water Volume", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "AirLoopSystemEnergyAndWaterUseMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Hot Water Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Steam Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Chilled Water Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Natural Gas Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Water Volume", "", iAggType::SumOrAvg);
         }
 
         if (namedMonthly(60).show) {
-            curReport = AddMonthlyReport("AirLoopSystemComponentLoadsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Air System Fan Air Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heat Exchanger Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heat Exchanger Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Total Heating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Evaporative Cooler Total Cooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Desiccant Dehumidifier Total Cooling Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "AirLoopSystemComponentLoadsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Fan Air Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heat Exchanger Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heat Exchanger Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Humidifier Total Heating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Evaporative Cooler Total Cooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Total Cooling Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(61).show) {
-            curReport = AddMonthlyReport("AirLoopSystemComponentEnergyUseMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Air System Fan Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Hot Water Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Cooling Coil Chilled Water Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System DX Heating Coil Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System DX Cooling Coil Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Natural Gas Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Steam Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Natural Gas Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Evaporative Cooler Electricity Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Desiccant Dehumidifier Electricity Energy", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "AirLoopSystemComponentEnergyUseMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Fan Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Hot Water Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Cooling Coil Chilled Water Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System DX Heating Coil Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System DX Cooling Coil Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Natural Gas Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Steam Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Humidifier Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Humidifier Natural Gas Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Evaporative Cooler Electricity Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Electricity Energy", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(62).show) {
-            curReport = AddMonthlyReport("MechanicalVentilationLoadsMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation No Load Heat Removal Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Cooling Load Increase Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Cooling Load Decrease Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation No Load Heat Addition Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Increase Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Heating Load Decrease Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", iAggType::SumOrAvg);
+            curReport = AddMonthlyReport(state, "MechanicalVentilationLoadsMonthly", 2);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation No Load Heat Removal Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Cooling Load Increase Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Cooling Load Decrease Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation No Load Heat Addition Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Heating Load Increase Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Heating Load Decrease Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", iAggType::SumOrAvg);
         }
         if (namedMonthly(63).show) {
-            curReport = AddMonthlyReport("HeatEmissionsReportMonthly", 2);
+            curReport = AddMonthlyReport(state, "HeatEmissionsReportMonthly", 2);
             // Place holder
-            AddMonthlyFieldSetInput(curReport, "Site Total Surface Heat Emission to Air", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Total Zone Exfiltration Heat Loss", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Site Total Zone Exhaust Air Heat Loss", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Relief Air Total Heat Loss Energy", "", iAggType::SumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "HVAC System Total Heat Rejection Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Total Surface Heat Emission to Air", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Total Zone Exfiltration Heat Loss", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Site Total Zone Exhaust Air Heat Loss", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "Air System Relief Air Total Heat Loss Energy", "", iAggType::SumOrAvg);
+            AddMonthlyFieldSetInput(state, curReport, "HVAC System Total Heat Rejection Energy", "", iAggType::SumOrAvg);
         }
     }
 
@@ -3733,7 +3710,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
                 if (state.dataGlobal->DoWeathSim) {
-                    for (iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
+                    for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
                         if (MonthlyInput(iInput).numTables > 0) {
                             tbl_stream << "<p><b>" << MonthlyInput(iInput).name << "</b></p> |\n";
                             for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
@@ -3743,7 +3720,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         }
                     }
-                    for (iInput = 1; iInput <= OutputTableBinnedCount; ++iInput) {
+                    for (iInput = 1; iInput <= state.dataOutRptTab->OutputTableBinnedCount; ++iInput) {
                         if (OutputTableBinned(iInput).numTables > 0) {
                             if (OutputTableBinned(iInput).scheduleIndex == 0) {
                                 tbl_stream << "<p><b>" << OutputTableBinned(iInput).varOrMeter << "</b></p> |\n";
@@ -3853,7 +3830,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (!state.dataGlobal->DoWeathSim) return;
         elapsedTime = TimeStepSys;
         timeInYear += elapsedTime;
-        for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
+        for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             // get values of array for current object being referenced
             curIntervalStart = OutputTableBinned(iInObj).intervalStart;
             curIntervalSize = OutputTableBinned(iInObj).intervalSize;
@@ -4030,8 +4007,8 @@ namespace EnergyPlus::OutputReportTabular {
         } else {
             elapsedTime = state.dataGlobal->TimeStepZone;
         }
-        IsMonthGathered(state.dataEnvrn->Month) = true;
-        for (iTable = 1; iTable <= MonthlyTablesCount; ++iTable) {
+        state.dataOutRptTab->IsMonthGathered(state.dataEnvrn->Month) = true;
+        for (iTable = 1; iTable <= state.dataOutRptTab->MonthlyTablesCount; ++iTable) {
             activeMinMax = false;     // at the beginning of the new timestep
             activeHoursShown = false; // fix by JG addressing CR6482
             curFirstColumn = MonthlyTables(iTable).firstColumn;
@@ -5585,12 +5562,12 @@ namespace EnergyPlus::OutputReportTabular {
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
         state.files.audit.ensure_open(state, "WriteTabularReports", state.files.outputControl.audit);
-        print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(state.files.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(state.files.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(state.files.audit, variable_fmt, "MonthlyInputCount", state.dataOutRptTab->MonthlyInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyInput", state.dataOutRptTab->sizeMonthlyInput);
+        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", state.dataOutRptTab->MonthlyFieldSetInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", state.dataOutRptTab->sizeMonthlyFieldSetInput);
+        print(state.files.audit, variable_fmt, "MonthlyTablesCount", state.dataOutRptTab->MonthlyTablesCount);
+        print(state.files.audit, variable_fmt, "MonthlyColumnsCount", state.dataOutRptTab->MonthlyColumnsCount);
         print(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
         print(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
         print(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
@@ -6767,7 +6744,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // loop through each input to get the name of the tables
-        for (iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
+        for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
             // loop through each report and
             digitsShown = MonthlyInput(iInput).showDigits;
             for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
@@ -6846,7 +6823,7 @@ namespace EnergyPlus::OutputReportTabular {
                                     curVal = (MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
                                     sumVal += curVal;
                                 }
-                                if (IsMonthGathered(lMonth)) {
+                                if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                     if (curVal > maxVal) maxVal = curVal;
                                     if (curVal < minVal) minVal = curVal;
@@ -6883,7 +6860,7 @@ namespace EnergyPlus::OutputReportTabular {
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
                                 curVal = MonthlyColumns(curCol).reslt(lMonth);
-                                if (IsMonthGathered(lMonth)) {
+                                if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                     sumVal += curVal;
                                     if (curVal > maxVal) maxVal = curVal;
@@ -6938,7 +6915,7 @@ namespace EnergyPlus::OutputReportTabular {
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
                                 curVal = MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
-                                if (IsMonthGathered(lMonth)) {
+                                if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                     if (curVal > maxVal) maxVal = curVal;
                                     if (curVal < minVal) minVal = curVal;
@@ -6993,7 +6970,7 @@ namespace EnergyPlus::OutputReportTabular {
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (IsMonthGathered(lMonth)) {
+                                if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     curVal = MonthlyColumns(curCol).reslt(lMonth);
                                     // CR7788 the conversion factors were causing an overflow for the InchPound case since the
                                     // value was very small
@@ -7141,7 +7118,7 @@ namespace EnergyPlus::OutputReportTabular {
         rowHead(37) = "10:01 to 11:00 pm";
         rowHead(38) = "11:01 to 12:00 am";
         rowHead(39) = "Total";
-        for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
+        for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             firstReport = OutputTableBinned(iInObj).resIndex;
             curNameWithSIUnits = OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInObj).units);
             if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
@@ -15135,7 +15112,7 @@ namespace EnergyPlus::OutputReportTabular {
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
         gatherElapsedTimeBEPS = 0.0;
-        ResetMonthlyGathering();
+        ResetMonthlyGathering(state);
         OutputReportTabularAnnual::ResetAnnualGathering();
         ResetBinGathering();
         ResetBEPSGathering();
@@ -15149,7 +15126,7 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataOutputProcessor->isFinalYear = true;
     }
 
-    void ResetMonthlyGathering()
+    void ResetMonthlyGathering(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all monthly gathering arrays to zero for multi-year simulations
@@ -15161,7 +15138,7 @@ namespace EnergyPlus::OutputReportTabular {
         int curCol;
         static Real64 BigNum(0.0);
 
-        for (iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
+        for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
             for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
                 curTable = jTable + MonthlyInput(iInput).firstTable - 1;
                 for (kColumn = 1; kColumn <= MonthlyTables(curTable).numColumns; ++kColumn) {
