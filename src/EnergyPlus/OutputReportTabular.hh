@@ -78,9 +78,6 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    extern int const MaxHeaderLength;
-    extern int const MaxNoteLength;
-
     extern int const aggTypeSumOrAvg;
     extern int const aggTypeMaximum;
     extern int const aggTypeMinimum;
@@ -149,8 +146,10 @@ namespace OutputReportTabular {
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
-    extern int const numResourceTypes;
-    extern int const numSourceTypes;
+    constexpr int numResourceTypes(14);
+    constexpr int numSourceTypes(12);
+
+    constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -163,7 +162,7 @@ namespace OutputReportTabular {
     extern int BinResultsTableCount;
     extern int BinResultsIntervalCount;
 
-    extern int const numNamedMonthly;
+    constexpr int numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
     extern int MonthlyInputCount;
@@ -182,7 +181,7 @@ namespace OutputReportTabular {
     extern bool WriteTabularFiles;
 
     // Allow up to five output files to be created
-    extern int const maxNumStyles;
+    constexpr int maxNumStyles(5);
 
     // From Report:Table:Style
     extern int unitsStyle; // see list of parameters

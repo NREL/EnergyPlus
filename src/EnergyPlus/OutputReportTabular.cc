@@ -176,9 +176,6 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    int const MaxHeaderLength(50);
-    int const MaxNoteLength(200);
-
     int const aggTypeSumOrAvg(1);
     int const aggTypeMaximum(2);
     int const aggTypeMinimum(3);
@@ -206,13 +203,6 @@ namespace OutputReportTabular {
     int const unitsStyleInchPound(4);
     int const unitsStyleNotFound(5);
 
-    // BEPS Report Related Variables
-    // From Report:Table:Predefined - BEPS
-    int const numResourceTypes(14);
-    int const numSourceTypes(12);
-
-    static std::string const validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
-
     // MODULE VARIABLE DECLARATIONS:
 
     // The Binned table type is different and only references one variable and its structure is very
@@ -223,9 +213,6 @@ namespace OutputReportTabular {
     int OutputTableBinnedCount(0);
     int BinResultsTableCount(0);
     int BinResultsIntervalCount(0);
-
-    int const numNamedMonthly(63);
-    // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
     int MonthlyInputCount(0);
     int sizeMonthlyInput(0);
@@ -243,9 +230,6 @@ namespace OutputReportTabular {
     bool WriteTabularFiles(false);
     bool GetInput(true);
     bool firstTimeGatherHGReport(true);
-
-    // Allow up to five output files to be created
-    int const maxNumStyles(5);
 
     // From Report:Table:Style
     int unitsStyle(0); // see list of parameters
