@@ -4031,8 +4031,6 @@ namespace EnergyPlus::EconomicTariff {
         using OutputReportTabular::displayTariffReport;
         using OutputReportTabular::LookupSItoIP;
         using OutputReportTabular::RealToStr;
-        using OutputReportTabular::unitsStyle;
-        using OutputReportTabular::unitsStyleInchPound;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
@@ -4073,7 +4071,7 @@ namespace EnergyPlus::EconomicTariff {
         }
 
         // do unit conversions if necessary
-        if (unitsStyle == unitsStyleInchPound) {
+        if (state.dataOutRptTab->unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
             SIunit = "[~~$~~/m2]";
             LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
             perAreaUnitConv = ConvertIP(unitConvIndex, 1.0);

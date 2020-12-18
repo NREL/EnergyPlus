@@ -190,19 +190,6 @@ namespace OutputReportTabular {
     int const aggTypeMaximumDuringHoursShown(12);
     int const aggTypeMinimumDuringHoursShown(13);
 
-    int const tableStyleComma(1);
-    int const tableStyleTab(2);
-    int const tableStyleFixed(3);
-    int const tableStyleHTML(4);
-    int const tableStyleXML(5);
-
-    int const unitsStyleNone(0); // no change to any units
-    int const unitsStyleJtoKWH(1);
-    int const unitsStyleJtoMJ(2);
-    int const unitsStyleJtoGJ(3);
-    int const unitsStyleInchPound(4);
-    int const unitsStyleNotFound(5);
-
     // MODULE VARIABLE DECLARATIONS:
 
     // The Binned table type is different and only references one variable and its structure is very
@@ -232,7 +219,6 @@ namespace OutputReportTabular {
     bool firstTimeGatherHGReport(true);
 
     // From Report:Table:Style
-    int unitsStyle(0); // see list of parameters
     int numStyles(0);
     std::ofstream csv_stream;                                                                                                    // CSV table stream
     std::ofstream tab_stream;                                                                                                    // Tab table stream
@@ -241,7 +227,7 @@ namespace OutputReportTabular {
     std::ofstream xml_stream;                                                                                                    // XML table stream
     Array1D<std::ofstream *> TabularOutputFile(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
     Array1D_string del(maxNumStyles);        // the delimiter to use
-    Array1D_int TableStyle(maxNumStyles, 0); // see list of parameters
+    Array1D<iTableStyle> TableStyle(maxNumStyles, iTableStyle::Unassigned); // see list of parameters
 
     Real64 timeInYear(0.0);
 
@@ -536,11 +522,10 @@ namespace OutputReportTabular {
         TOCEntriesSize = 0;
         UnitConvSize = 0;
         WriteTabularFiles = false;
-        unitsStyle = 0;
         numStyles = 0;
         TabularOutputFile = Array1D<std::ofstream *>(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream});
         del = Array1D_string(maxNumStyles);
-        TableStyle = Array1D_int(maxNumStyles, 0);
+        TableStyle = Array1D<iTableStyle>(maxNumStyles, iTableStyle::Unassigned);
         timeInYear = 0.0;
         displayTabularBEPS = false;
         displayLEEDSummary = false;
@@ -1775,9 +1760,9 @@ namespace OutputReportTabular {
         if (NumTabularStyle == 0) {
             AlphArray(1) = "COMMA";
             numStyles = 1;
-            TableStyle(1) = tableStyleComma;
+            TableStyle(1) = iTableStyle::Comma;
             del(1) = CharComma; // comma
-            unitsStyle = unitsStyleNone;
+            state.dataOutRptTab->unitsStyle = iUnitsStyle::None;
         } else if (NumTabularStyle == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1794,84 +1779,84 @@ namespace OutputReportTabular {
             // ColumnSeparator
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 numStyles = 1;
-                TableStyle(1) = tableStyleComma;
+                TableStyle(1) = iTableStyle::Comma;
                 del(1) = CharComma; // comma
             } else if (UtilityRoutines::SameString(AlphArray(1), "Tab")) {
                 numStyles = 1;
-                TableStyle(1) = tableStyleTab;
+                TableStyle(1) = iTableStyle::Tab;
                 del(1) = CharTab; // tab
             } else if (UtilityRoutines::SameString(AlphArray(1), "Fixed")) {
                 numStyles = 1;
-                TableStyle(1) = tableStyleFixed;
+                TableStyle(1) = iTableStyle::Fixed;
                 del(1) = CharSpace; // space
             } else if (UtilityRoutines::SameString(AlphArray(1), "HTML")) {
                 numStyles = 1;
-                TableStyle(1) = tableStyleHTML;
+                TableStyle(1) = iTableStyle::HTML;
                 del(1) = CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "XML")) {
                 numStyles = 1;
-                TableStyle(1) = tableStyleXML;
+                TableStyle(1) = iTableStyle::XML;
                 del(1) = CharSpace; // space - this is not used much for XML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndHTML")) {
                 numStyles = 2;
-                TableStyle(1) = tableStyleComma;
+                TableStyle(1) = iTableStyle::Comma;
                 del(1) = CharComma; // comma
-                TableStyle(2) = tableStyleHTML;
+                TableStyle(2) = iTableStyle::HTML;
                 del(2) = CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndXML")) {
                 numStyles = 2;
-                TableStyle(1) = tableStyleComma;
+                TableStyle(1) = iTableStyle::Comma;
                 del(1) = CharComma; // comma
-                TableStyle(2) = tableStyleXML;
+                TableStyle(2) = iTableStyle::XML;
                 del(2) = CharSpace; // space - this is not used much for XML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "TabAndHTML")) {
                 numStyles = 2;
-                TableStyle(1) = tableStyleTab;
+                TableStyle(1) = iTableStyle::Tab;
                 del(1) = CharTab; // tab
-                TableStyle(2) = tableStyleHTML;
+                TableStyle(2) = iTableStyle::HTML;
                 del(2) = CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "XMLandHTML")) {
                 numStyles = 2;
-                TableStyle(1) = tableStyleXML;
+                TableStyle(1) = iTableStyle::XML;
                 del(1) = CharSpace; // space - this is not used much for XML output
-                TableStyle(2) = tableStyleHTML;
+                TableStyle(2) = iTableStyle::HTML;
                 del(2) = CharSpace; // space - this is not used much for HTML output
             } else if (UtilityRoutines::SameString(AlphArray(1), "All")) {
                 numStyles = 5;
-                TableStyle(1) = tableStyleComma;
+                TableStyle(1) = iTableStyle::Comma;
                 del(1) = CharComma; // comma
-                TableStyle(2) = tableStyleTab;
+                TableStyle(2) = iTableStyle::Tab;
                 del(2) = CharTab; // tab
-                TableStyle(3) = tableStyleFixed;
+                TableStyle(3) = iTableStyle::Fixed;
                 del(3) = CharSpace; // space
-                TableStyle(4) = tableStyleHTML;
+                TableStyle(4) = iTableStyle::HTML;
                 del(4) = CharSpace; // space - this is not used much for HTML output
-                TableStyle(5) = tableStyleXML;
+                TableStyle(5) = iTableStyle::XML;
                 del(5) = CharSpace; // space - this is not used much for XML output
             } else {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 numStyles = 1;
-                TableStyle(1) = tableStyleComma;
+                TableStyle(1) = iTableStyle::Comma;
                 del(1) = CharComma; // comma
                 AlphArray(1) = "COMMA";
             }
             // MonthlyUnitConversion
             if (NumAlphas >= 2) {
-                unitsStyle = SetUnitsStyleFromString(AlphArray(2));
-                if (unitsStyle == unitsStyleNotFound) {
+                state.dataOutRptTab->unitsStyle = SetUnitsStyleFromString(AlphArray(2));
+                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::NotFound) {
                     ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                      "\". No unit conversion will be performed. Normal SI units will be shown.");
                 }
             } else {
-                unitsStyle = unitsStyleNone;
+                state.dataOutRptTab->unitsStyle = iUnitsStyle::None;
                 AlphArray(2) = "None";
             }
         } else if (NumTabularStyle > 1) {
             ShowWarningError(state, CurrentModuleObject + ": Only one instance of this object is allowed. Commas will be used.");
-            TableStyle = tableStyleComma;
+            TableStyle = iTableStyle::Comma;
             del = std::string(1, CharComma); // comma
             AlphArray(1) = "COMMA";
-            unitsStyle = unitsStyleNone;
+            state.dataOutRptTab->unitsStyle = iUnitsStyle::None;
             AlphArray(2) = "None";
         }
 
@@ -1886,21 +1871,21 @@ namespace OutputReportTabular {
         }
     }
 
-    int SetUnitsStyleFromString(std::string const &unitStringIn)
+    iUnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn)
     {
-        int unitsStyleReturn;
+        iUnitsStyle unitsStyleReturn;
         if (UtilityRoutines::SameString(unitStringIn, "None")) {
-            unitsStyleReturn = unitsStyleNone;
+            unitsStyleReturn = iUnitsStyle::None;
         } else if (UtilityRoutines::SameString(unitStringIn, "JTOKWH")) {
-            unitsStyleReturn = unitsStyleJtoKWH;
+            unitsStyleReturn = iUnitsStyle::JtoKWH;
         } else if (UtilityRoutines::SameString(unitStringIn, "JTOMJ")) {
-            unitsStyleReturn = unitsStyleJtoMJ;
+            unitsStyleReturn = iUnitsStyle::JtoMJ;
         } else if (UtilityRoutines::SameString(unitStringIn, "JTOGJ")) {
-            unitsStyleReturn = unitsStyleJtoGJ;
+            unitsStyleReturn = iUnitsStyle::JtoGJ;
         } else if (UtilityRoutines::SameString(unitStringIn, "INCHPOUND")) {
-            unitsStyleReturn = unitsStyleInchPound;
+            unitsStyleReturn = iUnitsStyle::InchPound;
         } else {
-            unitsStyleReturn = unitsStyleNotFound;
+            unitsStyleReturn = iUnitsStyle::NotFound;
         }
         return unitsStyleReturn;
     }
@@ -3534,7 +3519,7 @@ namespace OutputReportTabular {
         if (WriteTabularFiles && state.files.outputControl.tabular) {
             for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
                 curDel = del(iStyle);
-                if (TableStyle(iStyle) == tableStyleComma) {
+                if (TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
@@ -3547,7 +3532,7 @@ namespace OutputReportTabular {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
-                } else if (TableStyle(iStyle) == tableStyleTab) {
+                } else if (TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
@@ -3560,7 +3545,7 @@ namespace OutputReportTabular {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
-                } else if (TableStyle(iStyle) == tableStyleHTML) {
+                } else if (TableStyle(iStyle) == iTableStyle::HTML) {
                     DisplayString(state, "Writing tabular output file results using HTML format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
@@ -3593,7 +3578,7 @@ namespace OutputReportTabular {
                                << std::setw(2) << td(3) << '\n';
                     tbl_stream << "  " << std::setw(2) << td(5) << ':' << std::setw(2) << td(6) << ':' << std::setw(2) << td(7) << std::setfill(' ')
                                << "</b></p>\n";
-                } else if (TableStyle(iStyle) == tableStyleXML) {
+                } else if (TableStyle(iStyle) == iTableStyle::XML) {
                     DisplayString(state, "Writing tabular output file results using XML format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
@@ -3671,10 +3656,10 @@ namespace OutputReportTabular {
         if (WriteTabularFiles) {
             for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
                 std::ofstream &tbl_stream(*TabularOutputFile(iStyle));
-                if (TableStyle(iStyle) == tableStyleHTML) { // if HTML file put ending info
+                if (TableStyle(iStyle) == iTableStyle::HTML) { // if HTML file put ending info
                     tbl_stream << "</body>\n";
                     tbl_stream << "</html>\n";
-                } else if (TableStyle(iStyle) == tableStyleXML) {
+                } else if (TableStyle(iStyle) == iTableStyle::XML) {
                     if (!prevReportName.empty()) {
                         tbl_stream << "</" << prevReportName << ">\n"; // close the last element if it was used.
                     }
@@ -3750,7 +3735,7 @@ namespace OutputReportTabular {
         }
 
         for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
-            if (TableStyle(iStyle) == tableStyleHTML) {
+            if (TableStyle(iStyle) == iTableStyle::HTML) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 tbl_stream << "<hr>\n";
                 tbl_stream << "<a name=toc></a>\n";
@@ -3835,7 +3820,7 @@ namespace OutputReportTabular {
                             for (jTable = 1; jTable <= OutputTableBinned(iInput).numTables; ++jTable) {
                                 curTable = OutputTableBinned(iInput).resIndex + (jTable - 1);
                                 curName = "";
-                                if (unitsStyle == unitsStyleInchPound) {
+                                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                     origName = OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInput).units);
                                     LookupSItoIP(state, origName, indexUnitConv, curName);
                                 } else {
@@ -5858,7 +5843,7 @@ namespace OutputReportTabular {
                         lnPtr = index(lineIn.substr(12), 'm');
                         if (lnPtr != std::string::npos) {
                             curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
@@ -5898,7 +5883,7 @@ namespace OutputReportTabular {
                         if (iscalc) {
                             if (isASHRAE) {
                                 if (ashDesYear == "2001") {
-                                    if (unitsStyle == unitsStyleInchPound) {
+                                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -5913,7 +5898,7 @@ namespace OutputReportTabular {
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 3) + degChar);
                                     }
                                 } else { // 2005 and 2009 are the same
-                                    if (unitsStyle == unitsStyleInchPound) {
+                                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -5936,7 +5921,7 @@ namespace OutputReportTabular {
                                     col1 = 4;
                                     col2 = 5;
                                 }
-                                if (unitsStyle == unitsStyleInchPound) {
+                                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                     curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -5955,7 +5940,7 @@ namespace OutputReportTabular {
                         if (iscalc) {
                             if (isASHRAE) {
                                 if (ashDesYear == "2001") {
-                                    if (unitsStyle == unitsStyleInchPound) {
+                                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -5973,7 +5958,7 @@ namespace OutputReportTabular {
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, 6) + degChar);
                                     }
                                 } else { // 2005 and 2009 are the same
-                                    if (unitsStyle == unitsStyleInchPound) {
+                                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6001,7 +5986,7 @@ namespace OutputReportTabular {
                                     col2 = 5;
                                     col3 = 6;
                                 }
-                                if (unitsStyle == unitsStyleInchPound) {
+                                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                     curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6035,7 +6020,7 @@ namespace OutputReportTabular {
                             eposlt -= 2;
                         }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6067,7 +6052,7 @@ namespace OutputReportTabular {
                             eposlt -= 2;
                         }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6099,7 +6084,7 @@ namespace OutputReportTabular {
                             eposlt -= 2;
                         }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6131,7 +6116,7 @@ namespace OutputReportTabular {
                             eposlt -= 2;
                         }
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
@@ -6154,7 +6139,7 @@ namespace OutputReportTabular {
                         }
                     } else if (SELECT_CASE_var == StatLineType::wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                         if (storeASHRAEHDD != "") {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state,
@@ -6163,13 +6148,13 @@ namespace OutputReportTabular {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
                             }
                         } else {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
                             } else {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
                             }
                         }
-                        if (unitsStyle == unitsStyleInchPound) {
+                        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                             curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -6183,7 +6168,7 @@ namespace OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
                     } else if (SELECT_CASE_var == StatLineType::wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
                         if (storeASHRAECDD != "") {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state,
@@ -6192,13 +6177,13 @@ namespace OutputReportTabular {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
                             }
                         } else {
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
                             } else {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
                             }
                         }
-                        if (unitsStyle == unitsStyleInchPound) {
+                        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                             curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -6723,7 +6708,7 @@ namespace OutputReportTabular {
         // CALL PreDefTableEntry(state, pdchLeedGenData,'Climate Zone','-')
         // CALL PreDefTableEntry(state, pdchLeedGenData,'Heating Degree Days','-')
         // CALL PreDefTableEntry(state, pdchLeedGenData,'Cooling Degree Days','-')
-        if (unitsStyle == unitsStyleInchPound) {
+        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
@@ -6829,16 +6814,16 @@ namespace OutputReportTabular {
         verySmall = -1.0E280;
 
         // set the unit conversion
-        if (unitsStyle == unitsStyleNone) {
+        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::None) {
             energyUnitsString = "J";
             energyUnitsConversionFactor = 1.0;
-        } else if (unitsStyle == unitsStyleJtoKWH) {
+        } else if (state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoKWH) {
             energyUnitsString = "kWh";
             energyUnitsConversionFactor = 1.0 / 3600000.0;
-        } else if (unitsStyle == unitsStyleJtoMJ) {
+        } else if (state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoMJ) {
             energyUnitsString = "MJ";
             energyUnitsConversionFactor = 1.0 / 1000000.0;
-        } else if (unitsStyle == unitsStyleJtoGJ) {
+        } else if (state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoGJ) {
             energyUnitsString = "GJ";
             energyUnitsConversionFactor = 1.0 / 1000000000.0;
         } else { // Should never happen but assures compilers of initialization
@@ -6884,7 +6869,7 @@ namespace OutputReportTabular {
                         curAggString = " {" + stripped(curAggString) + '}';
                     }
                     // do the unit conversions
-                    if (unitsStyle == unitsStyleInchPound) {
+                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                         varNameWithUnits = MonthlyColumns(curCol).varName + unitEnumToStringBrackets(MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
@@ -7224,7 +7209,7 @@ namespace OutputReportTabular {
         for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
             firstReport = OutputTableBinned(iInObj).resIndex;
             curNameWithSIUnits = OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInObj).units);
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 curIntervalStart = ConvertIP(indexUnitConv, OutputTableBinned(iInObj).intervalStart);
                 curIntervalSize = ConvertIPdelta(indexUnitConv, OutputTableBinned(iInObj).intervalSize);
@@ -7348,7 +7333,7 @@ namespace OutputReportTabular {
                     repStDev = 0.0;
                     repMean = 0.0;
                 }
-                if (unitsStyle == unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                     tableBodyStat(1, 1) = RealToStr(ConvertIP(indexUnitConv, BinStatistics(repIndex).minimum), 2);
                     tableBodyStat(1, 2) = RealToStr(ConvertIP(indexUnitConv, repMean - 2 * repStDev), 2);
                     tableBodyStat(1, 3) = RealToStr(ConvertIP(indexUnitConv, repMean), 2);
@@ -7578,13 +7563,13 @@ namespace OutputReportTabular {
 
             // unit conversion - all values are used as divisors
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     largeConversionFactor = 3600000.0;
                     kConversionFactor = 1.0;
                     waterConversionFactor = 1.0;
                     areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
                     kConversionFactor = 1.0;
                     waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
@@ -7659,12 +7644,12 @@ namespace OutputReportTabular {
             tableBody.allocate(3, 4);
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Total Energy [kWh]";
                     columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
                     columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Total Energy [kBtu]";
                     columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
                     columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
@@ -8044,10 +8029,10 @@ namespace OutputReportTabular {
             tableBody.allocate(1, 3);
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Area [m2]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Area [ft2]";
                 } else {
                     columnHead(1) = "Area [m2]";
@@ -8060,7 +8045,7 @@ namespace OutputReportTabular {
 
             tableBody = "";
             tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
             } else {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
@@ -8126,8 +8111,8 @@ namespace OutputReportTabular {
             rowHead(16) = "Total End Uses";
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Electricity [kWh]";
                     columnHead(2) = "Natural Gas [kWh]";
                     columnHead(3) = "Gasoline [kWh]";
@@ -8141,7 +8126,7 @@ namespace OutputReportTabular {
                     columnHead(11) = "District Cooling [kWh]";
                     columnHead(12) = "District Heating [kWh]";
                     columnHead(13) = "Water [m3]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Electricity [kBtu]";
                     columnHead(2) = "Natural Gas [kBtu]";
                     columnHead(3) = "Gasoline [kBtu]";
@@ -8411,8 +8396,8 @@ namespace OutputReportTabular {
             columnHead(1) = "Subcategory";
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(2) = "Electricity [kWh]";
                     columnHead(3) = "Natural Gas [kWh]";
                     columnHead(4) = "Gasoline [kWh]";
@@ -8426,7 +8411,7 @@ namespace OutputReportTabular {
                     columnHead(12) = "District Cooling [kWh]";
                     columnHead(13) = "District Heating [kWh]";
                     columnHead(14) = "Water [m3]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(2) = "Electricity [kBtu]";
                     columnHead(3) = "Natural Gas [kBtu]";
                     columnHead(4) = "Gasoline [kBtu]";
@@ -8599,8 +8584,8 @@ namespace OutputReportTabular {
             rowHead(4) = "Total";
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Electricity Intensity [kWh/m2]";
                     columnHead(2) = "Natural Gas Intensity [kWh/m2]";
                     columnHead(3) = "Gasoline Intensity [kWh/m2]";
@@ -8614,7 +8599,7 @@ namespace OutputReportTabular {
                     columnHead(11) = "District Cooling Intensity [kWh/m2]";
                     columnHead(12) = "District Heating Intensity [kWh/m2]";
                     columnHead(13) = "Water Intensity [m3/m2]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Electricity Intensity [kBtu/ft2]";
                     columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
                     columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
@@ -8716,10 +8701,10 @@ namespace OutputReportTabular {
             tableBody.allocate(2, 14);
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Electricity [kWh]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Electricity [kBtu]";
                 } else {
                     columnHead(1) = "Electricity [GJ]";
@@ -8800,10 +8785,10 @@ namespace OutputReportTabular {
             tableBody.allocate(2, 7);
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Heat [kWh]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Heat [kBtu]";
                 } else {
                     columnHead(1) = "Heat [GJ]";
@@ -8882,10 +8867,10 @@ namespace OutputReportTabular {
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 13);
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Water [m3]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Water [gal]";
                 } else {
                     columnHead(1) = "Water [m3]";
@@ -8975,7 +8960,7 @@ namespace OutputReportTabular {
 
                 curNameWithSIUnits = "Degrees [deltaC]";
                 curNameAndUnits = curNameWithSIUnits;
-                if (unitsStyle == unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 }
                 columnHead(1) = curNameAndUnits;
@@ -8983,7 +8968,7 @@ namespace OutputReportTabular {
                 rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
                 rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-                if (unitsStyle != unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle != iUnitsStyle::InchPound) {
                     tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
                     tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
                 } else {
@@ -9146,11 +9131,11 @@ namespace OutputReportTabular {
             // unit conversion - all values are used as divisors
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     largeConversionFactor = 3600000.0;
                     areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
                     areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
                 } else {
@@ -9211,8 +9196,8 @@ namespace OutputReportTabular {
             largeConversionFactor = 1.0;
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Source Electricity [kWh]";
                     columnHead(2) = "Source Natural Gas [kWh]";
                     columnHead(3) = "Source Gasoline [kWh]";
@@ -9225,7 +9210,7 @@ namespace OutputReportTabular {
                     columnHead(10) = "Source Other Fuel 2 [kWh]";
                     columnHead(11) = "Source District Cooling [kWh]";
                     columnHead(12) = "Source District Heating [kWh]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Source Electricity [kBtu]";
                     columnHead(2) = "Source Natural Gas [kBtu]";
                     columnHead(3) = "Source Gasoline [kBtu]";
@@ -9288,8 +9273,8 @@ namespace OutputReportTabular {
             // Normalized by Area tables
 
             {
-                auto const SELECT_CASE_var(unitsStyle);
-                if (SELECT_CASE_var == unitsStyleJtoKWH) {
+                auto const SELECT_CASE_var(state.dataOutRptTab->unitsStyle);
+                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                     columnHead(1) = "Source Electricity [kWh/m2]";
                     columnHead(2) = "Source Natural Gas [kWh/m2]";
                     columnHead(3) = "Source Gasoline [kWh/m2]";
@@ -9302,7 +9287,7 @@ namespace OutputReportTabular {
                     columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
                     columnHead(11) = "Source District Cooling [kWh/m2]";
                     columnHead(12) = "Source District Heating [kWh/m2]";
-                } else if (SELECT_CASE_var == unitsStyleInchPound) {
+                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
                     columnHead(1) = "Source Electricity [kBtu/ft2]";
                     columnHead(2) = "Source Natural Gas [kBtu/ft2]";
                     columnHead(3) = "Source Gasoline [kBtu/ft2]";
@@ -9502,7 +9487,7 @@ namespace OutputReportTabular {
             collapsedTotal(12) = gatherDemandTotal(distrHeatSelected);
 
             // establish unit conversion factors
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
                 flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
             } else {
@@ -9639,7 +9624,7 @@ namespace OutputReportTabular {
             rowHead(16) = "";
             rowHead(17) = "Total End Uses";
 
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 columnHead(1) = "Electricity [kBtuh]";
                 columnHead(2) = "Natural Gas [kBtuh]";
                 columnHead(3) = "Gasoline [kBtuh]";
@@ -9742,7 +9727,7 @@ namespace OutputReportTabular {
                 }
             }
 
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 columnHead(1) = "Subcategory";
                 columnHead(2) = "Electricity [kBtuh]";
                 columnHead(3) = "Natural Gas [kBtuh]";
@@ -9978,7 +9963,7 @@ namespace OutputReportTabular {
         rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
         rowHead(8) = "Commissioning (~~$~~)";
         rowHead(9) = "Cost Estimate Total (~~$~~)";
-        if (unitsStyle == unitsStyleInchPound) {
+        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
             SIunit = "[m2]";
             LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
             m2_unitConv = ConvertIP(unitConvIndex, 1.0);
@@ -10102,7 +10087,7 @@ namespace OutputReportTabular {
         for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
                 if (unitConvIndex != 0) {
                     IPqty = ConvertIP(unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
@@ -10328,7 +10313,7 @@ namespace OutputReportTabular {
             WriteReportHeaders("Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             // do unit conversions if necessary
-            if (unitsStyle == unitsStyleInchPound) {
+            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 SIunit = "[m]";
                 LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
                 m_unitConv = ConvertIP(unitConvIndex, 1.0);
@@ -11459,10 +11444,10 @@ namespace OutputReportTabular {
                                 ++countColumn;
                                 // do the unit conversions
                                 colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
-                                if (unitsStyle == unitsStyleInchPound) {
+                                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                     LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
-                                } else if (unitsStyle == unitsStyleJtoKWH) {
+                                } else if (state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoKWH) {
                                     LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
                                 } else {
@@ -11494,10 +11479,10 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 // finally assign the entry to the place in the table body
-                                if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
+                                if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound || state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoKWH) {
                                     columnUnitConv = colUnitConv(colCurrent);
                                     if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        unitsStyle == unitsStyleInchPound) {
+                                        state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                         if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             LookupSItoIP(state, state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
                                             state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
@@ -11669,7 +11654,7 @@ namespace OutputReportTabular {
                 for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
                     // do the unit conversions
                     curColHeadWithSI = uniqueDesc(jUnique);
-                    if (unitsStyle == unitsStyleInchPound) {
+                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                         LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
                         colUnitConv(jUnique) = indexUnitConv;
                     } else {
@@ -11703,7 +11688,7 @@ namespace OutputReportTabular {
                         }
                         if ((foundDesc >= 1) && (foundObj >= 1)) {
                             curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
-                            if (unitsStyle == unitsStyleInchPound) {
+                            if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                                 if (colUnitConv(foundDesc) != 0) {
                                     curValue = ConvertIP(colUnitConv(foundDesc), curValueSI);
                                 } else {
@@ -11997,7 +11982,7 @@ namespace OutputReportTabular {
                                 std::vector<std::string> dataFields = splitCommaString(bodyLine);
                                 rowHead(rowNum) = fmt::to_string(rowNum);
                                 for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                    if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
+                                    if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound || state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoKWH) {
                                         if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
                                             int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                             Real64 convertedVal = ConvertIP(colUnitConv(iCol), StrToReal(dataFields[iCol]));
@@ -12039,9 +12024,9 @@ namespace OutputReportTabular {
     {
         std::string curHeading = "";
         int unitConv = 0;
-        if (unitsStyle == unitsStyleInchPound) {
+        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
             LookupSItoIP(state, heading, unitConv, curHeading);
-        } else if (unitsStyle == unitsStyleJtoKWH) {
+        } else if (state.dataOutRptTab->unitsStyle == iUnitsStyle::JtoKWH) {
             LookupJtokWH(heading, unitConv, curHeading);
         } else {
             curHeading = heading;
@@ -13931,7 +13916,7 @@ namespace OutputReportTabular {
     // apply unit conversions to the load components summary tables
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal)
     {
-        if (unitsStyle == unitsStyleInchPound) {
+        if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
             Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
             Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
             Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
@@ -14091,7 +14076,7 @@ namespace OutputReportTabular {
                 rowHead(rGrdTot) = "Grand Total";
 
                 columnHead.allocate(cPerArea);
-                if (unitsStyle != unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle != iUnitsStyle::InchPound) {
                     columnHead(cSensInst) = "Sensible - Instant [W]";
                     columnHead(cSensDelay) = "Sensible - Delayed [W]";
                     columnHead(cSensRA) = "Sensible - Return Air [W]";
@@ -14134,7 +14119,7 @@ namespace OutputReportTabular {
                 tableBody = "";
 
                 columnHead(1) = "Value";
-                if (unitsStyle != unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle != iUnitsStyle::InchPound) {
                     rowHead(1) = "Time of Peak Load";
                     rowHead(2) = "Outside Dry Bulb Temperature [C]";
                     rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -14216,7 +14201,7 @@ namespace OutputReportTabular {
                 tableBody = "";
 
                 columnHead(1) = "Value";
-                if (unitsStyle != unitsStyleInchPound) {
+                if (state.dataOutRptTab->unitsStyle != iUnitsStyle::InchPound) {
                     rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
@@ -14326,15 +14311,15 @@ namespace OutputReportTabular {
             std::ostream &tbl_stream(*TabularOutputFile(iStyle));
             std::string const &curDel(del(iStyle));
             auto const style(TableStyle(iStyle));
-            if ((style == tableStyleComma) || (style == tableStyleTab)) {
+            if ((style == iTableStyle::Comma) || (style == iTableStyle::Tab)) {
                 tbl_stream << "----------------------------------------------------------------------------------------------------\n";
                 tbl_stream << "REPORT:" << curDel << modifiedReportName << '\n';
                 tbl_stream << "FOR:" << curDel << objectName << '\n';
-            } else if (style == tableStyleFixed) {
+            } else if (style == iTableStyle::Fixed) {
                 tbl_stream << "----------------------------------------------------------------------------------------------------\n";
                 tbl_stream << "REPORT:      " << curDel << modifiedReportName << '\n';
                 tbl_stream << "FOR:         " << curDel << objectName << '\n';
-            } else if (style == tableStyleHTML) {
+            } else if (style == iTableStyle::HTML) {
                 tbl_stream << "<hr>\n";
                 tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
                 tbl_stream << "<a name=" << MakeAnchorName(reportName, objectName) << "></a>\n";
@@ -14344,7 +14329,7 @@ namespace OutputReportTabular {
                            << td(3) << '\n';
                 tbl_stream << "    " << std::setw(2) << td(5) << ':' << std::setw(2) << td(6) << ':' << std::setw(2) << td(7) << std::setfill(' ')
                            << "</b></p>\n";
-            } else if (style == tableStyleXML) {
+            } else if (style == iTableStyle::XML) {
                 if (len(prevReportName) != 0) {
                     tbl_stream << "</" << prevReportName << ">\n"; // close the last element if it was used.
                 }
@@ -14388,14 +14373,14 @@ namespace OutputReportTabular {
 
         for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
             auto const style(TableStyle(iStyle));
-            if ((style == tableStyleComma) || (style == tableStyleTab) || (style == tableStyleFixed)) {
+            if ((style == iTableStyle::Comma) || (style == iTableStyle::Tab) || (style == iTableStyle::Fixed)) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 tbl_stream << subtitle << "\n\n";
-            } else if (style == tableStyleHTML) {
+            } else if (style == iTableStyle::HTML) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 tbl_stream << "<b>" << subtitle << "</b><br><br>\n";
                 tbl_stream << "<!-- FullName:" << activeReportName << '_' << activeForName << '_' << subtitle << "-->\n";
-            } else if (style == tableStyleXML) {
+            } else if (style == iTableStyle::XML) {
                 // save the active subtable name for the XML reporting
                 activeSubTableName = subtitle;
                 // no other output is needed since WriteTable uses the subtable name for each record.
@@ -14437,17 +14422,17 @@ namespace OutputReportTabular {
 
         for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
             auto const style(TableStyle(iStyle));
-            if ((style == tableStyleComma) || (style == tableStyleTab) || (style == tableStyleFixed)) {
+            if ((style == iTableStyle::Comma) || (style == iTableStyle::Tab) || (style == iTableStyle::Fixed)) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 tbl_stream << lineOfText << '\n';
-            } else if (style == tableStyleHTML) {
+            } else if (style == iTableStyle::HTML) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 if (useBold) {
                     tbl_stream << "<b>" << lineOfText << "</b><br><br>\n";
                 } else {
                     tbl_stream << lineOfText << "<br>\n";
                 }
-            } else if (style == tableStyleXML) {
+            } else if (style == iTableStyle::XML) {
                 std::ostream &tbl_stream(*TabularOutputFile(iStyle));
                 if (!lineOfText.empty()) {
                     tbl_stream << "<note>" << lineOfText << "</note>\n";
@@ -14597,7 +14582,7 @@ namespace OutputReportTabular {
                 }
             }
             // extra preprocessing for fixed style reports
-            if (TableStyle(iStyle) == tableStyleFixed) {
+            if (TableStyle(iStyle) == iTableStyle::Fixed) {
                 // break column headings into multiple rows if long (for fixed) or contain two spaces in a row.
                 for (iCol = 1; iCol <= colsColumnLabels; ++iCol) {
                     colWidthLimit = widthColumn(iCol);
@@ -14616,7 +14601,7 @@ namespace OutputReportTabular {
 
             // output depending on style of format
             auto const style(TableStyle(iStyle));
-            if ((style == tableStyleComma) || (style == tableStyleTab)) {
+            if ((style == iTableStyle::Comma) || (style == iTableStyle::Tab)) {
                 // column headers
                 for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
                     outputLine = curDel; // one leading delimiters on column header lines
@@ -14640,7 +14625,7 @@ namespace OutputReportTabular {
                 }
                 tbl_stream << "\n\n";
 
-            } else if (style == tableStyleFixed) {
+            } else if (style == iTableStyle::Fixed) {
                 // column headers
                 for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
                     outputLine = blank; // spaces(:maxWidthRowLabel+2)  // two extra spaces and leave blank area for row labels
@@ -14674,7 +14659,7 @@ namespace OutputReportTabular {
                 }
                 tbl_stream << "\n\n";
 
-            } else if (style == tableStyleHTML) {
+            } else if (style == iTableStyle::HTML) {
                 // set up it being a table
                 tbl_stream << "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n";
                 // column headers
@@ -14715,7 +14700,7 @@ namespace OutputReportTabular {
                     }
                 }
                 tbl_stream << "<br><br>\n";
-            } else if (style == tableStyleXML) {
+            } else if (style == iTableStyle::XML) {
                 // check if entire table is blank and it if is skip generating anything
                 isTableBlank = true;
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {

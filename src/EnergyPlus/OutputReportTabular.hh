@@ -92,18 +92,23 @@ namespace OutputReportTabular {
     extern int const aggTypeMaximumDuringHoursShown;
     extern int const aggTypeMinimumDuringHoursShown;
 
-    extern int const tableStyleComma;
-    extern int const tableStyleTab;
-    extern int const tableStyleFixed;
-    extern int const tableStyleHTML;
-    extern int const tableStyleXML;
+    enum class iTableStyle {
+        Unassigned,
+        Comma,
+        Tab,
+        Fixed,
+        HTML,
+        XML,
+    };
 
-    extern int const unitsStyleNone; // no change to any units
-    extern int const unitsStyleJtoKWH;
-    extern int const unitsStyleJtoMJ;
-    extern int const unitsStyleJtoGJ;
-    extern int const unitsStyleInchPound;
-    extern int const unitsStyleNotFound;
+    enum class iUnitsStyle {
+        None,
+        JtoKWH,
+        JtoMJ,
+        JtoGJ,
+        InchPound,
+        NotFound,
+    };
 
     extern int const stepTypeZone;
     extern int const stepTypeHVAC;
@@ -184,7 +189,6 @@ namespace OutputReportTabular {
     constexpr int maxNumStyles(5);
 
     // From Report:Table:Style
-    extern int unitsStyle; // see list of parameters
     extern int numStyles;
     extern std::ofstream csv_stream;                   // CSV table stream
     extern std::ofstream tab_stream;                   // Tab table stream
@@ -193,7 +197,7 @@ namespace OutputReportTabular {
     extern std::ofstream xml_stream;                   // XML table stream
     extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
     extern Array1D_string del;                         // the delimiter to use
-    extern Array1D_int TableStyle;                     // see list of parameters
+    extern Array1D<iTableStyle> TableStyle;                     // see list of parameters
 
     extern Real64 timeInYear;
 
@@ -732,7 +736,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularStyle(EnergyPlusData &state);
 
-    int SetUnitsStyleFromString(std::string const &unitStringIn);
+    iUnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn);
 
     void GetInputOutputTableSummaryReports(EnergyPlusData &state);
 
@@ -1048,9 +1052,11 @@ namespace OutputReportTabular {
 
 struct OutputReportTabularData : BaseGlobalStruct {
 
+    OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
+
     void clear_state() override
     {
-
+        this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
     }
 };
 
