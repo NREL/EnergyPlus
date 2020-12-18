@@ -2130,7 +2130,7 @@ namespace EconomicLifeCycleCost {
             //---------------------------------
             // Life-Cycle Cost Verification and Results Report
             //---------------------------------
-            WriteReportHeaders("Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
             //---- Life-Cycle Cost Parameters
             rowHead.allocate(11);
             columnHead.allocate(1);
@@ -2209,7 +2209,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             columnWidth = 14; // array assignment - same for all columns
-            WriteSubtitle("Life-Cycle Cost Parameters");
+            WriteSubtitle(state, "Life-Cycle Cost Parameters");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -2248,7 +2248,7 @@ namespace EconomicLifeCycleCost {
                     tableBody(jObj, iYear + 2) = RealToStr(UsePriceEscalation(jObj).Escalation(iYear), 6);
                 }
             }
-            WriteSubtitle("Use Price Escalation");
+            WriteSubtitle(state, "Use Price Escalation");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -2285,7 +2285,7 @@ namespace EconomicLifeCycleCost {
                         tableBody(jObj, iYear + 1) = RealToStr(UseAdjustment(jObj).Adjustment(iYear), 6);
                     }
                 }
-                WriteSubtitle("Use Adjustment");
+                WriteSubtitle(state, "Use Adjustment");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
@@ -2326,7 +2326,7 @@ namespace EconomicLifeCycleCost {
                     tableBody(jObj, iYear + 1) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
-            WriteSubtitle("Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
+            WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2370,7 +2370,7 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
-            WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
+            WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2420,7 +2420,7 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
-            WriteSubtitle("Energy and Water Cost Cash Flows (With Escalation)");
+            WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2461,7 +2461,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
                 tableBody(4, iYear) = RealToStr(CashFlow(costCatTotCaptl).yrAmount(iYear), 2);
             }
-            WriteSubtitle("Capital Cash Flow by Category (Without Escalation)");
+            WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2514,7 +2514,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(9, iYear) = RealToStr(CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
                 tableBody(10, iYear) = RealToStr(CashFlow(costCatTotOper).yrAmount(iYear), 2);
             }
-            WriteSubtitle("Operating Cash Flow by Category (Without Escalation)");
+            WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2569,7 +2569,7 @@ namespace EconomicLifeCycleCost {
                     CashFlow(costCatTotOper).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
                 tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
             }
-            WriteSubtitle("Operating Cash Flow by Category (With Escalation)");
+            WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2626,7 +2626,7 @@ namespace EconomicLifeCycleCost {
                         tableBody(jObj, kMonth) = RealToStr(CashFlow(jObj).mnAmount(kMonth), 2);
                     }
                 }
-                WriteSubtitle("DEBUG ONLY - Monthly Cash Flows");
+                WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
@@ -2659,7 +2659,7 @@ namespace EconomicLifeCycleCost {
                     tableBody(kMonth, iYear) = RealToStr(CashFlow(costCatTotGrand).mnAmount((iYear - 1) * 12 + kMonth), 2);
                 }
             }
-            WriteSubtitle("Monthly Total Cash Flow (Without Escalation)");
+            WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -2747,7 +2747,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
-            WriteSubtitle("Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
+            WriteSubtitle(state, "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -2812,7 +2812,7 @@ namespace EconomicLifeCycleCost {
             tableBody(1, 15) = RealToStr(CashFlow(costCatTotCaptl).presentValue, 2);
             tableBody(1, 16) = RealToStr(CashFlow(costCatTotGrand).presentValue, 2);
 
-            WriteSubtitle("Present Value by Category");
+            WriteSubtitle(state, "Present Value by Category");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -2852,7 +2852,7 @@ namespace EconomicLifeCycleCost {
             rowHead(lengthStudyYears + 1) = "TOTAL";
             tableBody(3, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
-            WriteSubtitle("Present Value by Year");
+            WriteSubtitle(state, "Present Value by Year");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -2894,7 +2894,7 @@ namespace EconomicLifeCycleCost {
                 rowHead(lengthStudyYears + 1) = "TOTAL";
                 tableBody(5, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
-                WriteSubtitle("After Tax Estimate");
+                WriteSubtitle(state, "After Tax Estimate");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(

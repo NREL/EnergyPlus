@@ -703,7 +703,7 @@ namespace OutputReportTabularAnnual {
             if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
                 varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
                 OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-                OutputReportTabular::GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+                OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
             } else { // just do the Joule conversion
                 // if units is in Joules, convert if specified
                 if (fldStIt->m_varUnits == OutputProcessor::Unit::J) {
@@ -921,8 +921,8 @@ namespace OutputReportTabularAnnual {
                        curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev) {
             }
         } // fldStIt
-        OutputReportTabular::WriteReportHeaders(m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
-        OutputReportTabular::WriteSubtitle("Custom Annual Report");
+        OutputReportTabular::WriteReportHeaders(state, m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
+        OutputReportTabular::WriteSubtitle(state, "Custom Annual Report");
         OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
@@ -968,7 +968,7 @@ namespace OutputReportTabularAnnual {
                         tableBodyRange(iBin + 1, 2) =
                             OutputReportTabular::RealToStr(binBottom + float(iBin + 1) * intervalSize, fldStIt->m_showDigits);
                     }
-                    OutputReportTabular::WriteSubtitle("Bin Sizes for: " + fldStIt->m_colHead);
+                    OutputReportTabular::WriteSubtitle(state, "Bin Sizes for: " + fldStIt->m_colHead);
                     OutputReportTabular::WriteTable(state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
@@ -1274,7 +1274,7 @@ namespace OutputReportTabularAnnual {
         if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
             varNameWithUnits = fldStIt->m_variMeter + '[' + unitEnumToString(fldStIt->m_varUnits) + ']';
             OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-            OutputReportTabular::GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+            OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
         } else { // just do the Joule conversion
             // if units is in Joules, convert if specified
             if (fldStIt->m_varUnits == OutputProcessor::Unit::J) {

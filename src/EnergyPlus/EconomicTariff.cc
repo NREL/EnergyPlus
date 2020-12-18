@@ -101,7 +101,7 @@ namespace EnergyPlus::EconomicTariff {
             // do rest of GetInput only if at least one tariff is defined.
             GetInputEconomicsCurrencyType(state, ErrorsFound);
             if (state.dataEconTariff->numTariff >= 1) {
-                if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
+                if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables(state);
                 GetInputEconomicsQualify(state, ErrorsFound);
                 GetInputEconomicsChargeSimple(state, ErrorsFound);
@@ -601,7 +601,7 @@ namespace EnergyPlus::EconomicTariff {
             tariff(iInObj).totalAnnualCost = 0.0;
             // now create the Table Of Contents entries for an HTML file
             if (displayTariffReport) {
-                AddTOCEntry("Tariff Report", tariff(iInObj).tariffName);
+                AddTOCEntry(state, "Tariff Report", tariff(iInObj).tariffName);
             }
             // associate the resource number with each tariff
             if (tariff(iInObj).reportMeterIndx >= 1) {
@@ -2667,8 +2667,6 @@ namespace EnergyPlus::EconomicTariff {
         //    The list of steps for the tariff computation are in order
         //    for stack based computation (reverse polish notation)
 
-        using OutputReportTabular::WriteTabularFiles;
-
         // values used in specific operations
         Array1D<Real64> a(MaxNumMonths);
         int aPt;
@@ -2693,7 +2691,7 @@ namespace EnergyPlus::EconomicTariff {
         auto &computation(state.dataEconTariff->computation);
 
         if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
-            WriteTabularFiles = false;
+            state.dataOutRptTab->WriteTabularFiles = false;
             return;
         }
 
@@ -2703,7 +2701,7 @@ namespace EnergyPlus::EconomicTariff {
             econVar(nVar).isEvaluated = false;
         }
         if (state.dataEconTariff->numTariff >= 1) {
-            WriteTabularFiles = true;
+            state.dataOutRptTab->WriteTabularFiles = true;
             setNativeVariables(state);
             for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
@@ -4074,7 +4072,7 @@ namespace EnergyPlus::EconomicTariff {
         if (state.dataOutRptTab->unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
             SIunit = "[~~$~~/m2]";
             LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
-            perAreaUnitConv = ConvertIP(unitConvIndex, 1.0);
+            perAreaUnitConv = ConvertIP(state, unitConvIndex, 1.0);
         } else {
             perAreaUnitName = "[~~$~~/m2]";
             perAreaUnitConv = 1.0;
@@ -4090,7 +4088,7 @@ namespace EnergyPlus::EconomicTariff {
                 //---------------------------------
                 // Economics Results Summary Report
                 //---------------------------------
-                WriteReportHeaders("Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
                 gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
                 //---- Annual Summary
@@ -4140,7 +4138,7 @@ namespace EnergyPlus::EconomicTariff {
                     tableBody(4, 3) = RealToStr((allTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
                 }
                 columnWidth = 14; // array assignment - same for all columns
-                WriteSubtitle("Annual Cost");
+                WriteSubtitle(state, "Annual Cost");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
@@ -4197,7 +4195,7 @@ namespace EnergyPlus::EconomicTariff {
                     tableBody(6, iTariff) = RealToStr(tariff(iTariff).totalAnnualCost, 2);
                 }
                 columnWidth = 14; // array assignment - same for all columns
-                WriteSubtitle("Tariff Summary");
+                WriteSubtitle(state, "Tariff Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
@@ -4217,7 +4215,7 @@ namespace EnergyPlus::EconomicTariff {
             //---------------------------------
             if (displayTariffReport) {
                 for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-                    WriteReportHeaders("Tariff Report", tariff(iTariff).tariffName, OutputProcessor::StoreType::Averaged);
+                    WriteReportHeaders(state, "Tariff Report", tariff(iTariff).tariffName, OutputProcessor::StoreType::Averaged);
                     rowHead.allocate(7);
                     columnHead.allocate(1);
                     columnWidth.allocate(1);
@@ -4278,7 +4276,7 @@ namespace EnergyPlus::EconomicTariff {
                         }
                     }
                     columnWidth = 14; // array assignment - same for all columns
-                    WriteSubtitle("General");
+                    WriteSubtitle(state, "General");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
@@ -4376,9 +4374,9 @@ namespace EnergyPlus::EconomicTariff {
                     ReportEconomicVariable(state, "Other Variables", false, false, tariff(iTariff).tariffName);
                     //---- Computation
                     if (computation(iTariff).isUserDef) {
-                        WriteTextLine("Computation -  User Defined", true);
+                        WriteTextLine(state, "Computation -  User Defined", true);
                     } else {
-                        WriteTextLine("Computation -  Automatic", true);
+                        WriteTextLine(state, "Computation -  Automatic", true);
                     }
                     outString = "";
                     for (lStep = computation(iTariff).firstStep; lStep <= computation(iTariff).lastStep; ++lStep) {
@@ -4386,7 +4384,7 @@ namespace EnergyPlus::EconomicTariff {
                         {
                             auto const SELECT_CASE_var(curStep);
                             if (SELECT_CASE_var == 0) { // end of line
-                                WriteTextLine(rstrip(outString));
+                                WriteTextLine(state, rstrip(outString));
                                 outString = "";
                             } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
                                 outString = econVar(curStep).name + ' ' + outString;
@@ -4669,7 +4667,7 @@ namespace EnergyPlus::EconomicTariff {
             }
         }
         columnWidth = 14; // array assignment - same for all columns
-        WriteSubtitle(titleString);
+        WriteSubtitle(state, titleString);
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);

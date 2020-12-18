@@ -179,26 +179,8 @@ namespace OutputReportTabular {
     constexpr int numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
-    extern int TOCEntriesCount;
-    extern int TOCEntriesSize;
-
-    extern int UnitConvSize;
-
-    extern bool WriteTabularFiles;
-
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
-
-    // From Report:Table:Style
-    extern int numStyles;
-    extern std::ofstream csv_stream;                   // CSV table stream
-    extern std::ofstream tab_stream;                   // Tab table stream
-    extern std::ofstream fix_stream;                   // Fixed table stream
-    extern std::ofstream htm_stream;                   // HTML table stream
-    extern std::ofstream xml_stream;                   // XML table stream
-    extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
-    extern Array1D_string del;                         // the delimiter to use
-    extern Array1D<iTableStyle> TableStyle;                     // see list of parameters
 
     extern Real64 timeInYear;
 
@@ -761,7 +743,7 @@ namespace OutputReportTabular {
 
     void OpenOutputTabularFile(EnergyPlusData &state);
 
-    void CloseOutputTabularFile();
+    void CloseOutputTabularFile(EnergyPlusData &state);
 
     void WriteTableOfContents(EnergyPlusData &state);
 
@@ -928,11 +910,11 @@ namespace OutputReportTabular {
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex);
 
-    void WriteReportHeaders(std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
+    void WriteReportHeaders(EnergyPlusData &state, std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
 
-    void WriteSubtitle(std::string const &subtitle);
+    void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column
@@ -1027,27 +1009,27 @@ namespace OutputReportTabular {
 
     int digitsAferDecimal(std::string s);
 
-    void AddTOCEntry(std::string const &nameSection, std::string const &nameReport);
+    void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::string const &nameReport);
 
-    void SetupUnitConversions();
+    void SetupUnitConversions(EnergyPlusData &state);
 
     std::string GetUnitSubString(std::string const &inString); // Input String
 
     void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
 
-    void LookupJtokWH(std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
+    void LookupJtokWH(EnergyPlusData &state, std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
 
-    Real64 ConvertIP(int const unitConvIndex, Real64 const SIvalue);
+    Real64 ConvertIP(EnergyPlusData &state, int const unitConvIndex, Real64 const SIvalue);
 
-    Real64 ConvertIPdelta(int const unitConvIndex, Real64 const SIvalue);
+    Real64 ConvertIPdelta(EnergyPlusData &state, int const unitConvIndex, Real64 const SIvalue);
 
-    void GetUnitConversion(int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
+    void GetUnitConversion(EnergyPlusData &state, int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
 
     Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
     Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
-    Real64 getSpecificUnitIndex(std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitIndex(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
 } // namespace OutputReportTabular
 
@@ -1064,6 +1046,22 @@ struct OutputReportTabularData : BaseGlobalStruct {
     int MonthlyTablesCount = 0;
     int MonthlyColumnsCount = 0;
     Array1D_bool IsMonthGathered = Array1D_bool(12, false); // shown as true for any month used
+    int TOCEntriesCount = 0;
+    int TOCEntriesSize = 0;
+    int UnitConvSize = 0;
+    bool WriteTabularFiles = false;
+    bool GetInput = true;
+
+    // From Report:Table:Style
+    int numStyles = 0;
+    std::ofstream csv_stream;               // CSV table stream
+    std::ofstream tab_stream;               // Tab table stream
+    std::ofstream fix_stream;               // Fixed table stream
+    std::ofstream htm_stream;               // HTML table stream
+    std::ofstream xml_stream;               // XML table stream
+    Array1D<std::ofstream *> TabularOutputFile = Array1D<std::ofstream *>(OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
+    Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);        // the delimiter to use
+    Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
 
     void clear_state() override
     {
@@ -1078,6 +1076,16 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->MonthlyTablesCount = 0;
         this->MonthlyColumnsCount = 0;
         this->IsMonthGathered = Array1D_bool(12, false);
+        this->TOCEntriesCount = 0;
+        this->TOCEntriesSize = 0;
+        this->UnitConvSize = 0;
+        this->WriteTabularFiles = false;
+        this->GetInput = true;
+        this->numStyles = 0;
+        this->TabularOutputFile = Array1D<std::ofstream *>(
+            OutputReportTabular::maxNumStyles, {&this->csv_stream, &this->tab_stream, &this->fix_stream, &this->htm_stream, &this->xml_stream});
+        this->del = Array1D_string(OutputReportTabular::maxNumStyles);
+        this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned);
     }
 };
 

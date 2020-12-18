@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     Real64 curConversionFactor;
     Real64 curConversionOffset;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
 
     unitString = "";
@@ -217,7 +217,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     // Check a few report column headings too
     unitString = "Standard Rated Net Cooling Capacity [W]";
     indexUnitConv = unitsFromHeading(*state, unitString);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     // We expect W to convert to tons because it's cooling
     EXPECT_EQ(70, indexUnitConv);
     EXPECT_EQ("ton", curUnits);
@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
 
     unitString = "Rated Net Cooling Capacity Test A [W]";
     indexUnitConv = unitsFromHeading(*state, unitString);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     // We expect W to convert to tons because it's cooling
     EXPECT_EQ(70, indexUnitConv);
     EXPECT_EQ("ton", curUnits);
@@ -274,11 +274,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     Real64 curConversionOffset;
     std::string varNameWithUnits;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
 
     varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(70, indexUnitConv);
     EXPECT_EQ("ton", curUnits);
     EXPECT_EQ(0.0002843333, curConversionFactor);
@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "SITE OUTDOOR AIR DRYBULB TEMPERATURE[C]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(11, indexUnitConv);
     EXPECT_EQ("F", curUnits);
     EXPECT_EQ(1.8, curConversionFactor);
@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(20, indexUnitConv);
     EXPECT_EQ("kWh", curUnits);
     EXPECT_EQ(0.000000277778, curConversionFactor);
@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "ZONE COOLING SETPOINT NOT MET TIME[hr]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(17, indexUnitConv);
     EXPECT_EQ("hr", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(96, indexUnitConv);
     EXPECT_EQ("Invalid/Undefined", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "FICTIONAL VARIABLE[qqq]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
     varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
-    GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(97, indexUnitConv);
     EXPECT_EQ("", curUnits);
     EXPECT_EQ(1.0, curConversionFactor);
@@ -394,22 +394,22 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     std::string curUnits;
     std::string varNameWithUnits;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
 
     varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
-    LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
+    LookupJtokWH(*state, varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits);
 
     varNameWithUnits = "Electricity Energy Use [GJ]";
-    LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
+    LookupJtokWH(*state, varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(86, indexUnitConv);
     EXPECT_EQ("Electricity Energy Use [kWh]", curUnits);
 
-    varNameWithUnits = "Electricty [MJ/m2]";
-    LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
+    varNameWithUnits = "Electricity [MJ/m2]";
+    LookupJtokWH(*state, varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(95, indexUnitConv);
-    EXPECT_EQ("Electricty [kWh/m2]", curUnits);
+    EXPECT_EQ("Electricity [kWh/m2]", curUnits);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetColumnUsingTabs)
@@ -6713,7 +6713,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
     Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
     Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
     Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(*state, "m3/s-m2", "ft3/min-ft2");
-    int tempConvIndx = getSpecificUnitIndex("C", "F");
+    int tempConvIndx = getSpecificUnitIndex(*state, "C", "F");
 
     LoadSummaryUnitConversion(*state, compLoad);
 
@@ -6722,7 +6722,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
     EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
     EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
 
-    EXPECT_EQ(ConvertIP(tempConvIndx, 20.), compLoad.outsideDryBulb);
+    EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
     EXPECT_EQ(0.2 * airFlowPerAreaConversion / powerConversion, compLoad.airflowPerTotCap);
     EXPECT_EQ(0.15 * powerConversion / areaConversion, compLoad.totCapPerArea);
@@ -6918,7 +6918,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::SetupUnitConversions();
+    OutputReportTabular::SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
 
     // We ask for the air loop component load summary since that's the one we test
@@ -7242,9 +7242,9 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    WriteTabularFiles = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
@@ -7300,9 +7300,9 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    WriteTabularFiles = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
@@ -7809,9 +7809,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     OutputReportTabular::displayDemandEndUse = true;
     OutputReportTabular::displayLEEDSummary = true;
 
-    OutputReportTabular::WriteTabularFiles = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
 
-    SetupUnitConversions();
+    SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)

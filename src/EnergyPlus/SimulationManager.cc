@@ -648,7 +648,7 @@ namespace SimulationManager {
 
         ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
 
-        CloseOutputTabularFile();
+        CloseOutputTabularFile(state);
 
         DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
