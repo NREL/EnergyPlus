@@ -10,7 +10,7 @@
 set(CMAKE_CXX_STANDARD 17)
 
 if (NOT MSVC)
-  add_compile_options(-Wno-pedantic -Wno-unused-parameter)
+  add_compile_options(-Wno-pedantic -Wno-unused-parameter -Wno-unknown-pragmas)
 else()
   add_compile_options(/wd4267 /wd4996 /wd4068 /wd4244 )
 endif()
