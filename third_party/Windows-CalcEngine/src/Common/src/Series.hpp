@@ -14,6 +14,12 @@ namespace FenestrationCommon {
 		virtual double value() const = 0;
 		virtual void value( double const t_Value ) = 0;
 		virtual std::unique_ptr< ISeriesPoint > clone() const = 0;
+		virtual ~ISeriesPoint() = default;
+		ISeriesPoint() = default;
+		ISeriesPoint &operator=(const ISeriesPoint &) = delete;
+		ISeriesPoint &operator=(ISeriesPoint &&) = delete;
+		ISeriesPoint(const ISeriesPoint &) = delete;
+		ISeriesPoint(ISeriesPoint &&) = delete;
 	};
 
 	// Implementation of spectral property interface
