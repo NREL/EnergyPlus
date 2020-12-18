@@ -1270,22 +1270,25 @@ public:
                 sco2_rc_csp_par.m_DP_HT = DP_HT;
                 sco2_rc_csp_par.m_DP_PC = DP_PC;
                 sco2_rc_csp_par.m_DP_PHX = DP_PHX;
-                sco2_rc_csp_par.m_N_sub_hxrs = 10;
 
                 sco2_rc_csp_par.m_N_turbine = 3000.0;
 
-                sco2_rc_csp_par.m_tol = 1.E-3;
-                sco2_rc_csp_par.m_opt_tol = 1.E-3;
+                sco2_rc_csp_par.m_des_tol = 1.E-3;
+                sco2_rc_csp_par.m_des_opt_tol = 1.E-3;
                 
                 // Cycle Design Parameters
                     // LTR thermal design
                 sco2_rc_csp_par.m_LTR_target_code = 0;      // Optimize recuperator UA
                 sco2_rc_csp_par.m_LTR_min_dT = std::numeric_limits<double>::quiet_NaN();    //[K] shouldn't be using this with target code = 1
                 sco2_rc_csp_par.m_LTR_eff_max = as_double("recup_eff_max");     //[-]
+                sco2_rc_csp_par.m_LTR_N_sub_hxrs = 10;
+                sco2_rc_csp_par.m_LTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_constant_UA;
                     // HTR thermal design
                 sco2_rc_csp_par.m_HTR_target_code = 0;      // Optimize recuperator UA
                 sco2_rc_csp_par.m_HTR_min_dT = std::numeric_limits<double>::quiet_NaN();    //[K] shouldn't be using this with target code = 1
                 sco2_rc_csp_par.m_HTR_eff_max = as_double("recup_eff_max");     //[-]
+                sco2_rc_csp_par.m_HTR_N_sub_hxrs = 10;
+                sco2_rc_csp_par.m_HTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_constant_UA;
                     //
                 sco2_rc_csp_par.m_eta_mc = as_double("eta_c");                  //[-]
                 sco2_rc_csp_par.m_eta_rc = as_double("eta_c");                  //[-]
@@ -1298,10 +1301,14 @@ public:
                 // PHX design parameters
                 sco2_rc_csp_par.m_des_objective_type = 1;       //[-] Optimize design to maximize efficiency
                 sco2_rc_csp_par.m_phx_dt_cold_approach = sco2_rc_csp_par.m_phx_dt_hot_approach; //[K/C]
+                sco2_rc_csp_par.m_phx_N_sub_hx = 10;
+                sco2_rc_csp_par.m_phx_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_constant_UA;
 
                 // Air cooler parameters
                 sco2_rc_csp_par.m_frac_fan_power = as_double("fan_power_perc_net") / 100.0; //[-]
                 sco2_rc_csp_par.m_deltaP_cooler_frac = 0.002;       //[-]
+                sco2_rc_csp_par.m_eta_fan = 0.5;
+                sco2_rc_csp_par.m_N_nodes_pass = 10;
 
                 sco2_pc.ms_params.ms_mc_sco2_recomp_params = sco2_rc_csp_par;
 
@@ -1383,13 +1390,16 @@ public:
                     int n_m_dot_htf_ND_in = 10;
 
                     util::matrix_t<double> T_htf_parametrics, T_amb_parametrics, m_dot_htf_ND_parametrics;
+                    double od_opt_tol = 1.E-3;
+                    double od_tol = 1.E-3;
 
                     try
                     {
                         c_sco2_csp.generate_ud_pc_tables(T_htf_hot_low, T_htf_hot_high, n_T_htf_hot_in,
                             T_amb_low, T_amb_high, n_T_amb_in,
                             m_dot_htf_ND_low, m_dot_htf_ND_high, n_m_dot_htf_ND_in,
-                            T_htf_parametrics, T_amb_parametrics, m_dot_htf_ND_parametrics);
+                            T_htf_parametrics, T_amb_parametrics, m_dot_htf_ND_parametrics,
+                            od_opt_tol, od_tol);
                     }
                     catch (C_csp_exception &csp_exception)
                     {

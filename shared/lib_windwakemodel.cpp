@@ -544,8 +544,8 @@ void eddyViscosityWakeModel::wakeCalculations(/*INPUTS */ const double air_densi
 	}
 }
 
-void constantWakeModel::wakeCalculations(const double airDensity, const double distanceDownwind[], const double distanceCrosswind[],
-                                       double power[], double eff[], double thrust[], double windSpeed[], double turbulenceIntensity[])
+void constantWakeModel::wakeCalculations(const double airDensity, const double [], const double [],
+                                       double power[], double eff[], double thrust[], double windSpeed[], double [])
 {
     double turbPower = 0., turbThrust = 0.;
     wTurbine->turbinePower(windSpeed[0], airDensity, &turbPower, nullptr, &turbThrust);

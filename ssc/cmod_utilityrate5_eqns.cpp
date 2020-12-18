@@ -56,7 +56,7 @@ bool try_get_rate_structure(var_table* vt, const std::string& ssc_name, bool pow
             int unit_type = row[3];
             buy = row[4];
             double sell = row[5];
-            if (unit_type == 0)
+            if (unit_type == 0 || ((unit_type == -1 && max > 1e36)))
                 rate_data.table.assign("unit", var_data("kWh"));
             else if (unit_type == 2)
                 rate_data.table.assign("unit", var_data("kWh daily"));

@@ -1008,24 +1008,34 @@ public:
 		double om_opt_fuel_1_usage = as_double("om_opt_fuel_1_usage");
 		double om_opt_fuel_2_usage = as_double("om_opt_fuel_2_usage");
 		
-		// battery cost - replacement from lifetime analysis
-		if ((as_integer("en_batt") == 1) && (as_integer("batt_replacement_option") > 0))
-		{
-			ssc_number_t *batt_rep = 0;
-			if (as_integer("batt_replacement_option")==1)
-				batt_rep = as_array("batt_bank_replacement", &count); // replacements per year calculated
-			else // user specified
-				batt_rep = as_array("batt_replacement_schedule", &count); // replacements per year user-defined
-			double batt_cap = as_double("batt_computed_bank_capacity");
-			// updated 10/17/15 per 10/14/15 meeting
-			// updated 10/17/15 per 10/14/15 meeting
-			escal_or_annual(CF_battery_replacement_cost_schedule, nyears, "om_replacement_cost1", inflation_rate, batt_cap, false, as_double("om_replacement_cost_escal")*0.01);
+        // battery cost - replacement from lifetime analysis
+        if ((as_integer("en_batt") == 1) && (as_integer("batt_replacement_option") > 0))
+        {
+            ssc_number_t* batt_rep = 0;
+            std::vector<ssc_number_t> replacement_percent;
 
-			for (int i = 0; i < nyears && i < (int)count; i++) {
-				cf.at(CF_battery_replacement_cost, i + 1) = batt_rep[i] *
-					cf.at(CF_battery_replacement_cost_schedule, i + 1);
-			}
-		}
+            batt_rep = as_array("batt_bank_replacement", &count); // replacements per year calculated
+
+            // replace at capacity percent
+            if (as_integer("batt_replacement_option") == 1) {
+
+                for (i = 0; i < (int)count; i++) {
+                    replacement_percent.push_back(100);
+                }
+            }
+            else {// user specified
+                replacement_percent = as_vector_ssc_number_t("batt_replacement_schedule_percent");
+            }
+            double batt_cap = as_double("batt_computed_bank_capacity");
+            // updated 10/17/15 per 10/14/15 meeting
+            escal_or_annual(CF_battery_replacement_cost_schedule, nyears, "om_replacement_cost1", inflation_rate, batt_cap, false, as_double("om_replacement_cost_escal") * 0.01);
+
+            for (i = 0; i < nyears && i < (int)count; i++) {
+                // batt_rep and the cash flow sheets are 1 indexed, replacement_percent is zero indexed
+                cf.at(CF_battery_replacement_cost, i + 1) = batt_rep[i + 1] * replacement_percent[i] * 0.01 *
+                    cf.at(CF_battery_replacement_cost_schedule, i + 1);
+            }
+        }
 
 		// initialize energy and revenue
 		// initialize energy

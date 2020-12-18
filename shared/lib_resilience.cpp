@@ -33,7 +33,7 @@ dispatch_resilience::dispatch_resilience(const dispatch_t &orig, size_t start_in
     met_loads_kw = 0;
 
     m_batteryPower->canClipCharge = true;
-    m_batteryPower->canPVCharge = true;
+    m_batteryPower->canSystemCharge = true;
     m_batteryPower->canGridCharge = false;
     m_batteryPower->canDischarge = true;
 

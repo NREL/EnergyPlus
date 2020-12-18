@@ -257,18 +257,16 @@ SSCEXPORT void Reopt_size_battery_params(ssc_data_t data) {
 
     // convert load profile inputs, which are not net loads
     vt_get_array_vec(vt, "load", vec);
-    if (vec.size() != 8760 && vec.size() != 8760 * 2 && vec.size() != 8760 * 4){
+    size_t sim_len = vec.size();
+    if (sim_len != 8760 && sim_len != 8760 * 2 && sim_len != 8760 * 4){
         throw std::runtime_error("Load profile must be hourly, 30 min or 15 min data for a single year.");
     }
-    reopt_load.assign("loads_kw", var_data(&vec[0], vec.size()));
+    reopt_load.assign("loads_kw", var_data(&vec[0], sim_len));
     reopt_load.assign("loads_kw_is_net", false);
 
 	vt_get_array_vec(vt, "crit_load", vec);
-    if (vec.size() != 8760 && vec.size() != 8760 * 2 && vec.size() != 8760 * 4){
-        throw std::runtime_error("Critical load profile must be hourly, 30 min or 15 min data for a single year.");
-    }
-    else{
-        reopt_load.assign("critical_load_pct", 0.0);
+	if (vec.size() != sim_len) {
+        throw std::runtime_error("Critical load profile's length must be same as for load.");
     }
     reopt_load.assign("critical_loads_kw", var_data(&vec[0], vec.size()));
 
@@ -281,6 +279,7 @@ SSCEXPORT void Reopt_size_battery_params(ssc_data_t data) {
     reopt_site.assign_match_case("Wind", reopt_wind);
     reopt_site.assign_match_case("PV", reopt_pv);
     reopt_scenario.assign_match_case("Site", reopt_site);
+    reopt_scenario.assign_match_case("time_steps_per_hour", var_data((int)(sim_len / 8760)));
     reopt_table->assign_match_case("Scenario", reopt_scenario);
     vt->assign_match_case("reopt_scenario", reopt_params);
     vt->assign_match_case("log", log);

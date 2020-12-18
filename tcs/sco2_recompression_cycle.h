@@ -73,22 +73,26 @@ public:
         double m_LTR_min_dT;                //[K] target LTR minimum temperature difference
         double m_LTR_eff_target;            //[-] target LTR effectiveness
 		double m_LTR_eff_max;				//[-] Maximum allowable effectiveness in LT recuperator
-		    // HTR thermal design
+        int m_LTR_N_sub_hxrs;               //[-] Number of sub-hxs to use in hx model
+        NS_HX_counterflow_eqs::E_UA_target_type m_LTR_od_UA_target_type;
+        // HTR thermal design
         int m_HTR_target_code;              //[-] 1 = UA, 2 = min dT, 3 = effectiveness
         double m_HTR_UA;					//[kW/K] target HTR conductance
         double m_HTR_min_dT;                //[K] target HTR min temperature difference
         double m_HTR_eff_target;            //[-] target HTR effectiveness
         double m_HTR_eff_max;				//[-] Maximum allowable effectiveness in HT recuperator
-		    //
+        int m_HTR_N_sub_hxrs;               //[-] Number of sub-hxs to use in hx model
+        NS_HX_counterflow_eqs::E_UA_target_type m_HTR_od_UA_target_type;
+        //
         double m_recomp_frac;				//[-] Fraction of flow that bypasses the precooler and the main compressor at the design point
 		double m_eta_mc;					//[-] design-point efficiency of the main compressor; isentropic if positive, polytropic if negative
         int m_mc_comp_model_code;           //[-] Main compressor model - see sco2_cycle_components.h 
         double m_eta_rc;					//[-] design-point efficiency of the recompressor; isentropic if positive, polytropic if negative
         int m_rc_comp_model_code;           //[-] Recompressor model - see sco2_cycle_components.h 
         double m_eta_t;						//[-] design-point efficiency of the turbine; isentropic if positive, polytropic if negative
-		int m_N_sub_hxrs;					//[-] Number of sub-heat exchangers to use when calculating UA value for a heat exchanger
+		//int m_N_sub_hxrs;					//[-] Number of sub-heat exchangers to use when calculating UA value for a heat exchanger
 		double m_P_high_limit;				//[kPa] maximum allowable pressure in cycle
-		double m_tol;						//[-] Convergence tolerance
+		double m_des_tol;						//[-] Convergence tolerance
 		double m_N_turbine;					//[rpm] Turbine shaft speed (negative values link turbine to compressor)
 
 		// Air cooler parameters
@@ -97,6 +101,8 @@ public:
 		double m_deltaP_cooler_frac;	//[-] Fraction of high side (of cycle, i.e. comp outlet) pressure that is allowed as pressure drop to design the ACC
 		double m_T_amb_des;				//[K] Design point ambient temperature
 		double m_elevation;				//[m] Elevation (used to calculate ambient pressure)
+        double m_eta_fan;               //[-] Fan isentropic efficiency
+        int m_N_nodes_pass;             //[-] Number of nodes per pass
 
 		int m_des_objective_type;		//[2] = min phx deltat then max eta, [else] max eta
 		double m_min_phx_deltaT;		//[C]
@@ -107,17 +113,34 @@ public:
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
                 m_recomp_frac = 
-				m_eta_mc = m_eta_rc = m_eta_t = m_P_high_limit = m_tol = m_N_turbine =
-				m_frac_fan_power = m_deltaP_cooler_frac = m_T_amb_des = m_elevation = std::numeric_limits<double>::quiet_NaN();
-			m_N_sub_hxrs = -1;
+				m_eta_mc = m_eta_rc = m_eta_t = m_P_high_limit = m_des_tol = m_N_turbine =
+				m_frac_fan_power = m_deltaP_cooler_frac =
+                m_eta_fan = m_T_amb_des = m_elevation = std::numeric_limits<double>::quiet_NaN();
+			m_LTR_N_sub_hxrs = m_HTR_N_sub_hxrs = -1;
 
             // Compressor model codes
             m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
+
+
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_compA__P85_T37;
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_compA__P85_T32;
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_compA__P80_T37;
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_compA__P80_T32;
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_compA__interpolate;
+
+
+
+            //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
+
+
             m_rc_comp_model_code = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
+
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance
+            m_LTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
             m_HTR_target_code = 1;      // default to target conductance
+            m_HTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
 
 			// Default to standard optimization to maximize cycle efficiency
 			m_des_objective_type = 1;
@@ -125,6 +148,7 @@ public:
 
 			// Air cooler default
 			m_is_des_air_cooler = true;
+            m_N_nodes_pass = -1;
 
 			m_DP_LT.resize(2);
 			std::fill(m_DP_LT.begin(), m_DP_LT.end(), std::numeric_limits<double>::quiet_NaN());
@@ -153,20 +177,24 @@ public:
         double m_LTR_min_dT;                //[K] target LTR minimum temperature difference
         double m_LTR_eff_target;            //[-] target LTR effectiveness
         double m_LTR_eff_max;				//[-] Maximum allowable effectiveness in LT recuperator
-		    // HTR thermal design
+        int m_LTR_N_sub_hxrs;               //[-] Number of sub-hxs used to model hx
+        NS_HX_counterflow_eqs::E_UA_target_type m_LTR_od_UA_target_type;
+            // HTR thermal design
         int m_HTR_target_code;              //[-] 1 = UA, 2 = min dT, 3 = effectiveness
         double m_HTR_UA;					//[kW/K] target HTR conductance
         double m_HTR_min_dT;                //[K] target HTR min temperature difference
         double m_HTR_eff_target;            //[-] target HTR effectiveness
         double m_HTR_eff_max;				//[-] Maximum allowable effectiveness in HT recuperator
+        int m_HTR_N_sub_hxrs;               //[-] Number of sub-hxs used to model hx
+        NS_HX_counterflow_eqs::E_UA_target_type m_HTR_od_UA_target_type;
             //
         double m_eta_mc;					//[-] design-point efficiency of the main compressor; isentropic if positive, polytropic if negative
-		double m_eta_rc;					//[-] design-point efficiency of the recompressor; isentropic if positive, polytropic if negative
+        int m_mc_comp_model_code;           //[-] Recompressor model - see sco2_cycle_components.h 
+        double m_eta_rc;					//[-] design-point efficiency of the recompressor; isentropic if positive, polytropic if negative
 		double m_eta_t;						//[-] design-point efficiency of the turbine; isentropic if positive, polytropic if negative
-		int m_N_sub_hxrs;					//[-] Number of sub-heat exchangers to use when calculating UA value for a heat exchanger
 		double m_P_high_limit;				//[kPa] maximum allowable pressure in cycle
-		double m_tol;						//[-] Convergence tolerance
-		double m_opt_tol;					//[-] Optimization tolerance
+		double m_des_tol;					//[-] Convergence tolerance
+		double m_des_opt_tol;					//[-] Optimization tolerance
 		double m_N_turbine;					//[rpm] Turbine shaft speed (negative values link turbine to compressor)
 		
 		// Air cooler parameters
@@ -175,6 +203,8 @@ public:
 		double m_deltaP_cooler_frac;	//[-] Fraction of high side (of cycle, i.e. comp outlet) pressure that is allowed as pressure drop to design the ACC
 		double m_T_amb_des;				//[K] Design point ambient temperature
 		double m_elevation;				//[m] Elevation (used to calculate ambient pressure)
+        double m_eta_fan;               //[-] Fan isentropic efficiency
+        int m_N_nodes_pass;             //[-] Number of nodes per pass
 
 		int m_des_objective_type;			//[2] = min phx deltat then max eta, [else] max eta
 		double m_min_phx_deltaT;			//[C]
@@ -198,18 +228,24 @@ public:
 			m_W_dot_net = m_T_mc_in = m_T_t_in = m_UA_rec_total = 
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
-				m_eta_mc = m_eta_rc = m_eta_t = m_P_high_limit = m_tol = m_opt_tol = m_N_turbine =
+				m_eta_mc = m_eta_rc = m_eta_t = m_P_high_limit = m_des_tol = m_des_opt_tol = m_N_turbine =
 				m_frac_fan_power = m_deltaP_cooler_frac = m_T_amb_des = m_elevation =
-				m_P_mc_out_guess = m_PR_HP_to_LP_guess = m_recomp_frac_guess = m_LT_frac_guess = std::numeric_limits<double>::quiet_NaN();
+				m_P_mc_out_guess = m_PR_HP_to_LP_guess = m_recomp_frac_guess = m_LT_frac_guess =
+                m_eta_fan = std::numeric_limits<double>::quiet_NaN();
 
-			m_N_sub_hxrs = -1;
+			m_LTR_N_sub_hxrs = m_HTR_N_sub_hxrs = -1;
+
+            m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance
+            m_LTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
             m_HTR_target_code = 1;      // default to target conductance
+            m_HTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
 
 			// Air cooler default
 			m_is_des_air_cooler = true;
+            m_N_nodes_pass = -1;
 
 			// Default to standard optimization to maximize cycle efficiency
 			m_des_objective_type = 1;
@@ -286,13 +322,11 @@ public:
 		double m_recomp_frac;	//[-] Fraction of flow that bypasses the precooler and main compressor
 		double m_N_mc;			//[rpm] Main compressor shaft speed
 		double m_N_t;			//[rpm] Turbine shaft speed
-		int m_N_sub_hxrs;		//[-] Number of sub heat exchangers
 		double m_tol;			//[-] Convergence tolerance
 
 		S_od_parameters()
 		{
 			m_T_mc_in = m_T_t_in = m_P_mc_in = m_recomp_frac = m_N_mc = m_N_t = m_tol = std::numeric_limits<double>::quiet_NaN();
-			m_N_sub_hxrs = -1;
 		}
 	};
 
@@ -427,7 +461,8 @@ private:
 	C_comp_multi_stage m_rc_ms;
 	C_HeatExchanger m_PHX, m_PC;
 	
-	C_HX_co2_to_co2 mc_LT_recup, mc_HT_recup;
+    C_HX_co2_to_co2_CRM mc_LT_recup;
+    C_HX_co2_to_co2_CRM mc_HT_recup;
 
 	C_CO2_to_air_cooler mc_air_cooler;
 	
@@ -504,7 +539,7 @@ private:
 
 	//void off_design_phi_core(int & error_code);
 
-	void off_design_fix_shaft_speeds_core(int & error_code);
+	void off_design_fix_shaft_speeds_core(int & error_code, double od_tol /*-*/);
 	
 	//void optimal_off_design_core(int & error_code);
 
@@ -576,13 +611,13 @@ public:
 
 	//void off_design_phi(S_od_phi_par & od_phi_par_in, int & error_code);
 
-	int off_design_fix_shaft_speeds(S_od_par & od_phi_par_in);
+	int off_design_fix_shaft_speeds(S_od_par & od_phi_par_in, double od_tol /*-*/);
 
-	virtual int solve_OD_all_coolers_fan_power(double T_amb /*K*/, double & W_dot_fan /*MWe*/);
+	virtual int solve_OD_all_coolers_fan_power(double T_amb /*K*/, double od_tol /*-*/, double & W_dot_fan /*MWe*/);
 
-    virtual int solve_OD_mc_cooler_fan_power(double T_amb /*K*/, double & W_dot_mc_cooler_fan /*MWe*/);
+    virtual int solve_OD_mc_cooler_fan_power(double T_amb /*K*/, double od_tol /*-*/, double & W_dot_mc_cooler_fan /*MWe*/, double & P_co2_out /*kPa*/);
 
-    virtual int solve_OD_pc_cooler_fan_power(double T_amb /*K*/, double & W_dot_pc_cooler_fan /*MWe*/);
+    virtual int solve_OD_pc_cooler_fan_power(double T_amb /*K*/, double od_tol /*-*/, double & W_dot_pc_cooler_fan /*MWe*/, double & P_co2_out /*kPa*/);
 
 	//void optimal_off_design(S_opt_od_parameters & opt_od_par_in, int & error_code);
 	
@@ -607,7 +642,7 @@ public:
 
 	void set_od_pres(int n_state_point, double pres_kPa);
 
-	void off_design_recompressor(double T_in, double P_in, double m_dot, double P_out, int & error_code, double & T_out);
+	void off_design_recompressor(double T_in, double P_in, double m_dot, double P_out, double tol /*-*/, int & error_code, double & T_out);
 
 	void estimate_od_turbo_operation(double T_mc_in /*K*/, double P_mc_in /*kPa*/, double f_recomp /*-*/, double T_t_in /*K*/, double phi_mc /*-*/,
 							int & mc_error_code, double & mc_w_tip_ratio /*-*/, double & P_mc_out /*kPa*/,
@@ -644,6 +679,7 @@ public:
 		double m_T_t_in;		//[K] Turbine inlet temperature
 
         double m_f_mc_bypass;   //[-] Fraction of main compressor bypassed to cooler
+        double m_od_tol;
 
 	public:
 		
@@ -654,13 +690,14 @@ public:
 
 		C_mono_eq_x_f_recomp_y_N_rc(C_RecompCycle *pc_rc_cycle, double T_mc_in /*K*/, 
             double P_mc_in /*kPa*/, double T_t_in /*K*/,
-            double f_mc_bypass)
+            double f_mc_bypass, double od_tol)
 		{
 			mpc_rc_cycle = pc_rc_cycle;
 			m_T_mc_in = T_mc_in;		//[K]
 			m_P_mc_in = P_mc_in;		//[kPa]
 			m_T_t_in = T_t_in;			//[K]
             m_f_mc_bypass = f_mc_bypass;    //[-]
+            m_od_tol = od_tol;          //[-]
 
 			m_m_dot_t = m_m_dot_rc = m_m_dot_mc = m_m_dot_LTR_HP = std::numeric_limits<double>::quiet_NaN();
 		}
@@ -750,14 +787,17 @@ public:
 	{
 	private:
 		C_RecompCycle *mpc_rc_cycle;
+        double m_od_tol;
 
 	public:
-		C_mono_eq_LTR_od(C_RecompCycle *pc_rc_cycle, double m_dot_rc, double m_dot_LTR_HP, double m_dot_t)
+		C_mono_eq_LTR_od(C_RecompCycle *pc_rc_cycle, double m_dot_rc,
+            double m_dot_LTR_HP, double m_dot_t, double od_tol /*-*/)
 		{
 			mpc_rc_cycle = pc_rc_cycle;
 			m_m_dot_rc = m_dot_rc;
             m_m_dot_LTR_HP = m_dot_LTR_HP;  //[kg/s]
 			m_m_dot_t = m_dot_t;
+            m_od_tol = od_tol;
 		}	
 		
 		// These values are calculated in the operator() method and need to be extracted form this class
@@ -797,14 +837,17 @@ public:
 	{
 	private:
 		C_RecompCycle *mpc_rc_cycle;
+        double m_od_tol;
 
 	public:
-		C_mono_eq_HTR_od(C_RecompCycle *pc_rc_cycle, double m_dot_rc, double m_dot_LTR_HP, double m_dot_t)
+		C_mono_eq_HTR_od(C_RecompCycle *pc_rc_cycle, double m_dot_rc,
+            double m_dot_LTR_HP, double m_dot_t, double od_tol)
 		{
 			mpc_rc_cycle = pc_rc_cycle;
 			m_m_dot_rc = m_dot_rc;
             m_m_dot_LTR_HP = m_dot_LTR_HP;  //[kg/s]
 			m_m_dot_t = m_dot_t;
+            m_od_tol = od_tol;
 		}
 	
 		// These values are passed in as arguments to Constructor call and should not be reset

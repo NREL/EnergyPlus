@@ -126,7 +126,7 @@ private:
 */
 
 struct losses_state {
-    double loss_percent;
+    double loss_kw;
 
     friend std::ostream &operator<<(std::ostream &os, const losses_state &p);
 };
@@ -153,9 +153,9 @@ public:
     *
     * Construct the losses object for monthly losses
     *
-    * \param[in] monthly_charge vector (size 1 for annual or 12 for monthly) containing battery system losses when charging (kW)
-    * \param[in] monthly_discharge vector (size 1 for annual or 12 for monthly) containing battery system losses when discharge (kW)
-    * \param[in] monthly_idle vector (size 1 for annual or 12 for monthly) containing battery system losses when idle (kW)
+    * \param[in] monthly_charge vector (size 1 for annual or 12 for monthly) containing battery system losses when charging (kW) (applied to PV or grid)
+    * \param[in] monthly_discharge vector (size 1 for annual or 12 for monthly) containing battery system losses when discharge (kW) (applied to battery power)
+    * \param[in] monthly_idle vector (size 1 for annual or 12 for monthly) containing battery system losses when idle (kW) (applied to PV or grid)
     */
     losses_t(const std::vector<double>& monthly_charge, const std::vector<double>& monthly_discharge, const std::vector<double>& monthly_idle);
 
@@ -214,7 +214,6 @@ struct replacement_params {
     /// Maximum capacity relative to nameplate at which to replace battery back to 100%
     double replacement_capacity;
 
-    std::vector<int> replacement_schedule;
     std::vector<double> replacement_schedule_percent;    // (0 - 100%)
 
     friend std::ostream &operator<<(std::ostream &os, const replacement_params &p);
@@ -304,7 +303,7 @@ public:
     void setupReplacements(double capacity);
 
     // replace by schedule
-    void setupReplacements(std::vector<int> schedule, std::vector<double> replacement_percents);
+    void setupReplacements(std::vector<double> replacement_percents);
 
     void runReplacement(size_t year, size_t hour, size_t step);
 
@@ -316,7 +315,7 @@ public:
     double getReplacementPercent();
 
     // Run all for single time step, updating all component model states and return the dispatched power [kW]
-    double run(size_t lifetimeIndex, double &I, bool stateful = false);
+    double run(size_t lifetimeIndex, double &I);
 
     // Run for a single time step, using a control current A and the time step found in battery state
     void runCurrent(double I);
@@ -379,6 +378,12 @@ public:
     double V_nominal(); // the nominal battery voltage
 
     double I();
+
+    // Get estimated losses
+    double calculate_loss(double power, size_t lifetimeIndex);
+
+    // Get the losses at the current step
+    double getLoss();
 
     battery_state get_state();
 

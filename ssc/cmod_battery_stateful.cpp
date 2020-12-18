@@ -51,12 +51,12 @@ var_info vtab_battery_stateful_inputs[] = {
         { SSC_INPUT,		SSC_MATRIX,      "voltage_matrix",                             "Table with depth-of-discharge % and Voltage as columns",  "[[%, V]]","",                     "ParamsCell",       "voltage_choice=1",      "",                             "" },
         { SSC_INPUT,        SSC_NUMBER,      "Vnom_default",                               "Default nominal cell voltage",                            "V",       "",                     "ParamsCell",       "*",                          "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "resistance",                                 "Internal resistance",                                     "Ohm",     "",                     "ParamsCell",       "*",                           "",                              "" },
+        { SSC_INPUT,        SSC_NUMBER,      "Qfull",                                      "Fully charged cell capacity",                             "Ah",      "",                     "ParamsCell",       "*",                       "",                              "" },
+        { SSC_INPUT,        SSC_NUMBER,      "Qexp",                                       "Cell capacity at end of exponential zone",                "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
+        { SSC_INPUT,        SSC_NUMBER,      "Qnom",                                       "Cell capacity at end of nominal zone",                    "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "Vfull",                                      "Fully charged cell voltage",                              "V",       "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "Vexp",                                       "Cell voltage at end of exponential zone",                 "V",       "",                     "ParamsCell",       "voltage_choice=0&chem~2",  "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "Vnom",                                       "Cell voltage at end of nominal zone",                     "V",       "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
-        { SSC_INPUT,        SSC_NUMBER,      "Qfull",                                      "Fully charged cell capacity",                             "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
-        { SSC_INPUT,        SSC_NUMBER,      "Qexp",                                       "Cell capacity at end of exponential zone",                "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
-        { SSC_INPUT,        SSC_NUMBER,      "Qnom",                                       "Cell capacity at end of nominal zone",                    "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "C_rate",                                     "Rate at which voltage vs. capacity curve input",          "",        "",                     "ParamsCell",       "voltage_choice=0&chem~2", "",                              "" },
         { SSC_INPUT,        SSC_NUMBER,      "Qfull_flow",                                 "Fully charged flow battery capacity",                     "Ah",      "",                     "ParamsCell",       "voltage_choice=0&chem=3", "",                              "" },
 
@@ -87,7 +87,6 @@ var_info vtab_battery_stateful_inputs[] = {
         // replacement inputs
         { SSC_INPUT,        SSC_NUMBER,      "replacement_option",                         "Replacements: none (0), by capacity (1), or schedule (2)", "0=none,1=capacity limit,2=yearly schedule", "", "ParamsPack", "?=0",                  "INTEGER,MIN=0,MAX=2",          "" },
         { SSC_INPUT,        SSC_NUMBER,      "replacement_capacity",                       "Capacity degradation at which to replace battery",       "%",        "",                     "ParamsPack",       "replacement_option=1",                           "",                             "" },
-        { SSC_INPUT,        SSC_ARRAY,       "replacement_schedule",                       "Battery bank number of replacements in each year",       "[number/year]","length <= analysis_period",                  "ParamsPack",      "replacement_option=2",   "",                             "" },
         { SSC_INPUT,        SSC_ARRAY,       "replacement_schedule_percent",               "Percentage of battery capacity to replace in each year", "[%/year]","length <= analysis_period",                  "ParamsPack",      "replacement_option=2",   "",                             "" },
         var_info_invalid
 };
@@ -146,7 +145,7 @@ var_info vtab_battery_state[] = {
         { SSC_INOUT,        SSC_NUMBER,     "dq_relative_calendar_old",  "Change in capacity of last time step",                     "%",         "",                     "StateCell",        "",                           "",                               ""  },
 
         // losses
-        { SSC_INOUT,        SSC_NUMBER,     "loss_percent",              "Power loss percent",                                       "%",         "",                     "StatePack",          "",                           "",                               ""  },
+        { SSC_INOUT,        SSC_NUMBER,     "loss_kw",                   "Ancillary power loss (kW DC for DC connected, AC for AC connected)", "kW", "",                  "StatePack",          "",                           "",                               ""  },
 
         // replacements
         { SSC_INOUT,        SSC_NUMBER,     "n_replacements",            "Number of replacements at current year",                   "",         "",                      "StatePack",     "",                           "",                               ""  },
@@ -207,7 +206,7 @@ void write_battery_state(const battery_state& state, var_table* vt) {
     vt->assign_match_case("day_age_of_battery", lifetime->calendar->day_age_of_battery);
     vt->assign_match_case("dq_relative_calendar_old", lifetime->calendar->dq_relative_calendar_old);
 
-    vt->assign_match_case("loss_percent", state.losses->loss_percent);
+    vt->assign_match_case("loss_kw", state.losses->loss_kw);
 
     vt->assign_match_case("n_replacements", state.replacement->n_replacements);
     vt->assign_match_case( "indices_replaced", state.replacement->indices_replaced);
@@ -268,7 +267,7 @@ void read_battery_state(battery_state& state, var_table* vt) {
     vt_get_int(vt, "day_age_of_battery", &lifetime->calendar->day_age_of_battery);
     vt_get_number(vt, "dq_relative_calendar_old", &lifetime->calendar->dq_relative_calendar_old);
 
-    vt_get_number(vt, "loss_percent", &state.losses->loss_percent);
+    vt_get_number(vt, "loss_kw", &state.losses->loss_kw);
 
     vt_get_int(vt, "n_replacements", &state.replacement->n_replacements);
     vt_get_array_vec(vt, "indices_replaced", state.replacement->indices_replaced);
@@ -380,7 +379,6 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
     vt_get_int(vt, "replacement_option", &choice);
     replacements->replacement_option = static_cast<replacement_params::OPTIONS>(choice);
     if (replacements->replacement_option == replacement_params::SCHEDULE) {
-        vt_get_array_vec(vt, "replacement_schedule", replacements->replacement_schedule);
         vt_get_array_vec(vt, "replacement_schedule_percent", replacements->replacement_schedule_percent);
     }
     else if (replacements->replacement_option == replacement_params::CAPACITY_PERCENT) {
@@ -404,13 +402,13 @@ cm_battery_stateful::cm_battery_stateful(var_table* vt) :
         if (!compute_module::verify("precheck input", SSC_INPUT))
             throw exec_error("battery_stateful", log(0)->text);
         dt_hour = as_number("dt_hr");
-        control_mode = as_number("control_mode");
+        control_mode = as_integer("control_mode");
         params = create_battery_params(m_vartab, dt_hour);
         battery = std::unique_ptr<battery_t>(new battery_t(params));
         write_battery_state(battery->get_state(), m_vartab);
     }
-    catch (std::exception& e) {
-        throw runtime_error(e.what());
+    catch (general_error& e) {
+        throw std::runtime_error(e.err_text);
     }
 }
 

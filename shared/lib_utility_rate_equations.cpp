@@ -60,7 +60,7 @@ ur_month::ur_month(const ur_month& tmp) :
 	dc_flat_charge(tmp.dc_flat_charge)
 {}
 
-void ur_month::update_net_and_peak(double energy, double power, int step) {
+void ur_month::update_net_and_peak(double energy, double power, size_t step) {
 	// net energy use per month
 	energy_net += energy; // -load and +gen
 	// hours per period per month
@@ -80,10 +80,10 @@ void ur_month::reset()
     dc_flat_peak = 0;
     dc_flat_peak_hour = 0;
 
-    int start_tier = 0;
-    int end_tier = ec_tou_ub.ncols() - 1;
-    int num_periods = ec_tou_ub.nrows();
-    int num_tiers = end_tier - start_tier + 1;
+    size_t start_tier = 0;
+    size_t end_tier = ec_tou_ub.ncols() - 1;
+    size_t num_periods = ec_tou_ub.nrows();
+    size_t num_tiers = end_tier - start_tier + 1;
 
     ec_energy_surplus.resize_fill(num_periods, num_tiers, 0);
     ec_energy_use.resize_fill(num_periods, num_tiers, 0);
@@ -175,14 +175,13 @@ void rate_data::init(int num_rec_yearly) {
 
 void rate_data::init_energy_rates(bool gen_only) {
 	// calculate the monthly net energy per tier and period based on units
-	int c = 0;
 	for (int m = 0; m < (int)m_month.size(); m++)
 	{
 		// check for kWh/kW
-		int start_tier = 0;
-		int end_tier = (int)m_month[m].ec_tou_ub.ncols() - 1;
-		int num_periods = (int)m_month[m].ec_tou_ub.nrows();
-		int num_tiers = end_tier - start_tier + 1;
+        size_t start_tier = 0;
+        size_t end_tier = (int)m_month[m].ec_tou_ub.ncols() - 1;
+        size_t num_periods = (int)m_month[m].ec_tou_ub.nrows();
+        size_t num_tiers = end_tier - start_tier + 1;
 
 		if (!gen_only) // added for two meter no load scenarios to use load tier sizing
 		{
@@ -216,12 +215,12 @@ void rate_data::init_energy_rates(bool gen_only) {
 					{
 						if (found)
 						{
-							end_tier = (int)i_tier - 1;
+							end_tier = i_tier - 1;
 							break;
 						}
 						else if (mon_kWhperkW < m_month[m].ec_tou_ub_init.at(0, i_tier))
 						{
-							start_tier = (int)i_tier + 1;
+							start_tier = i_tier + 1;
 							found = true;
 						}
 					}
@@ -235,19 +234,19 @@ void rate_data::init_energy_rates(bool gen_only) {
 				num_tiers = end_tier - start_tier + 1;
 				// resize everytime to handle load and energy changes
 				// resize sr, br and ub for use in energy charge calculations below
-				util::matrix_t<float> br(num_periods, num_tiers);
-				util::matrix_t<float> sr(num_periods, num_tiers);
-				util::matrix_t<float> ub(num_periods, num_tiers);
+				util::matrix_t<double> br(num_periods, num_tiers);
+				util::matrix_t<double> sr(num_periods, num_tiers);
+				util::matrix_t<double> ub(num_periods, num_tiers);
 				// assign appropriate values.
-				for (int period = 0; period < num_periods; period++)
+				for (size_t period = 0; period < num_periods; period++)
 				{
-					for (int tier = 0; tier < num_tiers; tier++)
+					for (size_t tier = 0; tier < num_tiers; tier++)
 					{
 						br.at(period, tier) = m_month[m].ec_tou_br_init.at(period, start_tier + tier);
 						sr.at(period, tier) = m_month[m].ec_tou_sr_init.at(period, start_tier + tier);
 						ub.at(period, tier) = m_month[m].ec_tou_ub_init.at(period, start_tier + tier);
 						// update for correct tier number column headings
-						m_month[m].ec_periods_tiers[period][tier] = start_tier + m_ec_periods_tiers_init[period][tier];
+						m_month[m].ec_periods_tiers[period][tier] = (int) (start_tier + m_ec_periods_tiers_init[period][tier]);
 					}
 				}
 
@@ -258,7 +257,7 @@ void rate_data::init_energy_rates(bool gen_only) {
 		}
 		// reset now resized
 		start_tier = 0;
-		end_tier = (int)m_month[m].ec_tou_ub.ncols() - 1;
+		end_tier = m_month[m].ec_tou_ub.ncols() - 1;
 
 		m_month[m].ec_energy_surplus.resize_fill(num_periods, num_tiers, 0);
 		m_month[m].ec_energy_use.resize_fill(num_periods, num_tiers, 0);
@@ -270,8 +269,7 @@ void rate_data::init_energy_rates(bool gen_only) {
 
 void rate_data::setup_time_series(size_t cnt, ssc_number_t* ts_sr, ssc_number_t* ts_br)
 {
-	size_t nrows, ncols, r, c, m, i, j;
-	int period, tier, month;
+	size_t i;
 
 	size_t ts_step_per_hour = cnt / 8760;
 	// assign timestep values for utility rate calculations
@@ -319,7 +317,7 @@ void rate_data::setup_energy_rates(ssc_number_t* ec_weekday, ssc_number_t* ec_we
 	size_t ec_tou_rows, ssc_number_t* ec_tou_in, bool sell_eq_buy)
 {
 	size_t nrows, ncols, r, c, m, i, j;
-	int period, tier, month;
+	int period, tier;
 	size_t steps_per_hour = m_num_rec_yearly / 8760;
 	size_t idx = 0;
 
@@ -693,7 +691,7 @@ void rate_data::setup_demand_charges(ssc_number_t* dc_weekday, ssc_number_t* dc_
 	}
 }
 
-void rate_data::sort_energy_to_periods(int month, double energy, int step) {
+void rate_data::sort_energy_to_periods(int month, double energy, size_t step) {
 	// accumulate energy per period - place all in tier 0 initially and then
 	// break up according to tier boundaries and number of periods
 	ur_month& curr_month = m_month[month];
@@ -718,11 +716,11 @@ void rate_data::init_dc_peak_vectors(int month)
 	curr_month.dc_tou_peak_hour.clear();
 	
 	curr_month.dc_tou_peak = std::vector<ssc_number_t>(curr_month.dc_periods.size());
-	curr_month.dc_tou_peak_hour = std::vector<int>(curr_month.dc_periods.size());
+	curr_month.dc_tou_peak_hour = std::vector<size_t>(curr_month.dc_periods.size());
 	
 }
 
-void rate_data::find_dc_tou_peak(int month, double power, int step) {
+void rate_data::find_dc_tou_peak(int month, double power, size_t step) {
     ur_month& curr_month = m_month[month];
     if (curr_month.dc_periods.size() > 0)
     {
@@ -743,7 +741,7 @@ void rate_data::find_dc_tou_peak(int month, double power, int step) {
     }
 }
 
-ssc_number_t rate_data::get_demand_charge(int month, int year)
+ssc_number_t rate_data::get_demand_charge(int month, size_t year)
 {
 	size_t tier, period;
 	ur_month& curr_month = m_month[month];
@@ -820,7 +818,7 @@ ssc_number_t rate_data::get_demand_charge(int month, int year)
 	return total_charge;
 }
 
-int rate_data::get_tou_row(int year_one_index, int month)
+int rate_data::get_tou_row(size_t year_one_index, int month)
 {
 	int period = m_ec_tou_sched[year_one_index];
 	ur_month& curr_month = m_month[month];

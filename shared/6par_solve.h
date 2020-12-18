@@ -1,22 +1,22 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -49,7 +49,7 @@ bool solve6par_callback( int iter, Real x[], Real resid[], const int n, void *da
 			rd[i] = (double)( resid[i] );
 		}
 
-		return nif->notify( iter, xd, rd, 6 );	
+		return nif->notify( iter, xd, rd, 6 );
 	}
 	else
 		return true;
@@ -63,12 +63,12 @@ private:
 	Real Vmp, Imp, Voc, Isc, bVoc, aIsc, gPmp, Egref, Tref;
 
 public:
-	
+
 	__Module6ParNonlinear( notification_interface *nif,
 		double _Vmp, double _Imp, double _Voc, double _Isc,
 		double _bVoc, double _aIsc, double _gPmp, double _Egref, double _Tref )
 		: m_notifyInterface(nif),
-			Vmp(_Vmp), Imp(_Imp), 
+			Vmp(_Vmp), Imp(_Imp),
 			Voc(_Voc), Isc(_Isc),
 			bVoc(_bVoc), aIsc(_aIsc), gPmp(_gPmp),
 			Egref(_Egref), Tref(_Tref)
@@ -83,14 +83,14 @@ public:
 		Real Rs = x[3];
 		Real Rsh = x[4];
 		Real Adj = x[5];
-		
+
 		f[0] = Il - Io*( exp( Isc*Rs / a ) - 1 ) - Isc*Rs/Rsh - Isc;
 		f[1] = Io*( exp( Voc/a ) - 1 ) + Voc/Rsh -Il;
 		f[2] = Il - Io*( exp( (Vmp + Imp*Rs) / a ) - 1 ) - (Vmp + Imp*Rs)/Rsh - Imp;
 
 		f[3] = Imp - Vmp*(
 			( Io/a*exp( (Vmp + Imp*Rs)/a ) + 1/Rsh )
-		 /( 1 + Io*Rs/a*exp( (Vmp + Imp*Rs)/a ) + Rs/Rsh ) ); 
+		 /( 1 + Io*Rs/a*exp( (Vmp + Imp*Rs)/a ) + Rs/Rsh ) );
 
 		const Real dT = 5;
 
@@ -100,40 +100,40 @@ public:
 		const Real IoT = Io*pow( (Tref+dT)/Tref, 3)*exp( 11600 * (Egref/Tref - Eg/(Tref+dT)));
 
 		f[4] = Il+aIsc*(1-Adj/100)*dT - IoT*(exp( VocT/aT ) - 1 ) - VocT/Rsh;
-		
-		
+
+
 		Real gamma = 0;
 		mod6par_gamma_approx<Real>( &gamma, Io, Il, a, aIsc, Adj, Vmp, Imp, Rs, Rsh, Egref, Tref );
-		
+
 		f[5] = gamma - gPmp;
 	}
 
-	bool exec(Real &_a, Real &_Il, Real &_Io, Real &_Rs, Real &_Rsh, Real &_Adj, 
+	bool exec(Real &_a, Real &_Il, Real &_Io, Real &_Rs, Real &_Rsh, Real &_Adj,
 		int max_iter, double tol, notification_interface *nif )
-	{	
+	{
 		Real x[6], resid[6];
-		
+
 		x[0] = _a;
 		x[1] = _Il;
 		x[2] = _Io;
 		x[3] = _Rs;
 		x[4] = _Rsh;
 		x[5] = _Adj;
-		
+
 		bool check = false;
-		int niter = newton<Real, __Module6ParNonlinear, 6>( x, resid, check, *this, 
+		int niter = newton<Real, __Module6ParNonlinear, 6>( x, resid, check, *this,
 			max_iter, Real(tol), Real(tol), 0.7,
 			solve6par_callback<Real>, nif );
-		
+
 		if ( niter < 0 || check ) return false;
-		
+
 		_a = x[0];
 		_Il = x[1];
 		_Io = x[2];
 		_Rs = x[3];
 		_Rsh = x[4];
 		_Adj = x[5];
-		
+
 		return true;
 	}
 };
@@ -142,8 +142,8 @@ class module6par
 {
 public:
 	enum { monoSi, multiSi, CdTe, CIS, CIGS, Amorphous };
-	
-	module6par() 
+
+	module6par()
 		: Type(monoSi), Vmp(0), Imp(0), Voc(0), Isc(0), bVoc(0), aIsc(0), gPmp(0), Nser(0), Tref(0),
 			a(0.0), Il(0.0), Io(0.0), Rs(0.0), Rsh(0.0), Adj(0.0) {  }
 
@@ -161,7 +161,7 @@ public:
 	int Nser;
 
 	double Tref;
-	
+
 	double a, Il, Io, Rs, Rsh, Adj;
 
 	double bandgap()
@@ -171,7 +171,7 @@ public:
 		/*
 		switch( Type )
 		{
-		
+
 		case Amorphous: // http://en.wikipedia.org/wiki/Solar_cell
 			return 1.7;
 
@@ -184,7 +184,7 @@ public:
 		case CIGS:
 			return 1.4; // Ref. as above, and higher than CIS, b/c of addition of gallium http://solar.calfinder.com/library/solar-electricity/cells/cell-materials/cis
 
-			
+
 		case monoSi:
 		case multiSi:
 		default:
@@ -195,7 +195,7 @@ public:
 	void guess()
 	{
 		// guess initial conditions (take into account module technology -based on heuristics)
-		
+
 		/*
 		// -------- original regressions - based on CEC database -----------
 		switch( Type )
@@ -208,10 +208,10 @@ public:
 		case multiSi:
 		default:
 			a = 0.0252 * Nser;
-		}		
+		}
 		*/
 
-		
+
 		// -------- regressions based on bootstrapping iteration 1 -----------
 		switch( Type )
 		{
@@ -224,23 +224,23 @@ public:
 		default:
 			a = 0.0263 * Nser + 0.0212;
 		}
-				
+
 		if (a < 0.1) a = 0.1;
 		if (a > 10) a = 10;
-			
+
 		Il = Isc;
-			
+
 		Io = Isc*exp( -Voc/a );
 
 		// put a "reasonable" limit on the initial guess value of Io
 		if (Io > 1e-9) Io = 1e-9;
 		if (Io < 1e-15) Io = 1e-15;
-				
+
 		//if ( Type == monoSi || Type == multiSi )
 			//Rs = ( a * log( (Isc-Imp)/Io ) - Vmp ) / Imp;
 		//else
 		//  Rs = 0.3*(Voc - Vmp)/Imp;
-		
+
 		double Rs_scale, Rsh_scale;
 		switch( Type )
 		{
@@ -271,7 +271,7 @@ public:
 			break;
 		}
 
-		
+
 		//if ( Type == monoSi || Type == multiSi )
 		//	Rsh = 100;// * Rs;
 		//else
@@ -284,14 +284,14 @@ public:
 
 		if (Rs < 0.02) Rs = 0.02;
 		if (Rs > 60) Rs = 60;
-		
+
 		Rsh = Rsh_scale * Voc/(Isc-Imp);
 
 		Adj = 0.0;
 
 
-		
-		
+
+
 	}
 
 	void guess_ees()
@@ -308,13 +308,13 @@ public:
 	{
 		// ensure values are in "reasonable" ranges
 		if ( a < 0.05 || a > 15.0 ) return -1;
-		if ( Il < 0.5 || Il > 15.0 ) return -2;
+		if ( Il < 0.5 || Il > 20.0 ) return -2;
 		if ( Io < 1e-16 || Io > 1e-7 ) return -3;
 		if ( Rs < 0.001 || Rs > 75.0 ) return -4;
 		if ( Rsh < 1.0 || Rsh > 100001.0 ) return -5;
 		if ( Adj < -100.0 || Adj > 100.0 ) return -6;
 		if ( Imp >= Isc ) return -7;
-				
+
 		double V, I, P;
 
 		// make sure Pmp on curve is within 1 % of specified Pmp
@@ -324,7 +324,7 @@ public:
 		double Pmp = Vmp * Imp;
 		if ( fabs( (P-Pmp)/Pmp ) > 0.015 )
 			return -33;
-				
+
 		// make sure I @ open circut is basically zero (less than 1% of Imp)
 		V = Voc;
 		I = module6par::current(V, Il, Io, Rs, a, Rsh, Imp );
@@ -335,7 +335,7 @@ public:
 		double slope = max_slope( 0.015 * Voc, 0.98 * Voc );
 		if ( slope > 0 ) return -55;
 
-				
+
 		return 0;
 	}
 
@@ -346,7 +346,7 @@ public:
 		double count = 0;
 		const int numPoints = 100;
 		double V, I;
-		
+
 		double deriv = 0;
 
 		double Ilast = module6par::current(Vstart, Il, Io, Rs, a, Rsh, Imp);
@@ -367,10 +367,10 @@ public:
 
 		return deriv ;
 	}
-			
-	static double current(double Vmodule, double IL_ref, 
-								  double IO_ref, double RS, 
-								  double A_ref, double RSH_ref, 
+
+	static double current(double Vmodule, double IL_ref,
+								  double IO_ref, double RS,
+								  double A_ref, double RSH_ref,
 								  double I_mp_ref)
 	{
 			/*
@@ -440,7 +440,7 @@ public:
 
 		__Module6ParNonlinear<Real> solver( nif,
 			Vmp, Imp, Voc, Isc,
-			bVoc, aIsc, gPmp, bandgap(), Tref );		
+			bVoc, aIsc, gPmp, bandgap(), Tref );
 
 		Real _a = Real(a);
 		Real _Il = Real(Il);
@@ -450,7 +450,7 @@ public:
 		Real _Adj = Real(Adj);
 
 		bool ok = solver.exec( _a, _Il, _Io, _Rs, _Rsh, _Adj, max_iter, tol, nif );
-		
+
 		a = (double)(_a);
 		Il = (double)(_Il);
 		Io = (double)(_Io);
@@ -472,8 +472,8 @@ public:
 		guess();
 
 		int err = solve<Real>( max_iter, tol, nif );
-		
-		
+
+
 		if ( err < 0 && (Type == Amorphous || Type == CdTe) )
 		{
 			// attempt decreasing 'a' and solving
@@ -503,7 +503,7 @@ public:
 			Rsh /= 2;
 			err = solve<Real>( max_iter, tol, nif );
 		}
-		
+
 		double Isc_save = Isc;
 		int nattempt = 0;
 		while ( err < 0 && nattempt < 5 )
@@ -513,14 +513,19 @@ public:
 				err = solve<Real>( max_iter, tol, nif );
 				nattempt++;
 		}
-		
+
 		Isc = Isc_save;
-		
-		
+
+        // try the "default" initial guesses that multiSi uses
+        if (Type != multiSi && err < 0 ) {
+            Type = multiSi;
+            return solve_with_sanity_and_heuristics<double>(max_iter, tol);
+        }
+
 		return err;
 	}
 
-	
+
 };
 
 #endif

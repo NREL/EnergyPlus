@@ -207,9 +207,9 @@ bool noct_celltemp_t::operator() ( pvinput_t &input, pvmodule_t &module, double 
 		// calculate cell temperature, kelvin
 		//double G_total = input.Ibeam + input.Idiff + input.Ignd;		
 		double eff_ref = Imp *Vmp / ( I_ref*Area );
-		double tau_al = fabs(TauAlpha);  // Sev: What's the point of recalculating this??
+		tau_al = fabs(TauAlpha);  // Sev: What's the point of recalculating this??
 
-		double W_spd = input.Wspd * ffv_wind; //added 1/11/12 to account for FFV_wind correction factor internally
+		W_spd = input.Wspd * ffv_wind; //added 1/11/12 to account for FFV_wind correction factor internally
 		if (W_spd < 0.001) W_spd = 0.001;		
 		if (G_total > 0) tau_al *= Geff_total/G_total;		
 

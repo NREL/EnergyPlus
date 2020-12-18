@@ -222,8 +222,9 @@ public:
 	const var_info &info( const std::string &name );
 	bool is_ssc_array_output( const std::string &name );
 	var_data *lookup( const std::string &name );
-	var_data *assign( const std::string &name, const var_data &value );
-	ssc_number_t *allocate( const std::string &name, size_t length );
+    var_data *assign( const std::string &name, const var_data &value );
+    void unassign( const std::string& name);
+    ssc_number_t *allocate( const std::string &name, size_t length );
 	ssc_number_t *allocate( const std::string &name, size_t nrows, size_t ncols );
 	util::matrix_t<ssc_number_t>& allocate_matrix( const std::string &name, size_t nrows, size_t ncols );
 	var_data &value( const std::string &name );

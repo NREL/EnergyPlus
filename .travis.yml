@@ -49,8 +49,8 @@ script:
  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -j4 -C $WEXDIR/build_linux; fi
  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -j4 -C $SSCDIR/build_linux; fi
   - mkdir ${SSCDIR}/build && cd ${SSCDIR}/build
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake .. -DCMAKE_BUILD_TYPE=Release -Dskip_tools=1  && make; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=Release -Dskip_tools=1  && make; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake .. -DCMAKE_BUILD_TYPE=Release -DSAM_SKIP_TOOLS=1  && make; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=Release -DSAM_SKIP_TOOLS=1  && make; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test/Test; fi
 
 

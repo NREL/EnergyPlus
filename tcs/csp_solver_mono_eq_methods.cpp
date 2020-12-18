@@ -556,7 +556,7 @@ int C_csp_solver::C_MEQ__timestep::operator()(double t_ts_guess /*s*/, double *t
     if (fabs(diff_T_field_cold) > 1.E-3)
     {
         // Set up solver
-        c_solver.settings(1.E-3, 50, mpc_csp_solver->m_T_field_cold_limit, std::numeric_limits<double>::quiet_NaN(), false);
+        c_solver.settings(1.E-3, 50, mpc_csp_solver->m_T_field_cold_limit, mpc_csp_solver->m_T_field_in_hot_limit, false);
 
         C_monotonic_eq_solver::S_xy_pair xy1;
         xy1.x = T_field_cold_guess_1;        //[C]
@@ -705,6 +705,12 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
         mpc_csp_solver->mc_csp_messages.add_message(C_csp_messages::NOTICE, msg);
     }
 
+    // Choose max pc flow rate based on cycle operating mode
+    double m_dot_pc_max = mpc_csp_solver->m_m_dot_pc_max;     //[kg/hr]
+    if (m_pc_mode == C_csp_power_cycle::E_csp_power_cycle_modes::STARTUP_CONTROLLED) {
+        m_dot_pc_max = mpc_csp_solver->m_m_dot_pc_max_startup;          //[kg/hr]
+    }
+
     // Calculate mass flow to power cycle
     // and actual hot mass flow TES
     // based on solver strategy
@@ -721,7 +727,7 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
             q_dot_dc_est = m_dot_tes_dc = T_tes_dc_est = std::numeric_limits<double>::quiet_NaN();
             mpc_csp_solver->mc_tes.discharge_avail_est(m_T_field_cold_guess, mpc_csp_solver->mc_kernel.mc_sim_info.ms_ts.m_step, q_dot_dc_est, m_dot_tes_dc, T_tes_dc_est);
             m_dot_tes_dc *= 3600.0;     //[kg/hr] convert from kg/s
-            m_m_dot_pc_in = fmin(mpc_csp_solver->m_m_dot_pc_max, m_dot_field_out + m_dot_tes_dc);
+            m_m_dot_pc_in = fmin(m_dot_pc_max, m_dot_field_out + m_dot_tes_dc);
         }
         else if (m_solver_mode == E__CR_OUT__0)
         {
@@ -736,8 +742,8 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
 
             // max: not allowing TES CH, so all field m_dot must go to pc
             // min: can't send more to pc than field + dc
-            double m_dot_to_pc_max = fmin(mpc_csp_solver->m_m_dot_pc_max, m_dot_tes_dc + m_dot_field_out);
-            m_m_dot_pc_in = m_dot_field_out + f_m_dot_tes*fmax(0.0, m_dot_to_pc_max - m_dot_field_out);
+            double m_dot_to_pc_max = fmin(m_dot_pc_max, m_dot_tes_dc + m_dot_field_out);
+            m_m_dot_pc_in = m_dot_field_out + fmin(0.99999,f_m_dot_tes)*fmax(0.0, m_dot_to_pc_max - m_dot_field_out);
         }
         else if (m_solver_mode == E__CR_OUT__ITER_M_DOT_SU_CH_ONLY || m_solver_mode == E__CR_OUT__ITER_Q_DOT_TARGET_CH_ONLY)
         {
@@ -750,8 +756,8 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
             // min: not allowing TES DC, so max m_dot to pc is field m_dot
             // max: need to send enough mass flow to pc so TES doesn't overcharge
             double m_dot_to_tes_max = fmin(m_dot_field_out, m_dot_hot_to_tes_est);
-            double m_dot_to_tes_min = fmax(m_dot_field_out - mpc_csp_solver->m_m_dot_pc_max, 0.0);
-            double m_dot_to_tes = m_dot_to_tes_max - f_m_dot_tes * fmax(0.0, m_dot_to_tes_max - m_dot_to_tes_min);
+            double m_dot_to_tes_min = fmax(m_dot_field_out - m_dot_pc_max, 0.0);
+            double m_dot_to_tes = m_dot_to_tes_max - fmin(0.99999,f_m_dot_tes)* fmax(0.0, m_dot_to_tes_max - m_dot_to_tes_min);
 
             m_m_dot_pc_in = m_dot_field_out - m_dot_to_tes;
         }
@@ -776,7 +782,7 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
             *diff_target = std::numeric_limits<double>::quiet_NaN();
             return -2;
         }
-        if (m_m_dot_pc_in > mpc_csp_solver->m_m_dot_pc_max)
+        if (m_m_dot_pc_in > m_dot_pc_max)
         {
             return -11;
         }
@@ -795,14 +801,14 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
 
         if (m_solver_mode == E__PC_MAX_PLUS_TES_FULL__PC_MAX)
         {
-            m_m_dot_pc_in = mpc_csp_solver->m_m_dot_pc_max;  //[kg/hr]
+            m_m_dot_pc_in = m_dot_pc_max;  //[kg/hr]
         }
         else if (m_solver_mode == E__TO_PC_PLUS_TES_FULL__ITER_M_DOT_SU)
         {
-            m_m_dot_pc_in = f_m_dot_tes * mpc_csp_solver->m_m_dot_pc_max;
+            m_m_dot_pc_in = fmin(0.99999, f_m_dot_tes) * m_dot_pc_max;
         }
 
-        if (m_m_dot_pc_in > mpc_csp_solver->m_m_dot_pc_max)
+        if (m_m_dot_pc_in > m_dot_pc_max)
         {
             return -12;
         }
@@ -813,14 +819,14 @@ int C_csp_solver::C_MEQ__m_dot_tes::operator()(double f_m_dot_tes /*-*/, double 
     {
         if (m_solver_mode == E__TO_PC__PC_MAX)
         {
-            m_m_dot_pc_in = mpc_csp_solver->m_m_dot_pc_max;   //[kg/hr]
+            m_m_dot_pc_in = m_dot_pc_max;   //[kg/hr]
         }
         else if (m_solver_mode == E__TO_PC__ITER_M_DOT_SU)
         {
-            m_m_dot_pc_in = f_m_dot_tes * mpc_csp_solver->m_m_dot_pc_max;
+            m_m_dot_pc_in = fmin(0.99999, f_m_dot_tes) * m_dot_pc_max;
         }
 
-        if (m_m_dot_pc_in > mpc_csp_solver->m_m_dot_pc_max)
+        if (m_m_dot_pc_in > m_dot_pc_max)
         {
             return -12;
         }

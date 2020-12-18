@@ -408,6 +408,11 @@ var_data *compute_module::assign(const std::string &name, const var_data &value)
     return m_vartab->assign(name, value);
 }
 
+void compute_module::unassign(const std::string& name) {
+    if (!m_vartab) throw general_error("invalid data container object reference");
+    return m_vartab->unassign(name);
+}
+
 ssc_number_t *compute_module::allocate(const std::string &name, size_t length) {
     var_data *v = assign(name, var_data());
     v->type = SSC_ARRAY;

@@ -44,15 +44,15 @@ ACBatteryController::ACBatteryController(dispatch_t * dispatch, battery_metrics_
 
 void ACBatteryController::run(size_t year, size_t hour_of_year, size_t step_of_hour, size_t)
 {
-	if (m_batteryPower->powerPV < 0)
+	if (m_batteryPower->powerSystem < 0)
 	{
-		m_batteryPower->powerPVInverterDraw = m_batteryPower->powerPV;
-		m_batteryPower->powerPV = 0;
+		m_batteryPower->powerPVInverterDraw = m_batteryPower->powerSystem;
+		m_batteryPower->powerSystem = 0;
 	}
 
 	// For AC connected system, there is no power going through shared inverter
-	m_batteryPower->powerPVThroughSharedInverter = 0;
-	m_batteryPower->powerPVClipped = 0;
+	m_batteryPower->powerSystemThroughSharedInverter = 0;
+	m_batteryPower->powerSystemClipped = 0;
 
 	// Dispatch the battery
 	m_dispatch->dispatch(year, hour_of_year, step_of_hour);
@@ -79,12 +79,12 @@ void DCBatteryController::setSharedInverter(SharedInverter * sharedInverter)
 
 void DCBatteryController::run(size_t year, size_t hour_of_year, size_t step_of_hour, size_t)
 {
-	if (m_batteryPower->powerPV < 0){
-		m_batteryPower->powerPV = 0;
+	if (m_batteryPower->powerSystem < 0){
+		m_batteryPower->powerSystem = 0;
 	}
 
 	// For DC connected system, there is potentially full PV power going through shared inverter
-	m_batteryPower->powerPVThroughSharedInverter = m_batteryPower->powerPV;
+	m_batteryPower->powerSystemThroughSharedInverter = m_batteryPower->powerSystem;
 
 	// Dispatch the battery
 	m_dispatch->dispatch(year, hour_of_year, step_of_hour);

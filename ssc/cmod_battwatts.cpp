@@ -364,6 +364,7 @@ void cm_battwatts::exec()
                         resilience->run_surviving_batteries(p_crit_load[count % n_rec_single_year], p_ac[count]);
                     }
 
+                    batt->outGenWithoutBattery[count] = p_ac[count];
                     batt->advance(m_vartab, p_ac[count], voltage, p_load[count]);
                     p_gen[count] = batt->outGenPower[count];
                     count++;

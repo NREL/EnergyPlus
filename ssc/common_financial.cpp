@@ -1259,7 +1259,12 @@ bool dispatch_calculations::setup_ts()
 		m_cf.resize_fill(CF_max_timestep, 12, 0.0);
 
 	m_multipliers = m_cm->as_array("dispatch_factors_ts", &m_nmultipliers);
-	m_gen = m_cm->as_array("gen", &m_ngen);
+    if ((m_cm->is_assigned("en_electricity_rates") && m_cm->as_number("en_electricity_rates") == 1)) {
+        m_gen = m_cm->as_array("revenue_gen", &m_ngen);
+    }
+    else {
+        m_gen = m_cm->as_array("gen", &m_ngen);
+    }
 
 	// TODO - handle differences in ngen and nmultipliers - checked in compute_lifetime_dispatch_ts
 	// Could interporlate for different number of records like for PV and utility rates
@@ -3198,101 +3203,108 @@ bool hourly_energy_calculation::calculate(compute_module *cm)
 
 
 	ssc_number_t *pgen;
-	size_t nrec_gen = 0, step_per_hour_gen = 1;
+    size_t nrec_gen = 0;
+    m_step_per_hour_gen = 1;
 	pgen = m_cm->as_array("gen", &nrec_gen);
 
-	// in front of meter 
-	// update for battery in front of meter case
-	//In the case of no electricity rate, grid_to_batt is included in gen, and assuming buy=sell, this should be accounted for.
+	// in front of meter - account for charging and 
 	size_t i;
-	if ((cm->is_assigned("en_batt")) && (cm->as_number("en_batt") == 1) && 
-		(cm->is_assigned("batt_meter_position") ) && (cm->as_number("batt_meter_position") == 1) && 
-		cm->is_assigned("grid_to_batt") &&
-		cm->is_assigned("en_electricity_rates") && cm->as_number("en_electricity_rates") == 1)
-	{  
-		ssc_number_t *ppa_gen = cm->allocate("ppa_gen", nrec_gen);
+	ssc_number_t *revenue_gen = m_cm->allocate("revenue_gen", nrec_gen);
+	ssc_number_t *gen_purchases = m_cm->allocate("gen_purchases", nrec_gen);
 		 
-
-		// add grid_batt to gen for ppa revenue, since it is in 'gen' as a negative generation source, but should be valued at a different rate.
-		ssc_number_t *pgrid_batt;
-		size_t nrec_grid_batt = 0;
-		pgrid_batt = m_cm->as_array("grid_to_batt", &nrec_grid_batt);
-		if (nrec_gen != nrec_grid_batt)
-		{
-			throw exec_error("hourly_energy_calculations", util::format("number of grid to battery records (%d) must be equal to number of gen records (%d)", (int)nrec_grid_batt, (int)nrec_gen));
-			return false;
-		}
-		// we do this so that grid energy purchased through the electricity rate is not inadvertently double counted as lost revenue
-		for (i = 0; i < nrec_gen; i++) {
-			pgen[i] += pgrid_batt[i];
-			ppa_gen[i] = pgen[i];
-		}
+	// we do this so that grid energy purchased through the electricity rate is not inadvertently double counted as lost revenue
+	for (i = 0; i < nrec_gen; i++) {
+        gen_purchases[i] = std::min(pgen[i], 0.0);
+		revenue_gen[i] = std::max(pgen[i], 0.0);
 	}
-
-
+	
 	// for lifetime analysis
 	size_t nrec_gen_per_year = nrec_gen;
 	if (m_cm->as_integer("system_use_lifetime_output") == 1)
 		nrec_gen_per_year = nrec_gen / m_nyears;
-	step_per_hour_gen = nrec_gen_per_year / 8760;
-	if (step_per_hour_gen < 1 || step_per_hour_gen > 60 || step_per_hour_gen * 8760 != nrec_gen_per_year)
+    m_step_per_hour_gen = nrec_gen_per_year / 8760;
+	if (m_step_per_hour_gen < 1 || m_step_per_hour_gen > 60 || m_step_per_hour_gen * 8760 != nrec_gen_per_year)
 	{
 		m_error = util::format("invalid number of gen records (%d): must be an integer multiple of 8760", (int)nrec_gen_per_year);
 		throw exec_error("hourly_energy_calculation", m_error);
-		return false;
 	}
-	ssc_number_t ts_hour_gen = 1.0f / step_per_hour_gen;
+    m_ts_hour_gen = 1.0f / m_step_per_hour_gen;
 
 	m_hourly_energy.clear();
-
+    m_energy_sales.clear();
+    m_energy_purchases.clear();
+    m_energy_without_battery.clear();
+ 
 	// assign hourly values for "gen"
-	size_t idx = 0;
-	ssc_number_t ts_power = 0;
-	if (m_cm->as_integer("system_use_lifetime_output") == 1)
-	{   // availability, curtailment and degradation included in lifetime output
-		for (size_t y = 0; y < m_nyears; y++)
-		{
-			for (size_t i = 0; i < 8760; i++)
-			{
-				double hourly_energy = 0;
-				for (size_t ii = 0; ii < step_per_hour_gen; ii++)
-				{
-					ts_power = pgen[idx];
-					hourly_energy += ts_power * ts_hour_gen;
-					idx++;
-				}
-				m_hourly_energy.push_back(hourly_energy);
-			}
-		}
-		// check size
-		if (m_hourly_energy.size() != 8760*m_nyears)
-		{
-			m_error = util::format("invalid number of hourly energy records (%d): must be %d", (int)m_hourly_energy.size(), 8760*m_nyears);
-			throw exec_error("hourly_energy_calculation", m_error);
-			return false;
-		}
-	}
-	else
-	{
-		for (size_t i = 0; i < 8760; i++)
-		{
-			double hourly_energy = 0;
-			for (size_t ii = 0; ii < step_per_hour_gen; ii++)
-			{
-				ts_power = pgen[idx];
-				hourly_energy += ts_power * ts_hour_gen;
-				idx++;
-			}
-			m_hourly_energy.push_back(hourly_energy);
-		}
-		// check size
-		if (m_hourly_energy.size() != 8760)
-		{
-			m_error = util::format("invalid number of hourly energy records (%d): must be 8760", (int)m_hourly_energy.size());
-			throw exec_error("hourly_energy_calculation", m_error);
-			return false;
-		}
-	}
+    ssc_number_t* ppa_gen;
+    // Choose which variable goes through the hourly PPA process. If electricity purchases are through a utility rate, use only the positive revenue (revenue_gen), otherwise use gen
+    if (cm->is_assigned("en_electricity_rates") && cm->as_number("en_electricity_rates") == 1) {
+        ppa_gen = revenue_gen;
+    }
+    else {
+        ppa_gen = pgen;
+    }
+
+    sum_ts_to_hourly(ppa_gen, m_hourly_energy);
+    sum_ts_to_hourly(revenue_gen, m_energy_sales);
+    sum_ts_to_hourly(gen_purchases, m_energy_purchases);
+
+    if (cm->is_assigned("gen_without_battery")) {
+        ssc_number_t* gen_without_battery = m_cm->as_array("gen_without_battery", &nrec_gen);
+        if (nrec_gen % 8760 == 0) {
+            sum_ts_to_hourly(gen_without_battery, m_energy_without_battery);
+        }
+    }
+
 	return true;
 }
 
+void hourly_energy_calculation::sum_ts_to_hourly(ssc_number_t* timestep_power, std::vector<double>& hourly)
+{
+    size_t idx = 0;
+	ssc_number_t ts_power = 0;
+
+    if (m_cm->as_integer("system_use_lifetime_output") == 1)
+    {   // availability, curtailment and degradation included in lifetime output
+        for (size_t y = 0; y < m_nyears; y++)
+        {
+            for (size_t i = 0; i < 8760; i++)
+            {
+                double hourly_energy = 0;
+                for (size_t ii = 0; ii < m_step_per_hour_gen; ii++)
+                {
+                    ts_power = timestep_power[idx];
+                    hourly_energy += ts_power * m_ts_hour_gen;
+                    idx++;
+                }
+                hourly.push_back(hourly_energy);
+            }
+        }
+        // check size
+        if (hourly.size() != 8760 * m_nyears)
+        {
+            m_error = util::format("invalid number of hourly energy records (%d): must be %d", (int)hourly.size(), 8760 * m_nyears);
+            throw exec_error("hourly_energy_calculation", m_error);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < 8760; i++)
+        {
+            double hourly_energy = 0;
+            for (size_t ii = 0; ii < m_step_per_hour_gen; ii++)
+            {
+                ts_power = timestep_power[idx];
+                hourly_energy += ts_power * m_ts_hour_gen;
+                idx++;
+            }
+            hourly.push_back(hourly_energy);
+        }
+        // check size
+        if (m_hourly_energy.size() != 8760)
+        {
+            m_error = util::format("invalid number of hourly energy records (%d): must be 8760", (int)hourly.size());
+            throw exec_error("hourly_energy_calculation", m_error);
+        }
+    }
+}

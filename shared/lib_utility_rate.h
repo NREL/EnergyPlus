@@ -120,8 +120,9 @@ public:
     /*
      * Runs when the new month appears in the forecast for the first time. Year accounts for inflation and other pricing escalations
      * Modifies ur_month and buy/sell rates for the months specified
+     * If the mismatch between int month and size_t year looks wierd to you, you're going to have to change lib_util to fix it. Good luck.
      */
-    void initializeMonth(int month, int year);
+    void initializeMonth(int month, size_t year);
     // Runs when the starting hour of the forecast is in the new month. Copies next rates onto current rates
 	void copyTOUForecast();
 	
@@ -131,7 +132,7 @@ public:
      * See https://www.pge.com/includes/docs/pdfs/shared/environment/pge/cleanair/electricdrivevehicles/PEV_rate_options.pdf or cmod_utility_rate_5 for more details on the calculation in a real bill
      * Public for testing
      */
-	void compute_next_composite_tou(int month, int year);
+	void compute_next_composite_tou(int month, size_t year);
 
     // Composite buy/sell rates given the usage in the forecasts provided to the constructor.
 	std::vector<double> current_composite_sell_rates; // Sell rates at the start of the forecast
@@ -141,10 +142,10 @@ public:
 protected:
 
     /* Transfer net metering surplus credits from previous month to current month */
-	void restartMonth(int prevMonth, int currentMonth, int year);
+	void restartMonth(int prevMonth, int currentMonth, size_t year);
 
     double getEnergyChargeNetMetering(int month, std::vector<double>& buy_rates, std::vector<double>& sell_rates);
-    double getEnergyChargeNetBillingOrTimeSeries(double energy, int year_one_index, int current_month, int year, bool use_next_month);
+    double getEnergyChargeNetBillingOrTimeSeries(double energy, size_t year_one_index, int current_month, size_t year, bool use_next_month);
 
 	std::shared_ptr<rate_data> rate;
 

@@ -169,17 +169,17 @@ UtilityRateForecast::~UtilityRateForecast() {}
 double UtilityRateForecast::forecastCost(std::vector<double>& predicted_loads, size_t year, size_t hour_of_year, size_t step)
 {
 	double cost = 0;
-	int month = util::month_of(hour_of_year) - 1;
+	int month = util::month_of((double) hour_of_year) - 1;
 	size_t lifeTimeIndex = util::lifetimeIndex(year, hour_of_year, step, steps_per_hour);
 
 	size_t n = predicted_loads.size();
 
 	// Determine if this forecast crosses a month
 	size_t index_at_end = util::yearOneIndex(dt_hour, lifeTimeIndex + n);
-	int month_at_end = util::month_of(index_at_end / steps_per_hour) - 1;
+	int month_at_end = util::month_of((double) index_at_end / (double) steps_per_hour) - 1;
 
 	bool crossing_month = month != month_at_end;
-	int year_at_end = year;
+	size_t year_at_end = year;
 	if (month_at_end < month) {
 		year_at_end++;
 	}
@@ -206,11 +206,11 @@ double UtilityRateForecast::forecastCost(std::vector<double>& predicted_loads, s
 
     double newEnergyCharge = 0;
     bool use_next_month = false;
-    int current_year = year;
-	for (int i = 0; i < n; i++) {
+    size_t current_year = year;
+	for (size_t i = 0; i < n; i++) {
 		// Determine if this new step crosses a month
 		size_t year_one_index = util::yearOneIndex(dt_hour, lifeTimeIndex);
-		int current_month = util::month_of(hour_of_year) - 1;
+		int current_month = util::month_of((double) hour_of_year) - 1;
 		
 		if (current_month != month && !use_next_month)
 		{
@@ -276,10 +276,10 @@ double UtilityRateForecast::forecastCost(std::vector<double>& predicted_loads, s
 }
 
 // Year indexes from 0
-void UtilityRateForecast::compute_next_composite_tou(int month, int year)
+void UtilityRateForecast::compute_next_composite_tou(int month, size_t year)
 {
 	ur_month& curr_month = rate->m_month[month];
-	double expected_load = m_monthly_load_forecast[year * 12 + month];
+	double expected_load = m_monthly_load_forecast[year * 12 + (size_t) month];
 	ssc_number_t rate_esc = rate->rate_scale[year];
 	next_composite_buy_rates.clear();
 
@@ -374,14 +374,14 @@ void UtilityRateForecast::compute_next_composite_tou(int month, int year)
 	}
 }
 
-void UtilityRateForecast::initializeMonth(int month, int year)
+void UtilityRateForecast::initializeMonth(int month, size_t year)
 {
 	if (last_month_init != month)
 	{
 		rate->init_dc_peak_vectors(month);
 		compute_next_composite_tou(month, year);
 
-		double avg_load = m_monthly_load_forecast[year * 12 + month] / util::hours_in_month(month + 1);
+		double avg_load = m_monthly_load_forecast[year * 12 + month] / util::hours_in_month(month + (int) 1);
 
 		ur_month& curr_month = rate->m_month[month];
 		curr_month.dc_flat_peak = avg_load;
@@ -401,7 +401,7 @@ void UtilityRateForecast::copyTOUForecast()
 	std::copy(next_composite_sell_rates.begin(), next_composite_sell_rates.end(), std::back_inserter(current_composite_sell_rates));
 }
 
-void UtilityRateForecast::restartMonth(int prevMonth, int currentMonth, int year)
+void UtilityRateForecast::restartMonth(int prevMonth, int currentMonth, size_t year)
 {
     ur_month& prev_month = rate->m_month[prevMonth];
     ur_month& curr_month = rate->m_month[currentMonth];
@@ -436,7 +436,7 @@ double UtilityRateForecast::getEnergyChargeNetMetering(int month, std::vector<do
 	return cost;
 }
 
-double UtilityRateForecast::getEnergyChargeNetBillingOrTimeSeries(double energy, int year_one_index, int current_month, int year, bool use_next_month)
+double UtilityRateForecast::getEnergyChargeNetBillingOrTimeSeries(double energy, size_t year_one_index, int current_month, size_t year, bool use_next_month)
 {
     double cost = 0;
     // If the below is true, this function does nothing, so return zero early

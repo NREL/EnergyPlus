@@ -70,7 +70,7 @@ TEST_F(CMFuelCell, FuelCellBattery_cmod_fuelcell) {
 		{
 			int n;
 			ssc_number_t * fc_to_load = GetArray("fuelcell_to_load", n);
-			ssc_number_t * pv_to_load = GetArray("pv_to_load", n);
+			ssc_number_t * pv_to_load = GetArray("system_to_load", n);
 			ssc_number_t * batt_to_load = GetArray("batt_to_load", n);
 			ssc_number_t * grid_to_load = GetArray("grid_to_load", n);
 			ssc_number_t * load = GetArray("load", n);

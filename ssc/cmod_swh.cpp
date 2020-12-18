@@ -399,6 +399,7 @@ public:
 				else if (irrad_mode == 2) tt.set_global_diffuse(wf.gh, wf.df);
 				else tt.set_global_beam(wf.gh, wf.dn);
 				tt.set_location(hdr.lat, hdr.lon, hdr.tz);
+                tt.set_optional(hdr.elev, wf.pres, wf.tdry);
 				tt.set_time(wf.year, wf.month, wf.day, wf.hour, wf.minute,
 					instantaneous ? IRRADPROC_NO_INTERPOLATE_SUNRISE_SUNSET : ts_hour );
 				tt.set_sky_model(sky_model /* isotropic=0, hdkr=1, perez=2 */, albedo );

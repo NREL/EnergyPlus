@@ -291,8 +291,8 @@ TEST_F(FuelCellTest, DispatchFixedMultiple_lib_fuel_cell_dispatch) {
 		EXPECT_EQ(fuelCell->getPower(), unitPowerMax_kW * fixed_percent * 0.01);
 		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerFuelCellToLoad, 0);
 		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerFuelCellToGrid, n_multipleFuelCells * 40);
-		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerPVToLoad,  10);
-		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerPVToGrid,  10);
+		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerSystemToLoad,  10);
+		EXPECT_EQ(fuelCellDispatchMultiple->getBatteryPower()->powerSystemToGrid,  10);
 	}
 }
 

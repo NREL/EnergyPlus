@@ -110,6 +110,7 @@ public:
 	virtual double power_grid_target(){	return 0;}
 	virtual double power_batt_target(){ return 0.;}
 	virtual double cost_to_cycle() { return 0.;}
+    virtual double cost_to_cycle_per_kwh() { return 0.; }
 
 	// control settings
 	double battery_power_to_fill();
@@ -283,6 +284,9 @@ public:
 	/// Return the battery power target set by the controller
 	double power_batt_target();
 
+    /*! Return the calculated cost to cycle ($/cycle-kWh for all dispatch)*/
+    double cost_to_cycle_per_kwh() { return cost_to_cycle(); }
+
 protected:
 
 	/*! Initialize with a pointer*/
@@ -291,7 +295,7 @@ protected:
 	/*! Return the dispatch mode */
 	int get_mode();
 
-    /*! Return the calculated cost to cycle ($/cycle for behind the meter, $/cycle-kWh for front of the meter)*/
+    /*! Return the calculated cost to cycle ($/cycle for behind the meter, $/cycle-kWh for front of the meter) - used internally*/
     double cost_to_cycle() { return m_cycleCost; }
 
 	/*! Full time-series of PV production [kW] */

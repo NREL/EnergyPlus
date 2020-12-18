@@ -49,9 +49,9 @@ public:
 	util::matrix_t<ssc_number_t> ec_energy_surplus;
 	// peak demand per period
 	std::vector<ssc_number_t> dc_tou_peak;
-	std::vector<int> dc_tou_peak_hour;
+	std::vector<size_t> dc_tou_peak_hour;
 	ssc_number_t dc_flat_peak;
-	int dc_flat_peak_hour;
+	size_t dc_flat_peak_hour;
 	// energy tou charges
 	util::matrix_t<ssc_number_t>  ec_tou_ub_init;
 	util::matrix_t<ssc_number_t>  ec_tou_br_init;
@@ -81,7 +81,7 @@ public:
 	ur_month(const ur_month& tmp);
 
 	// Runs each step
-	void update_net_and_peak(double energy, double power, int step);
+	void update_net_and_peak(double energy, double power, size_t step);
 
     // Re-zeroes relevant vectors
     void reset();
@@ -138,13 +138,13 @@ public:
     void init_energy_rates(bool gen_only);
 
 	// Runs each step
-	void sort_energy_to_periods(int month, double energy, int step); // Net metering only
-	void find_dc_tou_peak(int month, double power, int step);
-	int get_tou_row(int year_one_index, int month);
+	void sort_energy_to_periods(int month, double energy, size_t step); // Net metering only
+	void find_dc_tou_peak(int month, double power, size_t step);
+	int get_tou_row(size_t year_one_index, int month);
 
 	// Runs each month
 	void init_dc_peak_vectors(int month); // Reinitialize vectors for re-use of memory year to year
-	ssc_number_t get_demand_charge(int month, int year);  // Sum time of use and flat demand charges to return total cost
+	ssc_number_t get_demand_charge(int month, size_t year);  // Sum time of use and flat demand charges to return total cost. If the mismatch between int month and size_t year looks wierd to you, you're going to have to change lib_util to fix it. Good luck.
     // Returns error codes so compute module can print errors. 0: no error, 10x: error in previous month, 20x: error in current month. x is the period where the error occured
     int transfer_surplus(ur_month& curr_month, ur_month& prev_month); // For net metering rollovers, used between months to copy data
     void compute_surplus(ur_month& curr_month); // For net metering rollovers, used within a single month prior to cost calculations

@@ -59,7 +59,7 @@ static const char *Reopt_size_battery_params_doc =
         "         'battery_per_kWh': optional double [$/kWh], Battery cost per kWh\\n"
         "         'batt_initial_SOC': optional double [%], Initial State-of-Charge, 0-100\\n"
         "         'batt_minimum_SOC': optional double [%], Minimum State-of-Charge, 0-100. Default is 20.\\n"
-        "         'batt_replacement_schedule': optional array [year], Number of years from start of analysis period to replace battery. Default is [0]\\n"
+        "         'batt_replacement_schedule_percent': optional array [%], Percentage in each year from start of analysis period to replace battery. Default is [0]\\n"
         "         'om_replacement_cost1': optional double [$/kWh], Cost to replace battery per kWh\\n"
         "     ++ Utility Rate inputs ++\\n"
         "         'ur_monthly_fixed_charge': double [$], Monthly fixed charge\\n"

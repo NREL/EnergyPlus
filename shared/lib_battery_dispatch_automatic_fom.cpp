@@ -188,11 +188,11 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
         revenueToPVCharge = _P_pv_ac[idx_year1] > 0 ? *max_ppa_cost * m_etaDischarge - ppa_cost / m_etaPVCharge - m_cycleCost : 0;
 
         /*! Computed revenue to charge from PV in each of next X hours ($/kWh)*/
-        size_t t_duration = static_cast<size_t>(ceilf(
-                _Battery->energy_nominal() / m_batteryPower->powerBatteryChargeMaxDC));
+        size_t t_duration = static_cast<size_t>(ceilf( (float)
+                _Battery->energy_nominal() / (float) m_batteryPower->powerBatteryChargeMaxDC));
         size_t pv_hours_on;
         double revenueToPVChargeMax = 0;
-        if (m_batteryPower->canPVCharge) {
+        if (m_batteryPower->canSystemCharge) {
             std::vector<double> revenueToPVChargeForecast;
             for (size_t i = idx_year1; i < idx_year1 + idx_lookahead; i++) {
                 // when considering grid charging, require PV output to exceed battery input capacity before accepting as a better option
@@ -217,21 +217,21 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
         /* Booleans to assist decisions */
         bool highDischargeValuePeriod = ppa_cost == *max_ppa_cost;
         bool highChargeValuePeriod = ppa_cost == *min_ppa_cost;
-        bool excessAcCapacity = _inverter_paco > m_batteryPower->powerPVThroughSharedInverter;
+        bool excessAcCapacity = _inverter_paco > m_batteryPower->powerSystemThroughSharedInverter;
         bool batteryHasDischargeCapacity = _Battery->SOC() >= m_batteryPower->stateOfChargeMin + 1.0;
 
         // Always Charge if PV is clipping
-        if (m_batteryPower->canClipCharge && m_batteryPower->powerPVClipped > 0 && revenueToClipCharge > 0)
+        if (m_batteryPower->canClipCharge && m_batteryPower->powerSystemClipped > 0 && revenueToClipCharge > 0)
         {
-            powerBattery = -m_batteryPower->powerPVClipped;
+            powerBattery = -m_batteryPower->powerSystemClipped;
         }
 
-        // Increase charge from PV if it is more valuable later than selling now
-        if (m_batteryPower->canPVCharge &&
+        // Increase charge from system (PV) if it is more valuable later than selling now
+        if (m_batteryPower->canSystemCharge &&
             //revenueToPVCharge >= revenueToGridChargeMax &&
             revenueToPVCharge > 0 &&
             highChargeValuePeriod &&
-            m_batteryPower->powerPV > 0)
+            m_batteryPower->powerSystem > 0)
         {
             // leave EnergyToStoreClipped capacity in battery
             if (m_batteryPower->canClipCharge)
@@ -239,10 +239,10 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
                 if (energyToStoreClipped < energyNeededToFillBattery)
                 {
                     double energyCanCharge = (energyNeededToFillBattery - energyToStoreClipped);
-                    if (energyCanCharge <= m_batteryPower->powerPV * _dt_hour)
-                        powerBattery = -std::fmax(energyCanCharge / _dt_hour, m_batteryPower->powerPVClipped);
+                    if (energyCanCharge <= m_batteryPower->powerSystem * _dt_hour)
+                        powerBattery = -std::fmax(energyCanCharge / _dt_hour, m_batteryPower->powerSystemClipped);
                     else
-                        powerBattery = -std::fmax(m_batteryPower->powerPV, m_batteryPower->powerPVClipped);
+                        powerBattery = -std::fmax(m_batteryPower->powerSystem, m_batteryPower->powerSystemClipped);
 
                     energyNeededToFillBattery = std::fmax(0, energyNeededToFillBattery + (powerBattery * _dt_hour));
                 }
@@ -250,7 +250,7 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
             }
             // otherwise, don't reserve capacity for clipping
             else {
-                powerBattery = -m_batteryPower->powerPV;
+                powerBattery = -m_batteryPower->powerSystem;
             }
         }
 
@@ -276,11 +276,12 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
 
         // Discharge if we are in a high-price period and have battery and inverter capacity
         if (highDischargeValuePeriod && revenueToDischarge > 0 && excessAcCapacity && batteryHasDischargeCapacity) {
+            double loss_kw = _Battery->calculate_loss(m_batteryPower->powerBatteryTarget, lifetimeIndex); // Battery is responsible for covering discharge losses
             if (m_batteryPower->connectionMode == BatteryPower::DC_CONNECTED) {
-                powerBattery = _inverter_paco - m_batteryPower->powerPV;
+                powerBattery = _inverter_paco + loss_kw - m_batteryPower->powerSystem;
             }
             else {
-            powerBattery = _inverter_paco;
+                powerBattery = _inverter_paco; // AC connected battery is already maxed out by AC power limit, cannot increase dispatch to ccover losses
             }
         }
 		// save for extraction
@@ -291,12 +292,15 @@ void dispatch_automatic_front_of_meter_t::update_dispatch(size_t year, size_t ho
 	{
 		// extract input power by modifying lifetime index to year 1
 		m_batteryPower->powerBatteryTarget = _P_battery_use[lifetimeIndex % (8760 * _steps_per_hour)];
+        double loss_kw = _Battery->calculate_loss(m_batteryPower->powerBatteryTarget, lifetimeIndex); // Battery is responsible for covering discharge losses
         if (m_batteryPower->connectionMode == AC_CONNECTED){
-            if (m_batteryPower->powerBatteryTarget < 0)
-                m_batteryPower->powerBatteryTarget *= m_batteryPower->singlePointEfficiencyDCToAC;
-            else
-                m_batteryPower->powerBatteryTarget /= m_batteryPower->singlePointEfficiencyDCToAC;
+            m_batteryPower->powerBatteryTarget = m_batteryPower->adjustForACEfficiencies(m_batteryPower->powerBatteryTarget, loss_kw);
         }
+        else if (m_batteryPower->powerBatteryTarget > 0) {
+            // Adjust for DC discharge losses
+            m_batteryPower->powerBatteryTarget += loss_kw;
+        }
+
 	}
 
 	m_batteryPower->powerBatteryDC = m_batteryPower->powerBatteryTarget;

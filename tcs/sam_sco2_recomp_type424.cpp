@@ -450,10 +450,11 @@ public:
 		ms_rc_autodes_hit_eta_par.m_eta_mc = m_eta_c;
 		ms_rc_autodes_hit_eta_par.m_eta_rc = m_eta_c;
 		ms_rc_autodes_hit_eta_par.m_eta_t = m_eta_t;
-		ms_rc_autodes_hit_eta_par.m_N_sub_hxrs = m_N_sub_hxrs;
+        ms_rc_autodes_hit_eta_par.m_LTR_N_sub_hxrs = m_N_sub_hxrs;      //[-]
+        ms_rc_autodes_hit_eta_par.m_HTR_N_sub_hxrs = m_N_sub_hxrs;      //[-]
 		ms_rc_autodes_hit_eta_par.m_P_high_limit = m_P_high_limit;		//[kPa]
-		ms_rc_autodes_hit_eta_par.m_tol = m_tol;
-		ms_rc_autodes_hit_eta_par.m_opt_tol = m_opt_tol;
+		ms_rc_autodes_hit_eta_par.m_des_tol = m_tol;
+		ms_rc_autodes_hit_eta_par.m_des_opt_tol = m_opt_tol;
 		ms_rc_autodes_hit_eta_par.m_N_turbine = m_N_t_des;
 		ms_rc_autodes_hit_eta_par.m_is_recomp_ok = 1;
 
@@ -611,7 +612,7 @@ public:
 		acc_des_par_cycle_dep.m_delta_P_des = m_deltaP_cooler_frac*ms_rc_cycle.get_design_solved()->m_pres[2 - 1];		//[kPa]
 		acc_des_par_cycle_dep.m_T_hot_out_des = m_T_mc_in_des;	//[K]
 		acc_des_par_cycle_dep.m_W_dot_fan_des = fan_power_frac*m_W_dot_fan_des/1000.0;	//[MW] Cooler air fan power at design
-		ACC.design_hx(acc_des_par_ind, acc_des_par_cycle_dep);
+		ACC.design_hx(acc_des_par_ind, acc_des_par_cycle_dep, 1.E-3);
 
 		// Get air-cooler design parameters
 		// compact_hx::S_hx_design_solved s_hx_design_solved;
@@ -650,8 +651,7 @@ public:
 		ms_rc_od_par.m_T_mc_in = m_T_mc_in_des;
 		ms_rc_od_par.m_T_t_in = m_T_t_in_des;
 		ms_rc_od_par.m_N_t = ms_rc_cycle.get_design_solved()->ms_t_des_solved.m_N_design;
-		ms_rc_od_par.m_N_sub_hxrs = ms_rc_autodes_hit_eta_par.m_N_sub_hxrs;
-		ms_rc_od_par.m_tol = ms_rc_autodes_hit_eta_par.m_tol;
+		ms_rc_od_par.m_tol = ms_rc_autodes_hit_eta_par.m_des_tol;
 
 		ms_phx_od_par.m_m_dot_htf_des = m_dot_rec_des;
 		ms_phx_od_par.m_T_htf_hot = m_T_htf_hot;
@@ -736,8 +736,7 @@ public:
 			ms_rc_od_par.m_T_mc_in = T_mc_in;
 			ms_rc_od_par.m_T_t_in = T_t_in;
 			ms_rc_od_par.m_N_t = ms_rc_cycle.get_design_solved()->ms_t_des_solved.m_N_design;
-			ms_rc_od_par.m_N_sub_hxrs = ms_rc_autodes_hit_eta_par.m_N_sub_hxrs;
-			ms_rc_od_par.m_tol = ms_rc_autodes_hit_eta_par.m_tol;
+			ms_rc_od_par.m_tol = ms_rc_autodes_hit_eta_par.m_des_tol;
 			
 			ms_phx_od_par.m_m_dot_htf_des = m_dot_rec_des;
 			ms_phx_od_par.m_T_htf_hot = T_htf_hot;
@@ -777,8 +776,8 @@ public:
 			
 			// Call off-design air-cooler model
 			int acc_error_code = 0;
-			ACC.off_design_hx(T_db, P_amb, ms_rc_cycle.get_od_solved()->m_temp[9 - 1], ms_rc_cycle.get_od_solved()->m_pres[9 - 1],
-											ms_rc_cycle.get_od_solved()->m_m_dot_mc, T_mc_in, W_dot_par, acc_error_code);
+			//ACC.off_design_hx(T_db, P_amb, ms_rc_cycle.get_od_solved()->m_temp[9 - 1], ms_rc_cycle.get_od_solved()->m_pres[9 - 1],
+			//								ms_rc_cycle.get_od_solved()->m_m_dot_mc, T_mc_in, W_dot_par, acc_error_code);
 
 			if(acc_error_code == 1)
 			{

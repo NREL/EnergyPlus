@@ -45,7 +45,7 @@ private:
 	//Constants for scaling GM table
 	double m_eff_scale;   //defined later based on max value
 
-	double m_f_qsf;
+    double m_A_sf_calc; //[m2]
 
 	int m_mode;
 	int m_mode_prev;
