@@ -116,41 +116,47 @@ namespace OutputReportTabular {
     extern int const stepTypeZone;
     extern int const stepTypeHVAC;
 
-    extern int const cSensInst;
-    extern int const cSensDelay;
-    extern int const cSensRA;
-    extern int const cLatent;
-    extern int const cTotal;
-    extern int const cPerc;
-    extern int const cArea;
-    extern int const cPerArea;
+    // These correspond to the columns in the load component table
+    constexpr int cSensInst(1);
+    constexpr int cSensDelay(2);
+    constexpr int cSensRA(3);
+    constexpr int cLatent(4);
+    constexpr int cTotal(5);
+    constexpr int cPerc(6);
+    constexpr int cArea(7);
+    constexpr int cPerArea(8);
 
-    extern int const rPeople;
-    extern int const rLights;
-    extern int const rEquip;
-    extern int const rRefrig;
-    extern int const rWaterUse;
-    extern int const rHvacLoss;
-    extern int const rPowerGen;
-    extern int const rDOAS;
-    extern int const rInfil;
-    extern int const rZoneVent;
-    extern int const rIntZonMix;
-    extern int const rRoof;
-    extern int const rIntZonCeil;
-    extern int const rOtherRoof;
-    extern int const rExtWall;
-    extern int const rIntZonWall;
-    extern int const rGrdWall;
-    extern int const rOtherWall;
-    extern int const rExtFlr;
-    extern int const rIntZonFlr;
-    extern int const rGrdFlr;
-    extern int const rOtherFlr;
-    extern int const rFeneCond;
-    extern int const rFeneSolr;
-    extern int const rOpqDoor;
-    extern int const rGrdTot;
+    // internal gains
+    constexpr int rPeople(1);
+    constexpr int rLights(2);
+    constexpr int rEquip(3);
+    constexpr int rRefrig(4);
+    constexpr int rWaterUse(5);
+    constexpr int rHvacLoss(6);
+    constexpr int rPowerGen(7);
+    // misc
+    constexpr int rDOAS(8);
+    constexpr int rInfil(9);
+    constexpr int rZoneVent(10);
+    constexpr int rIntZonMix(11);
+    // opaque surfaces
+    constexpr int rRoof(12);
+    constexpr int rIntZonCeil(13);
+    constexpr int rOtherRoof(14);
+    constexpr int rExtWall(15);
+    constexpr int rIntZonWall(16);
+    constexpr int rGrdWall(17);
+    constexpr int rOtherWall(18);
+    constexpr int rExtFlr(19);
+    constexpr int rIntZonFlr(20);
+    constexpr int rGrdFlr(21);
+    constexpr int rOtherFlr(22);
+    // subsurfaces
+    constexpr int rFeneCond(23);
+    constexpr int rFeneSolr(24);
+    constexpr int rOpqDoor(25);
+    // total
+    constexpr int rGrdTot(26);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -158,6 +164,12 @@ namespace OutputReportTabular {
     constexpr int numSourceTypes(12);
 
     constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
+
+    enum class iOutputType {
+        zoneOutput,
+        airLoopOutput,
+        facilityOutput,
+    };
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -925,7 +937,7 @@ namespace OutputReportTabular {
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
-                               int const &kind, // zone=1, airloop=2, facility=3
+                               iOutputType const &kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex);

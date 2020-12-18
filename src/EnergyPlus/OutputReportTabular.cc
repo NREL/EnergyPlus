@@ -398,52 +398,6 @@ namespace EnergyPlus::OutputReportTabular {
     // REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
     Array3D<Real64> feneSolarRadSeq;
 
-    // These correspond to the columns in the load component table
-    int const cSensInst(1);
-    int const cSensDelay(2);
-    int const cSensRA(3);
-    int const cLatent(4);
-    int const cTotal(5);
-    int const cPerc(6);
-    int const cArea(7);
-    int const cPerArea(8);
-
-    // internal gains
-    int const rPeople(1);
-    int const rLights(2);
-    int const rEquip(3);
-    int const rRefrig(4);
-    int const rWaterUse(5);
-    int const rHvacLoss(6);
-    int const rPowerGen(7);
-    // misc
-    int const rDOAS(8);
-    int const rInfil(9);
-    int const rZoneVent(10);
-    int const rIntZonMix(11);
-    // opaque surfaces
-    int const rRoof(12);
-    int const rIntZonCeil(13);
-    int const rOtherRoof(14);
-    int const rExtWall(15);
-    int const rIntZonWall(16);
-    int const rGrdWall(17);
-    int const rOtherWall(18);
-    int const rExtFlr(19);
-    int const rIntZonFlr(20);
-    int const rGrdFlr(21);
-    int const rOtherFlr(22);
-    // subsurfaces
-    int const rFeneCond(23);
-    int const rFeneSolr(24);
-    int const rOpqDoor(25);
-    // total
-    int const rGrdTot(26);
-
-    int const zoneOuput = 1;
-    int const airLoopOutput = 2;
-    int const facilityOutput = 3;
-
     int maxUniqueKeyCount(0);
 
     // for the XML report must keep track fo the active sub-table name and report set by other routines
@@ -13023,7 +12977,7 @@ namespace EnergyPlus::OutputReportTabular {
                 LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
                 LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
 
-                OutputCompLoadSummary(state, airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
+                OutputCompLoadSummary(state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
             }
         }
 
@@ -13128,7 +13082,7 @@ namespace EnergyPlus::OutputReportTabular {
             LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
             LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
 
-            OutputCompLoadSummary(state, facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+            OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
         }
 
         // ZoneComponentLoadSummary: Now we convert and Display
@@ -13139,7 +13093,7 @@ namespace EnergyPlus::OutputReportTabular {
                     LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
                     LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
 
-                    OutputCompLoadSummary(state, zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
+                    OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                 }
             }
         }
@@ -13963,7 +13917,7 @@ namespace EnergyPlus::OutputReportTabular {
 
     // provide output from the load component summary tables
     void OutputCompLoadSummary(EnergyPlusData &state,
-                               int const &kind, // zone=1, airloop=2, facility=3
+                               iOutputType const &kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex)
@@ -13978,15 +13932,15 @@ namespace EnergyPlus::OutputReportTabular {
         std::string reportName;
         std::string zoneAirLoopFacilityName;
 
-        if (kind == zoneOuput && displayZoneComponentLoadSummary) {
+        if (kind == iOutputType::zoneOutput && displayZoneComponentLoadSummary) {
             reportName = "Zone Component Load Summary";
             zoneAirLoopFacilityName = Zone(zoneOrAirLoopIndex).Name;
             writeOutput = true;
-        } else if (kind == airLoopOutput && displayAirLoopComponentLoadSummary) {
+        } else if (kind == iOutputType::airLoopOutput && displayAirLoopComponentLoadSummary) {
             reportName = "AirLoop Component Load Summary";
             zoneAirLoopFacilityName = DataSizing::FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
             writeOutput = true;
-        } else if (kind == facilityOutput && displayFacilityComponentLoadSummary) {
+        } else if (kind == iOutputType::facilityOutput && displayFacilityComponentLoadSummary) {
             reportName = "Facility Component Load Summary";
             zoneAirLoopFacilityName = "Facility";
             writeOutput = true;
@@ -14150,7 +14104,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tableBody(1, 7) = RealToStr(curCompLoad.zoneHumRatio, 5);     // Zone Humidity Ratio at Peak
                 }
                 tableBody(1, 8) = RealToStr(curCompLoad.supAirTemp, 2); // supply air temperature
-                if (kind == airLoopOutput) {
+                if (kind == iOutputType::airLoopOutput) {
                     tableBody(1, 9) = RealToStr(curCompLoad.mixAirTemp, 2); // mixed air temperature - not for zone or facility
                 }
                 tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 2);     // main fan air flow
@@ -14220,7 +14174,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 // write the list of zone for the AirLoop level report
-                if (kind == airLoopOutput && curCompLoad.zoneIndices.allocated()) {
+                if (kind == iOutputType::airLoopOutput && curCompLoad.zoneIndices.allocated()) {
                     int maxRow = 0;
                     for (size_t zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi) {
                         if (curCompLoad.zoneIndices(zi) > 0) {
