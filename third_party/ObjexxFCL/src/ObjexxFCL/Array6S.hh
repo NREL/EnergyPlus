@@ -4950,11 +4950,15 @@ private: // Methods
 	bool
 	computed_contiguous() const
 	{
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsequenced"
+#endif
 		std::int64_t u( u6_ );
 		return ( m6_ == 1 ) && ( m5_ == u ) && ( m4_ == ( u *= u5_ ) ) && ( m3_ == ( u *= u4_ ) ) && ( m2_ == ( u *= u3_ ) ) && ( m1_ == ( u *= u2_ ) );
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 	}
 
 	// Memory Range Set
