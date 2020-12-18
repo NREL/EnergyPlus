@@ -98,13 +98,6 @@ namespace MundtSimMgr {
     Real64 const MinSlope(0.001); // Bound on result from Mundt model
     Real64 const MaxSlope(5.0);   // Bound on result from Mundt Model
 
-    static std::string const BlankString;
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
     Array1D_int FloorSurfSetIDs;     // fixed variable for floors
     Array1D_int TheseSurfIDs;        // temporary working variable

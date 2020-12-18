@@ -5022,11 +5022,11 @@ namespace HeatBalanceSurfaceManager {
                 SetupOutputVariable(state, "Zone Humidity Index", OutputProcessor::Unit::None, ZoneHumidex(ZoneNum), "Zone",
                                     "State", Zone(ZoneNum).Name);
             }
-            for (int Loop = 1; Loop <= OutputProcessor::NumOfReqVariables; ++Loop) {
-                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Heat Index") {
+            for (int Loop = 1; Loop <= state.dataOutputProcessor->NumOfReqVariables; ++Loop) {
+                if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Heat Index") {
                     reportVarHeatIndex = true;
                 }
-                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Humidity") {
+                if (state.dataOutputProcessor->ReqRepVars(Loop).VarName == "Zone Humidity") {
                     reportVarHumidex = true;
                 }
             }

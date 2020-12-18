@@ -116,8 +116,6 @@ namespace HVACStandAloneERV {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    static std::string const BlankString;
-
     int const ControllerSimple(1);
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);

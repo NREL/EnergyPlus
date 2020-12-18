@@ -228,7 +228,6 @@ namespace SimulationManager {
         using SystemReports::ReportAirLoopConnections;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::isFinalYear;
         using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
@@ -483,11 +482,11 @@ namespace SimulationManager {
             NumOfWarmupDays = 0;
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             } else {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 365) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             }
 
@@ -524,7 +523,7 @@ namespace SimulationManager {
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
-                    ResetAccumulationWhenWarmupComplete();
+                    ResetAccumulationWhenWarmupComplete(state);
                 } else if (DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
@@ -1839,21 +1838,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataOutputs;
-        using OutputProcessor::InstMeterCacheSize;
-        using OutputProcessor::MaxIVariable;
-        using OutputProcessor::MaxRVariable;
-        using OutputProcessor::NumEnergyMeters;
-        using OutputProcessor::NumOfIVariable;
-        using OutputProcessor::NumOfIVariable_Setup;
-        using OutputProcessor::NumOfIVariable_Sum;
-        using OutputProcessor::NumOfRVariable;
-        using OutputProcessor::NumOfRVariable_Meter;
-        using OutputProcessor::NumOfRVariable_Setup;
-        using OutputProcessor::NumOfRVariable_Sum;
-        using OutputProcessor::NumReportList;
-        using OutputProcessor::NumTotalIVariable;
-        using OutputProcessor::NumTotalRVariable;
-        using OutputProcessor::NumVarMeterArrays;
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
         using namespace DataRuntimeLanguage;
@@ -1884,25 +1868,25 @@ namespace SimulationManager {
         state.files.audit.ensure_open(state, "CloseOutputFiles", state.files.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        print(state.files.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
-        print(state.files.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
-        print(state.files.audit, variable_fmt, "MaxRVariable", MaxRVariable);
-        print(state.files.audit, variable_fmt, "MaxIVariable", MaxIVariable);
-        print(state.files.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
-        print(state.files.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
+        print(state.files.audit, variable_fmt, "NumOfRVariable", state.dataOutputProcessor->NumOfRVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", state.dataOutputProcessor->NumTotalRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", state.dataOutputProcessor->NumOfRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", state.dataOutputProcessor->NumOfRVariable_Sum);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", state.dataOutputProcessor->NumOfRVariable_Meter);
+        print(state.files.audit, variable_fmt, "NumOfIVariable", state.dataOutputProcessor->NumOfIVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", state.dataOutputProcessor->NumTotalIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", state.dataOutputProcessor->NumOfIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", state.dataOutputProcessor->NumOfIVariable_Sum);
+        print(state.files.audit, variable_fmt, "MaxRVariable", state.dataOutputProcessor->MaxRVariable);
+        print(state.files.audit, variable_fmt, "MaxIVariable", state.dataOutputProcessor->MaxIVariable);
+        print(state.files.audit, variable_fmt, "NumEnergyMeters", state.dataOutputProcessor->NumEnergyMeters);
+        print(state.files.audit, variable_fmt, "NumVarMeterArrays", state.dataOutputProcessor->NumVarMeterArrays);
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
-        print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
-        print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
+        print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
+        print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
@@ -2935,7 +2919,7 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
+            NumVariables = GetNumMeteredVariables(state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
             print(state.files.debug, "CompSet, {}, {}, {:5}\n", state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);

@@ -172,7 +172,6 @@ namespace LowTempRadiantSystem {
     Real64 HighTempCooling(200.0); // Used to indicate that a user does not have a cooling control temperature
 
     static std::string const fluidNameWater("WATER");
-    static std::string const BlankString;
 
     // DERIVED TYPE DEFINITIONS:
 

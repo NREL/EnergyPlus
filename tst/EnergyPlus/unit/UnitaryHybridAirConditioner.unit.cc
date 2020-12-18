@@ -402,19 +402,16 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
     DataZoneEquipment::GetZoneEquipmentData(*state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    ZoneOAMassFlow.allocate(state->dataGlobal->NumOfZones);
-    ZoneOAMass.allocate(state->dataGlobal->NumOfZones);
-    ZoneOAVolFlowStdRho.allocate(state->dataGlobal->NumOfZones);
-    ZoneOAVolFlowCrntRho.allocate(state->dataGlobal->NumOfZones);
-    ZoneOAVolStdRho.allocate(state->dataGlobal->NumOfZones);
-    ZoneOAVolCrntRho.allocate(state->dataGlobal->NumOfZones);
-    ZoneMechACH.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAMassFlow.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAMass.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAVolFlowStdRho.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAVolFlowCrntRho.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAVolStdRho.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneOAVolCrntRho.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->ZoneMechACH.allocate(state->dataGlobal->NumOfZones);
     MAT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
-    MaxHeatingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
-    MaxOverheatingByVent.allocate(state->dataGlobal->NumOfZones);
-    MaxCoolingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
-    MaxOvercoolingByVent.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->MaxOvercoolingByVent.allocate(state->dataGlobal->NumOfZones);
     ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     DeadBandOrSetback(1) = false;
     ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
@@ -445,7 +442,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     SystemReports::ReportMaxVentilationLoads(*state);
     // output results
-    Real64 zone_oa_mass_flow = ZoneOAMassFlow(1); // OA flow reported to the zone from the unitary hybrid system
+    Real64 zone_oa_mass_flow = state->dataSysRpts->ZoneOAMassFlow(1); // OA flow reported to the zone from the unitary hybrid system
 
     // checks
     EXPECT_EQ(zone_oa_mass_flow, DesignMinVR); // reported zone OA flow matches unitary hybrid OA flow
@@ -455,7 +452,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     std::string TypeOfComp = "ZoneHVAC:HybridUnitaryHVAC";
     std::string NameOfComp = pZoneHybridUnitaryAirConditioner->Name;
-    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(

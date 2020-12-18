@@ -233,8 +233,6 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 const RadSurfEff = 0.72;     // Fraction of surface effective for radiation
     Real64 const StefanBoltz = 5.67e-8; // Stefan-Boltzmann constant (W/m2K4)
 
-    static std::string const BlankString;
-
     // MODULE VARIABLE DECLARATIONS:
     Real64 AbsAirTemp = 0.0;                // Absolute air temperature; K
     Real64 AbsCloSurfTemp = 0.0;            // Absolute clothing surface temperature; K

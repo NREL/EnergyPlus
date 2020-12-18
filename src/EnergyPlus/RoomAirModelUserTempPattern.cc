@@ -97,9 +97,6 @@ namespace RoomAirModelUserTempPattern {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
     // Functions
     bool MyOneTimeFlag(true); // one time setup flag
     bool MyOneTimeFlag2(true);

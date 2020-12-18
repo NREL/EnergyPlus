@@ -217,8 +217,8 @@ namespace EnergyPlus::DemandManager {
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
-        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
-                                                 GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * DataGlobalConstants::SecInHour);
+        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
+                                                 GetInstantMeterValue(state, DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
         // Calculate average demand over the averaging window including the current timestep meter demand
         AverageDemand = DemandManagerList(ListNum).AverageDemand +
@@ -317,7 +317,6 @@ namespace EnergyPlus::DemandManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using OutputProcessor::EnergyMeters;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -365,7 +364,7 @@ namespace EnergyPlus::DemandManager {
 
                 DemandManagerList(ListNum).Name = AlphArray(1);
 
-                DemandManagerList(ListNum).Meter = GetMeterIndex(AlphArray(2));
+                DemandManagerList(ListNum).Meter = GetMeterIndex(state, AlphArray(2));
 
                 if (DemandManagerList(ListNum).Meter == 0) {
                     ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));
@@ -374,7 +373,7 @@ namespace EnergyPlus::DemandManager {
 
                 } else {
                     {
-                        auto const SELECT_CASE_var(EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType);
+                        auto const SELECT_CASE_var(state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType);
                         if ((SELECT_CASE_var == "Electricity") || (SELECT_CASE_var == "ElectricityNet")) {
                             Units = "[W]"; // For setup of report variables
 

@@ -136,8 +136,6 @@ namespace HeatRecovery {
     int const EconoLockOut_No(0);
     int const EconoLockOut_Yes(1);
 
-    static std::string const BlankString;
-
     namespace {
         bool MyOneTimeAllocate(true);
     }

@@ -136,8 +136,6 @@ namespace HeatingCoils {
     int NumFuelCoil;
     int NumGasCoilMultiStage;
 
-    static std::string const BlankString;
-
     // reclaim heat object types
     int const COMPRESSORRACK_REFRIGERATEDCASE(1);
     int const COIL_DX_COOLING(2); // single speed DX
