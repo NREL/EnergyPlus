@@ -19,13 +19,29 @@ set(SRC
     InputProcessor.f90
     BasementSimData.f90)
 
-add_library(BasementOptions INTERFACE)
-if(NOT CMAKE_Fortran_COMPILER MATCHES "ifort")
-  target_compile_options(BasementOptions INTERFACE -ffloat-store)
-endif()
+set(STATIC_EXE FALSE)
 
-if(NOT APPLE AND NOT UNIX) # Windows
+add_library(BasementOptions INTERFACE)
+if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    target_compile_options(BasementOptions INTERFACE -static-intel)
+  else()
+    target_compile_options(BasementOptions INTERFACE -ffloat-store)
+  endif()
+elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    target_compile_options(BasementOptions INTERFACE -static-intel)
+  else()
+    target_compile_options(BasementOptions INTERFACE -ffloat-store)
+    target_compile_options(BasementOptions INTERFACE -static)
+    set(STATIC_EXE TRUE)
+  endif()
+else() # Windows
+  set(STATIC_EXE TRUE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    # Set release flags to be empty
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
     target_compile_options(
       BasementOptions
       INTERFACE /nologo
@@ -48,21 +64,23 @@ if(NOT APPLE AND NOT UNIX) # Windows
                 /Qimf-precision:high
                 /Qimf-arch-consistency:true
                 /Qvec-)
+  else()
+    target_compile_options(BasementOptions INTERFACE -static)
+    target_compile_options(BasementOptions INTERFACE -ffloat-store)
   endif()
 endif()
 
-set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH TRUE)
 add_executable(Basement ${SRC})
 
 set_target_properties(
   Basement PROPERTIES COMPILE_FLAGS
-                      "-O1")
+                      "-O1 -ffree-line-length-200")
 set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
-target_link_libraries(Basement PRIVATE BasementOptions fortran_project_options)
+target_link_libraries(Basement PRIVATE BasementOptions)
 
 install(TARGETS Basement DESTINATION PreProcess/GrndTempCalc)
-if(NOT ${FORTRAN_STATIC_EXE})
+if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(Basement PreProcess/GrndTempCalc)
 endif()
