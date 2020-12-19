@@ -49,10 +49,14 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DisplacementVentMgr {
 
@@ -103,6 +107,14 @@ namespace DisplacementVentMgr {
     void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
+
+struct DisplacementVentMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

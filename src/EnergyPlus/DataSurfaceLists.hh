@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -137,6 +138,14 @@ namespace DataSurfaceLists {
     int GetNumberOfSurfListVentSlab(EnergyPlusData &state);
 
 } // namespace DataSurfaceLists
+
+struct SurfaceListsData : BaseGlobalStruct
+{
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

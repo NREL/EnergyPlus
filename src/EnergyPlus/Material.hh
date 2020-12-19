@@ -283,17 +283,15 @@ namespace Material {
 
 }   // namespace Material
 
-    struct MaterialData : BaseGlobalStruct
+struct MaterialData : BaseGlobalStruct
+{
+    Array1D<Material::MaterialProperties> Material;
+
+    void clear_state() override
     {
-        Array1D<Material::MaterialProperties> Material;
-
-        void clear_state() override
-        {
-            Material.deallocate();
-        }
-    };
-
-extern MaterialData dataMaterial;
+        Material.deallocate();
+    }
+};
 
 }   // namespace EnergyPlus
 

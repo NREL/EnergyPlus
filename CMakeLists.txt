@@ -239,6 +239,11 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
+
+if( OPENGL_FOUND )
+  set(BUILD_PENUMBRA_TESTING OFF CACHE BOOL "")
+endif()
+
 # E+ required libraries
 add_subdirectory(idd)
 
@@ -290,7 +295,7 @@ if(BUILD_TESTING)
 
   set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
   set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if(OPENGL_FOUND)
+  if( OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
     set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
   endif()
 endif()
