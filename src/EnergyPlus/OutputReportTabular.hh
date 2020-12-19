@@ -182,37 +182,6 @@ namespace OutputReportTabular {
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
 
-    // BEPS Report Related Variables
-    // From Report:Table:Predefined - BEPS
-    // arrays that hold the meter numbers that are initialized at get input
-    extern Array1D_int meterNumTotalsBEPS;
-    extern Array1D_int meterNumTotalsSource;
-    extern Array1D_bool fuelfactorsused;
-    extern Array1D_bool ffUsed;
-    extern Array1D<Real64> SourceFactors;
-    extern Array1D_bool ffSchedUsed;
-    extern Array1D_int ffSchedIndex;
-    extern Array2D_int meterNumEndUseBEPS;
-    extern Array3D_int meterNumEndUseSubBEPS;
-    // arrays that hold the names of the resource and end uses
-    extern Array1D_string resourceTypeNames;
-    extern Array1D_string sourceTypeNames;
-    extern Array1D_string endUseNames;
-    // arrays that hold the actual values for the year
-    extern Array1D<Real64> gatherTotalsBEPS;
-    extern Array1D<Real64> gatherTotalsBySourceBEPS;
-    extern Array1D<Real64> gatherTotalsSource;
-    extern Array1D<Real64> gatherTotalsBySource;
-    extern Array2D<Real64> gatherEndUseBEPS;
-    extern Array2D<Real64> gatherEndUseBySourceBEPS;
-    extern Array3D<Real64> gatherEndUseSubBEPS;
-    // arrays the hold the demand values
-    extern Array1D<Real64> gatherDemandTotal;
-    extern Array2D<Real64> gatherDemandEndUse;
-    extern Array2D<Real64> gatherDemandIndEndUse;
-    extern Array3D<Real64> gatherDemandEndUseSub;
-    extern Array3D<Real64> gatherDemandIndEndUseSub;
-    extern Array1D_int gatherDemandTimeStamp;
     // to keep track of hours for the BEPS report gathering
     extern Real64 gatherElapsedTimeBEPS;
     // for normalization of results
@@ -931,11 +900,11 @@ namespace OutputReportTabular {
 
     void ResetBinGathering();
 
-    void ResetBEPSGathering();
+    void ResetBEPSGathering(EnergyPlusData &state);
 
-    void ResetSourceEnergyEndUseGathering();
+    void ResetSourceEnergyEndUseGathering(EnergyPlusData &state);
 
-    void ResetPeakDemandGathering();
+    void ResetPeakDemandGathering(EnergyPlusData &state);
 
     void ResetHeatGainGathering(EnergyPlusData &state);
 
@@ -1063,6 +1032,39 @@ struct OutputReportTabularData : BaseGlobalStruct {
     bool displayThermalResilienceSummaryExplicitly = false;
     bool displayCO2ResilienceSummaryExplicitly = false;
     bool displayVisualResilienceSummaryExplicitly = false;
+    // BEPS Report Related Variables
+    // From Report:Table:Predefined - BEPS
+    // arrays that hold the meter numbers that are initialized at get input
+    Array1D_int meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+    Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
+    Array1D_bool ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+    Array1D<Real64> SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D_bool ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+    Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
+    Array3D_int meterNumEndUseSubBEPS;
+    // arrays that hold the names of the resource and end uses
+    Array1D_string resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
+    Array1D_string sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
+    Array1D_string endUseNames = Array1D_string(DataGlobalConstants::iEndUse.size());
+    // arrays that hold the actual values for the year
+    Array1D<Real64> gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+    Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array3D<Real64> gatherEndUseSubBEPS;
+    Array1D_bool needOtherRowLEED45 = Array1D_bool(DataGlobalConstants::iEndUse.size());
+
+    // arrays the hold the demand values
+    Array1D<Real64> gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array2D<Real64> gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array2D<Real64> gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array3D<Real64> gatherDemandEndUseSub;
+    Array3D<Real64> gatherDemandIndEndUseSub;
+    Array1D_int gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
 
     void clear_state() override
     {
@@ -1111,6 +1113,33 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->displayThermalResilienceSummaryExplicitly = false;
         this->displayCO2ResilienceSummaryExplicitly = false;
         this->displayVisualResilienceSummaryExplicitly = false;
+        this->meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+        this->fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
+        this->ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+        this->SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+        this->ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
+        this->meterNumEndUseSubBEPS.deallocate();
+        this->resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
+        this->sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
+        this->endUseNames = Array1D_string(DataGlobalConstants::iEndUse.size());
+        this->gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+        this->gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+        this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherEndUseSubBEPS.deallocate();
+        this->needOtherRowLEED45 = Array1D_bool(DataGlobalConstants::iEndUse.size());
+        this->gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherDemandEndUseSub.deallocate();
+        this->gatherDemandIndEndUseSub.deallocate();
+        this->gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+
     }
 };
 

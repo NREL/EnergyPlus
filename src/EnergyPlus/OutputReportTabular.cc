@@ -177,39 +177,6 @@ namespace EnergyPlus::OutputReportTabular {
 
     // arrays for time binned results
 
-    // BEPS Report Related Variables
-    // From Report:Table:Predefined - BEPS
-    // arrays that hold the meter numbers that are initialized at get input
-    Array1D_int meterNumTotalsBEPS(numResourceTypes, 0);
-    Array1D_int meterNumTotalsSource(numSourceTypes, 0);
-    Array1D_bool fuelfactorsused(numSourceTypes, false);
-    Array1D_bool ffUsed(numResourceTypes, false);
-    Array1D<Real64> SourceFactors(numResourceTypes, 0.0);
-    Array1D_bool ffSchedUsed(numResourceTypes, false);
-    Array1D_int ffSchedIndex(numResourceTypes, 0);
-    Array2D_int meterNumEndUseBEPS(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
-    Array3D_int meterNumEndUseSubBEPS;
-    // arrays that hold the names of the resource and end uses
-    Array1D_string resourceTypeNames(numResourceTypes);
-    Array1D_string sourceTypeNames(numSourceTypes);
-    Array1D_string endUseNames(DataGlobalConstants::iEndUse.size());
-    // arrays that hold the actual values for the year
-    Array1D<Real64> gatherTotalsBEPS(numResourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsBySourceBEPS(numResourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsSource(numSourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsBySource(numSourceTypes, 0.0);
-    Array2D<Real64> gatherEndUseBEPS(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-    Array2D<Real64> gatherEndUseBySourceBEPS(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-    Array3D<Real64> gatherEndUseSubBEPS;
-    Array1D_bool needOtherRowLEED45(DataGlobalConstants::iEndUse.size());
-
-    // arrays the hold the demand values
-    Array1D<Real64> gatherDemandTotal(numResourceTypes, 0.0);
-    Array2D<Real64> gatherDemandEndUse(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-    Array2D<Real64> gatherDemandIndEndUse(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-    Array3D<Real64> gatherDemandEndUseSub;
-    Array3D<Real64> gatherDemandIndEndUseSub;
-    Array1D_int gatherDemandTimeStamp(numResourceTypes, 0);
     // to keep track of hours for the BEPS report gathering
     Real64 gatherElapsedTimeBEPS(0.0);
     // for normalization of results
@@ -217,7 +184,7 @@ namespace EnergyPlus::OutputReportTabular {
     Real64 buildingConditionedFloorArea(0.0);
     // keep track if schedules are used in fuel factors
     bool fuelFactorSchedulesUsed(false);
-    // for electic load components on BEPS report
+    // for electric load components on BEPS report
     int meterNumPowerFuelFireGen(0);
     Real64 gatherPowerFuelFireGen(0.0);
     int meterNumPowerPV(0);
@@ -383,51 +350,6 @@ namespace EnergyPlus::OutputReportTabular {
         GatherHeatGainReportfirstTime = true;
         AllocateLoadComponentArraysDoAllocate = true;
         initAdjFenDone = false;
-        state.dataOutRptTab->timeInYear = 0.0;
-        state.dataOutRptTab->displayTabularBEPS = false;
-        state.dataOutRptTab->displayLEEDSummary = false;
-        state.dataOutRptTab->displayTabularCompCosts = false;
-        state.dataOutRptTab->displayTabularVeriSum = false;
-        state.dataOutRptTab->displayComponentSizing = false;
-        state.dataOutRptTab->displaySurfaceShadowing = false;
-        state.dataOutRptTab->displayDemandEndUse = false;
-        state.dataOutRptTab->displayAdaptiveComfort = false;
-        state.dataOutRptTab->displaySourceEnergyEndUseSummary = false;
-        state.dataOutRptTab->displayZoneComponentLoadSummary = false;
-        state.dataOutRptTab->displayAirLoopComponentLoadSummary = false;
-        state.dataOutRptTab->displayFacilityComponentLoadSummary = false;
-        state.dataOutRptTab->displayLifeCycleCostReport = false;
-        state.dataOutRptTab->displayTariffReport = false;
-        state.dataOutRptTab->displayEconomicResultSummary = false;
-        state.dataOutRptTab->displayHeatEmissionsSummary = false;
-        state.dataOutRptTab->displayThermalResilienceSummary = false;
-        state.dataOutRptTab->displayCO2ResilienceSummary = false;
-        state.dataOutRptTab->displayVisualResilienceSummary = false;
-        state.dataOutRptTab->displayThermalResilienceSummaryExplicitly = false;
-        state.dataOutRptTab->displayCO2ResilienceSummaryExplicitly = false;
-        state.dataOutRptTab->displayVisualResilienceSummaryExplicitly = false;
-        state.dataOutRptTab->displayEioSummary = false;
-        meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
-        meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
-        fuelfactorsused = Array1D_bool(numSourceTypes, false);
-        ffUsed = Array1D_bool(numResourceTypes, false);
-        SourceFactors = Array1D<Real64>(numResourceTypes, 0.0);
-        ffSchedUsed = Array1D_bool(numResourceTypes, false);
-        ffSchedIndex = Array1D_int(numResourceTypes, 0);
-        meterNumEndUseBEPS = Array2D_int(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
-        meterNumEndUseSubBEPS.deallocate();
-        gatherTotalsBEPS = Array1D<Real64>(numResourceTypes, 0.0);
-        gatherTotalsBySourceBEPS = Array1D<Real64>(numResourceTypes, 0.0);
-        gatherTotalsSource = Array1D<Real64>(numSourceTypes, 0.0);
-        gatherTotalsBySource = Array1D<Real64>(numSourceTypes, 0.0);
-        gatherEndUseBEPS = Array2D<Real64>(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-        gatherEndUseBySourceBEPS = Array2D<Real64>(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-        gatherEndUseSubBEPS.deallocate();
-        gatherDemandTotal = Array1D<Real64>(numResourceTypes, 0.0);
-        gatherDemandEndUse = Array2D<Real64>(numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
-        gatherDemandEndUseSub.deallocate();
-        gatherDemandIndEndUseSub.deallocate();
-        gatherDemandTimeStamp = Array1D_int(numResourceTypes, 0);
         gatherElapsedTimeBEPS = 0.0;
         buildingGrossFloorArea = 0.0;
         buildingConditionedFloorArea = 0.0;
@@ -2061,93 +1983,93 @@ namespace EnergyPlus::OutputReportTabular {
         // if the BEPS report has been called for than initialize its arrays
         if (state.dataOutRptTab->displayTabularBEPS || state.dataOutRptTab->displayDemandEndUse || state.dataOutRptTab->displaySourceEnergyEndUseSummary || state.dataOutRptTab->displayLEEDSummary) {
             // initialize the resource type names
-            resourceTypeNames(1) = "Electricity";
-            resourceTypeNames(2) = "NaturalGas";
-            resourceTypeNames(3) = "DistrictCooling";
-            resourceTypeNames(4) = "DistrictHeating";
-            resourceTypeNames(5) = "Steam";
-            resourceTypeNames(6) = "Gasoline";
-            resourceTypeNames(7) = "Water";
-            resourceTypeNames(8) = "Diesel";
-            resourceTypeNames(9) = "Coal";
-            resourceTypeNames(10) = "FuelOilNo1";
-            resourceTypeNames(11) = "FuelOilNo2";
-            resourceTypeNames(12) = "Propane";
-            resourceTypeNames(13) = "OtherFuel1";
-            resourceTypeNames(14) = "OtherFuel2";
+            state.dataOutRptTab->resourceTypeNames(1) = "Electricity";
+            state.dataOutRptTab->resourceTypeNames(2) = "NaturalGas";
+            state.dataOutRptTab->resourceTypeNames(3) = "DistrictCooling";
+            state.dataOutRptTab->resourceTypeNames(4) = "DistrictHeating";
+            state.dataOutRptTab->resourceTypeNames(5) = "Steam";
+            state.dataOutRptTab->resourceTypeNames(6) = "Gasoline";
+            state.dataOutRptTab->resourceTypeNames(7) = "Water";
+            state.dataOutRptTab->resourceTypeNames(8) = "Diesel";
+            state.dataOutRptTab->resourceTypeNames(9) = "Coal";
+            state.dataOutRptTab->resourceTypeNames(10) = "FuelOilNo1";
+            state.dataOutRptTab->resourceTypeNames(11) = "FuelOilNo2";
+            state.dataOutRptTab->resourceTypeNames(12) = "Propane";
+            state.dataOutRptTab->resourceTypeNames(13) = "OtherFuel1";
+            state.dataOutRptTab->resourceTypeNames(14) = "OtherFuel2";
 
-            sourceTypeNames(1) = "Electricity";
-            sourceTypeNames(2) = "NaturalGas";
-            sourceTypeNames(3) = "Gasoline";
-            sourceTypeNames(4) = "Diesel";
-            sourceTypeNames(5) = "Coal";
-            sourceTypeNames(6) = "FuelOilNo1";
-            sourceTypeNames(7) = "FuelOilNo2";
-            sourceTypeNames(8) = "Propane";
-            sourceTypeNames(9) = "PurchasedElectric";
-            sourceTypeNames(10) = "SoldElectric";
-            sourceTypeNames(11) = "OtherFuel1";
-            sourceTypeNames(12) = "OtherFuel2";
+            state.dataOutRptTab->sourceTypeNames(1) = "Electricity";
+            state.dataOutRptTab->sourceTypeNames(2) = "NaturalGas";
+            state.dataOutRptTab->sourceTypeNames(3) = "Gasoline";
+            state.dataOutRptTab->sourceTypeNames(4) = "Diesel";
+            state.dataOutRptTab->sourceTypeNames(5) = "Coal";
+            state.dataOutRptTab->sourceTypeNames(6) = "FuelOilNo1";
+            state.dataOutRptTab->sourceTypeNames(7) = "FuelOilNo2";
+            state.dataOutRptTab->sourceTypeNames(8) = "Propane";
+            state.dataOutRptTab->sourceTypeNames(9) = "PurchasedElectric";
+            state.dataOutRptTab->sourceTypeNames(10) = "SoldElectric";
+            state.dataOutRptTab->sourceTypeNames(11) = "OtherFuel1";
+            state.dataOutRptTab->sourceTypeNames(12) = "OtherFuel2";
 
             // initialize the end use names
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
-            endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
+            state.dataOutRptTab->endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
             // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-            meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
-            meterNumEndUseSubBEPS = 0;
+            state.dataOutRptTab->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            state.dataOutRptTab->meterNumEndUseSubBEPS = 0;
 
             // loop through all of the resources and end uses and sub end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-                meterName = resourceTypeNames(iResource) + ":FACILITY";
+                meterName = state.dataOutRptTab->resourceTypeNames(iResource) + ":FACILITY";
                 meterNumber = GetMeterIndex(state, meterName);
-                meterNumTotalsBEPS(iResource) = meterNumber;
+                state.dataOutRptTab->meterNumTotalsBEPS(iResource) = meterNumber;
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    meterName = endUseNames(jEndUse) + ':' + resourceTypeNames(iResource); //// ':FACILITY'
+                    meterName = state.dataOutRptTab->endUseNames(jEndUse) + ':' + state.dataOutRptTab->resourceTypeNames(iResource); //// ':FACILITY'
                     meterNumber = GetMeterIndex(state, meterName);
-                    meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
+                    state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         meterName =
-                            state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + endUseNames(jEndUse) + ':' + resourceTypeNames(iResource);
+                            state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + state.dataOutRptTab->endUseNames(jEndUse) + ':' + state.dataOutRptTab->resourceTypeNames(iResource);
                         meterNumber = GetMeterIndex(state, meterName);
-                        meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
+                        state.dataOutRptTab->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                     }
                 }
             }
 
             for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-                meterNumber = GetMeterIndex(state, sourceTypeNames(iResource) + "Emissions:Source");
-                meterNumTotalsSource(iResource) = meterNumber;
+                meterNumber = GetMeterIndex(state, state.dataOutRptTab->sourceTypeNames(iResource) + "Emissions:Source");
+                state.dataOutRptTab->meterNumTotalsSource(iResource) = meterNumber;
             }
 
             // initialize the gathering arrays to zero
-            gatherTotalsBEPS = 0.0;
-            gatherTotalsBySourceBEPS = 0.0;
-            gatherTotalsSource = 0.0;
-            gatherTotalsBySource = 0.0;
-            gatherEndUseBEPS = 0.0;
-            gatherEndUseBySourceBEPS = 0.0;
+            state.dataOutRptTab->gatherTotalsBEPS = 0.0;
+            state.dataOutRptTab->gatherTotalsBySourceBEPS = 0.0;
+            state.dataOutRptTab->gatherTotalsSource = 0.0;
+            state.dataOutRptTab->gatherTotalsBySource = 0.0;
+            state.dataOutRptTab->gatherEndUseBEPS = 0.0;
+            state.dataOutRptTab->gatherEndUseBySourceBEPS = 0.0;
             // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-            gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
-            gatherEndUseSubBEPS = 0.0;
-            gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
-            gatherDemandEndUseSub = 0.0;
-            gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
-            gatherDemandIndEndUseSub = 0.0;
+            state.dataOutRptTab->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            state.dataOutRptTab->gatherEndUseSubBEPS = 0.0;
+            state.dataOutRptTab->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            state.dataOutRptTab->gatherDemandEndUseSub = 0.0;
+            state.dataOutRptTab->gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            state.dataOutRptTab->gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
             meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
@@ -3162,161 +3084,161 @@ namespace EnergyPlus::OutputReportTabular {
         GetFuelFactorInfo(state, "NaturalGas", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorNaturalGas = curSourceFactor;
-            fuelfactorsused(2) = true;
-            ffUsed(2) = true;
+            state.dataOutRptTab->fuelfactorsused(2) = true;
+            state.dataOutRptTab->ffUsed(2) = true;
         }
-        SourceFactors(2) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(2) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(2) = true;
-            ffSchedIndex(2) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(2) = true;
+            state.dataOutRptTab->ffSchedIndex(2) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
-            fuelfactorsused(7) = true;
-            ffUsed(11) = true;
+            state.dataOutRptTab->fuelfactorsused(7) = true;
+            state.dataOutRptTab->ffUsed(11) = true;
         }
-        SourceFactors(11) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(11) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(11) = true;
-            ffSchedIndex(11) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(11) = true;
+            state.dataOutRptTab->ffSchedIndex(11) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
-            fuelfactorsused(6) = true;
-            ffUsed(10) = true;
+            state.dataOutRptTab->fuelfactorsused(6) = true;
+            state.dataOutRptTab->ffUsed(10) = true;
         }
-        SourceFactors(10) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(10) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(10) = true;
-            ffSchedIndex(10) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(10) = true;
+            state.dataOutRptTab->ffSchedIndex(10) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Coal", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorCoal = curSourceFactor;
-            fuelfactorsused(5) = true;
-            ffUsed(9) = true;
+            state.dataOutRptTab->fuelfactorsused(5) = true;
+            state.dataOutRptTab->ffUsed(9) = true;
         }
-        SourceFactors(9) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(9) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(9) = true;
-            ffSchedIndex(9) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(9) = true;
+            state.dataOutRptTab->ffSchedIndex(9) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Electricity", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorElectric = curSourceFactor;
-            fuelfactorsused(1) = true;
-            ffUsed(1) = true;
+            state.dataOutRptTab->fuelfactorsused(1) = true;
+            state.dataOutRptTab->ffUsed(1) = true;
         }
-        SourceFactors(1) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(1) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(1) = true;
-            ffSchedIndex(1) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(1) = true;
+            state.dataOutRptTab->ffSchedIndex(1) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Gasoline", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorGasoline = curSourceFactor;
-            fuelfactorsused(3) = true;
-            ffUsed(6) = true;
+            state.dataOutRptTab->fuelfactorsused(3) = true;
+            state.dataOutRptTab->ffUsed(6) = true;
         }
-        SourceFactors(6) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(6) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(6) = true;
-            ffSchedIndex(6) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(6) = true;
+            state.dataOutRptTab->ffSchedIndex(6) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Propane", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorPropane = curSourceFactor;
-            fuelfactorsused(8) = true;
-            ffUsed(12) = true;
+            state.dataOutRptTab->fuelfactorsused(8) = true;
+            state.dataOutRptTab->ffUsed(12) = true;
         }
-        SourceFactors(12) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(12) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(12) = true;
-            ffSchedIndex(12) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(12) = true;
+            state.dataOutRptTab->ffSchedIndex(12) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Diesel", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorDiesel = curSourceFactor;
-            fuelfactorsused(4) = true;
-            ffUsed(8) = true;
+            state.dataOutRptTab->fuelfactorsused(4) = true;
+            state.dataOutRptTab->ffUsed(8) = true;
         }
-        SourceFactors(8) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(8) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(8) = true;
-            ffSchedIndex(8) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(8) = true;
+            state.dataOutRptTab->ffSchedIndex(8) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "DistrictCooling", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            ffUsed(3) = true;
+            state.dataOutRptTab->ffUsed(3) = true;
         }
-        SourceFactors(3) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(3) = curSourceFactor;
         if (fFScheduleUsed) {
-            ffSchedUsed(3) = true;
-            ffSchedIndex(3) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(3) = true;
+            state.dataOutRptTab->ffSchedIndex(3) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "DistrictHeating", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            ffUsed(4) = true;
+            state.dataOutRptTab->ffUsed(4) = true;
         }
-        SourceFactors(4) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(4) = curSourceFactor;
         if (fFScheduleUsed) {
-            ffSchedUsed(4) = true;
-            ffSchedIndex(4) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(4) = true;
+            state.dataOutRptTab->ffSchedIndex(4) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            ffUsed(5) = true;
+            state.dataOutRptTab->ffUsed(5) = true;
         }
-        SourceFactors(5) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(5) = curSourceFactor;
         if (fFScheduleUsed) {
-            ffSchedUsed(5) = true;
-            ffSchedIndex(5) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(5) = true;
+            state.dataOutRptTab->ffSchedIndex(5) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "OtherFuel1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorOtherFuel1 = curSourceFactor;
-            fuelfactorsused(11) = true; // should be source number
-            ffUsed(13) = true;
+            state.dataOutRptTab->fuelfactorsused(11) = true; // should be source number
+            state.dataOutRptTab->ffUsed(13) = true;
         }
-        SourceFactors(13) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(13) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(13) = true;
-            ffSchedIndex(13) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(13) = true;
+            state.dataOutRptTab->ffSchedIndex(13) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "OtherFuel2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorOtherFuel2 = curSourceFactor;
-            fuelfactorsused(12) = true; // should be source number
-            ffUsed(14) = true;
+            state.dataOutRptTab->fuelfactorsused(12) = true; // should be source number
+            state.dataOutRptTab->ffUsed(14) = true;
         }
-        SourceFactors(14) = curSourceFactor;
+        state.dataOutRptTab->SourceFactors(14) = curSourceFactor;
         if (fFScheduleUsed) {
             fuelFactorSchedulesUsed = true;
-            ffSchedUsed(14) = true;
-            ffSchedIndex(14) = ffScheduleIndex;
+            state.dataOutRptTab->ffSchedUsed(14) = true;
+            state.dataOutRptTab->ffSchedIndex(14) = ffScheduleIndex;
         }
 
         GetEnvironmentalImpactFactorInfo(state, efficiencyDistrictHeating, efficiencyDistrictCooling, sourceFactorSteam);
@@ -4285,23 +4207,23 @@ namespace EnergyPlus::OutputReportTabular {
 
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-                curMeterNumber = meterNumTotalsBEPS(iResource);
+                curMeterNumber = state.dataOutRptTab->meterNumTotalsBEPS(iResource);
                 if (curMeterNumber > 0) {
                     curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                    gatherTotalsBEPS(iResource) += curMeterValue;
+                    state.dataOutRptTab->gatherTotalsBEPS(iResource) += curMeterValue;
                 }
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
+                    curMeterNumber = state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                        gatherEndUseBEPS(iResource, jEndUse) += curMeterValue;
+                        state.dataOutRptTab->gatherEndUseBEPS(iResource, jEndUse) += curMeterValue;
 
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
+                            curMeterNumber = state.dataOutRptTab->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                             if (curMeterNumber > 0) {
                                 curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                                gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curMeterValue;
+                                state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curMeterValue;
                             }
                         }
                     }
@@ -4309,10 +4231,10 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-                curMeterNumber = meterNumTotalsSource(iResource);
+                curMeterNumber = state.dataOutRptTab->meterNumTotalsSource(iResource);
                 if (curMeterNumber > 0) {
                     curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                    gatherTotalsSource(iResource) += curMeterValue;
+                    state.dataOutRptTab->gatherTotalsSource(iResource) += curMeterValue;
                 }
             }
 
@@ -4433,34 +4355,34 @@ namespace EnergyPlus::OutputReportTabular {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
 
-                if (ffSchedUsed(iResource)) {
-                    curMeterNumber = meterNumTotalsBEPS(iResource);
+                if (state.dataOutRptTab->ffSchedUsed(iResource)) {
+                    curMeterNumber = state.dataOutRptTab->meterNumTotalsBEPS(iResource);
                     if (curMeterNumber > 0) {
                         curMeterValue =
-                            GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
-                        gatherTotalsBySourceBEPS(iResource) += curMeterValue;
+                            GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, state.dataOutRptTab->ffSchedIndex(iResource)) * state.dataOutRptTab->SourceFactors(iResource);
+                        state.dataOutRptTab->gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                     }
                 } else {
-                    curMeterNumber = meterNumTotalsBEPS(iResource);
+                    curMeterNumber = state.dataOutRptTab->meterNumTotalsBEPS(iResource);
                     if (curMeterNumber > 0) {
-                        curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * SourceFactors(iResource);
-                        gatherTotalsBySourceBEPS(iResource) += curMeterValue;
+                        curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * state.dataOutRptTab->SourceFactors(iResource);
+                        state.dataOutRptTab->gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                     }
                 }
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (ffSchedUsed(iResource)) {
-                        curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
+                    if (state.dataOutRptTab->ffSchedUsed(iResource)) {
+                        curMeterNumber = state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
                             curMeterValue =
-                                GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
-                            gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
+                                GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, state.dataOutRptTab->ffSchedIndex(iResource)) * state.dataOutRptTab->SourceFactors(iResource);
+                            state.dataOutRptTab->gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                         }
                     } else {
-                        curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
+                        curMeterNumber = state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
-                            curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * SourceFactors(iResource);
-                            gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
+                            curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * state.dataOutRptTab->SourceFactors(iResource);
+                            state.dataOutRptTab->gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                         }
                     }
                 }
@@ -4553,29 +4475,29 @@ namespace EnergyPlus::OutputReportTabular {
         if ((state.dataOutRptTab->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-                curMeterNumber = meterNumTotalsBEPS(iResource);
+                curMeterNumber = state.dataOutRptTab->meterNumTotalsBEPS(iResource);
                 if (curMeterNumber > 0) {
                     curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                     // check if current value is greater than existing peak demand value
-                    if (curDemandValue > gatherDemandTotal(iResource)) {
-                        gatherDemandTotal(iResource) = curDemandValue;
+                    if (curDemandValue > state.dataOutRptTab->gatherDemandTotal(iResource)) {
+                        state.dataOutRptTab->gatherDemandTotal(iResource) = curDemandValue;
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                         minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
                         EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
-                        gatherDemandTimeStamp(iResource) = timestepTimeStamp;
+                        state.dataOutRptTab->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
                         for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                            curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
+                            curMeterNumber = state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse);
                             if (curMeterNumber > 0) {
                                 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
-                                gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
+                                state.dataOutRptTab->gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
                                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                                    curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
+                                    curMeterNumber = state.dataOutRptTab->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                                     if (curMeterNumber > 0) {
                                         curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
-                                        gatherDemandEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
+                                        state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
                                     }
                                 }
                             }
@@ -4590,19 +4512,19 @@ namespace EnergyPlus::OutputReportTabular {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
+                    curMeterNumber = state.dataOutRptTab->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
                         curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
-                        if (curDemandValue > gatherDemandIndEndUse(iResource, jEndUse)) {
-                            gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
+                        if (curDemandValue > state.dataOutRptTab->gatherDemandIndEndUse(iResource, jEndUse)) {
+                            state.dataOutRptTab->gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
                         }
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
+                            curMeterNumber = state.dataOutRptTab->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                             if (curMeterNumber > 0) {
                                 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                 // check if current value is greater than existing peak demand value
-                                if (curDemandValue > gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource)) {
-                                    gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
+                                if (curDemandValue > state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource)) {
+                                    state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
                                 }
                             }
                         }
@@ -7344,35 +7266,35 @@ namespace EnergyPlus::OutputReportTabular {
             DetermineBuildingFloorArea(state);
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = gatherEndUseBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = gatherEndUseBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = gatherEndUseBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = gatherEndUseBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = gatherEndUseBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = gatherEndUseBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = gatherEndUseBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = gatherEndUseBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = gatherEndUseBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = gatherEndUseBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = gatherEndUseBEPS(3, jEndUse);  // district cooling <- purchased cooling
+                collapsedEndUse(1, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(1, jEndUse);   // electricity
+                collapsedEndUse(2, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(2, jEndUse);   // natural gas
+                collapsedEndUse(3, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(6, jEndUse);   // gasoline
+                collapsedEndUse(4, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(8, jEndUse);   // diesel
+                collapsedEndUse(5, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(9, jEndUse);   // coal
+                collapsedEndUse(6, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(10, jEndUse);  // Fuel Oil No1
+                collapsedEndUse(7, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(11, jEndUse);  // Fuel Oil No2
+                collapsedEndUse(8, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(12, jEndUse);  // propane
+                collapsedEndUse(9, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(13, jEndUse);  // otherfuel1
+                collapsedEndUse(10, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(14, jEndUse); // otherfuel2
+                collapsedEndUse(11, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(3, jEndUse);  // district cooling <- purchased cooling
                 collapsedEndUse(12, jEndUse) =
-                    gatherEndUseBEPS(4, jEndUse) + gatherEndUseBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
-                collapsedEndUse(13, jEndUse) = gatherEndUseBEPS(7, jEndUse);     // water
+                    state.dataOutRptTab->gatherEndUseBEPS(4, jEndUse) + state.dataOutRptTab->gatherEndUseBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
+                collapsedEndUse(13, jEndUse) = state.dataOutRptTab->gatherEndUseBEPS(7, jEndUse);     // water
             }
             // repeat with totals
-            collapsedTotal(1) = gatherTotalsBEPS(1);                        // electricity
-            collapsedTotal(2) = gatherTotalsBEPS(2);                        // natural gas
-            collapsedTotal(3) = gatherTotalsBEPS(6);                        // gasoline
-            collapsedTotal(4) = gatherTotalsBEPS(8);                        // diesel
-            collapsedTotal(5) = gatherTotalsBEPS(9);                        // coal
-            collapsedTotal(6) = gatherTotalsBEPS(10);                       // Fuel Oil No1
-            collapsedTotal(7) = gatherTotalsBEPS(11);                       // Fuel Oil No2
-            collapsedTotal(8) = gatherTotalsBEPS(12);                       // propane
-            collapsedTotal(9) = gatherTotalsBEPS(13);                       // other fuel 1
-            collapsedTotal(10) = gatherTotalsBEPS(14);                      // other fuel 2
-            collapsedTotal(11) = gatherTotalsBEPS(3);                       // district cooling <- purchased cooling
-            collapsedTotal(12) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
-            collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
+            collapsedTotal(1) = state.dataOutRptTab->gatherTotalsBEPS(1);                        // electricity
+            collapsedTotal(2) = state.dataOutRptTab->gatherTotalsBEPS(2);                        // natural gas
+            collapsedTotal(3) = state.dataOutRptTab->gatherTotalsBEPS(6);                        // gasoline
+            collapsedTotal(4) = state.dataOutRptTab->gatherTotalsBEPS(8);                        // diesel
+            collapsedTotal(5) = state.dataOutRptTab->gatherTotalsBEPS(9);                        // coal
+            collapsedTotal(6) = state.dataOutRptTab->gatherTotalsBEPS(10);                       // Fuel Oil No1
+            collapsedTotal(7) = state.dataOutRptTab->gatherTotalsBEPS(11);                       // Fuel Oil No2
+            collapsedTotal(8) = state.dataOutRptTab->gatherTotalsBEPS(12);                       // propane
+            collapsedTotal(9) = state.dataOutRptTab->gatherTotalsBEPS(13);                       // other fuel 1
+            collapsedTotal(10) = state.dataOutRptTab->gatherTotalsBEPS(14);                      // other fuel 2
+            collapsedTotal(11) = state.dataOutRptTab->gatherTotalsBEPS(3);                       // district cooling <- purchased cooling
+            collapsedTotal(12) = state.dataOutRptTab->gatherTotalsBEPS(4) + state.dataOutRptTab->gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
+            collapsedTotal(13) = state.dataOutRptTab->gatherTotalsBEPS(7);                       // water
 
             if (state.dataGlobal->createPerfLog) {
                 UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
@@ -7401,21 +7323,21 @@ namespace EnergyPlus::OutputReportTabular {
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8);   // diesel
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // Fuel Oil No1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // Fuel Oil No2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 12);  // propane
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 13);  // otherfuel1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 14); // otherfuel2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 3);  // district cooling <- purch cooling
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8);   // diesel
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 9);   // coal
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // Fuel Oil No1
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // Fuel Oil No2
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 12);  // propane
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 13);  // otherfuel1
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 14); // otherfuel2
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 3);  // district cooling <- purch cooling
                     collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
-                        gatherEndUseSubBEPS(kEndUseSub, jEndUse, 4) +
-                        gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
+                        state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 4) +
+                        state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = state.dataOutRptTab->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
                 }
             }
 
@@ -7530,18 +7452,18 @@ namespace EnergyPlus::OutputReportTabular {
             // previously these variables were converted into GJ so now we don't need
             // to do any conversion
             // water is not included   gatherTotalsBEPS(7)    !water
-            totalSiteEnergyUse = (gatherTotalsBEPS(1) + gatherTotalsBEPS(2) + gatherTotalsBEPS(3) + gatherTotalsBEPS(4) + gatherTotalsBEPS(5) +
-                                  gatherTotalsBEPS(6) + gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) + gatherTotalsBEPS(11) +
-                                  gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
+            totalSiteEnergyUse = (state.dataOutRptTab->gatherTotalsBEPS(1) + state.dataOutRptTab->gatherTotalsBEPS(2) + state.dataOutRptTab->gatherTotalsBEPS(3) + state.dataOutRptTab->gatherTotalsBEPS(4) + state.dataOutRptTab->gatherTotalsBEPS(5) +
+                                  state.dataOutRptTab->gatherTotalsBEPS(6) + state.dataOutRptTab->gatherTotalsBEPS(8) + state.dataOutRptTab->gatherTotalsBEPS(9) + state.dataOutRptTab->gatherTotalsBEPS(10) + state.dataOutRptTab->gatherTotalsBEPS(11) +
+                                  state.dataOutRptTab->gatherTotalsBEPS(12) + state.dataOutRptTab->gatherTotalsBEPS(13) + state.dataOutRptTab->gatherTotalsBEPS(14)) /
                                  largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline | diesel
                                                         // | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
             netElecPurchasedSold = gatherElecPurchased - gatherElecSurplusSold;
 
             // water is not included   gatherTotalsBEPS(7)    !water
-            netSiteEnergyUse = netElecPurchasedSold + (gatherTotalsBEPS(2) + gatherTotalsBEPS(3) + gatherTotalsBEPS(4) + gatherTotalsBEPS(5) +
-                                                       gatherTotalsBEPS(6) + gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) +
-                                                       gatherTotalsBEPS(11) + gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
+            netSiteEnergyUse = netElecPurchasedSold + (state.dataOutRptTab->gatherTotalsBEPS(2) + state.dataOutRptTab->gatherTotalsBEPS(3) + state.dataOutRptTab->gatherTotalsBEPS(4) + state.dataOutRptTab->gatherTotalsBEPS(5) +
+                                                       state.dataOutRptTab->gatherTotalsBEPS(6) + state.dataOutRptTab->gatherTotalsBEPS(8) + state.dataOutRptTab->gatherTotalsBEPS(9) + state.dataOutRptTab->gatherTotalsBEPS(10) +
+                                                       state.dataOutRptTab->gatherTotalsBEPS(11) + state.dataOutRptTab->gatherTotalsBEPS(12) + state.dataOutRptTab->gatherTotalsBEPS(13) + state.dataOutRptTab->gatherTotalsBEPS(14)) /
                                                           largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
                                                                                  // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
                                                                                  // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
@@ -7552,138 +7474,138 @@ namespace EnergyPlus::OutputReportTabular {
             // source emissions already have the source factors included in the calcs.
             totalSourceEnergyUse = 0.0;
             //  electricity
-            if (fuelfactorsused(1)) {
-                totalSourceEnergyUse += gatherTotalsSource(1);
+            if (state.dataOutRptTab->fuelfactorsused(1)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(1);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(1) * sourceFactorElectric;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(1) * sourceFactorElectric;
             }
             //  natural gas
-            if (fuelfactorsused(2)) {
-                totalSourceEnergyUse += gatherTotalsSource(2);
+            if (state.dataOutRptTab->fuelfactorsused(2)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(2);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(2) * sourceFactorNaturalGas;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * sourceFactorNaturalGas;
             }
             // gasoline
-            if (fuelfactorsused(3)) {
-                totalSourceEnergyUse += gatherTotalsSource(3);
+            if (state.dataOutRptTab->fuelfactorsused(3)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(3);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(6) * sourceFactorGasoline;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * sourceFactorGasoline;
             }
             // diesel
-            if (fuelfactorsused(4)) {
-                totalSourceEnergyUse += gatherTotalsSource(4);
+            if (state.dataOutRptTab->fuelfactorsused(4)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(4);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(8) * sourceFactorDiesel;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * sourceFactorDiesel;
             }
             // coal
-            if (fuelfactorsused(5)) {
-                totalSourceEnergyUse += gatherTotalsSource(5);
+            if (state.dataOutRptTab->fuelfactorsused(5)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(5);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(9) * sourceFactorCoal;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * sourceFactorCoal;
             }
             // Fuel Oil No1
-            if (fuelfactorsused(6)) {
-                totalSourceEnergyUse += gatherTotalsSource(6);
+            if (state.dataOutRptTab->fuelfactorsused(6)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(6);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(10) * sourceFactorFuelOil1;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * sourceFactorFuelOil1;
             }
             // Fuel Oil No2
-            if (fuelfactorsused(7)) {
-                totalSourceEnergyUse += gatherTotalsSource(7);
+            if (state.dataOutRptTab->fuelfactorsused(7)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(7);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(11) * sourceFactorFuelOil2;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * sourceFactorFuelOil2;
             }
             // propane
-            if (fuelfactorsused(8)) {
-                totalSourceEnergyUse += gatherTotalsSource(8);
+            if (state.dataOutRptTab->fuelfactorsused(8)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(8);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(12) * sourceFactorPropane;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * sourceFactorPropane;
             }
             // otherfuel1
-            if (fuelfactorsused(11)) {
-                totalSourceEnergyUse += gatherTotalsSource(11);
+            if (state.dataOutRptTab->fuelfactorsused(11)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(11);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
             }
             // otherfuel2
-            if (fuelfactorsused(12)) {
-                totalSourceEnergyUse += gatherTotalsSource(12);
+            if (state.dataOutRptTab->fuelfactorsused(12)) {
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(12);
             } else {
-                totalSourceEnergyUse += gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
             }
 
             totalSourceEnergyUse =
-                (totalSourceEnergyUse + gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
-                 gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + gatherTotalsBEPS(5) * sourceFactorSteam) /
+                (totalSourceEnergyUse + state.dataOutRptTab->gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
+                 state.dataOutRptTab->gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * sourceFactorSteam) /
                 largeConversionFactor; // district cooling | district heating | steam
 
             // now determine "net" source from purchased and surplus sold (still in J)
 
-            if (fuelfactorsused(1)) {
-                netSourceElecPurchasedSold = gatherTotalsSource(9) - gatherTotalsSource(10);
+            if (state.dataOutRptTab->fuelfactorsused(1)) {
+                netSourceElecPurchasedSold = state.dataOutRptTab->gatherTotalsSource(9) - state.dataOutRptTab->gatherTotalsSource(10);
             } else {
                 netSourceElecPurchasedSold = netElecPurchasedSold * sourceFactorElectric * largeConversionFactor; // back to J
             }
 
             netSourceEnergyUse = 0.0;
             //  natural gas
-            if (fuelfactorsused(2)) {
-                netSourceEnergyUse += gatherTotalsSource(2);
+            if (state.dataOutRptTab->fuelfactorsused(2)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(2);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(2) * sourceFactorNaturalGas;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * sourceFactorNaturalGas;
             }
             // gasoline
-            if (fuelfactorsused(3)) {
-                netSourceEnergyUse += gatherTotalsSource(3);
+            if (state.dataOutRptTab->fuelfactorsused(3)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(3);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(6) * sourceFactorGasoline;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * sourceFactorGasoline;
             }
             // diesel
-            if (fuelfactorsused(4)) {
-                netSourceEnergyUse += gatherTotalsSource(4);
+            if (state.dataOutRptTab->fuelfactorsused(4)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(4);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(8) * sourceFactorDiesel;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * sourceFactorDiesel;
             }
             // coal
-            if (fuelfactorsused(5)) {
-                netSourceEnergyUse += gatherTotalsSource(5);
+            if (state.dataOutRptTab->fuelfactorsused(5)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(5);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(9) * sourceFactorCoal;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * sourceFactorCoal;
             }
             // Fuel Oil No1
-            if (fuelfactorsused(6)) {
-                netSourceEnergyUse += gatherTotalsSource(6);
+            if (state.dataOutRptTab->fuelfactorsused(6)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(6);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(10) * sourceFactorFuelOil1;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * sourceFactorFuelOil1;
             }
             // Fuel Oil No2
-            if (fuelfactorsused(7)) {
-                netSourceEnergyUse += gatherTotalsSource(7);
+            if (state.dataOutRptTab->fuelfactorsused(7)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(7);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(11) * sourceFactorFuelOil2;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * sourceFactorFuelOil2;
             }
             // propane
-            if (fuelfactorsused(8)) {
-                netSourceEnergyUse += gatherTotalsSource(8);
+            if (state.dataOutRptTab->fuelfactorsused(8)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(8);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(12) * sourceFactorPropane;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * sourceFactorPropane;
             }
             // otherfuel1
-            if (fuelfactorsused(11)) {
-                netSourceEnergyUse += gatherTotalsSource(11);
+            if (state.dataOutRptTab->fuelfactorsused(11)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(11);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
             }
             // otherfuel2
-            if (fuelfactorsused(12)) {
-                netSourceEnergyUse += gatherTotalsSource(12);
+            if (state.dataOutRptTab->fuelfactorsused(12)) {
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(12);
             } else {
-                netSourceEnergyUse += gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
             }
 
             netSourceEnergyUse =
-                (netSourceEnergyUse + netSourceElecPurchasedSold + gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
-                 gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + gatherTotalsBEPS(5) * sourceFactorSteam) /
+                (netSourceEnergyUse + netSourceElecPurchasedSold + state.dataOutRptTab->gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
+                 state.dataOutRptTab->gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * sourceFactorSteam) /
                 largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
 
             // show annual values
@@ -7760,20 +7682,20 @@ namespace EnergyPlus::OutputReportTabular {
             //  tableBody(10,1) = TRIM(RealToStr(sourceFactorFuelOil2 ,3))
             //  tableBody(11,1) = TRIM(RealToStr(sourceFactorPropane ,3))
 
-            if (!ffSchedUsed(1)) {
+            if (!state.dataOutRptTab->ffSchedUsed(1)) {
                 tableBody(1, 1) = RealToStr(sourceFactorElectric, 3);
-            } else if (gatherTotalsBEPS(1) > SmallValue) {
-                tableBody(1, 1) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(1) / gatherTotalsBEPS(1), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(1)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(1) > SmallValue) {
+                tableBody(1, 1) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(1) / state.dataOutRptTab->gatherTotalsBEPS(1), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(1)) + "\")";
             } else {
                 tableBody(1, 1) = "N/A";
             }
 
-            if (!ffSchedUsed(2)) {
+            if (!state.dataOutRptTab->ffSchedUsed(2)) {
                 tableBody(1, 2) = RealToStr(sourceFactorNaturalGas, 3);
-            } else if (gatherTotalsBEPS(2) > SmallValue) {
-                tableBody(1, 2) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(2) / gatherTotalsBEPS(2), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(2)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(2) > SmallValue) {
+                tableBody(1, 2) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(2) / state.dataOutRptTab->gatherTotalsBEPS(2), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(2)) + "\")";
             } else {
                 tableBody(1, 2) = "N/A";
             }
@@ -7784,74 +7706,74 @@ namespace EnergyPlus::OutputReportTabular {
 
             tableBody(1, 5) = RealToStr(sourceFactorSteam, 3); // Steam
 
-            if (!ffSchedUsed(6)) {
+            if (!state.dataOutRptTab->ffSchedUsed(6)) {
                 tableBody(1, 6) = RealToStr(sourceFactorGasoline, 3);
-            } else if (gatherTotalsBEPS(6) > SmallValue) {
-                tableBody(1, 6) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(6) / gatherTotalsBEPS(6), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(6)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(6) > SmallValue) {
+                tableBody(1, 6) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(6) / state.dataOutRptTab->gatherTotalsBEPS(6), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(6)) + "\")";
             } else {
                 tableBody(1, 6) = "N/A";
             }
 
-            if (!ffSchedUsed(8)) {
+            if (!state.dataOutRptTab->ffSchedUsed(8)) {
                 tableBody(1, 7) = RealToStr(sourceFactorDiesel, 3);
-            } else if (gatherTotalsBEPS(8) > SmallValue) {
-                tableBody(1, 7) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(8) / gatherTotalsBEPS(8), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(8)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(8) > SmallValue) {
+                tableBody(1, 7) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(8) / state.dataOutRptTab->gatherTotalsBEPS(8), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(8)) + "\")";
             } else {
                 tableBody(1, 7) = "N/A";
             }
 
-            if (!ffSchedUsed(9)) {
+            if (!state.dataOutRptTab->ffSchedUsed(9)) {
                 tableBody(1, 8) = RealToStr(sourceFactorCoal, 3);
-            } else if (gatherTotalsBEPS(9) > SmallValue) {
-                tableBody(1, 8) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(9) / gatherTotalsBEPS(9), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(9)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(9) > SmallValue) {
+                tableBody(1, 8) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(9) / state.dataOutRptTab->gatherTotalsBEPS(9), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(9)) + "\")";
             } else {
                 tableBody(1, 8) = "N/A";
             }
 
-            if (!ffSchedUsed(10)) {
+            if (!state.dataOutRptTab->ffSchedUsed(10)) {
                 tableBody(1, 9) = RealToStr(sourceFactorFuelOil1, 3);
-            } else if (gatherTotalsBEPS(10) > SmallValue) {
-                tableBody(1, 9) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(10) / gatherTotalsBEPS(10), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(10)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(10) > SmallValue) {
+                tableBody(1, 9) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(10) / state.dataOutRptTab->gatherTotalsBEPS(10), 3) +
+                                  " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(10)) + "\")";
             } else {
                 tableBody(1, 9) = "N/A";
             }
 
-            if (!ffSchedUsed(11)) {
+            if (!state.dataOutRptTab->ffSchedUsed(11)) {
                 tableBody(1, 10) = RealToStr(sourceFactorFuelOil2, 3);
-            } else if (gatherTotalsBEPS(11) > SmallValue) {
-                tableBody(1, 10) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(11) / gatherTotalsBEPS(11), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(11)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(11) > SmallValue) {
+                tableBody(1, 10) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(11) / state.dataOutRptTab->gatherTotalsBEPS(11), 3) +
+                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(11)) + "\")";
             } else {
                 tableBody(1, 10) = "N/A";
             }
 
-            if (!ffSchedUsed(12)) {
+            if (!state.dataOutRptTab->ffSchedUsed(12)) {
                 tableBody(1, 11) = RealToStr(sourceFactorPropane, 3);
-            } else if (gatherTotalsBEPS(12) > SmallValue) {
-                tableBody(1, 11) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(12) / gatherTotalsBEPS(12), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(12)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(12) > SmallValue) {
+                tableBody(1, 11) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(12) / state.dataOutRptTab->gatherTotalsBEPS(12), 3) +
+                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(12)) + "\")";
             } else {
                 tableBody(1, 11) = "N/A";
             }
 
-            if (!ffSchedUsed(13)) {
+            if (!state.dataOutRptTab->ffSchedUsed(13)) {
                 tableBody(1, 12) = RealToStr(sourceFactorOtherFuel1, 3);
-            } else if (gatherTotalsBEPS(13) > SmallValue) {
-                tableBody(1, 12) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(13) / gatherTotalsBEPS(13), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(13)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(13) > SmallValue) {
+                tableBody(1, 12) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(13) / state.dataOutRptTab->gatherTotalsBEPS(13), 3) +
+                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(13)) + "\")";
             } else {
                 tableBody(1, 12) = "N/A";
             }
 
-            if (!ffSchedUsed(14)) {
+            if (!state.dataOutRptTab->ffSchedUsed(14)) {
                 tableBody(1, 13) = RealToStr(sourceFactorOtherFuel2, 3);
-            } else if (gatherTotalsBEPS(14) > SmallValue) {
-                tableBody(1, 13) = "Effective Factor = " + RealToStr(gatherTotalsBySourceBEPS(14) / gatherTotalsBEPS(14), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ffSchedIndex(14)) + "\")";
+            } else if (state.dataOutRptTab->gatherTotalsBEPS(14) > SmallValue) {
+                tableBody(1, 13) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(14) / state.dataOutRptTab->gatherTotalsBEPS(14), 3) +
+                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(14)) + "\")";
             } else {
                 tableBody(1, 13) = "N/A";
             }
@@ -8185,7 +8107,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             // determine if subcategories add up to the total and
             // if not, determine the difference for the 'other' row
-            needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
+            state.dataOutRptTab->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
@@ -8197,7 +8119,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                         // if just a small value remains set it to zero
                         if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
-                            needOtherRowLEED45(jEndUse) = true;
+                            state.dataOutRptTab->needOtherRowLEED45(jEndUse) = true;
                         } else {
                             endUseSubOther(iResource, jEndUse) = 0.0;
                         }
@@ -8215,7 +8137,7 @@ namespace EnergyPlus::OutputReportTabular {
                         ++numRows;
                     }
                     // check if an 'other' row is needed
-                    if (needOtherRowLEED45(jEndUse)) {
+                    if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                         ++numRows;
                     }
                 } else {
@@ -8241,7 +8163,7 @@ namespace EnergyPlus::OutputReportTabular {
                         ++i;
                     }
                     // check if an 'other' row is needed
-                    if (needOtherRowLEED45(jEndUse)) {
+                    if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                         tableBody(1, i) = "Other";
                         ++i;
                     }
@@ -8309,7 +8231,7 @@ namespace EnergyPlus::OutputReportTabular {
                             ++i;
                         }
                         // put other
-                        if (needOtherRowLEED45(jEndUse)) {
+                        if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                             tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
                             ++i;
                         }
@@ -8388,7 +8310,7 @@ namespace EnergyPlus::OutputReportTabular {
                             ++i;
                         }
                         // put other
-                        if (needOtherRowLEED45(jEndUse)) {
+                        if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state, resource_entry_map(iResource),
                                              state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
                                              unconvert * endUseSubOther(iResource, jEndUse));
@@ -8956,35 +8878,35 @@ namespace EnergyPlus::OutputReportTabular {
             DetermineBuildingFloorArea(state);
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = gatherEndUseBySourceBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = gatherEndUseBySourceBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
+                collapsedEndUse(1, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
+                collapsedEndUse(2, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
+                collapsedEndUse(3, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
+                collapsedEndUse(4, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
+                collapsedEndUse(5, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
+                collapsedEndUse(6, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
+                collapsedEndUse(7, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
+                collapsedEndUse(8, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
+                collapsedEndUse(9, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
+                collapsedEndUse(10, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
+                collapsedEndUse(11, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
                 collapsedEndUse(12, jEndUse) =
-                    gatherEndUseBySourceBEPS(4, jEndUse) + gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
-                collapsedEndUse(13, jEndUse) = gatherEndUseBySourceBEPS(7, jEndUse);             // water
+                    state.dataOutRptTab->gatherEndUseBySourceBEPS(4, jEndUse) + state.dataOutRptTab->gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
+                collapsedEndUse(13, jEndUse) = state.dataOutRptTab->gatherEndUseBySourceBEPS(7, jEndUse);             // water
             }
             // repeat with totals
-            collapsedTotal(1) = gatherTotalsBySourceBEPS(1);                                // electricity
-            collapsedTotal(2) = gatherTotalsBySourceBEPS(2);                                // natural gas
-            collapsedTotal(3) = gatherTotalsBySourceBEPS(6);                                // gasoline
-            collapsedTotal(4) = gatherTotalsBySourceBEPS(8);                                // diesel
-            collapsedTotal(5) = gatherTotalsBySourceBEPS(9);                                // coal
-            collapsedTotal(6) = gatherTotalsBySourceBEPS(10);                               // Fuel Oil No1
-            collapsedTotal(7) = gatherTotalsBySourceBEPS(11);                               // Fuel Oil No2
-            collapsedTotal(8) = gatherTotalsBySourceBEPS(12);                               // propane
-            collapsedTotal(9) = gatherTotalsBySourceBEPS(13);                               // otherfuel1
-            collapsedTotal(10) = gatherTotalsBySourceBEPS(14);                              // otherfuel2
-            collapsedTotal(11) = gatherTotalsBySourceBEPS(3);                               // district cooling <- purchased cooling
-            collapsedTotal(12) = gatherTotalsBySourceBEPS(4) + gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
-            collapsedTotal(13) = gatherTotalsBySourceBEPS(7);                               // water
+            collapsedTotal(1) = state.dataOutRptTab->gatherTotalsBySourceBEPS(1);                                // electricity
+            collapsedTotal(2) = state.dataOutRptTab->gatherTotalsBySourceBEPS(2);                                // natural gas
+            collapsedTotal(3) = state.dataOutRptTab->gatherTotalsBySourceBEPS(6);                                // gasoline
+            collapsedTotal(4) = state.dataOutRptTab->gatherTotalsBySourceBEPS(8);                                // diesel
+            collapsedTotal(5) = state.dataOutRptTab->gatherTotalsBySourceBEPS(9);                                // coal
+            collapsedTotal(6) = state.dataOutRptTab->gatherTotalsBySourceBEPS(10);                               // Fuel Oil No1
+            collapsedTotal(7) = state.dataOutRptTab->gatherTotalsBySourceBEPS(11);                               // Fuel Oil No2
+            collapsedTotal(8) = state.dataOutRptTab->gatherTotalsBySourceBEPS(12);                               // propane
+            collapsedTotal(9) = state.dataOutRptTab->gatherTotalsBySourceBEPS(13);                               // otherfuel1
+            collapsedTotal(10) = state.dataOutRptTab->gatherTotalsBySourceBEPS(14);                              // otherfuel2
+            collapsedTotal(11) = state.dataOutRptTab->gatherTotalsBySourceBEPS(3);                               // district cooling <- purchased cooling
+            collapsedTotal(12) = state.dataOutRptTab->gatherTotalsBySourceBEPS(4) + state.dataOutRptTab->gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
+            collapsedTotal(13) = state.dataOutRptTab->gatherTotalsBySourceBEPS(7);                               // water
 
             // unit conversion - all values are used as divisors
 
@@ -9301,35 +9223,35 @@ namespace EnergyPlus::OutputReportTabular {
             WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // totals - select which additional fuel to display and which other district heating
             collapsedTotal = 0.0;
-            collapsedTotal(1) = gatherDemandTotal(1); // electricity
-            collapsedTimeStep(1) = gatherDemandTimeStamp(1);
-            collapsedTotal(2) = gatherDemandTotal(2); // natural gas
-            collapsedTimeStep(2) = gatherDemandTimeStamp(2);
-            collapsedTotal(3) = gatherDemandTotal(6); // gasoline
-            collapsedTimeStep(3) = gatherDemandTimeStamp(6);
-            collapsedTotal(4) = gatherDemandTotal(8); // diesel
-            collapsedTimeStep(4) = gatherDemandTimeStamp(8);
-            collapsedTotal(5) = gatherDemandTotal(9); // coal
-            collapsedTimeStep(5) = gatherDemandTimeStamp(9);
-            collapsedTotal(6) = gatherDemandTotal(10); // fuel oil no 1
-            collapsedTimeStep(6) = gatherDemandTimeStamp(10);
-            collapsedTotal(7) = gatherDemandTotal(11); // fuel oil no 2
-            collapsedTimeStep(7) = gatherDemandTimeStamp(11);
-            collapsedTotal(8) = gatherDemandTotal(12); // propane
-            collapsedTimeStep(8) = gatherDemandTimeStamp(12);
-            collapsedTotal(9) = gatherDemandTotal(13); // other fuel 1
-            collapsedTimeStep(9) = gatherDemandTimeStamp(13);
-            collapsedTotal(10) = gatherDemandTotal(14); // other fuel 2
-            collapsedTimeStep(10) = gatherDemandTimeStamp(14);
-            collapsedTotal(11) = gatherDemandTotal(3); // district cooling <- purchased cooling
-            collapsedTimeStep(11) = gatherDemandTimeStamp(3);
-            collapsedTotal(13) = gatherDemandTotal(7); // water
-            collapsedTimeStep(13) = gatherDemandTimeStamp(7);
+            collapsedTotal(1) = state.dataOutRptTab->gatherDemandTotal(1); // electricity
+            collapsedTimeStep(1) = state.dataOutRptTab->gatherDemandTimeStamp(1);
+            collapsedTotal(2) = state.dataOutRptTab->gatherDemandTotal(2); // natural gas
+            collapsedTimeStep(2) = state.dataOutRptTab->gatherDemandTimeStamp(2);
+            collapsedTotal(3) = state.dataOutRptTab->gatherDemandTotal(6); // gasoline
+            collapsedTimeStep(3) = state.dataOutRptTab->gatherDemandTimeStamp(6);
+            collapsedTotal(4) = state.dataOutRptTab->gatherDemandTotal(8); // diesel
+            collapsedTimeStep(4) = state.dataOutRptTab->gatherDemandTimeStamp(8);
+            collapsedTotal(5) = state.dataOutRptTab->gatherDemandTotal(9); // coal
+            collapsedTimeStep(5) = state.dataOutRptTab->gatherDemandTimeStamp(9);
+            collapsedTotal(6) = state.dataOutRptTab->gatherDemandTotal(10); // fuel oil no 1
+            collapsedTimeStep(6) = state.dataOutRptTab->gatherDemandTimeStamp(10);
+            collapsedTotal(7) = state.dataOutRptTab->gatherDemandTotal(11); // fuel oil no 2
+            collapsedTimeStep(7) = state.dataOutRptTab->gatherDemandTimeStamp(11);
+            collapsedTotal(8) = state.dataOutRptTab->gatherDemandTotal(12); // propane
+            collapsedTimeStep(8) = state.dataOutRptTab->gatherDemandTimeStamp(12);
+            collapsedTotal(9) = state.dataOutRptTab->gatherDemandTotal(13); // other fuel 1
+            collapsedTimeStep(9) = state.dataOutRptTab->gatherDemandTimeStamp(13);
+            collapsedTotal(10) = state.dataOutRptTab->gatherDemandTotal(14); // other fuel 2
+            collapsedTimeStep(10) = state.dataOutRptTab->gatherDemandTimeStamp(14);
+            collapsedTotal(11) = state.dataOutRptTab->gatherDemandTotal(3); // district cooling <- purchased cooling
+            collapsedTimeStep(11) = state.dataOutRptTab->gatherDemandTimeStamp(3);
+            collapsedTotal(13) = state.dataOutRptTab->gatherDemandTotal(7); // water
+            collapsedTimeStep(13) = state.dataOutRptTab->gatherDemandTimeStamp(7);
 
             // set flag if both puchased heating and steam both have positive demand
-            bothDistrHeatNonZero = (gatherDemandTotal(4) > 0.0) && (gatherDemandTotal(5) > 0.0);
+            bothDistrHeatNonZero = (state.dataOutRptTab->gatherDemandTotal(4) > 0.0) && (state.dataOutRptTab->gatherDemandTotal(5) > 0.0);
             // select the district heating source that has a larger demand
-            if (gatherDemandTotal(4) > gatherDemandTotal(5)) {
+            if (state.dataOutRptTab->gatherDemandTotal(4) > state.dataOutRptTab->gatherDemandTotal(5)) {
                 distrHeatSelected = 4; // purchased heating
                 if (bothDistrHeatNonZero) {
                     footnote += " Steam has non-zero demand but is not shown on this report.";
@@ -9341,8 +9263,8 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             // set the time of peak demand and total demand for the purchased heating/steam
-            collapsedTimeStep(12) = gatherDemandTimeStamp(distrHeatSelected);
-            collapsedTotal(12) = gatherDemandTotal(distrHeatSelected);
+            collapsedTimeStep(12) = state.dataOutRptTab->gatherDemandTimeStamp(distrHeatSelected);
+            collapsedTotal(12) = state.dataOutRptTab->gatherDemandTotal(distrHeatSelected);
 
             // establish unit conversion factors
             if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
@@ -9356,36 +9278,36 @@ namespace EnergyPlus::OutputReportTabular {
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             collapsedEndUse = 0.0;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
-                collapsedEndUse(2, jEndUse) = gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
-                collapsedEndUse(3, jEndUse) = gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
-                collapsedEndUse(4, jEndUse) = gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
-                collapsedEndUse(5, jEndUse) = gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
-                collapsedEndUse(6, jEndUse) = gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
-                collapsedEndUse(7, jEndUse) = gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
-                collapsedEndUse(8, jEndUse) = gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
-                collapsedEndUse(9, jEndUse) = gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
-                collapsedEndUse(10, jEndUse) = gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
-                collapsedEndUse(11, jEndUse) = gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
-                collapsedEndUse(12, jEndUse) = gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
-                collapsedEndUse(13, jEndUse) = gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
+                collapsedEndUse(1, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
+                collapsedEndUse(2, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
+                collapsedEndUse(3, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
+                collapsedEndUse(4, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
+                collapsedEndUse(5, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
+                collapsedEndUse(6, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
+                collapsedEndUse(7, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
+                collapsedEndUse(8, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
+                collapsedEndUse(9, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
+                collapsedEndUse(10, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
+                collapsedEndUse(11, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
+                collapsedEndUse(12, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
+                collapsedEndUse(13, jEndUse) = state.dataOutRptTab->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion;   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion;  // fuel oil no 1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion;  // fuel oil no 2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion;  // propane
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion;  // otherfuel1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion;  // purch cooling
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion;   // coal
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion;  // fuel oil no 1
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion;  // fuel oil no 2
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion;  // propane
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion;  // otherfuel1
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion;  // purch cooling
                     collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
-                        gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion;                            // district heating
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion;   // water
+                        state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion;                            // district heating
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = state.dataOutRptTab->gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion;   // water
                 }
             }
             // collapse the individual peaks for the end use subcategories for the LEED report
@@ -9393,36 +9315,36 @@ namespace EnergyPlus::OutputReportTabular {
             // no unit conversion, it is done at the reporting stage if necessary
             collapsedIndEndUse = 0.0;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedIndEndUse(1, jEndUse) = gatherDemandIndEndUse(1, jEndUse);                  // electricity
-                collapsedIndEndUse(2, jEndUse) = gatherDemandIndEndUse(2, jEndUse);                  // natural gas
-                collapsedIndEndUse(3, jEndUse) = gatherDemandIndEndUse(6, jEndUse);                  // gasoline
-                collapsedIndEndUse(4, jEndUse) = gatherDemandIndEndUse(8, jEndUse);                  // diesel
-                collapsedIndEndUse(5, jEndUse) = gatherDemandIndEndUse(9, jEndUse);                  // coal
-                collapsedIndEndUse(6, jEndUse) = gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
-                collapsedIndEndUse(7, jEndUse) = gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
-                collapsedIndEndUse(8, jEndUse) = gatherDemandIndEndUse(12, jEndUse);                 // propane
-                collapsedIndEndUse(9, jEndUse) = gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
-                collapsedIndEndUse(10, jEndUse) = gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
-                collapsedIndEndUse(11, jEndUse) = gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
-                collapsedIndEndUse(12, jEndUse) = gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
-                collapsedIndEndUse(13, jEndUse) = gatherDemandIndEndUse(7, jEndUse);                 // water
+                collapsedIndEndUse(1, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(1, jEndUse);                  // electricity
+                collapsedIndEndUse(2, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
+                collapsedIndEndUse(3, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
+                collapsedIndEndUse(4, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(8, jEndUse);                  // diesel
+                collapsedIndEndUse(5, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(9, jEndUse);                  // coal
+                collapsedIndEndUse(6, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
+                collapsedIndEndUse(7, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
+                collapsedIndEndUse(8, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(12, jEndUse);                 // propane
+                collapsedIndEndUse(9, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
+                collapsedIndEndUse(10, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
+                collapsedIndEndUse(11, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
+                collapsedIndEndUse(12, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
+                collapsedIndEndUse(13, jEndUse) = state.dataOutRptTab->gatherDemandIndEndUse(7, jEndUse);                 // water
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 12) =
-                        gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                               // district heating
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7);  // water
+                        state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                               // district heating
+                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = state.dataOutRptTab->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7);  // water
                 }
             }
 
@@ -9678,7 +9600,7 @@ namespace EnergyPlus::OutputReportTabular {
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (needOtherRowLEED45(jEndUse)) {
+                    if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                             endUseSubOther(iResource, jEndUse) =
                                 collapsedIndEndUse(iResource, jEndUse); // often the case that no subcategories are defined
@@ -9722,7 +9644,7 @@ namespace EnergyPlus::OutputReportTabular {
                             ++i;
                         }
                         // put other
-                        if (needOtherRowLEED45(jEndUse)) {
+                        if (state.dataOutRptTab->needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state,
                                 resource_entry_map(iResource), state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
                             ++i;
@@ -15061,9 +14983,9 @@ namespace EnergyPlus::OutputReportTabular {
         ResetMonthlyGathering(state);
         OutputReportTabularAnnual::ResetAnnualGathering();
         ResetBinGathering();
-        ResetBEPSGathering();
-        ResetSourceEnergyEndUseGathering();
-        ResetPeakDemandGathering();
+        ResetBEPSGathering(state);
+        ResetSourceEnergyEndUseGathering(state);
+        ResetPeakDemandGathering(state);
         ResetHeatGainGathering(state);
         ResetRemainingPredefinedEntries(state);
         ThermalComfort::ResetThermalComfortSimpleASH55(state);
@@ -15134,16 +15056,16 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
-    void ResetBEPSGathering()
+    void ResetBEPSGathering(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all ABUPS gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        gatherTotalsBEPS = 0.0;
-        gatherEndUseBEPS = 0.0;
-        gatherEndUseSubBEPS = 0.0;
-        gatherTotalsSource = 0.0;
-        // reset the specific componenents being gathered
+        state.dataOutRptTab->gatherTotalsBEPS = 0.0;
+        state.dataOutRptTab->gatherEndUseBEPS = 0.0;
+        state.dataOutRptTab->gatherEndUseSubBEPS = 0.0;
+        state.dataOutRptTab->gatherTotalsSource = 0.0;
+        // reset the specific components being gathered
         gatherPowerFuelFireGen = 0.0;
         gatherPowerPV = 0.0;
         gatherPowerWind = 0.0;
@@ -15166,24 +15088,24 @@ namespace EnergyPlus::OutputReportTabular {
         gatherWaterEndUseTotal = 0.0;
     }
 
-    void ResetSourceEnergyEndUseGathering()
+    void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all source energy end use table gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        gatherTotalsBySourceBEPS = 0.0;
-        gatherEndUseBySourceBEPS = 0.0;
+        state.dataOutRptTab->gatherTotalsBySourceBEPS = 0.0;
+        state.dataOutRptTab->gatherEndUseBySourceBEPS = 0.0;
     }
 
-    void ResetPeakDemandGathering()
+    void ResetPeakDemandGathering(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all demand end use components table gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        gatherDemandTotal = 0.0;
-        gatherDemandTimeStamp = 0;
-        gatherDemandEndUse = 0.0;
-        gatherDemandEndUseSub = 0.0;
+        state.dataOutRptTab->gatherDemandTotal = 0.0;
+        state.dataOutRptTab->gatherDemandTimeStamp = 0;
+        state.dataOutRptTab->gatherDemandEndUse = 0.0;
+        state.dataOutRptTab->gatherDemandEndUseSub = 0.0;
     }
 
     void ResetHeatGainGathering(EnergyPlusData &state)

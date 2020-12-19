@@ -3584,26 +3584,26 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
-    ResetBEPSGathering();
+    ResetBEPSGathering(*state);
 
-    EXPECT_EQ(0., gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
@@ -3622,24 +3622,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     int endUseNum = 1;
     int subEndUseNum = 1;
 
-    meterNumEndUseSubBEPS.allocate(10, 10, 10);
-    gatherDemandEndUseSub.allocate(10, 10, 10);
-    gatherDemandIndEndUseSub.allocate(10, 10, 10);
+    state->dataOutRptTab->meterNumEndUseSubBEPS.allocate(10, 10, 10);
+    state->dataOutRptTab->gatherDemandEndUseSub.allocate(10, 10, 10);
+    state->dataOutRptTab->gatherDemandIndEndUseSub.allocate(10, 10, 10);
     state->dataOutputProcessor->EnergyMeters.allocate(100);
 
     state->dataOutputProcessor->EndUseCategory.allocate(endUseNum);
     state->dataOutputProcessor->EndUseCategory(endUseNum).NumSubcategories = 1;
 
-    meterNumTotalsBEPS(resourceNum) = totalMeterNum; // create a test meter number
-    gatherDemandTotal(resourceNum) = 0.;
+    state->dataOutRptTab->meterNumTotalsBEPS(resourceNum) = totalMeterNum; // create a test meter number
+    state->dataOutRptTab->gatherDemandTotal(resourceNum) = 0.;
 
-    meterNumEndUseBEPS(resourceNum, endUseNum) = endUseMeterNum;
-    gatherDemandEndUse(resourceNum, endUseNum) = 0.;
-    gatherDemandIndEndUse(resourceNum, endUseNum) = 0.;
+    state->dataOutRptTab->meterNumEndUseBEPS(resourceNum, endUseNum) = endUseMeterNum;
+    state->dataOutRptTab->gatherDemandEndUse(resourceNum, endUseNum) = 0.;
+    state->dataOutRptTab->gatherDemandIndEndUse(resourceNum, endUseNum) = 0.;
 
-    meterNumEndUseSubBEPS(subEndUseNum, endUseNum, resourceNum) = subEndUseMeterNum;
-    gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum) = 0.;
-    gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum) = 0.;
+    state->dataOutRptTab->meterNumEndUseSubBEPS(subEndUseNum, endUseNum, resourceNum) = subEndUseMeterNum;
+    state->dataOutRptTab->gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum) = 0.;
+    state->dataOutRptTab->gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum) = 0.;
 
     // first "timestep"
 
@@ -3649,13 +3649,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
-    EXPECT_EQ(123., gatherDemandTotal(resourceNum));
+    EXPECT_EQ(123., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
-    EXPECT_EQ(47., gatherDemandEndUse(resourceNum, endUseNum));
-    EXPECT_EQ(47., gatherDemandIndEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(47., state->dataOutRptTab->gatherDemandEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(47., state->dataOutRptTab->gatherDemandIndEndUse(resourceNum, endUseNum));
 
-    EXPECT_EQ(28., gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
-    EXPECT_EQ(28., gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(28., state->dataOutRptTab->gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(28., state->dataOutRptTab->gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
 
     // next "timestep" total higher
 
@@ -3665,13 +3665,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
-    EXPECT_EQ(133., gatherDemandTotal(resourceNum));
+    EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
-    EXPECT_EQ(57., gatherDemandEndUse(resourceNum, endUseNum));
-    EXPECT_EQ(57., gatherDemandIndEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(57., state->dataOutRptTab->gatherDemandEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(57., state->dataOutRptTab->gatherDemandIndEndUse(resourceNum, endUseNum));
 
-    EXPECT_EQ(38., gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
-    EXPECT_EQ(38., gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(38., state->dataOutRptTab->gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(38., state->dataOutRptTab->gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
 
     // next "timestep" total lower but end use higher and sub end use higher
 
@@ -3681,13 +3681,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
-    EXPECT_EQ(133., gatherDemandTotal(resourceNum));
+    EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
-    EXPECT_EQ(57., gatherDemandEndUse(resourceNum, endUseNum));
-    EXPECT_EQ(61., gatherDemandIndEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(57., state->dataOutRptTab->gatherDemandEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(61., state->dataOutRptTab->gatherDemandIndEndUse(resourceNum, endUseNum));
 
-    EXPECT_EQ(38., gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
-    EXPECT_EQ(42., gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(38., state->dataOutRptTab->gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(42., state->dataOutRptTab->gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
 
     // next "timestep" total higher but end use lower and sub end use lower
 
@@ -3697,17 +3697,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
-    EXPECT_EQ(143., gatherDemandTotal(resourceNum));
+    EXPECT_EQ(143., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
-    EXPECT_EQ(59., gatherDemandEndUse(resourceNum, endUseNum));
-    EXPECT_EQ(61., gatherDemandIndEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(59., state->dataOutRptTab->gatherDemandEndUse(resourceNum, endUseNum));
+    EXPECT_EQ(61., state->dataOutRptTab->gatherDemandIndEndUse(resourceNum, endUseNum));
 
-    EXPECT_EQ(39., gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
-    EXPECT_EQ(42., gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(39., state->dataOutRptTab->gatherDemandEndUseSub(subEndUseNum, endUseNum, resourceNum));
+    EXPECT_EQ(42., state->dataOutRptTab->gatherDemandIndEndUseSub(subEndUseNum, endUseNum, resourceNum));
 
-    meterNumEndUseSubBEPS.deallocate();
-    gatherDemandEndUseSub.deallocate();
-    gatherDemandIndEndUseSub.deallocate();
+    state->dataOutRptTab->meterNumEndUseSubBEPS.deallocate();
+    state->dataOutRptTab->gatherDemandEndUseSub.deallocate();
+    state->dataOutRptTab->gatherDemandIndEndUseSub.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
@@ -7742,14 +7742,14 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
     // Gross takes all that are PartOfTot
     Real64 expectedBuildingGrossFloorArea = Zone(1).FloorArea + Zone(2).FloorArea;
-    // Conditionned takes only PartOfTot AND COnditioned
+    // Conditioned takes only PartOfTot AND COnditioned
     Real64 expectedBuildingConditionedFloorArea = Zone(1).FloorArea;
 
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
     // And that this only comes for a single end use DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
-    OutputReportTabular::gatherEndUseBySourceBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
-    OutputReportTabular::gatherTotalsBySourceBEPS(1) = 3.6e10;
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
+    state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
@@ -7906,31 +7906,31 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 1, gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
