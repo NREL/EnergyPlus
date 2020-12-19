@@ -127,10 +127,9 @@ namespace DataSurfaces {
         SwitchableGlazing = 2,
         ExtShadeOn = 3,
         ExtScreenOn = 4,
-        IntBlindOn = 5,
-        ExtBlindOn = 6,
-        BGShadeOn = 7,
-        GlassDoor = 8,
+        IntBlindOn = 6,
+        ExtBlindOn = 7,
+        BGShadeOn = 8,
         BGBlindOn = 9
     };
 
@@ -518,7 +517,7 @@ namespace DataSurfaces {
     extern Array1D<WinShadingFlag> SurfWinShadingFlag;                       // -1: window has no shading device
     extern Array1D<bool> SurfWinShaded;                            // Window shading flag is not shadeoff or noshade
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    extern Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    extern Array1D<WinShadingFlag> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     extern Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag

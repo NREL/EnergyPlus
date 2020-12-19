@@ -9173,7 +9173,7 @@ namespace SolarShading {
 
                 // EMS Actuator Point: override setting if ems flag on
                 if (SurfWinShadingFlagEMSOn(ISurf)) {
-                    SurfWinShadingFlag(ISurf) = WinShadingFlag(SurfWinShadingFlagEMSValue(ISurf));
+                    SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMSValue(ISurf);
                 }
                 if (SurfWinShadingFlag(ISurf) != WinShadingFlag::NoShade && SurfWinShadingFlag(ISurf) != WinShadingFlag::ShadeOff) {
                     SurfWinShaded(ISurf) = true;
