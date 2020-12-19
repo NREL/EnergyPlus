@@ -177,33 +177,6 @@ namespace EnergyPlus::OutputReportTabular {
 
     // arrays for time binned results
 
-    Real64 timeInYear(0.0);
-
-    // Flags for predefined tabular reports
-    bool displayTabularBEPS(false);
-    bool displayLEEDSummary(false);
-    bool displayTabularCompCosts(false);
-    bool displayTabularVeriSum(false);
-    bool displayComponentSizing(false);
-    bool displaySurfaceShadowing(false);
-    bool displayDemandEndUse(false);
-    bool displayAdaptiveComfort(false);
-    bool displaySourceEnergyEndUseSummary(false);
-    bool displayZoneComponentLoadSummary(false);
-    bool displayAirLoopComponentLoadSummary(false);
-    bool displayFacilityComponentLoadSummary(false);
-    bool displayLifeCycleCostReport(false);
-    bool displayTariffReport(false);
-    bool displayEconomicResultSummary(false);
-    bool displayHeatEmissionsSummary(false);
-    bool displayEioSummary(false);
-    bool displayThermalResilienceSummary(false);
-    bool displayCO2ResilienceSummary(false);
-    bool displayVisualResilienceSummary(false);
-    bool displayThermalResilienceSummaryExplicitly(false);
-    bool displayCO2ResilienceSummaryExplicitly(false);
-    bool displayVisualResilienceSummaryExplicitly(false);
-
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
@@ -410,30 +383,30 @@ namespace EnergyPlus::OutputReportTabular {
         GatherHeatGainReportfirstTime = true;
         AllocateLoadComponentArraysDoAllocate = true;
         initAdjFenDone = false;
-        timeInYear = 0.0;
-        displayTabularBEPS = false;
-        displayLEEDSummary = false;
-        displayTabularCompCosts = false;
-        displayTabularVeriSum = false;
-        displayComponentSizing = false;
-        displaySurfaceShadowing = false;
-        displayDemandEndUse = false;
-        displayAdaptiveComfort = false;
-        displaySourceEnergyEndUseSummary = false;
-        displayZoneComponentLoadSummary = false;
-        displayAirLoopComponentLoadSummary = false;
-        displayFacilityComponentLoadSummary = false;
-        displayLifeCycleCostReport = false;
-        displayTariffReport = false;
-        displayEconomicResultSummary = false;
-        displayHeatEmissionsSummary = false;
-        displayThermalResilienceSummary = false;
-        displayCO2ResilienceSummary = false;
-        displayVisualResilienceSummary = false;
-        displayThermalResilienceSummaryExplicitly = false;
-        displayCO2ResilienceSummaryExplicitly = false;
-        displayVisualResilienceSummaryExplicitly = false;
-        displayEioSummary = false;
+        state.dataOutRptTab->timeInYear = 0.0;
+        state.dataOutRptTab->displayTabularBEPS = false;
+        state.dataOutRptTab->displayLEEDSummary = false;
+        state.dataOutRptTab->displayTabularCompCosts = false;
+        state.dataOutRptTab->displayTabularVeriSum = false;
+        state.dataOutRptTab->displayComponentSizing = false;
+        state.dataOutRptTab->displaySurfaceShadowing = false;
+        state.dataOutRptTab->displayDemandEndUse = false;
+        state.dataOutRptTab->displayAdaptiveComfort = false;
+        state.dataOutRptTab->displaySourceEnergyEndUseSummary = false;
+        state.dataOutRptTab->displayZoneComponentLoadSummary = false;
+        state.dataOutRptTab->displayAirLoopComponentLoadSummary = false;
+        state.dataOutRptTab->displayFacilityComponentLoadSummary = false;
+        state.dataOutRptTab->displayLifeCycleCostReport = false;
+        state.dataOutRptTab->displayTariffReport = false;
+        state.dataOutRptTab->displayEconomicResultSummary = false;
+        state.dataOutRptTab->displayHeatEmissionsSummary = false;
+        state.dataOutRptTab->displayThermalResilienceSummary = false;
+        state.dataOutRptTab->displayCO2ResilienceSummary = false;
+        state.dataOutRptTab->displayVisualResilienceSummary = false;
+        state.dataOutRptTab->displayThermalResilienceSummaryExplicitly = false;
+        state.dataOutRptTab->displayCO2ResilienceSummaryExplicitly = false;
+        state.dataOutRptTab->displayVisualResilienceSummaryExplicitly = false;
+        state.dataOutRptTab->displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
         fuelfactorsused = Array1D_bool(numSourceTypes, false);
@@ -1427,7 +1400,7 @@ namespace EnergyPlus::OutputReportTabular {
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
-        timeInYear = 0.0; // intialize the time in year counter
+        state.dataOutRptTab->timeInYear = 0.0; // intialize the time in year counter
         // determine size of array that holds the IDF description
         state.dataOutRptTab->OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         OutputTableBinned.allocate(state.dataOutRptTab->OutputTableBinnedCount);
@@ -1841,7 +1814,7 @@ namespace EnergyPlus::OutputReportTabular {
             // get the object
             inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             // default all report flags to false (do not get produced)
-            displayTabularBEPS = false;
+            state.dataOutRptTab->displayTabularBEPS = false;
             // initialize the names of the predefined monthly report titles
             InitializePredefinedMonthlyTitles(state);
             // loop through the fields looking for matching report titles
@@ -1850,82 +1823,82 @@ namespace EnergyPlus::OutputReportTabular {
                 if (AlphArray(iReport).empty()) {
                     ShowFatalError(state, "Blank report name in Output:Table:SummaryReports");
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
-                    displayTabularBEPS = true;
+                    state.dataOutRptTab->displayTabularBEPS = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentCostEconomicsSummary")) {
-                    displayTabularCompCosts = true;
+                    state.dataOutRptTab->displayTabularCompCosts = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InputVerificationandResultsSummary")) {
-                    displayTabularVeriSum = true;
+                    state.dataOutRptTab->displayTabularVeriSum = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
-                    displayComponentSizing = true;
+                    state.dataOutRptTab->displayComponentSizing = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
-                    displaySurfaceShadowing = true;
+                    state.dataOutRptTab->displaySurfaceShadowing = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "DemandEndUseComponentsSummary")) {
-                    displayDemandEndUse = true;
+                    state.dataOutRptTab->displayDemandEndUse = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AdaptiveComfortSummary")) {
-                    displayAdaptiveComfort = true;
+                    state.dataOutRptTab->displayAdaptiveComfort = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SourceEnergyEndUseComponentsSummary")) {
-                    displaySourceEnergyEndUseSummary = true;
+                    state.dataOutRptTab->displaySourceEnergyEndUseSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
-                    displayZoneComponentLoadSummary = true;
+                    state.dataOutRptTab->displayZoneComponentLoadSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AirLoopComponentLoadSummary")) {
-                    displayAirLoopComponentLoadSummary = true;
+                    state.dataOutRptTab->displayAirLoopComponentLoadSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "FacilityComponentLoadSummary")) {
-                    displayFacilityComponentLoadSummary = true;
+                    state.dataOutRptTab->displayFacilityComponentLoadSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "LEEDSummary")) {
-                    displayLEEDSummary = true;
+                    state.dataOutRptTab->displayLEEDSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "LifeCycleCostReport")) {
-                    displayLifeCycleCostReport = true;
+                    state.dataOutRptTab->displayLifeCycleCostReport = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "TariffReport")) {
-                    displayTariffReport = true;
+                    state.dataOutRptTab->displayTariffReport = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EconomicResultSummary")) {
-                    displayEconomicResultSummary = true;
+                    state.dataOutRptTab->displayEconomicResultSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "HeatEmissionsSummary")) {
-                    displayHeatEmissionsSummary = true;
+                    state.dataOutRptTab->displayHeatEmissionsSummary = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
-                    displayThermalResilienceSummary = true;
-                    displayThermalResilienceSummaryExplicitly = true;
+                    state.dataOutRptTab->displayThermalResilienceSummary = true;
+                    state.dataOutRptTab->displayThermalResilienceSummaryExplicitly = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
-                    displayCO2ResilienceSummary = true;
-                    displayCO2ResilienceSummaryExplicitly = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummary = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummaryExplicitly = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
-                    displayVisualResilienceSummary = true;
-                    displayVisualResilienceSummaryExplicitly = true;
+                    state.dataOutRptTab->displayVisualResilienceSummary = true;
+                    state.dataOutRptTab->displayVisualResilienceSummaryExplicitly = true;
                     state.dataOutRptTab->WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
@@ -1933,58 +1906,58 @@ namespace EnergyPlus::OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
-                    displayEioSummary = true;
+                    state.dataOutRptTab->displayEioSummary = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummary")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
-                    displayTabularBEPS = true;
-                    displayTabularVeriSum = true;
-                    displayTabularCompCosts = true;
-                    displaySurfaceShadowing = true;
-                    displayComponentSizing = true;
-                    displayDemandEndUse = true;
-                    displayAdaptiveComfort = true;
-                    displaySourceEnergyEndUseSummary = true;
-                    displayLifeCycleCostReport = true;
-                    displayTariffReport = true;
-                    displayEconomicResultSummary = true;
-                    displayEioSummary = true;
-                    displayLEEDSummary = true;
-                    displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+                    state.dataOutRptTab->displayTabularBEPS = true;
+                    state.dataOutRptTab->displayTabularVeriSum = true;
+                    state.dataOutRptTab->displayTabularCompCosts = true;
+                    state.dataOutRptTab->displaySurfaceShadowing = true;
+                    state.dataOutRptTab->displayComponentSizing = true;
+                    state.dataOutRptTab->displayDemandEndUse = true;
+                    state.dataOutRptTab->displayAdaptiveComfort = true;
+                    state.dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+                    state.dataOutRptTab->displayLifeCycleCostReport = true;
+                    state.dataOutRptTab->displayTariffReport = true;
+                    state.dataOutRptTab->displayEconomicResultSummary = true;
+                    state.dataOutRptTab->displayEioSummary = true;
+                    state.dataOutRptTab->displayLEEDSummary = true;
+                    state.dataOutRptTab->displayHeatEmissionsSummary = true;
+                    state.dataOutRptTab->displayThermalResilienceSummary = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummary = true;
+                    state.dataOutRptTab->displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
-                    displayTabularBEPS = true;
-                    displayTabularVeriSum = true;
-                    displayTabularCompCosts = true;
-                    displaySurfaceShadowing = true;
-                    displayComponentSizing = true;
-                    displayDemandEndUse = true;
-                    displayAdaptiveComfort = true;
-                    displaySourceEnergyEndUseSummary = true;
-                    displayLifeCycleCostReport = true;
-                    displayTariffReport = true;
-                    displayEconomicResultSummary = true;
-                    displayEioSummary = true;
-                    displayLEEDSummary = true;
-                    displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+                    state.dataOutRptTab->displayTabularBEPS = true;
+                    state.dataOutRptTab->displayTabularVeriSum = true;
+                    state.dataOutRptTab->displayTabularCompCosts = true;
+                    state.dataOutRptTab->displaySurfaceShadowing = true;
+                    state.dataOutRptTab->displayComponentSizing = true;
+                    state.dataOutRptTab->displayDemandEndUse = true;
+                    state.dataOutRptTab->displayAdaptiveComfort = true;
+                    state.dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+                    state.dataOutRptTab->displayLifeCycleCostReport = true;
+                    state.dataOutRptTab->displayTariffReport = true;
+                    state.dataOutRptTab->displayEconomicResultSummary = true;
+                    state.dataOutRptTab->displayEioSummary = true;
+                    state.dataOutRptTab->displayLEEDSummary = true;
+                    state.dataOutRptTab->displayHeatEmissionsSummary = true;
+                    state.dataOutRptTab->displayThermalResilienceSummary = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummary = true;
+                    state.dataOutRptTab->displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     // the sizing period reports
-                    displayZoneComponentLoadSummary = true;
-                    displayAirLoopComponentLoadSummary = true;
-                    displayFacilityComponentLoadSummary = true;
+                    state.dataOutRptTab->displayZoneComponentLoadSummary = true;
+                    state.dataOutRptTab->displayAirLoopComponentLoadSummary = true;
+                    state.dataOutRptTab->displayFacilityComponentLoadSummary = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllMonthly")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
@@ -1993,23 +1966,23 @@ namespace EnergyPlus::OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndMonthly")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
-                    displayTabularBEPS = true;
-                    displayTabularVeriSum = true;
-                    displayTabularCompCosts = true;
-                    displaySurfaceShadowing = true;
-                    displayComponentSizing = true;
-                    displayDemandEndUse = true;
-                    displayAdaptiveComfort = true;
-                    displaySourceEnergyEndUseSummary = true;
-                    displayLifeCycleCostReport = true;
-                    displayTariffReport = true;
-                    displayEconomicResultSummary = true;
-                    displayEioSummary = true;
-                    displayLEEDSummary = true;
-                    displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+                    state.dataOutRptTab->displayTabularBEPS = true;
+                    state.dataOutRptTab->displayTabularVeriSum = true;
+                    state.dataOutRptTab->displayTabularCompCosts = true;
+                    state.dataOutRptTab->displaySurfaceShadowing = true;
+                    state.dataOutRptTab->displayComponentSizing = true;
+                    state.dataOutRptTab->displayDemandEndUse = true;
+                    state.dataOutRptTab->displayAdaptiveComfort = true;
+                    state.dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+                    state.dataOutRptTab->displayLifeCycleCostReport = true;
+                    state.dataOutRptTab->displayTariffReport = true;
+                    state.dataOutRptTab->displayEconomicResultSummary = true;
+                    state.dataOutRptTab->displayEioSummary = true;
+                    state.dataOutRptTab->displayLEEDSummary = true;
+                    state.dataOutRptTab->displayHeatEmissionsSummary = true;
+                    state.dataOutRptTab->displayThermalResilienceSummary = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummary = true;
+                    state.dataOutRptTab->displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
@@ -2019,23 +1992,23 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
-                    displayTabularBEPS = true;
-                    displayTabularVeriSum = true;
-                    displayTabularCompCosts = true;
-                    displaySurfaceShadowing = true;
-                    displayComponentSizing = true;
-                    displayDemandEndUse = true;
-                    displayAdaptiveComfort = true;
-                    displaySourceEnergyEndUseSummary = true;
-                    displayLifeCycleCostReport = true;
-                    displayTariffReport = true;
-                    displayEconomicResultSummary = true;
-                    displayEioSummary = true;
-                    displayLEEDSummary = true;
-                    displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+                    state.dataOutRptTab->displayTabularBEPS = true;
+                    state.dataOutRptTab->displayTabularVeriSum = true;
+                    state.dataOutRptTab->displayTabularCompCosts = true;
+                    state.dataOutRptTab->displaySurfaceShadowing = true;
+                    state.dataOutRptTab->displayComponentSizing = true;
+                    state.dataOutRptTab->displayDemandEndUse = true;
+                    state.dataOutRptTab->displayAdaptiveComfort = true;
+                    state.dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+                    state.dataOutRptTab->displayLifeCycleCostReport = true;
+                    state.dataOutRptTab->displayTariffReport = true;
+                    state.dataOutRptTab->displayEconomicResultSummary = true;
+                    state.dataOutRptTab->displayEioSummary = true;
+                    state.dataOutRptTab->displayLEEDSummary = true;
+                    state.dataOutRptTab->displayHeatEmissionsSummary = true;
+                    state.dataOutRptTab->displayThermalResilienceSummary = true;
+                    state.dataOutRptTab->displayCO2ResilienceSummary = true;
+                    state.dataOutRptTab->displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
@@ -2044,9 +2017,9 @@ namespace EnergyPlus::OutputReportTabular {
                         namedMonthly(jReport).show = true;
                     }
                     // the sizing period reports
-                    displayZoneComponentLoadSummary = true;
-                    displayAirLoopComponentLoadSummary = true;
-                    displayFacilityComponentLoadSummary = true;
+                    state.dataOutRptTab->displayZoneComponentLoadSummary = true;
+                    state.dataOutRptTab->displayAirLoopComponentLoadSummary = true;
+                    state.dataOutRptTab->displayFacilityComponentLoadSummary = true;
                 }
                 // check the reports that are predefined and are created by OutputReportPredefined
                 for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
@@ -2086,7 +2059,7 @@ namespace EnergyPlus::OutputReportTabular {
             ShowFatalError(state, CurrentModuleObject + ": Preceding errors cause termination.");
         }
         // if the BEPS report has been called for than initialize its arrays
-        if (displayTabularBEPS || displayDemandEndUse || displaySourceEnergyEndUseSummary || displayLEEDSummary) {
+        if (state.dataOutRptTab->displayTabularBEPS || state.dataOutRptTab->displayDemandEndUse || state.dataOutRptTab->displaySourceEnergyEndUseSummary || state.dataOutRptTab->displayLEEDSummary) {
             // initialize the resource type names
             resourceTypeNames(1) = "Electricity";
             resourceTypeNames(2) = "NaturalGas";
@@ -3614,7 +3587,7 @@ namespace EnergyPlus::OutputReportTabular {
         int indexUnitConv;
 
         // normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
-        if (displayLifeCycleCostReport && LCCparamPresent) {
+        if (state.dataOutRptTab->displayLifeCycleCostReport && LCCparamPresent) {
             AddTOCEntry(state, "Life-Cycle Cost Report", "Entire Facility");
         }
 
@@ -3625,19 +3598,19 @@ namespace EnergyPlus::OutputReportTabular {
                 tbl_stream << "<a name=toc></a>\n";
                 tbl_stream << "<p><b>Table of Contents</b></p>\n";
                 tbl_stream << "<a href=\"#top\">Top</a>\n";
-                if (displayTabularBEPS) {
+                if (state.dataOutRptTab->displayTabularBEPS) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Building_Utility_Performance_Summary, Entire_Facility)
                                << "\">Annual Building Utility Performance Summary</a>\n";
                 }
-                if (displayTabularVeriSum) {
+                if (state.dataOutRptTab->displayTabularVeriSum) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Input_Verification_and_Results_Summary, Entire_Facility)
                                << "\">Input Verification and Results Summary</a>\n";
                 }
-                if (displayDemandEndUse) {
+                if (state.dataOutRptTab->displayDemandEndUse) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Demand_End_Use_Components_Summary, Entire_Facility)
                                << "\">Demand End Use Components Summary</a>\n";
                 }
-                if (displaySourceEnergyEndUseSummary) {
+                if (state.dataOutRptTab->displaySourceEnergyEndUseSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Source_Energy_End_Use_Components_Summary, Entire_Facility)
                                << "\">Source Energy End Use Components Summary</a>\n";
                 }
@@ -3645,22 +3618,22 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Component_Cost_Economics_Summary, Entire_Facility)
                                << "\">Component Cost Economics Summary</a>\n";
                 }
-                if (displayComponentSizing) {
+                if (state.dataOutRptTab->displayComponentSizing) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Component_Sizing_Summary, Entire_Facility)
                                << "\">Component Sizing Summary</a>\n";
                 }
-                if (displaySurfaceShadowing) {
+                if (state.dataOutRptTab->displaySurfaceShadowing) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Surface_Shadowing_Summary, Entire_Facility)
                                << "\">Surface Shadowing Summary</a>\n";
                 }
-                if (displayAdaptiveComfort) {
+                if (state.dataOutRptTab->displayAdaptiveComfort) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Adaptive_Comfort_Summary, Entire_Facility)
                                << "\">Adaptive Comfort Summary</a>\n";
                 }
-                if (displayEioSummary) {
+                if (state.dataOutRptTab->displayEioSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Initialization_Summary, Entire_Facility) << "\">Initialization Summary</a>\n";
                 }
-                if (displayHeatEmissionsSummary) {
+                if (state.dataOutRptTab->displayHeatEmissionsSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility)
                                << "\">Annual Heat Emissions Summary</a>\n";
                 }
@@ -3802,7 +3775,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!state.dataGlobal->DoWeathSim) return;
         elapsedTime = TimeStepSys;
-        timeInYear += elapsedTime;
+        state.dataOutRptTab->timeInYear += elapsedTime;
         for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             // get values of array for current object being referenced
             curIntervalStart = OutputTableBinned(iInObj).intervalStart;
@@ -4297,7 +4270,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // if no beps report is called then skip
 
-        if ((displayTabularBEPS || displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+        if ((state.dataOutRptTab->displayTabularBEPS || state.dataOutRptTab->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // add the current time to the total elapsed time
             // FOLLOWING LINE MOVED TO UPDATETABULARREPORTS because used even when beps is not called
             // gatherElapsedTimeBEPS = gatherElapsedTimeBEPS + TimeStepZone
@@ -4456,7 +4429,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // if no beps by source report is called then skip
 
-        if ((displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+        if ((state.dataOutRptTab->displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
 
@@ -4577,7 +4550,7 @@ namespace EnergyPlus::OutputReportTabular {
         int timestepTimeStamp;
         assert(state.dataGlobal->TimeStepZoneSec > 0.0);
 
-        if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+        if ((state.dataOutRptTab->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
@@ -4613,7 +4586,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // gather the peak demands of each individual enduse subcategory for the LEED report
-        if ((displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+        if ((state.dataOutRptTab->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
@@ -4658,7 +4631,7 @@ namespace EnergyPlus::OutputReportTabular {
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
 
-        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
+        if (!state.dataOutRptTab->displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
         // Only gather zone report at zone time steps
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
@@ -5519,9 +5492,9 @@ namespace EnergyPlus::OutputReportTabular {
             WriteLoadComponentSummaryTables(state);
             WriteHeatEmissionTable(state);
 
-            if (displayThermalResilienceSummary) WriteThermalResilienceTables(state);
-            if (displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
-            if (displayVisualResilienceSummary) WriteVisualResilienceTables(state);
+            if (state.dataOutRptTab->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
+            if (state.dataOutRptTab->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
+            if (state.dataOutRptTab->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
@@ -7356,9 +7329,9 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 leedSiteTotal(0.0);
         Real64 unconvert;
 
-        if (displayTabularBEPS || displayLEEDSummary) {
+        if (state.dataOutRptTab->displayTabularBEPS || state.dataOutRptTab->displayLEEDSummary) {
             // show the headers of the report
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteReportHeaders(state, "Annual Building Utility Performance Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 // show the number of hours that the table applies to
                 WriteTextLine(state, "Values gathered over " + RealToStr(gatherElapsedTimeBEPS, 2) + " hours", true);
@@ -7734,7 +7707,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Site and Source Energy");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -7884,7 +7857,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Site to Source Energy Conversion Factors");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -7939,7 +7912,7 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Building Area");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8195,7 +8168,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "End Uses");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 if (sqlite) {
@@ -8348,7 +8321,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "End Uses By Subcategory");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
 
@@ -8527,7 +8500,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Utility Use Per Conditioned Floor Area");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8557,7 +8530,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Utility Use Per Total Floor Area");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8649,7 +8622,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Electric Loads Satisfied");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8725,7 +8698,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "On-Site Thermal Sources");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8820,7 +8793,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             //  ! heading for the entire sub-table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Water Source Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
@@ -8834,7 +8807,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             //---- Comfort and Setpoint Not Met Sub-Table
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 rowHead.allocate(2);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);
@@ -8882,7 +8855,7 @@ namespace EnergyPlus::OutputReportTabular {
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(1, 3);
 
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteSubtitle(state, "Comfort and Setpoint Not Met Summary");
             }
 
@@ -8899,7 +8872,7 @@ namespace EnergyPlus::OutputReportTabular {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours not met", RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
             tableBody(1, 3) = RealToStr(state.dataOutRptPredefined->TotalTimeNotSimpleASH55EitherForABUPS, 2);
 
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
@@ -8922,7 +8895,7 @@ namespace EnergyPlus::OutputReportTabular {
             //---- Control Summary Sub-Table
 
             //---- End Notes
-            if (displayTabularBEPS) {
+            if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteTextLine(state, "Note 1: An asterisk (*) indicates that the feature is not yet implemented.");
             }
             // CALL WriteTextLine('Note 2: The source energy conversion factors used are: ')
@@ -8970,7 +8943,7 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
 
-        if (displaySourceEnergyEndUseSummary) {
+        if (state.dataOutRptTab->displaySourceEnergyEndUseSummary) {
             // show the headers of the report
             WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // show the number of hours that the table applies to
@@ -9323,7 +9296,7 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 unconvert;
         std::string subCatName;
 
-        if (displayDemandEndUse) {
+        if (state.dataOutRptTab->displayDemandEndUse) {
             // show the headers of the report
             WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // totals - select which additional fuel to display and which other district heating
@@ -10193,7 +10166,7 @@ namespace EnergyPlus::OutputReportTabular {
         zoneGlassArea = 0.0;
 
         // all arrays are in the format: (row, columnm)
-        if (displayTabularVeriSum) {
+        if (state.dataOutRptTab->displayTabularVeriSum) {
             // show the headers of the report
             WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
@@ -10896,7 +10869,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Should deallocate after writing table. - LKL
 
-        if (displayAdaptiveComfort && TotPeople > 0) {
+        if (state.dataOutRptTab->displayAdaptiveComfort && TotPeople > 0) {
             peopleInd.allocate(TotPeople);
 
             for (i = 1; i <= TotPeople; ++i) {
@@ -11051,7 +11024,7 @@ namespace EnergyPlus::OutputReportTabular {
             bool hasPierceSET = true;
             if (TotPeople == 0) {
                 hasPierceSET = false;
-                if (displayThermalResilienceSummaryExplicitly) {
+                if (state.dataOutRptTab->displayThermalResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Thermal Resilience Summary - SET Hours reports: "
                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                      "but no People object is defined.");
@@ -11060,7 +11033,7 @@ namespace EnergyPlus::OutputReportTabular {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
-                    if (displayThermalResilienceSummaryExplicitly) {
+                    if (state.dataOutRptTab->displayThermalResilienceSummaryExplicitly) {
                         ShowWarningError(state,  "Writing Annual Thermal Resilience Summary - SET Hours reports: "
                                           "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                           "but no Pierce model is defined in " + People(iPeople).Name + " object.");
@@ -11114,7 +11087,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
-                if (displayVisualResilienceSummaryExplicitly) {
+                if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
                                      "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
@@ -11146,7 +11119,7 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_string rowHead;
         Array2D_string tableBody;
 
-        if (displayHeatEmissionsSummary) {
+        if (state.dataOutRptTab->displayHeatEmissionsSummary) {
 
             WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             WriteSubtitle(state, "Heat Emission by Components");
@@ -11448,7 +11421,7 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 curValueSI(0.0);
         static Real64 curValue(0.0);
 
-        if (displayComponentSizing) {
+        if (state.dataOutRptTab->displayComponentSizing) {
             WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // The arrays that look for unique headers are dimensioned in the
             // running program since the size of the number of entries is
@@ -11683,7 +11656,7 @@ namespace EnergyPlus::OutputReportTabular {
         int NGSS;
 
         // displaySurfaceShadowing = false  for debugging
-        if (displaySurfaceShadowing) {
+        if (state.dataOutRptTab->displaySurfaceShadowing) {
             numreceivingfields = 0;
             for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
                 numreceivingfields += ShadowComb(HTS).NumGenSurf;
@@ -11798,7 +11771,7 @@ namespace EnergyPlus::OutputReportTabular {
     void WriteEioTables(EnergyPlusData &state)
     {
 
-        if (displayEioSummary) {
+        if (state.dataOutRptTab->displayEioSummary) {
             Array1D_string columnHead;
             Array1D_int columnWidth;
             Array1D_string rowHead;
@@ -11975,18 +11948,18 @@ namespace EnergyPlus::OutputReportTabular {
 
         int iZone;
         if (state.dataGlobal->CompLoadReportIsReq) {
-            if (displayZoneComponentLoadSummary) {
+            if (state.dataOutRptTab->displayZoneComponentLoadSummary) {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
                     AddTOCEntry(state, "Zone Component Load Summary", Zone(iZone).Name);
                 }
             }
-            if (displayAirLoopComponentLoadSummary) {
+            if (state.dataOutRptTab->displayAirLoopComponentLoadSummary) {
                 for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
                     AddTOCEntry(state, "AirLoop Component Load Summary", DataSizing::FinalSysSizing(AirLoopNum).AirPriLoopName);
                 }
             }
-            if (displayFacilityComponentLoadSummary) {
+            if (state.dataOutRptTab->displayFacilityComponentLoadSummary) {
                 AddTOCEntry(state, "Facility Component Load Summary", "Facility");
             }
         }
@@ -12511,7 +12484,7 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::TotSurfaces;
         using DataZoneEquipment::ZoneEquipConfig;
 
-        if (!((displayZoneComponentLoadSummary || displayAirLoopComponentLoadSummary || displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
+        if (!((state.dataOutRptTab->displayZoneComponentLoadSummary || state.dataOutRptTab->displayAirLoopComponentLoadSummary || state.dataOutRptTab->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
             return;
 
         int coolDesSelected;
@@ -12582,7 +12555,7 @@ namespace EnergyPlus::OutputReportTabular {
         CompLoadTablesType curCompLoadTable; // active component load table
 
         // initialize arrays
-        if (displayZoneComponentLoadSummary) {
+        if (state.dataOutRptTab->displayZoneComponentLoadSummary) {
             ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneHeatCompLoadTables) {
                 e.cells.allocate(cPerArea, rGrdTot);
@@ -12598,7 +12571,7 @@ namespace EnergyPlus::OutputReportTabular {
                 e.cellUsed = false;
             }
         }
-        if (displayAirLoopComponentLoadSummary) {
+        if (state.dataOutRptTab->displayAirLoopComponentLoadSummary) {
             AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
             for (auto &e : AirLoopHeatCompLoadTables) {
                 e.cells.allocate(cPerArea, rGrdTot);
@@ -12632,7 +12605,7 @@ namespace EnergyPlus::OutputReportTabular {
                 e.cellUsed = false;
             }
         }
-        if (displayFacilityComponentLoadSummary) {
+        if (state.dataOutRptTab->displayFacilityComponentLoadSummary) {
             FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
             FacilityHeatCompLoadTables.cells = 0.;
             FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
@@ -12665,7 +12638,7 @@ namespace EnergyPlus::OutputReportTabular {
         GetZoneComponentAreas(state, ZoneComponentAreas);
 
         // ZoneComponentLoadSummary
-        if (displayZoneComponentLoadSummary) {
+        if (state.dataOutRptTab->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (!ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
@@ -12757,7 +12730,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // AirLoopComponentLoadSummary
-        if (displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
+        if (state.dataOutRptTab->displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
             Array1D_int zoneToAirLoopCool;
             zoneToAirLoopCool.dimension(state.dataGlobal->NumOfZones);
             Array1D_int zoneToAirLoopHeat;
@@ -12822,7 +12795,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
                     // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                    if (displayZoneComponentLoadSummary &&
+                    if (state.dataOutRptTab->displayZoneComponentLoadSummary &&
                         (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
                         (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                         AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
@@ -12859,7 +12832,7 @@ namespace EnergyPlus::OutputReportTabular {
                         CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
-                    if (displayZoneComponentLoadSummary &&
+                    if (state.dataOutRptTab->displayZoneComponentLoadSummary &&
                         (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
                         (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                         AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
@@ -12932,7 +12905,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // FacilityComponentLoadSummary
-        if (displayFacilityComponentLoadSummary) {
+        if (state.dataOutRptTab->displayFacilityComponentLoadSummary) {
 
             coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
             timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
@@ -12945,7 +12918,7 @@ namespace EnergyPlus::OutputReportTabular {
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
                 // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                if (displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                if (state.dataOutRptTab->displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
                     (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                 } else {
@@ -12982,7 +12955,7 @@ namespace EnergyPlus::OutputReportTabular {
                 FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
                 CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
 
-                if (displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                if (state.dataOutRptTab->displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
                     (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                 } else {
@@ -13036,7 +13009,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // ZoneComponentLoadSummary: Now we convert and Display
-        if (displayZoneComponentLoadSummary) {
+        if (state.dataOutRptTab->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (!ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
@@ -13882,15 +13855,15 @@ namespace EnergyPlus::OutputReportTabular {
         std::string reportName;
         std::string zoneAirLoopFacilityName;
 
-        if (kind == iOutputType::zoneOutput && displayZoneComponentLoadSummary) {
+        if (kind == iOutputType::zoneOutput && state.dataOutRptTab->displayZoneComponentLoadSummary) {
             reportName = "Zone Component Load Summary";
             zoneAirLoopFacilityName = Zone(zoneOrAirLoopIndex).Name;
             writeOutput = true;
-        } else if (kind == iOutputType::airLoopOutput && displayAirLoopComponentLoadSummary) {
+        } else if (kind == iOutputType::airLoopOutput && state.dataOutRptTab->displayAirLoopComponentLoadSummary) {
             reportName = "AirLoop Component Load Summary";
             zoneAirLoopFacilityName = DataSizing::FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
             writeOutput = true;
-        } else if (kind == iOutputType::facilityOutput && displayFacilityComponentLoadSummary) {
+        } else if (kind == iOutputType::facilityOutput && state.dataOutRptTab->displayFacilityComponentLoadSummary) {
             reportName = "Facility Component Load Summary";
             zoneAirLoopFacilityName = "Facility";
             writeOutput = true;
@@ -15095,7 +15068,7 @@ namespace EnergyPlus::OutputReportTabular {
         ResetRemainingPredefinedEntries(state);
         ThermalComfort::ResetThermalComfortSimpleASH55(state);
         ThermalComfort::ResetSetPointMet(state);
-        ResetAdaptiveComfort();
+        ResetAdaptiveComfort(state);
         state.dataOutputProcessor->isFinalYear = true;
     }
 
@@ -15361,7 +15334,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
-    void ResetAdaptiveComfort()
+    void ResetAdaptiveComfort(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
@@ -15369,7 +15342,7 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         int i;
-        if (displayAdaptiveComfort && TotPeople > 0) {
+        if (state.dataOutRptTab->displayAdaptiveComfort && TotPeople > 0) {
             for (i = 1; i <= TotPeople; ++i) {
                 if (People(i).AdaptiveASH55) {
                     People(i).TimeNotMetASH5590 = 0.;

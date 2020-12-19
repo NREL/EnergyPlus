@@ -2094,7 +2094,6 @@ namespace EconomicLifeCycleCost {
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
-        using OutputReportTabular::displayLifeCycleCostReport;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2126,7 +2125,7 @@ namespace EconomicLifeCycleCost {
         int numYears;
         Real64 totalPV;
 
-        if (LCCparamPresent && displayLifeCycleCostReport) {
+        if (LCCparamPresent && state.dataOutRptTab->displayLifeCycleCostReport) {
             //---------------------------------
             // Life-Cycle Cost Verification and Results Report
             //---------------------------------

@@ -304,15 +304,15 @@ namespace HeatBalanceSurfaceManager {
 
         CalcThermalResilience(state);
 
-        if (OutputReportTabular::displayThermalResilienceSummary) {
+        if (state.dataOutRptTab->displayThermalResilienceSummary) {
             ReportThermalResilience(state);
         }
 
-        if (OutputReportTabular::displayCO2ResilienceSummary) {
+        if (state.dataOutRptTab->displayCO2ResilienceSummary) {
             ReportCO2Resilience(state);
         }
 
-        if (OutputReportTabular::displayVisualResilienceSummary) {
+        if (state.dataOutRptTab->displayVisualResilienceSummary) {
             ReportVisualResilience(state);
         }
 
@@ -5046,7 +5046,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate Heat Index and Humidex.
         // The heat index equation set is fit to Fahrenheit units, so the zone air temperature values are first convert to F,
         // then heat index is calculated and converted back to C.
-        if (reportVarHeatIndex || OutputReportTabular::displayThermalResilienceSummary) {
+        if (reportVarHeatIndex || state.dataOutRptTab->displayThermalResilienceSummary) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 Real64 ZoneT = ZTAV(ZoneNum);
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
@@ -5070,7 +5070,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneHeatIndex(ZoneNum) = HI;
             }
         }
-        if (reportVarHumidex || OutputReportTabular::displayThermalResilienceSummary) {
+        if (reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
                 Real64 ZoneT = ZTAV(ZoneNum);
@@ -5234,12 +5234,12 @@ namespace HeatBalanceSurfaceManager {
             }
             reportCO2ResilienceFirstTime = false;
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                if (OutputReportTabular::displayCO2ResilienceSummaryExplicitly) {
+                if (state.dataOutRptTab->displayCO2ResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
                                      "Zone Air CO2 Concentration output is required, "
                                      "but no ZoneAirContaminantBalance object is defined.");
                 }
-                OutputReportTabular::displayCO2ResilienceSummary = false;
+                state.dataOutRptTab->displayCO2ResilienceSummary = false;
                 return;
             }
         }
@@ -5283,12 +5283,12 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             if (!hasDayLighting) {
-                if (OutputReportTabular::displayVisualResilienceSummaryExplicitly) {
+                if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
                                      "but no Daylighting Control Object is defined.");
                 }
-                OutputReportTabular::displayVisualResilienceSummary = false;
+                state.dataOutRptTab->displayVisualResilienceSummary = false;
                 return;
             }
         }

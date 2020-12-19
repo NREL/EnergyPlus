@@ -3564,7 +3564,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
-    displayTabularBEPS = true;
+    state->dataOutRptTab->displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
     auto timeStep = 1.0;
@@ -3610,8 +3610,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 {
     // Glazer - Sep 2017
 
-    displayDemandEndUse = true;
-    displayLEEDSummary = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
     state->dataGlobal->TimeStepZoneSec = 900.0;
 
     int resourceNum = 1;
@@ -3713,7 +3713,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 {
 
-    displayHeatEmissionsSummary = true;
+    state->dataOutRptTab->displayHeatEmissionsSummary = true;
     state->dataGlobal->DoWeathSim = true;
     DataHVACGlobals::TimeStepSys = 10.0;
     state->dataEnvrn->OutHumRat = 0.005;
@@ -6048,7 +6048,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    displayTabularVeriSum = true;
+    state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
@@ -6158,7 +6158,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    displayTabularVeriSum = true;
+    state->dataOutRptTab->displayTabularVeriSum = true;
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
@@ -6891,7 +6891,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
-    displayAirLoopComponentLoadSummary = true;
+    state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
@@ -6923,9 +6923,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
     // We ask for the air loop component load summary since that's the one we test
     // We also ask for the zone component load summary because that's necessary to "copy" the load and trigger a potential double conversion
-    OutputReportTabular::displayAirLoopComponentLoadSummary = true;
-    OutputReportTabular::displayZoneComponentLoadSummary = true;
-    OutputReportTabular::displayFacilityComponentLoadSummary = true;
+    state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
+    state->dataOutRptTab->displayZoneComponentLoadSummary = true;
+    state->dataOutRptTab->displayFacilityComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
 
 
@@ -7624,7 +7624,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::displaySourceEnergyEndUseSummary = true;
+    state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
 
 
     // DetermineBuildingFloorArea
@@ -7805,9 +7805,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::displayTabularBEPS = true;
-    OutputReportTabular::displayDemandEndUse = true;
-    OutputReportTabular::displayLEEDSummary = true;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
 
     state->dataOutRptTab->WriteTabularFiles = true;
 
@@ -7887,7 +7887,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
-    displayTabularBEPS = true;
+    state->dataOutRptTab->displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
     auto timeStep = 1.0;

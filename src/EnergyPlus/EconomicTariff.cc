@@ -92,7 +92,6 @@ namespace EnergyPlus::EconomicTariff {
 
 
         using OutputReportTabular::AddTOCEntry;
-        using OutputReportTabular::displayEconomicResultSummary;
 
         bool ErrorsFound(false);
 
@@ -101,7 +100,7 @@ namespace EnergyPlus::EconomicTariff {
             // do rest of GetInput only if at least one tariff is defined.
             GetInputEconomicsCurrencyType(state, ErrorsFound);
             if (state.dataEconTariff->numTariff >= 1) {
-                if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
+                if (!ErrorsFound && state.dataOutRptTab->displayEconomicResultSummary) AddTOCEntry(state, "Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables(state);
                 GetInputEconomicsQualify(state, ErrorsFound);
                 GetInputEconomicsChargeSimple(state, ErrorsFound);
@@ -141,7 +140,6 @@ namespace EnergyPlus::EconomicTariff {
 
         using DataGlobalConstants::AssignResourceTypeNum;
         using OutputReportTabular::AddTOCEntry;
-        using OutputReportTabular::displayTariffReport;
         using namespace DataIPShortCuts;
 
         std::string const RoutineName("GetInputEconomicsTariff: ");
@@ -600,7 +598,7 @@ namespace EnergyPlus::EconomicTariff {
             tariff(iInObj).isSelected = false;
             tariff(iInObj).totalAnnualCost = 0.0;
             // now create the Table Of Contents entries for an HTML file
-            if (displayTariffReport) {
+            if (state.dataOutRptTab->displayTariffReport) {
                 AddTOCEntry(state, "Tariff Report", tariff(iInObj).tariffName);
             }
             // associate the resource number with each tariff
@@ -4025,8 +4023,6 @@ namespace EnergyPlus::EconomicTariff {
         using OutputReportTabular::buildingGrossFloorArea;
         using OutputReportTabular::ConvertIP;
         using OutputReportTabular::DetermineBuildingFloorArea;
-        using OutputReportTabular::displayEconomicResultSummary;
-        using OutputReportTabular::displayTariffReport;
         using OutputReportTabular::LookupSItoIP;
         using OutputReportTabular::RealToStr;
         using OutputReportTabular::WriteReportHeaders;
@@ -4079,7 +4075,7 @@ namespace EnergyPlus::EconomicTariff {
         }
 
         if (state.dataEconTariff->numTariff > 0) {
-            if (displayEconomicResultSummary) {
+            if (state.dataOutRptTab->displayEconomicResultSummary) {
                 DisplayString(state, "Writing Tariff Reports");
                 for (auto &e : econVar)
                     e.isReported = false;
@@ -4213,7 +4209,7 @@ namespace EnergyPlus::EconomicTariff {
             //---------------------------------
             // Tariff Report
             //---------------------------------
-            if (displayTariffReport) {
+            if (state.dataOutRptTab->displayTariffReport) {
                 for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                     WriteReportHeaders(state, "Tariff Report", tariff(iTariff).tariffName, OutputProcessor::StoreType::Averaged);
                     rowHead.allocate(7);

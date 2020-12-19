@@ -182,32 +182,6 @@ namespace OutputReportTabular {
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
 
-    extern Real64 timeInYear;
-
-    // Flags for predefined tabular reports
-    extern bool displayTabularBEPS;
-    extern bool displayLEEDSummary;
-    extern bool displayTabularCompCosts; // added BTG 5/6/04 for component cost summary
-    extern bool displayTabularVeriSum;   // added JG 2006-06-28 for input verification and summary report
-    extern bool displayComponentSizing;
-    extern bool displaySurfaceShadowing;
-    extern bool displayDemandEndUse;
-    extern bool displayAdaptiveComfort;
-    extern bool displaySourceEnergyEndUseSummary;
-    extern bool displayZoneComponentLoadSummary;
-    extern bool displayAirLoopComponentLoadSummary;
-    extern bool displayFacilityComponentLoadSummary;
-    extern bool displayLifeCycleCostReport;
-    extern bool displayTariffReport;
-    extern bool displayEconomicResultSummary;
-    extern bool displayHeatEmissionsSummary;
-    extern bool displayEioSummary;
-    extern bool displayThermalResilienceSummary;
-    extern bool displayCO2ResilienceSummary;
-    extern bool displayVisualResilienceSummary;
-    extern bool displayThermalResilienceSummaryExplicitly;
-    extern bool displayCO2ResilienceSummaryExplicitly;
-    extern bool displayVisualResilienceSummaryExplicitly;
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
@@ -967,7 +941,7 @@ namespace OutputReportTabular {
 
     void ResetRemainingPredefinedEntries(EnergyPlusData &state);
 
-    void ResetAdaptiveComfort();
+    void ResetAdaptiveComfort(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -1063,6 +1037,33 @@ struct OutputReportTabularData : BaseGlobalStruct {
     Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);        // the delimiter to use
     Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
 
+    Real64 timeInYear = 0.0;
+
+    // Flags for predefined tabular reports
+    bool displayTabularBEPS = false;
+    bool displayLEEDSummary = false;
+    bool displayTabularCompCosts = false;
+    bool displayTabularVeriSum = false;
+    bool displayComponentSizing = false;
+    bool displaySurfaceShadowing = false;
+    bool displayDemandEndUse = false;
+    bool displayAdaptiveComfort = false;
+    bool displaySourceEnergyEndUseSummary = false;
+    bool displayZoneComponentLoadSummary = false;
+    bool displayAirLoopComponentLoadSummary = false;
+    bool displayFacilityComponentLoadSummary = false;
+    bool displayLifeCycleCostReport = false;
+    bool displayTariffReport = false;
+    bool displayEconomicResultSummary = false;
+    bool displayHeatEmissionsSummary = false;
+    bool displayEioSummary = false;
+    bool displayThermalResilienceSummary = false;
+    bool displayCO2ResilienceSummary = false;
+    bool displayVisualResilienceSummary = false;
+    bool displayThermalResilienceSummaryExplicitly = false;
+    bool displayCO2ResilienceSummaryExplicitly = false;
+    bool displayVisualResilienceSummaryExplicitly = false;
+
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
@@ -1086,6 +1087,30 @@ struct OutputReportTabularData : BaseGlobalStruct {
             OutputReportTabular::maxNumStyles, {&this->csv_stream, &this->tab_stream, &this->fix_stream, &this->htm_stream, &this->xml_stream});
         this->del = Array1D_string(OutputReportTabular::maxNumStyles);
         this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned);
+        this->timeInYear = 0.0;
+        this->displayTabularBEPS = false;
+        this->displayLEEDSummary = false;
+        this->displayTabularCompCosts = false;
+        this->displayTabularVeriSum = false;
+        this->displayComponentSizing = false;
+        this->displaySurfaceShadowing = false;
+        this->displayDemandEndUse = false;
+        this->displayAdaptiveComfort = false;
+        this->displaySourceEnergyEndUseSummary = false;
+        this->displayZoneComponentLoadSummary = false;
+        this->displayAirLoopComponentLoadSummary = false;
+        this->displayFacilityComponentLoadSummary = false;
+        this->displayLifeCycleCostReport = false;
+        this->displayTariffReport = false;
+        this->displayEconomicResultSummary = false;
+        this->displayHeatEmissionsSummary = false;
+        this->displayEioSummary = false;
+        this->displayThermalResilienceSummary = false;
+        this->displayCO2ResilienceSummary = false;
+        this->displayVisualResilienceSummary = false;
+        this->displayThermalResilienceSummaryExplicitly = false;
+        this->displayCO2ResilienceSummaryExplicitly = false;
+        this->displayVisualResilienceSummaryExplicitly = false;
     }
 };
 
