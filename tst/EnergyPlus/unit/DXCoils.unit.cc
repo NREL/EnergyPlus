@@ -1697,8 +1697,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
 
     EXPECT_FALSE(DXCoil(1).ReportCoolingCoilCrankcasePower);
     // These two output variables are listed in rdd for Coil:Cooling:DX:MultiSpeed used for AC only
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", OutputProcessor::DDVariableTypes(10).VarNameOnly);
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", state->dataOutputProcessor->DDVariableTypes(10).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", state->dataOutputProcessor->DDVariableTypes(11).VarNameOnly);
 
     state->dataGlobal->SysSizingCalc = false;
     state->dataAirLoop->AirLoopInputsFilled = false;

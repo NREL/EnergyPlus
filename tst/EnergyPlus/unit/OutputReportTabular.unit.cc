@@ -3572,8 +3572,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers(*state, "Zone", timeStep);
     SetupTimePointers(*state, "HVAC", timeStep);
 
-    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -3583,17 +3583,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     ResetBEPSGathering();
@@ -3602,7 +3602,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 }
 
@@ -3625,10 +3625,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     meterNumEndUseSubBEPS.allocate(10, 10, 10);
     gatherDemandEndUseSub.allocate(10, 10, 10);
     gatherDemandIndEndUseSub.allocate(10, 10, 10);
-    EnergyMeters.allocate(100);
+    state->dataOutputProcessor->EnergyMeters.allocate(100);
 
-    EndUseCategory.allocate(endUseNum);
-    EndUseCategory(endUseNum).NumSubcategories = 1;
+    state->dataOutputProcessor->EndUseCategory.allocate(endUseNum);
+    state->dataOutputProcessor->EndUseCategory(endUseNum).NumSubcategories = 1;
 
     meterNumTotalsBEPS(resourceNum) = totalMeterNum; // create a test meter number
     gatherDemandTotal(resourceNum) = 0.;
@@ -3643,9 +3643,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    EnergyMeters(totalMeterNum).CurTSValue = 123.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue = 123.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3659,9 +3659,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 133.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue = 133.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3675,9 +3675,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total lower but end use higher and sub end use higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 103.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue = 103.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3691,9 +3691,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher but end use lower and sub end use lower
 
-    EnergyMeters(totalMeterNum).CurTSValue = 143.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue = 143.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -7228,7 +7228,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     }
 
     // Variables aren't going to be output to SQL/ESO anyways
-    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 0);
+    EXPECT_EQ(state->dataOutputProcessor->NumOfReqVariables, 0);
 
     EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
     // If everything worked, we should have 2 tables, one for each zone.
@@ -7895,8 +7895,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers(*state, "Zone", timeStep);
     SetupTimePointers(*state, "HVAC", timeStep);
 
-    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -7904,7 +7904,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
@@ -7914,7 +7914,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
@@ -7924,7 +7924,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General

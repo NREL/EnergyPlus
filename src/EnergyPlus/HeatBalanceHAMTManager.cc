@@ -141,10 +141,6 @@ namespace HeatBalanceHAMTManager {
     Real64 const qvplim(100000.0); // Maximum latent heat W
     Real64 const rhmax(1.01);      // Maximum RH value
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
     // MODULE VARIABLE DECLARATIONS:
     Array1D_int firstcell;
     Array1D_int lastcell;

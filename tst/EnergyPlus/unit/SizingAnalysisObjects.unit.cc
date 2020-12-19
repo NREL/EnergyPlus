@@ -412,12 +412,12 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp) * (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                                               (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
@@ -438,12 +438,12 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp) * (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                                               (subTimeStp) * (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 

@@ -95,7 +95,7 @@ char * listAllAPIDataCSV(EnergyPlusState state) {
         output.append(trend.name).append("\n");
     }
     output.append("**METERS**\n");
-    for (auto const & meter : EnergyPlus::OutputProcessor::EnergyMeters) {
+    for (auto const & meter : thisState->dataOutputProcessor->EnergyMeters) {
         if (meter.Name.empty()) {
             break;
         }
@@ -103,7 +103,7 @@ char * listAllAPIDataCSV(EnergyPlusState state) {
         output.append(meter.Name).append("\n");
     }
     output.append("**VARIABLES**\n");
-    for (auto const & variable : EnergyPlus::OutputProcessor::RVariableTypes) {
+    for (auto const & variable : thisState->dataOutputProcessor->RVariableTypes) {
         if (variable.VarNameOnly.empty() && variable.KeyNameOnlyUC.empty()) {
             break;
         }
@@ -142,17 +142,18 @@ void resetErrorFlag(EnergyPlusState state) {
 }
 
 
-void requestVariable(EnergyPlusState, const char* type, const char* key) {
+void requestVariable(EnergyPlusState state, const char* type, const char* key) {
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
     // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
     request.varName = type;
     request.varKey = key;
-    EnergyPlus::OutputProcessor::apiVarRequests.push_back(request);
+    thisState->dataOutputProcessor->apiVarRequests.push_back(request);
 }
 
-int getVariableHandle(EnergyPlusState, const char* type, const char* key) {
+int getVariableHandle(EnergyPlusState state, const char* type, const char* key) {
     // Variables are accessed through a single integer ID, but there are multiple internal types: real and integer.
     // I am going to make the integer handle span all both types, by carefully defining the handle.
     // basically, the handles are contiguous, with:
@@ -162,20 +163,21 @@ int getVariableHandle(EnergyPlusState, const char* type, const char* key) {
     //  - index N+M being the highest integer variable handle
     // In this function, it is as simple as looping over both types and continuing to increment
     // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle = -1; // initialize to -1 as a flag
-    if (EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
+    if (thisState->dataOutputProcessor->RVariableTypes.allocated()) {
         handle = 0; // initialize to 0 to get a 1 based Array1D index
-        for (int i = 1; i <= EnergyPlus::OutputProcessor::NumOfRVariable; i++) {
-            auto &availOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(i);
+        for (int i = 1; i <= thisState->dataOutputProcessor->NumOfRVariable; i++) {
+            auto &availOutputVar = thisState->dataOutputProcessor->RVariableTypes(i);
             handle++;
             if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
                 return handle;
             }
         }
     }
-    if (EnergyPlus::OutputProcessor::IVariableTypes.allocated()) {
+    if (thisState->dataOutputProcessor->IVariableTypes.allocated()) {
         // now, if real variables *were* searched, we need to pick up the handle where it left off, otherwise initialize it to zero
         if (handle == -1) {
             // real variables were not searched, init to zero
@@ -183,8 +185,8 @@ int getVariableHandle(EnergyPlusState, const char* type, const char* key) {
         } else {
             // real variables where searched, let it just continue where it left off
         }
-        for (int i = 1; i <= EnergyPlus::OutputProcessor::NumOfIVariable; i++) {
-            auto &availOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(i);
+        for (int i = 1; i <= thisState->dataOutputProcessor->NumOfIVariable; i++) {
+            auto &availOutputVar = thisState->dataOutputProcessor->IVariableTypes(i);
             handle++;
             if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
                 return handle;
@@ -202,15 +204,15 @@ Real64 getVariableValue(EnergyPlusState state, const int handle) {
     //  - index N+1 being the first integer variable handle
     //  - index N+M being the highest integer variable handle
     // note that this function will return -1 if it cannot
-    if (handle > 0 && handle <= EnergyPlus::OutputProcessor::NumOfRVariable) {
-        auto &thisOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(handle);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle > 0 && handle <= thisState->dataOutputProcessor->NumOfRVariable) {
+        auto &thisOutputVar = thisState->dataOutputProcessor->RVariableTypes(handle);
         return *thisOutputVar.VarPtr.Which;
-    } else if (handle > EnergyPlus::OutputProcessor::NumOfRVariable && handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
-        int thisHandle = handle - EnergyPlus::OutputProcessor::NumOfRVariable;
-        auto &thisOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(thisHandle);
+    } else if (handle > thisState->dataOutputProcessor->NumOfRVariable && handle <= thisState->dataOutputProcessor->NumOfRVariable + thisState->dataOutputProcessor->NumOfIVariable) {
+        int thisHandle = handle - thisState->dataOutputProcessor->NumOfRVariable;
+        auto &thisOutputVar = thisState->dataOutputProcessor->IVariableTypes(thisHandle);
         return (Real64)*thisOutputVar.VarPtr.Which;
     } else {
-        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
         if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Variable handle out of range in getVariableValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {
@@ -225,9 +227,10 @@ Real64 getVariableValue(EnergyPlusState state, const int handle) {
 }
 
 
-int getMeterHandle(EnergyPlusState, const char* meterName) {
+int getMeterHandle(EnergyPlusState state, const char* meterName) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
-    auto i = EnergyPlus::GetMeterIndex(meterNameUC);
+    auto i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
     if (i == 0) {
         // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
         return -1;
@@ -236,24 +239,26 @@ int getMeterHandle(EnergyPlusState, const char* meterName) {
     }
 }
 
-Real64 getMeterValue(EnergyPlusState state, int handle) {
-    if (handle >= 1 && handle <= (int)EnergyPlus::OutputProcessor::EnergyMeters.size()) {
-        return EnergyPlus::GetCurrentMeterValue(handle);
+Real64 getMeterValue(EnergyPlusState state, int handle)
+{
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle >= 1 && handle <= (int)thisState->dataOutputProcessor->EnergyMeters.size()) {
+        return EnergyPlus::GetCurrentMeterValue(*thisState, handle);
     } else {
-        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
         if (thisState->dataGlobal->errorCallback) {
-            std::cout << "ERROR: Meter handle out of range in getMeterValue, returning zero but caller should take note and likely abort." << std::endl;
+            std::cout << "ERROR: Meter handle out of range in getMeterValue, returning zero but caller should take note and likely abort."
+                      << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
             EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Index error in getMeterValue; received handle: {}", handle));
-            EnergyPlus::ShowContinueError(*thisState, "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            EnergyPlus::ShowContinueError(
+                *thisState, "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         thisState->dataPluginManager->apiErrorFlag = true;
         return 0;
     }
 }
-
 
 int getActuatorHandle(EnergyPlusState state, const char* componentType, const char* controlType, const char* uniqueKey) {
     int handle = 0;
@@ -272,7 +277,6 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
                 for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
                     auto const & usedActuator = thisState->dataRuntimeLang->EMSActuatorUsed(ActuatorLoopUsed);
                     if (usedActuator.ActuatorVariableNum == handle) {
@@ -314,7 +318,6 @@ void resetActuator(EnergyPlusState state, int handle) {
         auto & theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
     } else {
-        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
         if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in resetActuator, returning but caller should take note and likely abort." << std::endl;
         } else {
@@ -341,7 +344,6 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
         }
         *theActuator.Actuated = true;
     } else {
-        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
         if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in setActuatorValue, returning but caller should take note and likely abort." << std::endl;
         } else {
@@ -371,7 +373,6 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle) {
             }
         }
     } else {
-        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
         if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in getActuatorValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {

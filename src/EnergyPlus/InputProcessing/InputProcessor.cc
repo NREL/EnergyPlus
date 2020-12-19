@@ -1743,7 +1743,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         }
     }
 
-    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+    for (auto const & requestedVar : state.dataOutputProcessor->apiVarRequests) {
         addRecordToOutputVariableStructure(state, requestedVar.varKey, requestedVar.varName);
     }
 

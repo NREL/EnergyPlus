@@ -134,7 +134,6 @@ namespace WaterThermalTanks {
     std::string const cHPWHWrappedCondenser = "WaterHeater:HeatPump:WrappedCondenser";
     std::string const cCoilDesuperheater = "Coil:WaterHeating:Desuperheater";
     std::string const fluidNameWater = "WATER";
-    std::string const blankString;
 
     PlantComponent *WaterThermalTankData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -6070,7 +6069,7 @@ namespace WaterThermalTanks {
                 Real64 EMP2 = 0.0;
                 Real64 EMP3 = 0.0;
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                          blankString,
+                                                          std::string(),
                                                           state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
                                                           0,
                                                           EMP1,
