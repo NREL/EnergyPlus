@@ -182,78 +182,6 @@ namespace OutputReportTabular {
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
 
-    extern Array1D_int td;
-    //(1)   Current year
-    //(2)   Current month
-    //(3)   Current day
-    //(4)   Time difference with respect to UTC in minutes (0-59)
-    //(5)   Hour of the day (0-23)
-    //(6)   Minutes (0-59)
-    //(7)   Seconds (0-59)
-    //(8)   Milliseconds (0-999)
-
-    // Design day name storage
-    extern Array1D_string DesignDayName;
-    extern int DesignDayCount;
-
-    // arrays related to pulse and load component reporting
-    extern Array2D_int radiantPulseTimestep;
-    extern Array2D<Real64> radiantPulseReceived;
-    extern Array3D<Real64> loadConvectedNormal;
-    extern Array3D<Real64> loadConvectedWithPulse;
-    extern Array3D<Real64> netSurfRadSeq;
-    extern Array2D<Real64> decayCurveCool;
-    extern Array2D<Real64> decayCurveHeat;
-    extern Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
-    extern Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
-
-    extern Array3D<Real64> peopleInstantSeq;
-    extern Array3D<Real64> peopleLatentSeq;
-    extern Array3D<Real64> peopleRadSeq;
-    extern Array3D<Real64> peopleDelaySeq;
-
-    extern Array3D<Real64> lightInstantSeq;
-    extern Array3D<Real64> lightRetAirSeq;
-    extern Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
-    extern Array3D<Real64> lightSWRadSeq; // short wave visible radiation
-    extern Array3D<Real64> lightDelaySeq;
-
-    extern Array3D<Real64> equipInstantSeq;
-    extern Array3D<Real64> equipLatentSeq;
-    extern Array3D<Real64> equipRadSeq;
-    extern Array3D<Real64> equipDelaySeq;
-
-    extern Array3D<Real64> refrigInstantSeq;
-    extern Array3D<Real64> refrigRetAirSeq;
-    extern Array3D<Real64> refrigLatentSeq;
-
-    extern Array3D<Real64> waterUseInstantSeq;
-    extern Array3D<Real64> waterUseLatentSeq;
-
-    extern Array3D<Real64> hvacLossInstantSeq;
-    extern Array3D<Real64> hvacLossRadSeq;
-    extern Array3D<Real64> hvacLossDelaySeq;
-
-    extern Array3D<Real64> powerGenInstantSeq;
-    extern Array3D<Real64> powerGenRadSeq;
-    extern Array3D<Real64> powerGenDelaySeq;
-
-    extern Array3D<Real64> infilInstantSeq;
-    extern Array3D<Real64> infilLatentSeq;
-
-    extern Array3D<Real64> zoneVentInstantSeq;
-    extern Array3D<Real64> zoneVentLatentSeq;
-
-    extern Array3D<Real64> interZoneMixInstantSeq;
-    extern Array3D<Real64> interZoneMixLatentSeq;
-
-    extern Array3D<Real64> feneCondInstantSeq;
-    // REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
-    extern Array3D<Real64> feneSolarRadSeq;
-    extern Array3D<Real64> feneSolarDelaySeq;
-
-    extern Array3D<Real64> surfDelaySeq;
-
     extern int maxUniqueKeyCount;
 
     // for the XML report must keep track fo the active sub-table name and report set by other routines
@@ -722,7 +650,7 @@ namespace OutputReportTabular {
 
     void AllocateLoadComponentArrays(EnergyPlusData &state);
 
-    void DeallocateLoadComponentArrays();
+    void DeallocateLoadComponentArrays(EnergyPlusData &state);
 
     void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
@@ -1066,6 +994,68 @@ struct OutputReportTabularData : BaseGlobalStruct {
     Real64 sourceFactorOtherFuel1 = 0.0;
     Real64 sourceFactorOtherFuel2 = 0.0;
 
+    Array1D_int td = Array1D_int(8);
+    //(1)   Current year
+    //(2)   Current month
+    //(3)   Current day
+    //(4)   Time difference with respect to UTC in minutes (0-59)
+    //(5)   Hour of the day (0-23)
+    //(6)   Minutes (0-59)
+    //(7)   Seconds (0-59)
+    //(8)   Milliseconds (0-999)
+
+    // Design day name storage
+    Array1D_string DesignDayName;
+    int DesignDayCount = 0;
+
+    // arrays related to pulse and load component reporting
+    Array2D_int radiantPulseTimestep;
+    Array2D<Real64> radiantPulseReceived;
+    Array3D<Real64> loadConvectedNormal;
+    Array3D<Real64> loadConvectedWithPulse;
+    Array3D<Real64> netSurfRadSeq;
+    Array2D<Real64> decayCurveCool;
+    Array2D<Real64> decayCurveHeat;
+    Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
+    Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
+
+    Array3D<Real64> peopleInstantSeq;
+    Array3D<Real64> peopleLatentSeq;
+    Array3D<Real64> peopleRadSeq;
+
+    Array3D<Real64> lightInstantSeq;
+    Array3D<Real64> lightRetAirSeq;
+    Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
+    Array3D<Real64> lightSWRadSeq; // short wave visible radiation
+
+    Array3D<Real64> equipInstantSeq;
+    Array3D<Real64> equipLatentSeq;
+    Array3D<Real64> equipRadSeq;
+
+    Array3D<Real64> refrigInstantSeq;
+    Array3D<Real64> refrigRetAirSeq;
+    Array3D<Real64> refrigLatentSeq;
+
+    Array3D<Real64> waterUseInstantSeq;
+    Array3D<Real64> waterUseLatentSeq;
+
+    Array3D<Real64> hvacLossInstantSeq;
+    Array3D<Real64> hvacLossRadSeq;
+
+    Array3D<Real64> powerGenInstantSeq;
+    Array3D<Real64> powerGenRadSeq;
+    Array3D<Real64> infilInstantSeq;
+    Array3D<Real64> infilLatentSeq;
+
+    Array3D<Real64> zoneVentInstantSeq;
+    Array3D<Real64> zoneVentLatentSeq;
+
+    Array3D<Real64> interZoneMixInstantSeq;
+    Array3D<Real64> interZoneMixLatentSeq;
+
+    Array3D<Real64> feneCondInstantSeq;
+    Array3D<Real64> feneSolarRadSeq;
+
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
@@ -1197,6 +1187,45 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->sourceFactorPropane = 0.0;
         this->sourceFactorOtherFuel1 = 0.0;
         this->sourceFactorOtherFuel2 = 0.0;
+        this->td = Array1D_int(8);
+        this->DesignDayName.deallocate();
+        this->DesignDayCount = 0;
+        this->radiantPulseTimestep.deallocate();
+        this->radiantPulseReceived.deallocate();
+        this->loadConvectedNormal.deallocate();
+        this->loadConvectedWithPulse.deallocate();
+        this->netSurfRadSeq.deallocate();
+        this->decayCurveCool.deallocate();
+        this->decayCurveHeat.deallocate();
+        this->ITABSFseq.deallocate();
+        this->TMULTseq .deallocate();
+        this->peopleInstantSeq.deallocate();
+        this->peopleLatentSeq.deallocate();
+        this->peopleRadSeq.deallocate();
+        this->lightInstantSeq.deallocate();
+        this->lightRetAirSeq.deallocate();
+        this->lightLWRadSeq.deallocate();
+        this->lightSWRadSeq.deallocate();
+        this->equipInstantSeq.deallocate();
+        this->equipLatentSeq.deallocate();
+        this->equipRadSeq.deallocate();
+        this->refrigInstantSeq.deallocate();
+        this->refrigRetAirSeq.deallocate();
+        this->refrigLatentSeq.deallocate();
+        this->waterUseInstantSeq.deallocate();
+        this->waterUseLatentSeq.deallocate();
+        this->hvacLossInstantSeq.deallocate();
+        this->hvacLossRadSeq.deallocate();
+        this->powerGenInstantSeq.deallocate();
+        this->powerGenRadSeq.deallocate();
+        this->infilInstantSeq.deallocate();
+        this->infilLatentSeq.deallocate();
+        this->zoneVentInstantSeq.deallocate();
+        this->zoneVentLatentSeq.deallocate();
+        this->interZoneMixInstantSeq.deallocate();
+        this->interZoneMixLatentSeq.deallocate();
+        this->feneCondInstantSeq.deallocate();
+        this->feneSolarRadSeq.deallocate();
     }
 };
 

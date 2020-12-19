@@ -496,127 +496,127 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     AllocateLoadComponentArrays(*state);
 
     // radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
-    EXPECT_EQ(radiantPulseTimestep.size(), 24u);
+    EXPECT_EQ(state->dataOutRptTab->radiantPulseTimestep.size(), 24u);
 
     // radiantPulseReceived.allocate( { 0, TotDesDays + TotRunDesPersDays }, TotSurfaces );
-    EXPECT_EQ(radiantPulseReceived.size(), 42u);
+    EXPECT_EQ(state->dataOutRptTab->radiantPulseReceived.size(), 42u);
 
     // loadConvectedNormal.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
-    EXPECT_EQ(loadConvectedNormal.size(), 3395u);
+    EXPECT_EQ(state->dataOutRptTab->loadConvectedNormal.size(), 3395u);
 
     // loadConvectedWithPulse.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
-    EXPECT_EQ(loadConvectedWithPulse.size(), 3395u);
+    EXPECT_EQ(state->dataOutRptTab->loadConvectedWithPulse.size(), 3395u);
 
     // netSurfRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(netSurfRadSeq.size(), 3360u);
+    EXPECT_EQ(state->dataOutRptTab->netSurfRadSeq.size(), 3360u);
 
     // decayCurveCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(decayCurveCool.size(), 672u);
+    EXPECT_EQ(state->dataOutRptTab->decayCurveCool.size(), 672u);
 
     // decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(decayCurveHeat.size(), 672u);
+    EXPECT_EQ(state->dataOutRptTab->decayCurveHeat.size(), 672u);
 
     // ITABSFseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(ITABSFseq.size(), 3360u);
+    EXPECT_EQ(state->dataOutRptTab->ITABSFseq.size(), 3360u);
 
     // TMULTseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(TMULTseq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->TMULTseq.size(), 1920u);
 
     // peopleInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(peopleInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->peopleInstantSeq.size(), 1920u);
 
     // peopleLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(peopleLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->peopleLatentSeq.size(), 1920u);
 
     // peopleRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(peopleRadSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->peopleRadSeq.size(), 1920u);
 
     // peopleDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( peopleDelaySeq.size(), 1920u );
 
     // lightInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(lightInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->lightInstantSeq.size(), 1920u);
 
     // lightRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(lightRetAirSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->lightRetAirSeq.size(), 1920u);
 
     // lightLWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(lightLWRadSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->lightLWRadSeq.size(), 1920u);
 
     // lightSWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(lightSWRadSeq.size(), 3360u);
+    EXPECT_EQ(state->dataOutRptTab->lightSWRadSeq.size(), 3360u);
 
     // lightDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( lightDelaySeq.size(), 1920u );
 
     // equipInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(equipInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->equipInstantSeq.size(), 1920u);
 
     // equipLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(equipLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->equipLatentSeq.size(), 1920u);
 
     // equipRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(equipRadSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->equipRadSeq.size(), 1920u);
 
     // equipDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( equipDelaySeq.size(), 1920u );
 
     // refrigInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(refrigInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->refrigInstantSeq.size(), 1920u);
 
     // refrigRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(refrigRetAirSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->refrigRetAirSeq.size(), 1920u);
 
     // refrigLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(refrigLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->refrigLatentSeq.size(), 1920u);
 
     // waterUseInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(waterUseInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->waterUseInstantSeq.size(), 1920u);
 
     // waterUseLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(waterUseLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->waterUseLatentSeq.size(), 1920u);
 
     // hvacLossInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(hvacLossInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->hvacLossInstantSeq.size(), 1920u);
 
     // hvacLossRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(hvacLossRadSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->hvacLossRadSeq.size(), 1920u);
 
     // hvacLossDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( hvacLossDelaySeq.size(), 1920u );
 
     // powerGenInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(powerGenInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->powerGenInstantSeq.size(), 1920u);
 
     // powerGenRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(powerGenRadSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->powerGenRadSeq.size(), 1920u);
 
     // powerGenDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( powerGenDelaySeq.size(), 1920u );
 
     // infilInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(infilInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->infilInstantSeq.size(), 1920u);
 
     // infilLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(infilLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->infilLatentSeq.size(), 1920u);
 
     // zoneVentInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(zoneVentInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->zoneVentInstantSeq.size(), 1920u);
 
     // zoneVentLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(zoneVentLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->zoneVentLatentSeq.size(), 1920u);
 
     // interZoneMixInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(interZoneMixInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->interZoneMixInstantSeq.size(), 1920u);
 
     // interZoneMixLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(interZoneMixLatentSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->interZoneMixLatentSeq.size(), 1920u);
 
     // feneCondInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-    EXPECT_EQ(feneCondInstantSeq.size(), 1920u);
+    EXPECT_EQ(state->dataOutRptTab->feneCondInstantSeq.size(), 1920u);
 
     // feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-    EXPECT_EQ(feneSolarRadSeq.size(), 3360u);
+    EXPECT_EQ(state->dataOutRptTab->feneSolarRadSeq.size(), 3360u);
 
     // feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
     // EXPECT_EQ( feneSolarDelaySeq.size(), 1920u );
@@ -6842,7 +6842,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     feneCondInstantSeq(coolDesSelected, 1, 1) = 0.88;
 
-    netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
+    state->dataOutRptTab->netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
 
     GetDelaySequences(*state,
                       coolDesSelected,
@@ -8188,14 +8188,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
-            OutputReportTabular::TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
-            OutputReportTabular::ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
-            OutputReportTabular::decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
-            OutputReportTabular::peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
-            OutputReportTabular::equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
-            OutputReportTabular::hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
-            OutputReportTabular::powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
-            OutputReportTabular::lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
+            state->dataOutRptTab->TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
+            state->dataOutRptTab->ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
+            state->dataOutRptTab->equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
+            state->dataOutRptTab->hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
+            state->dataOutRptTab->powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
+            state->dataOutRptTab->lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
         }
     }
 
@@ -8237,14 +8237,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
-            OutputReportTabular::TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
-            OutputReportTabular::ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
-            OutputReportTabular::decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
-            OutputReportTabular::peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
-            OutputReportTabular::equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
-            OutputReportTabular::hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
-            OutputReportTabular::powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
-            OutputReportTabular::lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
+            state->dataOutRptTab->TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
+            state->dataOutRptTab->ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            state->dataOutRptTab->peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
+            state->dataOutRptTab->equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
+            state->dataOutRptTab->hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
+            state->dataOutRptTab->powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
+            state->dataOutRptTab->lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
         }
     }
 
