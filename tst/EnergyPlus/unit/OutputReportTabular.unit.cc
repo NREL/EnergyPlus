@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
 {
-    OutputTableBinned.allocate(10);
+    state->dataOutRptTab->OutputTableBinned.allocate(10);
     EXPECT_TRUE(warningAboutKeyNotFound(*state, 0, 1, "moduleName"));
     EXPECT_FALSE(warningAboutKeyNotFound(*state, 100, 1, "moduleName"));
 }
@@ -3509,20 +3509,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     state->dataEnvrn->Month = 12;
 
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
+    EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 2, MonthlyColumns(1).reslt(12));
+    EXPECT_EQ(extLitUse * 2, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, MonthlyColumns(1).reslt(12));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     ResetMonthlyGathering(*state);
 
-    EXPECT_EQ(0., MonthlyColumns(1).reslt(12));
+    EXPECT_EQ(0., state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
+    EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
@@ -3779,13 +3779,13 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
     GetInputTabularTimeBins(*state);
 
-    EXPECT_EQ(OutputReportTabular::OutputTableBinned.size(), 1u);
-    EXPECT_EQ(OutputTableBinned(1).keyValue, "SYSTEM1");
-    EXPECT_EQ(OutputTableBinned(1).varOrMeter, "SOME TEMPERATURE VARIABLE");
-    EXPECT_EQ(OutputTableBinned(1).intervalStart, 0.0);
-    EXPECT_EQ(OutputTableBinned(1).intervalSize, 0.20);
-    EXPECT_EQ(OutputTableBinned(1).intervalCount, 5);
-    EXPECT_EQ(OutputTableBinned(1).ScheduleName, "ALWAYS1");
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned.size(), 1u);
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).keyValue, "SYSTEM1");
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).varOrMeter, "SOME TEMPERATURE VARIABLE");
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).intervalStart, 0.0);
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).intervalSize, 0.20);
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).intervalCount, 5);
+    EXPECT_EQ(state->dataOutRptTab->OutputTableBinned(1).ScheduleName, "ALWAYS1");
 }
 
 // TEST_F( EnergyPlusFixture, FinAndOverhangCount )
@@ -7217,13 +7217,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     OutputReportTabular::InitializeTabularMonthly(*state);
 
     // We check that the Predefined Table is actually set to show
-    EXPECT_EQ("SetpointsNotMetWithTemperaturesMonthly", namedMonthly(31).title);
-    EXPECT_TRUE(namedMonthly(31).show);
+    EXPECT_EQ("SetpointsNotMetWithTemperaturesMonthly", state->dataOutRptTab->namedMonthly(31).title);
+    EXPECT_TRUE(state->dataOutRptTab->namedMonthly(31).show);
 
     // Check that it's the only one that's shown
     for (int i = 1; i <= OutputReportTabular::numNamedMonthly; ++i) {
         if (i != 31) {
-            EXPECT_FALSE(OutputReportTabular::namedMonthly(i).show);
+            EXPECT_FALSE(state->dataOutRptTab->namedMonthly(i).show);
         }
     }
 
@@ -7234,7 +7234,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // If everything worked, we should have 2 tables, one for each zone.
     // Previously, KeyCount was 0  because it couldn't find the variable in the OutputVariablesForSimulation
     // and so the numTables was zero
-    EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 2);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInput(1).numTables, 2);
 }
 // https://github.com/NREL/EnergyPlus/issues/6442
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)

@@ -182,15 +182,6 @@ namespace OutputReportTabular {
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
 
-    extern int maxUniqueKeyCount;
-
-    // for the XML report must keep track fo the active sub-table name and report set by other routines
-    extern std::string activeSubTableName;
-    extern std::string activeReportNameNoSpace;
-    extern std::string activeReportName;
-    extern std::string activeForName;
-    extern std::string prevReportName;
-
     // LineTypes for reading the stat file
     enum class StatLineType {
         Initialized, // used as a dummy placeholder
@@ -478,21 +469,6 @@ namespace OutputReportTabular {
         }
     };
 
-    // Object Data
-    extern Array1D<OutputTableBinnedType> OutputTableBinned;
-    extern Array2D<BinResultsType> BinResults;      // table number, number of intervals
-    extern Array1D<BinResultsType> BinResultsBelow; // time below the lowest defined bin
-    extern Array1D<BinResultsType> BinResultsAbove; // time above the highest defined bin
-    extern Array1D<BinObjVarIDType> BinObjVarID;
-    extern Array1D<BinStatisticsType> BinStatistics;
-    extern Array1D<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
-    extern Array1D<MonthlyFieldSetInputType> MonthlyFieldSetInput;
-    extern Array1D<MonthlyInputType> MonthlyInput;
-    extern Array1D<MonthlyTablesType> MonthlyTables;
-    extern Array1D<MonthlyColumnsType> MonthlyColumns;
-    extern Array1D<TOCEntriesType> TOCEntries;
-    extern Array1D<UnitConvType> UnitConv;
-
     // Functions
     void clear_state(EnergyPlusData &state);
 
@@ -760,7 +736,7 @@ namespace OutputReportTabular {
 
     void ResetMonthlyGathering(EnergyPlusData &state);
 
-    void ResetBinGathering();
+    void ResetBinGathering(EnergyPlusData &state);
 
     void ResetBEPSGathering(EnergyPlusData &state);
 
@@ -1056,6 +1032,37 @@ struct OutputReportTabularData : BaseGlobalStruct {
     Array3D<Real64> feneCondInstantSeq;
     Array3D<Real64> feneSolarRadSeq;
 
+    int maxUniqueKeyCount = 0;
+
+    // for the XML report must keep track fo the active sub-table name and report set by other routines
+    std::string activeSubTableName;
+    std::string activeReportNameNoSpace;
+    std::string activeReportName;
+    std::string activeForName;
+    std::string prevReportName;
+
+    // Object Data
+    Array1D<OutputReportTabular::OutputTableBinnedType> OutputTableBinned;
+    Array2D<OutputReportTabular::BinResultsType> BinResults;      // table number, number of intervals
+    Array1D<OutputReportTabular::BinResultsType> BinResultsBelow; // time below the lowest defined bin
+    Array1D<OutputReportTabular::BinResultsType> BinResultsAbove; // time above the highest defined bin
+    Array1D<OutputReportTabular::BinObjVarIDType> BinObjVarID;
+    Array1D<OutputReportTabular::BinStatisticsType> BinStatistics;
+    Array1D<OutputReportTabular::NamedMonthlyType> namedMonthly; // for predefined monthly report titles
+    Array1D<OutputReportTabular::MonthlyFieldSetInputType> MonthlyFieldSetInput;
+    Array1D<OutputReportTabular::MonthlyInputType> MonthlyInput;
+    Array1D<OutputReportTabular::MonthlyTablesType> MonthlyTables;
+    Array1D<OutputReportTabular::MonthlyColumnsType> MonthlyColumns;
+    Array1D<OutputReportTabular::TOCEntriesType> TOCEntries;
+    Array1D<OutputReportTabular::UnitConvType> UnitConv;
+
+    bool GatherMonthlyResultsForTimestepRunOnce = true;
+    bool UpdateTabularReportsGetInput = true;
+    bool GatherHeatGainReportfirstTime = true;
+    bool AllocateLoadComponentArraysDoAllocate = true;
+    bool initAdjFenDone = false;
+    int numPeopleAdaptive = 0;
+
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
@@ -1226,6 +1233,31 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->interZoneMixLatentSeq.deallocate();
         this->feneCondInstantSeq.deallocate();
         this->feneSolarRadSeq.deallocate();
+        this->maxUniqueKeyCount = 0;
+        this->activeSubTableName.clear();
+        this->activeReportNameNoSpace.clear();
+        this->activeReportName.clear();
+        this->activeForName.clear();
+        this->prevReportName.clear();
+        this->OutputTableBinned.deallocate();
+        this->BinResults.deallocate();
+        this->BinResultsBelow.deallocate();
+        this->BinResultsAbove.deallocate();
+        this->BinObjVarID.deallocate();
+        this->BinStatistics.deallocate();
+        this->namedMonthly.deallocate();
+        this->MonthlyFieldSetInput.deallocate();
+        this->MonthlyInput.deallocate();
+        this->MonthlyTables.deallocate();
+        this->MonthlyColumns.deallocate();
+        this->TOCEntries.deallocate();
+        this->UnitConv.deallocate();
+        this->GatherMonthlyResultsForTimestepRunOnce = true;
+        this->UpdateTabularReportsGetInput = true;
+        this->GatherHeatGainReportfirstTime = true;
+        this->AllocateLoadComponentArraysDoAllocate = true;
+        this->initAdjFenDone = false;
+        this->numPeopleAdaptive = 0;
     }
 };
 

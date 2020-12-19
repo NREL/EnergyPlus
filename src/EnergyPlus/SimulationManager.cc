@@ -1838,7 +1838,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataOutputs;
-        using OutputReportTabular::maxUniqueKeyCount;
         using namespace DataRuntimeLanguage;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
@@ -1880,7 +1879,7 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "MaxIVariable", state.dataOutputProcessor->MaxIVariable);
         print(state.files.audit, variable_fmt, "NumEnergyMeters", state.dataOutputProcessor->NumEnergyMeters);
         print(state.files.audit, variable_fmt, "NumVarMeterArrays", state.dataOutputProcessor->NumVarMeterArrays);
-        print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
+        print(state.files.audit, variable_fmt, "maxUniqueKeyCount", state.dataOutRptTab->maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);

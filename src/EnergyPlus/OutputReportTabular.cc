@@ -170,72 +170,10 @@ namespace EnergyPlus::OutputReportTabular {
     using namespace DataHeatBalance;
     using namespace HybridModel;
 
-    // MODULE VARIABLE DECLARATIONS:
-
-    // The Binned table type is different and only references one variable and its structure is very
-    // different from the others so it is has its own type.
-
-    // arrays for time binned results
-
-    int maxUniqueKeyCount(0);
-
-    // for the XML report must keep track fo the active sub-table name and report set by other routines
-    std::string activeSubTableName;
-    std::string activeReportNameNoSpace;
-    std::string activeReportName;
-    std::string activeForName;
-    std::string prevReportName;
-
-    // Object Data
-    Array1D<OutputTableBinnedType> OutputTableBinned;
-    Array2D<BinResultsType> BinResults;      // table number, number of intervals
-    Array1D<BinResultsType> BinResultsBelow; // time below the lowest defined bin
-    Array1D<BinResultsType> BinResultsAbove; // time above the highest defined bin
-    Array1D<BinObjVarIDType> BinObjVarID;
-    Array1D<BinStatisticsType> BinStatistics;
-    Array1D<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
-    Array1D<MonthlyFieldSetInputType> MonthlyFieldSetInput;
-    Array1D<MonthlyInputType> MonthlyInput;
-    Array1D<MonthlyTablesType> MonthlyTables;
-    Array1D<MonthlyColumnsType> MonthlyColumns;
-    Array1D<TOCEntriesType> TOCEntries;
-    Array1D<UnitConvType> UnitConv;
-
-    namespace {
-        bool GatherMonthlyResultsForTimestepRunOnce(true);
-        bool UpdateTabularReportsGetInput(true);
-        bool GatherHeatGainReportfirstTime(true);
-        bool AllocateLoadComponentArraysDoAllocate(true);
-        bool initAdjFenDone(false);
-        int numPeopleAdaptive(0);
-    } // namespace
-
     // Functions
     void clear_state(EnergyPlusData &state)
     {
-        GatherMonthlyResultsForTimestepRunOnce = true;
-        UpdateTabularReportsGetInput = true;
-        GatherHeatGainReportfirstTime = true;
-        AllocateLoadComponentArraysDoAllocate = true;
-        initAdjFenDone = false;
-        maxUniqueKeyCount = 0;
-        OutputTableBinned.deallocate();
-        BinResults.deallocate();
-        BinResultsBelow.deallocate();
-        BinResultsAbove.deallocate();
-        BinObjVarID.deallocate();
-        BinStatistics.deallocate();
-        namedMonthly.deallocate();
-        MonthlyFieldSetInput.deallocate();
-        MonthlyInput.deallocate();
-        MonthlyTables.deallocate();
-        MonthlyColumns.deallocate();
-        TOCEntries.deallocate();
-        UnitConv.deallocate();
-
         OutputReportTabular::ResetTabularReports(state);
-
-        numPeopleAdaptive = 0;
     }
 
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
@@ -270,7 +208,7 @@ namespace EnergyPlus::OutputReportTabular {
             ShowFatalError(state, "Invalid reporting requested -- UpdateTabularReports");
         }
 
-        if (UpdateTabularReportsGetInput) {
+        if (state.dataOutRptTab->UpdateTabularReportsGetInput) {
             GetInputTabularMonthly(state);
             OutputReportTabularAnnual::GetInputTabularAnnual(state);
             OutputReportTabularAnnual::checkAggregationOrderForAnnual(state);
@@ -285,7 +223,7 @@ namespace EnergyPlus::OutputReportTabular {
             GetInputFuelAndPollutionFactors(state);
             SetupUnitConversions(state);
             AddTOCLoadComponentTableSummaries(state);
-            UpdateTabularReportsGetInput = false;
+            state.dataOutRptTab->UpdateTabularReportsGetInput = false;
             date_and_time(_, _, _, state.dataOutRptTab->td);
         }
         if (state.dataGlobal->DoOutputReporting && state.dataOutRptTab->WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
@@ -428,7 +366,7 @@ namespace EnergyPlus::OutputReportTabular {
                     curAggType = iAggType::MinimumDuringHoursShown;
                 } else {
                     curAggType = iAggType::SumOrAvg;
-                    ShowWarningError(state, CurrentModuleObject + '=' + MonthlyInput(TabNum).name + ", Variable name=" + AlphArray(jField));
+                    ShowWarningError(state, CurrentModuleObject + '=' + state.dataOutRptTab->MonthlyInput(TabNum).name + ", Variable name=" + AlphArray(jField));
                     ShowContinueError(state, "Invalid aggregation type=\"" + curAggString + "\"  Defaulting to SumOrAverage.");
                 }
                 AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
@@ -472,20 +410,20 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const SizeAdder(25);
 
-        if (!allocated(MonthlyInput)) {
-            MonthlyInput.allocate(SizeAdder);
+        if (!allocated(state.dataOutRptTab->MonthlyInput)) {
+            state.dataOutRptTab->MonthlyInput.allocate(SizeAdder);
             state.dataOutRptTab->sizeMonthlyInput = SizeAdder;
             state.dataOutRptTab->MonthlyInputCount = 1;
         } else {
             ++state.dataOutRptTab->MonthlyInputCount;
             // if larger than current size grow the array
             if (state.dataOutRptTab->MonthlyInputCount > state.dataOutRptTab->sizeMonthlyInput) {
-                MonthlyInput.redimension(state.dataOutRptTab->sizeMonthlyInput += SizeAdder);
+                state.dataOutRptTab->MonthlyInput.redimension(state.dataOutRptTab->sizeMonthlyInput += SizeAdder);
             }
         }
         // initialize new record
-        MonthlyInput(state.dataOutRptTab->MonthlyInputCount).name = inReportName;
-        MonthlyInput(state.dataOutRptTab->MonthlyInputCount).showDigits = inNumDigitsShown;
+        state.dataOutRptTab->MonthlyInput(state.dataOutRptTab->MonthlyInputCount).name = inReportName;
+        state.dataOutRptTab->MonthlyInput(state.dataOutRptTab->MonthlyInputCount).showDigits = inNumDigitsShown;
         return state.dataOutRptTab->MonthlyInputCount;
     }
 
@@ -524,29 +462,29 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!allocated(MonthlyFieldSetInput)) {
-            MonthlyFieldSetInput.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptTab->MonthlyFieldSetInput)) {
+            state.dataOutRptTab->MonthlyFieldSetInput.allocate(sizeIncrement);
             state.dataOutRptTab->sizeMonthlyFieldSetInput = sizeIncrement;
             state.dataOutRptTab->MonthlyFieldSetInputCount = 1;
         } else {
             ++state.dataOutRptTab->MonthlyFieldSetInputCount;
             // if larger than current size grow the array
             if (state.dataOutRptTab->MonthlyFieldSetInputCount > state.dataOutRptTab->sizeMonthlyFieldSetInput) {
-                MonthlyFieldSetInput.redimension(state.dataOutRptTab->sizeMonthlyFieldSetInput *=
+                state.dataOutRptTab->MonthlyFieldSetInput.redimension(state.dataOutRptTab->sizeMonthlyFieldSetInput *=
                                                  2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)
-        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).variMeter = inVariMeter;
-        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).colHead = inColHead;
-        MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).aggregate = inAggregate;
+        state.dataOutRptTab->MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).variMeter = inVariMeter;
+        state.dataOutRptTab->MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).colHead = inColHead;
+        state.dataOutRptTab->MonthlyFieldSetInput(state.dataOutRptTab->MonthlyFieldSetInputCount).aggregate = inAggregate;
         // update the references from the MonthlyInput array
         if ((inMonthReport > 0) && (inMonthReport <= state.dataOutRptTab->MonthlyInputCount)) {
-            if (MonthlyInput(inMonthReport).firstFieldSet == 0) {
-                MonthlyInput(inMonthReport).firstFieldSet = state.dataOutRptTab->MonthlyFieldSetInputCount;
-                MonthlyInput(inMonthReport).numFieldSet = 1;
+            if (state.dataOutRptTab->MonthlyInput(inMonthReport).firstFieldSet == 0) {
+                state.dataOutRptTab->MonthlyInput(inMonthReport).firstFieldSet = state.dataOutRptTab->MonthlyFieldSetInputCount;
+                state.dataOutRptTab->MonthlyInput(inMonthReport).numFieldSet = 1;
             } else {
-                ++MonthlyInput(inMonthReport).numFieldSet;
+                ++state.dataOutRptTab->MonthlyInput(inMonthReport).numFieldSet;
             }
         }
     }
@@ -624,8 +562,8 @@ namespace EnergyPlus::OutputReportTabular {
 
         // if not a running a weather simulation do not create reports
         if (!state.dataGlobal->DoWeathSim) return;
-        maxUniqueKeyCount = 1500;
-        UniqueKeyNames.allocate(maxUniqueKeyCount);
+        state.dataOutRptTab->maxUniqueKeyCount = 1500;
+        UniqueKeyNames.allocate(state.dataOutRptTab->maxUniqueKeyCount);
         // First pass through the input objects is to put the name of the report
         // into the array and count the number of unique keys found to allocate
         // the monthlyTables and monthlyColumns
@@ -646,8 +584,8 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataOutRptTab->MonthlyTablesCount = 0;
         for (TabNum = 1; TabNum <= state.dataOutRptTab->MonthlyInputCount; ++TabNum) {
             // the number of columns based on number of alpha fields
-            NumColumns = MonthlyInput(TabNum).numFieldSet;
-            FirstColumn = MonthlyInput(TabNum).firstFieldSet;
+            NumColumns = state.dataOutRptTab->MonthlyInput(TabNum).numFieldSet;
+            FirstColumn = state.dataOutRptTab->MonthlyInput(TabNum).firstFieldSet;
             environmentKeyFound = false;
             UniqueKeyCount = 0;
             for (colNum = 1; colNum <= NumColumns; ++colNum) {
@@ -655,11 +593,11 @@ namespace EnergyPlus::OutputReportTabular {
                 //#ifdef ITM_KEYCACHE
                 // Noel comment:  First time in this TabNum/ColNum loop, let's save the results
                 //  of GetVariableKeyCountandType & GetVariableKeys.
-                curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+                curVariMeter = UtilityRoutines::MakeUPPERCase(state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
                 // call the key count function but only need count during this pass
                 GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
                 if (TypeVar == OutputProcessor::VarType_NotFound) {
-                    ShowWarningError(state, "In Output:Table:Monthly '" +  MonthlyInput(TabNum).name + "' invalid Variable or Meter Name '" + curVariMeter + "'");
+                    ShowWarningError(state, "In Output:Table:Monthly '" +  state.dataOutRptTab->MonthlyInput(TabNum).name + "' invalid Variable or Meter Name '" + curVariMeter + "'");
                 }
                 //    IF (KeyCount > maxKeyCount) THEN
                 //      DEALLOCATE(NamesOfKeys)
@@ -668,22 +606,22 @@ namespace EnergyPlus::OutputReportTabular {
                 //      ALLOCATE(NamesOfKeys(maxKeyCount))
                 //      ALLOCATE(IndexesForKeyVar(maxKeyCount))
                 //    ENDIF
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys.allocate(KeyCount);
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys.allocate(KeyCount);
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
 
                 // fill keys?
                 GetVariableKeys(state, curVariMeter,
                                 TypeVar,
-                                MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
-                                MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
+                                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
+                                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
 
                 // save these values to use later -- noel
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper = curVariMeter;
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar = TypeVar;
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount = KeyCount;
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum = AvgSumVar;
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType = StepTypeVar;
-                MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits = UnitsVar;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper = curVariMeter;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar = TypeVar;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount = KeyCount;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum = AvgSumVar;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType = StepTypeVar;
+                state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits = UnitsVar;
                 //    DO iKey = 1, KeyCount
                 //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey) = NamesOfKeys(iKey)  !noel
                 //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
@@ -700,22 +638,22 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iKey = 1; iKey <= KeyCount; ++iKey) {
                     found = 0;
                     // set a flag if environment variables are found
-                    if (UtilityRoutines::SameString(MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
+                    if (UtilityRoutines::SameString(state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
                         environmentKeyFound = true;
                         found = -1; // so not counted in list of unique keys
                     }
                     for (jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique) {
-                        if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
+                        if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
                             found = jUnique;
                             break;
                         }
                     }
                     if (found == 0) {
                         ++UniqueKeyCount;
-                        if (UniqueKeyCount > maxUniqueKeyCount) {
-                            UniqueKeyNames.redimension(maxUniqueKeyCount += 500);
+                        if (UniqueKeyCount > state.dataOutRptTab->maxUniqueKeyCount) {
+                            UniqueKeyNames.redimension(state.dataOutRptTab->maxUniqueKeyCount += 500);
                         }
-                        UniqueKeyNames(UniqueKeyCount) = MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
+                        UniqueKeyNames(UniqueKeyCount) = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
                     }
                 }
                 //#ifdef ITM_KEYCACHE
@@ -736,16 +674,16 @@ namespace EnergyPlus::OutputReportTabular {
         // Now that we have the maximum size of the number of tables (each table is
         // repeated for the number of keys found) and the number of total columns
         // of all of the tables, allocate the arrays to store this information.
-        MonthlyTables.allocate(state.dataOutRptTab->MonthlyTablesCount);
-        MonthlyColumns.allocate(state.dataOutRptTab->MonthlyColumnsCount);
+        state.dataOutRptTab->MonthlyTables.allocate(state.dataOutRptTab->MonthlyTablesCount);
+        state.dataOutRptTab->MonthlyColumns.allocate(state.dataOutRptTab->MonthlyColumnsCount);
         // Initialize tables and results
-        for (auto &e : MonthlyTables) {
+        for (auto &e : state.dataOutRptTab->MonthlyTables) {
             e.keyValue.clear();
             e.firstColumn = 0;
             e.numColumns = 0;
         }
 
-        for (auto &e : MonthlyColumns) {
+        for (auto &e : state.dataOutRptTab->MonthlyColumns) {
             e.varName.clear();
             e.varNum = 0;
             e.typeOfVar = 0;
@@ -755,28 +693,28 @@ namespace EnergyPlus::OutputReportTabular {
             e.aggType = iAggType::Unassigned;
         }
         for (colNum = 1; colNum <= state.dataOutRptTab->MonthlyColumnsCount; ++colNum) {
-            MonthlyColumns(colNum).reslt = 0.0;
-            MonthlyColumns(colNum).timeStamp = 0;
-            MonthlyColumns(colNum).duration = 0.0;
+            state.dataOutRptTab->MonthlyColumns(colNum).reslt = 0.0;
+            state.dataOutRptTab->MonthlyColumns(colNum).timeStamp = 0;
+            state.dataOutRptTab->MonthlyColumns(colNum).duration = 0.0;
         }
 
         ColumnsRecount = 0;
         TablesRecount = 0;
         for (TabNum = 1; TabNum <= state.dataOutRptTab->MonthlyInputCount; ++TabNum) {
             // the number of columns based on number of alpha fields
-            NumColumns = MonthlyInput(TabNum).numFieldSet;
-            FirstColumn = MonthlyInput(TabNum).firstFieldSet;
+            NumColumns = state.dataOutRptTab->MonthlyInput(TabNum).numFieldSet;
+            FirstColumn = state.dataOutRptTab->MonthlyInput(TabNum).firstFieldSet;
             UniqueKeyCount = 0;
             environmentKeyFound = false;
             for (colNum = 1; colNum <= NumColumns; ++colNum) {
                 //#ifdef ITM_KEYCACHE
                 // Noel comment:  Here is where we could use the saved values
-                curVariMeter = MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
-                KeyCount = MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
-                TypeVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
-                AvgSumVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
-                StepTypeVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
-                UnitsVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
+                curVariMeter = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
+                KeyCount = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
+                TypeVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
+                AvgSumVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
+                StepTypeVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
+                UnitsVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
                 //    DO iKey = 1, KeyCount  !noel
                 //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
                 //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
@@ -798,7 +736,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
                     if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
+                        ShowWarningError(state, "Processing Monthly Tabular Reports: " + state.dataOutRptTab->MonthlyInput(TabNum).name);
                         ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                         if (VarWarning) {
                             ShowContinueError(state, "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
@@ -810,19 +748,19 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iKey = 1; iKey <= KeyCount; ++iKey) {
                     found = 0;
                     // set a flag if environment variables are found
-                    if (UtilityRoutines::SameString(MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
+                    if (UtilityRoutines::SameString(state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
                         environmentKeyFound = true;
                         found = -1; // so not counted in list of unique keys
                     }
                     for (jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique) {
-                        if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
+                        if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
                             found = jUnique;
                             break;
                         }
                     }
                     if (found == 0) {
                         ++UniqueKeyCount;
-                        UniqueKeyNames(UniqueKeyCount) = MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
+                        UniqueKeyNames(UniqueKeyCount) = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey);
                     }
                 }
                 //#ifdef ITM_KEYCACHE
@@ -837,40 +775,40 @@ namespace EnergyPlus::OutputReportTabular {
                 UniqueKeyCount = 1;
             }
             // increment the number of tables based on the number of unique keys
-            MonthlyInput(TabNum).firstTable = TablesRecount + 1;
-            MonthlyInput(TabNum).numTables = UniqueKeyCount;
+            state.dataOutRptTab->MonthlyInput(TabNum).firstTable = TablesRecount + 1;
+            state.dataOutRptTab->MonthlyInput(TabNum).numTables = UniqueKeyCount;
             TablesRecount += UniqueKeyCount;
             // loop through the different unique keys since each user defined table
             // has that many instances - one for each unique key.
             // It is unusual that this loop is about 'keys' and an inner loop is also
             // about 'keys' but for this loop the keys are really instances of tables.
             for (kUniqueKey = 1; kUniqueKey <= UniqueKeyCount; ++kUniqueKey) {
-                lTable = kUniqueKey + MonthlyInput(TabNum).firstTable - 1;
+                lTable = kUniqueKey + state.dataOutRptTab->MonthlyInput(TabNum).firstTable - 1;
                 // use the term 'environment' for identifying the report if
                 if (environmentKeyFound && UniqueKeyCount == 1) {
-                    MonthlyTables(lTable).keyValue = "Environment";
+                    state.dataOutRptTab->MonthlyTables(lTable).keyValue = "Environment";
                 } else { // this is the most common case is to use the unique key for the report
-                    MonthlyTables(lTable).keyValue = UniqueKeyNames(kUniqueKey);
+                    state.dataOutRptTab->MonthlyTables(lTable).keyValue = UniqueKeyNames(kUniqueKey);
                 }
-                MonthlyTables(lTable).firstColumn = ColumnsRecount + 1;
-                MonthlyTables(lTable).numColumns = NumColumns;
+                state.dataOutRptTab->MonthlyTables(lTable).firstColumn = ColumnsRecount + 1;
+                state.dataOutRptTab->MonthlyTables(lTable).numColumns = NumColumns;
                 ColumnsRecount += NumColumns;
-                FirstColumn = MonthlyInput(TabNum).firstFieldSet;
+                FirstColumn = state.dataOutRptTab->MonthlyInput(TabNum).firstFieldSet;
                 for (colNum = 1; colNum <= NumColumns; ++colNum) {
                     environmentKeyFound = false;
-                    mColumn = colNum + MonthlyTables(lTable).firstColumn - 1;
+                    mColumn = colNum + state.dataOutRptTab->MonthlyTables(lTable).firstColumn - 1;
                     // when going through the columns this time, not all columns may have
                     // a EP variable that corresponds to it.  In no variable is found
                     // then set it to 0 to be skipped during data gathering
 
                     //#ifdef ITM_KEYCACHE
                     // Noel comment:  Here is where we could use the saved values
-                    curVariMeter = MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
-                    KeyCount = MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
-                    TypeVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
-                    AvgSumVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
-                    StepTypeVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
-                    UnitsVar = MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
+                    curVariMeter = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
+                    KeyCount = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
+                    TypeVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
+                    AvgSumVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
+                    StepTypeVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
+                    UnitsVar = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
                     //    DO iKey = 1, KeyCount  !noel
                     //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
                     //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
@@ -885,7 +823,7 @@ namespace EnergyPlus::OutputReportTabular {
                     //#endif
 
                     if (KeyCount == 1) { // first test if KeyCount is one to avoid referencing a zero element array
-                        if (UtilityRoutines::SameString(MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(1), "ENVIRONMENT")) {
+                        if (UtilityRoutines::SameString(state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(1), "ENVIRONMENT")) {
                             environmentKeyFound = true;
                         }
                     }
@@ -896,7 +834,7 @@ namespace EnergyPlus::OutputReportTabular {
                         // search through the keys for the currently active key "UniqueKeyNames(kUniqueKey)"
                         found = 0;
                         for (iKey = 1; iKey <= KeyCount; ++iKey) {
-                            if (UtilityRoutines::SameString(MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey),
+                            if (UtilityRoutines::SameString(state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey),
                                                             UniqueKeyNames(kUniqueKey))) {
                                 found = iKey;
                                 break;
@@ -904,54 +842,54 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     if ((found > 0) && (KeyCount >= 1)) {
-                        MonthlyColumns(mColumn).varName = curVariMeter;
-                        MonthlyColumns(mColumn).varNum = MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar(found);
-                        MonthlyColumns(mColumn).typeOfVar = TypeVar;
-                        MonthlyColumns(mColumn).avgSum = AvgSumVar;
-                        MonthlyColumns(mColumn).stepType = StepTypeVar;
-                        MonthlyColumns(mColumn).units = UnitsVar;
-                        MonthlyColumns(mColumn).aggType = MonthlyFieldSetInput(FirstColumn + colNum - 1).aggregate;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).varName = curVariMeter;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).varNum = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar(found);
+                        state.dataOutRptTab->MonthlyColumns(mColumn).typeOfVar = TypeVar;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).avgSum = AvgSumVar;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).stepType = StepTypeVar;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).units = UnitsVar;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).aggType = state.dataOutRptTab->MonthlyFieldSetInput(FirstColumn + colNum - 1).aggregate;
                         // set accumulator values to default as appropriate for aggregation type
                         {
-                            auto const SELECT_CASE_var(MonthlyColumns(mColumn).aggType);
+                            auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumns(mColumn).aggType);
                             if (SELECT_CASE_var == iAggType::SumOrAvg) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
-                                MonthlyColumns(mColumn).duration = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).duration = 0.0;
                             } else if (SELECT_CASE_var == iAggType::Maximum) {
-                                MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
-                                MonthlyColumns(mColumn).timeStamp = 0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
+                                state.dataOutRptTab->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::Minimum) {
-                                MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
-                                MonthlyColumns(mColumn).timeStamp = 0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
+                                state.dataOutRptTab->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursZero) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursNonZero) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursPositive) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursNonPositive) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursNegative) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::HoursNonNegative) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
                             } else if (SELECT_CASE_var == iAggType::SumOrAverageHoursShown) {
-                                MonthlyColumns(mColumn).reslt = 0.0;
-                                MonthlyColumns(mColumn).duration = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = 0.0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).duration = 0.0;
                             } else if (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) {
-                                MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
-                                MonthlyColumns(mColumn).timeStamp = 0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = -HUGE_(BigNum);
+                                state.dataOutRptTab->MonthlyColumns(mColumn).timeStamp = 0;
                             } else if (SELECT_CASE_var == iAggType::MinimumDuringHoursShown) {
-                                MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
-                                MonthlyColumns(mColumn).timeStamp = 0;
+                                state.dataOutRptTab->MonthlyColumns(mColumn).reslt = HUGE_(BigNum);
+                                state.dataOutRptTab->MonthlyColumns(mColumn).timeStamp = 0;
                             }
                         }
                     } else { // if no key corresponds to this instance of the report
                         // fixing CR5878 removed the showing of the warning once about a specific variable.
                         if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                            ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
+                            ShowWarningError(state, "Processing Monthly Tabular Reports: " + state.dataOutRptTab->MonthlyInput(TabNum).name);
                             ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                             ShowContinueError(state, "..i.e., Variable name=" + UniqueKeyNames(kUniqueKey) + ':' + curVariMeter +
                                               " not valid for this simulation.");
@@ -961,13 +899,13 @@ namespace EnergyPlus::OutputReportTabular {
                                 VarWarning = false;
                             }
                         }
-                        MonthlyColumns(mColumn).varName = curVariMeter;
-                        MonthlyColumns(mColumn).varNum = 0;
-                        MonthlyColumns(mColumn).typeOfVar = 0;
-                        MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
-                        MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
-                        MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
-                        MonthlyColumns(mColumn).aggType = iAggType::SumOrAvg;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).varName = curVariMeter;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).varNum = 0;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).typeOfVar = 0;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
+                        state.dataOutRptTab->MonthlyColumns(mColumn).aggType = iAggType::SumOrAvg;
                     }
                     //#ifdef ITM_KEYCACHE
                     //#else
@@ -995,13 +933,13 @@ namespace EnergyPlus::OutputReportTabular {
             bool foundHourAgg = false;
             bool missingMaxOrMinError = false;
             bool missingHourAggError = false;
-            for (int jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
-                int curTable = jTable + MonthlyInput(iInput).firstTable - 1;
+            for (int jTable = 1; jTable <= state.dataOutRptTab->MonthlyInput(iInput).numTables; ++jTable) {
+                int curTable = jTable + state.dataOutRptTab->MonthlyInput(iInput).firstTable - 1;
                 // test if the aggregation types are in the correct order
-                for (int kColumn = 1; kColumn <= MonthlyTables(curTable).numColumns; ++kColumn) {
-                    int curCol = kColumn + MonthlyTables(curTable).firstColumn - 1;
-                    if (MonthlyColumns(curCol).varNum == 0) break; // if no variable was ever found than stop checking
-                    iAggType curAggType = MonthlyColumns(curCol).aggType;
+                for (int kColumn = 1; kColumn <= state.dataOutRptTab->MonthlyTables(curTable).numColumns; ++kColumn) {
+                    int curCol = kColumn + state.dataOutRptTab->MonthlyTables(curTable).firstColumn - 1;
+                    if (state.dataOutRptTab->MonthlyColumns(curCol).varNum == 0) break; // if no variable was ever found than stop checking
+                    iAggType curAggType = state.dataOutRptTab->MonthlyColumns(curCol).aggType;
                     if ((curAggType == iAggType::Maximum) || (curAggType == iAggType::Minimum)) {
                         foundMinOrMax = true;
                     } else if ((curAggType == iAggType::HoursNonZero) || (curAggType == iAggType::HoursZero) || (curAggType == iAggType::HoursPositive) ||
@@ -1021,13 +959,13 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
             if (missingMaxOrMinError) {
-                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
+                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + state.dataOutRptTab->MonthlyInput(iInput).name +
                                 "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or "
                                 "maximum aggregation types. The report will not be generated.");
                 foundError = true;
             }
             if (missingHourAggError) {
-                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
+                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + state.dataOutRptTab->MonthlyInput(iInput).name +
                                 "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- "
                                 "aggregation types. The report will not be generated.");
                 foundError = true;
@@ -1098,10 +1036,10 @@ namespace EnergyPlus::OutputReportTabular {
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
-        state.dataOutRptTab->timeInYear = 0.0; // intialize the time in year counter
+        state.dataOutRptTab->timeInYear = 0.0; // initialize the time in year counter
         // determine size of array that holds the IDF description
         state.dataOutRptTab->OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        OutputTableBinned.allocate(state.dataOutRptTab->OutputTableBinnedCount);
+        state.dataOutRptTab->OutputTableBinned.allocate(state.dataOutRptTab->OutputTableBinnedCount);
         if (state.dataOutRptTab->OutputTableBinnedCount > 0) {
             state.dataOutRptTab->WriteTabularFiles = true;
             // if not a run period using weather do not create reports
@@ -1127,17 +1065,17 @@ namespace EnergyPlus::OutputReportTabular {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            OutputTableBinned(iInObj).keyValue = AlphArray(1);
-            OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
+            state.dataOutRptTab->OutputTableBinned(iInObj).keyValue = AlphArray(1);
+            state.dataOutRptTab->OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
             // if a schedule has been specified assign
             if (len(AlphArray(3)) > 0) {
-                OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
-                OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
-                if (OutputTableBinned(iInObj).scheduleIndex == 0) {
+                state.dataOutRptTab->OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
+                state.dataOutRptTab->OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
+                if (state.dataOutRptTab->OutputTableBinned(iInObj).scheduleIndex == 0) {
                     ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
                 }
             } else {
-                OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
+                state.dataOutRptTab->OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
             }
             // validate the kind of variable - not used internally except for validation
             if (len(AlphArray(4)) > 0) {
@@ -1147,61 +1085,61 @@ namespace EnergyPlus::OutputReportTabular {
                                      " the Variable Type was not energy, demand, temperature, or flowrate.");
                 }
             }
-            OutputTableBinned(iInObj).intervalStart = NumArray(1);
-            OutputTableBinned(iInObj).intervalSize = NumArray(2);
-            OutputTableBinned(iInObj).intervalCount = int(NumArray(3));
+            state.dataOutRptTab->OutputTableBinned(iInObj).intervalStart = NumArray(1);
+            state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize = NumArray(2);
+            state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount = int(NumArray(3));
             // valid range checking on inputs
-            if (OutputTableBinned(iInObj).intervalCount < 1) {
-                OutputTableBinned(iInObj).intervalCount = 1;
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount < 1) {
+                state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount = 1;
             }
-            if (OutputTableBinned(iInObj).intervalCount > 20) {
-                OutputTableBinned(iInObj).intervalCount = 20;
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount > 20) {
+                state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount = 20;
             }
-            if (OutputTableBinned(iInObj).intervalSize < 0) {
-                OutputTableBinned(iInObj).intervalSize = 1000.0;
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize < 0) {
+                state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize = 1000.0;
             }
-            OutputTableBinned(iInObj).resIndex = state.dataOutRptTab->BinResultsTableCount + 1; // the next results report
+            state.dataOutRptTab->OutputTableBinned(iInObj).resIndex = state.dataOutRptTab->BinResultsTableCount + 1; // the next results report
             // find maximum number of intervals
-            if (OutputTableBinned(iInObj).intervalCount > state.dataOutRptTab->BinResultsIntervalCount) {
-                state.dataOutRptTab->BinResultsIntervalCount = OutputTableBinned(iInObj).intervalCount;
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount > state.dataOutRptTab->BinResultsIntervalCount) {
+                state.dataOutRptTab->BinResultsIntervalCount = state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount;
             }
-            GetVariableKeyCountandType(state, OutputTableBinned(iInObj).varOrMeter,
-                                       OutputTableBinned(iInObj).numTables,
-                                       OutputTableBinned(iInObj).typeOfVar,
-                                       OutputTableBinned(iInObj).avgSum,
-                                       OutputTableBinned(iInObj).stepType,
-                                       OutputTableBinned(iInObj).units);
-            if (OutputTableBinned(iInObj).typeOfVar == 0) {
-                ShowWarningError(state, CurrentModuleObject + ": User specified meter or variable not found: " + OutputTableBinned(iInObj).varOrMeter);
+            GetVariableKeyCountandType(state, state.dataOutRptTab->OutputTableBinned(iInObj).varOrMeter,
+                                       state.dataOutRptTab->OutputTableBinned(iInObj).numTables,
+                                       state.dataOutRptTab->OutputTableBinned(iInObj).typeOfVar,
+                                       state.dataOutRptTab->OutputTableBinned(iInObj).avgSum,
+                                       state.dataOutRptTab->OutputTableBinned(iInObj).stepType,
+                                       state.dataOutRptTab->OutputTableBinned(iInObj).units);
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).typeOfVar == 0) {
+                ShowWarningError(state, CurrentModuleObject + ": User specified meter or variable not found: " + state.dataOutRptTab->OutputTableBinned(iInObj).varOrMeter);
             }
             // If only a single table key is requested than only one should be counted
             // later will reset the numTables array pointer but for now use it to know
             // how many items to scan through
-            if (OutputTableBinned(iInObj).keyValue == "*") {
-                state.dataOutRptTab->BinResultsTableCount += OutputTableBinned(iInObj).numTables;
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).keyValue == "*") {
+                state.dataOutRptTab->BinResultsTableCount += state.dataOutRptTab->OutputTableBinned(iInObj).numTables;
             } else {
                 ++state.dataOutRptTab->BinResultsTableCount; // if a particular key is requested then only one more report
             }
         }
         // size the arrays that holds the bin results
-        BinResults.allocate(state.dataOutRptTab->BinResultsIntervalCount, state.dataOutRptTab->BinResultsTableCount);
-        BinResultsBelow.allocate(state.dataOutRptTab->BinResultsTableCount);
-        BinResultsAbove.allocate(state.dataOutRptTab->BinResultsTableCount);
-        BinStatistics.allocate(state.dataOutRptTab->BinResultsTableCount);
-        BinObjVarID.allocate(state.dataOutRptTab->BinResultsTableCount);
+        state.dataOutRptTab->BinResults.allocate(state.dataOutRptTab->BinResultsIntervalCount, state.dataOutRptTab->BinResultsTableCount);
+        state.dataOutRptTab->BinResultsBelow.allocate(state.dataOutRptTab->BinResultsTableCount);
+        state.dataOutRptTab->BinResultsAbove.allocate(state.dataOutRptTab->BinResultsTableCount);
+        state.dataOutRptTab->BinStatistics.allocate(state.dataOutRptTab->BinResultsTableCount);
+        state.dataOutRptTab->BinObjVarID.allocate(state.dataOutRptTab->BinResultsTableCount);
         // now that the arrays are sized go back and fill in
         // what ID numbers are used for each table
         for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
-            firstReport = OutputTableBinned(iInObj).resIndex;
+            firstReport = state.dataOutRptTab->OutputTableBinned(iInObj).resIndex;
             // allocate the arrays to the number of objects
-            objNames.allocate(OutputTableBinned(iInObj).numTables);
-            objVarIDs.allocate(OutputTableBinned(iInObj).numTables);
-            GetVariableKeys(state, OutputTableBinned(iInObj).varOrMeter, OutputTableBinned(iInObj).typeOfVar, objNames, objVarIDs);
-            if (OutputTableBinned(iInObj).keyValue == "*") {
-                for (iTable = 1; iTable <= OutputTableBinned(iInObj).numTables; ++iTable) {
+            objNames.allocate(state.dataOutRptTab->OutputTableBinned(iInObj).numTables);
+            objVarIDs.allocate(state.dataOutRptTab->OutputTableBinned(iInObj).numTables);
+            GetVariableKeys(state, state.dataOutRptTab->OutputTableBinned(iInObj).varOrMeter, state.dataOutRptTab->OutputTableBinned(iInObj).typeOfVar, objNames, objVarIDs);
+            if (state.dataOutRptTab->OutputTableBinned(iInObj).keyValue == "*") {
+                for (iTable = 1; iTable <= state.dataOutRptTab->OutputTableBinned(iInObj).numTables; ++iTable) {
                     repIndex = firstReport + (iTable - 1);
-                    BinObjVarID(repIndex).namesOfObj = objNames(iTable);
-                    BinObjVarID(repIndex).varMeterNum = objVarIDs(iTable);
+                    state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj = objNames(iTable);
+                    state.dataOutRptTab->BinObjVarID(repIndex).varMeterNum = objVarIDs(iTable);
                     // check if valid meter or number
                     if (objVarIDs(iTable) == 0) {
                         ShowWarningError(state, CurrentModuleObject + ": Specified variable or meter not found: " + objNames(iTable));
@@ -1210,37 +1148,37 @@ namespace EnergyPlus::OutputReportTabular {
             } else {
                 // scan through the keys and look for the user specified key
                 found = 0;
-                for (iTable = 1; iTable <= OutputTableBinned(iInObj).numTables; ++iTable) {
-                    if (UtilityRoutines::SameString(objNames(iTable), OutputTableBinned(iInObj).keyValue)) {
+                for (iTable = 1; iTable <= state.dataOutRptTab->OutputTableBinned(iInObj).numTables; ++iTable) {
+                    if (UtilityRoutines::SameString(objNames(iTable), state.dataOutRptTab->OutputTableBinned(iInObj).keyValue)) {
                         found = iTable;
                         break;
                     }
                 }
                 // the first and only report is assigned to the found object name
                 if (!warningAboutKeyNotFound(state, found, iInObj, CurrentModuleObject)) {
-                    BinObjVarID(firstReport).namesOfObj = objNames(found);
-                    BinObjVarID(firstReport).varMeterNum = objVarIDs(found);
+                    state.dataOutRptTab->BinObjVarID(firstReport).namesOfObj = objNames(found);
+                    state.dataOutRptTab->BinObjVarID(firstReport).varMeterNum = objVarIDs(found);
                 }
                 // reset the number of tables to one
-                OutputTableBinned(iInObj).numTables = 1;
+                state.dataOutRptTab->OutputTableBinned(iInObj).numTables = 1;
             }
         }
         // clear the binning arrays to zeros
-        for (auto &e : BinResults) {
+        for (auto &e : state.dataOutRptTab->BinResults) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
-        for (auto &e : BinResultsBelow) {
+        for (auto &e : state.dataOutRptTab->BinResultsBelow) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
-        for (auto &e : BinResultsAbove) {
+        for (auto &e : state.dataOutRptTab->BinResultsAbove) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
 
         // initialize statistics counters
-        for (auto &e : BinStatistics) {
+        for (auto &e : state.dataOutRptTab->BinStatistics) {
             e.minimum = HUGE_(bigVal);
             e.maximum = -HUGE_(bigVal);
             e.n = 0;
@@ -1252,8 +1190,8 @@ namespace EnergyPlus::OutputReportTabular {
     bool warningAboutKeyNotFound(EnergyPlusData &state, int foundIndex, int inObjIndex, std::string const &moduleName)
     {
         if (foundIndex == 0) {
-            ShowWarningError(state, moduleName + ": Specified key not found: " + OutputTableBinned(inObjIndex).keyValue +
-                             " for variable: " + OutputTableBinned(inObjIndex).varOrMeter);
+            ShowWarningError(state, moduleName + ": Specified key not found: " + state.dataOutRptTab->OutputTableBinned(inObjIndex).keyValue +
+                             " for variable: " + state.dataOutRptTab->OutputTableBinned(inObjIndex).varOrMeter);
             return true;
         } else {
             return false;
@@ -1659,7 +1597,7 @@ namespace EnergyPlus::OutputReportTabular {
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllMonthly")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
-                        namedMonthly(jReport).show = true;
+                        state.dataOutRptTab->namedMonthly(jReport).show = true;
                     }
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndMonthly")) {
@@ -1686,7 +1624,7 @@ namespace EnergyPlus::OutputReportTabular {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
-                        namedMonthly(jReport).show = true;
+                        state.dataOutRptTab->namedMonthly(jReport).show = true;
                     }
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
                     state.dataOutRptTab->WriteTabularFiles = true;
@@ -1712,7 +1650,7 @@ namespace EnergyPlus::OutputReportTabular {
                         state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
-                        namedMonthly(jReport).show = true;
+                        state.dataOutRptTab->namedMonthly(jReport).show = true;
                     }
                     // the sizing period reports
                     state.dataOutRptTab->displayZoneComponentLoadSummary = true;
@@ -1734,8 +1672,8 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // check if the predefined monthly reports are used
                 for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
-                    if (UtilityRoutines::SameString(AlphArray(iReport), namedMonthly(jReport).title)) {
-                        namedMonthly(jReport).show = true;
+                    if (UtilityRoutines::SameString(AlphArray(iReport), state.dataOutRptTab->namedMonthly(jReport).title)) {
+                        state.dataOutRptTab->namedMonthly(jReport).show = true;
                         state.dataOutRptTab->WriteTabularFiles = true;
                         nameFound = true;
                     }
@@ -2029,70 +1967,70 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int xcount;
 
-        namedMonthly.allocate(numNamedMonthly);
-        namedMonthly(1).title = "ZoneCoolingSummaryMonthly";
-        namedMonthly(2).title = "ZoneHeatingSummaryMonthly";
-        namedMonthly(3).title = "ZoneElectricSummaryMonthly";
-        namedMonthly(4).title = "SpaceGainsMonthly";
-        namedMonthly(5).title = "PeakSpaceGainsMonthly";
-        namedMonthly(6).title = "SpaceGainComponentsAtCoolingPeakMonthly";
-        namedMonthly(7).title = "EnergyConsumptionElectricityNaturalGasMonthly";
-        namedMonthly(8).title = "EnergyConsumptionElectricityGeneratedPropaneMonthly";
-        namedMonthly(9).title = "EnergyConsumptionDieselFuelOilMonthly";
-        namedMonthly(10).title = "EnergyConsumptionDistrictHeatingCoolingMonthly";
-        namedMonthly(11).title = "EnergyConsumptionCoalGasolineMonthly";
-        namedMonthly(12).title = "EnergyConsumptionOtherFuelsMonthly";
-        namedMonthly(13).title = "EndUseEnergyConsumptionElectricityMonthly";
-        namedMonthly(14).title = "EndUseEnergyConsumptionNaturalGasMonthly";
-        namedMonthly(15).title = "EndUseEnergyConsumptionDieselMonthly";
-        namedMonthly(16).title = "EndUseEnergyConsumptionFuelOilMonthly";
-        namedMonthly(17).title = "EndUseEnergyConsumptionCoalMonthly";
-        namedMonthly(18).title = "EndUseEnergyConsumptionPropaneMonthly";
-        namedMonthly(19).title = "EndUseEnergyConsumptionGasolineMonthly";
-        namedMonthly(20).title = "EndUseEnergyConsumptionOtherFuelsMonthly";
-        namedMonthly(21).title = "PeakEnergyEndUseElectricityPart1Monthly";
-        namedMonthly(22).title = "PeakEnergyEndUseElectricityPart2Monthly";
-        namedMonthly(23).title = "ElectricComponentsOfPeakDemandMonthly";
-        namedMonthly(24).title = "PeakEnergyEndUseNaturalGasMonthly";
-        namedMonthly(25).title = "PeakEnergyEndUseDieselMonthly";
-        namedMonthly(26).title = "PeakEnergyEndUseFuelOilMonthly";
-        namedMonthly(27).title = "PeakEnergyEndUseCoalMonthly";
-        namedMonthly(28).title = "PeakEnergyEndUsePropaneMonthly";
-        namedMonthly(29).title = "PeakEnergyEndUseGasolineMonthly";
-        namedMonthly(30).title = "PeakEnergyEndUseOtherFuelsMonthly";
-        namedMonthly(31).title = "SetpointsNotMetWithTemperaturesMonthly";
-        namedMonthly(32).title = "ComfortReportSimple55Monthly";
-        namedMonthly(33).title = "UnglazedTranspiredSolarCollectorSummaryMonthly";
-        namedMonthly(34).title = "OccupantComfortDataSummaryMonthly";
-        namedMonthly(35).title = "ChillerReportMonthly";
-        namedMonthly(36).title = "TowerReportMonthly";
-        namedMonthly(37).title = "BoilerReportMonthly";
-        namedMonthly(38).title = "DXReportMonthly";
-        namedMonthly(39).title = "WindowReportMonthly";
-        namedMonthly(40).title = "WindowEnergyReportMonthly";
-        namedMonthly(41).title = "WindowZoneSummaryMonthly";
-        namedMonthly(42).title = "WindowEnergyZoneSummaryMonthly";
-        namedMonthly(43).title = "AverageOutdoorConditionsMonthly";
-        namedMonthly(44).title = "OutdoorConditionsMaximumDryBulbMonthly";
-        namedMonthly(45).title = "OutdoorConditionsMinimumDryBulbMonthly";
-        namedMonthly(46).title = "OutdoorConditionsMaximumWetBulbMonthly";
-        namedMonthly(47).title = "OutdoorConditionsMaximumDewPointMonthly";
-        namedMonthly(48).title = "OutdoorGroundConditionsMonthly";
-        namedMonthly(49).title = "WindowACReportMonthly";
-        namedMonthly(50).title = "WaterHeaterReportMonthly";
-        namedMonthly(51).title = "GeneratorReportMonthly";
-        namedMonthly(52).title = "DaylightingReportMonthly";
-        namedMonthly(53).title = "CoilReportMonthly";
-        namedMonthly(54).title = "PlantLoopDemandReportMonthly";
-        namedMonthly(55).title = "FanReportMonthly";
-        namedMonthly(56).title = "PumpReportMonthly";
-        namedMonthly(57).title = "CondLoopDemandReportMonthly";
-        namedMonthly(58).title = "ZoneTemperatureOscillationReportMonthly";
-        namedMonthly(59).title = "AirLoopSystemEnergyAndWaterUseMonthly";
-        namedMonthly(60).title = "AirLoopSystemComponentLoadsMonthly";
-        namedMonthly(61).title = "AirLoopSystemComponentEnergyUseMonthly";
-        namedMonthly(62).title = "MechanicalVentilationLoadsMonthly";
-        namedMonthly(63).title = "HeatEmissionsReportMonthly";
+        state.dataOutRptTab->namedMonthly.allocate(numNamedMonthly);
+        state.dataOutRptTab->namedMonthly(1).title = "ZoneCoolingSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(2).title = "ZoneHeatingSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(3).title = "ZoneElectricSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(4).title = "SpaceGainsMonthly";
+        state.dataOutRptTab->namedMonthly(5).title = "PeakSpaceGainsMonthly";
+        state.dataOutRptTab->namedMonthly(6).title = "SpaceGainComponentsAtCoolingPeakMonthly";
+        state.dataOutRptTab->namedMonthly(7).title = "EnergyConsumptionElectricityNaturalGasMonthly";
+        state.dataOutRptTab->namedMonthly(8).title = "EnergyConsumptionElectricityGeneratedPropaneMonthly";
+        state.dataOutRptTab->namedMonthly(9).title = "EnergyConsumptionDieselFuelOilMonthly";
+        state.dataOutRptTab->namedMonthly(10).title = "EnergyConsumptionDistrictHeatingCoolingMonthly";
+        state.dataOutRptTab->namedMonthly(11).title = "EnergyConsumptionCoalGasolineMonthly";
+        state.dataOutRptTab->namedMonthly(12).title = "EnergyConsumptionOtherFuelsMonthly";
+        state.dataOutRptTab->namedMonthly(13).title = "EndUseEnergyConsumptionElectricityMonthly";
+        state.dataOutRptTab->namedMonthly(14).title = "EndUseEnergyConsumptionNaturalGasMonthly";
+        state.dataOutRptTab->namedMonthly(15).title = "EndUseEnergyConsumptionDieselMonthly";
+        state.dataOutRptTab->namedMonthly(16).title = "EndUseEnergyConsumptionFuelOilMonthly";
+        state.dataOutRptTab->namedMonthly(17).title = "EndUseEnergyConsumptionCoalMonthly";
+        state.dataOutRptTab->namedMonthly(18).title = "EndUseEnergyConsumptionPropaneMonthly";
+        state.dataOutRptTab->namedMonthly(19).title = "EndUseEnergyConsumptionGasolineMonthly";
+        state.dataOutRptTab->namedMonthly(20).title = "EndUseEnergyConsumptionOtherFuelsMonthly";
+        state.dataOutRptTab->namedMonthly(21).title = "PeakEnergyEndUseElectricityPart1Monthly";
+        state.dataOutRptTab->namedMonthly(22).title = "PeakEnergyEndUseElectricityPart2Monthly";
+        state.dataOutRptTab->namedMonthly(23).title = "ElectricComponentsOfPeakDemandMonthly";
+        state.dataOutRptTab->namedMonthly(24).title = "PeakEnergyEndUseNaturalGasMonthly";
+        state.dataOutRptTab->namedMonthly(25).title = "PeakEnergyEndUseDieselMonthly";
+        state.dataOutRptTab->namedMonthly(26).title = "PeakEnergyEndUseFuelOilMonthly";
+        state.dataOutRptTab->namedMonthly(27).title = "PeakEnergyEndUseCoalMonthly";
+        state.dataOutRptTab->namedMonthly(28).title = "PeakEnergyEndUsePropaneMonthly";
+        state.dataOutRptTab->namedMonthly(29).title = "PeakEnergyEndUseGasolineMonthly";
+        state.dataOutRptTab->namedMonthly(30).title = "PeakEnergyEndUseOtherFuelsMonthly";
+        state.dataOutRptTab->namedMonthly(31).title = "SetpointsNotMetWithTemperaturesMonthly";
+        state.dataOutRptTab->namedMonthly(32).title = "ComfortReportSimple55Monthly";
+        state.dataOutRptTab->namedMonthly(33).title = "UnglazedTranspiredSolarCollectorSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(34).title = "OccupantComfortDataSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(35).title = "ChillerReportMonthly";
+        state.dataOutRptTab->namedMonthly(36).title = "TowerReportMonthly";
+        state.dataOutRptTab->namedMonthly(37).title = "BoilerReportMonthly";
+        state.dataOutRptTab->namedMonthly(38).title = "DXReportMonthly";
+        state.dataOutRptTab->namedMonthly(39).title = "WindowReportMonthly";
+        state.dataOutRptTab->namedMonthly(40).title = "WindowEnergyReportMonthly";
+        state.dataOutRptTab->namedMonthly(41).title = "WindowZoneSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(42).title = "WindowEnergyZoneSummaryMonthly";
+        state.dataOutRptTab->namedMonthly(43).title = "AverageOutdoorConditionsMonthly";
+        state.dataOutRptTab->namedMonthly(44).title = "OutdoorConditionsMaximumDryBulbMonthly";
+        state.dataOutRptTab->namedMonthly(45).title = "OutdoorConditionsMinimumDryBulbMonthly";
+        state.dataOutRptTab->namedMonthly(46).title = "OutdoorConditionsMaximumWetBulbMonthly";
+        state.dataOutRptTab->namedMonthly(47).title = "OutdoorConditionsMaximumDewPointMonthly";
+        state.dataOutRptTab->namedMonthly(48).title = "OutdoorGroundConditionsMonthly";
+        state.dataOutRptTab->namedMonthly(49).title = "WindowACReportMonthly";
+        state.dataOutRptTab->namedMonthly(50).title = "WaterHeaterReportMonthly";
+        state.dataOutRptTab->namedMonthly(51).title = "GeneratorReportMonthly";
+        state.dataOutRptTab->namedMonthly(52).title = "DaylightingReportMonthly";
+        state.dataOutRptTab->namedMonthly(53).title = "CoilReportMonthly";
+        state.dataOutRptTab->namedMonthly(54).title = "PlantLoopDemandReportMonthly";
+        state.dataOutRptTab->namedMonthly(55).title = "FanReportMonthly";
+        state.dataOutRptTab->namedMonthly(56).title = "PumpReportMonthly";
+        state.dataOutRptTab->namedMonthly(57).title = "CondLoopDemandReportMonthly";
+        state.dataOutRptTab->namedMonthly(58).title = "ZoneTemperatureOscillationReportMonthly";
+        state.dataOutRptTab->namedMonthly(59).title = "AirLoopSystemEnergyAndWaterUseMonthly";
+        state.dataOutRptTab->namedMonthly(60).title = "AirLoopSystemComponentLoadsMonthly";
+        state.dataOutRptTab->namedMonthly(61).title = "AirLoopSystemComponentEnergyUseMonthly";
+        state.dataOutRptTab->namedMonthly(62).title = "MechanicalVentilationLoadsMonthly";
+        state.dataOutRptTab->namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
             ShowFatalError(state,
@@ -2102,10 +2040,10 @@ namespace EnergyPlus::OutputReportTabular {
                                   NumMonthlyReports));
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
-                if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), namedMonthly(xcount).title)) {
+                if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), state.dataOutRptTab->namedMonthly(xcount).title)) {
                     ShowSevereError(state,
                         "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
-                    ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, namedMonthly(xcount).title));
+                    ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, state.dataOutRptTab->namedMonthly(xcount).title));
                     ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
@@ -2152,7 +2090,7 @@ namespace EnergyPlus::OutputReportTabular {
         // AddVariablesForMonthlyReport routine in InputProcessor.
         // ----------------------------------------------------------------------------------------
 
-        if (namedMonthly(1).show) {
+        if (state.dataOutRptTab->namedMonthly(1).show) {
             curReport = AddMonthlyReport(state, "ZoneCoolingSummaryMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
@@ -2163,20 +2101,20 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(2).show) {
+        if (state.dataOutRptTab->namedMonthly(2).show) {
             curReport = AddMonthlyReport(state, "ZoneHeatingSummaryMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Rate", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(3).show) {
+        if (state.dataOutRptTab->namedMonthly(3).show) {
             curReport = AddMonthlyReport(state, "ZoneElectricSummaryMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", iAggType::Maximum);
         }
-        if (namedMonthly(4).show) {
+        if (state.dataOutRptTab->namedMonthly(4).show) {
             curReport = AddMonthlyReport(state, "SpaceGainsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", iAggType::SumOrAvg);
@@ -2188,7 +2126,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(5).show) {
+        if (state.dataOutRptTab->namedMonthly(5).show) {
             curReport = AddMonthlyReport(state, "PeakSpaceGainsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", iAggType::Maximum);
@@ -2200,7 +2138,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::Maximum);
         }
-        if (namedMonthly(6).show) {
+        if (state.dataOutRptTab->namedMonthly(6).show) {
             curReport = AddMonthlyReport(state, "SpaceGainComponentsAtCoolingPeakMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", iAggType::ValueWhenMaxMin);
@@ -2213,21 +2151,21 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Gain Energy", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(7).show) {
+        if (state.dataOutRptTab->namedMonthly(7).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityNaturalGasMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(8).show) {
+        if (state.dataOutRptTab->namedMonthly(8).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityGeneratedPropaneMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(9).show) {
+        if (state.dataOutRptTab->namedMonthly(9).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionDieselFuelOilMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", iAggType::Maximum);
@@ -2236,28 +2174,28 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "FuelOilNo2:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "FuelOilNo2:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(10).show) {
+        if (state.dataOutRptTab->namedMonthly(10).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(11).show) {
+        if (state.dataOutRptTab->namedMonthly(11).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionCoalGasolineMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(12).show) {
+        if (state.dataOutRptTab->namedMonthly(12).show) {
             curReport = AddMonthlyReport(state, "EnergyConsumptionOtherFuelsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", iAggType::Maximum);
         }
-        if (namedMonthly(13).show) {
+        if (state.dataOutRptTab->namedMonthly(13).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionElectricityMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", iAggType::SumOrAvg);
@@ -2273,7 +2211,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Electricity", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(14).show) {
+        if (state.dataOutRptTab->namedMonthly(14).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionNaturalGasMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", iAggType::SumOrAvg);
@@ -2283,7 +2221,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:NaturalGas", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Humidifier:NaturalGas", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(15).show) {
+        if (state.dataOutRptTab->namedMonthly(15).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionDieselMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", iAggType::SumOrAvg);
@@ -2291,7 +2229,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Diesel", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(16).show) {
+        if (state.dataOutRptTab->namedMonthly(16).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionFuelOilMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", iAggType::SumOrAvg);
@@ -2304,13 +2242,13 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo2", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(17).show) {
+        if (state.dataOutRptTab->namedMonthly(17).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionCoalMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(18).show) {
+        if (state.dataOutRptTab->namedMonthly(18).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionPropaneMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", iAggType::SumOrAvg);
@@ -2319,7 +2257,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Propane", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Humidifier:Propane", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(19).show) {
+        if (state.dataOutRptTab->namedMonthly(19).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionGasolineMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", iAggType::SumOrAvg);
@@ -2327,7 +2265,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Gasoline", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(20).show) {
+        if (state.dataOutRptTab->namedMonthly(20).show) {
             curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionOtherFuelsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", iAggType::SumOrAvg);
@@ -2340,7 +2278,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel2", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(21).show) {
+        if (state.dataOutRptTab->namedMonthly(21).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart1Monthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", iAggType::Maximum);
@@ -2350,7 +2288,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Pumps:Electricity", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Heating:Electricity", "", iAggType::Maximum);
         }
-        if (namedMonthly(22).show) {
+        if (state.dataOutRptTab->namedMonthly(22).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart2Monthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", iAggType::Maximum);
@@ -2359,7 +2297,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Electricity", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", iAggType::Maximum);
         }
-        if (namedMonthly(23).show) {
+        if (state.dataOutRptTab->namedMonthly(23).show) {
             curReport = AddMonthlyReport(state, "ElectricComponentsOfPeakDemandMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", iAggType::ValueWhenMaxMin);
@@ -2372,7 +2310,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(24).show) {
+        if (state.dataOutRptTab->namedMonthly(24).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseNaturalGasMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", iAggType::Maximum);
@@ -2381,7 +2319,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:NaturalGas", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:NaturalGas", "", iAggType::Maximum);
         }
-        if (namedMonthly(25).show) {
+        if (state.dataOutRptTab->namedMonthly(25).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseDieselMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", iAggType::Maximum);
@@ -2389,7 +2327,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Diesel", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", iAggType::Maximum);
         }
-        if (namedMonthly(26).show) {
+        if (state.dataOutRptTab->namedMonthly(26).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseFuelOilMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", iAggType::Maximum);
@@ -2402,13 +2340,13 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:FuelOilNo2", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", iAggType::Maximum);
         }
-        if (namedMonthly(27).show) {
+        if (state.dataOutRptTab->namedMonthly(27).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseCoalMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", iAggType::Maximum);
         }
-        if (namedMonthly(28).show) {
+        if (state.dataOutRptTab->namedMonthly(28).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUsePropaneMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", iAggType::Maximum);
@@ -2416,7 +2354,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Propane", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Propane", "", iAggType::Maximum);
         }
-        if (namedMonthly(29).show) {
+        if (state.dataOutRptTab->namedMonthly(29).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseGasolineMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", iAggType::Maximum);
@@ -2424,7 +2362,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Gasoline", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", iAggType::Maximum);
         }
-        if (namedMonthly(30).show) {
+        if (state.dataOutRptTab->namedMonthly(30).show) {
             curReport = AddMonthlyReport(state, "PeakEnergyEndUseOtherFuelsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", iAggType::Maximum);
@@ -2437,7 +2375,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "WaterSystems:OtherFuel2", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", iAggType::Maximum);
         }
-        if (namedMonthly(31).show) {
+        if (state.dataOutRptTab->namedMonthly(31).show) {
             curReport = AddMonthlyReport(state, "SetpointsNotMetWithTemperaturesMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Heating Setpoint Not Met Time", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
@@ -2448,7 +2386,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Cooling Setpoint Not Met While Occupied Time", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
         }
-        if (namedMonthly(32).show) {
+        if (state.dataOutRptTab->namedMonthly(32).show) {
             curReport = AddMonthlyReport(state, "ComfortReportSimple55Monthly", 2);
             AddMonthlyFieldSetInput(state,
                 curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", "", iAggType::HoursNonZero);
@@ -2460,14 +2398,14 @@ namespace EnergyPlus::OutputReportTabular {
                 curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", iAggType::SumOrAverageHoursShown);
         }
-        if (namedMonthly(33).show) {
+        if (state.dataOutRptTab->namedMonthly(33).show) {
             curReport = AddMonthlyReport(state, "UnglazedTranspiredSolarCollectorSummaryMonthly", 5);
             AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", iAggType::SumOrAverageHoursShown);
             AddMonthlyFieldSetInput(state, curReport, "Solar Collector Outside Face Suction Velocity", "", iAggType::SumOrAverageHoursShown);
             AddMonthlyFieldSetInput(state, curReport, "Solar Collector Sensible Heating Rate", "", iAggType::SumOrAverageHoursShown);
         }
-        if (namedMonthly(34).show) {
+        if (state.dataOutRptTab->namedMonthly(34).show) {
             curReport = AddMonthlyReport(state, "OccupantComfortDataSummaryMonthly", 5);
             AddMonthlyFieldSetInput(state, curReport, "People Occupant Count", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "People Air Temperature", "", iAggType::SumOrAverageHoursShown);
@@ -2475,7 +2413,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Thermal Comfort Fanger Model PMV", "", iAggType::SumOrAverageHoursShown);
             AddMonthlyFieldSetInput(state, curReport, "Zone Thermal Comfort Fanger Model PPD", "", iAggType::SumOrAverageHoursShown);
         }
-        if (namedMonthly(35).show) {
+        if (state.dataOutRptTab->namedMonthly(35).show) {
             curReport = AddMonthlyReport(state, "ChillerReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Rate", "", iAggType::Maximum);
@@ -2488,7 +2426,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Chiller Part Load Ratio", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Chiller Part Load Ratio", "", iAggType::Maximum);
         }
-        if (namedMonthly(36).show) {
+        if (state.dataOutRptTab->namedMonthly(36).show) {
             curReport = AddMonthlyReport(state, "TowerReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", iAggType::HoursNonZero);
@@ -2498,7 +2436,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Outlet Temperature", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Mass Flow Rate", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(37).show) {
+        if (state.dataOutRptTab->namedMonthly(37).show) {
             curReport = AddMonthlyReport(state, "BoilerReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Boiler Gas Consumption", "", iAggType::SumOrAvg);
@@ -2512,7 +2450,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Boiler Part Load Ratio", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Boiler Part Load Ratio", "", iAggType::Maximum);
         }
-        if (namedMonthly(38).show) {
+        if (state.dataOutRptTab->namedMonthly(38).show) {
             curReport = AddMonthlyReport(state, "DXReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Electricity Energy", "", iAggType::SumOrAvg);
@@ -2528,7 +2466,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Electricity Rate", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", iAggType::Maximum);
         }
-        if (namedMonthly(39).show) {
+        if (state.dataOutRptTab->namedMonthly(39).show) {
             curReport = AddMonthlyReport(state, "WindowReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
@@ -2539,7 +2477,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Surface Shading Device Is On Time Fraction", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Surface Storm Window On Off Status", "", iAggType::HoursNonZero);
         }
-        if (namedMonthly(40).show) {
+        if (state.dataOutRptTab->namedMonthly(40).show) {
             curReport = AddMonthlyReport(state, "WindowEnergyReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
@@ -2547,7 +2485,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Gain Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Loss Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(41).show) {
+        if (state.dataOutRptTab->namedMonthly(41).show) {
             curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", iAggType::SumOrAvg);
@@ -2557,7 +2495,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(42).show) {
+        if (state.dataOutRptTab->namedMonthly(42).show) {
             curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", iAggType::SumOrAvg);
@@ -2567,7 +2505,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(43).show) {
+        if (state.dataOutRptTab->namedMonthly(43).show) {
             curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::SumOrAvg);
@@ -2578,7 +2516,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Site Rain Status", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(44).show) {
+        if (state.dataOutRptTab->namedMonthly(44).show) {
             curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDryBulbMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
@@ -2588,7 +2526,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(45).show) {
+        if (state.dataOutRptTab->namedMonthly(45).show) {
             curReport = AddMonthlyReport(state, "OutdoorConditionsMinimumDryBulbMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::Minimum);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::ValueWhenMaxMin);
@@ -2598,7 +2536,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(46).show) {
+        if (state.dataOutRptTab->namedMonthly(46).show) {
             curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumWetBulbMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
@@ -2608,7 +2546,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(47).show) {
+        if (state.dataOutRptTab->namedMonthly(47).show) {
             curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDewPointMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", iAggType::ValueWhenMaxMin);
@@ -2618,7 +2556,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Diffuse Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(48).show) {
+        if (state.dataOutRptTab->namedMonthly(48).show) {
             curReport = AddMonthlyReport(state, "OutdoorGroundConditionsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Ground Temperature", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Site Surface Ground Temperature", "", iAggType::SumOrAvg);
@@ -2627,7 +2565,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Site Ground Reflected Solar Radiation Rate per Area", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Site Snow on Ground Status", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(49).show) {
+        if (state.dataOutRptTab->namedMonthly(49).show) {
             curReport = AddMonthlyReport(state, "WindowACReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Energy", "", iAggType::SumOrAvg);
@@ -2639,7 +2577,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Latent Cooling Rate", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Rate", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(50).show) {
+        if (state.dataOutRptTab->namedMonthly(50).show) {
             curReport = AddMonthlyReport(state, "WaterHeaterReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Water Heater Total Demand Heat Transfer Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Water Heater Use Side Heat Transfer Energy", "", iAggType::SumOrAvg);
@@ -2652,7 +2590,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Recovery Supply Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(51).show) {
+        if (state.dataOutRptTab->namedMonthly(51).show) {
             curReport = AddMonthlyReport(state, "GeneratorReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Generator Produced AC Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Generator Diesel Consumption", "", iAggType::SumOrAvg);
@@ -2664,7 +2602,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Generator Exhaust Heat Recovery Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Generator Exhaust Air Temperature", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(52).show) {
+        if (state.dataOutRptTab->namedMonthly(52).show) {
             curReport = AddMonthlyReport(state, "DaylightingReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Site Exterior Beam Normal Illuminance", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Daylighting Lighting Power Multiplier", "", iAggType::SumOrAverageHoursShown);
@@ -2678,7 +2616,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(53).show) {
+        if (state.dataOutRptTab->namedMonthly(53).show) {
             curReport = AddMonthlyReport(state, "CoilReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Rate", "", iAggType::Maximum);
@@ -2688,21 +2626,21 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Sensible Cooling Rate", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Wetted Area Fraction", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(54).show) {
+        if (state.dataOutRptTab->namedMonthly(54).show) {
             curReport = AddMonthlyReport(state, "PlantLoopDemandReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
         }
-        if (namedMonthly(55).show) {
+        if (state.dataOutRptTab->namedMonthly(55).show) {
             curReport = AddMonthlyReport(state, "FanReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Rate", "", iAggType::Maximum);
             AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(56).show) {
+        if (state.dataOutRptTab->namedMonthly(56).show) {
             curReport = AddMonthlyReport(state, "PumpReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Pump Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Pump Fluid Heat Gain Energy", "", iAggType::SumOrAvg);
@@ -2712,7 +2650,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Pump Outlet Temperature", "", iAggType::ValueWhenMaxMin);
             AddMonthlyFieldSetInput(state, curReport, "Pump Mass Flow Rate", "", iAggType::ValueWhenMaxMin);
         }
-        if (namedMonthly(57).show) {
+        if (state.dataOutRptTab->namedMonthly(57).show) {
             curReport = AddMonthlyReport(state, "CondLoopDemandReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", iAggType::Maximum);
@@ -2721,12 +2659,12 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", iAggType::Maximum);
         }
-        if (namedMonthly(58).show) {
+        if (state.dataOutRptTab->namedMonthly(58).show) {
             curReport = AddMonthlyReport(state, "ZoneTemperatureOscillationReportMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Oscillating Temperatures Time", "", iAggType::HoursNonZero);
             AddMonthlyFieldSetInput(state, curReport, "Zone People Occupant Count", "", iAggType::SumOrAverageHoursShown);
         }
-        if (namedMonthly(59).show) {
+        if (state.dataOutRptTab->namedMonthly(59).show) {
             curReport = AddMonthlyReport(state, "AirLoopSystemEnergyAndWaterUseMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Air System Hot Water Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Air System Steam Energy", "", iAggType::SumOrAvg);
@@ -2736,7 +2674,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Air System Water Volume", "", iAggType::SumOrAvg);
         }
 
-        if (namedMonthly(60).show) {
+        if (state.dataOutRptTab->namedMonthly(60).show) {
             curReport = AddMonthlyReport(state, "AirLoopSystemComponentLoadsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Air System Fan Air Heating Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Air System Cooling Coil Total Cooling Energy", "", iAggType::SumOrAvg);
@@ -2747,7 +2685,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Air System Evaporative Cooler Total Cooling Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Total Cooling Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(61).show) {
+        if (state.dataOutRptTab->namedMonthly(61).show) {
             curReport = AddMonthlyReport(state, "AirLoopSystemComponentEnergyUseMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Air System Fan Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Hot Water Energy", "", iAggType::SumOrAvg);
@@ -2762,7 +2700,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Air System Evaporative Cooler Electricity Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Electricity Energy", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(62).show) {
+        if (state.dataOutRptTab->namedMonthly(62).show) {
             curReport = AddMonthlyReport(state, "MechanicalVentilationLoadsMonthly", 2);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation No Load Heat Removal Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Cooling Load Increase Energy", "", iAggType::SumOrAvg);
@@ -2774,7 +2712,7 @@ namespace EnergyPlus::OutputReportTabular {
             AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Heating Load Decrease Energy", "", iAggType::SumOrAvg);
             AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", iAggType::SumOrAvg);
         }
-        if (namedMonthly(63).show) {
+        if (state.dataOutRptTab->namedMonthly(63).show) {
             curReport = AddMonthlyReport(state, "HeatEmissionsReportMonthly", 2);
             // Place holder
             AddMonthlyFieldSetInput(state, curReport, "Site Total Surface Heat Emission to Air", "", iAggType::SumOrAvg);
@@ -3215,8 +3153,8 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "</body>\n";
                     tbl_stream << "</html>\n";
                 } else if (state.dataOutRptTab->TableStyle(iStyle) == iTableStyle::XML) {
-                    if (!prevReportName.empty()) {
-                        tbl_stream << "</" << prevReportName << ">\n"; // close the last element if it was used.
+                    if (!state.dataOutRptTab->prevReportName.empty()) {
+                        tbl_stream << "</" << state.dataOutRptTab->prevReportName << ">\n"; // close the last element if it was used.
                     }
                     tbl_stream << "</EnergyPlusTabularReports>\n";
                 }
@@ -3355,39 +3293,39 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 if (state.dataGlobal->DoWeathSim) {
                     for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
-                        if (MonthlyInput(iInput).numTables > 0) {
-                            tbl_stream << "<p><b>" << MonthlyInput(iInput).name << "</b></p> |\n";
-                            for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
-                                curTable = jTable + MonthlyInput(iInput).firstTable - 1;
-                                tbl_stream << "<a href=\"#" << MakeAnchorName(MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue) << "\">"
-                                           << MonthlyTables(curTable).keyValue << "</a>    |   \n";
+                        if (state.dataOutRptTab->MonthlyInput(iInput).numTables > 0) {
+                            tbl_stream << "<p><b>" << state.dataOutRptTab->MonthlyInput(iInput).name << "</b></p> |\n";
+                            for (jTable = 1; jTable <= state.dataOutRptTab->MonthlyInput(iInput).numTables; ++jTable) {
+                                curTable = jTable + state.dataOutRptTab->MonthlyInput(iInput).firstTable - 1;
+                                tbl_stream << "<a href=\"#" << MakeAnchorName(state.dataOutRptTab->MonthlyInput(iInput).name, state.dataOutRptTab->MonthlyTables(curTable).keyValue) << "\">"
+                                           << state.dataOutRptTab->MonthlyTables(curTable).keyValue << "</a>    |   \n";
                             }
                         }
                     }
                     for (iInput = 1; iInput <= state.dataOutRptTab->OutputTableBinnedCount; ++iInput) {
-                        if (OutputTableBinned(iInput).numTables > 0) {
-                            if (OutputTableBinned(iInput).scheduleIndex == 0) {
-                                tbl_stream << "<p><b>" << OutputTableBinned(iInput).varOrMeter << "</b></p> |\n";
+                        if (state.dataOutRptTab->OutputTableBinned(iInput).numTables > 0) {
+                            if (state.dataOutRptTab->OutputTableBinned(iInput).scheduleIndex == 0) {
+                                tbl_stream << "<p><b>" << state.dataOutRptTab->OutputTableBinned(iInput).varOrMeter << "</b></p> |\n";
                             } else {
-                                tbl_stream << "<p><b>" << OutputTableBinned(iInput).varOrMeter << " [" << OutputTableBinned(iInput).ScheduleName
+                                tbl_stream << "<p><b>" << state.dataOutRptTab->OutputTableBinned(iInput).varOrMeter << " [" << state.dataOutRptTab->OutputTableBinned(iInput).ScheduleName
                                            << "]</b></p> |\n";
                             }
-                            for (jTable = 1; jTable <= OutputTableBinned(iInput).numTables; ++jTable) {
-                                curTable = OutputTableBinned(iInput).resIndex + (jTable - 1);
+                            for (jTable = 1; jTable <= state.dataOutRptTab->OutputTableBinned(iInput).numTables; ++jTable) {
+                                curTable = state.dataOutRptTab->OutputTableBinned(iInput).resIndex + (jTable - 1);
                                 curName = "";
                                 if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
-                                    origName = OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInput).units);
+                                    origName = state.dataOutRptTab->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(state.dataOutRptTab->OutputTableBinned(iInput).units);
                                     LookupSItoIP(state, origName, indexUnitConv, curName);
                                 } else {
-                                    curName = OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInput).units);
+                                    curName = state.dataOutRptTab->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(state.dataOutRptTab->OutputTableBinned(iInput).units);
                                 }
-                                if (OutputTableBinned(iInput).scheduleIndex == 0) {
-                                    tbl_stream << "<a href=\"#" << MakeAnchorName(curName, BinObjVarID(curTable).namesOfObj) << "\">"
-                                               << BinObjVarID(curTable).namesOfObj << "</a>   |  \n";
+                                if (state.dataOutRptTab->OutputTableBinned(iInput).scheduleIndex == 0) {
+                                    tbl_stream << "<a href=\"#" << MakeAnchorName(curName, state.dataOutRptTab->BinObjVarID(curTable).namesOfObj) << "\">"
+                                               << state.dataOutRptTab->BinObjVarID(curTable).namesOfObj << "</a>   |  \n";
                                 } else {
                                     tbl_stream << "<a href=\"#"
-                                               << MakeAnchorName(curName + OutputTableBinned(iInput).ScheduleName, BinObjVarID(curTable).namesOfObj)
-                                               << "\">" << BinObjVarID(curTable).namesOfObj << "</a>   |  \n";
+                                               << MakeAnchorName(curName + state.dataOutRptTab->OutputTableBinned(iInput).ScheduleName, state.dataOutRptTab->BinObjVarID(curTable).namesOfObj)
+                                               << "\">" << state.dataOutRptTab->BinObjVarID(curTable).namesOfObj << "</a>   |  \n";
                                 }
                             }
                         }
@@ -3396,15 +3334,15 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // add entries specifically added using AddTOCEntry
                 for (iEntry = 1; iEntry <= state.dataOutRptTab->TOCEntriesCount; ++iEntry) {
-                    if (!TOCEntries(iEntry).isWritten) {
-                        curSection = TOCEntries(iEntry).sectionName;
+                    if (!state.dataOutRptTab->TOCEntries(iEntry).isWritten) {
+                        curSection = state.dataOutRptTab->TOCEntries(iEntry).sectionName;
                         tbl_stream << "<p><b>" << curSection << "</b></p> |\n";
                         for (jEntry = iEntry; jEntry <= state.dataOutRptTab->TOCEntriesCount; ++jEntry) {
-                            if (!TOCEntries(jEntry).isWritten) {
-                                if (TOCEntries(jEntry).sectionName == curSection) {
-                                    tbl_stream << "<a href=\"#" << MakeAnchorName(TOCEntries(jEntry).sectionName, TOCEntries(jEntry).reportName)
-                                               << "\">" << TOCEntries(jEntry).reportName << "</a>   |  \n";
-                                    TOCEntries(jEntry).isWritten = true;
+                            if (!state.dataOutRptTab->TOCEntries(jEntry).isWritten) {
+                                if (state.dataOutRptTab->TOCEntries(jEntry).sectionName == curSection) {
+                                    tbl_stream << "<a href=\"#" << MakeAnchorName(state.dataOutRptTab->TOCEntries(jEntry).sectionName, state.dataOutRptTab->TOCEntries(jEntry).reportName)
+                                               << "\">" << state.dataOutRptTab->TOCEntries(jEntry).reportName << "</a>   |  \n";
+                                    state.dataOutRptTab->TOCEntries(jEntry).isWritten = true;
                                 }
                             }
                         }
@@ -3476,15 +3414,15 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataOutRptTab->timeInYear += elapsedTime;
         for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
             // get values of array for current object being referenced
-            curIntervalStart = OutputTableBinned(iInObj).intervalStart;
-            curIntervalSize = OutputTableBinned(iInObj).intervalSize;
-            curIntervalCount = OutputTableBinned(iInObj).intervalCount;
-            curResIndex = OutputTableBinned(iInObj).resIndex;
-            curNumTables = OutputTableBinned(iInObj).numTables;
+            curIntervalStart = state.dataOutRptTab->OutputTableBinned(iInObj).intervalStart;
+            curIntervalSize = state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize;
+            curIntervalCount = state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount;
+            curResIndex = state.dataOutRptTab->OutputTableBinned(iInObj).resIndex;
+            curNumTables = state.dataOutRptTab->OutputTableBinned(iInObj).numTables;
             topValue = curIntervalStart + curIntervalSize * curIntervalCount;
-            curTypeOfVar = OutputTableBinned(iInObj).typeOfVar;
-            curStepType = OutputTableBinned(iInObj).stepType;
-            curScheduleIndex = OutputTableBinned(iInObj).scheduleIndex;
+            curTypeOfVar = state.dataOutRptTab->OutputTableBinned(iInObj).typeOfVar;
+            curStepType = state.dataOutRptTab->OutputTableBinned(iInObj).stepType;
+            curScheduleIndex = state.dataOutRptTab->OutputTableBinned(iInObj).scheduleIndex;
             // if a schedule was used, check if it was non-zero value
             if (curScheduleIndex != 0) {
                 if (GetCurrentScheduleValue(state, curScheduleIndex) != 0.0) {
@@ -3503,14 +3441,14 @@ namespace EnergyPlus::OutputReportTabular {
                         ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
                          (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                         // put actual value from OutputProcesser arrays
-                        curValue = GetInternalVariableValue(state, curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
+                        curValue = GetInternalVariableValue(state, curTypeOfVar, state.dataOutRptTab->BinObjVarID(repIndex).varMeterNum);
                         // per MJW when a summed variable is used divide it by the length of the time step
                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                             elapsedTime = TimeStepSys;
                         } else {
                             elapsedTime = state.dataGlobal->TimeStepZone;
                         }
-                        if (OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (state.dataOutRptTab->OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                             curValue /= (elapsedTime * DataGlobalConstants::SecInHour);
                         }
                         // round the value to the number of signficant digits used in the final output report
@@ -3524,26 +3462,26 @@ namespace EnergyPlus::OutputReportTabular {
                         // check if the value is above the maximum or below the minimum value
                         // first before binning the value within the range.
                         if (curValue < curIntervalStart) {
-                            BinResultsBelow(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
-                            BinResultsBelow(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
+                            state.dataOutRptTab->BinResultsBelow(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
+                            state.dataOutRptTab->BinResultsBelow(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else if (curValue >= topValue) {
-                            BinResultsAbove(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
-                            BinResultsAbove(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
+                            state.dataOutRptTab->BinResultsAbove(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
+                            state.dataOutRptTab->BinResultsAbove(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else {
                             // determine which bin the results are in
                             binNum = int((curValue - curIntervalStart) / curIntervalSize) + 1;
-                            BinResults(binNum, repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
-                            BinResults(binNum, repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
+                            state.dataOutRptTab->BinResults(binNum, repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
+                            state.dataOutRptTab->BinResults(binNum, repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         }
                         // add to statistics array
-                        ++BinStatistics(repIndex).n;
-                        BinStatistics(repIndex).sum += curValue;
-                        BinStatistics(repIndex).sum2 += curValue * curValue;
-                        if (curValue < BinStatistics(repIndex).minimum) {
-                            BinStatistics(repIndex).minimum = curValue;
+                        ++state.dataOutRptTab->BinStatistics(repIndex).n;
+                        state.dataOutRptTab->BinStatistics(repIndex).sum += curValue;
+                        state.dataOutRptTab->BinStatistics(repIndex).sum2 += curValue * curValue;
+                        if (curValue < state.dataOutRptTab->BinStatistics(repIndex).minimum) {
+                            state.dataOutRptTab->BinStatistics(repIndex).minimum = curValue;
                         }
-                        if (curValue > BinStatistics(repIndex).maximum) {
-                            BinStatistics(repIndex).maximum = curValue;
+                        if (curValue > state.dataOutRptTab->BinStatistics(repIndex).maximum) {
+                            state.dataOutRptTab->BinStatistics(repIndex).maximum = curValue;
                         }
                     }
                 }
@@ -3621,14 +3559,14 @@ namespace EnergyPlus::OutputReportTabular {
         assert(state.dataGlobal->TimeStepZoneSec > 0.0);
 
         // create temporary arrays to speed processing of these arrays
-        if (GatherMonthlyResultsForTimestepRunOnce) {
+        if (state.dataOutRptTab->GatherMonthlyResultsForTimestepRunOnce) {
             // MonthlyColumns
-            MonthlyColumnsTypeOfVar.allocate(MonthlyColumns.I());
-            MonthlyColumnsStepType.allocate(MonthlyColumns.I());
-            MonthlyColumnsAggType.allocate(MonthlyColumns.I());
-            MonthlyColumnsVarNum.allocate(MonthlyColumns.I());
-            for (int i = MonthlyColumns.l(), e = MonthlyColumns.u(); i <= e; ++i) {
-                auto const &col(MonthlyColumns(i));
+            MonthlyColumnsTypeOfVar.allocate(state.dataOutRptTab->MonthlyColumns.I());
+            MonthlyColumnsStepType.allocate(state.dataOutRptTab->MonthlyColumns.I());
+            MonthlyColumnsAggType.allocate(state.dataOutRptTab->MonthlyColumns.I());
+            MonthlyColumnsVarNum.allocate(state.dataOutRptTab->MonthlyColumns.I());
+            for (int i = state.dataOutRptTab->MonthlyColumns.l(), e = state.dataOutRptTab->MonthlyColumns.u(); i <= e; ++i) {
+                auto const &col(state.dataOutRptTab->MonthlyColumns(i));
                 MonthlyColumnsTypeOfVar(i) = col.typeOfVar;
                 MonthlyColumnsStepType(i) = col.stepType;
                 MonthlyColumnsAggType(i) = col.aggType;
@@ -3636,13 +3574,13 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // MonthlyTables
-            MonthlyTablesNumColumns.allocate(MonthlyTables.I());
-            for (int i = MonthlyTables.l(), e = MonthlyTables.u(); i <= e; ++i) {
-                MonthlyTablesNumColumns(i) = MonthlyTables(i).numColumns;
+            MonthlyTablesNumColumns.allocate(state.dataOutRptTab->MonthlyTables.I());
+            for (int i = state.dataOutRptTab->MonthlyTables.l(), e = state.dataOutRptTab->MonthlyTables.u(); i <= e; ++i) {
+                MonthlyTablesNumColumns(i) = state.dataOutRptTab->MonthlyTables(i).numColumns;
             }
 
             // set flag so this block is only executed once
-            GatherMonthlyResultsForTimestepRunOnce = false;
+            state.dataOutRptTab->GatherMonthlyResultsForTimestepRunOnce = false;
         }
 
         elapsedTime = TimeStepSys;
@@ -3655,7 +3593,7 @@ namespace EnergyPlus::OutputReportTabular {
         for (iTable = 1; iTable <= state.dataOutRptTab->MonthlyTablesCount; ++iTable) {
             activeMinMax = false;     // at the beginning of the new timestep
             activeHoursShown = false; // fix by JG addressing CR6482
-            curFirstColumn = MonthlyTables(iTable).firstColumn;
+            curFirstColumn = state.dataOutRptTab->MonthlyTables(iTable).firstColumn;
             for (jColumn = 1; jColumn <= MonthlyTablesNumColumns(iTable); ++jColumn) {
                 curCol = jColumn + curFirstColumn - 1;
                 curTypeOfVar = MonthlyColumnsTypeOfVar(curCol);
@@ -3669,9 +3607,9 @@ namespace EnergyPlus::OutputReportTabular {
                     curVarNum = MonthlyColumnsVarNum(curCol);
                     curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                     // Get the value from the result array
-                    oldResultValue = MonthlyColumns(curCol).reslt(state.dataEnvrn->Month);
-                    oldTimeStamp = MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month);
-                    oldDuration = MonthlyColumns(curCol).duration(state.dataEnvrn->Month);
+                    oldResultValue = state.dataOutRptTab->MonthlyColumns(curCol).reslt(state.dataEnvrn->Month);
+                    oldTimeStamp = state.dataOutRptTab->MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month);
+                    oldDuration = state.dataOutRptTab->MonthlyColumns(curCol).duration(state.dataEnvrn->Month);
                     // Zero the revised values (as default if not set later in SELECT)
                     newResultValue = 0.0;
                     newTimeStamp = 0;
@@ -3688,7 +3626,7 @@ namespace EnergyPlus::OutputReportTabular {
                     {
                         auto const SELECT_CASE_var(MonthlyColumnsAggType(curCol));
                         if (SELECT_CASE_var == iAggType::SumOrAvg) {
-                            if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 newResultValue = oldResultValue + curValue;
                             } else {
                                 newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
@@ -3697,7 +3635,7 @@ namespace EnergyPlus::OutputReportTabular {
                             activeNewValue = true;
                         } else if (SELECT_CASE_var == iAggType::Maximum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
-                            if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                 } else {
@@ -3714,7 +3652,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         } else if (SELECT_CASE_var == iAggType::Minimum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
-                            if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                 } else {
@@ -3788,9 +3726,9 @@ namespace EnergyPlus::OutputReportTabular {
                     // new columns. This skips the aggregation types that don't even get
                     // triggered now such as valueWhenMinMax and all the agg*HoursShown
                     if (activeNewValue) {
-                        MonthlyColumns(curCol).reslt(state.dataEnvrn->Month) = newResultValue;
-                        MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month) = newTimeStamp;
-                        MonthlyColumns(curCol).duration(state.dataEnvrn->Month) = newDuration;
+                        state.dataOutRptTab->MonthlyColumns(curCol).reslt(state.dataEnvrn->Month) = newResultValue;
+                        state.dataOutRptTab->MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month) = newTimeStamp;
+                        state.dataOutRptTab->MonthlyColumns(curCol).duration(state.dataEnvrn->Month) = newDuration;
                     }
                     // if a minimum or maximum value was set this timeStep then
                     // scan the remaining columns of the table looking for values
@@ -3798,27 +3736,27 @@ namespace EnergyPlus::OutputReportTabular {
                     // if another minimum or maximum column is found then end
                     // the scan (it will be taken care of when that column is done)
                     if (activeMinMax) {
-                        for (kOtherColumn = jColumn + 1; kOtherColumn <= MonthlyTables(iTable).numColumns; ++kOtherColumn) {
-                            scanColumn = kOtherColumn + MonthlyTables(iTable).firstColumn - 1;
+                        for (kOtherColumn = jColumn + 1; kOtherColumn <= state.dataOutRptTab->MonthlyTables(iTable).numColumns; ++kOtherColumn) {
+                            scanColumn = kOtherColumn + state.dataOutRptTab->MonthlyTables(iTable).firstColumn - 1;
                             {
-                                auto const SELECT_CASE_var(MonthlyColumns(scanColumn).aggType);
+                                auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumns(scanColumn).aggType);
                                 if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum)) {
                                     // end scanning since these might reset
                                     break; // do
                                 } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
                                     // this case is when the value should be set
-                                    scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
-                                    scanVarNum = MonthlyColumns(scanColumn).varNum;
+                                    scanTypeOfVar = state.dataOutRptTab->MonthlyColumns(scanColumn).typeOfVar;
+                                    scanVarNum = state.dataOutRptTab->MonthlyColumns(scanColumn).varNum;
                                     scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                     // When a summed variable is used divide it by the length of the time step
-                                    if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (state.dataOutRptTab->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                         } else {
                                             scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
-                                    MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                    state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
                                 } else {
                                     // do nothing
                                 }
@@ -3828,14 +3766,14 @@ namespace EnergyPlus::OutputReportTabular {
                     // If the hours variable is active then scan through the rest of the variables
                     // and accumulate
                     if (activeHoursShown) {
-                        for (kOtherColumn = jColumn + 1; kOtherColumn <= MonthlyTables(iTable).numColumns; ++kOtherColumn) {
-                            scanColumn = kOtherColumn + MonthlyTables(iTable).firstColumn - 1;
-                            scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
-                            scanVarNum = MonthlyColumns(scanColumn).varNum;
+                        for (kOtherColumn = jColumn + 1; kOtherColumn <= state.dataOutRptTab->MonthlyTables(iTable).numColumns; ++kOtherColumn) {
+                            scanColumn = kOtherColumn + state.dataOutRptTab->MonthlyTables(iTable).firstColumn - 1;
+                            scanTypeOfVar = state.dataOutRptTab->MonthlyColumns(scanColumn).typeOfVar;
+                            scanVarNum = state.dataOutRptTab->MonthlyColumns(scanColumn).varNum;
                             scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
-                            oldScanValue = MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
+                            oldScanValue = state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
                             {
-                                auto const SELECT_CASE_var(MonthlyColumns(scanColumn).aggType);
+                                auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumns(scanColumn).aggType);
                                 if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero)) {
                                     // end scanning since these might reset
                                     break; // do
@@ -3847,15 +3785,15 @@ namespace EnergyPlus::OutputReportTabular {
                                     break; // do
                                 } else if (SELECT_CASE_var == iAggType::SumOrAverageHoursShown) {
                                     // this case is when the value should be set
-                                    if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
+                                    if (state.dataOutRptTab->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                                     } else {
                                         // for averaging - weight by elapsed time
-                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
                                     }
-                                    MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
+                                    state.dataOutRptTab->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
                                 } else if (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) {
-                                    if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (state.dataOutRptTab->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                         } else {
@@ -3863,11 +3801,11 @@ namespace EnergyPlus::OutputReportTabular {
                                         }
                                     }
                                     if (scanValue > oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else if (SELECT_CASE_var == iAggType::MinimumDuringHoursShown) {
-                                    if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (state.dataOutRptTab->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                         } else {
@@ -3875,8 +3813,8 @@ namespace EnergyPlus::OutputReportTabular {
                                         }
                                     }
                                     if (scanValue < oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        state.dataOutRptTab->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else {
                                     // do nothing
@@ -4662,12 +4600,12 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) return; // only add values over the HVAC timestep basis
 
-        if (GatherHeatGainReportfirstTime) {
+        if (state.dataOutRptTab->GatherHeatGainReportfirstTime) {
             radiantHeat.allocate(state.dataGlobal->NumOfZones);
             radiantCool.allocate(state.dataGlobal->NumOfZones);
             ATUHeat.allocate(state.dataGlobal->NumOfZones);
             ATUCool.allocate(state.dataGlobal->NumOfZones);
-            GatherHeatGainReportfirstTime = false;
+            state.dataOutRptTab->GatherHeatGainReportfirstTime = false;
         }
         // clear the radiant surface accumulation variables
         radiantHeat = 0.0;
@@ -6390,17 +6328,17 @@ namespace EnergyPlus::OutputReportTabular {
         // loop through each input to get the name of the tables
         for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
             // loop through each report and
-            digitsShown = MonthlyInput(iInput).showDigits;
-            for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
-                curTable = jTable + MonthlyInput(iInput).firstTable - 1;
+            digitsShown = state.dataOutRptTab->MonthlyInput(iInput).showDigits;
+            for (jTable = 1; jTable <= state.dataOutRptTab->MonthlyInput(iInput).numTables; ++jTable) {
+                curTable = jTable + state.dataOutRptTab->MonthlyInput(iInput).firstTable - 1;
                 // first loop through and count how many 'columns' are defined
                 // since max and min actually define two columns (the value
                 // and the timestamp).
                 columnUsedCount = 0;
-                for (kColumn = 1; kColumn <= MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + MonthlyTables(curTable).firstColumn - 1;
+                for (kColumn = 1; kColumn <= state.dataOutRptTab->MonthlyTables(curTable).numColumns; ++kColumn) {
+                    curCol = kColumn + state.dataOutRptTab->MonthlyTables(curTable).firstColumn - 1;
                     {
-                        auto const SELECT_CASE_var(MonthlyColumns(curCol).aggType);
+                        auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumns(curCol).aggType);
                         if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::ValueWhenMaxMin) ||
                             (SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
                             (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
@@ -6418,53 +6356,53 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(columnUsedCount, 16);
                 tableBody = ""; // set entire table to blank as default
                 columnRecount = 0;
-                for (kColumn = 1; kColumn <= MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + MonthlyTables(curTable).firstColumn - 1;
-                    curAggString = aggString.at(MonthlyColumns(curCol).aggType);
+                for (kColumn = 1; kColumn <= state.dataOutRptTab->MonthlyTables(curTable).numColumns; ++kColumn) {
+                    curCol = kColumn + state.dataOutRptTab->MonthlyTables(curTable).firstColumn - 1;
+                    curAggString = aggString.at(state.dataOutRptTab->MonthlyColumns(curCol).aggType);
                     if (len(curAggString) > 0) {
                         curAggString = " {" + stripped(curAggString) + '}';
                     }
                     // do the unit conversions
                     if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
-                        varNameWithUnits = MonthlyColumns(curCol).varName + unitEnumToStringBrackets(MonthlyColumns(curCol).units);
+                        varNameWithUnits = state.dataOutRptTab->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(state.dataOutRptTab->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
                     } else { // just do the Joule conversion
                         // if units is in Joules, convert if specified
-                        if (UtilityRoutines::SameString(unitEnumToString(MonthlyColumns(curCol).units), "J")) {
+                        if (UtilityRoutines::SameString(unitEnumToString(state.dataOutRptTab->MonthlyColumns(curCol).units), "J")) {
                             curUnits = energyUnitsString;
                             curConversionFactor = energyUnitsConversionFactor;
                             curConversionOffset = 0.0;
                         } else { // if not joules don't perform conversion
-                            curUnits = unitEnumToString(MonthlyColumns(curCol).units);
+                            curUnits = unitEnumToString(state.dataOutRptTab->MonthlyColumns(curCol).units);
                             curConversionFactor = 1.0;
                             curConversionOffset = 0.0;
                         }
                     }
                     {
-                        auto const SELECT_CASE_var(MonthlyColumns(curCol).aggType);
+                        auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumns(curCol).aggType);
                         if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
                             ++columnRecount;
                             // put in the name of the variable for the column
-                            columnHead(columnRecount) = MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                            columnHead(columnRecount) = state.dataOutRptTab->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
                             sumVal = 0.0;
                             sumDuration = 0.0;
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (MonthlyColumns(curCol).avgSum ==
+                                if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum ==
                                     OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                    if (MonthlyColumns(curCol).duration(lMonth) != 0) {
+                                    if (state.dataOutRptTab->MonthlyColumns(curCol).duration(lMonth) != 0) {
                                         curVal =
-                                            ((MonthlyColumns(curCol).reslt(lMonth) / MonthlyColumns(curCol).duration(lMonth)) * curConversionFactor) +
+                                            ((state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth) / state.dataOutRptTab->MonthlyColumns(curCol).duration(lMonth)) * curConversionFactor) +
                                             curConversionOffset;
                                     } else {
                                         curVal = 0.0;
                                     }
-                                    sumVal += (MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
-                                    sumDuration += MonthlyColumns(curCol).duration(lMonth);
+                                    sumVal += (state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                    sumDuration += state.dataOutRptTab->MonthlyColumns(curCol).duration(lMonth);
                                 } else {
-                                    curVal = (MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                    curVal = (state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
                                     sumVal += curVal;
                                 }
                                 if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
@@ -6476,7 +6414,7 @@ namespace EnergyPlus::OutputReportTabular {
                                 }
                             } // lMonth
                             // add the summary to bottom
-                            if (MonthlyColumns(curCol).avgSum ==
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum ==
                                 OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
                                 if (sumDuration > 0) {
                                     tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
@@ -6498,12 +6436,12 @@ namespace EnergyPlus::OutputReportTabular {
 
                             ++columnRecount;
                             // put in the name of the variable for the column
-                            columnHead(columnRecount) = MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
+                            columnHead(columnRecount) = state.dataOutRptTab->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
                             sumVal = 0.0;
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = MonthlyColumns(curCol).reslt(lMonth);
+                                curVal = state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth);
                                 if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                     sumVal += curVal;
@@ -6523,7 +6461,7 @@ namespace EnergyPlus::OutputReportTabular {
                             }
                         } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
                             ++columnRecount;
-                            if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
                                 curUnits += "/s";
                             }
                             if (UtilityRoutines::SameString(curUnits, "J/s")) {
@@ -6554,11 +6492,11 @@ namespace EnergyPlus::OutputReportTabular {
                                 curUnits = "ton";
                                 curConversionFactor *= 3600.0;
                             }
-                            columnHead(columnRecount) = MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                            columnHead(columnRecount) = state.dataOutRptTab->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
+                                curVal = state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
                                 if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
                                     tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                     if (curVal > maxVal) maxVal = curVal;
@@ -6578,7 +6516,7 @@ namespace EnergyPlus::OutputReportTabular {
                                    (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) || (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
                             columnRecount += 2;
                             // put in the name of the variable for the column
-                            if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            if (state.dataOutRptTab->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 curUnits += "/s";
                             }
                             if (UtilityRoutines::SameString(curUnits, "J/s")) {
@@ -6609,13 +6547,13 @@ namespace EnergyPlus::OutputReportTabular {
                                 curUnits = "ton";
                                 curConversionFactor *= 3600.0;
                             }
-                            columnHead(columnRecount - 1) = MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
-                            columnHead(columnRecount) = MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
+                            columnHead(columnRecount - 1) = state.dataOutRptTab->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
+                            columnHead(columnRecount) = state.dataOutRptTab->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
                             minVal = storedMaxVal;
                             maxVal = storedMinVal;
                             for (lMonth = 1; lMonth <= 12; ++lMonth) {
                                 if (state.dataOutRptTab->IsMonthGathered(lMonth)) {
-                                    curVal = MonthlyColumns(curCol).reslt(lMonth);
+                                    curVal = state.dataOutRptTab->MonthlyColumns(curCol).reslt(lMonth);
                                     // CR7788 the conversion factors were causing an overflow for the InchPound case since the
                                     // value was very small
                                     // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
@@ -6628,7 +6566,7 @@ namespace EnergyPlus::OutputReportTabular {
                                         } else {
                                             tableBody(columnRecount - 1, lMonth) = "-";
                                         }
-                                        tableBody(columnRecount, lMonth) = DateToString(MonthlyColumns(curCol).timeStamp(lMonth));
+                                        tableBody(columnRecount, lMonth) = DateToString(state.dataOutRptTab->MonthlyColumns(curCol).timeStamp(lMonth));
                                     } else {
                                         tableBody(columnRecount - 1, lMonth) = "-";
                                         tableBody(columnRecount, lMonth) = "-";
@@ -6653,16 +6591,16 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                 } // KColumn
-                WriteReportHeaders(state, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
+                WriteReportHeaders(state, state.dataOutRptTab->MonthlyInput(iInput).name, state.dataOutRptTab->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
                 WriteSubtitle(state, "Custom Monthly Report");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
+                        tableBody, rowHead, columnHead, state.dataOutRptTab->MonthlyInput(iInput).name, state.dataOutRptTab->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
+                        tableBody, rowHead, columnHead, state.dataOutRptTab->MonthlyInput(iInput).name, state.dataOutRptTab->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
             } // jTables
         }     // iInput
@@ -6763,20 +6701,20 @@ namespace EnergyPlus::OutputReportTabular {
         rowHead(38) = "11:01 to 12:00 am";
         rowHead(39) = "Total";
         for (iInObj = 1; iInObj <= state.dataOutRptTab->OutputTableBinnedCount; ++iInObj) {
-            firstReport = OutputTableBinned(iInObj).resIndex;
-            curNameWithSIUnits = OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInObj).units);
+            firstReport = state.dataOutRptTab->OutputTableBinned(iInObj).resIndex;
+            curNameWithSIUnits = state.dataOutRptTab->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(state.dataOutRptTab->OutputTableBinned(iInObj).units);
             if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                curIntervalStart = ConvertIP(state, indexUnitConv, OutputTableBinned(iInObj).intervalStart);
-                curIntervalSize = ConvertIPdelta(state, indexUnitConv, OutputTableBinned(iInObj).intervalSize);
+                curIntervalStart = ConvertIP(state, indexUnitConv, state.dataOutRptTab->OutputTableBinned(iInObj).intervalStart);
+                curIntervalSize = ConvertIPdelta(state, indexUnitConv, state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize);
             } else {
                 curNameAndUnits = curNameWithSIUnits;
-                curIntervalStart = OutputTableBinned(iInObj).intervalStart;
-                curIntervalSize = OutputTableBinned(iInObj).intervalSize;
+                curIntervalStart = state.dataOutRptTab->OutputTableBinned(iInObj).intervalStart;
+                curIntervalSize = state.dataOutRptTab->OutputTableBinned(iInObj).intervalSize;
             }
-            curIntervalCount = OutputTableBinned(iInObj).intervalCount;
-            curResIndex = OutputTableBinned(iInObj).resIndex;
-            curNumTables = OutputTableBinned(iInObj).numTables;
+            curIntervalCount = state.dataOutRptTab->OutputTableBinned(iInObj).intervalCount;
+            curResIndex = state.dataOutRptTab->OutputTableBinned(iInObj).resIndex;
+            curNumTables = state.dataOutRptTab->OutputTableBinned(iInObj).numTables;
             topValue = curIntervalStart + curIntervalSize * curIntervalCount;
             if (curIntervalSize < 1) {
                 numIntervalDigits = 4;
@@ -6807,32 +6745,32 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(curIntervalCount + 3, 2) = "Total";
             for (iTable = 1; iTable <= curNumTables; ++iTable) {
                 repIndex = firstReport + (iTable - 1);
-                if (OutputTableBinned(iInObj).scheduleIndex == 0) {
+                if (state.dataOutRptTab->OutputTableBinned(iInObj).scheduleIndex == 0) {
                     repNameWithUnitsandscheduleName = curNameAndUnits;
                 } else {
-                    repNameWithUnitsandscheduleName = curNameAndUnits + " [" + OutputTableBinned(iInObj).ScheduleName + ']';
+                    repNameWithUnitsandscheduleName = curNameAndUnits + " [" + state.dataOutRptTab->OutputTableBinned(iInObj).ScheduleName + ']';
                 }
-                WriteReportHeaders(state, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, OutputTableBinned(iInObj).avgSum);
+                WriteReportHeaders(state, repNameWithUnitsandscheduleName, state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj, state.dataOutRptTab->OutputTableBinned(iInObj).avgSum);
                 for (kHour = 1; kHour <= 24; ++kHour) {
-                    tableBody(1, 14 + kHour) = RealToStr(BinResultsBelow(repIndex).hrly(kHour), 2);
-                    tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(BinResultsAbove(repIndex).hrly(kHour), 2);
-                    rowTotal = BinResultsBelow(repIndex).hrly(kHour) + BinResultsAbove(repIndex).hrly(kHour);
+                    tableBody(1, 14 + kHour) = RealToStr(state.dataOutRptTab->BinResultsBelow(repIndex).hrly(kHour), 2);
+                    tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(state.dataOutRptTab->BinResultsAbove(repIndex).hrly(kHour), 2);
+                    rowTotal = state.dataOutRptTab->BinResultsBelow(repIndex).hrly(kHour) + state.dataOutRptTab->BinResultsAbove(repIndex).hrly(kHour);
                     for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 14 + kHour) = RealToStr(BinResults(nCol, repIndex).hrly(kHour), 2);
+                        tableBody(nCol + 1, 14 + kHour) = RealToStr(state.dataOutRptTab->BinResults(nCol, repIndex).hrly(kHour), 2);
                         // sum the total for all columns
-                        rowTotal += BinResults(nCol, repIndex).hrly(kHour);
+                        rowTotal += state.dataOutRptTab->BinResults(nCol, repIndex).hrly(kHour);
                     }
                     tableBody(nCol + 2, 14 + kHour) = RealToStr(rowTotal, 2);
                 }
                 tableTotal = 0.0;
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    tableBody(1, 2 + kMonth) = RealToStr(BinResultsBelow(repIndex).mnth(kMonth), 2);
-                    tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(BinResultsAbove(repIndex).mnth(kMonth), 2);
-                    rowTotal = BinResultsBelow(repIndex).mnth(kMonth) + BinResultsAbove(repIndex).mnth(kMonth);
+                    tableBody(1, 2 + kMonth) = RealToStr(state.dataOutRptTab->BinResultsBelow(repIndex).mnth(kMonth), 2);
+                    tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(state.dataOutRptTab->BinResultsAbove(repIndex).mnth(kMonth), 2);
+                    rowTotal = state.dataOutRptTab->BinResultsBelow(repIndex).mnth(kMonth) + state.dataOutRptTab->BinResultsAbove(repIndex).mnth(kMonth);
                     for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 2 + kMonth) = RealToStr(BinResults(nCol, repIndex).mnth(kMonth), 2);
+                        tableBody(nCol + 1, 2 + kMonth) = RealToStr(state.dataOutRptTab->BinResults(nCol, repIndex).mnth(kMonth), 2);
                         // sum the total for all columns
-                        rowTotal += BinResults(nCol, repIndex).mnth(kMonth);
+                        rowTotal += state.dataOutRptTab->BinResults(nCol, repIndex).mnth(kMonth);
                     }
                     tableBody(nCol + 2, 2 + kMonth) = RealToStr(rowTotal, 2);
                     tableTotal += rowTotal;
@@ -6841,15 +6779,15 @@ namespace EnergyPlus::OutputReportTabular {
                 for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
                     colTotal = 0.0;
                     for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                        colTotal += BinResults(nCol, repIndex).mnth(kMonth);
+                        colTotal += state.dataOutRptTab->BinResults(nCol, repIndex).mnth(kMonth);
                     }
                     tableBody(nCol + 1, 39) = RealToStr(colTotal, 2);
                 }
                 aboveTotal = 0.0;
                 belowTotal = 0.0;
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    aboveTotal += BinResultsAbove(repIndex).mnth(kMonth);
-                    belowTotal += BinResultsBelow(repIndex).mnth(kMonth);
+                    aboveTotal += state.dataOutRptTab->BinResultsAbove(repIndex).mnth(kMonth);
+                    belowTotal += state.dataOutRptTab->BinResultsBelow(repIndex).mnth(kMonth);
                 }
                 tableBody(1, 39) = RealToStr(belowTotal, 2);
                 tableBody(curIntervalCount + 2, 39) = RealToStr(aboveTotal, 2);
@@ -6860,11 +6798,11 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 // create statistics table
                 rowHeadStat(1) = "Minimum";
@@ -6877,42 +6815,42 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidthStat(1) = 14;
                 // per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
                 // first check if very large constant number has caused the second part to be larger than the first
-                if (BinStatistics(repIndex).n > 1) {
-                    if (BinStatistics(repIndex).sum2 > (pow_2(BinStatistics(repIndex).sum) / BinStatistics(repIndex).n)) {
-                        repStDev = std::sqrt((BinStatistics(repIndex).sum2 - (pow_2(BinStatistics(repIndex).sum) / BinStatistics(repIndex).n)) /
-                                             (BinStatistics(repIndex).n - 1));
+                if (state.dataOutRptTab->BinStatistics(repIndex).n > 1) {
+                    if (state.dataOutRptTab->BinStatistics(repIndex).sum2 > (pow_2(state.dataOutRptTab->BinStatistics(repIndex).sum) / state.dataOutRptTab->BinStatistics(repIndex).n)) {
+                        repStDev = std::sqrt((state.dataOutRptTab->BinStatistics(repIndex).sum2 - (pow_2(state.dataOutRptTab->BinStatistics(repIndex).sum) / state.dataOutRptTab->BinStatistics(repIndex).n)) /
+                                             (state.dataOutRptTab->BinStatistics(repIndex).n - 1));
                     } else {
                         repStDev = 0.0;
                     }
-                    repMean = BinStatistics(repIndex).sum / BinStatistics(repIndex).n;
+                    repMean = state.dataOutRptTab->BinStatistics(repIndex).sum / state.dataOutRptTab->BinStatistics(repIndex).n;
                 } else {
                     repStDev = 0.0;
                     repMean = 0.0;
                 }
                 if (state.dataOutRptTab->unitsStyle == iUnitsStyle::InchPound) {
-                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, BinStatistics(repIndex).minimum), 2);
+                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, state.dataOutRptTab->BinStatistics(repIndex).minimum), 2);
                     tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
                     tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
                     tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
-                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, BinStatistics(repIndex).maximum), 2);
+                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, state.dataOutRptTab->BinStatistics(repIndex).maximum), 2);
                     tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
                 } else {
-                    tableBodyStat(1, 1) = RealToStr(BinStatistics(repIndex).minimum, 2);
+                    tableBodyStat(1, 1) = RealToStr(state.dataOutRptTab->BinStatistics(repIndex).minimum, 2);
                     tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
                     tableBodyStat(1, 3) = RealToStr(repMean, 2);
                     tableBodyStat(1, 4) = RealToStr(repMean + 2 * repStDev, 2);
-                    tableBodyStat(1, 5) = RealToStr(BinStatistics(repIndex).maximum, 2);
+                    tableBodyStat(1, 5) = RealToStr(state.dataOutRptTab->BinStatistics(repIndex).maximum, 2);
                     tableBodyStat(1, 6) = RealToStr(repStDev, 2);
                 }
                 WriteSubtitle(state, "Statistics");
                 WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, state.dataOutRptTab->BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
             }
         }
@@ -10572,13 +10510,13 @@ namespace EnergyPlus::OutputReportTabular {
 
             for (i = 1; i <= TotPeople; ++i) {
                 if (People(i).AdaptiveASH55 || People(i).AdaptiveCEN15251) {
-                    ++numPeopleAdaptive;
-                    peopleInd(numPeopleAdaptive) = i;
+                    ++state.dataOutRptTab->numPeopleAdaptive;
+                    peopleInd(state.dataOutRptTab->numPeopleAdaptive) = i;
                 }
             }
 
-            rowHead.allocate(numPeopleAdaptive);
-            tableBody.allocate(5, numPeopleAdaptive);
+            rowHead.allocate(state.dataOutRptTab->numPeopleAdaptive);
+            tableBody.allocate(5, state.dataOutRptTab->numPeopleAdaptive);
 
             WriteReportHeaders(state, "Adaptive Comfort Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             WriteSubtitle(state, "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
@@ -10592,7 +10530,7 @@ namespace EnergyPlus::OutputReportTabular {
             columnHead(5) = "CEN15251 Category III Acceptability Limits [Hours]";
 
             tableBody = "";
-            for (i = 1; i <= numPeopleAdaptive; ++i) {
+            for (i = 1; i <= state.dataOutRptTab->numPeopleAdaptive; ++i) {
                 rowHead(i) = People(i).Name;
                 if (People(i).AdaptiveASH55) {
                     tableBody(1, i) = RealToStr(People(peopleInd(i)).TimeNotMetASH5590, 2);
@@ -11700,7 +11638,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (AllocateLoadComponentArraysDoAllocate) {
+        if (state.dataOutRptTab->AllocateLoadComponentArraysDoAllocate) {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
             state.dataOutRptTab->radiantPulseTimestep.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataGlobal->NumOfZones);
             state.dataOutRptTab->radiantPulseTimestep = 0;
@@ -11774,7 +11712,7 @@ namespace EnergyPlus::OutputReportTabular {
             state.dataOutRptTab->feneCondInstantSeq = 0.0;
             state.dataOutRptTab->feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             state.dataOutRptTab->feneSolarRadSeq = 0.0;
-            AllocateLoadComponentArraysDoAllocate = false;
+            state.dataOutRptTab->AllocateLoadComponentArraysDoAllocate = false;
         }
     }
 
@@ -12759,10 +12697,10 @@ namespace EnergyPlus::OutputReportTabular {
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;
 
-        if (!initAdjFenDone) {
+        if (!state.dataOutRptTab->initAdjFenDone) {
             adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             adjFenDone = false;
-            initAdjFenDone = true;
+            state.dataOutRptTab->initAdjFenDone = true;
         }
 
         int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
@@ -13881,20 +13819,20 @@ namespace EnergyPlus::OutputReportTabular {
                 tbl_stream << "    " << std::setw(2) << state.dataOutRptTab->td(5) << ':' << std::setw(2) << state.dataOutRptTab->td(6) << ':' << std::setw(2) << state.dataOutRptTab->td(7) << std::setfill(' ')
                            << "</b></p>\n";
             } else if (style == iTableStyle::XML) {
-                if (len(prevReportName) != 0) {
-                    tbl_stream << "</" << prevReportName << ">\n"; // close the last element if it was used.
+                if (len(state.dataOutRptTab->prevReportName) != 0) {
+                    tbl_stream << "</" << state.dataOutRptTab->prevReportName << ">\n"; // close the last element if it was used.
                 }
                 tbl_stream << "<" << ConvertToElementTag(modifiedReportName) << ">\n";
                 tbl_stream << "  <for>" << objectName << "</for>\n";
-                prevReportName = ConvertToElementTag(modifiedReportName); // save the name for next time
+                state.dataOutRptTab->prevReportName = ConvertToElementTag(modifiedReportName); // save the name for next time
             }
         }
         // clear the active subtable name for the XML reporting
-        activeSubTableName = "";
+        state.dataOutRptTab->activeSubTableName = "";
         // save the report name if the subtable name is not available during XML processing
-        activeReportName = modifiedReportName;
+        state.dataOutRptTab->activeReportName = modifiedReportName;
         // save the "for" which is the object name in the report for HTML comment that contains the report, for, and subtable
-        activeForName = objectName;
+        state.dataOutRptTab->activeForName = objectName;
     }
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle)
@@ -13930,10 +13868,10 @@ namespace EnergyPlus::OutputReportTabular {
             } else if (style == iTableStyle::HTML) {
                 std::ostream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
                 tbl_stream << "<b>" << subtitle << "</b><br><br>\n";
-                tbl_stream << "<!-- FullName:" << activeReportName << '_' << activeForName << '_' << subtitle << "-->\n";
+                tbl_stream << "<!-- FullName:" << state.dataOutRptTab->activeReportName << '_' << state.dataOutRptTab->activeForName << '_' << subtitle << "-->\n";
             } else if (style == iTableStyle::XML) {
                 // save the active subtable name for the XML reporting
-                activeSubTableName = subtitle;
+                state.dataOutRptTab->activeSubTableName = subtitle;
                 // no other output is needed since WriteTable uses the subtable name for each record.
             }
         }
@@ -14266,14 +14204,14 @@ namespace EnergyPlus::OutputReportTabular {
                 // if non-blank cells in the table body were found create the table.
                 if (!isTableBlank) {
                     // if report name and subtable name the same add "record" to the end
-                    activeSubTableName = ConvertToElementTag(activeSubTableName);
-                    activeReportNameNoSpace = ConvertToElementTag(activeReportName);
-                    if (UtilityRoutines::SameString(activeSubTableName, activeReportNameNoSpace)) {
-                        activeSubTableName += "Record";
+                    state.dataOutRptTab->activeSubTableName = ConvertToElementTag(state.dataOutRptTab->activeSubTableName);
+                    state.dataOutRptTab->activeReportNameNoSpace = ConvertToElementTag(state.dataOutRptTab->activeReportName);
+                    if (UtilityRoutines::SameString(state.dataOutRptTab->activeSubTableName, state.dataOutRptTab->activeReportNameNoSpace)) {
+                        state.dataOutRptTab->activeSubTableName += "Record";
                     }
                     // if no subtable name use the report name and add "record" to the end
-                    if (len(activeSubTableName) == 0) {
-                        activeSubTableName = activeReportNameNoSpace + "Record";
+                    if (len(state.dataOutRptTab->activeSubTableName) == 0) {
+                        state.dataOutRptTab->activeSubTableName = state.dataOutRptTab->activeReportNameNoSpace + "Record";
                     }
                     // if a single column table, transpose it automatically
                     if ((colsBody == 1) && (rowsBody > 1)) {
@@ -14318,7 +14256,7 @@ namespace EnergyPlus::OutputReportTabular {
                                 }
                             }
                             if (!isRecordBlank) {
-                                tbl_stream << "  <" << activeSubTableName << ">\n";
+                                tbl_stream << "  <" << state.dataOutRptTab->activeSubTableName << ">\n";
                                 if (len(rowLabelTags(jRow)) > 0) {
                                     tbl_stream << "    <name>" << rowLabelTags(jRow) << "</name>\n";
                                 }
@@ -14335,7 +14273,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                    << ">\n";
                                     }
                                 }
-                                tbl_stream << "  </" << activeSubTableName << ">\n";
+                                tbl_stream << "  </" << state.dataOutRptTab->activeSubTableName << ">\n";
                             }
                         }
                     } else { // transpose XML table
@@ -14350,7 +14288,7 @@ namespace EnergyPlus::OutputReportTabular {
                                 }
                             }
                             if (!isRecordBlank) {
-                                tbl_stream << "  <" << activeSubTableName << ">\n";
+                                tbl_stream << "  <" << state.dataOutRptTab->activeSubTableName << ">\n";
                                 // if the column has units put them into the name tag
                                 if (len(columnLabelTags(iCol)) > 0) {
                                     if (len(columnUnitStrings(iCol)) > 0) {
@@ -14372,7 +14310,7 @@ namespace EnergyPlus::OutputReportTabular {
                                         tbl_stream << "    " << tagWithAttrib << stripped(bodyEsc(iCol, jRow)) << "</" << rowLabelTags(jRow) << ">\n";
                                     }
                                 }
-                                tbl_stream << "  </" << activeSubTableName << ">\n";
+                                tbl_stream << "  </" << state.dataOutRptTab->activeSubTableName << ">\n";
                             }
                         }
                     }
@@ -14753,7 +14691,7 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
         OutputReportTabularAnnual::ResetAnnualGathering();
-        ResetBinGathering();
+        ResetBinGathering(state);
         ResetBEPSGathering(state);
         ResetSourceEnergyEndUseGathering(state);
         ResetPeakDemandGathering(state);
@@ -14778,25 +14716,25 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 BigNum(0.0);
 
         for (iInput = 1; iInput <= state.dataOutRptTab->MonthlyInputCount; ++iInput) {
-            for (jTable = 1; jTable <= MonthlyInput(iInput).numTables; ++jTable) {
-                curTable = jTable + MonthlyInput(iInput).firstTable - 1;
-                for (kColumn = 1; kColumn <= MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + MonthlyTables(curTable).firstColumn - 1;
-                    MonthlyColumns(curCol).timeStamp = 0;
-                    MonthlyColumns(curCol).duration = 0.0;
-                    if (MonthlyColumns(curCol).aggType == iAggType::Maximum || MonthlyColumns(curCol).aggType == iAggType::MaximumDuringHoursShown) {
-                        MonthlyColumns(curCol).reslt = -HUGE_(BigNum);
-                    } else if (MonthlyColumns(curCol).aggType == iAggType::Minimum || MonthlyColumns(curCol).aggType == iAggType::MinimumDuringHoursShown) {
-                        MonthlyColumns(curCol).reslt = HUGE_(BigNum);
+            for (jTable = 1; jTable <= state.dataOutRptTab->MonthlyInput(iInput).numTables; ++jTable) {
+                curTable = jTable + state.dataOutRptTab->MonthlyInput(iInput).firstTable - 1;
+                for (kColumn = 1; kColumn <= state.dataOutRptTab->MonthlyTables(curTable).numColumns; ++kColumn) {
+                    curCol = kColumn + state.dataOutRptTab->MonthlyTables(curTable).firstColumn - 1;
+                    state.dataOutRptTab->MonthlyColumns(curCol).timeStamp = 0;
+                    state.dataOutRptTab->MonthlyColumns(curCol).duration = 0.0;
+                    if (state.dataOutRptTab->MonthlyColumns(curCol).aggType == iAggType::Maximum || state.dataOutRptTab->MonthlyColumns(curCol).aggType == iAggType::MaximumDuringHoursShown) {
+                        state.dataOutRptTab->MonthlyColumns(curCol).reslt = -HUGE_(BigNum);
+                    } else if (state.dataOutRptTab->MonthlyColumns(curCol).aggType == iAggType::Minimum || state.dataOutRptTab->MonthlyColumns(curCol).aggType == iAggType::MinimumDuringHoursShown) {
+                        state.dataOutRptTab->MonthlyColumns(curCol).reslt = HUGE_(BigNum);
                     } else {
-                        MonthlyColumns(curCol).reslt = 0.0;
+                        state.dataOutRptTab->MonthlyColumns(curCol).reslt = 0.0;
                     }
                 }
             }
         }
     }
 
-    void ResetBinGathering()
+    void ResetBinGathering(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all timebins gathering arrays to zero for multi-year simulations
@@ -14804,21 +14742,21 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
         // clear the binning arrays to zeros
-        for (auto &e : BinResults) {
+        for (auto &e : state.dataOutRptTab->BinResults) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
-        for (auto &e : BinResultsBelow) {
+        for (auto &e : state.dataOutRptTab->BinResultsBelow) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
-        for (auto &e : BinResultsAbove) {
+        for (auto &e : state.dataOutRptTab->BinResultsAbove) {
             e.mnth = 0.0;
             e.hrly = 0.0;
         }
 
         // re-initialize statistics counters
-        for (auto &e : BinStatistics) {
+        for (auto &e : state.dataOutRptTab->BinStatistics) {
             e.minimum = HUGE_(bigVal);
             e.maximum = -HUGE_(bigVal);
             e.n = 0;
@@ -15402,19 +15340,19 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
 
-        if (!allocated(TOCEntries)) {
+        if (!allocated(state.dataOutRptTab->TOCEntries)) {
             state.dataOutRptTab->TOCEntriesSize = 20;
-            TOCEntries.allocate(state.dataOutRptTab->TOCEntriesSize);
+            state.dataOutRptTab->TOCEntries.allocate(state.dataOutRptTab->TOCEntriesSize);
             state.dataOutRptTab->TOCEntriesCount = 1;
         } else {
             ++state.dataOutRptTab->TOCEntriesCount;
             // if larger than current size grow the array
             if (state.dataOutRptTab->TOCEntriesCount > state.dataOutRptTab->TOCEntriesSize) {
-                TOCEntries.redimension(state.dataOutRptTab->TOCEntriesSize += 20);
+                state.dataOutRptTab->TOCEntries.redimension(state.dataOutRptTab->TOCEntriesSize += 20);
             }
         }
-        TOCEntries(state.dataOutRptTab->TOCEntriesCount).reportName = nameReport;
-        TOCEntries(state.dataOutRptTab->TOCEntriesCount).sectionName = nameSection;
+        state.dataOutRptTab->TOCEntries(state.dataOutRptTab->TOCEntriesCount).reportName = nameReport;
+        state.dataOutRptTab->TOCEntries(state.dataOutRptTab->TOCEntriesCount).sectionName = nameSection;
     }
 
     void SetupUnitConversions(EnergyPlusData &state)
@@ -15451,426 +15389,426 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
         state.dataOutRptTab->UnitConvSize = 115;
-        UnitConv.allocate(state.dataOutRptTab->UnitConvSize);
-        UnitConv(1).siName = "%";
-        UnitConv(2).siName = "°C";
-        UnitConv(3).siName = "0=OFF 1=ON";
-        UnitConv(4).siName = "0-NO  1-YES";
-        UnitConv(5).siName = "1-YES 0-NO";
-        UnitConv(6).siName = "A";
-        UnitConv(7).siName = "ACH";
-        UnitConv(8).siName = "ACH";
-        UnitConv(9).siName = "BASE 10C";
-        UnitConv(10).siName = "BASE 18C";
-        UnitConv(11).siName = "C";
-        UnitConv(12).siName = "CD/M2";
-        UnitConv(13).siName = "DEG";
-        UnitConv(14).siName = "FRAC";
-        UnitConv(15).siName = "HOUR";
-        UnitConv(16).siName = "HOURS";
-        UnitConv(17).siName = "HR";
-        UnitConv(18).siName = "HRS";
-        UnitConv(19).siName = "J";
-        UnitConv(20).siName = "J";
-        UnitConv(21).siName = "J";
-        UnitConv(22).siName = "J";
-        UnitConv(23).siName = "J";
-        UnitConv(24).siName = "J";
-        UnitConv(25).siName = "J/KG";
-        UnitConv(26).siName = "J/KGWATER";
-        UnitConv(27).siName = "J/M2";
-        UnitConv(28).siName = "K/M";
-        UnitConv(29).siName = "KG";
-        UnitConv(30).siName = "KG/KG";
-        UnitConv(31).siName = "KG/M3";
-        UnitConv(32).siName = "KG/S";
-        UnitConv(33).siName = "KGWATER/KGDRYAIR";
-        UnitConv(34).siName = "KGWATER/SEC";
-        UnitConv(35).siName = "KMOL/S";
-        UnitConv(36).siName = "KMOL/SEC";
-        UnitConv(37).siName = "KWH";
-        UnitConv(38).siName = "L";
-        UnitConv(39).siName = "L";
-        UnitConv(40).siName = "LUM/W";
-        UnitConv(41).siName = "LUX";
-        UnitConv(42).siName = "M";
-        UnitConv(43).siName = "M";
-        UnitConv(44).siName = "M/S";
-        UnitConv(45).siName = "M/S";
-        UnitConv(46).siName = "M2";
-        UnitConv(47).siName = "M2/PERSON";
-        UnitConv(48).siName = "M3";
-        UnitConv(49).siName = "M3";
-        UnitConv(50).siName = "M3/M2";
-        UnitConv(51).siName = "M3/S";
-        UnitConv(52).siName = "M3/S";
-        UnitConv(53).siName = "M3/S-M2";
-        UnitConv(54).siName = "M3/S-PERSON";
-        UnitConv(55).siName = "M3/S-PERSON";
-        UnitConv(56).siName = "PA";
-        UnitConv(57).siName = "PA";
-        UnitConv(58).siName = "PA";
-        UnitConv(59).siName = "PA";
-        UnitConv(60).siName = "PA";
-        UnitConv(61).siName = "PA";
-        UnitConv(62).siName = "PA";
-        UnitConv(63).siName = "PA";
-        UnitConv(64).siName = "S";
-        UnitConv(65).siName = "V";
-        UnitConv(66).siName = "W";
-        UnitConv(67).siName = "W";
-        UnitConv(68).siName = "W";
-        UnitConv(69).siName = "W";
-        UnitConv(70).siName = "W";
-        UnitConv(71).siName = "W/KG";
-        UnitConv(72).siName = "W/KG H2O"; // TODO: replace with W/kgWater? or rather just remove
-        UnitConv(73).siName = "W/K";
-        UnitConv(74).siName = "W/M2";
-        UnitConv(75).siName = "W/M2";
-        UnitConv(76).siName = "W/M2-C";
-        UnitConv(77).siName = "W/M2-K";
-        UnitConv(78).siName = "W/W";
-        UnitConv(79).siName = "W/W";
-        UnitConv(80).siName = "deltaC";
-        UnitConv(81).siName = "KJ/KG";
-        UnitConv(82).siName = "W-S/M3";
-        UnitConv(83).siName = "W-S/M3";
-        UnitConv(84).siName = "~~$~~/m2";
-        UnitConv(85).siName = "GJ";
-        UnitConv(86).siName = "GJ";
-        UnitConv(87).siName = "GJ";
-        UnitConv(88).siName = "GJ";
-        UnitConv(89).siName = "GJ";
-        UnitConv(90).siName = "GJ";
-        UnitConv(91).siName = "GJ";
-        UnitConv(92).siName = "MJ/m2";
-        UnitConv(93).siName = "MJ/m2";
-        UnitConv(94).siName = "MJ/m2";
-        UnitConv(95).siName = "MJ/m2";
-        UnitConv(96).siName = "Invalid/Undefined";
-        UnitConv(97).siName = "";
-        UnitConv(98).siName = "W/C";
-        UnitConv(99).siName = "DAY";
-        UnitConv(100).siName = "MIN";
-        UnitConv(101).siName = "HR/WK";
-        UnitConv(102).siName = "$";
-        UnitConv(103).siName = "$/UNIT ENERGY";
-        UnitConv(104).siName = "KW";
-        UnitConv(105).siName = " ";
-        UnitConv(106).siName = "AH";
-        UnitConv(107).siName = "CLO";
-        UnitConv(108).siName = "J/KG-K";
-        UnitConv(109).siName = "KGWATER/S";
-        UnitConv(110).siName = "PPM";
-        UnitConv(111).siName = "RAD";
-        UnitConv(112).siName = "REV/MIN";
-        UnitConv(113).siName = "NM";
-        UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(115).siName = "PERSON/M2";
+        state.dataOutRptTab->UnitConv.allocate(state.dataOutRptTab->UnitConvSize);
+        state.dataOutRptTab->UnitConv(1).siName = "%";
+        state.dataOutRptTab->UnitConv(2).siName = "°C";
+        state.dataOutRptTab->UnitConv(3).siName = "0=OFF 1=ON";
+        state.dataOutRptTab->UnitConv(4).siName = "0-NO  1-YES";
+        state.dataOutRptTab->UnitConv(5).siName = "1-YES 0-NO";
+        state.dataOutRptTab->UnitConv(6).siName = "A";
+        state.dataOutRptTab->UnitConv(7).siName = "ACH";
+        state.dataOutRptTab->UnitConv(8).siName = "ACH";
+        state.dataOutRptTab->UnitConv(9).siName = "BASE 10C";
+        state.dataOutRptTab->UnitConv(10).siName = "BASE 18C";
+        state.dataOutRptTab->UnitConv(11).siName = "C";
+        state.dataOutRptTab->UnitConv(12).siName = "CD/M2";
+        state.dataOutRptTab->UnitConv(13).siName = "DEG";
+        state.dataOutRptTab->UnitConv(14).siName = "FRAC";
+        state.dataOutRptTab->UnitConv(15).siName = "HOUR";
+        state.dataOutRptTab->UnitConv(16).siName = "HOURS";
+        state.dataOutRptTab->UnitConv(17).siName = "HR";
+        state.dataOutRptTab->UnitConv(18).siName = "HRS";
+        state.dataOutRptTab->UnitConv(19).siName = "J";
+        state.dataOutRptTab->UnitConv(20).siName = "J";
+        state.dataOutRptTab->UnitConv(21).siName = "J";
+        state.dataOutRptTab->UnitConv(22).siName = "J";
+        state.dataOutRptTab->UnitConv(23).siName = "J";
+        state.dataOutRptTab->UnitConv(24).siName = "J";
+        state.dataOutRptTab->UnitConv(25).siName = "J/KG";
+        state.dataOutRptTab->UnitConv(26).siName = "J/KGWATER";
+        state.dataOutRptTab->UnitConv(27).siName = "J/M2";
+        state.dataOutRptTab->UnitConv(28).siName = "K/M";
+        state.dataOutRptTab->UnitConv(29).siName = "KG";
+        state.dataOutRptTab->UnitConv(30).siName = "KG/KG";
+        state.dataOutRptTab->UnitConv(31).siName = "KG/M3";
+        state.dataOutRptTab->UnitConv(32).siName = "KG/S";
+        state.dataOutRptTab->UnitConv(33).siName = "KGWATER/KGDRYAIR";
+        state.dataOutRptTab->UnitConv(34).siName = "KGWATER/SEC";
+        state.dataOutRptTab->UnitConv(35).siName = "KMOL/S";
+        state.dataOutRptTab->UnitConv(36).siName = "KMOL/SEC";
+        state.dataOutRptTab->UnitConv(37).siName = "KWH";
+        state.dataOutRptTab->UnitConv(38).siName = "L";
+        state.dataOutRptTab->UnitConv(39).siName = "L";
+        state.dataOutRptTab->UnitConv(40).siName = "LUM/W";
+        state.dataOutRptTab->UnitConv(41).siName = "LUX";
+        state.dataOutRptTab->UnitConv(42).siName = "M";
+        state.dataOutRptTab->UnitConv(43).siName = "M";
+        state.dataOutRptTab->UnitConv(44).siName = "M/S";
+        state.dataOutRptTab->UnitConv(45).siName = "M/S";
+        state.dataOutRptTab->UnitConv(46).siName = "M2";
+        state.dataOutRptTab->UnitConv(47).siName = "M2/PERSON";
+        state.dataOutRptTab->UnitConv(48).siName = "M3";
+        state.dataOutRptTab->UnitConv(49).siName = "M3";
+        state.dataOutRptTab->UnitConv(50).siName = "M3/M2";
+        state.dataOutRptTab->UnitConv(51).siName = "M3/S";
+        state.dataOutRptTab->UnitConv(52).siName = "M3/S";
+        state.dataOutRptTab->UnitConv(53).siName = "M3/S-M2";
+        state.dataOutRptTab->UnitConv(54).siName = "M3/S-PERSON";
+        state.dataOutRptTab->UnitConv(55).siName = "M3/S-PERSON";
+        state.dataOutRptTab->UnitConv(56).siName = "PA";
+        state.dataOutRptTab->UnitConv(57).siName = "PA";
+        state.dataOutRptTab->UnitConv(58).siName = "PA";
+        state.dataOutRptTab->UnitConv(59).siName = "PA";
+        state.dataOutRptTab->UnitConv(60).siName = "PA";
+        state.dataOutRptTab->UnitConv(61).siName = "PA";
+        state.dataOutRptTab->UnitConv(62).siName = "PA";
+        state.dataOutRptTab->UnitConv(63).siName = "PA";
+        state.dataOutRptTab->UnitConv(64).siName = "S";
+        state.dataOutRptTab->UnitConv(65).siName = "V";
+        state.dataOutRptTab->UnitConv(66).siName = "W";
+        state.dataOutRptTab->UnitConv(67).siName = "W";
+        state.dataOutRptTab->UnitConv(68).siName = "W";
+        state.dataOutRptTab->UnitConv(69).siName = "W";
+        state.dataOutRptTab->UnitConv(70).siName = "W";
+        state.dataOutRptTab->UnitConv(71).siName = "W/KG";
+        state.dataOutRptTab->UnitConv(72).siName = "W/KG H2O"; // TODO: replace with W/kgWater? or rather just remove
+        state.dataOutRptTab->UnitConv(73).siName = "W/K";
+        state.dataOutRptTab->UnitConv(74).siName = "W/M2";
+        state.dataOutRptTab->UnitConv(75).siName = "W/M2";
+        state.dataOutRptTab->UnitConv(76).siName = "W/M2-C";
+        state.dataOutRptTab->UnitConv(77).siName = "W/M2-K";
+        state.dataOutRptTab->UnitConv(78).siName = "W/W";
+        state.dataOutRptTab->UnitConv(79).siName = "W/W";
+        state.dataOutRptTab->UnitConv(80).siName = "deltaC";
+        state.dataOutRptTab->UnitConv(81).siName = "KJ/KG";
+        state.dataOutRptTab->UnitConv(82).siName = "W-S/M3";
+        state.dataOutRptTab->UnitConv(83).siName = "W-S/M3";
+        state.dataOutRptTab->UnitConv(84).siName = "~~$~~/m2";
+        state.dataOutRptTab->UnitConv(85).siName = "GJ";
+        state.dataOutRptTab->UnitConv(86).siName = "GJ";
+        state.dataOutRptTab->UnitConv(87).siName = "GJ";
+        state.dataOutRptTab->UnitConv(88).siName = "GJ";
+        state.dataOutRptTab->UnitConv(89).siName = "GJ";
+        state.dataOutRptTab->UnitConv(90).siName = "GJ";
+        state.dataOutRptTab->UnitConv(91).siName = "GJ";
+        state.dataOutRptTab->UnitConv(92).siName = "MJ/m2";
+        state.dataOutRptTab->UnitConv(93).siName = "MJ/m2";
+        state.dataOutRptTab->UnitConv(94).siName = "MJ/m2";
+        state.dataOutRptTab->UnitConv(95).siName = "MJ/m2";
+        state.dataOutRptTab->UnitConv(96).siName = "Invalid/Undefined";
+        state.dataOutRptTab->UnitConv(97).siName = "";
+        state.dataOutRptTab->UnitConv(98).siName = "W/C";
+        state.dataOutRptTab->UnitConv(99).siName = "DAY";
+        state.dataOutRptTab->UnitConv(100).siName = "MIN";
+        state.dataOutRptTab->UnitConv(101).siName = "HR/WK";
+        state.dataOutRptTab->UnitConv(102).siName = "$";
+        state.dataOutRptTab->UnitConv(103).siName = "$/UNIT ENERGY";
+        state.dataOutRptTab->UnitConv(104).siName = "KW";
+        state.dataOutRptTab->UnitConv(105).siName = " ";
+        state.dataOutRptTab->UnitConv(106).siName = "AH";
+        state.dataOutRptTab->UnitConv(107).siName = "CLO";
+        state.dataOutRptTab->UnitConv(108).siName = "J/KG-K";
+        state.dataOutRptTab->UnitConv(109).siName = "KGWATER/S";
+        state.dataOutRptTab->UnitConv(110).siName = "PPM";
+        state.dataOutRptTab->UnitConv(111).siName = "RAD";
+        state.dataOutRptTab->UnitConv(112).siName = "REV/MIN";
+        state.dataOutRptTab->UnitConv(113).siName = "NM";
+        state.dataOutRptTab->UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        state.dataOutRptTab->UnitConv(115).siName = "PERSON/M2";
 
-        UnitConv(1).ipName = "%";
-        UnitConv(2).ipName = "F";
-        UnitConv(3).ipName = "0=Off 1=On";
-        UnitConv(4).ipName = "0-No  1-Yes";
-        UnitConv(5).ipName = "1-Yes 0-No";
-        UnitConv(6).ipName = "A";
-        UnitConv(7).ipName = "ACH";
-        UnitConv(8).ipName = "ach";
-        UnitConv(9).ipName = "base 50F";
-        UnitConv(10).ipName = "base 65F";
-        UnitConv(11).ipName = "F";
-        UnitConv(12).ipName = "cd/in2";
-        UnitConv(13).ipName = "deg";
-        UnitConv(14).ipName = "Frac";
-        UnitConv(15).ipName = "Hour";
-        UnitConv(16).ipName = "Hours";
-        UnitConv(17).ipName = "hr";
-        UnitConv(18).ipName = "hrs";
-        UnitConv(19).ipName = "kBtu";
-        UnitConv(20).ipName = "kWh";
-        UnitConv(21).ipName = "therm";
-        UnitConv(22).ipName = "MMBtu";
-        UnitConv(23).ipName = "Wh";
-        UnitConv(24).ipName = "ton-hrs";
-        UnitConv(25).ipName = "Btu/lb";
-        UnitConv(26).ipName = "Btu/lbWater";
-        UnitConv(27).ipName = "kBtu/sqft";
-        UnitConv(28).ipName = "F/ft";
-        UnitConv(29).ipName = "lb";
-        UnitConv(30).ipName = "lb/lb";
-        UnitConv(31).ipName = "lb/ft3";
-        UnitConv(32).ipName = "lb/s";
-        UnitConv(33).ipName = "lbWater/lbDryAir";
-        UnitConv(34).ipName = "lbWater/s";
-        UnitConv(35).ipName = "kmol/s";
-        UnitConv(36).ipName = "kmol/sec";
-        UnitConv(37).ipName = "kWh";
-        UnitConv(38).ipName = "gal";
-        UnitConv(39).ipName = "ft3";
-        UnitConv(40).ipName = "lum/W";
-        UnitConv(41).ipName = "foot-candles";
-        UnitConv(42).ipName = "ft";
-        UnitConv(43).ipName = "in";
-        UnitConv(44).ipName = "ft/min";
-        UnitConv(45).ipName = "miles/hr";
-        UnitConv(46).ipName = "ft2";
-        UnitConv(47).ipName = "ft2/person";
-        UnitConv(48).ipName = "ft3";
-        UnitConv(49).ipName = "gal";
-        UnitConv(50).ipName = "f3/f2";
-        UnitConv(51).ipName = "ft3/min";
-        UnitConv(52).ipName = "gal/min";
-        UnitConv(53).ipName = "ft3/min-ft2";
-        UnitConv(54).ipName = "ft3/min-person";
-        UnitConv(55).ipName = "gal/min-person";
-        UnitConv(56).ipName = "psi";
-        UnitConv(57).ipName = "inHg";
-        UnitConv(58).ipName = "inH2O";
-        UnitConv(59).ipName = "ftH2O";
-        UnitConv(60).ipName = "psi";
-        UnitConv(61).ipName = "inHg";
-        UnitConv(62).ipName = "inH2O";
-        UnitConv(63).ipName = "ftH2O";
-        UnitConv(64).ipName = "s";
-        UnitConv(65).ipName = "V";
-        UnitConv(66).ipName = "Btu/h";
-        UnitConv(67).ipName = "W";
-        UnitConv(68).ipName = "kW";
-        UnitConv(69).ipName = "kBtuh";
-        UnitConv(70).ipName = "ton";
-        UnitConv(71).ipName = "kBtuh/lb";
-        UnitConv(72).ipName = "kBtuh/lb";
-        UnitConv(73).ipName = "Btu/h-F";
-        UnitConv(74).ipName = "Btu/h-ft2";
-        UnitConv(75).ipName = "kBtuh/ft2";
-        UnitConv(76).ipName = "Btu/h-ft2-F";
-        UnitConv(77).ipName = "Btu/h-ft2-F";
-        UnitConv(78).ipName = "Btuh/Btuh";
-        UnitConv(79).ipName = "W/W";
-        UnitConv(80).ipName = "deltaF";
-        UnitConv(81).ipName = "Btu/lb";
-        UnitConv(82).ipName = "W-min/ft3";
-        UnitConv(83).ipName = "W-min/gal";
-        UnitConv(84).ipName = "~~$~~/ft2";
-        UnitConv(85).ipName = "kBtu";
-        UnitConv(86).ipName = "kWh";
-        UnitConv(87).ipName = "kWh";
-        UnitConv(88).ipName = "therm";
-        UnitConv(89).ipName = "MMBtu";
-        UnitConv(90).ipName = "Wh";
-        UnitConv(91).ipName = "ton-hrs";
-        UnitConv(92).ipName = "kWh/ft2";
-        UnitConv(93).ipName = "kBtu/ft2";
-        UnitConv(94).ipName = "kBtu/ft2";
-        UnitConv(95).ipName = "kWh/m2";
-        UnitConv(96).ipName = "Invalid/Undefined";
-        UnitConv(97).ipName = "";
-        UnitConv(98).ipName = "Btu/h-F";
-        UnitConv(99).ipName = "day";
-        UnitConv(100).ipName = "min";
-        UnitConv(101).ipName = "hr/wk";
-        UnitConv(102).ipName = "$";
-        UnitConv(103).ipName = "$/unit energy";
-        UnitConv(104).ipName = "kW";
-        UnitConv(105).ipName = " ";
-        UnitConv(106).ipName = "Ah";
-        UnitConv(107).ipName = "clo";
-        UnitConv(108).ipName = "Btu/lbm-R";
-        UnitConv(109).ipName = "lbWater/s";
-        UnitConv(110).ipName = "ppm";
-        UnitConv(111).ipName = "rad";
-        UnitConv(112).ipName = "rev/min";
-        UnitConv(113).ipName = "lbf-ft";
-        UnitConv(114).ipName = "Btu/W-h";
-        UnitConv(115).ipName = "person/ft2";
+        state.dataOutRptTab->UnitConv(1).ipName = "%";
+        state.dataOutRptTab->UnitConv(2).ipName = "F";
+        state.dataOutRptTab->UnitConv(3).ipName = "0=Off 1=On";
+        state.dataOutRptTab->UnitConv(4).ipName = "0-No  1-Yes";
+        state.dataOutRptTab->UnitConv(5).ipName = "1-Yes 0-No";
+        state.dataOutRptTab->UnitConv(6).ipName = "A";
+        state.dataOutRptTab->UnitConv(7).ipName = "ACH";
+        state.dataOutRptTab->UnitConv(8).ipName = "ach";
+        state.dataOutRptTab->UnitConv(9).ipName = "base 50F";
+        state.dataOutRptTab->UnitConv(10).ipName = "base 65F";
+        state.dataOutRptTab->UnitConv(11).ipName = "F";
+        state.dataOutRptTab->UnitConv(12).ipName = "cd/in2";
+        state.dataOutRptTab->UnitConv(13).ipName = "deg";
+        state.dataOutRptTab->UnitConv(14).ipName = "Frac";
+        state.dataOutRptTab->UnitConv(15).ipName = "Hour";
+        state.dataOutRptTab->UnitConv(16).ipName = "Hours";
+        state.dataOutRptTab->UnitConv(17).ipName = "hr";
+        state.dataOutRptTab->UnitConv(18).ipName = "hrs";
+        state.dataOutRptTab->UnitConv(19).ipName = "kBtu";
+        state.dataOutRptTab->UnitConv(20).ipName = "kWh";
+        state.dataOutRptTab->UnitConv(21).ipName = "therm";
+        state.dataOutRptTab->UnitConv(22).ipName = "MMBtu";
+        state.dataOutRptTab->UnitConv(23).ipName = "Wh";
+        state.dataOutRptTab->UnitConv(24).ipName = "ton-hrs";
+        state.dataOutRptTab->UnitConv(25).ipName = "Btu/lb";
+        state.dataOutRptTab->UnitConv(26).ipName = "Btu/lbWater";
+        state.dataOutRptTab->UnitConv(27).ipName = "kBtu/sqft";
+        state.dataOutRptTab->UnitConv(28).ipName = "F/ft";
+        state.dataOutRptTab->UnitConv(29).ipName = "lb";
+        state.dataOutRptTab->UnitConv(30).ipName = "lb/lb";
+        state.dataOutRptTab->UnitConv(31).ipName = "lb/ft3";
+        state.dataOutRptTab->UnitConv(32).ipName = "lb/s";
+        state.dataOutRptTab->UnitConv(33).ipName = "lbWater/lbDryAir";
+        state.dataOutRptTab->UnitConv(34).ipName = "lbWater/s";
+        state.dataOutRptTab->UnitConv(35).ipName = "kmol/s";
+        state.dataOutRptTab->UnitConv(36).ipName = "kmol/sec";
+        state.dataOutRptTab->UnitConv(37).ipName = "kWh";
+        state.dataOutRptTab->UnitConv(38).ipName = "gal";
+        state.dataOutRptTab->UnitConv(39).ipName = "ft3";
+        state.dataOutRptTab->UnitConv(40).ipName = "lum/W";
+        state.dataOutRptTab->UnitConv(41).ipName = "foot-candles";
+        state.dataOutRptTab->UnitConv(42).ipName = "ft";
+        state.dataOutRptTab->UnitConv(43).ipName = "in";
+        state.dataOutRptTab->UnitConv(44).ipName = "ft/min";
+        state.dataOutRptTab->UnitConv(45).ipName = "miles/hr";
+        state.dataOutRptTab->UnitConv(46).ipName = "ft2";
+        state.dataOutRptTab->UnitConv(47).ipName = "ft2/person";
+        state.dataOutRptTab->UnitConv(48).ipName = "ft3";
+        state.dataOutRptTab->UnitConv(49).ipName = "gal";
+        state.dataOutRptTab->UnitConv(50).ipName = "f3/f2";
+        state.dataOutRptTab->UnitConv(51).ipName = "ft3/min";
+        state.dataOutRptTab->UnitConv(52).ipName = "gal/min";
+        state.dataOutRptTab->UnitConv(53).ipName = "ft3/min-ft2";
+        state.dataOutRptTab->UnitConv(54).ipName = "ft3/min-person";
+        state.dataOutRptTab->UnitConv(55).ipName = "gal/min-person";
+        state.dataOutRptTab->UnitConv(56).ipName = "psi";
+        state.dataOutRptTab->UnitConv(57).ipName = "inHg";
+        state.dataOutRptTab->UnitConv(58).ipName = "inH2O";
+        state.dataOutRptTab->UnitConv(59).ipName = "ftH2O";
+        state.dataOutRptTab->UnitConv(60).ipName = "psi";
+        state.dataOutRptTab->UnitConv(61).ipName = "inHg";
+        state.dataOutRptTab->UnitConv(62).ipName = "inH2O";
+        state.dataOutRptTab->UnitConv(63).ipName = "ftH2O";
+        state.dataOutRptTab->UnitConv(64).ipName = "s";
+        state.dataOutRptTab->UnitConv(65).ipName = "V";
+        state.dataOutRptTab->UnitConv(66).ipName = "Btu/h";
+        state.dataOutRptTab->UnitConv(67).ipName = "W";
+        state.dataOutRptTab->UnitConv(68).ipName = "kW";
+        state.dataOutRptTab->UnitConv(69).ipName = "kBtuh";
+        state.dataOutRptTab->UnitConv(70).ipName = "ton";
+        state.dataOutRptTab->UnitConv(71).ipName = "kBtuh/lb";
+        state.dataOutRptTab->UnitConv(72).ipName = "kBtuh/lb";
+        state.dataOutRptTab->UnitConv(73).ipName = "Btu/h-F";
+        state.dataOutRptTab->UnitConv(74).ipName = "Btu/h-ft2";
+        state.dataOutRptTab->UnitConv(75).ipName = "kBtuh/ft2";
+        state.dataOutRptTab->UnitConv(76).ipName = "Btu/h-ft2-F";
+        state.dataOutRptTab->UnitConv(77).ipName = "Btu/h-ft2-F";
+        state.dataOutRptTab->UnitConv(78).ipName = "Btuh/Btuh";
+        state.dataOutRptTab->UnitConv(79).ipName = "W/W";
+        state.dataOutRptTab->UnitConv(80).ipName = "deltaF";
+        state.dataOutRptTab->UnitConv(81).ipName = "Btu/lb";
+        state.dataOutRptTab->UnitConv(82).ipName = "W-min/ft3";
+        state.dataOutRptTab->UnitConv(83).ipName = "W-min/gal";
+        state.dataOutRptTab->UnitConv(84).ipName = "~~$~~/ft2";
+        state.dataOutRptTab->UnitConv(85).ipName = "kBtu";
+        state.dataOutRptTab->UnitConv(86).ipName = "kWh";
+        state.dataOutRptTab->UnitConv(87).ipName = "kWh";
+        state.dataOutRptTab->UnitConv(88).ipName = "therm";
+        state.dataOutRptTab->UnitConv(89).ipName = "MMBtu";
+        state.dataOutRptTab->UnitConv(90).ipName = "Wh";
+        state.dataOutRptTab->UnitConv(91).ipName = "ton-hrs";
+        state.dataOutRptTab->UnitConv(92).ipName = "kWh/ft2";
+        state.dataOutRptTab->UnitConv(93).ipName = "kBtu/ft2";
+        state.dataOutRptTab->UnitConv(94).ipName = "kBtu/ft2";
+        state.dataOutRptTab->UnitConv(95).ipName = "kWh/m2";
+        state.dataOutRptTab->UnitConv(96).ipName = "Invalid/Undefined";
+        state.dataOutRptTab->UnitConv(97).ipName = "";
+        state.dataOutRptTab->UnitConv(98).ipName = "Btu/h-F";
+        state.dataOutRptTab->UnitConv(99).ipName = "day";
+        state.dataOutRptTab->UnitConv(100).ipName = "min";
+        state.dataOutRptTab->UnitConv(101).ipName = "hr/wk";
+        state.dataOutRptTab->UnitConv(102).ipName = "$";
+        state.dataOutRptTab->UnitConv(103).ipName = "$/unit energy";
+        state.dataOutRptTab->UnitConv(104).ipName = "kW";
+        state.dataOutRptTab->UnitConv(105).ipName = " ";
+        state.dataOutRptTab->UnitConv(106).ipName = "Ah";
+        state.dataOutRptTab->UnitConv(107).ipName = "clo";
+        state.dataOutRptTab->UnitConv(108).ipName = "Btu/lbm-R";
+        state.dataOutRptTab->UnitConv(109).ipName = "lbWater/s";
+        state.dataOutRptTab->UnitConv(110).ipName = "ppm";
+        state.dataOutRptTab->UnitConv(111).ipName = "rad";
+        state.dataOutRptTab->UnitConv(112).ipName = "rev/min";
+        state.dataOutRptTab->UnitConv(113).ipName = "lbf-ft";
+        state.dataOutRptTab->UnitConv(114).ipName = "Btu/W-h";
+        state.dataOutRptTab->UnitConv(115).ipName = "person/ft2";
 
-        UnitConv(1).mult = 1.0;
-        UnitConv(2).mult = 1.8;
-        UnitConv(3).mult = 1.0;
-        UnitConv(4).mult = 1.0;
-        UnitConv(5).mult = 1.0;
-        UnitConv(6).mult = 1.0;
-        UnitConv(7).mult = 1.0;
-        UnitConv(8).mult = 1.0;
-        UnitConv(9).mult = 1.8;
-        UnitConv(10).mult = 1.8;
-        UnitConv(11).mult = 1.8;
-        UnitConv(12).mult = 0.000645160041625726;
-        UnitConv(13).mult = 1.0;
-        UnitConv(14).mult = 1.0;
-        UnitConv(15).mult = 1.0;
-        UnitConv(16).mult = 1.0;
-        UnitConv(17).mult = 1.0;
-        UnitConv(18).mult = 1.0;
-        UnitConv(19).mult = 0.00000094845;
-        UnitConv(20).mult = 0.000000277778;
-        UnitConv(21).mult = 0.0000000094845;
-        UnitConv(22).mult = 0.00000000094845;
-        UnitConv(23).mult = 0.000277777777777778;
-        UnitConv(24).mult = 0.0000000789847;
-        UnitConv(25).mult = 0.00042956;
-        UnitConv(26).mult = 0.0000004302105;
-        UnitConv(27).mult = 0.00000008811404;
-        UnitConv(28).mult = 0.54861322767449;
-        UnitConv(29).mult = 2.2046;
-        UnitConv(30).mult = 1.0;
-        UnitConv(31).mult = 0.062428;
-        UnitConv(32).mult = 2.2046;
-        UnitConv(33).mult = 1.0;
-        UnitConv(34).mult = 2.2046;
-        UnitConv(35).mult = 1.0;
-        UnitConv(36).mult = 1.0;
-        UnitConv(37).mult = 1.0;
-        UnitConv(38).mult = 0.264172037284185;
-        UnitConv(39).mult = 0.0353146624712848;
-        UnitConv(40).mult = 1.0;
-        UnitConv(41).mult = 0.092902267;
-        UnitConv(42).mult = 3.281;
-        UnitConv(43).mult = 39.37;
-        UnitConv(44).mult = 196.86;
-        UnitConv(45).mult = 2.2369;
-        UnitConv(46).mult = 10.764961;
-        UnitConv(47).mult = 10.764961;
-        UnitConv(48).mult = 35.319837041;
-        UnitConv(49).mult = 264.172;
-        UnitConv(50).mult = 3.281;
-        UnitConv(51).mult = 2118.6438;
-        UnitConv(52).mult = 15852.0;
-        UnitConv(53).mult = 196.85;
-        UnitConv(54).mult = 2118.6438;
-        UnitConv(55).mult = 15852.0;
-        UnitConv(56).mult = 0.0001450377;
-        UnitConv(57).mult = 0.00029613;
-        UnitConv(58).mult = 0.00401463;
-        UnitConv(59).mult = 0.00033455;
-        UnitConv(60).mult = 0.0001450377;
-        UnitConv(61).mult = 0.00029613;
-        UnitConv(62).mult = 0.00401463;
-        UnitConv(63).mult = 0.00033455;
-        UnitConv(64).mult = 1.0;
-        UnitConv(65).mult = 1.0;
-        UnitConv(66).mult = 3.412;
-        UnitConv(67).mult = 1.0;
-        UnitConv(68).mult = 0.001;
-        UnitConv(69).mult = 0.00341442;
-        UnitConv(70).mult = 0.0002843333;
-        UnitConv(71).mult = 0.001547673;
-        UnitConv(72).mult = 0.001547673;
-        UnitConv(73).mult = 1.8987;
-        UnitConv(74).mult = 0.316954237;
-        UnitConv(75).mult = 0.000316954237;
-        UnitConv(76).mult = 0.176085687;
-        UnitConv(77).mult = 0.176085687;
-        UnitConv(78).mult = 1.0;
-        UnitConv(79).mult = 1.0;
-        UnitConv(80).mult = 1.8;
-        UnitConv(81).mult = 0.42956;
-        UnitConv(82).mult = 1.0 / 2118.6438;
-        UnitConv(83).mult = 1.0 / 15852;
-        UnitConv(84).mult = 1.0 / 10.764961;
-        UnitConv(85).mult = 0.00000094845 * 1000000000;
-        UnitConv(86).mult = 0.000000277778 * 1000000000;
-        UnitConv(87).mult = 0.000000277778 * 1000000000;
-        UnitConv(88).mult = 0.0000000094845 * 1000000000;
-        UnitConv(89).mult = 0.00000000094845 * 1000000000;
-        UnitConv(90).mult = 0.000277777777777778 * 1000000000;
-        UnitConv(91).mult = 0.0000000789847 * 1000000000;
-        UnitConv(92).mult = 0.277777777777778 / 10.764961;
-        UnitConv(93).mult = 0.94708628903179 / 10.764961;
-        UnitConv(94).mult = 0.94708628903179 / 10.764961;
-        UnitConv(95).mult = 0.27777777777778;
-        UnitConv(96).mult = 1.0;
-        UnitConv(97).mult = 1.0;
-        UnitConv(98).mult = 1.8987;
-        UnitConv(99).mult = 1.0;
-        UnitConv(100).mult = 1.0;
-        UnitConv(101).mult = 1.0;
-        UnitConv(102).mult = 1.0;
-        UnitConv(103).mult = 1.0;
-        UnitConv(104).mult = 1.0;
-        UnitConv(105).mult = 1.0;
-        UnitConv(106).mult = 1.0;
-        UnitConv(107).mult = 1.0;
-        UnitConv(108).mult = 0.000238845896627;
-        UnitConv(109).mult = 2.2046;
-        UnitConv(110).mult = 1.0;
-        UnitConv(111).mult = 1.0;
-        UnitConv(112).mult = 1.0;
-        UnitConv(113).mult = 0.737562149277;
-        UnitConv(114).mult = 1.0;
-        UnitConv(115).mult = 0.09290304;
+        state.dataOutRptTab->UnitConv(1).mult = 1.0;
+        state.dataOutRptTab->UnitConv(2).mult = 1.8;
+        state.dataOutRptTab->UnitConv(3).mult = 1.0;
+        state.dataOutRptTab->UnitConv(4).mult = 1.0;
+        state.dataOutRptTab->UnitConv(5).mult = 1.0;
+        state.dataOutRptTab->UnitConv(6).mult = 1.0;
+        state.dataOutRptTab->UnitConv(7).mult = 1.0;
+        state.dataOutRptTab->UnitConv(8).mult = 1.0;
+        state.dataOutRptTab->UnitConv(9).mult = 1.8;
+        state.dataOutRptTab->UnitConv(10).mult = 1.8;
+        state.dataOutRptTab->UnitConv(11).mult = 1.8;
+        state.dataOutRptTab->UnitConv(12).mult = 0.000645160041625726;
+        state.dataOutRptTab->UnitConv(13).mult = 1.0;
+        state.dataOutRptTab->UnitConv(14).mult = 1.0;
+        state.dataOutRptTab->UnitConv(15).mult = 1.0;
+        state.dataOutRptTab->UnitConv(16).mult = 1.0;
+        state.dataOutRptTab->UnitConv(17).mult = 1.0;
+        state.dataOutRptTab->UnitConv(18).mult = 1.0;
+        state.dataOutRptTab->UnitConv(19).mult = 0.00000094845;
+        state.dataOutRptTab->UnitConv(20).mult = 0.000000277778;
+        state.dataOutRptTab->UnitConv(21).mult = 0.0000000094845;
+        state.dataOutRptTab->UnitConv(22).mult = 0.00000000094845;
+        state.dataOutRptTab->UnitConv(23).mult = 0.000277777777777778;
+        state.dataOutRptTab->UnitConv(24).mult = 0.0000000789847;
+        state.dataOutRptTab->UnitConv(25).mult = 0.00042956;
+        state.dataOutRptTab->UnitConv(26).mult = 0.0000004302105;
+        state.dataOutRptTab->UnitConv(27).mult = 0.00000008811404;
+        state.dataOutRptTab->UnitConv(28).mult = 0.54861322767449;
+        state.dataOutRptTab->UnitConv(29).mult = 2.2046;
+        state.dataOutRptTab->UnitConv(30).mult = 1.0;
+        state.dataOutRptTab->UnitConv(31).mult = 0.062428;
+        state.dataOutRptTab->UnitConv(32).mult = 2.2046;
+        state.dataOutRptTab->UnitConv(33).mult = 1.0;
+        state.dataOutRptTab->UnitConv(34).mult = 2.2046;
+        state.dataOutRptTab->UnitConv(35).mult = 1.0;
+        state.dataOutRptTab->UnitConv(36).mult = 1.0;
+        state.dataOutRptTab->UnitConv(37).mult = 1.0;
+        state.dataOutRptTab->UnitConv(38).mult = 0.264172037284185;
+        state.dataOutRptTab->UnitConv(39).mult = 0.0353146624712848;
+        state.dataOutRptTab->UnitConv(40).mult = 1.0;
+        state.dataOutRptTab->UnitConv(41).mult = 0.092902267;
+        state.dataOutRptTab->UnitConv(42).mult = 3.281;
+        state.dataOutRptTab->UnitConv(43).mult = 39.37;
+        state.dataOutRptTab->UnitConv(44).mult = 196.86;
+        state.dataOutRptTab->UnitConv(45).mult = 2.2369;
+        state.dataOutRptTab->UnitConv(46).mult = 10.764961;
+        state.dataOutRptTab->UnitConv(47).mult = 10.764961;
+        state.dataOutRptTab->UnitConv(48).mult = 35.319837041;
+        state.dataOutRptTab->UnitConv(49).mult = 264.172;
+        state.dataOutRptTab->UnitConv(50).mult = 3.281;
+        state.dataOutRptTab->UnitConv(51).mult = 2118.6438;
+        state.dataOutRptTab->UnitConv(52).mult = 15852.0;
+        state.dataOutRptTab->UnitConv(53).mult = 196.85;
+        state.dataOutRptTab->UnitConv(54).mult = 2118.6438;
+        state.dataOutRptTab->UnitConv(55).mult = 15852.0;
+        state.dataOutRptTab->UnitConv(56).mult = 0.0001450377;
+        state.dataOutRptTab->UnitConv(57).mult = 0.00029613;
+        state.dataOutRptTab->UnitConv(58).mult = 0.00401463;
+        state.dataOutRptTab->UnitConv(59).mult = 0.00033455;
+        state.dataOutRptTab->UnitConv(60).mult = 0.0001450377;
+        state.dataOutRptTab->UnitConv(61).mult = 0.00029613;
+        state.dataOutRptTab->UnitConv(62).mult = 0.00401463;
+        state.dataOutRptTab->UnitConv(63).mult = 0.00033455;
+        state.dataOutRptTab->UnitConv(64).mult = 1.0;
+        state.dataOutRptTab->UnitConv(65).mult = 1.0;
+        state.dataOutRptTab->UnitConv(66).mult = 3.412;
+        state.dataOutRptTab->UnitConv(67).mult = 1.0;
+        state.dataOutRptTab->UnitConv(68).mult = 0.001;
+        state.dataOutRptTab->UnitConv(69).mult = 0.00341442;
+        state.dataOutRptTab->UnitConv(70).mult = 0.0002843333;
+        state.dataOutRptTab->UnitConv(71).mult = 0.001547673;
+        state.dataOutRptTab->UnitConv(72).mult = 0.001547673;
+        state.dataOutRptTab->UnitConv(73).mult = 1.8987;
+        state.dataOutRptTab->UnitConv(74).mult = 0.316954237;
+        state.dataOutRptTab->UnitConv(75).mult = 0.000316954237;
+        state.dataOutRptTab->UnitConv(76).mult = 0.176085687;
+        state.dataOutRptTab->UnitConv(77).mult = 0.176085687;
+        state.dataOutRptTab->UnitConv(78).mult = 1.0;
+        state.dataOutRptTab->UnitConv(79).mult = 1.0;
+        state.dataOutRptTab->UnitConv(80).mult = 1.8;
+        state.dataOutRptTab->UnitConv(81).mult = 0.42956;
+        state.dataOutRptTab->UnitConv(82).mult = 1.0 / 2118.6438;
+        state.dataOutRptTab->UnitConv(83).mult = 1.0 / 15852;
+        state.dataOutRptTab->UnitConv(84).mult = 1.0 / 10.764961;
+        state.dataOutRptTab->UnitConv(85).mult = 0.00000094845 * 1000000000;
+        state.dataOutRptTab->UnitConv(86).mult = 0.000000277778 * 1000000000;
+        state.dataOutRptTab->UnitConv(87).mult = 0.000000277778 * 1000000000;
+        state.dataOutRptTab->UnitConv(88).mult = 0.0000000094845 * 1000000000;
+        state.dataOutRptTab->UnitConv(89).mult = 0.00000000094845 * 1000000000;
+        state.dataOutRptTab->UnitConv(90).mult = 0.000277777777777778 * 1000000000;
+        state.dataOutRptTab->UnitConv(91).mult = 0.0000000789847 * 1000000000;
+        state.dataOutRptTab->UnitConv(92).mult = 0.277777777777778 / 10.764961;
+        state.dataOutRptTab->UnitConv(93).mult = 0.94708628903179 / 10.764961;
+        state.dataOutRptTab->UnitConv(94).mult = 0.94708628903179 / 10.764961;
+        state.dataOutRptTab->UnitConv(95).mult = 0.27777777777778;
+        state.dataOutRptTab->UnitConv(96).mult = 1.0;
+        state.dataOutRptTab->UnitConv(97).mult = 1.0;
+        state.dataOutRptTab->UnitConv(98).mult = 1.8987;
+        state.dataOutRptTab->UnitConv(99).mult = 1.0;
+        state.dataOutRptTab->UnitConv(100).mult = 1.0;
+        state.dataOutRptTab->UnitConv(101).mult = 1.0;
+        state.dataOutRptTab->UnitConv(102).mult = 1.0;
+        state.dataOutRptTab->UnitConv(103).mult = 1.0;
+        state.dataOutRptTab->UnitConv(104).mult = 1.0;
+        state.dataOutRptTab->UnitConv(105).mult = 1.0;
+        state.dataOutRptTab->UnitConv(106).mult = 1.0;
+        state.dataOutRptTab->UnitConv(107).mult = 1.0;
+        state.dataOutRptTab->UnitConv(108).mult = 0.000238845896627;
+        state.dataOutRptTab->UnitConv(109).mult = 2.2046;
+        state.dataOutRptTab->UnitConv(110).mult = 1.0;
+        state.dataOutRptTab->UnitConv(111).mult = 1.0;
+        state.dataOutRptTab->UnitConv(112).mult = 1.0;
+        state.dataOutRptTab->UnitConv(113).mult = 0.737562149277;
+        state.dataOutRptTab->UnitConv(114).mult = 1.0;
+        state.dataOutRptTab->UnitConv(115).mult = 0.09290304;
 
-        UnitConv(2).offset = 32.0;
-        UnitConv(11).offset = 32.0;
-        UnitConv(25).offset = 7.6736;
-        UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
+        state.dataOutRptTab->UnitConv(2).offset = 32.0;
+        state.dataOutRptTab->UnitConv(11).offset = 32.0;
+        state.dataOutRptTab->UnitConv(25).offset = 7.6736;
+        state.dataOutRptTab->UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
 
-        UnitConv(20).hint = "ELEC";
-        UnitConv(21).hint = "GAS";
-        UnitConv(24).hint = "COOL";
-        UnitConv(38).hint = "WATER";
-        UnitConv(49).hint = "WATER";
-        UnitConv(52).hint = "WATER";
-        UnitConv(67).hint = "ELEC";
-        UnitConv(70).hint = "COOL";
-        UnitConv(79).hint = "SI";
-        UnitConv(83).hint = "WATER";
-        UnitConv(86).hint = "CONSUMP";
-        UnitConv(87).hint = "ELEC";
-        UnitConv(88).hint = "GAS";
-        UnitConv(91).hint = "COOL";
-        UnitConv(92).hint = "ELEC";
-        UnitConv(93).hint = "GAS";
-        UnitConv(93).hint = "ADDITIONAL";
+        state.dataOutRptTab->UnitConv(20).hint = "ELEC";
+        state.dataOutRptTab->UnitConv(21).hint = "GAS";
+        state.dataOutRptTab->UnitConv(24).hint = "COOL";
+        state.dataOutRptTab->UnitConv(38).hint = "WATER";
+        state.dataOutRptTab->UnitConv(49).hint = "WATER";
+        state.dataOutRptTab->UnitConv(52).hint = "WATER";
+        state.dataOutRptTab->UnitConv(67).hint = "ELEC";
+        state.dataOutRptTab->UnitConv(70).hint = "COOL";
+        state.dataOutRptTab->UnitConv(79).hint = "SI";
+        state.dataOutRptTab->UnitConv(83).hint = "WATER";
+        state.dataOutRptTab->UnitConv(86).hint = "CONSUMP";
+        state.dataOutRptTab->UnitConv(87).hint = "ELEC";
+        state.dataOutRptTab->UnitConv(88).hint = "GAS";
+        state.dataOutRptTab->UnitConv(91).hint = "COOL";
+        state.dataOutRptTab->UnitConv(92).hint = "ELEC";
+        state.dataOutRptTab->UnitConv(93).hint = "GAS";
+        state.dataOutRptTab->UnitConv(93).hint = "ADDITIONAL";
 
-        UnitConv(19).several = true;
-        UnitConv(20).several = true;
-        UnitConv(21).several = true;
-        UnitConv(22).several = true;
-        UnitConv(23).several = true;
-        UnitConv(24).several = true;
-        UnitConv(38).several = true;
-        UnitConv(39).several = true;
-        UnitConv(42).several = true;
-        UnitConv(43).several = true;
-        UnitConv(44).several = true;
-        UnitConv(45).several = true;
-        UnitConv(48).several = true;
-        UnitConv(49).several = true;
-        UnitConv(51).several = true;
-        UnitConv(52).several = true;
-        UnitConv(54).several = true;
-        UnitConv(55).several = true;
-        UnitConv(56).several = true;
-        UnitConv(57).several = true;
-        UnitConv(58).several = true;
-        UnitConv(59).several = true;
-        UnitConv(60).several = true;
-        UnitConv(61).several = true;
-        UnitConv(62).several = true;
-        UnitConv(63).several = true;
-        UnitConv(66).several = true;
-        UnitConv(67).several = true;
-        UnitConv(68).several = true;
-        UnitConv(69).several = true;
-        UnitConv(70).several = true;
-        UnitConv(74).several = true;
-        UnitConv(75).several = true;
-        UnitConv(78).several = true;
-        UnitConv(79).several = true;
-        UnitConv(82).several = true;
-        UnitConv(83).several = true;
-        UnitConv(85).several = true;
-        UnitConv(86).several = true;
-        UnitConv(87).several = true;
-        UnitConv(88).several = true;
-        UnitConv(89).several = true;
-        UnitConv(90).several = true;
-        UnitConv(91).several = true;
-        UnitConv(92).several = true;
-        UnitConv(93).several = true;
-        UnitConv(94).several = true;
-        UnitConv(95).several = true;
+        state.dataOutRptTab->UnitConv(19).several = true;
+        state.dataOutRptTab->UnitConv(20).several = true;
+        state.dataOutRptTab->UnitConv(21).several = true;
+        state.dataOutRptTab->UnitConv(22).several = true;
+        state.dataOutRptTab->UnitConv(23).several = true;
+        state.dataOutRptTab->UnitConv(24).several = true;
+        state.dataOutRptTab->UnitConv(38).several = true;
+        state.dataOutRptTab->UnitConv(39).several = true;
+        state.dataOutRptTab->UnitConv(42).several = true;
+        state.dataOutRptTab->UnitConv(43).several = true;
+        state.dataOutRptTab->UnitConv(44).several = true;
+        state.dataOutRptTab->UnitConv(45).several = true;
+        state.dataOutRptTab->UnitConv(48).several = true;
+        state.dataOutRptTab->UnitConv(49).several = true;
+        state.dataOutRptTab->UnitConv(51).several = true;
+        state.dataOutRptTab->UnitConv(52).several = true;
+        state.dataOutRptTab->UnitConv(54).several = true;
+        state.dataOutRptTab->UnitConv(55).several = true;
+        state.dataOutRptTab->UnitConv(56).several = true;
+        state.dataOutRptTab->UnitConv(57).several = true;
+        state.dataOutRptTab->UnitConv(58).several = true;
+        state.dataOutRptTab->UnitConv(59).several = true;
+        state.dataOutRptTab->UnitConv(60).several = true;
+        state.dataOutRptTab->UnitConv(61).several = true;
+        state.dataOutRptTab->UnitConv(62).several = true;
+        state.dataOutRptTab->UnitConv(63).several = true;
+        state.dataOutRptTab->UnitConv(66).several = true;
+        state.dataOutRptTab->UnitConv(67).several = true;
+        state.dataOutRptTab->UnitConv(68).several = true;
+        state.dataOutRptTab->UnitConv(69).several = true;
+        state.dataOutRptTab->UnitConv(70).several = true;
+        state.dataOutRptTab->UnitConv(74).several = true;
+        state.dataOutRptTab->UnitConv(75).several = true;
+        state.dataOutRptTab->UnitConv(78).several = true;
+        state.dataOutRptTab->UnitConv(79).several = true;
+        state.dataOutRptTab->UnitConv(82).several = true;
+        state.dataOutRptTab->UnitConv(83).several = true;
+        state.dataOutRptTab->UnitConv(85).several = true;
+        state.dataOutRptTab->UnitConv(86).several = true;
+        state.dataOutRptTab->UnitConv(87).several = true;
+        state.dataOutRptTab->UnitConv(88).several = true;
+        state.dataOutRptTab->UnitConv(89).several = true;
+        state.dataOutRptTab->UnitConv(90).several = true;
+        state.dataOutRptTab->UnitConv(91).several = true;
+        state.dataOutRptTab->UnitConv(92).several = true;
+        state.dataOutRptTab->UnitConv(93).several = true;
+        state.dataOutRptTab->UnitConv(94).several = true;
+        state.dataOutRptTab->UnitConv(95).several = true;
     }
 
     std::string GetUnitSubString(std::string const &inString) // Input String
@@ -15971,13 +15909,13 @@ namespace EnergyPlus::OutputReportTabular {
         int foundConv = 0;
         int firstOfSeveral = 0;
         for (int iUnit = 1; iUnit <= state.dataOutRptTab->UnitConvSize; ++iUnit) {
-            if (UtilityRoutines::SameString(UnitConv(iUnit).siName, unitSIOnly)) {
-                if (UnitConv(iUnit).several) {
+            if (UtilityRoutines::SameString(state.dataOutRptTab->UnitConv(iUnit).siName, unitSIOnly)) {
+                if (state.dataOutRptTab->UnitConv(iUnit).several) {
                     if (firstOfSeveral == 0) firstOfSeveral = iUnit;
-                    if (UnitConv(iUnit).is_default) defaultConv = iUnit;
+                    if (state.dataOutRptTab->UnitConv(iUnit).is_default) defaultConv = iUnit;
                     // look for the hint string
-                    if (len(UnitConv(iUnit).hint) > 0) {
-                        if (has(stringInUpper, UnitConv(iUnit).hint)) {
+                    if (len(state.dataOutRptTab->UnitConv(iUnit).hint) > 0) {
+                        if (has(stringInUpper, state.dataOutRptTab->UnitConv(iUnit).hint)) {
                             foundConv = iUnit;
                             break;
                         }
@@ -16009,13 +15947,13 @@ namespace EnergyPlus::OutputReportTabular {
         // if one was selected substitute the units into the output string
         if (selectedConv > 0) {
             if (modeInString == misBrac) {
-                stringOutWithIP = stringInWithSI.substr(0, posLBrac + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrac);
+                stringOutWithIP = stringInWithSI.substr(0, posLBrac + 1) + state.dataOutRptTab->UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrac);
             } else if (modeInString == misParen) {
-                stringOutWithIP = stringInWithSI.substr(0, posLParen + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRParen);
+                stringOutWithIP = stringInWithSI.substr(0, posLParen + 1) + state.dataOutRptTab->UnitConv(selectedConv).ipName + stringInWithSI.substr(posRParen);
             } else if (modeInString == misBrce) {
-                stringOutWithIP = stringInWithSI.substr(0, posLBrce + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrce);
+                stringOutWithIP = stringInWithSI.substr(0, posLBrce + 1) + state.dataOutRptTab->UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrce);
             } else if (modeInString == misNoHint) {
-                stringOutWithIP = UnitConv(selectedConv).ipName;
+                stringOutWithIP = state.dataOutRptTab->UnitConv(selectedConv).ipName;
             }
         } else {
             // if no conversion just output the input string
@@ -16098,7 +16036,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (unitConvIndex == 0 || SIvalue == -999.0 || SIvalue == -99999.0) { // don't convert unknown data to IP
             ConvertIP = SIvalue;
         } else if ((unitConvIndex > 0) && (unitConvIndex <= state.dataOutRptTab->UnitConvSize)) {
-            ConvertIP = (SIvalue * UnitConv(unitConvIndex).mult) + UnitConv(unitConvIndex).offset;
+            ConvertIP = (SIvalue * state.dataOutRptTab->UnitConv(unitConvIndex).mult) + state.dataOutRptTab->UnitConv(unitConvIndex).offset;
         } else {
             ConvertIP = SIvalue;
         }
@@ -16148,7 +16086,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (unitConvIndex == 0) {
             ConvertIPdelta = SIvalue;
         } else if ((unitConvIndex > 0) && (unitConvIndex <= state.dataOutRptTab->UnitConvSize)) {
-            ConvertIPdelta = SIvalue * UnitConv(unitConvIndex).mult;
+            ConvertIPdelta = SIvalue * state.dataOutRptTab->UnitConv(unitConvIndex).mult;
         } else {
             ConvertIPdelta = SIvalue;
         }
@@ -16193,9 +16131,9 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
         if ((unitConvIndex > 0) && (unitConvIndex <= state.dataOutRptTab->UnitConvSize)) {
-            multiplier = UnitConv(unitConvIndex).mult;
-            offset = UnitConv(unitConvIndex).offset;
-            IPunit = UnitConv(unitConvIndex).ipName;
+            multiplier = state.dataOutRptTab->UnitConv(unitConvIndex).mult;
+            offset = state.dataOutRptTab->UnitConv(unitConvIndex).offset;
+            IPunit = state.dataOutRptTab->UnitConv(unitConvIndex).ipName;
         } else {
             multiplier = 1.0;
             offset = 0.0;
@@ -16249,15 +16187,15 @@ namespace EnergyPlus::OutputReportTabular {
         static int iUnit(0);
 
         for (iUnit = 1; iUnit <= state.dataOutRptTab->UnitConvSize; ++iUnit) {
-            if (UtilityRoutines::SameString(UnitConv(iUnit).siName, SIunit)) {
-                if (UtilityRoutines::SameString(UnitConv(iUnit).ipName, IPunit)) {
+            if (UtilityRoutines::SameString(state.dataOutRptTab->UnitConv(iUnit).siName, SIunit)) {
+                if (UtilityRoutines::SameString(state.dataOutRptTab->UnitConv(iUnit).ipName, IPunit)) {
                     found = iUnit;
                     break;
                 }
             }
         }
         if (found != 0) {
-            getSpecificUnitMultiplier = UnitConv(found).mult;
+            getSpecificUnitMultiplier = state.dataOutRptTab->UnitConv(found).mult;
         } else {
             ShowWarningError(state, "Unable to find a unit conversion from " + SIunit + " to " + IPunit);
             ShowContinueError(state, "Applying default conversion factor of 1.0");
@@ -16364,8 +16302,8 @@ namespace EnergyPlus::OutputReportTabular {
         static int iUnit(0);
 
         for (iUnit = 1; iUnit <= state.dataOutRptTab->UnitConvSize; ++iUnit) {
-            if (UtilityRoutines::SameString(UnitConv(iUnit).siName, SIunit)) {
-                if (UtilityRoutines::SameString(UnitConv(iUnit).ipName, IPunit)) {
+            if (UtilityRoutines::SameString(state.dataOutRptTab->UnitConv(iUnit).siName, SIunit)) {
+                if (UtilityRoutines::SameString(state.dataOutRptTab->UnitConv(iUnit).ipName, IPunit)) {
                     found = iUnit;
                     break;
                 }
