@@ -116,8 +116,6 @@ namespace HVACStandAloneERV {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    static std::string const BlankString;
-
     int const ControllerSimple(1);
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -369,7 +367,7 @@ namespace HVACStandAloneERV {
             StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
             if (lAlphaBlanks(2)) {
-                StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 StandAloneERV(StandAloneERVNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (StandAloneERV(StandAloneERVNum).SchedPtr == 0) {
@@ -1834,7 +1832,7 @@ namespace HVACStandAloneERV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         StandAloneERV(StandAloneERVNum).ElecUseEnergy = StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).SensCoolingEnergy = StandAloneERV(StandAloneERVNum).SensCoolingRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).LatCoolingEnergy = StandAloneERV(StandAloneERVNum).LatCoolingRate * ReportingConstant;

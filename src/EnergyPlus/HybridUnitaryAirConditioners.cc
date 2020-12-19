@@ -544,7 +544,7 @@ namespace HybridUnitaryAirConditioners {
                 // A2, \field Availability Schedule Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
                 if (lAlphaBlanks(2)) {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                     if (ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {

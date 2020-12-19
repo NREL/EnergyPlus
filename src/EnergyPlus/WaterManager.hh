@@ -120,6 +120,7 @@ namespace WaterManager {
         bool MyEnvrnFlag;   // flag for init once at start of environment
         bool MyWarmupFlag; // flag for init after warmup complete
         bool MyTankDemandCheckFlag;
+        Real64 overflowTwater = 0.0;
 
         void clear_state() override
         {
@@ -128,11 +129,12 @@ namespace WaterManager {
             this->MyEnvrnFlag = true;
             this->MyWarmupFlag = false;
             this->MyTankDemandCheckFlag = true;
+            this->overflowTwater = 0.0;
         }
 
         // Default Constructor
         WaterManagerData()
-            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
+            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
         {
         }
     };

@@ -54,9 +54,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
@@ -1304,7 +1304,7 @@ namespace EconomicLifeCycleCost {
         // gather costs from EconomicTariff for each end use
         numResourcesUsed = 0;
         for (auto iResource : DataGlobalConstants::AllResourceTypes) {
-            GetMonthlyCostForResource(iResource, curResourceCosts);
+            GetMonthlyCostForResource(state, iResource, curResourceCosts);
             annualCost = 0.0;
             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                 resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);

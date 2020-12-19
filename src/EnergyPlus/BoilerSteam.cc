@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -381,7 +380,7 @@ namespace BoilerSteam {
                 } else {
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
                     DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->MissingSetPointErrDone) {
@@ -539,9 +538,9 @@ namespace BoilerSteam {
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "Boiler:Steam");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->NomEffic);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Boiler:Steam");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->NomEffic);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
         }
 
         if (ErrorsFound) {
@@ -798,7 +797,7 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 

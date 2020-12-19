@@ -58,6 +58,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -68,13 +69,12 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
@@ -111,10 +111,6 @@ namespace SystemAvailabilityManager {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
     using DataHeatBalance::ZoneList;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
 
     Real64 CurrentEndTime(0.0);     // Current end time
     Real64 CurrentEndTimeLast(0.0); // last end time
@@ -555,7 +551,7 @@ namespace SystemAvailabilityManager {
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).MgrType = state.dataSystemAvailabilityManager->SysAvailMgr_NightCycle;
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).TempTolRange = rNumericArgs(1);
-                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour()) * double(state.dataGlobal->NumOfTimeStepInHour));
+                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour) * double(state.dataGlobal->NumOfTimeStepInHour));
                 CyclingTimeSteps = max(1, CyclingTimeSteps);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps = CyclingTimeSteps;
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));

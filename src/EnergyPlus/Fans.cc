@@ -403,7 +403,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -466,7 +466,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -549,7 +549,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -607,7 +607,7 @@ namespace Fans {
                     }
                 }
             } else {
-                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
 
             if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -687,7 +687,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -964,20 +964,20 @@ namespace Fans {
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Air Mass Flow Rate",
                                  "[kg/s]",
                                  Fan(FanNum).EMSMaxMassFlowOverrideOn,
                                  Fan(FanNum).EMSAirMassFlowValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", Fan(FanNum).FanName, "[Pa]", Fan(FanNum).DeltaPress);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Pressure Rise", "[Pa]", Fan(FanNum).EMSFanPressureOverrideOn, Fan(FanNum).EMSFanPressureValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", Fan(FanNum).FanName, "[fraction]", Fan(FanNum).FanEff);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Total Efficiency", "[fraction]", Fan(FanNum).EMSFanEffOverrideOn, Fan(FanNum).EMSFanEffValue);
 
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Autosized Air Flow Rate",
                                  "[m3/s]",
@@ -1490,21 +1490,21 @@ namespace Fans {
 
         // cpw31Aug2010 Rearrange order to match table and use FanVolFlow to calculate RatedPower
         // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-        PreDefTableEntry(pdchFanType, equipName, Fan(FanNum).FanType);
-        PreDefTableEntry(pdchFanTotEff, equipName, Fan(FanNum).FanEff);
-        PreDefTableEntry(pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
-        PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, Fan(FanNum).FanType);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, Fan(FanNum).FanEff);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
             Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, state.dataEnvrn->StdRhoAir);
         }
-        PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
-            PreDefTableEntry(pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
         }
-        PreDefTableEntry(pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
-        PreDefTableEntry(pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
-        PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         if (NVPerfNum > 0) {
@@ -2589,7 +2589,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {

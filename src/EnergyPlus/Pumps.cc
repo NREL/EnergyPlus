@@ -792,7 +792,7 @@ namespace Pumps {
             } else {
                 // Calc Condensate Pump Water Volume Flow Rate
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
             }
 
@@ -1170,13 +1170,13 @@ namespace Pumps {
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
-                SetupEMSActuator("Pump",
+                SetupEMSActuator(state, "Pump",
                                  PumpEquip(PumpNum).Name,
                                  "Pump Mass Flow Rate",
                                  "[kg/s]",
                                  PumpEquip(PumpNum).EMSMassFlowOverrideOn,
                                  PumpEquip(PumpNum).EMSMassFlowValue);
-                SetupEMSActuator("Pump",
+                SetupEMSActuator(state, "Pump",
                                  PumpEquip(PumpNum).Name,
                                  "Pump Pressure Rise",
                                  "[Pa]",
@@ -1454,7 +1454,7 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
             if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
 
@@ -1482,7 +1482,7 @@ namespace Pumps {
             } else {
                 TempWaterDensity = GetDensityGlycol(state,
                                                     PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
-                                                    DataGlobalConstants::InitConvTemp(),
+                                                    DataGlobalConstants::InitConvTemp,
                                                     PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                     RoutineName);
                 mdotMax = PumpEquip(PumpNum).NomVolFlowRate * TempWaterDensity;
@@ -2062,11 +2062,11 @@ namespace Pumps {
         if (PumpEquip(PumpNum).LoopNum > 0) {
             TempWaterDensity = GetDensityGlycol(state,
                                                 PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
-                                                DataGlobalConstants::InitConvTemp(),
+                                                DataGlobalConstants::InitConvTemp,
                                                 PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                 RoutineName);
         } else {
-            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
         }
 
         // note: we assume pump impeller efficiency is 78% for autosizing
@@ -2114,7 +2114,7 @@ namespace Pumps {
                     if (!PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).BranchPumpsExist) {
                         // size pump to full flow of plant loop
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2126,7 +2126,7 @@ namespace Pumps {
                         DesVolFlowRatePerBranch = PlantSizData(PlantSizNum).DesVolFlowRate /
                                                   PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).TotalPumps;
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2215,7 +2215,7 @@ namespace Pumps {
         }
 
         if (PlantFinalSizesOkayToReport) {
-            PumpDataForTable(PumpNum);
+            PumpDataForTable(state, PumpNum);
         }
 
         if (ErrorsFound) {
@@ -2287,16 +2287,16 @@ namespace Pumps {
             PumpEquipReport(PumpNum).PumpHeattoFluid = PumpHeattoFluid;
             PumpEquipReport(PumpNum).OutletTemp = Node(OutletNode).Temp;
             PumpEquip(PumpNum).Power = Power;
-            PumpEquip(PumpNum).Energy = PumpEquip(PumpNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+            PumpEquip(PumpNum).Energy = PumpEquip(PumpNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
             PumpEquipReport(PumpNum).ShaftPower = ShaftPower;
-            PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour();
+            PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour;
             if (PumpType == Pump_ConSpeed || PumpType == Pump_VarSpeed || PumpType == Pump_Cond) {
                 PumpEquipReport(PumpNum).NumPumpsOperating = 1;
             } else if (PumpType == PumpBank_ConSpeed || PumpType == PumpBank_VarSpeed) {
                 PumpEquipReport(PumpNum).NumPumpsOperating = NumPumpsRunning;
             }
             PumpEquipReport(PumpNum).ZoneTotalGainRate = Power - PumpHeattoFluid;
-            PumpEquipReport(PumpNum).ZoneTotalGainEnergy = PumpEquipReport(PumpNum).ZoneTotalGainRate * TimeStepSys * DataGlobalConstants::SecInHour();
+            PumpEquipReport(PumpNum).ZoneTotalGainEnergy = PumpEquipReport(PumpNum).ZoneTotalGainRate * TimeStepSys * DataGlobalConstants::SecInHour;
             PumpEquipReport(PumpNum).ZoneConvGainRate = (1 - PumpEquip(PumpNum).SkinLossRadFraction) * PumpEquipReport(PumpNum).ZoneTotalGainRate;
             PumpEquipReport(PumpNum).ZoneRadGainRate = PumpEquip(PumpNum).SkinLossRadFraction * PumpEquipReport(PumpNum).ZoneTotalGainRate;
         }
@@ -2306,7 +2306,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void PumpDataForTable(int const NumPump)
+    void PumpDataForTable(EnergyPlusData &state, int const NumPump)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2346,24 +2346,24 @@ namespace Pumps {
         std::string equipName;
 
         equipName = PumpEquip(NumPump).Name;
-        PreDefTableEntry(pdchPumpType, equipName, cPumpTypes(PumpEquip(NumPump).PumpType));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpType, equipName, cPumpTypes(PumpEquip(NumPump).PumpType));
         if (PumpEquip(NumPump).PumpControl == PumpControlType::Continuous) {
-            PreDefTableEntry(pdchPumpControl, equipName, "Continuous");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Continuous");
         } else if (PumpEquip(NumPump).PumpControl == PumpControlType::Intermittent) {
-            PreDefTableEntry(pdchPumpControl, equipName, "Intermittent");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Intermittent");
         } else {
-            PreDefTableEntry(pdchPumpControl, equipName, "Unknown");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Unknown");
         }
-        PreDefTableEntry(pdchPumpHead, equipName, PumpEquip(NumPump).NomPumpHead);
-        PreDefTableEntry(pdchPumpFlow, equipName, PumpEquip(NumPump).NomVolFlowRate, 6);
-        PreDefTableEntry(pdchPumpPower, equipName, PumpEquip(NumPump).NomPowerUse);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpHead, equipName, PumpEquip(NumPump).NomPumpHead);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpFlow, equipName, PumpEquip(NumPump).NomVolFlowRate, 6);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPower, equipName, PumpEquip(NumPump).NomPowerUse);
         if (PumpEquip(NumPump).NomVolFlowRate != 0) {
-            PreDefTableEntry(pdchPumpPwrPerFlow, equipName, PumpEquip(NumPump).NomPowerUse / PumpEquip(NumPump).NomVolFlowRate);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, PumpEquip(NumPump).NomPowerUse / PumpEquip(NumPump).NomVolFlowRate);
         } else {
-            PreDefTableEntry(pdchPumpPwrPerFlow, equipName, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, "-");
         }
-        PreDefTableEntry(pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
-        PreDefTableEntry(pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
     }
 
     //*************************************************************************!

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -228,6 +229,14 @@ namespace MicroturbineElectricGenerator {
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
+
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

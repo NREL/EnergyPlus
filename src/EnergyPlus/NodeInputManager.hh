@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -172,6 +173,14 @@ namespace NodeInputManager {
     void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace NodeInputManager
+
+struct NodeInputManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

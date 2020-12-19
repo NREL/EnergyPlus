@@ -177,7 +177,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
 
     // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay() / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

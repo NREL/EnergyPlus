@@ -352,7 +352,7 @@ namespace SteamBaseboardRadiator {
             // Get schedule
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -1339,10 +1339,10 @@ namespace SteamBaseboardRadiator {
 
         using DataSurfaces::Surface;
 
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number
