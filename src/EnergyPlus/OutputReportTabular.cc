@@ -177,72 +177,6 @@ namespace EnergyPlus::OutputReportTabular {
 
     // arrays for time binned results
 
-    // to keep track of hours for the BEPS report gathering
-    Real64 gatherElapsedTimeBEPS(0.0);
-    // for normalization of results
-    Real64 buildingGrossFloorArea(0.0);
-    Real64 buildingConditionedFloorArea(0.0);
-    // keep track if schedules are used in fuel factors
-    bool fuelFactorSchedulesUsed(false);
-    // for electric load components on BEPS report
-    int meterNumPowerFuelFireGen(0);
-    Real64 gatherPowerFuelFireGen(0.0);
-    int meterNumPowerPV(0);
-    Real64 gatherPowerPV(0.0);
-    int meterNumPowerWind(0);
-    Real64 gatherPowerWind(0.0);
-    Real64 OverallNetEnergyFromStorage(0.0);
-    int meterNumPowerHTGeothermal(0);
-    Real64 gatherPowerHTGeothermal(0.0);
-    int meterNumElecProduced(0);
-    Real64 gatherElecProduced(0.0);
-    int meterNumElecPurchased(0);
-    Real64 gatherElecPurchased(0.0);
-    int meterNumElecSurplusSold(0);
-    Real64 gatherElecSurplusSold(0.0);
-    int meterNumElecStorage = (0);
-    Real64 gatherElecStorage = (0.0);
-    int meterNumPowerConversion = (0);
-    Real64 gatherPowerConversion = (0.0);
-    // for on site thermal source components on BEPS report
-    int meterNumWaterHeatRecovery(0);
-    Real64 gatherWaterHeatRecovery(0.0);
-    int meterNumAirHeatRecoveryCool(0);
-    Real64 gatherAirHeatRecoveryCool(0.0);
-    int meterNumAirHeatRecoveryHeat(0);
-    Real64 gatherAirHeatRecoveryHeat(0.0);
-    int meterNumHeatHTGeothermal(0);
-    Real64 gatherHeatHTGeothermal(0.0);
-    int meterNumHeatSolarWater(0);
-    Real64 gatherHeatSolarWater(0.0);
-    int meterNumHeatSolarAir(0);
-    Real64 gatherHeatSolarAir(0.0);
-    // for on site water components on BEPS report
-    int meterNumRainWater(0);
-    Real64 gatherRainWater(0.0);
-    int meterNumCondensate(0);
-    Real64 gatherCondensate(0.0);
-    int meterNumGroundwater(0);
-    Real64 gatherWellwater(0.0);
-    int meterNumMains(0);
-    Real64 gatherMains(0.0);
-    int meterNumWaterEndUseTotal(0);
-    Real64 gatherWaterEndUseTotal(0.0);
-    // for source energy conversion factors on BEPS report
-    Real64 sourceFactorElectric(0.0);
-    Real64 sourceFactorNaturalGas(0.0);
-    Real64 efficiencyDistrictCooling(0.0);
-    Real64 efficiencyDistrictHeating(0.0);
-    Real64 sourceFactorSteam(0.0);
-    Real64 sourceFactorGasoline(0.0);
-    Real64 sourceFactorDiesel(0.0);
-    Real64 sourceFactorCoal(0.0);
-    Real64 sourceFactorFuelOil1(0.0);
-    Real64 sourceFactorFuelOil2(0.0);
-    Real64 sourceFactorPropane(0.0);
-    Real64 sourceFactorOtherFuel1(0.0);
-    Real64 sourceFactorOtherFuel2(0.0);
-
     Array1D_int td(8);
     //(1)   Current year
     //(2)   Current month
@@ -303,7 +237,6 @@ namespace EnergyPlus::OutputReportTabular {
     Array3D<Real64> interZoneMixLatentSeq;
 
     Array3D<Real64> feneCondInstantSeq;
-    // REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
     Array3D<Real64> feneSolarRadSeq;
 
     int maxUniqueKeyCount(0);
@@ -350,60 +283,6 @@ namespace EnergyPlus::OutputReportTabular {
         GatherHeatGainReportfirstTime = true;
         AllocateLoadComponentArraysDoAllocate = true;
         initAdjFenDone = false;
-        gatherElapsedTimeBEPS = 0.0;
-        buildingGrossFloorArea = 0.0;
-        buildingConditionedFloorArea = 0.0;
-        fuelFactorSchedulesUsed = false;
-        meterNumPowerFuelFireGen = 0;
-        gatherPowerFuelFireGen = 0.0;
-        meterNumPowerPV = 0;
-        gatherPowerPV = 0.0;
-        meterNumPowerWind = 0;
-        gatherPowerWind = 0.0;
-        OverallNetEnergyFromStorage = 0.0;
-        meterNumPowerHTGeothermal = 0;
-        gatherPowerHTGeothermal = 0.0;
-        meterNumElecProduced = 0;
-        gatherElecProduced = 0.0;
-        meterNumElecPurchased = 0;
-        gatherElecPurchased = 0.0;
-        meterNumElecSurplusSold = 0;
-        gatherElecSurplusSold = 0.0;
-        meterNumWaterHeatRecovery = 0;
-        gatherWaterHeatRecovery = 0.0;
-        meterNumAirHeatRecoveryCool = 0;
-        gatherAirHeatRecoveryCool = 0.0;
-        meterNumAirHeatRecoveryHeat = 0;
-        gatherAirHeatRecoveryHeat = 0.0;
-        meterNumHeatHTGeothermal = 0;
-        gatherHeatHTGeothermal = 0.0;
-        meterNumHeatSolarWater = 0;
-        gatherHeatSolarWater = 0.0;
-        meterNumHeatSolarAir = 0;
-        gatherHeatSolarAir = 0.0;
-        meterNumRainWater = 0;
-        gatherRainWater = 0.0;
-        meterNumCondensate = 0;
-        gatherCondensate = 0.0;
-        meterNumGroundwater = 0;
-        gatherWellwater = 0.0;
-        meterNumMains = 0;
-        gatherMains = 0.0;
-        meterNumWaterEndUseTotal = 0;
-        gatherWaterEndUseTotal = 0.0;
-        sourceFactorElectric = 0.0;
-        sourceFactorNaturalGas = 0.0;
-        efficiencyDistrictCooling = 0.0;
-        efficiencyDistrictHeating = 0.0;
-        sourceFactorSteam = 0.0;
-        sourceFactorGasoline = 0.0;
-        sourceFactorDiesel = 0.0;
-        sourceFactorCoal = 0.0;
-        sourceFactorFuelOil1 = 0.0;
-        sourceFactorFuelOil2 = 0.0;
-        sourceFactorPropane = 0.0;
-        sourceFactorOtherFuel1 = 0.0;
-        sourceFactorOtherFuel2 = 0.0;
         DesignDayName.deallocate();
         DesignDayCount = 0;
         radiantPulseTimestep.deallocate();
@@ -514,7 +393,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
         if (state.dataGlobal->DoOutputReporting && state.dataOutRptTab->WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-                gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
+                state.dataOutRptTab->gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
             }
             if (state.dataGlobal->DoWeathSim) {
                 GatherMonthlyResultsForTimestep(state, t_timeStepType);
@@ -2072,61 +1951,61 @@ namespace EnergyPlus::OutputReportTabular {
             state.dataOutRptTab->gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
-            meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
-            meterNumPowerPV = GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
-            meterNumPowerWind = GetMeterIndex(state, "WindTurbine:ElectricityProduced");
-            meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGeothermal:ElectricityProduced");
-            meterNumElecStorage = GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
-            meterNumPowerConversion = GetMeterIndex(state, "PowerConversion:ElectricityProduced");
-            meterNumElecProduced = GetMeterIndex(state, "ElectricityProduced:Facility");
-            meterNumElecPurchased = GetMeterIndex(state, "ElectricityPurchased:Facility");
-            meterNumElecSurplusSold = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
+            state.dataOutRptTab->meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
+            state.dataOutRptTab->meterNumPowerPV = GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
+            state.dataOutRptTab->meterNumPowerWind = GetMeterIndex(state, "WindTurbine:ElectricityProduced");
+            state.dataOutRptTab->meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGeothermal:ElectricityProduced");
+            state.dataOutRptTab->meterNumElecStorage = GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
+            state.dataOutRptTab->meterNumPowerConversion = GetMeterIndex(state, "PowerConversion:ElectricityProduced");
+            state.dataOutRptTab->meterNumElecProduced = GetMeterIndex(state, "ElectricityProduced:Facility");
+            state.dataOutRptTab->meterNumElecPurchased = GetMeterIndex(state, "ElectricityPurchased:Facility");
+            state.dataOutRptTab->meterNumElecSurplusSold = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
             // if no ElectricityPurchased:Facility meter is defined then no electric load center
             // was created by the user and no power generation will occur in the plant. The amount
             // purchased would be the total end use.
-            if (meterNumElecPurchased == 0) {
-                meterNumElecPurchased = GetMeterIndex(state, "Electricity:Facility");
+            if (state.dataOutRptTab->meterNumElecPurchased == 0) {
+                state.dataOutRptTab->meterNumElecPurchased = GetMeterIndex(state, "Electricity:Facility");
             }
 
             // initialize the gathering variables for the electric load components
-            gatherPowerFuelFireGen = 0.0;
-            gatherPowerPV = 0.0;
-            gatherPowerWind = 0.0;
-            gatherPowerHTGeothermal = 0.0;
-            gatherElecProduced = 0.0;
-            gatherElecPurchased = 0.0;
-            gatherElecSurplusSold = 0.0;
-            gatherElecStorage = 0.0;
-            gatherPowerConversion = 0.0;
+            state.dataOutRptTab->gatherPowerFuelFireGen = 0.0;
+            state.dataOutRptTab->gatherPowerPV = 0.0;
+            state.dataOutRptTab->gatherPowerWind = 0.0;
+            state.dataOutRptTab->gatherPowerHTGeothermal = 0.0;
+            state.dataOutRptTab->gatherElecProduced = 0.0;
+            state.dataOutRptTab->gatherElecPurchased = 0.0;
+            state.dataOutRptTab->gatherElecSurplusSold = 0.0;
+            state.dataOutRptTab->gatherElecStorage = 0.0;
+            state.dataOutRptTab->gatherPowerConversion = 0.0;
 
             // get meter numbers for onsite thermal components on BEPS report
-            meterNumWaterHeatRecovery = GetMeterIndex(state, "HeatRecovery:EnergyTransfer");
-            meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HeatRecoveryForCooling:EnergyTransfer");
-            meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HeatRecoveryForHeating:EnergyTransfer");
-            meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGeothermal:HeatProduced");
-            meterNumHeatSolarWater = GetMeterIndex(state, "SolarWater:Facility");
-            meterNumHeatSolarAir = GetMeterIndex(state, "HeatProduced:SolarAir");
+            state.dataOutRptTab->meterNumWaterHeatRecovery = GetMeterIndex(state, "HeatRecovery:EnergyTransfer");
+            state.dataOutRptTab->meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HeatRecoveryForCooling:EnergyTransfer");
+            state.dataOutRptTab->meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HeatRecoveryForHeating:EnergyTransfer");
+            state.dataOutRptTab->meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGeothermal:HeatProduced");
+            state.dataOutRptTab->meterNumHeatSolarWater = GetMeterIndex(state, "SolarWater:Facility");
+            state.dataOutRptTab->meterNumHeatSolarAir = GetMeterIndex(state, "HeatProduced:SolarAir");
             // initialize the gathering variables for onsite thermal components on BEPS report
-            gatherWaterHeatRecovery = 0.0;
-            gatherAirHeatRecoveryCool = 0.0;
-            gatherAirHeatRecoveryHeat = 0.0;
-            gatherHeatHTGeothermal = 0.0;
-            gatherHeatSolarWater = 0.0;
-            gatherHeatSolarAir = 0.0;
+            state.dataOutRptTab->gatherWaterHeatRecovery = 0.0;
+            state.dataOutRptTab->gatherAirHeatRecoveryCool = 0.0;
+            state.dataOutRptTab->gatherAirHeatRecoveryHeat = 0.0;
+            state.dataOutRptTab->gatherHeatHTGeothermal = 0.0;
+            state.dataOutRptTab->gatherHeatSolarWater = 0.0;
+            state.dataOutRptTab->gatherHeatSolarAir = 0.0;
 
             // get meter numbers for water components on BEPS report
-            meterNumRainWater = GetMeterIndex(state, "Rainwater:OnSiteWater");
-            meterNumCondensate = GetMeterIndex(state, "Condensate:OnSiteWater");
-            meterNumGroundwater = GetMeterIndex(state, "Wellwater:OnSiteWater");
-            meterNumMains = GetMeterIndex(state, "MainsWater:Facility");
-            meterNumWaterEndUseTotal = GetMeterIndex(state, "Water:Facility");
+            state.dataOutRptTab->meterNumRainWater = GetMeterIndex(state, "Rainwater:OnSiteWater");
+            state.dataOutRptTab->meterNumCondensate = GetMeterIndex(state, "Condensate:OnSiteWater");
+            state.dataOutRptTab->meterNumGroundwater = GetMeterIndex(state, "Wellwater:OnSiteWater");
+            state.dataOutRptTab->meterNumMains = GetMeterIndex(state, "MainsWater:Facility");
+            state.dataOutRptTab->meterNumWaterEndUseTotal = GetMeterIndex(state, "Water:Facility");
 
             // initialize the gathering variables for water components on BEPS report
-            gatherRainWater = 0.0;
-            gatherCondensate = 0.0;
-            gatherWellwater = 0.0;
-            gatherMains = 0.0;
-            gatherWaterEndUseTotal = 0.0;
+            state.dataOutRptTab->gatherRainWater = 0.0;
+            state.dataOutRptTab->gatherCondensate = 0.0;
+            state.dataOutRptTab->gatherWellwater = 0.0;
+            state.dataOutRptTab->gatherMains = 0.0;
+            state.dataOutRptTab->gatherWaterEndUseTotal = 0.0;
         }
     }
 
@@ -3053,20 +2932,20 @@ namespace EnergyPlus::OutputReportTabular {
         int ffScheduleIndex;
 
         // set the default factors for source energy - they will be overwritten if the user sets any values
-        sourceFactorElectric = 3.167;
-        sourceFactorNaturalGas = 1.084;
-        sourceFactorSteam = 1.20;
-        sourceFactorGasoline = 1.05;
-        sourceFactorDiesel = 1.05;
-        sourceFactorCoal = 1.05;
-        sourceFactorFuelOil1 = 1.05;
-        sourceFactorFuelOil2 = 1.05;
-        sourceFactorPropane = 1.05;
-        sourceFactorOtherFuel1 = 1.0;
-        sourceFactorOtherFuel2 = 1.0;
+        state.dataOutRptTab->sourceFactorElectric = 3.167;
+        state.dataOutRptTab->sourceFactorNaturalGas = 1.084;
+        state.dataOutRptTab->sourceFactorSteam = 1.20;
+        state.dataOutRptTab->sourceFactorGasoline = 1.05;
+        state.dataOutRptTab->sourceFactorDiesel = 1.05;
+        state.dataOutRptTab->sourceFactorCoal = 1.05;
+        state.dataOutRptTab->sourceFactorFuelOil1 = 1.05;
+        state.dataOutRptTab->sourceFactorFuelOil2 = 1.05;
+        state.dataOutRptTab->sourceFactorPropane = 1.05;
+        state.dataOutRptTab->sourceFactorOtherFuel1 = 1.0;
+        state.dataOutRptTab->sourceFactorOtherFuel2 = 1.0;
         // the following should be kept consistent with the assumptions in the pollution calculation routines
-        efficiencyDistrictCooling = 3.0;
-        efficiencyDistrictHeating = 0.3;
+        state.dataOutRptTab->efficiencyDistrictCooling = 3.0;
+        state.dataOutRptTab->efficiencyDistrictHeating = 0.3;
 
         //  TotalSourceEnergyUse = (gatherTotalsSource(1) & !total source from electricity
         //                  +  gatherTotalsSource(2)   & !natural gas
@@ -3083,104 +2962,104 @@ namespace EnergyPlus::OutputReportTabular {
 
         GetFuelFactorInfo(state, "NaturalGas", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorNaturalGas = curSourceFactor;
+            state.dataOutRptTab->sourceFactorNaturalGas = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(2) = true;
             state.dataOutRptTab->ffUsed(2) = true;
         }
         state.dataOutRptTab->SourceFactors(2) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(2) = true;
             state.dataOutRptTab->ffSchedIndex(2) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorFuelOil2 = curSourceFactor;
+            state.dataOutRptTab->sourceFactorFuelOil2 = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(7) = true;
             state.dataOutRptTab->ffUsed(11) = true;
         }
         state.dataOutRptTab->SourceFactors(11) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(11) = true;
             state.dataOutRptTab->ffSchedIndex(11) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorFuelOil1 = curSourceFactor;
+            state.dataOutRptTab->sourceFactorFuelOil1 = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(6) = true;
             state.dataOutRptTab->ffUsed(10) = true;
         }
         state.dataOutRptTab->SourceFactors(10) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(10) = true;
             state.dataOutRptTab->ffSchedIndex(10) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Coal", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorCoal = curSourceFactor;
+            state.dataOutRptTab->sourceFactorCoal = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(5) = true;
             state.dataOutRptTab->ffUsed(9) = true;
         }
         state.dataOutRptTab->SourceFactors(9) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(9) = true;
             state.dataOutRptTab->ffSchedIndex(9) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Electricity", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorElectric = curSourceFactor;
+            state.dataOutRptTab->sourceFactorElectric = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(1) = true;
             state.dataOutRptTab->ffUsed(1) = true;
         }
         state.dataOutRptTab->SourceFactors(1) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(1) = true;
             state.dataOutRptTab->ffSchedIndex(1) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Gasoline", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorGasoline = curSourceFactor;
+            state.dataOutRptTab->sourceFactorGasoline = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(3) = true;
             state.dataOutRptTab->ffUsed(6) = true;
         }
         state.dataOutRptTab->SourceFactors(6) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(6) = true;
             state.dataOutRptTab->ffSchedIndex(6) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Propane", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorPropane = curSourceFactor;
+            state.dataOutRptTab->sourceFactorPropane = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(8) = true;
             state.dataOutRptTab->ffUsed(12) = true;
         }
         state.dataOutRptTab->SourceFactors(12) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(12) = true;
             state.dataOutRptTab->ffSchedIndex(12) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "Diesel", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorDiesel = curSourceFactor;
+            state.dataOutRptTab->sourceFactorDiesel = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(4) = true;
             state.dataOutRptTab->ffUsed(8) = true;
         }
         state.dataOutRptTab->SourceFactors(8) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(8) = true;
             state.dataOutRptTab->ffSchedIndex(8) = ffScheduleIndex;
         }
@@ -3217,31 +3096,31 @@ namespace EnergyPlus::OutputReportTabular {
 
         GetFuelFactorInfo(state, "OtherFuel1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorOtherFuel1 = curSourceFactor;
+            state.dataOutRptTab->sourceFactorOtherFuel1 = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(11) = true; // should be source number
             state.dataOutRptTab->ffUsed(13) = true;
         }
         state.dataOutRptTab->SourceFactors(13) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(13) = true;
             state.dataOutRptTab->ffSchedIndex(13) = ffScheduleIndex;
         }
 
         GetFuelFactorInfo(state, "OtherFuel2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
-            sourceFactorOtherFuel2 = curSourceFactor;
+            state.dataOutRptTab->sourceFactorOtherFuel2 = curSourceFactor;
             state.dataOutRptTab->fuelfactorsused(12) = true; // should be source number
             state.dataOutRptTab->ffUsed(14) = true;
         }
         state.dataOutRptTab->SourceFactors(14) = curSourceFactor;
         if (fFScheduleUsed) {
-            fuelFactorSchedulesUsed = true;
+            state.dataOutRptTab->fuelFactorSchedulesUsed = true;
             state.dataOutRptTab->ffSchedUsed(14) = true;
             state.dataOutRptTab->ffSchedIndex(14) = ffScheduleIndex;
         }
 
-        GetEnvironmentalImpactFactorInfo(state, efficiencyDistrictHeating, efficiencyDistrictCooling, sourceFactorSteam);
+        GetEnvironmentalImpactFactorInfo(state, state.dataOutRptTab->efficiencyDistrictHeating, state.dataOutRptTab->efficiencyDistrictCooling, state.dataOutRptTab->sourceFactorSteam);
     }
 
     //======================================================================================================================
@@ -4239,28 +4118,28 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // gather the electric load components
-            gatherPowerFuelFireGen += GetCurrentMeterValue(state, meterNumPowerFuelFireGen);
-            gatherPowerPV += GetCurrentMeterValue(state, meterNumPowerPV);
-            gatherPowerWind += GetCurrentMeterValue(state, meterNumPowerWind);
-            gatherPowerHTGeothermal += GetCurrentMeterValue(state, meterNumPowerHTGeothermal);
-            gatherElecProduced += GetCurrentMeterValue(state, meterNumElecProduced);
-            gatherElecPurchased += GetCurrentMeterValue(state, meterNumElecPurchased);
-            gatherElecSurplusSold += GetCurrentMeterValue(state, meterNumElecSurplusSold);
-            gatherElecStorage += GetCurrentMeterValue(state, meterNumElecStorage);
-            gatherPowerConversion += GetCurrentMeterValue(state, meterNumPowerConversion);
+            state.dataOutRptTab->gatherPowerFuelFireGen += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumPowerFuelFireGen);
+            state.dataOutRptTab->gatherPowerPV += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumPowerPV);
+            state.dataOutRptTab->gatherPowerWind += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumPowerWind);
+            state.dataOutRptTab->gatherPowerHTGeothermal += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumPowerHTGeothermal);
+            state.dataOutRptTab->gatherElecProduced += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumElecProduced);
+            state.dataOutRptTab->gatherElecPurchased += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumElecPurchased);
+            state.dataOutRptTab->gatherElecSurplusSold += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumElecSurplusSold);
+            state.dataOutRptTab->gatherElecStorage += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumElecStorage);
+            state.dataOutRptTab->gatherPowerConversion += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumPowerConversion);
             // gather the onsite thermal components
-            gatherWaterHeatRecovery += GetCurrentMeterValue(state, meterNumWaterHeatRecovery);
-            gatherAirHeatRecoveryCool += GetCurrentMeterValue(state, meterNumAirHeatRecoveryCool);
-            gatherAirHeatRecoveryHeat += GetCurrentMeterValue(state, meterNumAirHeatRecoveryHeat);
-            gatherHeatHTGeothermal += GetCurrentMeterValue(state, meterNumHeatHTGeothermal);
-            gatherHeatSolarWater += GetCurrentMeterValue(state, meterNumHeatSolarWater);
-            gatherHeatSolarAir += GetCurrentMeterValue(state, meterNumHeatSolarAir);
+            state.dataOutRptTab->gatherWaterHeatRecovery += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumWaterHeatRecovery);
+            state.dataOutRptTab->gatherAirHeatRecoveryCool += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumAirHeatRecoveryCool);
+            state.dataOutRptTab->gatherAirHeatRecoveryHeat += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumAirHeatRecoveryHeat);
+            state.dataOutRptTab->gatherHeatHTGeothermal += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumHeatHTGeothermal);
+            state.dataOutRptTab->gatherHeatSolarWater += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumHeatSolarWater);
+            state.dataOutRptTab->gatherHeatSolarAir += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumHeatSolarAir);
             // gather the water supply components
-            gatherRainWater += GetCurrentMeterValue(state, meterNumRainWater);
-            gatherCondensate += GetCurrentMeterValue(state, meterNumCondensate);
-            gatherWellwater += GetCurrentMeterValue(state, meterNumGroundwater);
-            gatherMains += GetCurrentMeterValue(state, meterNumMains);
-            gatherWaterEndUseTotal += GetCurrentMeterValue(state, meterNumWaterEndUseTotal);
+            state.dataOutRptTab->gatherRainWater += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumRainWater);
+            state.dataOutRptTab->gatherCondensate += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumCondensate);
+            state.dataOutRptTab->gatherWellwater += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumGroundwater);
+            state.dataOutRptTab->gatherMains += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumMains);
+            state.dataOutRptTab->gatherWaterEndUseTotal += GetCurrentMeterValue(state, state.dataOutRptTab->meterNumWaterEndUseTotal);
         }
     }
 
@@ -6179,13 +6058,13 @@ namespace EnergyPlus::OutputReportTabular {
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             // average operating hours per week
-            if (gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
+            if (state.dataOutRptTab->gatherElapsedTimeBEPS > 0) {
+                HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / state.dataOutRptTab->gatherElapsedTimeBEPS;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtAvgHrOper, Lights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
-            if ((Lights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
-                HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
+            if ((Lights(iLight).DesignLevel * state.dataOutRptTab->gatherElapsedTimeBEPS) > 0) {
+                HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * state.dataOutRptTab->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, Lights(iLight).Name, HrsPerWeek);
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, Lights(iLight).Name, Lights(iLight).SumConsumption * mult / 1000000000.0);
@@ -6202,14 +6081,14 @@ namespace EnergyPlus::OutputReportTabular {
                                  ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             }
             // average operating hours per week
-            if (gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
+            if (state.dataOutRptTab->gatherElapsedTimeBEPS > 0) {
+                HrsPerWeek = 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumTimeNotZeroCons / state.dataOutRptTab->gatherElapsedTimeBEPS;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtAvgHrOper, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
-            if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
+            if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * state.dataOutRptTab->gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek =
-                    24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
+                    24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * state.dataOutRptTab->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtConsump, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0);
@@ -7256,8 +7135,8 @@ namespace EnergyPlus::OutputReportTabular {
             if (state.dataOutRptTab->displayTabularBEPS) {
                 WriteReportHeaders(state, "Annual Building Utility Performance Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 // show the number of hours that the table applies to
-                WriteTextLine(state, "Values gathered over " + RealToStr(gatherElapsedTimeBEPS, 2) + " hours", true);
-                if (gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
+                WriteTextLine(state, "Values gathered over " + RealToStr(state.dataOutRptTab->gatherElapsedTimeBEPS, 2) + " hours", true);
+                if (state.dataOutRptTab->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
                     WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
                 }
                 WriteTextLine(state, "", true);
@@ -7310,7 +7189,7 @@ namespace EnergyPlus::OutputReportTabular {
                 UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
                 UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
                 UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
-                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", gatherElapsedTimeBEPS));
+                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", state.dataOutRptTab->gatherElapsedTimeBEPS));
                 UtilityRoutines::appendPerfLog(state,
                                                "Facility Any Zone Oscillating Temperatures Time [hours]",
                                                format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
@@ -7363,8 +7242,8 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             // convert floor areas
-            convBldgGrossFloorArea = buildingGrossFloorArea / areaConversionFactor;
-            convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
+            convBldgGrossFloorArea = state.dataOutRptTab->buildingGrossFloorArea / areaConversionFactor;
+            convBldgCondFloorArea = state.dataOutRptTab->buildingConditionedFloorArea / areaConversionFactor;
 
             // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
@@ -7387,24 +7266,24 @@ namespace EnergyPlus::OutputReportTabular {
             collapsedTotal(13) = WaterConversionFunct(collapsedTotal(13), waterConversionFactor);
 
             // convert to GJ
-            gatherPowerFuelFireGen /= largeConversionFactor;
-            gatherPowerPV /= largeConversionFactor;
-            gatherPowerWind /= largeConversionFactor;
-            gatherPowerHTGeothermal /= largeConversionFactor;
-            gatherPowerConversion /= largeConversionFactor;
-            gatherElecProduced /= largeConversionFactor;
-            gatherElecPurchased /= largeConversionFactor;
-            gatherElecSurplusSold /= largeConversionFactor;
+            state.dataOutRptTab->gatherPowerFuelFireGen /= largeConversionFactor;
+            state.dataOutRptTab->gatherPowerPV /= largeConversionFactor;
+            state.dataOutRptTab->gatherPowerWind /= largeConversionFactor;
+            state.dataOutRptTab->gatherPowerHTGeothermal /= largeConversionFactor;
+            state.dataOutRptTab->gatherPowerConversion /= largeConversionFactor;
+            state.dataOutRptTab->gatherElecProduced /= largeConversionFactor;
+            state.dataOutRptTab->gatherElecPurchased /= largeConversionFactor;
+            state.dataOutRptTab->gatherElecSurplusSold /= largeConversionFactor;
 
             // get change in overall state of charge for electrical storage devices.
             if (facilityElectricServiceObj->numElecStorageDevices > 0) {
                 // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
                 // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge()
                 // ) ) + gatherElecStorage;
-                OverallNetEnergyFromStorage = gatherElecStorage;
-                OverallNetEnergyFromStorage /= largeConversionFactor;
+                state.dataOutRptTab->OverallNetEnergyFromStorage = state.dataOutRptTab->gatherElecStorage;
+                state.dataOutRptTab->OverallNetEnergyFromStorage /= largeConversionFactor;
             } else {
-                OverallNetEnergyFromStorage = 0.0;
+                state.dataOutRptTab->OverallNetEnergyFromStorage = 0.0;
             }
             // determine which resource is the primary heating resourse
             resourcePrimaryHeating = 0;
@@ -7458,7 +7337,7 @@ namespace EnergyPlus::OutputReportTabular {
                                  largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline | diesel
                                                         // | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
-            netElecPurchasedSold = gatherElecPurchased - gatherElecSurplusSold;
+            netElecPurchasedSold = state.dataOutRptTab->gatherElecPurchased - state.dataOutRptTab->gatherElecSurplusSold;
 
             // water is not included   gatherTotalsBEPS(7)    !water
             netSiteEnergyUse = netElecPurchasedSold + (state.dataOutRptTab->gatherTotalsBEPS(2) + state.dataOutRptTab->gatherTotalsBEPS(3) + state.dataOutRptTab->gatherTotalsBEPS(4) + state.dataOutRptTab->gatherTotalsBEPS(5) +
@@ -7468,8 +7347,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                                                  // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
                                                                                  // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
-            if (efficiencyDistrictCooling == 0) efficiencyDistrictCooling = 1.0;
-            if (efficiencyDistrictHeating == 0) efficiencyDistrictHeating = 1.0;
+            if (state.dataOutRptTab->efficiencyDistrictCooling == 0) state.dataOutRptTab->efficiencyDistrictCooling = 1.0;
+            if (state.dataOutRptTab->efficiencyDistrictHeating == 0) state.dataOutRptTab->efficiencyDistrictHeating = 1.0;
 
             // source emissions already have the source factors included in the calcs.
             totalSourceEnergyUse = 0.0;
@@ -7477,66 +7356,66 @@ namespace EnergyPlus::OutputReportTabular {
             if (state.dataOutRptTab->fuelfactorsused(1)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(1);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(1) * sourceFactorElectric;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(1) * state.dataOutRptTab->sourceFactorElectric;
             }
             //  natural gas
             if (state.dataOutRptTab->fuelfactorsused(2)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(2);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * sourceFactorNaturalGas;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * state.dataOutRptTab->sourceFactorNaturalGas;
             }
             // gasoline
             if (state.dataOutRptTab->fuelfactorsused(3)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(3);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * sourceFactorGasoline;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * state.dataOutRptTab->sourceFactorGasoline;
             }
             // diesel
             if (state.dataOutRptTab->fuelfactorsused(4)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(4);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * sourceFactorDiesel;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * state.dataOutRptTab->sourceFactorDiesel;
             }
             // coal
             if (state.dataOutRptTab->fuelfactorsused(5)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(5);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * sourceFactorCoal;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * state.dataOutRptTab->sourceFactorCoal;
             }
             // Fuel Oil No1
             if (state.dataOutRptTab->fuelfactorsused(6)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(6);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * sourceFactorFuelOil1;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * state.dataOutRptTab->sourceFactorFuelOil1;
             }
             // Fuel Oil No2
             if (state.dataOutRptTab->fuelfactorsused(7)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(7);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * sourceFactorFuelOil2;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * state.dataOutRptTab->sourceFactorFuelOil2;
             }
             // propane
             if (state.dataOutRptTab->fuelfactorsused(8)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(8);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * sourceFactorPropane;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * state.dataOutRptTab->sourceFactorPropane;
             }
             // otherfuel1
             if (state.dataOutRptTab->fuelfactorsused(11)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(11);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * state.dataOutRptTab->sourceFactorOtherFuel1;
             }
             // otherfuel2
             if (state.dataOutRptTab->fuelfactorsused(12)) {
                 totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(12);
             } else {
-                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
+                totalSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * state.dataOutRptTab->sourceFactorOtherFuel2;
             }
 
             totalSourceEnergyUse =
-                (totalSourceEnergyUse + state.dataOutRptTab->gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
-                 state.dataOutRptTab->gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * sourceFactorSteam) /
+                (totalSourceEnergyUse + state.dataOutRptTab->gatherTotalsBEPS(3) * state.dataOutRptTab->sourceFactorElectric / state.dataOutRptTab->efficiencyDistrictCooling +
+                 state.dataOutRptTab->gatherTotalsBEPS(4) * state.dataOutRptTab->sourceFactorNaturalGas / state.dataOutRptTab->efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * state.dataOutRptTab->sourceFactorSteam) /
                 largeConversionFactor; // district cooling | district heating | steam
 
             // now determine "net" source from purchased and surplus sold (still in J)
@@ -7544,7 +7423,7 @@ namespace EnergyPlus::OutputReportTabular {
             if (state.dataOutRptTab->fuelfactorsused(1)) {
                 netSourceElecPurchasedSold = state.dataOutRptTab->gatherTotalsSource(9) - state.dataOutRptTab->gatherTotalsSource(10);
             } else {
-                netSourceElecPurchasedSold = netElecPurchasedSold * sourceFactorElectric * largeConversionFactor; // back to J
+                netSourceElecPurchasedSold = netElecPurchasedSold * state.dataOutRptTab->sourceFactorElectric * largeConversionFactor; // back to J
             }
 
             netSourceEnergyUse = 0.0;
@@ -7552,60 +7431,60 @@ namespace EnergyPlus::OutputReportTabular {
             if (state.dataOutRptTab->fuelfactorsused(2)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(2);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * sourceFactorNaturalGas;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(2) * state.dataOutRptTab->sourceFactorNaturalGas;
             }
             // gasoline
             if (state.dataOutRptTab->fuelfactorsused(3)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(3);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * sourceFactorGasoline;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(6) * state.dataOutRptTab->sourceFactorGasoline;
             }
             // diesel
             if (state.dataOutRptTab->fuelfactorsused(4)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(4);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * sourceFactorDiesel;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(8) * state.dataOutRptTab->sourceFactorDiesel;
             }
             // coal
             if (state.dataOutRptTab->fuelfactorsused(5)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(5);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * sourceFactorCoal;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(9) * state.dataOutRptTab->sourceFactorCoal;
             }
             // Fuel Oil No1
             if (state.dataOutRptTab->fuelfactorsused(6)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(6);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * sourceFactorFuelOil1;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(10) * state.dataOutRptTab->sourceFactorFuelOil1;
             }
             // Fuel Oil No2
             if (state.dataOutRptTab->fuelfactorsused(7)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(7);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * sourceFactorFuelOil2;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(11) * state.dataOutRptTab->sourceFactorFuelOil2;
             }
             // propane
             if (state.dataOutRptTab->fuelfactorsused(8)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(8);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * sourceFactorPropane;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(12) * state.dataOutRptTab->sourceFactorPropane;
             }
             // otherfuel1
             if (state.dataOutRptTab->fuelfactorsused(11)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(11);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * sourceFactorOtherFuel1;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(13) * state.dataOutRptTab->sourceFactorOtherFuel1;
             }
             // otherfuel2
             if (state.dataOutRptTab->fuelfactorsused(12)) {
                 netSourceEnergyUse += state.dataOutRptTab->gatherTotalsSource(12);
             } else {
-                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * sourceFactorOtherFuel2;
+                netSourceEnergyUse += state.dataOutRptTab->gatherTotalsBEPS(14) * state.dataOutRptTab->sourceFactorOtherFuel2;
             }
 
             netSourceEnergyUse =
-                (netSourceEnergyUse + netSourceElecPurchasedSold + state.dataOutRptTab->gatherTotalsBEPS(3) * sourceFactorElectric / efficiencyDistrictCooling +
-                 state.dataOutRptTab->gatherTotalsBEPS(4) * sourceFactorNaturalGas / efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * sourceFactorSteam) /
+                (netSourceEnergyUse + netSourceElecPurchasedSold + state.dataOutRptTab->gatherTotalsBEPS(3) * state.dataOutRptTab->sourceFactorElectric / state.dataOutRptTab->efficiencyDistrictCooling +
+                 state.dataOutRptTab->gatherTotalsBEPS(4) * state.dataOutRptTab->sourceFactorNaturalGas / state.dataOutRptTab->efficiencyDistrictHeating + state.dataOutRptTab->gatherTotalsBEPS(5) * state.dataOutRptTab->sourceFactorSteam) /
                 largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
 
             // show annual values
@@ -7683,7 +7562,7 @@ namespace EnergyPlus::OutputReportTabular {
             //  tableBody(11,1) = TRIM(RealToStr(sourceFactorPropane ,3))
 
             if (!state.dataOutRptTab->ffSchedUsed(1)) {
-                tableBody(1, 1) = RealToStr(sourceFactorElectric, 3);
+                tableBody(1, 1) = RealToStr(state.dataOutRptTab->sourceFactorElectric, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(1) > SmallValue) {
                 tableBody(1, 1) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(1) / state.dataOutRptTab->gatherTotalsBEPS(1), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(1)) + "\")";
@@ -7692,7 +7571,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(2)) {
-                tableBody(1, 2) = RealToStr(sourceFactorNaturalGas, 3);
+                tableBody(1, 2) = RealToStr(state.dataOutRptTab->sourceFactorNaturalGas, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(2) > SmallValue) {
                 tableBody(1, 2) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(2) / state.dataOutRptTab->gatherTotalsBEPS(2), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(2)) + "\")";
@@ -7700,14 +7579,14 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 2) = "N/A";
             }
 
-            tableBody(1, 3) = RealToStr(sourceFactorElectric / efficiencyDistrictCooling, 3); // District Cooling
+            tableBody(1, 3) = RealToStr(state.dataOutRptTab->sourceFactorElectric / state.dataOutRptTab->efficiencyDistrictCooling, 3); // District Cooling
 
-            tableBody(1, 4) = RealToStr(sourceFactorNaturalGas / efficiencyDistrictHeating, 3); // District Heating
+            tableBody(1, 4) = RealToStr(state.dataOutRptTab->sourceFactorNaturalGas / state.dataOutRptTab->efficiencyDistrictHeating, 3); // District Heating
 
-            tableBody(1, 5) = RealToStr(sourceFactorSteam, 3); // Steam
+            tableBody(1, 5) = RealToStr(state.dataOutRptTab->sourceFactorSteam, 3); // Steam
 
             if (!state.dataOutRptTab->ffSchedUsed(6)) {
-                tableBody(1, 6) = RealToStr(sourceFactorGasoline, 3);
+                tableBody(1, 6) = RealToStr(state.dataOutRptTab->sourceFactorGasoline, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(6) > SmallValue) {
                 tableBody(1, 6) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(6) / state.dataOutRptTab->gatherTotalsBEPS(6), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(6)) + "\")";
@@ -7716,7 +7595,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(8)) {
-                tableBody(1, 7) = RealToStr(sourceFactorDiesel, 3);
+                tableBody(1, 7) = RealToStr(state.dataOutRptTab->sourceFactorDiesel, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(8) > SmallValue) {
                 tableBody(1, 7) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(8) / state.dataOutRptTab->gatherTotalsBEPS(8), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(8)) + "\")";
@@ -7725,7 +7604,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(9)) {
-                tableBody(1, 8) = RealToStr(sourceFactorCoal, 3);
+                tableBody(1, 8) = RealToStr(state.dataOutRptTab->sourceFactorCoal, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(9) > SmallValue) {
                 tableBody(1, 8) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(9) / state.dataOutRptTab->gatherTotalsBEPS(9), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(9)) + "\")";
@@ -7734,7 +7613,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(10)) {
-                tableBody(1, 9) = RealToStr(sourceFactorFuelOil1, 3);
+                tableBody(1, 9) = RealToStr(state.dataOutRptTab->sourceFactorFuelOil1, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(10) > SmallValue) {
                 tableBody(1, 9) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(10) / state.dataOutRptTab->gatherTotalsBEPS(10), 3) +
                                   " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(10)) + "\")";
@@ -7743,7 +7622,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(11)) {
-                tableBody(1, 10) = RealToStr(sourceFactorFuelOil2, 3);
+                tableBody(1, 10) = RealToStr(state.dataOutRptTab->sourceFactorFuelOil2, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(11) > SmallValue) {
                 tableBody(1, 10) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(11) / state.dataOutRptTab->gatherTotalsBEPS(11), 3) +
                                    " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(11)) + "\")";
@@ -7752,7 +7631,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(12)) {
-                tableBody(1, 11) = RealToStr(sourceFactorPropane, 3);
+                tableBody(1, 11) = RealToStr(state.dataOutRptTab->sourceFactorPropane, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(12) > SmallValue) {
                 tableBody(1, 11) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(12) / state.dataOutRptTab->gatherTotalsBEPS(12), 3) +
                                    " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(12)) + "\")";
@@ -7761,7 +7640,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(13)) {
-                tableBody(1, 12) = RealToStr(sourceFactorOtherFuel1, 3);
+                tableBody(1, 12) = RealToStr(state.dataOutRptTab->sourceFactorOtherFuel1, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(13) > SmallValue) {
                 tableBody(1, 12) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(13) / state.dataOutRptTab->gatherTotalsBEPS(13), 3) +
                                    " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(13)) + "\")";
@@ -7770,7 +7649,7 @@ namespace EnergyPlus::OutputReportTabular {
             }
 
             if (!state.dataOutRptTab->ffSchedUsed(14)) {
-                tableBody(1, 13) = RealToStr(sourceFactorOtherFuel2, 3);
+                tableBody(1, 13) = RealToStr(state.dataOutRptTab->sourceFactorOtherFuel2, 3);
             } else if (state.dataOutRptTab->gatherTotalsBEPS(14) > SmallValue) {
                 tableBody(1, 13) = "Effective Factor = " + RealToStr(state.dataOutRptTab->gatherTotalsBySourceBEPS(14) / state.dataOutRptTab->gatherTotalsBEPS(14), 3) +
                                    " (calculated using schedule \"" + GetScheduleName(state, state.dataOutRptTab->ffSchedIndex(14)) + "\")";
@@ -7957,16 +7836,16 @@ namespace EnergyPlus::OutputReportTabular {
 
             unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
             //  Energy Use Intensities - Electricity
-            if (buildingGrossFloorArea > 0) {
+            if (state.dataOutRptTab->buildingGrossFloorArea > 0) {
                 PreDefTableEntry(state,
-                    state.dataOutRptPredefined->pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal(colElectricity, 12) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal(colElectricity, 5) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * (useVal(colElectricity, 15)) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal(colElectricity, 15) / buildingGrossFloorArea, 2);
+                    state.dataOutRptPredefined->pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal(colElectricity, 12) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal(colElectricity, 5) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * (useVal(colElectricity, 15)) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal(colElectricity, 15) / state.dataOutRptTab->buildingGrossFloorArea, 2);
             }
 
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
@@ -7981,11 +7860,11 @@ namespace EnergyPlus::OutputReportTabular {
             addFootNoteSubTable(state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
 
             //  Energy Use Intensities- Natural Gas
-            if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
+            if (state.dataOutRptTab->buildingGrossFloorArea > 0) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal(colGas, 15) / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal(colGas, 15) / state.dataOutRptTab->buildingGrossFloorArea, 2);
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Natural Gas", unconvert * useVal(colGas, 15), 2);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc, "Natural Gas", unconvert * (useVal(colGas, 5) + useVal(colGas, 13)), 2);
@@ -8004,9 +7883,9 @@ namespace EnergyPlus::OutputReportTabular {
                 useVal(3, 5) + useVal(4, 5) + useVal(5, 5) + useVal(6, 5) + useVal(7, 5) + useVal(8, 5) + useVal(9, 5) + useVal(10, 5);
             useValColAddFuel13 =
                 useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
-            if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
+            if (state.dataOutRptTab->buildingGrossFloorArea > 0) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / state.dataOutRptTab->buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / state.dataOutRptTab->buildingGrossFloorArea, 2);
             }
             PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchLeedEusTotal, "Additional", unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
@@ -8512,34 +8391,34 @@ namespace EnergyPlus::OutputReportTabular {
             // show annual values
             unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
 
-            tableBody(1, 1) = RealToStr(gatherPowerFuelFireGen, 3);
-            tableBody(1, 2) = RealToStr(gatherPowerHTGeothermal, 3);
-            tableBody(1, 3) = RealToStr(gatherPowerPV, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2);
-            tableBody(1, 4) = RealToStr(gatherPowerWind, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2);
-            tableBody(1, 5) = RealToStr(gatherPowerConversion, 3);
-            tableBody(1, 6) = RealToStr(OverallNetEnergyFromStorage, 3);
-            tableBody(1, 7) = RealToStr(gatherElecProduced, 3);
-            tableBody(1, 9) = RealToStr(gatherElecPurchased, 3);
-            tableBody(1, 10) = RealToStr(gatherElecSurplusSold, 3);
-            tableBody(1, 11) = RealToStr(gatherElecPurchased - gatherElecSurplusSold, 3);
-            tableBody(1, 13) = RealToStr(gatherElecProduced + (gatherElecPurchased - gatherElecSurplusSold), 3);
+            tableBody(1, 1) = RealToStr(state.dataOutRptTab->gatherPowerFuelFireGen, 3);
+            tableBody(1, 2) = RealToStr(state.dataOutRptTab->gatherPowerHTGeothermal, 3);
+            tableBody(1, 3) = RealToStr(state.dataOutRptTab->gatherPowerPV, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * state.dataOutRptTab->gatherPowerPV, 2);
+            tableBody(1, 4) = RealToStr(state.dataOutRptTab->gatherPowerWind, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * state.dataOutRptTab->gatherPowerWind, 2);
+            tableBody(1, 5) = RealToStr(state.dataOutRptTab->gatherPowerConversion, 3);
+            tableBody(1, 6) = RealToStr(state.dataOutRptTab->OverallNetEnergyFromStorage, 3);
+            tableBody(1, 7) = RealToStr(state.dataOutRptTab->gatherElecProduced, 3);
+            tableBody(1, 9) = RealToStr(state.dataOutRptTab->gatherElecPurchased, 3);
+            tableBody(1, 10) = RealToStr(state.dataOutRptTab->gatherElecSurplusSold, 3);
+            tableBody(1, 11) = RealToStr(state.dataOutRptTab->gatherElecPurchased - state.dataOutRptTab->gatherElecSurplusSold, 3);
+            tableBody(1, 13) = RealToStr(state.dataOutRptTab->gatherElecProduced + (state.dataOutRptTab->gatherElecPurchased - state.dataOutRptTab->gatherElecSurplusSold), 3);
             tableBody(1, 14) = RealToStr(collapsedTotal(1), 3);
 
             // show annual percentages
             if (collapsedTotal(1) > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * gatherPowerFuelFireGen / collapsedTotal(1), 2);
-                tableBody(2, 2) = RealToStr(100.0 * gatherPowerHTGeothermal / collapsedTotal(1), 2);
-                tableBody(2, 3) = RealToStr(100.0 * gatherPowerPV / collapsedTotal(1), 2);
-                tableBody(2, 4) = RealToStr(100.0 * gatherPowerWind / collapsedTotal(1), 2);
-                tableBody(2, 5) = RealToStr(100.0 * gatherPowerConversion / collapsedTotal(1), 2);
-                tableBody(2, 6) = RealToStr(100.0 * OverallNetEnergyFromStorage / collapsedTotal(1), 2);
-                tableBody(2, 7) = RealToStr(100.0 * gatherElecProduced / collapsedTotal(1), 2);
-                tableBody(2, 9) = RealToStr(100.0 * gatherElecPurchased / collapsedTotal(1), 2);
-                tableBody(2, 10) = RealToStr(100.0 * gatherElecSurplusSold / collapsedTotal(1), 2);
-                tableBody(2, 11) = RealToStr(100.0 * (gatherElecPurchased - gatherElecSurplusSold) / collapsedTotal(1), 2);
-                tableBody(2, 13) = RealToStr(100.0 * (gatherElecProduced + (gatherElecPurchased - gatherElecSurplusSold)) / collapsedTotal(1), 2);
+                tableBody(2, 1) = RealToStr(100.0 * state.dataOutRptTab->gatherPowerFuelFireGen / collapsedTotal(1), 2);
+                tableBody(2, 2) = RealToStr(100.0 * state.dataOutRptTab->gatherPowerHTGeothermal / collapsedTotal(1), 2);
+                tableBody(2, 3) = RealToStr(100.0 * state.dataOutRptTab->gatherPowerPV / collapsedTotal(1), 2);
+                tableBody(2, 4) = RealToStr(100.0 * state.dataOutRptTab->gatherPowerWind / collapsedTotal(1), 2);
+                tableBody(2, 5) = RealToStr(100.0 * state.dataOutRptTab->gatherPowerConversion / collapsedTotal(1), 2);
+                tableBody(2, 6) = RealToStr(100.0 * state.dataOutRptTab->OverallNetEnergyFromStorage / collapsedTotal(1), 2);
+                tableBody(2, 7) = RealToStr(100.0 * state.dataOutRptTab->gatherElecProduced / collapsedTotal(1), 2);
+                tableBody(2, 9) = RealToStr(100.0 * state.dataOutRptTab->gatherElecPurchased / collapsedTotal(1), 2);
+                tableBody(2, 10) = RealToStr(100.0 * state.dataOutRptTab->gatherElecSurplusSold / collapsedTotal(1), 2);
+                tableBody(2, 11) = RealToStr(100.0 * (state.dataOutRptTab->gatherElecPurchased - state.dataOutRptTab->gatherElecSurplusSold) / collapsedTotal(1), 2);
+                tableBody(2, 13) = RealToStr(100.0 * (state.dataOutRptTab->gatherElecProduced + (state.dataOutRptTab->gatherElecPurchased - state.dataOutRptTab->gatherElecSurplusSold)) / collapsedTotal(1), 2);
                 tableBody(2, 14) = RealToStr(100.0, 2);
             }
 
@@ -8589,33 +8468,33 @@ namespace EnergyPlus::OutputReportTabular {
 
             // convert to GJ
 
-            gatherWaterHeatRecovery /= largeConversionFactor;
-            gatherAirHeatRecoveryCool /= largeConversionFactor;
-            gatherAirHeatRecoveryHeat /= largeConversionFactor;
-            gatherHeatHTGeothermal /= largeConversionFactor;
-            gatherHeatSolarWater /= largeConversionFactor;
-            gatherHeatSolarAir /= largeConversionFactor;
+            state.dataOutRptTab->gatherWaterHeatRecovery /= largeConversionFactor;
+            state.dataOutRptTab->gatherAirHeatRecoveryCool /= largeConversionFactor;
+            state.dataOutRptTab->gatherAirHeatRecoveryHeat /= largeConversionFactor;
+            state.dataOutRptTab->gatherHeatHTGeothermal /= largeConversionFactor;
+            state.dataOutRptTab->gatherHeatSolarWater /= largeConversionFactor;
+            state.dataOutRptTab->gatherHeatSolarAir /= largeConversionFactor;
 
             // determine total on site heat
-            totalOnsiteHeat = gatherWaterHeatRecovery + gatherAirHeatRecoveryCool + gatherAirHeatRecoveryHeat + gatherHeatHTGeothermal +
-                              gatherHeatSolarWater + gatherHeatSolarAir;
+            totalOnsiteHeat = state.dataOutRptTab->gatherWaterHeatRecovery + state.dataOutRptTab->gatherAirHeatRecoveryCool + state.dataOutRptTab->gatherAirHeatRecoveryHeat + state.dataOutRptTab->gatherHeatHTGeothermal +
+                              state.dataOutRptTab->gatherHeatSolarWater + state.dataOutRptTab->gatherHeatSolarAir;
 
             // show annual values
-            tableBody(1, 1) = RealToStr(gatherWaterHeatRecovery, 2);
-            tableBody(1, 2) = RealToStr(gatherAirHeatRecoveryCool, 2);
-            tableBody(1, 3) = RealToStr(gatherAirHeatRecoveryHeat, 2);
-            tableBody(1, 4) = RealToStr(gatherHeatHTGeothermal, 2);
-            tableBody(1, 5) = RealToStr(gatherHeatSolarWater, 2);
-            tableBody(1, 6) = RealToStr(gatherHeatSolarAir, 2);
+            tableBody(1, 1) = RealToStr(state.dataOutRptTab->gatherWaterHeatRecovery, 2);
+            tableBody(1, 2) = RealToStr(state.dataOutRptTab->gatherAirHeatRecoveryCool, 2);
+            tableBody(1, 3) = RealToStr(state.dataOutRptTab->gatherAirHeatRecoveryHeat, 2);
+            tableBody(1, 4) = RealToStr(state.dataOutRptTab->gatherHeatHTGeothermal, 2);
+            tableBody(1, 5) = RealToStr(state.dataOutRptTab->gatherHeatSolarWater, 2);
+            tableBody(1, 6) = RealToStr(state.dataOutRptTab->gatherHeatSolarAir, 2);
             tableBody(1, 7) = RealToStr(totalOnsiteHeat, 2);
 
             if (totalOnsiteHeat > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * gatherWaterHeatRecovery / totalOnsiteHeat, 2);
-                tableBody(2, 2) = RealToStr(100.0 * gatherAirHeatRecoveryCool / totalOnsiteHeat, 2);
-                tableBody(2, 3) = RealToStr(100.0 * gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2);
-                tableBody(2, 4) = RealToStr(100.0 * gatherHeatHTGeothermal / totalOnsiteHeat, 2);
-                tableBody(2, 5) = RealToStr(100.0 * gatherHeatSolarWater / totalOnsiteHeat, 2);
-                tableBody(2, 6) = RealToStr(100.0 * gatherHeatSolarAir / totalOnsiteHeat, 2);
+                tableBody(2, 1) = RealToStr(100.0 * state.dataOutRptTab->gatherWaterHeatRecovery / totalOnsiteHeat, 2);
+                tableBody(2, 2) = RealToStr(100.0 * state.dataOutRptTab->gatherAirHeatRecoveryCool / totalOnsiteHeat, 2);
+                tableBody(2, 3) = RealToStr(100.0 * state.dataOutRptTab->gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2);
+                tableBody(2, 4) = RealToStr(100.0 * state.dataOutRptTab->gatherHeatHTGeothermal / totalOnsiteHeat, 2);
+                tableBody(2, 5) = RealToStr(100.0 * state.dataOutRptTab->gatherHeatSolarWater / totalOnsiteHeat, 2);
+                tableBody(2, 6) = RealToStr(100.0 * state.dataOutRptTab->gatherHeatSolarAir / totalOnsiteHeat, 2);
                 tableBody(2, 7) = RealToStr(100.0, 2);
             }
 
@@ -8672,12 +8551,12 @@ namespace EnergyPlus::OutputReportTabular {
             rowHead(13) = "Total Water End Uses";
             tableBody = "-";
 
-            totalOnsiteWater = gatherRainWater + gatherCondensate + gatherWellwater;
+            totalOnsiteWater = state.dataOutRptTab->gatherRainWater + state.dataOutRptTab->gatherCondensate + state.dataOutRptTab->gatherWellwater;
 
             //  ! show annual values
-            tableBody(1, 1) = RealToStr(gatherRainWater / waterConversionFactor, 2);
-            tableBody(1, 2) = RealToStr(gatherCondensate / waterConversionFactor, 2);
-            tableBody(1, 3) = RealToStr(gatherWellwater / waterConversionFactor, 2);
+            tableBody(1, 1) = RealToStr(state.dataOutRptTab->gatherRainWater / waterConversionFactor, 2);
+            tableBody(1, 2) = RealToStr(state.dataOutRptTab->gatherCondensate / waterConversionFactor, 2);
+            tableBody(1, 3) = RealToStr(state.dataOutRptTab->gatherWellwater / waterConversionFactor, 2);
             tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
 
             if (allocated(state.dataWaterData->WaterStorage)) {
@@ -8693,24 +8572,24 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(1, 7) = RealToStr(finalStorage / waterConversionFactor, 2);
             tableBody(1, 8) = RealToStr(StorageChange / waterConversionFactor, 2);
 
-            totalWater = totalOnsiteWater + gatherMains + StorageChange;
+            totalWater = totalOnsiteWater + state.dataOutRptTab->gatherMains + StorageChange;
 
-            tableBody(1, 10) = RealToStr(gatherMains / waterConversionFactor, 2);
+            tableBody(1, 10) = RealToStr(state.dataOutRptTab->gatherMains / waterConversionFactor, 2);
             tableBody(1, 12) = RealToStr(totalWater / waterConversionFactor, 2);
-            tableBody(1, 13) = RealToStr(gatherWaterEndUseTotal / waterConversionFactor, 2);
+            tableBody(1, 13) = RealToStr(state.dataOutRptTab->gatherWaterEndUseTotal / waterConversionFactor, 2);
 
-            if (gatherWaterEndUseTotal > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * gatherRainWater / gatherWaterEndUseTotal, 2);
-                tableBody(2, 2) = RealToStr(100.0 * gatherCondensate / gatherWaterEndUseTotal, 2);
-                tableBody(2, 3) = RealToStr(100.0 * gatherWellwater / gatherWaterEndUseTotal, 2);
-                tableBody(2, 4) = RealToStr(100.0 * totalOnsiteWater / gatherWaterEndUseTotal, 2);
-                tableBody(2, 6) = RealToStr(100.0 * initialStorage / gatherWaterEndUseTotal, 2);
-                tableBody(2, 7) = RealToStr(100.0 * finalStorage / gatherWaterEndUseTotal, 2);
-                tableBody(2, 8) = RealToStr(100.0 * StorageChange / gatherWaterEndUseTotal, 2);
+            if (state.dataOutRptTab->gatherWaterEndUseTotal > 0) {
+                tableBody(2, 1) = RealToStr(100.0 * state.dataOutRptTab->gatherRainWater / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 2) = RealToStr(100.0 * state.dataOutRptTab->gatherCondensate / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 3) = RealToStr(100.0 * state.dataOutRptTab->gatherWellwater / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 4) = RealToStr(100.0 * totalOnsiteWater / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 6) = RealToStr(100.0 * initialStorage / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 7) = RealToStr(100.0 * finalStorage / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
+                tableBody(2, 8) = RealToStr(100.0 * StorageChange / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
 
-                tableBody(2, 10) = RealToStr(100.0 * gatherMains / gatherWaterEndUseTotal, 2);
+                tableBody(2, 10) = RealToStr(100.0 * state.dataOutRptTab->gatherMains / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
 
-                tableBody(2, 12) = RealToStr(100.0 * totalWater / gatherWaterEndUseTotal, 2);
+                tableBody(2, 12) = RealToStr(100.0 * totalWater / state.dataOutRptTab->gatherWaterEndUseTotal, 2);
                 tableBody(2, 13) = RealToStr(100.0, 2);
             }
 
@@ -8869,8 +8748,8 @@ namespace EnergyPlus::OutputReportTabular {
             // show the headers of the report
             WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // show the number of hours that the table applies to
-            WriteTextLine(state, "Values gathered over " + RealToStr(gatherElapsedTimeBEPS, 2) + " hours", true);
-            if (gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
+            WriteTextLine(state, "Values gathered over " + RealToStr(state.dataOutRptTab->gatherElapsedTimeBEPS, 2) + " hours", true);
+            if (state.dataOutRptTab->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
                 WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
             }
             WriteTextLine(state, "", true);
@@ -9100,7 +8979,7 @@ namespace EnergyPlus::OutputReportTabular {
             {
                 tableBody = "";
                 // convert floor area
-                Real64 convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
+                Real64 convBldgCondFloorArea = state.dataOutRptTab->buildingConditionedFloorArea / areaConversionFactor;
                 if (convBldgCondFloorArea > 0) {
                     for (iResource = 1; iResource <= 12; ++iResource) {
                         for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
@@ -9137,7 +9016,7 @@ namespace EnergyPlus::OutputReportTabular {
             //---- Normalized by Total Area Sub-Table
             {
                 tableBody = "";
-                Real64 convBldgGrossFloorArea = buildingGrossFloorArea / areaConversionFactor;
+                Real64 convBldgGrossFloorArea = state.dataOutRptTab->buildingGrossFloorArea / areaConversionFactor;
 
                 if (convBldgGrossFloorArea > 0) {
                     for (iResource = 1; iResource <= 12; ++iResource) {
@@ -9719,7 +9598,7 @@ namespace EnergyPlus::OutputReportTabular {
         WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
         // compute floor area if no ABUPS
-        if (buildingConditionedFloorArea == 0.0) {
+        if (state.dataOutRptTab->buildingConditionedFloorArea == 0.0) {
             DetermineBuildingFloorArea(state);
         }
 
@@ -9757,12 +9636,12 @@ namespace EnergyPlus::OutputReportTabular {
 
         TableBodyData(1, 1) = state.dataCostEstimateManager->RefrncBldg.LineItemTot;
         tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
-        TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
+        TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * state.dataOutRptTab->buildingConditionedFloorArea;
         tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
 
         if (state.dataCostEstimateManager->RefrncBldg.RegionalModifier != 1.0) {
             TableBodyData(1, 3) =
-                (state.dataCostEstimateManager->RefrncBldg.LineItemTot + state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
+                (state.dataCostEstimateManager->RefrncBldg.LineItemTot + state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * state.dataOutRptTab->buildingConditionedFloorArea) * (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
         } else {
             TableBodyData(1, 3) = 0.0;
         }
@@ -9783,18 +9662,18 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataCostEstimateManager->RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
         TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
         tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
-        if (buildingConditionedFloorArea > 0.0) {
-            TableBodyData(1, 10) = TableBodyData(1, 9) / (buildingConditionedFloorArea * m2_unitConv);
+        if (state.dataOutRptTab->buildingConditionedFloorArea > 0.0) {
+            TableBodyData(1, 10) = TableBodyData(1, 9) / (state.dataOutRptTab->buildingConditionedFloorArea * m2_unitConv);
         }
         tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
 
         TableBodyData(2, 1) = state.dataCostEstimateManager->CurntBldg.LineItemTot;
         tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
-        TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
+        TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * state.dataOutRptTab->buildingConditionedFloorArea;
         tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
         if (state.dataCostEstimateManager->CurntBldg.RegionalModifier != 1.0) {
             TableBodyData(2, 3) =
-                (state.dataCostEstimateManager->CurntBldg.LineItemTot + state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
+                (state.dataCostEstimateManager->CurntBldg.LineItemTot + state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * state.dataOutRptTab->buildingConditionedFloorArea) * (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
         } else {
             TableBodyData(2, 3) = 0.0;
         }
@@ -9817,8 +9696,8 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataCostEstimateManager->CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
         TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
         tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
-        if (buildingConditionedFloorArea > 0) {
-            TableBodyData(2, 10) = TableBodyData(2, 9) / (buildingConditionedFloorArea * m2_unitConv);
+        if (state.dataOutRptTab->buildingConditionedFloorArea > 0) {
+            TableBodyData(2, 10) = TableBodyData(2, 9) / (state.dataOutRptTab->buildingConditionedFloorArea * m2_unitConv);
         }
         tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
 
@@ -10150,7 +10029,7 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
-            tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated
+            tableBody(1, 10) = RealToStr(state.dataOutRptTab->gatherElapsedTimeBEPS, 2);    // hours simulated
             //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
 
             WriteSubtitle(state, "General");
@@ -14922,8 +14801,8 @@ namespace EnergyPlus::OutputReportTabular {
         int iZone;
         // INTEGER  :: found
 
-        buildingGrossFloorArea = 0.0;
-        buildingConditionedFloorArea = 0.0;
+        state.dataOutRptTab->buildingGrossFloorArea = 0.0;
+        state.dataOutRptTab->buildingConditionedFloorArea = 0.0;
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             curZoneArea = Zone(iZone).FloorArea * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
 
@@ -14941,12 +14820,12 @@ namespace EnergyPlus::OutputReportTabular {
             // IF (found /= 0)  curZoneArea = 0.0d0
 
             if (Zone(iZone).isPartOfTotalArea) {
-                buildingGrossFloorArea += curZoneArea;
+                state.dataOutRptTab->buildingGrossFloorArea += curZoneArea;
                 // If a ZoneHVAC:EquipmentConnections is used for a zone then
                 // it is considered conditioned. Also ZONE SUPPLY PLENUM and ZONE RETURN PLENUM are
                 // also is considered conditioned.
                 if (Zone(iZone).SystemZoneNodeNumber > 0) {
-                    buildingConditionedFloorArea += curZoneArea;
+                    state.dataOutRptTab->buildingConditionedFloorArea += curZoneArea;
                 }
             }
         }
@@ -14979,7 +14858,7 @@ namespace EnergyPlus::OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        gatherElapsedTimeBEPS = 0.0;
+        state.dataOutRptTab->gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering(state);
         OutputReportTabularAnnual::ResetAnnualGathering();
         ResetBinGathering();
@@ -15066,26 +14945,26 @@ namespace EnergyPlus::OutputReportTabular {
         state.dataOutRptTab->gatherEndUseSubBEPS = 0.0;
         state.dataOutRptTab->gatherTotalsSource = 0.0;
         // reset the specific components being gathered
-        gatherPowerFuelFireGen = 0.0;
-        gatherPowerPV = 0.0;
-        gatherPowerWind = 0.0;
-        gatherPowerHTGeothermal = 0.0;
-        gatherElecProduced = 0.0;
-        gatherElecPurchased = 0.0;
-        gatherElecSurplusSold = 0.0;
-        gatherElecStorage = 0.0;
-        gatherPowerConversion = 0.0;
-        gatherWaterHeatRecovery = 0.0;
-        gatherAirHeatRecoveryCool = 0.0;
-        gatherAirHeatRecoveryHeat = 0.0;
-        gatherHeatHTGeothermal = 0.0;
-        gatherHeatSolarWater = 0.0;
-        gatherHeatSolarAir = 0.0;
-        gatherRainWater = 0.0;
-        gatherCondensate = 0.0;
-        gatherWellwater = 0.0;
-        gatherMains = 0.0;
-        gatherWaterEndUseTotal = 0.0;
+        state.dataOutRptTab->gatherPowerFuelFireGen = 0.0;
+        state.dataOutRptTab->gatherPowerPV = 0.0;
+        state.dataOutRptTab->gatherPowerWind = 0.0;
+        state.dataOutRptTab->gatherPowerHTGeothermal = 0.0;
+        state.dataOutRptTab->gatherElecProduced = 0.0;
+        state.dataOutRptTab->gatherElecPurchased = 0.0;
+        state.dataOutRptTab->gatherElecSurplusSold = 0.0;
+        state.dataOutRptTab->gatherElecStorage = 0.0;
+        state.dataOutRptTab->gatherPowerConversion = 0.0;
+        state.dataOutRptTab->gatherWaterHeatRecovery = 0.0;
+        state.dataOutRptTab->gatherAirHeatRecoveryCool = 0.0;
+        state.dataOutRptTab->gatherAirHeatRecoveryHeat = 0.0;
+        state.dataOutRptTab->gatherHeatHTGeothermal = 0.0;
+        state.dataOutRptTab->gatherHeatSolarWater = 0.0;
+        state.dataOutRptTab->gatherHeatSolarAir = 0.0;
+        state.dataOutRptTab->gatherRainWater = 0.0;
+        state.dataOutRptTab->gatherCondensate = 0.0;
+        state.dataOutRptTab->gatherWellwater = 0.0;
+        state.dataOutRptTab->gatherMains = 0.0;
+        state.dataOutRptTab->gatherWaterEndUseTotal = 0.0;
     }
 
     void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)

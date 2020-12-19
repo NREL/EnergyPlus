@@ -182,72 +182,6 @@ namespace OutputReportTabular {
     // Allow up to five output files to be created
     constexpr int maxNumStyles(5);
 
-    // to keep track of hours for the BEPS report gathering
-    extern Real64 gatherElapsedTimeBEPS;
-    // for normalization of results
-    extern Real64 buildingGrossFloorArea;
-    extern Real64 buildingConditionedFloorArea;
-    // keep track if schedules are used in fuel factors
-    extern bool fuelFactorSchedulesUsed;
-    // for electic load components on BEPS report
-    extern int meterNumPowerFuelFireGen;
-    extern Real64 gatherPowerFuelFireGen;
-    extern int meterNumPowerPV;
-    extern Real64 gatherPowerPV;
-    extern int meterNumPowerWind;
-    extern Real64 gatherPowerWind;
-    extern Real64 OverallNetEnergyFromStorage;
-    extern int meterNumPowerHTGeothermal;
-    extern Real64 gatherPowerHTGeothermal;
-    extern int meterNumElecProduced;
-    extern Real64 gatherElecProduced;
-    extern int meterNumElecPurchased;
-    extern Real64 gatherElecPurchased;
-    extern int meterNumElecSurplusSold;
-    extern Real64 gatherElecSurplusSold;
-    extern int meterNumElecStorage;
-    extern Real64 gatherElecStorage;
-    extern int meterNumPowerConversion;
-    extern Real64 gatherPowerConversion;
-    // for on site thermal source components on BEPS report
-    extern int meterNumWaterHeatRecovery;
-    extern Real64 gatherWaterHeatRecovery;
-    extern int meterNumAirHeatRecoveryCool;
-    extern Real64 gatherAirHeatRecoveryCool;
-    extern int meterNumAirHeatRecoveryHeat;
-    extern Real64 gatherAirHeatRecoveryHeat;
-    extern int meterNumHeatHTGeothermal;
-    extern Real64 gatherHeatHTGeothermal;
-    extern int meterNumHeatSolarWater;
-    extern Real64 gatherHeatSolarWater;
-    extern int meterNumHeatSolarAir;
-    extern Real64 gatherHeatSolarAir;
-    // for on site water components on BEPS report
-    extern int meterNumRainWater;
-    extern Real64 gatherRainWater;
-    extern int meterNumCondensate;
-    extern Real64 gatherCondensate;
-    extern int meterNumGroundwater;
-    extern Real64 gatherWellwater;
-    extern int meterNumMains;
-    extern Real64 gatherMains;
-    extern int meterNumWaterEndUseTotal;
-    extern Real64 gatherWaterEndUseTotal;
-    // for source energy conversion factors on BEPS report
-    extern Real64 sourceFactorElectric;
-    extern Real64 sourceFactorNaturalGas;
-    extern Real64 efficiencyDistrictCooling;
-    extern Real64 efficiencyDistrictHeating;
-    extern Real64 sourceFactorSteam;
-    extern Real64 sourceFactorGasoline;
-    extern Real64 sourceFactorDiesel;
-    extern Real64 sourceFactorCoal;
-    extern Real64 sourceFactorFuelOil1;
-    extern Real64 sourceFactorFuelOil2;
-    extern Real64 sourceFactorPropane;
-    extern Real64 sourceFactorOtherFuel1;
-    extern Real64 sourceFactorOtherFuel2;
-
     extern Array1D_int td;
     //(1)   Current year
     //(2)   Current month
@@ -1066,6 +1000,72 @@ struct OutputReportTabularData : BaseGlobalStruct {
     Array3D<Real64> gatherDemandIndEndUseSub;
     Array1D_int gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
 
+    // to keep track of hours for the BEPS report gathering
+    Real64 gatherElapsedTimeBEPS = 0.0;
+    // for normalization of results
+    Real64 buildingGrossFloorArea = 0.0;
+    Real64 buildingConditionedFloorArea = 0.0;
+    // keep track if schedules are used in fuel factors
+    bool fuelFactorSchedulesUsed = false;
+    // for electric load components on BEPS report
+    int meterNumPowerFuelFireGen = 0;
+    Real64 gatherPowerFuelFireGen = 0.0;
+    int meterNumPowerPV = 0;
+    Real64 gatherPowerPV = 0.0;
+    int meterNumPowerWind = 0;
+    Real64 gatherPowerWind = 0.0;
+    Real64 OverallNetEnergyFromStorage = 0.0;
+    int meterNumPowerHTGeothermal = 0;
+    Real64 gatherPowerHTGeothermal = 0.0;
+    int meterNumElecProduced = 0;
+    Real64 gatherElecProduced = 0.0;
+    int meterNumElecPurchased = 0;
+    Real64 gatherElecPurchased = 0.0;
+    int meterNumElecSurplusSold = 0;
+    Real64 gatherElecSurplusSold = 0.0;
+    int meterNumElecStorage = 0;
+    Real64 gatherElecStorage = 0.0;
+    int meterNumPowerConversion = 0;
+    Real64 gatherPowerConversion = 0.0;
+    // for on site thermal source components on BEPS report
+    int meterNumWaterHeatRecovery = 0;
+    Real64 gatherWaterHeatRecovery = 0.0;
+    int meterNumAirHeatRecoveryCool = 0;
+    Real64 gatherAirHeatRecoveryCool = 0.0;
+    int meterNumAirHeatRecoveryHeat = 0;
+    Real64 gatherAirHeatRecoveryHeat = 0.0;
+    int meterNumHeatHTGeothermal = 0;
+    Real64 gatherHeatHTGeothermal = 0.0;
+    int meterNumHeatSolarWater = 0;
+    Real64 gatherHeatSolarWater = 0.0;
+    int meterNumHeatSolarAir = 0;
+    Real64 gatherHeatSolarAir = 0.0;
+    // for on site water components on BEPS report
+    int meterNumRainWater = 0;
+    Real64 gatherRainWater = 0.0;
+    int meterNumCondensate = 0;
+    Real64 gatherCondensate = 0.0;
+    int meterNumGroundwater = 0;
+    Real64 gatherWellwater = 0.0;
+    int meterNumMains = 0;
+    Real64 gatherMains = 0.0;
+    int meterNumWaterEndUseTotal = 0;
+    Real64 gatherWaterEndUseTotal = 0.0;
+    // for source energy conversion factors on BEPS report
+    Real64 sourceFactorElectric = 0.0;
+    Real64 sourceFactorNaturalGas = 0.0;
+    Real64 efficiencyDistrictCooling = 0.0;
+    Real64 efficiencyDistrictHeating = 0.0;
+    Real64 sourceFactorSteam = 0.0;
+    Real64 sourceFactorGasoline = 0.0;
+    Real64 sourceFactorDiesel = 0.0;
+    Real64 sourceFactorCoal = 0.0;
+    Real64 sourceFactorFuelOil1 = 0.0;
+    Real64 sourceFactorFuelOil2 = 0.0;
+    Real64 sourceFactorPropane = 0.0;
+    Real64 sourceFactorOtherFuel1 = 0.0;
+    Real64 sourceFactorOtherFuel2 = 0.0;
+
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
@@ -1139,7 +1139,64 @@ struct OutputReportTabularData : BaseGlobalStruct {
         this->gatherDemandEndUseSub.deallocate();
         this->gatherDemandIndEndUseSub.deallocate();
         this->gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-
+        this->gatherElapsedTimeBEPS = 0.0;
+        this->buildingGrossFloorArea = 0.0;
+        this->buildingConditionedFloorArea = 0.0;
+        this->fuelFactorSchedulesUsed = false;
+        this->meterNumPowerFuelFireGen = 0;
+        this->gatherPowerFuelFireGen = 0.0;
+        this->meterNumPowerPV = 0;
+        this->gatherPowerPV = 0.0;
+        this->meterNumPowerWind = 0;
+        this->gatherPowerWind = 0.0;
+        this->OverallNetEnergyFromStorage = 0.0;
+        this->meterNumPowerHTGeothermal = 0;
+        this->gatherPowerHTGeothermal = 0.0;
+        this->meterNumElecProduced = 0;
+        this->gatherElecProduced = 0.0;
+        this->meterNumElecPurchased = 0;
+        this->gatherElecPurchased = 0.0;
+        this->meterNumElecSurplusSold = 0;
+        this->gatherElecSurplusSold = 0.0;
+        this->meterNumElecStorage = 0;
+        this->gatherElecStorage = 0.0;
+        this->meterNumPowerConversion = 0;
+        this->gatherPowerConversion = 0.0;
+        this->meterNumWaterHeatRecovery = 0;
+        this->gatherWaterHeatRecovery = 0.0;
+        this->meterNumAirHeatRecoveryCool = 0;
+        this->gatherAirHeatRecoveryCool = 0.0;
+        this->meterNumAirHeatRecoveryHeat = 0;
+        this->gatherAirHeatRecoveryHeat = 0.0;
+        this->meterNumHeatHTGeothermal = 0;
+        this->gatherHeatHTGeothermal = 0.0;
+        this->meterNumHeatSolarWater = 0;
+        this->gatherHeatSolarWater = 0.0;
+        this->meterNumHeatSolarAir = 0;
+        this->gatherHeatSolarAir = 0.0;
+        this->meterNumRainWater = 0;
+        this->gatherRainWater = 0.0;
+        this->meterNumCondensate = 0;
+        this->gatherCondensate = 0.0;
+        this->meterNumGroundwater = 0;
+        this->gatherWellwater = 0.0;
+        this->meterNumMains = 0;
+        this->gatherMains = 0.0;
+        this->meterNumWaterEndUseTotal = 0;
+        this->gatherWaterEndUseTotal = 0.0;
+        this->sourceFactorElectric = 0.0;
+        this->sourceFactorNaturalGas = 0.0;
+        this->efficiencyDistrictCooling = 0.0;
+        this->efficiencyDistrictHeating = 0.0;
+        this->sourceFactorSteam = 0.0;
+        this->sourceFactorGasoline = 0.0;
+        this->sourceFactorDiesel = 0.0;
+        this->sourceFactorCoal = 0.0;
+        this->sourceFactorFuelOil1 = 0.0;
+        this->sourceFactorFuelOil2 = 0.0;
+        this->sourceFactorPropane = 0.0;
+        this->sourceFactorOtherFuel1 = 0.0;
+        this->sourceFactorOtherFuel2 = 0.0;
     }
 };
 

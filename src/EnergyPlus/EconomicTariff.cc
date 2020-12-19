@@ -4019,8 +4019,6 @@ namespace EnergyPlus::EconomicTariff {
         //    MODIFIED       January 2010, Kyle Benne
         //                   Added SQLite output
 
-        using OutputReportTabular::buildingConditionedFloorArea;
-        using OutputReportTabular::buildingGrossFloorArea;
         using OutputReportTabular::ConvertIP;
         using OutputReportTabular::DetermineBuildingFloorArea;
         using OutputReportTabular::LookupSItoIP;
@@ -4060,7 +4058,7 @@ namespace EnergyPlus::EconomicTariff {
         auto &chargeBlock(state.dataEconTariff->chargeBlock);
 
         // compute floor area if no ABUPS
-        if (buildingConditionedFloorArea == 0.0) {
+        if (state.dataOutRptTab->buildingConditionedFloorArea == 0.0) {
             DetermineBuildingFloorArea(state);
         }
 
@@ -4121,17 +4119,17 @@ namespace EnergyPlus::EconomicTariff {
                 tableBody(2, 1) = RealToStr(gasTotalCost, 2);
                 tableBody(3, 1) = RealToStr(otherTotalCost, 2);
                 tableBody(4, 1) = RealToStr(allTotalCost, 2);
-                if (buildingGrossFloorArea > 0.0) {
-                    tableBody(1, 2) = RealToStr((elecTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 2) = RealToStr((gasTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 2) = RealToStr((otherTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 2) = RealToStr((allTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
+                if (state.dataOutRptTab->buildingGrossFloorArea > 0.0) {
+                    tableBody(1, 2) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(2, 2) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(3, 2) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(4, 2) = RealToStr((allTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
                 }
-                if (buildingConditionedFloorArea > 0.0) {
-                    tableBody(1, 3) = RealToStr((elecTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 3) = RealToStr((gasTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 3) = RealToStr((otherTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 3) = RealToStr((allTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                if (state.dataOutRptTab->buildingConditionedFloorArea > 0.0) {
+                    tableBody(1, 3) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(2, 3) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(3, 3) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(4, 3) = RealToStr((allTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle(state, "Annual Cost");
