@@ -1006,8 +1006,8 @@ if(BUILD_TESTING)
                  ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c)
   target_link_libraries(TestAPI_Functional_C PRIVATE energyplusapi
                                                      project_options project_fp_options project_warnings)
-  if(NOT MSVC)                                                   
-    target_compile_options(TestAPI_Functional_C PRIVATE -Wno-unused)
+  if(NOT MSVC)
+    target_compile_options(TestAPI_Functional_C PRIVATE -Wno-unused -Wno-unused-parameter)
   endif()
   add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
 
