@@ -104,7 +104,6 @@ namespace WaterToAirHeatPump {
     using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
     static std::string const fluidNameWater("WATER");
-    static std::string const BlankString;
 
     void SimWatertoAirHP(EnergyPlusData &state,
                          std::string const &CompName,   // component name

@@ -92,8 +92,6 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-    static std::string const BlankString;
-
     void SimWindTurbine(EnergyPlusData &state,
                         [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
                         std::string const &GeneratorName,                   // User specified name of Generator

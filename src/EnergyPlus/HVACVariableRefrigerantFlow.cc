@@ -175,8 +175,6 @@ namespace HVACVariableRefrigerantFlow {
     int const ModeHeatingOnly(2);       // Flag for Heating Only Mode [-]
     int const ModeCoolingAndHeating(3); // Flag for Simultaneous Cooling and Heating Only Mode [-]
 
-    static std::string const BlankString;
-
     bool GetVRFInputFlag(true);             // Flag set to make sure you get input once
     bool MyOneTimeFlag(true);               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     bool MyOneTimeSizeFlag(true);           // One time flag used to allocate MyEnvrnFlag and MySizeFlag

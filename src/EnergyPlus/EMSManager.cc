@@ -233,7 +233,6 @@ namespace EMSManager {
         using OutputProcessor::MeterType;
         using OutputProcessor::RealVariables;
         using OutputProcessor::RealVariableType;
-        using OutputProcessor::RVariableTypes;
         using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::EvaluateStack;
 
@@ -624,7 +623,7 @@ namespace EMSManager {
                 state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName = cAlphaArgs(2);
                 state.dataRuntimeLang->Sensor(SensorNum).OutputVarName = cAlphaArgs(3);
 
-                VarIndex = GetMeterIndex(cAlphaArgs(3));
+                VarIndex = GetMeterIndex(state, cAlphaArgs(3));
                 if (VarIndex > 0) {
                     if (!lAlphaFieldBlanks(2)) {
                         ShowWarningError(state, "Unused" + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -1020,7 +1019,7 @@ namespace EMSManager {
             if (state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay) continue;
 
             // try again to process sensor.
-            VarIndex = GetMeterIndex(state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
+            VarIndex = GetMeterIndex(state, state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
             if (VarIndex > 0) {
 
                 state.dataRuntimeLang->Sensor(SensorNum).Type = 3;

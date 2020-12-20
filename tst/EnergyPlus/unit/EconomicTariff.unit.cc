@@ -48,9 +48,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -259,10 +256,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "WATER:FACILITY";
-    EnergyMeters(1).ResourceType = "WATER";
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
 
     UpdateUtilityBills(*state);
 
@@ -302,10 +299,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "WATER:FACILITY";
-    EnergyMeters(1).ResourceType = "WATER";
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
 
     UpdateUtilityBills(*state);;
 
@@ -342,10 +339,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "NATURALGAS:FACILITY";
-    EnergyMeters(1).ResourceType = "NATURALGAS";
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "NATURALGAS:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "NATURALGAS";
 
     UpdateUtilityBills(*state);;
 
@@ -383,10 +380,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    NumEnergyMeters = 1;
-    EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    EnergyMeters(1).ResourceType = "ELECTRICITY";
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "ELECTRICITY";
 
     UpdateUtilityBills(*state);;
 
@@ -407,12 +404,12 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
 {
-    NumEnergyMeters = 4;
-    EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    EnergyMeters(2).Name = "NATURALGAS:FACILITY";
-    EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
-    EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
+    state->dataOutputProcessor->NumEnergyMeters = 4;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(2).Name = "NATURALGAS:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
 
     state->dataEconTariff->numTariff = 4;
     state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);

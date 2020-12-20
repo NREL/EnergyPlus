@@ -105,13 +105,6 @@ namespace DisplacementVentMgr {
     using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
     Real64 HAT_MX;                       // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
     Real64 HA_MX;                        // HA_MX Convection Coefficient times Area for the upper subzone

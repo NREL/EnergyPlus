@@ -7516,7 +7516,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
         NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7536,7 +7536,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
         NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7558,7 +7558,7 @@ namespace EnergyPlus::SetPointManager {
         for (int i = 1; i <= this->numTowers; i++) {
             TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).TypeOf;
             NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).Name;
-            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
             VarIndexes.allocate(NumVariables);
             VarTypes.allocate(NumVariables);
             IndexTypes.allocate(NumVariables);
@@ -7581,7 +7581,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
         NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
