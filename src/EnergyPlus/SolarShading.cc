@@ -6019,6 +6019,8 @@ namespace SolarShading {
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfDome) = 0.0;
                 }
+                IntBeamAbsByShadFac(SurfDome) = 0.0;
+                ExtBeamAbsByShadFac(SurfDome) = 0.0;
             }
         }
 

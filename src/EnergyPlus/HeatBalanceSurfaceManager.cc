@@ -733,8 +733,6 @@ namespace HeatBalanceSurfaceManager {
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
-
-//                if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
                     surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)
                     continue;
@@ -2812,7 +2810,6 @@ namespace HeatBalanceSurfaceManager {
                 int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
                 int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-//                    if (Surface(SurfNum).HeatTransSurf) {
                     int ConstrNum = Surface(SurfNum).Construction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
                     if (Surface(SurfNum).ExtSolar) {
@@ -2859,13 +2856,11 @@ namespace HeatBalanceSurfaceManager {
                             SurfOpaqQRadSWInAbs(SurfNum) += SurfOpaqAI(SurfNum);
                         }
                     }
-//                    }
                 }
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-//                        if (Surface(SurfNum).HeatTransSurf) {
                         // Exclude special shading surfaces which required QRadSWOut calculations above
                         int RoughIndexMovInsul = 0; // Roughness index of movable insulation
                         Real64 HMovInsul; // Resistance or "h" value of movable insulation (from EvalOutsideMovableInsulation, not used)
@@ -3375,7 +3370,6 @@ namespace HeatBalanceSurfaceManager {
                             }
 
                         } // RoughIndexMovInsul <= 0, no movable insulation
-//                        }  // Surface(SurfNum)%HeatTransSurf
                     } // Surface(SurfNum)%ExtSolar
                 } // end of surface window loop
             } // end of zone loop
@@ -3518,7 +3512,6 @@ namespace HeatBalanceSurfaceManager {
             int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-//                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
@@ -3564,7 +3557,6 @@ namespace HeatBalanceSurfaceManager {
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
-//                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
@@ -3892,8 +3884,6 @@ namespace HeatBalanceSurfaceManager {
             int const lastSurf = Zone(zoneNum).SurfaceLast;
             if (firstSurf <= 0) continue;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-
-//                if (!Surface(SurfNum).HeatTransSurf) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 ITABSF(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 Real64 HMovInsul = 0.0; // Conductance of movable insulation
@@ -4974,9 +4964,7 @@ namespace HeatBalanceSurfaceManager {
             if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
             SumAET = 0.0;
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-//                if (Surface(SurfNum).HeatTransSurf) {
                 SumAET += SurfaceAE(SurfNum) * TempSurfIn(SurfNum);
-//                }
             }
             if (ZoneAESum(ZoneNum) > 0.01) {
                 MRT(ZoneNum) = SumAET / ZoneAESum(ZoneNum);
