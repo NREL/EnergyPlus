@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -116,9 +115,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 
-namespace EnergyPlus {
-
-namespace SimAirServingZones {
+namespace EnergyPlus::SimAirServingZones {
 
     // MODULE INFORMATION
     //       AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
@@ -142,44 +139,6 @@ namespace SimAirServingZones {
     using namespace DataSizing;
     using namespace DataZoneEquipment;
     using namespace DataAirSystems;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    int const BeforeBranchSim(1);
-    int const AfterBranchSim(2);
-    // CompType numerics -- for this module
-    // component types addressed by this module
-    int const OAMixer_Num(1);
-    int const Fan_Simple_CV(2);
-    int const Fan_Simple_VAV(3);
-    int const WaterCoil_SimpleCool(4);
-    int const WaterCoil_Cooling(5);
-    int const WaterCoil_SimpleHeat(6);
-    int const SteamCoil_AirHeat(7);
-    int const WaterCoil_DetailedCool(8);
-    int const Coil_ElectricHeat(9);
-    int const Coil_GasHeat(10);
-    int const WaterCoil_CoolingHXAsst(11);
-    int const DXCoil_CoolingHXAsst(12);
-    int const Coil_DeSuperHeat(13);
-    int const DXSystem(14);
-    int const HeatXchngr(15);
-    int const Desiccant(16);
-    int const Unglazed_SolarCollector(17);
-    int const EvapCooler(18);
-    int const Furnace_UnitarySys_HeatOnly(19);
-    int const Furnace_UnitarySys_HeatCool(20);
-    int const Humidifier(21);
-    int const Duct(22);
-    int const UnitarySystem_BypassVAVSys(23);
-    int const UnitarySystem_MSHeatPump(24);
-    int const Fan_ComponentModel(25);
-    int const DXHeatPumpSystem(26);
-    int const CoilUserDefined(27);
-    int const Fan_System_Object(28);
-    int const UnitarySystemModel(29);
-    int const ZoneVRFasAirLoopEquip(30);
 
     bool GetAirLoopInputFlag(true); // Flag set to make sure you get input once
 
@@ -7806,7 +7765,5 @@ namespace SimAirServingZones {
 
     //        End of Utility subroutines for the SimAir Module
     // *****************************************************************************
-
-} // namespace SimAirServingZones
 
 } // namespace EnergyPlus
