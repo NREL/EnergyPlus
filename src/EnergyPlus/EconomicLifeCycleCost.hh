@@ -126,15 +126,6 @@ namespace EconomicLifeCycleCost {
         BasePeriod,
     };
 
-    extern int numRecurringCosts;
-
-    extern int numNonrecurringCost;
-
-    extern int numUsePriceEscalation;
-
-    extern int numUseAdjustment;
-
-    extern int numCashFlow;
     extern int const skRecurring;
     extern int const skNonrecurring;
     extern int const skResource;
@@ -142,7 +133,6 @@ namespace EconomicLifeCycleCost {
     extern int const pvkEnergy;
     extern int const pvkNonEnergy;
     extern int const pvkNotComputed;
-    extern int numResourcesUsed;
 
     // present value factors
     extern Array1D<Real64> SPV;
@@ -154,7 +144,37 @@ namespace EconomicLifeCycleCost {
     extern Array1D<Real64> AfterTaxCashFlow;
     extern Array1D<Real64> AfterTaxPresentValue;
 
-    extern Array1D_string const MonthNames;
+    constexpr const char * MonthNames(int const &i) {
+        switch (i) {
+        case 1:
+            return "January";
+        case 2:
+            return "February";
+        case 3:
+            return "March";
+        case 4:
+            return "April";
+        case 5:
+            return "May";
+        case 6:
+            return "June";
+        case 7:
+            return "July";
+        case 8:
+            return "August";
+        case 9:
+            return "September";
+        case 10:
+            return "October";
+        case 11:
+            return "November";
+        case 12:
+            return "December";
+        default:
+            assert(false);
+            return "";
+        }
+    }
 
     // arrays related to escalated energy costs
     extern Array1D<Real64> EscalatedTotEnergy;
@@ -342,6 +362,12 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
     // derived
     int lastDateMonth = 0; // Last Date Month (the month before the base date month)
     int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
+    int numRecurringCosts = 0;
+    int numNonrecurringCost = 0;
+    int numUsePriceEscalation = 0;
+    int numUseAdjustment = 0;
+    int numCashFlow = 0;
+    int numResourcesUsed = 0;
 
     void clear_state() override
     {
@@ -362,6 +388,12 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
         this->depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None;
         this->lastDateMonth = 0;
         this->lastDateYear = 0;
+        this->numRecurringCosts = 0;
+        this->numNonrecurringCost = 0;
+        this->numUsePriceEscalation = 0;
+        this->numUseAdjustment = 0;
+        this->numCashFlow = 0;
+        this->numResourcesUsed = 0;
     }
 };
 

@@ -66,9 +66,7 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace EconomicLifeCycleCost {
+namespace EnergyPlus::EconomicLifeCycleCost {
 
     // Module containing the routines dealing with the EconomicLifeCycleCost
 
@@ -104,23 +102,14 @@ namespace EconomicLifeCycleCost {
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
 
-    int numRecurringCosts(0);
-
-    int numNonrecurringCost(0);
-
-    int numUsePriceEscalation(0);
-
-    int numUseAdjustment(0);
-
-    int numCashFlow;
     int const skRecurring(1);
     int const skNonrecurring(2);
     int const skResource(3);
     int const skSum(4);
+
     int const pvkEnergy(1);
     int const pvkNonEnergy(2);
     int const pvkNotComputed(3);
-    int numResourcesUsed;
 
     // present value factors
     Array1D<Real64> SPV;
@@ -132,9 +121,6 @@ namespace EconomicLifeCycleCost {
     Array1D<Real64> Taxes;
     Array1D<Real64> AfterTaxCashFlow;
     Array1D<Real64> AfterTaxPresentValue;
-
-    Array1D_string const
-        MonthNames(12, {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
 
     // arrays related to escalated energy costs
     Array1D<Real64> EscalatedTotEnergy;
@@ -228,28 +214,6 @@ namespace EconomicLifeCycleCost {
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Perform the life cycle cost computations and write report.
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (state.dataEconLifeCycleCost->LCCparamPresent) {
             DisplayString(state, "Computing Life Cycle Costs and Reporting");
@@ -546,9 +510,9 @@ namespace EconomicLifeCycleCost {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numRecurringCosts = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        RecurringCosts.allocate(numRecurringCosts);
-        for (iInObj = 1; iInObj <= numRecurringCosts; ++iInObj) {
+        state.dataEconLifeCycleCost->numRecurringCosts = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        RecurringCosts.allocate(state.dataEconLifeCycleCost->numRecurringCosts);
+        for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numRecurringCosts; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -728,14 +692,14 @@ namespace EconomicLifeCycleCost {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numNonrecurringCost = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataEconLifeCycleCost->numNonrecurringCost = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         numComponentCostLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
         if (numComponentCostLineItems > 0) {                    // leave room for component cost total
-            NonrecurringCost.allocate(numNonrecurringCost + 1); // add a place for CostEstimate total
+            NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost + 1); // add a place for CostEstimate total
         } else {
-            NonrecurringCost.allocate(numNonrecurringCost);
+            NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost);
         }
-        for (iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj) {
+        for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numNonrecurringCost; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -856,13 +820,13 @@ namespace EconomicLifeCycleCost {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        UsePriceEscalation.allocate(numUsePriceEscalation);
-        for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
+        state.dataEconLifeCycleCost->numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        UsePriceEscalation.allocate(state.dataEconLifeCycleCost->numUsePriceEscalation);
+        for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++iInObj) {
             UsePriceEscalation(iInObj).Escalation.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
-        if (numUsePriceEscalation > 0) {
-            for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
+        if (state.dataEconLifeCycleCost->numUsePriceEscalation > 0) {
+            for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++iInObj) {
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               iInObj,
@@ -992,13 +956,13 @@ namespace EconomicLifeCycleCost {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        UseAdjustment.allocate(numUseAdjustment);
-        for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
+        state.dataEconLifeCycleCost->numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        UseAdjustment.allocate(state.dataEconLifeCycleCost->numUseAdjustment);
+        for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++iInObj) {
             UseAdjustment(iInObj).Adjustment.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
-        if (numUseAdjustment > 0) {
-            for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
+        if (state.dataEconLifeCycleCost->numUseAdjustment > 0) {
+            for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++iInObj) {
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
                                               iInObj,
@@ -1213,19 +1177,19 @@ namespace EconomicLifeCycleCost {
         monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
         if (state.dataCostEstimateManager->CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
-            ++numNonrecurringCost;
-            NonrecurringCost(numNonrecurringCost).name = "Total of ComponentCost:*";
-            NonrecurringCost(numNonrecurringCost).lineItem = "";
-            NonrecurringCost(numNonrecurringCost).category = costCatConstruction;
-            NonrecurringCost(numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-            NonrecurringCost(numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
-            NonrecurringCost(numNonrecurringCost).yearsFromStart = 0;
-            NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
-            NonrecurringCost(numNonrecurringCost).totalMonthsFromStart = 0;
+            ++state.dataEconLifeCycleCost->numNonrecurringCost;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).name = "Total of ComponentCost:*";
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).lineItem = "";
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).category = costCatConstruction;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).yearsFromStart = 0;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).monthsFromStart = 0;
+            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).totalMonthsFromStart = 0;
         }
 
         // gather costs from EconomicTariff for each end use
-        numResourcesUsed = 0;
+        state.dataEconLifeCycleCost->numResourcesUsed = 0;
         for (auto iResource : DataGlobalConstants::AllResourceTypes) {
             GetMonthlyCostForResource(state, iResource, curResourceCosts);
             annualCost = 0.0;
@@ -1234,7 +1198,7 @@ namespace EconomicLifeCycleCost {
                 annualCost += resourceCosts.at(jMonth).at(iResource);
             }
             if (annualCost != 0.0) {
-                ++numResourcesUsed;
+                ++state.dataEconLifeCycleCost->numResourcesUsed;
                 resourceCostNotZero.at(iResource) = true;
             } else {
                 resourceCostNotZero.at(iResource) = false;
@@ -1267,14 +1231,14 @@ namespace EconomicLifeCycleCost {
             }
         }
 
-        numCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + numResourcesUsed;
+        state.dataEconLifeCycleCost->numCashFlow = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + state.dataEconLifeCycleCost->numResourcesUsed;
         // Cashflow array order:
         //   1 cost categories
         //   2 recurring costs
         //   3 nonrecurring costs
         //   4 resource costs
-        CashFlow.allocate(numCashFlow);
-        for (iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+        CashFlow.allocate(state.dataEconLifeCycleCost->numCashFlow);
+        for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             CashFlow(iCashFlow).mnAmount.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
             CashFlow(iCashFlow).yrAmount.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             CashFlow(iCashFlow).yrPresVal.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
@@ -1283,8 +1247,8 @@ namespace EconomicLifeCycleCost {
             CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
         }
         // Put nonrecurring costs into cashflows
-        offset = countOfCostCat + numRecurringCosts;
-        for (jCost = 1; jCost <= numNonrecurringCost; ++jCost) {
+        offset = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts;
+        for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numNonrecurringCost; ++jCost) {
             CashFlow(offset + jCost).name = NonrecurringCost(jCost).name;
             CashFlow(offset + jCost).SourceKind = skNonrecurring;
             CashFlow(offset + jCost).Category = NonrecurringCost(jCost).category;
@@ -1304,7 +1268,7 @@ namespace EconomicLifeCycleCost {
         }
         // Put recurring costs into cashflows
         offset = countOfCostCat;
-        for (jCost = 1; jCost <= numRecurringCosts; ++jCost) {
+        for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numRecurringCosts; ++jCost) {
             CashFlow(offset + jCost).name = RecurringCosts(jCost).name;
             CashFlow(offset + jCost).SourceKind = skRecurring;
             CashFlow(offset + jCost).Category = RecurringCosts(jCost).category;
@@ -1330,7 +1294,7 @@ namespace EconomicLifeCycleCost {
         }
         // Put resource costs into cashflows
         // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
-        cashFlowCounter = countOfCostCat + numRecurringCosts + numNonrecurringCost;
+        cashFlowCounter = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost;
         for (auto iResource : DataGlobalConstants::AllResourceTypes) {
             if (resourceCostNotZero.at(iResource)) {
                 ++cashFlowCounter;
@@ -1370,7 +1334,7 @@ namespace EconomicLifeCycleCost {
                 CashFlow(cashFlowCounter).Resource = iResource;
                 CashFlow(cashFlowCounter).SourceKind = skResource;
                 CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
-                if (cashFlowCounter <= numCashFlow) {
+                if (cashFlowCounter <= state.dataEconLifeCycleCost->numCashFlow) {
                     // put the monthly energy costs into the cashflow prior to adjustments
                     // energy costs (a.k.a. resource costs) start at the start of service and repeat
                     // until the end of the study total
@@ -1389,7 +1353,7 @@ namespace EconomicLifeCycleCost {
                     // now factor in adjustments
                     // need to find the correct adjustment to use for the current resource
                     found = 0;
-                    for (jAdj = 1; jAdj <= numUseAdjustment; ++jAdj) {
+                    for (jAdj = 1; jAdj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jAdj) {
                         if (UseAdjustment(jAdj).resource == iResource) {
                             found = jAdj;
                             break;
@@ -1414,7 +1378,7 @@ namespace EconomicLifeCycleCost {
             CashFlow(jCost).SourceKind = skSum;
         }
         // add the cashflows by category
-        for (jCost = countOfCostCat + 1; jCost <= numCashFlow; ++jCost) {
+        for (jCost = countOfCostCat + 1; jCost <= state.dataEconLifeCycleCost->numCashFlow; ++jCost) {
             curCategory = CashFlow(jCost).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
                 for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
@@ -1436,7 +1400,7 @@ namespace EconomicLifeCycleCost {
             CashFlow(costCatTotGrand).mnAmount(jMonth) = CashFlow(costCatTotOper).mnAmount(jMonth) + CashFlow(costCatTotCaptl).mnAmount(jMonth);
         }
         // convert all monthly cashflows into yearly cashflows
-        for (jCost = 1; jCost <= numCashFlow; ++jCost) {
+        for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numCashFlow; ++jCost) {
             for (kYear = 1; kYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++kYear) {
                 annualCost = 0.0;
                 for (int jMonth = 1; jMonth <= 12; ++jMonth) {
@@ -1449,7 +1413,7 @@ namespace EconomicLifeCycleCost {
             }
         }
         // generate a warning if resource referenced was not used
-        for (int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
+        for (int nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
             auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
             if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
@@ -1464,7 +1428,7 @@ namespace EconomicLifeCycleCost {
         // J. Glazer - August 2019
         int nUsePriceEsc;
 
-         for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+         for (int iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
                 // make sure this is not water
                 auto curResource = CashFlow(iCashFlow).Resource;
@@ -1474,7 +1438,7 @@ namespace EconomicLifeCycleCost {
                 }
                 if ((curResource != DataGlobalConstants::ResourceType::None)) {
                     int found = 0;
-                    for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
+                    for (nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
                         if (UsePriceEscalation(nUsePriceEsc).resource == curResource) {
                             found = nUsePriceEsc;
                             break;
@@ -1540,7 +1504,7 @@ namespace EconomicLifeCycleCost {
         Real64 effectiveYear;
 
         // identify how each cashflow should be treated
-        for (iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+        for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).SourceKind);
                 if (SELECT_CASE_var == skResource) {
@@ -1603,7 +1567,7 @@ namespace EconomicLifeCycleCost {
             }
         }
         // loop through the resources and if they match a UseEscalation use those values instead
-        for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
+        for (nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
             auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
             if (curResource != DataGlobalConstants::ResourceType::None) {
                 for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
@@ -1624,7 +1588,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
         }
-        for (iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+        for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
                 if (SELECT_CASE_var == pvkNonEnergy) {
@@ -1653,7 +1617,7 @@ namespace EconomicLifeCycleCost {
         for (int i = 1; i <= countOfCostCat; ++i) {
             CashFlow(i).presentValue = 0; // initialize value to zero before summing in next for loop
         }
-        for (iCashFlow = countOfCostCat + 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+        for (iCashFlow = countOfCostCat + 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             curCategory = CashFlow(iCashFlow).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
                 CashFlow(curCategory).presentValue += CashFlow(iCashFlow).presentValue;
@@ -2147,7 +2111,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Use Price Escalation
-            numColumns = max(1, numUsePriceEscalation);
+            numColumns = max(1, state.dataEconLifeCycleCost->numUsePriceEscalation);
             rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 2);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2159,13 +2123,13 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear + 2) = fmt::to_string(iYear);
             }
-            for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
+            for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = UsePriceEscalation(jObj).name;
                 tableBody(jObj, 1) = GetResourceTypeChar(UsePriceEscalation(jObj).resource);
                 tableBody(jObj, 2) =
                     format("{} {}", MonthNames(UsePriceEscalation(jObj).escalationStartMonth), UsePriceEscalation(jObj).escalationStartYear);
             }
-            for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) {
+            for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++jObj) {
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear + 2) = RealToStr(UsePriceEscalation(jObj).Escalation(iYear), 6);
                 }
@@ -2185,8 +2149,8 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Use Adjustment
-            if (numUseAdjustment >= 1) { // only create table if objects used
-                numColumns = max(1, numUseAdjustment);
+            if (state.dataEconLifeCycleCost->numUseAdjustment >= 1) { // only create table if objects used
+                numColumns = max(1, state.dataEconLifeCycleCost->numUseAdjustment);
                 numYears = state.dataEconLifeCycleCost->lengthStudyYears - (state.dataEconLifeCycleCost->serviceDateYear - state.dataEconLifeCycleCost->baseDateYear);
                 rowHead.allocate(numYears + 1);
                 columnHead.allocate(numColumns);
@@ -2198,11 +2162,11 @@ namespace EconomicLifeCycleCost {
                 for (iYear = 1; iYear <= numYears; ++iYear) {
                     rowHead(iYear + 1) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->serviceDateMonth), state.dataEconLifeCycleCost->serviceDateYear + iYear - 1);
                 }
-                for (jObj = 1; jObj <= numUseAdjustment; ++jObj) { // loop through objects not columns to add names
+                for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                     columnHead(jObj) = UseAdjustment(jObj).name;
                     tableBody(jObj, 1) = GetResourceTypeChar(UseAdjustment(jObj).resource);
                 }
-                for (jObj = 1; jObj <= numUseAdjustment; ++jObj) {
+                for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jObj) {
                     for (iYear = 1; iYear <= numYears; ++iYear) {
                         tableBody(jObj, iYear + 1) = RealToStr(UseAdjustment(jObj).Adjustment(iYear), 6);
                     }
@@ -2223,7 +2187,7 @@ namespace EconomicLifeCycleCost {
                 tableBody.deallocate();
             }
             //---- Cash Flow for Recurring and Nonrecurring Costs
-            numColumns = max(1, numRecurringCosts + numNonrecurringCost);
+            numColumns = max(1, state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost);
             rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 1);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2233,7 +2197,7 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear + 1) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
-            for (jObj = 1; jObj <= (numRecurringCosts + numNonrecurringCost); ++jObj) {
+            for (jObj = 1; jObj <= (state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost); ++jObj) {
                 curCashFlow = countOfCostCat + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 {
@@ -2272,7 +2236,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (Without Escalation)
-            numColumns = max(1, numResourcesUsed + 1);
+            numColumns = max(1, state.dataEconLifeCycleCost->numResourcesUsed + 1);
             rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2281,8 +2245,8 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
-            for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
-                curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
+            for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numResourcesUsed; ++jObj) {
+                curCashFlow = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
@@ -2315,7 +2279,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (With Escalation)
-            numColumns = max(1, numResourcesUsed + 1);
+            numColumns = max(1, state.dataEconLifeCycleCost->numResourcesUsed + 1);
             rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2324,8 +2288,8 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
-            for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
-                curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
+            for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numResourcesUsed; ++jObj) {
+                curCashFlow = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 auto curResource = CashFlow(curCashFlow).Resource;
                 if (CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
@@ -2517,9 +2481,9 @@ namespace EconomicLifeCycleCost {
             bool showMonthlyCashFlows = false;
             if (showMonthlyCashFlows) {
                 rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
-                columnHead.allocate(numCashFlow);
-                columnWidth.allocate(numCashFlow);
-                tableBody.allocate(numCashFlow, state.dataEconLifeCycleCost->lengthStudyTotalMonths);
+                columnHead.allocate(state.dataEconLifeCycleCost->numCashFlow);
+                columnWidth.allocate(state.dataEconLifeCycleCost->numCashFlow);
+                tableBody.allocate(state.dataEconLifeCycleCost->numCashFlow, state.dataEconLifeCycleCost->lengthStudyTotalMonths);
                 tableBody = "";
                 columnHead(1) = "mnt";
                 columnHead(2) = "rpr";
@@ -2537,14 +2501,14 @@ namespace EconomicLifeCycleCost {
                 columnHead(14) = "tOpr";
                 columnHead(15) = "tCap";
                 columnHead(16) = "Totl";
-                for (jObj = countOfCostCat + 1; jObj <= numCashFlow; ++jObj) {
+                for (jObj = countOfCostCat + 1; jObj <= state.dataEconLifeCycleCost->numCashFlow; ++jObj) {
                     columnHead(jObj) = CashFlow(jObj).name;
                 }
                 for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
                     rowHead(kMonth) = format("{} {}", MonthNames(1 + (kMonth + state.dataEconLifeCycleCost->baseDateMonth - 2) % 12), state.dataEconLifeCycleCost->baseDateYear + int((kMonth - 1) / 12));
                 }
                 for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
-                    for (jObj = 1; jObj <= numCashFlow; ++jObj) {
+                    for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numCashFlow; ++jObj) {
                         tableBody(jObj, kMonth) = RealToStr(CashFlow(jObj).mnAmount(kMonth), 2);
                     }
                 }
@@ -2596,7 +2560,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Present Value for Recurring, Nonrecurring and Energy Costs
-            numRows = max(1, numRecurringCosts + numNonrecurringCost + numResourcesUsed);
+            numRows = max(1, state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + state.dataEconLifeCycleCost->numResourcesUsed);
             rowHead.allocate(numRows + 1);
             columnHead.allocate(5);
             columnWidth.allocate(5);
@@ -2610,7 +2574,7 @@ namespace EconomicLifeCycleCost {
             columnHead(5) = "Present Value Factor";
             totalPV = 0.0;
             rowHead(numRows + 1) = "TOTAL";
-            for (jObj = 1; jObj <= (numRecurringCosts + numNonrecurringCost + numResourcesUsed); ++jObj) {
+            for (jObj = 1; jObj <= (state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + state.dataEconLifeCycleCost->numResourcesUsed); ++jObj) {
                 offset = countOfCostCat;
                 rowHead(jObj) = CashFlow(offset + jObj).name;
                 {
@@ -2836,12 +2800,6 @@ namespace EconomicLifeCycleCost {
 
     void clear_state()
     {
-        numRecurringCosts = 0;
-        numNonrecurringCost = 0;
-        numUsePriceEscalation = 0;
-        numUseAdjustment = 0;
-        numCashFlow = 0;
-        numResourcesUsed = 0;
         SPV.deallocate();
         DepreciatedCapital.deallocate();
         TaxableIncome.deallocate();
@@ -2865,7 +2823,5 @@ namespace EconomicLifeCycleCost {
         ExpressAsCashFlows_baseMonths1900 = 0;
         ExpressAsCashFlows_serviceMonths1900 = 0;
     }
-
-} // namespace EconomicLifeCycleCost
 
 } // namespace EnergyPlus
