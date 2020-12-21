@@ -190,8 +190,6 @@ namespace HVACControllers {
     Real64 const SomeFloatingPoint(1.0);
     int const NumSigDigits(PRECISION(SomeFloatingPoint));
 
-    static std::string const BlankString;
-
     // Parameters for controls used here
     int const iNoControlVariable(0);
     int const iTemperature(1);

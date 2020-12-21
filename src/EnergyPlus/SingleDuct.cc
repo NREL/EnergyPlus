@@ -130,7 +130,6 @@ namespace EnergyPlus::SingleDuct {
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
-    static std::string const BlankString;
 
     void SimulateSingleDuct(
         EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)

@@ -456,7 +456,7 @@ namespace PollutionModule {
 
     void CalcPollution(EnergyPlusData &state);
 
-    void ReadEnergyMeters();
+    void ReadEnergyMeters(EnergyPlusData &state);
 
     // *****************************************************************************
     // Utility Routines to allow access to data inside this module.

@@ -665,7 +665,7 @@ namespace OutputReportTabularAnnual {
         computeBinColumns(state);
 
         // Use title case names of variables if available for column headers
-        columnHeadersToTitleCase();
+        columnHeadersToTitleCase(state);
 
         // first loop through and count how many 'columns' are defined
         // since max and min actually define two columns (the value
@@ -1332,7 +1332,7 @@ namespace OutputReportTabularAnnual {
         return returnBins;
     }
 
-    void AnnualTable::columnHeadersToTitleCase()
+    void AnnualTable::columnHeadersToTitleCase(EnergyPlusData &state)
     {
         std::vector<AnnualFieldSet>::iterator fldStIt;
         for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
@@ -1340,9 +1340,9 @@ namespace OutputReportTabularAnnual {
                 if (fldStIt->m_indexesForKeyVar.size() > 0) {
                     int varNum = fldStIt->m_indexesForKeyVar[0];
                     if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real) {
-                        fldStIt->m_colHead = OutputProcessor::RVariableTypes(varNum).VarNameOnly;
+                        fldStIt->m_colHead = state.dataOutputProcessor->RVariableTypes(varNum).VarNameOnly;
                     } else if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter) {
-                        fldStIt->m_colHead = OutputProcessor::EnergyMeters(varNum).Name;
+                        fldStIt->m_colHead = state.dataOutputProcessor->EnergyMeters(varNum).Name;
                     }
                 }
             }

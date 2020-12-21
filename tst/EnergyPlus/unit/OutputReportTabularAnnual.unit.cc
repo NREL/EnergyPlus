@@ -260,10 +260,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
     DataHVACGlobals::TimeStepSys = 1.0;
 
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
-    OutputProcessor::EnergyMeters(1).Name = "HEATING:MYTH:VARIABLE";
-    OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:MYTH";
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "HEATING:MYTH:VARIABLE";
+    state->dataOutputProcessor->EnergyMeters(2).Name = "ELECTRICITY:MYTH";
 
 
     std::vector<AnnualTable> annualTables;
@@ -272,8 +272,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
     annualTables.back().addFieldSet("ELECTRICITY:MYTH", AnnualFieldSet::AggregationKind::maximumDuringHoursShown, 2);
     annualTables.back().setupGathering(*state);
 
-    OutputProcessor::EnergyMeters(1).CurTSValue = -10.;
-    OutputProcessor::EnergyMeters(2).CurTSValue = 50.;
+    state->dataOutputProcessor->EnergyMeters(1).CurTSValue = -10.;
+    state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 50.;
     annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     std::vector<std::string> fieldSetParams = annualTables.back().inspectTableFieldSets(0);
@@ -284,8 +284,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
     EXPECT_EQ(fieldSetParams[0], "ELECTRICITY:MYTH"); // m_colHead
     EXPECT_EQ(fieldSetParams[13].std::string::substr(0,6), "-99000"); // m_cell[0].result
 
-    OutputProcessor::EnergyMeters(1).CurTSValue = 15.;
-    OutputProcessor::EnergyMeters(2).CurTSValue = 55.;
+    state->dataOutputProcessor->EnergyMeters(1).CurTSValue = 15.;
+    state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 55.;
     annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     fieldSetParams = annualTables.back().inspectTableFieldSets(0);
@@ -341,10 +341,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Facility",
                         "General"); // create an electric meter
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
-    OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
-    OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -354,7 +354,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 
-    firstTable->columnHeadersToTitleCase();
+    firstTable->columnHeadersToTitleCase(*state);
 
     std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "ONPEAKTIME"); // m_colHead
@@ -398,10 +398,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Facility",
                         "General"); // create an electric meter
 
-    OutputProcessor::NumEnergyMeters = 2;
-    OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
-    OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
-    OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
+    state->dataOutputProcessor->NumEnergyMeters = 2;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
     state->dataGlobal->DoWeathSim = true;
 

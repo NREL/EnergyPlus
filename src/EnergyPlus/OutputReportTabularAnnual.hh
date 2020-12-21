@@ -133,7 +133,7 @@ namespace OutputReportTabularAnnual {
         void clearTable();
 
         // this could be private but was made public for unit testing only
-        void columnHeadersToTitleCase();
+        void columnHeadersToTitleCase(EnergyPlusData &state);
 
     private:
         // Members

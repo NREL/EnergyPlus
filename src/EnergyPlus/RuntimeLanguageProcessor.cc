@@ -106,16 +106,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
     int const ParenthesisLeft(10);  // indicates left side parenthesis found in parsing
     int const ParenthesisRight(11); // indicates right side parenthesis found in parsing
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     bool GetInput(true);
     bool InitializeOnce(true);
     bool MyEnvrnFlag(true);
@@ -437,7 +427,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // reinitilize sensors
         for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
-            SetInternalVariableValue(state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index, 0.0, 0);
+            SetInternalVariableValue(state, state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index, 0.0, 0);
         }
     }
 

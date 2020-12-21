@@ -119,8 +119,6 @@ namespace DualDuct {
     int const PerPersonDCVByCurrentLevel(21);
     int const PerPersonByDesignLevel(22);
 
-    static std::string const BlankString;
-
     // MODULE VARIABLE DECLARATIONS:
     Array1D_bool CheckEquipName;
 
