@@ -252,6 +252,7 @@ set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-Ca
 
 set(SAM_SKIP_TOOLS ON)
 set(SAM_SKIP_TESTS ON)
+set(SAMAPI_EXPORT OFF)
 ADD_SUBDIRECTORY(third_party/ssc)
 set_target_properties(ssc PROPERTIES FOLDER ThirdParty/ssc)
 IF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
