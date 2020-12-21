@@ -104,48 +104,13 @@ namespace EconomicLifeCycleCost {
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
 
-    // ModifiedAcceleratedCostRecoverySystem or Straight Line
-    int const depMethMACRS3(1);
-    int const depMethMACRS5(2);
-    int const depMethMACRS7(3);
-    int const depMethMACRS10(4);
-    int const depMethMACRS15(5);
-    int const depMethMACRS20(6);
-    int const depMethStraight27(7);
-    int const depMethStraight31(8);
-    int const depMethStraight39(9);
-    int const depMethStraight40(10);
-    int const depMethNone(11);
-
-    int const costCatMaintenance(1);
-    int const costCatRepair(2);
-    int const costCatOperation(3);
-    int const costCatReplacement(4);
-    int const costCatMinorOverhaul(5);
-    int const costCatMajorOverhaul(6);
-    int const costCatOtherOperational(7);
-    int const costCatConstruction(8);
-    int const costCatSalvage(9);
-    int const costCatOtherCapital(10);
-    int const costCatWater(11);
-    int const costCatEnergy(12);
-    int const costCatTotEnergy(13);
-    int const costCatTotOper(14);
-    int const costCatTotCaptl(15);
-    int const costCatTotGrand(16);
-
-    int const countOfCostCat(16); // count of the number of cost categories
-
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
     //   Distillate oil - FuelOilNo1
-    //   Liquified petroleum gas - Propane
+    //   Liquefied petroleum gas - Propane
     //   Residual oil - FuelOilNo2
     //   Coal
-
-    int const startServicePeriod(1);
-    int const startBasePeriod(2);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -167,7 +132,7 @@ namespace EconomicLifeCycleCost {
     int lengthStudyYears(0);                      // Length of Study Period in Years
     int lengthStudyTotalMonths(0);                // Length of Study expressed in months (years x 12)
     Real64 taxRate(0.0);                          // Tax rate
-    int depreciationMethod(depMethNone);          // Depreciation Method
+    iDeprMethod depreciationMethod(iDeprMethod::None);          // Depreciation Method
     // derived
     int lastDateMonth(0); // Last Date Month (the month before the base date month)
     int lastDateYear(0);  // Last Date Year (base date year + length of study period in years)
@@ -550,33 +515,33 @@ namespace EconomicLifeCycleCost {
             //      \key None
             //      \default None
             if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-3year")) {
-                depreciationMethod = depMethMACRS3;
+                depreciationMethod = iDeprMethod::MACRS3;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-5year")) {
-                depreciationMethod = depMethMACRS5;
+                depreciationMethod = iDeprMethod::MACRS5;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-7year")) {
-                depreciationMethod = depMethMACRS7;
+                depreciationMethod = iDeprMethod::MACRS7;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-10year")) {
-                depreciationMethod = depMethMACRS10;
+                depreciationMethod = iDeprMethod::MACRS10;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-15year")) {
-                depreciationMethod = depMethMACRS15;
+                depreciationMethod = iDeprMethod::MACRS15;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-20year")) {
-                depreciationMethod = depMethMACRS20;
+                depreciationMethod = iDeprMethod::MACRS20;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-27year")) {
-                depreciationMethod = depMethStraight27;
+                depreciationMethod = iDeprMethod::Straight27;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-31year")) {
-                depreciationMethod = depMethStraight31;
+                depreciationMethod = iDeprMethod::Straight31;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-39year")) {
-                depreciationMethod = depMethStraight39;
+                depreciationMethod = iDeprMethod::Straight39;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-40year")) {
-                depreciationMethod = depMethStraight40;
+                depreciationMethod = iDeprMethod::Straight40;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "None")) {
-                depreciationMethod = depMethNone;
+                depreciationMethod = iDeprMethod::None;
             } else if (lAlphaFieldBlanks(6)) {
-                depreciationMethod = depMethNone;
+                depreciationMethod = iDeprMethod::None;
                 ShowWarningError(state, CurrentModuleObject + ": The input field " + cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
             } else {
-                depreciationMethod = depMethNone;
-                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(6) + "=\"" + AlphaArray(6) + "\". \"None\" will be used.");
+                depreciationMethod = iDeprMethod::None;
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(6) + "=\"" + AlphaArray(6) + R"(". "None" will be used.)");
             }
             // compute derived variables
             lastDateMonth = baseDateMonth - 1; // same month of the year for first and last month
@@ -679,11 +644,11 @@ namespace EconomicLifeCycleCost {
             //        \key BasePeriod
             //        \default ServicePeriod
             if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-                RecurringCosts(iInObj).startOfCosts = startServicePeriod;
+                RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-                RecurringCosts(iInObj).startOfCosts = startBasePeriod;
+                RecurringCosts(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
-                RecurringCosts(iInObj).startOfCosts = startServicePeriod;
+                RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
@@ -854,11 +819,11 @@ namespace EconomicLifeCycleCost {
             //      \key BasePeriod
             //      \default ServicePeriod
             if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-                NonrecurringCost(iInObj).startOfCosts = startServicePeriod;
+                NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-                NonrecurringCost(iInObj).startOfCosts = startBasePeriod;
+                NonrecurringCost(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
-                NonrecurringCost(iInObj).startOfCosts = startServicePeriod;
+                NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
@@ -1286,7 +1251,7 @@ namespace EconomicLifeCycleCost {
             NonrecurringCost(numNonrecurringCost).lineItem = "";
             NonrecurringCost(numNonrecurringCost).category = costCatConstruction;
             NonrecurringCost(numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-            NonrecurringCost(numNonrecurringCost).startOfCosts = startBasePeriod;
+            NonrecurringCost(numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
             NonrecurringCost(numNonrecurringCost).yearsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).totalMonthsFromStart = 0;
@@ -1358,9 +1323,9 @@ namespace EconomicLifeCycleCost {
             CashFlow(offset + jCost).Category = NonrecurringCost(jCost).category;
             CashFlow(offset + jCost).orginalCost = NonrecurringCost(jCost).cost;
             CashFlow(offset + jCost).mnAmount = 0.0;
-            if (NonrecurringCost(jCost).startOfCosts == startServicePeriod) {
+            if (NonrecurringCost(jCost).startOfCosts == iStartCosts::ServicePeriod) {
                 month = NonrecurringCost(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-            } else if (NonrecurringCost(jCost).startOfCosts == startBasePeriod) {
+            } else if (NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
                 month = NonrecurringCost(jCost).totalMonthsFromStart + 1;
             }
             if ((month >= 1) && (month <= lengthStudyTotalMonths)) {
@@ -1377,9 +1342,9 @@ namespace EconomicLifeCycleCost {
             CashFlow(offset + jCost).SourceKind = skRecurring;
             CashFlow(offset + jCost).Category = RecurringCosts(jCost).category;
             CashFlow(offset + jCost).orginalCost = RecurringCosts(jCost).cost;
-            if (RecurringCosts(jCost).startOfCosts == startServicePeriod) {
+            if (RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
                 firstMonth = RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-            } else if (RecurringCosts(jCost).startOfCosts == startBasePeriod) {
+            } else if (RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
                 firstMonth = RecurringCosts(jCost).totalMonthsFromStart + 1;
             }
             if ((firstMonth >= 1) && (firstMonth <= lengthStudyTotalMonths)) {
@@ -1810,19 +1775,19 @@ namespace EconomicLifeCycleCost {
         DepreciationPercent = 0.0; // default all values to zero
         {
             auto const SELECT_CASE_var(depreciationMethod);
-            if (SELECT_CASE_var == depMethMACRS3) { // IRS Publication 946 for 2009 Table A-1
+            if (SELECT_CASE_var == iDeprMethod::MACRS3) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 33.33;
                 DepreciationPercent(2) = 44.45;
                 DepreciationPercent(3) = 14.81;
                 DepreciationPercent(4) = 7.41;
-            } else if (SELECT_CASE_var == depMethMACRS5) { // IRS Publication 946 for 2009 Table A-1
+            } else if (SELECT_CASE_var == iDeprMethod::MACRS5) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 20.0;
                 DepreciationPercent(2) = 32.0;
                 DepreciationPercent(3) = 19.2;
                 DepreciationPercent(4) = 11.52;
                 DepreciationPercent(5) = 11.52;
                 DepreciationPercent(6) = 5.76;
-            } else if (SELECT_CASE_var == depMethMACRS7) { // IRS Publication 946 for 2009 Table A-1
+            } else if (SELECT_CASE_var == iDeprMethod::MACRS7) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 14.29;
                 DepreciationPercent(2) = 24.49;
                 DepreciationPercent(3) = 17.49;
@@ -1831,7 +1796,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(6) = 8.92;
                 DepreciationPercent(7) = 8.93;
                 DepreciationPercent(8) = 4.46;
-            } else if (SELECT_CASE_var == depMethMACRS10) { // IRS Publication 946 for 2009 Table A-1
+            } else if (SELECT_CASE_var == iDeprMethod::MACRS10) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 10.0;
                 DepreciationPercent(2) = 18.0;
                 DepreciationPercent(3) = 14.4;
@@ -1843,7 +1808,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(9) = 6.56;
                 DepreciationPercent(10) = 6.55;
                 DepreciationPercent(11) = 3.28;
-            } else if (SELECT_CASE_var == depMethMACRS15) { // IRS Publication 946 for 2009 Table A-1
+            } else if (SELECT_CASE_var == iDeprMethod::MACRS15) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 5.0;
                 DepreciationPercent(2) = 9.5;
                 DepreciationPercent(3) = 8.55;
@@ -1860,7 +1825,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(14) = 5.9;
                 DepreciationPercent(15) = 5.91;
                 DepreciationPercent(16) = 2.95;
-            } else if (SELECT_CASE_var == depMethMACRS20) { // IRS Publication 946 for 2009 Table A-1
+            } else if (SELECT_CASE_var == iDeprMethod::MACRS20) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 3.75;
                 DepreciationPercent(2) = 7.219;
                 DepreciationPercent(3) = 6.677;
@@ -1882,7 +1847,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(19) = 4.462;
                 DepreciationPercent(20) = 4.461;
                 DepreciationPercent(21) = 2.231;
-            } else if (SELECT_CASE_var == depMethStraight27) { // IRS Publication 946 for 2009 Table A-6 (June)
+            } else if (SELECT_CASE_var == iDeprMethod::Straight27) { // IRS Publication 946 for 2009 Table A-6 (June)
                 DepreciationPercent(1) = 1.97;
                 DepreciationPercent(2) = 3.636;
                 DepreciationPercent(3) = 3.636;
@@ -1911,7 +1876,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(26) = 3.637;
                 DepreciationPercent(27) = 3.636;
                 DepreciationPercent(28) = 3.485;
-            } else if (SELECT_CASE_var == depMethStraight31) { // IRS Publication 946 for 2009 Table A-7 (June)
+            } else if (SELECT_CASE_var == iDeprMethod::Straight31) { // IRS Publication 946 for 2009 Table A-7 (June)
                 DepreciationPercent(1) = 1.72;
                 DepreciationPercent(2) = 3.175;
                 DepreciationPercent(3) = 3.175;
@@ -1944,7 +1909,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(30) = 3.174;
                 DepreciationPercent(31) = 3.175;
                 DepreciationPercent(32) = 3.042;
-            } else if (SELECT_CASE_var == depMethStraight39) { // IRS Publication 946 for 2009 Table A-7a (June)
+            } else if (SELECT_CASE_var == iDeprMethod::Straight39) { // IRS Publication 946 for 2009 Table A-7a (June)
                 DepreciationPercent(1) = 1.391;
                 DepreciationPercent(2) = 2.564;
                 DepreciationPercent(3) = 2.564;
@@ -1985,7 +1950,7 @@ namespace EconomicLifeCycleCost {
                 DepreciationPercent(38) = 2.564;
                 DepreciationPercent(39) = 2.564;
                 DepreciationPercent(40) = 1.177;
-            } else if (SELECT_CASE_var == depMethStraight40) { // IRS Publication 946 for 2009 Table A-13 (June)
+            } else if (SELECT_CASE_var == iDeprMethod::Straight40) { // IRS Publication 946 for 2009 Table A-13 (June)
                 DepreciationPercent(1) = 1.354;
                 DepreciationPercent(2) = 2.5;
                 DepreciationPercent(3) = 2.5;
@@ -2174,27 +2139,27 @@ namespace EconomicLifeCycleCost {
             tableBody(1, 10) = RealToStr(taxRate, 4);
             {
                 auto const SELECT_CASE_var(depreciationMethod);
-                if (SELECT_CASE_var == depMethMACRS3) {
+                if (SELECT_CASE_var == iDeprMethod::MACRS3) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-3year";
-                } else if (SELECT_CASE_var == depMethMACRS5) {
+                } else if (SELECT_CASE_var == iDeprMethod::MACRS5) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-5year";
-                } else if (SELECT_CASE_var == depMethMACRS7) {
+                } else if (SELECT_CASE_var == iDeprMethod::MACRS7) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-7year";
-                } else if (SELECT_CASE_var == depMethMACRS10) {
+                } else if (SELECT_CASE_var == iDeprMethod::MACRS10) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-10year";
-                } else if (SELECT_CASE_var == depMethMACRS15) {
+                } else if (SELECT_CASE_var == iDeprMethod::MACRS15) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-15year";
-                } else if (SELECT_CASE_var == depMethMACRS20) {
+                } else if (SELECT_CASE_var == iDeprMethod::MACRS20) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-20year";
-                } else if (SELECT_CASE_var == depMethStraight27) {
+                } else if (SELECT_CASE_var == iDeprMethod::Straight27) {
                     tableBody(1, 11) = "StraightLine-27year";
-                } else if (SELECT_CASE_var == depMethStraight31) {
+                } else if (SELECT_CASE_var == iDeprMethod::Straight31) {
                     tableBody(1, 11) = "StraightLine-31year";
-                } else if (SELECT_CASE_var == depMethStraight39) {
+                } else if (SELECT_CASE_var == iDeprMethod::Straight39) {
                     tableBody(1, 11) = "StraightLine-39year";
-                } else if (SELECT_CASE_var == depMethStraight40) {
+                } else if (SELECT_CASE_var == iDeprMethod::Straight40) {
                     tableBody(1, 11) = "StraightLine-40year";
-                } else if (SELECT_CASE_var == depMethNone) {
+                } else if (SELECT_CASE_var == iDeprMethod::None) {
                     tableBody(1, 11) = "None";
                 }
             }
@@ -2392,7 +2357,7 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
             }
-            for (int jObj = 1; jObj <= numResourcesUsed; ++jObj) {
+            for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 auto curResource = CashFlow(curCashFlow).Resource;
@@ -2918,7 +2883,7 @@ namespace EconomicLifeCycleCost {
         lengthStudyYears = 0;
         lengthStudyTotalMonths = 0;
         taxRate = 0.0;
-        depreciationMethod = depMethNone;
+        depreciationMethod = iDeprMethod::None;
         lastDateMonth = 0;
         lastDateYear = 0;
         numRecurringCosts = 0;

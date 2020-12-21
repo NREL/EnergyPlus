@@ -80,37 +80,38 @@ namespace EconomicLifeCycleCost {
         CurrentDollar,
     };
 
-    // ModifiedAcceleratedCostRecoverySystem or Straight Line
-    extern int const depMethMACRS3;
-    extern int const depMethMACRS5;
-    extern int const depMethMACRS7;
-    extern int const depMethMACRS10;
-    extern int const depMethMACRS15;
-    extern int const depMethMACRS20;
-    extern int const depMethStraight27;
-    extern int const depMethStraight31;
-    extern int const depMethStraight39;
-    extern int const depMethStraight40;
-    extern int const depMethNone;
+    enum class iDeprMethod {
+        MACRS3,
+        MACRS5,
+        MACRS7,
+        MACRS10,
+        MACRS15,
+        MACRS20,
+        Straight27,
+        Straight31,
+        Straight39,
+        Straight40,
+        None,
+    };
 
-    extern int const costCatMaintenance;
-    extern int const costCatRepair;
-    extern int const costCatOperation;
-    extern int const costCatReplacement;
-    extern int const costCatMinorOverhaul;
-    extern int const costCatMajorOverhaul;
-    extern int const costCatOtherOperational;
-    extern int const costCatConstruction;
-    extern int const costCatSalvage;
-    extern int const costCatOtherCapital;
-    extern int const costCatWater;
-    extern int const costCatEnergy;
-    extern int const costCatTotEnergy;
-    extern int const costCatTotOper;
-    extern int const costCatTotCaptl;
-    extern int const costCatTotGrand;
+    constexpr int costCatMaintenance(1);
+    constexpr int costCatRepair(2);
+    constexpr int costCatOperation(3);
+    constexpr int costCatReplacement(4);
+    constexpr int costCatMinorOverhaul(5);
+    constexpr int costCatMajorOverhaul(6);
+    constexpr int costCatOtherOperational(7);
+    constexpr int costCatConstruction(8);
+    constexpr int costCatSalvage(9);
+    constexpr int costCatOtherCapital(10);
+    constexpr int costCatWater(11);
+    constexpr int costCatEnergy(12);
+    constexpr int costCatTotEnergy(13);
+    constexpr int costCatTotOper(14);
+    constexpr int costCatTotCaptl(15);
+    constexpr int costCatTotGrand(16);
 
-    extern int const countOfCostCat; // count of the number of cost categories
+    constexpr int countOfCostCat(16); // count of the number of cost categories
 
     // The NIST supplement includes UPV* factors for
     //   Electricity
@@ -120,8 +121,10 @@ namespace EconomicLifeCycleCost {
     //   Residual oil - FuelOilNo2
     //   Coal
 
-    extern int const startServicePeriod;
-    extern int const startBasePeriod;
+    enum class iStartCosts {
+        ServicePeriod,
+        BasePeriod,
+    };
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -143,7 +146,7 @@ namespace EconomicLifeCycleCost {
     extern int lengthStudyYears;       // Length of Study Period in Years
     extern int lengthStudyTotalMonths; // Length of Study expressed in months (years x 12)
     extern Real64 taxRate;             // Tax rate
-    extern int depreciationMethod;     // Depreciation Method
+    extern iDeprMethod depreciationMethod;     // Depreciation Method
     // derived
     extern int lastDateMonth; // Last Date Month (the month before the base date month)
     extern int lastDateYear;  // Last Date Year (base date year + length of study period in years)
@@ -193,7 +196,7 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;        // Line Item
         int category;                // Category
         Real64 cost;                 // Cost
-        int startOfCosts;            // Start of Costs
+        iStartCosts startOfCosts;    // Start of Costs
         int yearsFromStart;          // Years from Start 0 - 100
         int monthsFromStart;         // Months from Start 0 - 11
         int totalMonthsFromStart;    // Total months (12 x years) + months
@@ -204,8 +207,8 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
-              repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
+            : category(costCatMaintenance), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+              totalMonthsFromStart(0), repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
     };
@@ -217,14 +220,15 @@ namespace EconomicLifeCycleCost {
         std::string lineItem;     // Line Item
         int category;             // Category
         Real64 cost;              // Cost
-        int startOfCosts;         // Start of Costs
+        iStartCosts startOfCosts; // Start of Costs
         int yearsFromStart;       // Years from Start 0 - 100
         int monthsFromStart;      // Months from Start 0 - 11
         int totalMonthsFromStart; // Total months (12 x years) + months
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
+            : category(costCatConstruction), cost(0.0), startOfCosts(iStartCosts::ServicePeriod), yearsFromStart(0), monthsFromStart(0),
+              totalMonthsFromStart(0)
         {
         }
     };
