@@ -122,10 +122,6 @@ namespace HVACVariableRefrigerantFlow {
     using namespace Psychrometrics;
     using namespace DataPlant;
 
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
-
     // Heat Recovery System used
     int const No(1);  // Heat Pump mode only
     int const Yes(2); // Heat Pump or Heat Recovery Mode (not available at this time)

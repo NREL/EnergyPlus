@@ -64,11 +64,10 @@ struct EnergyPlusData;
 
 namespace SimAirServingZones {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // coil operation
-    extern int const CoilOn;  // normal coil operation
-    extern int const CoilOff; // signal coil shouldn't run
+    constexpr int CoilOn(1);  // normal coil operation
+    constexpr int CoilOff(0); // signal coil shouldn't run
+
     extern int const BeforeBranchSim;
     extern int const AfterBranchSim;
     // CompType numerics -- for this module
@@ -98,7 +97,7 @@ namespace SimAirServingZones {
     extern int const Duct;
     extern int const UnitarySystem_BypassVAVSys;
     extern int const UnitarySystem_MSHeatPump;
-    extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
+    extern int const Fan_ComponentModel;
     extern int const DXHeatPumpSystem;
     extern int const CoilUserDefined;
     extern int const UnitarySystemModel;

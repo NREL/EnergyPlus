@@ -79,8 +79,8 @@ namespace DXCoils {
     extern int const Timed;    // defrost cycle is timed
     extern int const OnDemand; // defrost cycle occurs only when required
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     extern Real64 const RatedInletAirTemp;           // 26.6667C or 80F
     extern Real64 const RatedInletWetBulbTemp;       // 19.44 or 67F

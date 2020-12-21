@@ -168,10 +168,6 @@ namespace HVACMultiSpeedHeatPump {
         Cubic,       // Cubic curve type
     };
 
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
-
     static std::string const fluidNameSteam("STEAM");
 
     // DERIVED TYPE DEFINITIONS

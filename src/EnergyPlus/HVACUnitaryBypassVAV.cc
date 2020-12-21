@@ -128,11 +128,6 @@ namespace HVACUnitaryBypassVAV {
     // "Ventilation for Changeover-Bypass VAV Systems," D. Stanke, ASHRAE Journal Vol. 46, No. 11, November 2004.
     //  Lawrence Berkeley Laboratory. Nov. 1993. DOE-2 Supplement Version 2.1E, Winklemann et.al.
 
-    // MODULE PARAMETER DEFINITIONS
-    // Compressor operation
-    int const On(1);  // Normal compressor operation
-    int const Off(0); // Signal DXCoil that compressor should not run
-
     // Dehumidification control modes (DehumidControlMode) for Multimode units only
     int const DehumidControl_None(0);
     int const DehumidControl_Multimode(1);

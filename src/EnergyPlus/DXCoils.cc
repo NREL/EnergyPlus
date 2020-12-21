@@ -141,9 +141,6 @@ namespace DXCoils {
     // Defrost control  (heat pump only)
     int const Timed(1);    // defrost cycle is timed
     int const OnDemand(2); // defrost cycle occurs only when required
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
 
     Real64 const RatedInletAirTemp(26.6667);          // 26.6667C or 80F
     Real64 const RatedInletWetBulbTemp(19.4444);      // 19.44 or 67F
@@ -451,7 +448,8 @@ namespace DXCoils {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (present(SpeedNum))
-                    CalcMultiSpeedDXCoilCooling(state, DXCoilNum,
+                    CalcMultiSpeedDXCoilCooling(state,
+                                                DXCoilNum,
                                                 SpeedRatio,
                                                 CycRatio,
                                                 SpeedNum,

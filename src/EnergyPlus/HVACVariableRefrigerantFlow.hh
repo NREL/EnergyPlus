@@ -67,8 +67,8 @@ struct EnergyPlusData;
 namespace HVACVariableRefrigerantFlow {
 
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Heat Recovery System used
     extern int const No;  // Heat Pump mode only

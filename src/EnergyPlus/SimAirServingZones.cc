@@ -145,9 +145,7 @@ namespace SimAirServingZones {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    // coil operation
-    int const CoilOn(1);  // normal coil operation
-    int const CoilOff(0); // signal coil shouldn't run
+
     int const BeforeBranchSim(1);
     int const AfterBranchSim(2);
     // CompType numerics -- for this module
@@ -176,7 +174,7 @@ namespace SimAirServingZones {
     int const Duct(22);
     int const UnitarySystem_BypassVAVSys(23);
     int const UnitarySystem_MSHeatPump(24);
-    int const Fan_ComponentModel(25); // cpw22Aug2010 (new)
+    int const Fan_ComponentModel(25);
     int const DXHeatPumpSystem(26);
     int const CoilUserDefined(27);
     int const Fan_System_Object(28);
@@ -1228,7 +1226,6 @@ namespace SimAirServingZones {
                             state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(state, state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
-                                   // cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
                             HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(state, state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
                                 ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
@@ -3557,7 +3554,6 @@ namespace SimAirServingZones {
                 DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
                 HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
 
-                // cpw22Aug2010 Add Fan:ComponentModel (new)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
 
