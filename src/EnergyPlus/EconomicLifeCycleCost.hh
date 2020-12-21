@@ -126,31 +126,6 @@ namespace EconomicLifeCycleCost {
         BasePeriod,
     };
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // related to LifeCycleCost:Parameters
-    extern bool LCCparamPresent;       // If a LifeCycleCost:Parameters object is present
-    extern std::string LCCname;        // Name
-    extern iDiscConv discountConvention;     // Discounting Convention
-    extern iInflAppr inflationApproach;      // Inflation Approach
-    extern Real64 realDiscountRate;    // Real Discount Rate
-    extern Real64 nominalDiscountRate; // Nominal Discount Rate
-    extern Real64 inflation;           // Inflation
-    extern int baseDateMonth;          // Base Date Month (1=Jan, 12=Dec)
-    extern int baseDateYear;           // Base Date Year  1900-2100
-    extern int serviceDateMonth;       // Service Date Month (1=Jan, 12=Dec)
-    extern int serviceDateYear;        // Service Date Year 1900-2100
-    extern int lengthStudyYears;       // Length of Study Period in Years
-    extern int lengthStudyTotalMonths; // Length of Study expressed in months (years x 12)
-    extern Real64 taxRate;             // Tax rate
-    extern iDeprMethod depreciationMethod;     // Depreciation Method
-    // derived
-    extern int lastDateMonth; // Last Date Month (the month before the base date month)
-    extern int lastDateYear;  // Last Date Year (base date year + length of study period in years)
-
     extern int numRecurringCosts;
 
     extern int numNonrecurringCost;
@@ -327,11 +302,11 @@ namespace EconomicLifeCycleCost {
 
     void ExpressAsCashFlows(EnergyPlusData &state);
 
-    void ComputeEscalatedEnergyCosts();
+    void ComputeEscalatedEnergyCosts(EnergyPlusData &state);
 
-    void ComputePresentValue();
+    void ComputePresentValue(EnergyPlusData &state);
 
-    void ComputeTaxAndDepreciation();
+    void ComputeTaxAndDepreciation(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -348,10 +323,45 @@ namespace EconomicLifeCycleCost {
 } // namespace EconomicLifeCycleCost
 
 struct EconomicLifeCycleCostData : BaseGlobalStruct {
+    // related to LifeCycleCost:Parameters
+    bool LCCparamPresent = false; // If a LifeCycleCost:Parameters object is present
+    std::string LCCname;          // Name
+    EconomicLifeCycleCost::iDiscConv discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;     // Discounting Convention
+    EconomicLifeCycleCost::iInflAppr inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar; // Inflation Approach
+    Real64 realDiscountRate = 0.0;                                                                         // Real Discount Rate
+    Real64 nominalDiscountRate = 0.0;                                                                      // Nominal Discount Rate
+    Real64 inflation = 0.0;                                                                                // Inflation
+    int baseDateMonth = 0;                                                                                 // Base Date Month (1=Jan, 12=Dec)
+    int baseDateYear = 0;                                                                                  // Base Date Year  1900-2100
+    int serviceDateMonth = 0;                                                                              // Service Date Month (1=Jan, 12=Dec)
+    int serviceDateYear = 0;                                                                               // Service Date Year 1900-2100
+    int lengthStudyYears = 0;                                                                              // Length of Study Period in Years
+    int lengthStudyTotalMonths = 0; // Length of Study expressed in months (years x 12)
+    Real64 taxRate = 0.0;           // Tax rate
+    EconomicLifeCycleCost::iDeprMethod depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None; // Depreciation Method
+    // derived
+    int lastDateMonth = 0; // Last Date Month (the month before the base date month)
+    int lastDateYear = 0;  // Last Date Year (base date year + length of study period in years)
 
     void clear_state() override
     {
-
+        this->LCCparamPresent = false;
+        this->LCCname.clear();
+        this->discountConvention = EconomicLifeCycleCost::iDiscConv::EndOfYear;
+        this->inflationApproach = EconomicLifeCycleCost::iInflAppr::ConstantDollar;
+        this->realDiscountRate = 0.0;
+        this->nominalDiscountRate = 0.0;
+        this->inflation = 0.0;
+        this->baseDateMonth = 0;
+        this->baseDateYear = 0;
+        this->serviceDateMonth = 0;
+        this->serviceDateYear = 0;
+        this->lengthStudyYears = 0;
+        this->lengthStudyTotalMonths = 0;
+        this->taxRate = 0.0;
+        this->depreciationMethod = EconomicLifeCycleCost::iDeprMethod::None;
+        this->lastDateMonth = 0;
+        this->lastDateYear = 0;
     }
 };
 

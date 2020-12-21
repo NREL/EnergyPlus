@@ -3191,16 +3191,6 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Go through the reports and create links
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using EconomicLifeCycleCost::LCCparamPresent;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const Entire_Facility("Entire Facility");
         static std::string const Annual_Building_Utility_Performance_Summary("Annual Building Utility Performance Summary");
@@ -3238,7 +3228,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         // normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
-        if (ort->displayLifeCycleCostReport && LCCparamPresent) {
+        if (ort->displayLifeCycleCostReport && state.dataEconLifeCycleCost->LCCparamPresent) {
             AddTOCEntry(state, "Life-Cycle Cost Report", "Entire Facility");
         }
 

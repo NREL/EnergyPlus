@@ -83,7 +83,7 @@ namespace EconomicLifeCycleCost {
     //   on input provided by the user as well as calculated energy costs.
 
     // METHODOLOGY EMPLOYED:
-    //   Uses NIST Handbook 135 "Life-Cycle Costing Manual for the Federaml
+    //   Uses NIST Handbook 135 "Life-Cycle Costing Manual for the Federal
     //   Energy Management Program" for most computations.
 
     // REFERENCES:
@@ -103,39 +103,6 @@ namespace EconomicLifeCycleCost {
     // Using/Aliasing
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
-
-    // The NIST supplement includes UPV* factors for
-    //   Electricity
-    //   Natural gas
-    //   Distillate oil - FuelOilNo1
-    //   Liquefied petroleum gas - Propane
-    //   Residual oil - FuelOilNo2
-    //   Coal
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // related to LifeCycleCost:Parameters
-    bool LCCparamPresent(false);                  // If a LifeCycleCost:Parameters object is present
-    std::string LCCname;                          // Name
-    iDiscConv discountConvention(iDiscConv::EndOfYear);     // Discounting Convention
-    iInflAppr inflationApproach(iInflAppr::ConstantDollar); // Inflation Approach
-    Real64 realDiscountRate(0.0);                 // Real Discount Rate
-    Real64 nominalDiscountRate(0.0);              // Nominal Discount Rate
-    Real64 inflation(0.0);                        // Inflation
-    int baseDateMonth(0);                         // Base Date Month (1=Jan, 12=Dec)
-    int baseDateYear(0);                          // Base Date Year  1900-2100
-    int serviceDateMonth(0);                      // Service Date Month (1=Jan, 12=Dec)
-    int serviceDateYear(0);                       // Service Date Year 1900-2100
-    int lengthStudyYears(0);                      // Length of Study Period in Years
-    int lengthStudyTotalMonths(0);                // Length of Study expressed in months (years x 12)
-    Real64 taxRate(0.0);                          // Tax rate
-    iDeprMethod depreciationMethod(iDeprMethod::None);          // Depreciation Method
-    // derived
-    int lastDateMonth(0); // Last Date Month (the month before the base date month)
-    int lastDateYear(0);  // Last Date Year (base date year + length of study period in years)
 
     int numRecurringCosts(0);
 
@@ -284,12 +251,12 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (LCCparamPresent) {
+        if (state.dataEconLifeCycleCost->LCCparamPresent) {
             DisplayString(state, "Computing Life Cycle Costs and Reporting");
             ExpressAsCashFlows(state);
-            ComputePresentValue();
-            ComputeEscalatedEnergyCosts();
-            ComputeTaxAndDepreciation();
+            ComputePresentValue(state);
+            ComputeEscalatedEnergyCosts(state);
+            ComputeTaxAndDepreciation(state);
             WriteTabularLifeCycleCostReport(state);
         }
     }
@@ -330,9 +297,9 @@ namespace EconomicLifeCycleCost {
         NumObj = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumObj == 0) {
-            LCCparamPresent = false;
+            state.dataEconLifeCycleCost->LCCparamPresent = false;
         } else if (NumObj == 1) {
-            LCCparamPresent = true;
+            state.dataEconLifeCycleCost->LCCparamPresent = true;
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
@@ -356,7 +323,7 @@ namespace EconomicLifeCycleCost {
             //  A1,  \field Name
             //       \required-field
             //       \type alpha
-            LCCname = AlphaArray(1);
+            state.dataEconLifeCycleCost->LCCname = AlphaArray(1);
             //  A2, \field Discounting Convention
             //      \type choice
             //      \key EndOfYear
@@ -364,13 +331,13 @@ namespace EconomicLifeCycleCost {
             //      \key BeginningOfYear
             //      \default EndOfYear
             if (UtilityRoutines::SameString(AlphaArray(2), "EndOfYear")) {
-                discountConvention = iDiscConv::EndOfYear;
+                state.dataEconLifeCycleCost->discountConvention = iDiscConv::EndOfYear;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "MidYear")) {
-                discountConvention = iDiscConv::MidYear;
+                state.dataEconLifeCycleCost->discountConvention = iDiscConv::MidYear;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "BeginningOfYear")) {
-                discountConvention = iDiscConv::BeginOfYear;
+                state.dataEconLifeCycleCost->discountConvention = iDiscConv::BeginOfYear;
             } else {
-                discountConvention = iDiscConv::EndOfYear;
+                state.dataEconLifeCycleCost->discountConvention = iDiscConv::EndOfYear;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) + "\". EndOfYear will be used.");
             }
             // A3,  \field Inflation Approach
@@ -379,44 +346,44 @@ namespace EconomicLifeCycleCost {
             //      \key CurrentDollar
             //      \default ConstantDollar
             if (UtilityRoutines::SameString(AlphaArray(3), "ConstantDollar")) {
-                inflationApproach = iInflAppr::ConstantDollar;
+                state.dataEconLifeCycleCost->inflationApproach = iInflAppr::ConstantDollar;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "CurrentDollar")) {
-                inflationApproach = iInflAppr::CurrentDollar;
+                state.dataEconLifeCycleCost->inflationApproach = iInflAppr::CurrentDollar;
             } else {
-                inflationApproach = iInflAppr::ConstantDollar;
+                state.dataEconLifeCycleCost->inflationApproach = iInflAppr::ConstantDollar;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". ConstantDollar will be used.");
             }
             // N1,  \field Real Discount Rate
             //      \type real
-            realDiscountRate = NumArray(1);
-            if ((inflationApproach == iInflAppr::ConstantDollar) && lNumericFieldBlanks(1)) {
+            state.dataEconLifeCycleCost->realDiscountRate = NumArray(1);
+            if ((state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) && lNumericFieldBlanks(1)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(1) +
                                  " to be blank when ConstantDollar analysis is be used.");
             }
-            if ((realDiscountRate > 0.30) || (realDiscountRate < -0.30)) {
+            if ((state.dataEconLifeCycleCost->realDiscountRate > 0.30) || (state.dataEconLifeCycleCost->realDiscountRate < -0.30)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
             // N2,  \field Nominal Discount Rate
             //      \type real
-            nominalDiscountRate = NumArray(2);
-            if ((inflationApproach == iInflAppr::CurrentDollar) && lNumericFieldBlanks(2)) {
+            state.dataEconLifeCycleCost->nominalDiscountRate = NumArray(2);
+            if ((state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) && lNumericFieldBlanks(2)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(2) +
                                  " to be blank when CurrentDollar analysis is be used.");
             }
-            if ((nominalDiscountRate > 0.30) || (nominalDiscountRate < -0.30)) {
+            if ((state.dataEconLifeCycleCost->nominalDiscountRate > 0.30) || (state.dataEconLifeCycleCost->nominalDiscountRate < -0.30)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
             // N3,  \field Inflation
             //      \type real
-            inflation = NumArray(3);
-            if ((inflationApproach == iInflAppr::ConstantDollar) && (!lNumericFieldBlanks(3))) {
+            state.dataEconLifeCycleCost->inflation = NumArray(3);
+            if ((state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) && (!lNumericFieldBlanks(3))) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(3) +
                                  " contain a value when ConstantDollar analysis is be used.");
             }
-            if ((inflation > 0.30) || (inflation < -0.30)) {
+            if ((state.dataEconLifeCycleCost->inflation > 0.30) || (state.dataEconLifeCycleCost->inflation < -0.30)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                                  ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
             }
@@ -435,17 +402,17 @@ namespace EconomicLifeCycleCost {
             //      \key November
             //      \key December
             //      \default January
-            baseDateMonth = MonthToMonthNumber(AlphaArray(4), 1);
+            state.dataEconLifeCycleCost->baseDateMonth = MonthToMonthNumber(AlphaArray(4), 1);
             // N4,  \field Base Date Year
             //      \type integer
             //      \minimum 1900
             //      \maximum 2100
-            baseDateYear = int(NumArray(4));
-            if (baseDateYear > 2100) {
+            state.dataEconLifeCycleCost->baseDateYear = int(NumArray(4));
+            if (state.dataEconLifeCycleCost->baseDateYear > 2100) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
                                  ".  Value greater than 2100 yet it is representing a year. ");
             }
-            if (baseDateYear < 1900) {
+            if (state.dataEconLifeCycleCost->baseDateYear < 1900) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
                                  ".  Value less than 1900 yet it is representing a year. ");
             }
@@ -464,17 +431,17 @@ namespace EconomicLifeCycleCost {
             //      \key November
             //      \key December
             //      \default January
-            serviceDateMonth = MonthToMonthNumber(AlphaArray(5), 1);
+            state.dataEconLifeCycleCost->serviceDateMonth = MonthToMonthNumber(AlphaArray(5), 1);
             // N5,  \field Service Date Year
             //      \type integer
             //      \minimum 1900
             //      \maximum 2100
-            serviceDateYear = int(NumArray(5));
-            if (serviceDateYear > 2100) {
+            state.dataEconLifeCycleCost->serviceDateYear = int(NumArray(5));
+            if (state.dataEconLifeCycleCost->serviceDateYear > 2100) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
                                  ".  Value greater than 2100 yet it is representing a year. ");
             }
-            if (serviceDateYear < 1900) {
+            if (state.dataEconLifeCycleCost->serviceDateYear < 1900) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
                                  ".  Value less than 1900 yet it is representing a year. ");
             }
@@ -482,21 +449,21 @@ namespace EconomicLifeCycleCost {
             //      \type integer
             //      \minimum 1
             //      \maximum 100
-            lengthStudyYears = int(NumArray(6));
-            if (lengthStudyYears > 100) {
+            state.dataEconLifeCycleCost->lengthStudyYears = int(NumArray(6));
+            if (state.dataEconLifeCycleCost->lengthStudyYears > 100) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
                                  ".  A value greater than 100 is not reasonable for an economic evaluation. ");
             }
-            if (lengthStudyYears < 1) {
+            if (state.dataEconLifeCycleCost->lengthStudyYears < 1) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
                                  ".  A value less than 1 is not reasonable for an economic evaluation. ");
             }
-            lengthStudyTotalMonths = lengthStudyYears * 12;
+            state.dataEconLifeCycleCost->lengthStudyTotalMonths = state.dataEconLifeCycleCost->lengthStudyYears * 12;
             // N7, \field Tax rate
             //      \type real
             //      \minimum 0.0
-            taxRate = NumArray(7);
-            if (taxRate < 0.0 && (!lNumericFieldBlanks(7))) {
+            state.dataEconLifeCycleCost->taxRate = NumArray(7);
+            if (state.dataEconLifeCycleCost->taxRate < 0.0 && (!lNumericFieldBlanks(7))) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(10) +
                                  ".  A value less than 0 is not reasonable for a tax rate. ");
             }
@@ -515,41 +482,41 @@ namespace EconomicLifeCycleCost {
             //      \key None
             //      \default None
             if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-3year")) {
-                depreciationMethod = iDeprMethod::MACRS3;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS3;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-5year")) {
-                depreciationMethod = iDeprMethod::MACRS5;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS5;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-7year")) {
-                depreciationMethod = iDeprMethod::MACRS7;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS7;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-10year")) {
-                depreciationMethod = iDeprMethod::MACRS10;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS10;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-15year")) {
-                depreciationMethod = iDeprMethod::MACRS15;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS15;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "ModifiedAcceleratedCostRecoverySystem-20year")) {
-                depreciationMethod = iDeprMethod::MACRS20;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::MACRS20;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-27year")) {
-                depreciationMethod = iDeprMethod::Straight27;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::Straight27;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-31year")) {
-                depreciationMethod = iDeprMethod::Straight31;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::Straight31;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-39year")) {
-                depreciationMethod = iDeprMethod::Straight39;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::Straight39;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "StraightLine-40year")) {
-                depreciationMethod = iDeprMethod::Straight40;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::Straight40;
             } else if (UtilityRoutines::SameString(AlphaArray(6), "None")) {
-                depreciationMethod = iDeprMethod::None;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::None;
             } else if (lAlphaFieldBlanks(6)) {
-                depreciationMethod = iDeprMethod::None;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::None;
                 ShowWarningError(state, CurrentModuleObject + ": The input field " + cAlphaFieldNames(6) + "is blank. \"None\" will be used.");
             } else {
-                depreciationMethod = iDeprMethod::None;
+                state.dataEconLifeCycleCost->depreciationMethod = iDeprMethod::None;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(6) + "=\"" + AlphaArray(6) + R"(". "None" will be used.)");
             }
             // compute derived variables
-            lastDateMonth = baseDateMonth - 1; // same month of the year for first and last month
-            if (lastDateMonth == 0) lastDateMonth = 12;
-            lastDateYear = baseDateYear + lengthStudyYears - 1;
+            state.dataEconLifeCycleCost->lastDateMonth = state.dataEconLifeCycleCost->baseDateMonth - 1; // same month of the year for first and last month
+            if (state.dataEconLifeCycleCost->lastDateMonth == 0) state.dataEconLifeCycleCost->lastDateMonth = 12;
+            state.dataEconLifeCycleCost->lastDateYear = state.dataEconLifeCycleCost->baseDateYear + state.dataEconLifeCycleCost->lengthStudyYears - 1;
         } else {
             ShowWarningError(state, CurrentModuleObject + ": Only one instance of this object is allowed. No life-cycle cost reports will be generated.");
-            LCCparamPresent = false;
+            state.dataEconLifeCycleCost->LCCparamPresent = false;
         }
     }
 
@@ -574,7 +541,7 @@ namespace EconomicLifeCycleCost {
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
-        if (!LCCparamPresent) return;
+        if (!state.dataEconLifeCycleCost->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:RecurringCosts";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
@@ -756,7 +723,7 @@ namespace EconomicLifeCycleCost {
         std::string CurrentModuleObject; // for ease in renaming.
         int numComponentCostLineItems;   // number of ComponentCost:LineItem objects
 
-        if (!LCCparamPresent) return;
+        if (!state.dataEconLifeCycleCost->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
@@ -884,7 +851,7 @@ namespace EconomicLifeCycleCost {
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
-        if (!LCCparamPresent) return;
+        if (!state.dataEconLifeCycleCost->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
@@ -892,7 +859,7 @@ namespace EconomicLifeCycleCost {
         numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         UsePriceEscalation.allocate(numUsePriceEscalation);
         for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
-            UsePriceEscalation(iInObj).Escalation.allocate(lengthStudyYears);
+            UsePriceEscalation(iInObj).Escalation.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
         if (numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
@@ -973,7 +940,7 @@ namespace EconomicLifeCycleCost {
                 //      \begin-extensible
                 // The array is from the baseDateYear until baseDateYear + lengthStudyYears
                 // Set the array to default to 1.0
-                for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                     UsePriceEscalation(iInObj).Escalation(jYear) = 1.0;
                 }
                 // Since the years in the UsePriceEscalation may not match up with the baseDateYear and
@@ -982,13 +949,13 @@ namespace EconomicLifeCycleCost {
                 UsePriceEscalation_escStartYear = UsePriceEscalation(iInObj).escalationStartYear;
                 UsePriceEscalation_escNumYears = NumNums - 1;
                 UsePriceEscalation_escEndYear = UsePriceEscalation_escStartYear + UsePriceEscalation_escNumYears - 1;
-                UsePriceEscalation_earlierEndYear = min(UsePriceEscalation_escEndYear, lastDateYear);   // pick the earlier ending date
-                UsePriceEscalation_laterStartYear = max(UsePriceEscalation_escStartYear, baseDateYear); // pick the later starting date
+                UsePriceEscalation_earlierEndYear = min(UsePriceEscalation_escEndYear, state.dataEconLifeCycleCost->lastDateYear);   // pick the earlier ending date
+                UsePriceEscalation_laterStartYear = max(UsePriceEscalation_escStartYear, state.dataEconLifeCycleCost->baseDateYear); // pick the later starting date
                 for (jYear = UsePriceEscalation_laterStartYear; jYear <= UsePriceEscalation_earlierEndYear; ++jYear) {
                     UsePriceEscalation_curFld = 2 + jYear - UsePriceEscalation_escStartYear;
-                    UsePriceEscalation_curEsc = 1 + jYear - baseDateYear;
+                    UsePriceEscalation_curEsc = 1 + jYear - state.dataEconLifeCycleCost->baseDateYear;
                     if ((UsePriceEscalation_curFld <= NumNums) && (UsePriceEscalation_curFld >= 1)) {
-                        if ((UsePriceEscalation_curEsc <= lengthStudyYears) && (UsePriceEscalation_curEsc >= 1)) {
+                        if ((UsePriceEscalation_curEsc <= state.dataEconLifeCycleCost->lengthStudyYears) && (UsePriceEscalation_curEsc >= 1)) {
                             UsePriceEscalation(iInObj).Escalation(UsePriceEscalation_curEsc) = NumArray(UsePriceEscalation_curFld);
                         }
                     }
@@ -1020,7 +987,7 @@ namespace EconomicLifeCycleCost {
         std::string CurrentModuleObject; // for ease in renaming.
         int numFldsToUse;
 
-        if (!LCCparamPresent) return;
+        if (!state.dataEconLifeCycleCost->LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UseAdjustment";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
@@ -1028,7 +995,7 @@ namespace EconomicLifeCycleCost {
         numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         UseAdjustment.allocate(numUseAdjustment);
         for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
-            UseAdjustment(iInObj).Adjustment.allocate(lengthStudyYears);
+            UseAdjustment(iInObj).Adjustment.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
         if (numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
@@ -1079,10 +1046,10 @@ namespace EconomicLifeCycleCost {
                 //       \type real
                 //       \begin-extensible
                 // Set the array to default to 1.0
-                for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                     UseAdjustment(iInObj).Adjustment(jYear) = 1.0;
                 }
-                numFldsToUse = min(NumNums, lengthStudyYears);
+                numFldsToUse = min(NumNums, state.dataEconLifeCycleCost->lengthStudyYears);
                 for (jYear = 1; jYear <= numFldsToUse; ++jYear) {
                     UseAdjustment(iInObj).Adjustment(jYear) = NumArray(jYear);
                 }
@@ -1241,8 +1208,8 @@ namespace EconomicLifeCycleCost {
         int iLoop;
 
         // compute months from 1900 for base and service period
-        ExpressAsCashFlows_baseMonths1900 = (baseDateYear - 1900) * 12 + baseDateMonth;
-        ExpressAsCashFlows_serviceMonths1900 = (serviceDateYear - 1900) * 12 + serviceDateMonth;
+        ExpressAsCashFlows_baseMonths1900 = (state.dataEconLifeCycleCost->baseDateYear - 1900) * 12 + state.dataEconLifeCycleCost->baseDateMonth;
+        ExpressAsCashFlows_serviceMonths1900 = (state.dataEconLifeCycleCost->serviceDateYear - 1900) * 12 + state.dataEconLifeCycleCost->serviceDateMonth;
         monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
         if (state.dataCostEstimateManager->CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
@@ -1275,7 +1242,7 @@ namespace EconomicLifeCycleCost {
             resourceCostAnnual.at(iResource) = annualCost;
         }
         // allocate the escalated energy cost arrays
-        for (int year = 1; year <= lengthStudyYears; ++year) {
+        for (int year = 1; year <= state.dataEconLifeCycleCost->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
             for (auto iResource : DataGlobalConstants::AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
@@ -1283,19 +1250,19 @@ namespace EconomicLifeCycleCost {
             EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
         }
 
-        EscalatedTotEnergy.allocate(lengthStudyYears);
+        EscalatedTotEnergy.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         EscalatedTotEnergy = 0.0;
 
         // pre-compute the inflation factors for each year
-        monthlyInflationFactor.allocate(lengthStudyTotalMonths);
-        if (inflationApproach == iInflAppr::ConstantDollar) {
+        monthlyInflationFactor.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
+        if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) {
             monthlyInflationFactor = 1.0; // not really used but just in case
-        } else if (inflationApproach == iInflAppr::CurrentDollar) {
+        } else if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) {
             // to allocate an interest rate (in this case inflation) cannot just use 1/12
             // for the monthly value since it will be slightly wrong. Instead use inverse of
             // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
-            inflationPerMonth = std::pow(inflation + 1.0, 1.0 / 12.0) - 1;
-            for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+            inflationPerMonth = std::pow(state.dataEconLifeCycleCost->inflation + 1.0, 1.0 / 12.0) - 1;
+            for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
                 monthlyInflationFactor(jMonth) = std::pow(1.0 + inflationPerMonth, jMonth - 1);
             }
         }
@@ -1308,9 +1275,9 @@ namespace EconomicLifeCycleCost {
         //   4 resource costs
         CashFlow.allocate(numCashFlow);
         for (iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
-            CashFlow(iCashFlow).mnAmount.allocate(lengthStudyTotalMonths);
-            CashFlow(iCashFlow).yrAmount.allocate(lengthStudyYears);
-            CashFlow(iCashFlow).yrPresVal.allocate(lengthStudyYears);
+            CashFlow(iCashFlow).mnAmount.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
+            CashFlow(iCashFlow).yrAmount.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+            CashFlow(iCashFlow).yrPresVal.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             CashFlow(iCashFlow).mnAmount = 0.0;  // zero all cash flow values
             CashFlow(iCashFlow).yrAmount = 0.0;  // zero all cash flow values
             CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
@@ -1328,7 +1295,7 @@ namespace EconomicLifeCycleCost {
             } else if (NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
                 month = NonrecurringCost(jCost).totalMonthsFromStart + 1;
             }
-            if ((month >= 1) && (month <= lengthStudyTotalMonths)) {
+            if ((month >= 1) && (month <= state.dataEconLifeCycleCost->lengthStudyTotalMonths)) {
                 CashFlow(offset + jCost).mnAmount(month) = NonrecurringCost(jCost).cost * monthlyInflationFactor(month);
             } else {
                 ShowWarningError(state, "For life cycle costing a nonrecurring cost named " + NonrecurringCost(jCost).name +
@@ -1347,13 +1314,13 @@ namespace EconomicLifeCycleCost {
             } else if (RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
                 firstMonth = RecurringCosts(jCost).totalMonthsFromStart + 1;
             }
-            if ((firstMonth >= 1) && (firstMonth <= lengthStudyTotalMonths)) {
+            if ((firstMonth >= 1) && (firstMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths)) {
                 month = firstMonth;
                 if (RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
                     for (iLoop = 1; iLoop <= 10000; ++iLoop) { // add a limit to the loop to prevent runaway condition
                         CashFlow(offset + jCost).mnAmount(month) = RecurringCosts(jCost).cost * monthlyInflationFactor(month);
                         month += RecurringCosts(jCost).totalRepeatPeriodMonths;
-                        if (month > lengthStudyTotalMonths) break;
+                        if (month > state.dataEconLifeCycleCost->lengthStudyTotalMonths) break;
                     }
                 }
             } else {
@@ -1411,12 +1378,12 @@ namespace EconomicLifeCycleCost {
                         CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
                     }
                     CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
-                    for (int jMonth = monthsBaseToService + 13; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                    for (int jMonth = monthsBaseToService + 13; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
                         // use the cost from a year earlier
                         CashFlow(cashFlowCounter).mnAmount(jMonth) = CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
                     }
                     // add in the impact of inflation
-                    for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                    for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
                         CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
                     }
                     // now factor in adjustments
@@ -1430,10 +1397,10 @@ namespace EconomicLifeCycleCost {
                     }
                     // if any adjustments were found for that resource apply the multiplier
                     if (found != 0) {
-                        for (kYear = 1; kYear <= lengthStudyYears; ++kYear) { // if service period is later than base period then this will go too far
+                        for (kYear = 1; kYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++kYear) { // if service period is later than base period then this will go too far
                             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                                 month = (kYear - 1) * 12 + jMonth;
-                                if (month > lengthStudyTotalMonths) break;
+                                if (month > state.dataEconLifeCycleCost->lengthStudyTotalMonths) break;
                                 CashFlow(cashFlowCounter).mnAmount(month) *= UseAdjustment(found).Adjustment(kYear);
                             }
                         }
@@ -1450,13 +1417,13 @@ namespace EconomicLifeCycleCost {
         for (jCost = countOfCostCat + 1; jCost <= numCashFlow; ++jCost) {
             curCategory = CashFlow(jCost).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
-                for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
                     CashFlow(curCategory).mnAmount(jMonth) += CashFlow(jCost).mnAmount(jMonth);
                 }
             }
         }
         // create total categories
-        for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+        for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
             CashFlow(costCatTotEnergy).mnAmount(jMonth) = CashFlow(costCatEnergy).mnAmount(jMonth);
             CashFlow(costCatTotOper).mnAmount(jMonth) = CashFlow(costCatMaintenance).mnAmount(jMonth) + CashFlow(costCatRepair).mnAmount(jMonth) +
                                                         CashFlow(costCatOperation).mnAmount(jMonth) + CashFlow(costCatReplacement).mnAmount(jMonth) +
@@ -1470,11 +1437,11 @@ namespace EconomicLifeCycleCost {
         }
         // convert all monthly cashflows into yearly cashflows
         for (jCost = 1; jCost <= numCashFlow; ++jCost) {
-            for (kYear = 1; kYear <= lengthStudyYears; ++kYear) {
+            for (kYear = 1; kYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++kYear) {
                 annualCost = 0.0;
                 for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                     month = (kYear - 1) * 12 + jMonth;
-                    if (month <= lengthStudyTotalMonths) {
+                    if (month <= state.dataEconLifeCycleCost->lengthStudyTotalMonths) {
                         annualCost += CashFlow(jCost).mnAmount(month);
                     }
                 }
@@ -1492,7 +1459,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void ComputeEscalatedEnergyCosts()
+    void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
     {
         // J. Glazer - August 2019
         int nUsePriceEsc;
@@ -1514,11 +1481,11 @@ namespace EconomicLifeCycleCost {
                         }
                     }
                     if (found > 0) {
-                        for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                        for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                             EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear) * UsePriceEscalation(found).Escalation(jYear);
                         }
                     } else { // if no escalation than just store the original energy cost
-                        for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                        for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                             EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear);
                         }
                     }
@@ -1526,13 +1493,13 @@ namespace EconomicLifeCycleCost {
             }
         }
         for (auto kResource : DataGlobalConstants::AllResourceTypes) {
-            for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+            for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                 EscalatedTotEnergy(jYear) += EscalatedEnergy.at(jYear).at(kResource);
             }
         }
     }
 
-    void ComputePresentValue()
+    void ComputePresentValue(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1597,8 +1564,8 @@ namespace EconomicLifeCycleCost {
             }
         }
         // compute the Single Present Value factors based on the discount rate
-        SPV.allocate(lengthStudyYears);
-        for (int year = 1; year <= lengthStudyYears; ++year) {
+        SPV.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        for (int year = 1; year <= state.dataEconLifeCycleCost->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
             for (auto iResource : DataGlobalConstants::AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
@@ -1608,16 +1575,16 @@ namespace EconomicLifeCycleCost {
 
         // Depending if using Constant or Current Dollar analysis
         // use the appropriate discount rate
-        if (inflationApproach == iInflAppr::ConstantDollar) {
-            curDiscountRate = realDiscountRate;
-        } else if (inflationApproach == iInflAppr::CurrentDollar) {
-            curDiscountRate = nominalDiscountRate;
+        if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) {
+            curDiscountRate = state.dataEconLifeCycleCost->realDiscountRate;
+        } else if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) {
+            curDiscountRate = state.dataEconLifeCycleCost->nominalDiscountRate;
         }
         // compute single present values based on real discount rates
-        for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+        for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
             // NIST 155 D.2.1.1 - Single Present Value (SPV) formula
             {
-                auto const SELECT_CASE_var(discountConvention);
+                auto const SELECT_CASE_var(state.dataEconLifeCycleCost->discountConvention);
                 if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
                     effectiveYear = double(jYear) - 1.0;
                 } else if (SELECT_CASE_var == iDiscConv::MidYear) {
@@ -1630,7 +1597,7 @@ namespace EconomicLifeCycleCost {
             SPV(jYear) = 1.0 / std::pow(1.0 + curDiscountRate, effectiveYear);
         }
         // use SPV as default values for all energy types
-        for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+        for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
             for (auto kResource : DataGlobalConstants::AllResourceTypes) {
                 energySPV.at(jYear).at(kResource) = SPV(jYear);
             }
@@ -1639,10 +1606,10 @@ namespace EconomicLifeCycleCost {
         for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
             auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
             if (curResource != DataGlobalConstants::ResourceType::None) {
-                for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                     // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                     {
-                        auto const SELECT_CASE_var(discountConvention);
+                        auto const SELECT_CASE_var(state.dataEconLifeCycleCost->discountConvention);
                         if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
                             effectiveYear = double(jYear) - 1.0;
                         } else if (SELECT_CASE_var == iDiscConv::MidYear) {
@@ -1662,7 +1629,7 @@ namespace EconomicLifeCycleCost {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
                 if (SELECT_CASE_var == pvkNonEnergy) {
                     totalPV = 0.0;
-                    for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                    for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                         CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * SPV(jYear);
                         totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
                     }
@@ -1671,7 +1638,7 @@ namespace EconomicLifeCycleCost {
                     auto curResource = CashFlow(iCashFlow).Resource;
                     if (curResource != DataGlobalConstants::ResourceType::None) {
                         totalPV = 0.0;
-                        for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                        for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                             CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * energySPV.at(jYear).at(curResource);
                             totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
                         }
@@ -1690,7 +1657,7 @@ namespace EconomicLifeCycleCost {
             curCategory = CashFlow(iCashFlow).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
                 CashFlow(curCategory).presentValue += CashFlow(iCashFlow).presentValue;
-                for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                     CashFlow(curCategory).yrPresVal(jYear) += CashFlow(iCashFlow).yrPresVal(jYear);
                 }
             }
@@ -1704,7 +1671,7 @@ namespace EconomicLifeCycleCost {
         CashFlow(costCatTotCaptl).presentValue =
             CashFlow(costCatConstruction).presentValue + CashFlow(costCatSalvage).presentValue + CashFlow(costCatOtherCapital).presentValue;
         CashFlow(costCatTotGrand).presentValue = CashFlow(costCatTotOper).presentValue + CashFlow(costCatTotCaptl).presentValue;
-        for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+        for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
             CashFlow(costCatTotEnergy).yrPresVal(jYear) = CashFlow(costCatEnergy).yrPresVal(jYear);
             CashFlow(costCatTotOper).yrPresVal(jYear) = CashFlow(costCatMaintenance).yrPresVal(jYear) + CashFlow(costCatRepair).yrPresVal(jYear) +
                                                         CashFlow(costCatOperation).yrPresVal(jYear) + CashFlow(costCatReplacement).yrPresVal(jYear) +
@@ -1718,7 +1685,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void ComputeTaxAndDepreciation()
+    void ComputeTaxAndDepreciation(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1757,11 +1724,11 @@ namespace EconomicLifeCycleCost {
         int iYear;
         int jYear;
 
-        DepreciatedCapital.allocate(lengthStudyYears);
-        TaxableIncome.allocate(lengthStudyYears);
-        Taxes.allocate(lengthStudyYears);
-        AfterTaxCashFlow.allocate(lengthStudyYears);
-        AfterTaxPresentValue.allocate(lengthStudyYears);
+        DepreciatedCapital.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        TaxableIncome.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        Taxes.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        AfterTaxCashFlow.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        AfterTaxPresentValue.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
 
         // Depreciation factors are based on IRS Publication 946 for 2009 "How to Depreciate Property"
         // The MACRS valus are based on Modified Accelerated Cost Recovery System GDS for 3, 5, 7, 10 year
@@ -1774,7 +1741,7 @@ namespace EconomicLifeCycleCost {
         // the June value was used.
         DepreciationPercent = 0.0; // default all values to zero
         {
-            auto const SELECT_CASE_var(depreciationMethod);
+            auto const SELECT_CASE_var(state.dataEconLifeCycleCost->depreciationMethod);
             if (SELECT_CASE_var == iDeprMethod::MACRS3) { // IRS Publication 946 for 2009 Table A-1
                 DepreciationPercent(1) = 33.33;
                 DepreciationPercent(2) = 44.45;
@@ -1996,11 +1963,11 @@ namespace EconomicLifeCycleCost {
         }
         // convert construction costs (not salvage) into depreciation
         DepreciatedCapital = 0.0; // set all years to zero
-        for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+        for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
             curCapital = CashFlow(costCatConstruction).yrAmount(iYear) + CashFlow(costCatOtherCapital).yrAmount(iYear);
             for (jYear = 1; jYear <= SizeDepr; ++jYear) {
                 curDepYear = iYear + jYear - 1; // start depreciating with the year that the capital was shown and go to years following
-                if (curDepYear <= lengthStudyYears) {
+                if (curDepYear <= state.dataEconLifeCycleCost->lengthStudyYears) {
                     DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercent(jYear) / 100);
                 }
             }
@@ -2011,9 +1978,9 @@ namespace EconomicLifeCycleCost {
         //   taxable income (before-tax cash flow - depreciation)
         //   income taxes (taxable income x incremental tax rate)
         //   after-tax cash flow (before-tax cash flow - income taxes)
-        for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+        for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
             TaxableIncome(iYear) = CashFlow(costCatTotGrand).yrAmount(iYear) - DepreciatedCapital(iYear);
-            Taxes(iYear) = TaxableIncome(iYear) * taxRate;
+            Taxes(iYear) = TaxableIncome(iYear) * state.dataEconLifeCycleCost->taxRate;
             AfterTaxCashFlow(iYear) = CashFlow(costCatTotGrand).yrAmount(iYear) - Taxes(iYear);
             // the present value after taxes is pretax present value minus the present value of the taxes
             AfterTaxPresentValue(iYear) = CashFlow(costCatTotGrand).yrPresVal(iYear) - Taxes(iYear) * SPV(iYear);
@@ -2081,7 +2048,7 @@ namespace EconomicLifeCycleCost {
         int numYears;
         Real64 totalPV;
 
-        if (LCCparamPresent && state.dataOutRptTab->displayLifeCycleCostReport) {
+        if (state.dataEconLifeCycleCost->LCCparamPresent && state.dataOutRptTab->displayLifeCycleCostReport) {
             //---------------------------------
             // Life-Cycle Cost Verification and Results Report
             //---------------------------------
@@ -2105,40 +2072,40 @@ namespace EconomicLifeCycleCost {
             rowHead(11) = "Depreciation Method";
             columnHead(1) = "Value";
 
-            tableBody(1, 1) = LCCname;
-            if (discountConvention == iDiscConv::EndOfYear) {
+            tableBody(1, 1) = state.dataEconLifeCycleCost->LCCname;
+            if (state.dataEconLifeCycleCost->discountConvention == iDiscConv::EndOfYear) {
                 tableBody(1, 2) = "EndOfYear";
-            } else if (discountConvention == iDiscConv::MidYear) {
+            } else if (state.dataEconLifeCycleCost->discountConvention == iDiscConv::MidYear) {
                 tableBody(1, 2) = "MidYear";
-            } else if (discountConvention == iDiscConv::BeginOfYear) {
+            } else if (state.dataEconLifeCycleCost->discountConvention == iDiscConv::BeginOfYear) {
                 tableBody(1, 2) = "BeginningOfYear";
             }
-            if (inflationApproach == iInflAppr::ConstantDollar) {
+            if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) {
                 tableBody(1, 3) = "ConstantDollar";
-            } else if (inflationApproach == iInflAppr::CurrentDollar) {
+            } else if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) {
                 tableBody(1, 3) = "CurrentDollar";
             }
-            if (inflationApproach == iInflAppr::ConstantDollar) {
-                tableBody(1, 4) = RealToStr(realDiscountRate, 4);
+            if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::ConstantDollar) {
+                tableBody(1, 4) = RealToStr(state.dataEconLifeCycleCost->realDiscountRate, 4);
             } else {
                 tableBody(1, 4) = "-- N/A --";
             }
-            if (inflationApproach == iInflAppr::CurrentDollar) {
-                tableBody(1, 5) = RealToStr(nominalDiscountRate, 4);
+            if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) {
+                tableBody(1, 5) = RealToStr(state.dataEconLifeCycleCost->nominalDiscountRate, 4);
             } else {
                 tableBody(1, 5) = "-- N/A --";
             }
-            if (inflationApproach == iInflAppr::CurrentDollar) {
-                tableBody(1, 6) = RealToStr(inflation, 4);
+            if (state.dataEconLifeCycleCost->inflationApproach == iInflAppr::CurrentDollar) {
+                tableBody(1, 6) = RealToStr(state.dataEconLifeCycleCost->inflation, 4);
             } else {
                 tableBody(1, 6) = "-- N/A --";
             }
-            tableBody(1, 7) = format("{} {}", MonthNames(baseDateMonth), baseDateYear);
-            tableBody(1, 8) = format("{} {}", MonthNames(serviceDateMonth), serviceDateYear);
-            tableBody(1, 9) = fmt::to_string(lengthStudyYears);
-            tableBody(1, 10) = RealToStr(taxRate, 4);
+            tableBody(1, 7) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear);
+            tableBody(1, 8) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->serviceDateMonth), state.dataEconLifeCycleCost->serviceDateYear);
+            tableBody(1, 9) = fmt::to_string(state.dataEconLifeCycleCost->lengthStudyYears);
+            tableBody(1, 10) = RealToStr(state.dataEconLifeCycleCost->taxRate, 4);
             {
-                auto const SELECT_CASE_var(depreciationMethod);
+                auto const SELECT_CASE_var(state.dataEconLifeCycleCost->depreciationMethod);
                 if (SELECT_CASE_var == iDeprMethod::MACRS3) {
                     tableBody(1, 11) = "ModifiedAcceleratedCostRecoverySystem-3year";
                 } else if (SELECT_CASE_var == iDeprMethod::MACRS5) {
@@ -2181,15 +2148,15 @@ namespace EconomicLifeCycleCost {
             tableBody.deallocate();
             //---- Use Price Escalation
             numColumns = max(1, numUsePriceEscalation);
-            rowHead.allocate(lengthStudyYears + 2);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 2);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
-            tableBody.allocate(numColumns, lengthStudyYears + 2);
+            tableBody.allocate(numColumns, state.dataEconLifeCycleCost->lengthStudyYears + 2);
             tableBody = "";
             columnHead = "none";
             rowHead(1) = "Resource";
             rowHead(2) = "Start Date";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear + 2) = fmt::to_string(iYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
@@ -2199,7 +2166,7 @@ namespace EconomicLifeCycleCost {
                     format("{} {}", MonthNames(UsePriceEscalation(jObj).escalationStartMonth), UsePriceEscalation(jObj).escalationStartYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) {
-                for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear + 2) = RealToStr(UsePriceEscalation(jObj).Escalation(iYear), 6);
                 }
             }
@@ -2220,7 +2187,7 @@ namespace EconomicLifeCycleCost {
             //---- Use Adjustment
             if (numUseAdjustment >= 1) { // only create table if objects used
                 numColumns = max(1, numUseAdjustment);
-                numYears = lengthStudyYears - (serviceDateYear - baseDateYear);
+                numYears = state.dataEconLifeCycleCost->lengthStudyYears - (state.dataEconLifeCycleCost->serviceDateYear - state.dataEconLifeCycleCost->baseDateYear);
                 rowHead.allocate(numYears + 1);
                 columnHead.allocate(numColumns);
                 columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2229,7 +2196,7 @@ namespace EconomicLifeCycleCost {
                 columnHead = "none";
                 rowHead(1) = "";
                 for (iYear = 1; iYear <= numYears; ++iYear) {
-                    rowHead(iYear + 1) = format("{} {}", MonthNames(serviceDateMonth), serviceDateYear + iYear - 1);
+                    rowHead(iYear + 1) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->serviceDateMonth), state.dataEconLifeCycleCost->serviceDateYear + iYear - 1);
                 }
                 for (jObj = 1; jObj <= numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                     columnHead(jObj) = UseAdjustment(jObj).name;
@@ -2257,14 +2224,14 @@ namespace EconomicLifeCycleCost {
             }
             //---- Cash Flow for Recurring and Nonrecurring Costs
             numColumns = max(1, numRecurringCosts + numNonrecurringCost);
-            rowHead.allocate(lengthStudyYears + 1);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 1);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
-            tableBody.allocate(numColumns, lengthStudyYears + 1);
+            tableBody.allocate(numColumns, state.dataEconLifeCycleCost->lengthStudyYears + 1);
             tableBody = "";
             rowHead(1) = "";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear + 1) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear + 1) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= (numRecurringCosts + numNonrecurringCost); ++jObj) {
                 curCashFlow = countOfCostCat + jObj;
@@ -2277,7 +2244,7 @@ namespace EconomicLifeCycleCost {
                         tableBody(jObj, 1) = "Recurring";
                     }
                 }
-                for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear + 1) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
@@ -2306,23 +2273,23 @@ namespace EconomicLifeCycleCost {
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (Without Escalation)
             numColumns = max(1, numResourcesUsed + 1);
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
-            tableBody.allocate(numColumns, lengthStudyYears);
+            tableBody.allocate(numColumns, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
-                for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
             columnHead(numColumns) = "Total";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
@@ -2349,30 +2316,30 @@ namespace EconomicLifeCycleCost {
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (With Escalation)
             numColumns = max(1, numResourcesUsed + 1);
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
-            tableBody.allocate(numColumns, lengthStudyYears);
+            tableBody.allocate(numColumns, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 auto curResource = CashFlow(curCashFlow).Resource;
                 if (CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
-                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                    for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                         tableBody(jObj, iYear) = RealToStr(EscalatedEnergy.at(iYear).at(curResource), 2);
                     }
                 } else { // for water just use the original cashflow since not involved in escalation
-                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                    for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                         tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                     }
                 }
             }
             columnHead(numColumns) = "Total";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
@@ -2399,18 +2366,18 @@ namespace EconomicLifeCycleCost {
             tableBody.deallocate();
 
             //---- Capital Cash Flow by Category
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(4);
             columnWidth.allocate(4);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(4, lengthStudyYears);
+            tableBody.allocate(4, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
             columnHead(1) = "Construction";
             columnHead(2) = "Salvage";
             columnHead(3) = "OtherCapital";
             columnHead(4) = "Total";
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatConstruction).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatSalvage).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
@@ -2439,11 +2406,11 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Operating Cash Flow by Category (Without Escalation)
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(10);
             columnWidth.allocate(10);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(10, lengthStudyYears);
+            tableBody.allocate(10, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
             columnHead(1) = "Energy";
             columnHead(2) = "Water";
@@ -2456,8 +2423,8 @@ namespace EconomicLifeCycleCost {
             columnHead(9) = "OtherOperational";
             columnHead(10) = "Total";
 
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatEnergy).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
@@ -2492,11 +2459,11 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Operating Cash Flow by Category (With Escalation)
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(10);
             columnWidth.allocate(10);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(10, lengthStudyYears);
+            tableBody.allocate(10, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
             columnHead(1) = "Energy";
             columnHead(2) = "Water";
@@ -2509,8 +2476,8 @@ namespace EconomicLifeCycleCost {
             columnHead(9) = "OtherOperational";
             columnHead(10) = "Total";
 
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
@@ -2549,10 +2516,10 @@ namespace EconomicLifeCycleCost {
             //---- DEBUG ONLY - Monthly Cash Flows
             bool showMonthlyCashFlows = false;
             if (showMonthlyCashFlows) {
-                rowHead.allocate(lengthStudyTotalMonths);
+                rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
                 columnHead.allocate(numCashFlow);
                 columnWidth.allocate(numCashFlow);
-                tableBody.allocate(numCashFlow, lengthStudyTotalMonths);
+                tableBody.allocate(numCashFlow, state.dataEconLifeCycleCost->lengthStudyTotalMonths);
                 tableBody = "";
                 columnHead(1) = "mnt";
                 columnHead(2) = "rpr";
@@ -2573,10 +2540,10 @@ namespace EconomicLifeCycleCost {
                 for (jObj = countOfCostCat + 1; jObj <= numCashFlow; ++jObj) {
                     columnHead(jObj) = CashFlow(jObj).name;
                 }
-                for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
-                    rowHead(kMonth) = format("{} {}", MonthNames(1 + (kMonth + baseDateMonth - 2) % 12), baseDateYear + int((kMonth - 1) / 12));
+                for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
+                    rowHead(kMonth) = format("{} {}", MonthNames(1 + (kMonth + state.dataEconLifeCycleCost->baseDateMonth - 2) % 12), state.dataEconLifeCycleCost->baseDateYear + int((kMonth - 1) / 12));
                 }
-                for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
+                for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
                     for (jObj = 1; jObj <= numCashFlow; ++jObj) {
                         tableBody(jObj, kMonth) = RealToStr(CashFlow(jObj).mnAmount(kMonth), 2);
                     }
@@ -2597,19 +2564,19 @@ namespace EconomicLifeCycleCost {
                 tableBody.deallocate();
             }
             //---- Monthly Total Cash Flow
-            rowHead.allocate(lengthStudyYears);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
             columnHead.allocate(12);
             columnWidth.allocate(12);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(12, lengthStudyYears);
+            tableBody.allocate(12, state.dataEconLifeCycleCost->lengthStudyYears);
             tableBody = "";
             for (kMonth = 1; kMonth <= 12; ++kMonth) {
                 columnHead(kMonth) = MonthNames(kMonth);
             }
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = fmt::to_string(baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = fmt::to_string(state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
             }
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
                     tableBody(kMonth, iYear) = RealToStr(CashFlow(costCatTotGrand).mnAmount((iYear - 1) * 12 + kMonth), 2);
                 }
@@ -2782,19 +2749,19 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Present Value by Year
-            rowHead.allocate(lengthStudyYears + 1);
+            rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 1);
             columnHead.allocate(3);
             columnWidth.allocate(3);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(3, lengthStudyYears + 1);
+            tableBody.allocate(3, state.dataEconLifeCycleCost->lengthStudyYears + 1);
             tableBody = "";
             columnHead(1) = "Total Cost (Without Escalation)";
             columnHead(2) = "Total Cost (With Escalation)";
             columnHead(3) = "Present Value of Costs";
 
             totalPV = 0.0;
-            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+            for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatTotGrand).yrAmount(iYear), 2);
                 // adjust for escalated energy costs
                 Real64 yearly_total_cost =
@@ -2804,8 +2771,8 @@ namespace EconomicLifeCycleCost {
                 totalPV += CashFlow(costCatTotGrand).yrPresVal(iYear);
             }
 
-            rowHead(lengthStudyYears + 1) = "TOTAL";
-            tableBody(3, lengthStudyYears + 1) = RealToStr(totalPV, 2);
+            rowHead(state.dataEconLifeCycleCost->lengthStudyYears + 1) = "TOTAL";
+            tableBody(3, state.dataEconLifeCycleCost->lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
             WriteSubtitle(state, "Present Value by Year");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2822,12 +2789,12 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- After Tax Estimate
-            if (taxRate != 0.0) {
-                rowHead.allocate(lengthStudyYears + 1);
+            if (state.dataEconLifeCycleCost->taxRate != 0.0) {
+                rowHead.allocate(state.dataEconLifeCycleCost->lengthStudyYears + 1);
                 columnHead.allocate(5);
                 columnWidth.allocate(5);
                 columnWidth = 14; // array assignment - same for all columns
-                tableBody.allocate(5, lengthStudyYears + 1);
+                tableBody.allocate(5, state.dataEconLifeCycleCost->lengthStudyYears + 1);
                 tableBody = "";
                 columnHead(1) = "Depreciated Capital";
                 columnHead(2) = "Taxable Income";
@@ -2836,8 +2803,8 @@ namespace EconomicLifeCycleCost {
                 columnHead(5) = "After Tax Present Value";
 
                 totalPV = 0.0;
-                for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                    rowHead(iYear) = format("{} {}", MonthNames(baseDateMonth), baseDateYear + iYear - 1);
+                for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
+                    rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
                     tableBody(1, iYear) = RealToStr(DepreciatedCapital(iYear), 2);
                     tableBody(2, iYear) = RealToStr(TaxableIncome(iYear), 2);
                     tableBody(3, iYear) = RealToStr(Taxes(iYear), 2);
@@ -2846,8 +2813,8 @@ namespace EconomicLifeCycleCost {
                     totalPV += AfterTaxPresentValue(iYear);
                 }
 
-                rowHead(lengthStudyYears + 1) = "TOTAL";
-                tableBody(5, lengthStudyYears + 1) = RealToStr(totalPV, 2);
+                rowHead(state.dataEconLifeCycleCost->lengthStudyYears + 1) = "TOTAL";
+                tableBody(5, state.dataEconLifeCycleCost->lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
                 WriteSubtitle(state, "After Tax Estimate");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2869,23 +2836,6 @@ namespace EconomicLifeCycleCost {
 
     void clear_state()
     {
-        LCCparamPresent = false;
-        LCCname = "";
-        discountConvention = iDiscConv::EndOfYear;
-        inflationApproach = iInflAppr::ConstantDollar;
-        realDiscountRate = 0.0;
-        nominalDiscountRate = 0.0;
-        inflation = 0.0;
-        baseDateMonth = 0;
-        baseDateYear = 0;
-        serviceDateMonth = 0;
-        serviceDateYear = 0;
-        lengthStudyYears = 0;
-        lengthStudyTotalMonths = 0;
-        taxRate = 0.0;
-        depreciationMethod = iDeprMethod::None;
-        lastDateMonth = 0;
-        lastDateYear = 0;
         numRecurringCosts = 0;
         numNonrecurringCost = 0;
         numUsePriceEscalation = 0;
