@@ -102,15 +102,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
 
-    int const skRecurring(1);
-    int const skNonrecurring(2);
-    int const skResource(3);
-    int const skSum(4);
-
-    int const pvkEnergy(1);
-    int const pvkNonEnergy(2);
-    int const pvkNotComputed(3);
-
     // present value factors
     Array1D<Real64> SPV;
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>>  energySPV; // yearly equivalent to FEMP UPV* values
@@ -1250,7 +1241,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         offset = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts;
         for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numNonrecurringCost; ++jCost) {
             CashFlow(offset + jCost).name = NonrecurringCost(jCost).name;
-            CashFlow(offset + jCost).SourceKind = skNonrecurring;
+            CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
             CashFlow(offset + jCost).Category = NonrecurringCost(jCost).category;
             CashFlow(offset + jCost).orginalCost = NonrecurringCost(jCost).cost;
             CashFlow(offset + jCost).mnAmount = 0.0;
@@ -1270,7 +1261,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         offset = countOfCostCat;
         for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numRecurringCosts; ++jCost) {
             CashFlow(offset + jCost).name = RecurringCosts(jCost).name;
-            CashFlow(offset + jCost).SourceKind = skRecurring;
+            CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
             CashFlow(offset + jCost).Category = RecurringCosts(jCost).category;
             CashFlow(offset + jCost).orginalCost = RecurringCosts(jCost).cost;
             if (RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
@@ -1332,7 +1323,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 }
 
                 CashFlow(cashFlowCounter).Resource = iResource;
-                CashFlow(cashFlowCounter).SourceKind = skResource;
+                CashFlow(cashFlowCounter).SourceKind = iSourceKind::Resource;
                 CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
                 if (cashFlowCounter <= state.dataEconLifeCycleCost->numCashFlow) {
                     // put the monthly energy costs into the cashflow prior to adjustments
@@ -1375,7 +1366,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // put cashflows into categories
         for (jCost = 1; jCost <= countOfCostCat; ++jCost) {
             CashFlow(jCost).Category = jCost; // make each category the type indicated
-            CashFlow(jCost).SourceKind = skSum;
+            CashFlow(jCost).SourceKind = iSourceKind::Sum;
         }
         // add the cashflows by category
         for (jCost = countOfCostCat + 1; jCost <= state.dataEconLifeCycleCost->numCashFlow; ++jCost) {
@@ -1429,7 +1420,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         int nUsePriceEsc;
 
          for (int iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
-            if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
+            if (CashFlow(iCashFlow).pvKind == iPrValKind::Energy) {
                 // make sure this is not water
                 auto curResource = CashFlow(iCashFlow).Resource;
                 if (CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
@@ -1507,23 +1498,23 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).SourceKind);
-                if (SELECT_CASE_var == skResource) {
+                if (SELECT_CASE_var == iSourceKind::Resource) {
                     // only for real fuels purchased such as electricity, natural gas, etc..
                     if ((CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::Electricity) && (CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
-                        CashFlow(iCashFlow).pvKind = pvkEnergy;
+                        CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
                     } else {
-                        CashFlow(iCashFlow).pvKind = pvkNonEnergy;
+                        CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
                     }
-                } else if ((SELECT_CASE_var == skRecurring) || (SELECT_CASE_var == skNonrecurring)) {
+                } else if ((SELECT_CASE_var == iSourceKind::Recurring) || (SELECT_CASE_var == iSourceKind::Nonrecurring)) {
                     if (CashFlow(iCashFlow).Category == costCatEnergy) {
-                        CashFlow(iCashFlow).pvKind = pvkEnergy;
+                        CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
                     } else {
-                        CashFlow(iCashFlow).pvKind = pvkNonEnergy;
+                        CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
                     }
-                } else if (SELECT_CASE_var == skSum) {
-                    CashFlow(iCashFlow).pvKind = pvkNotComputed;
+                } else if (SELECT_CASE_var == iSourceKind::Sum) {
+                    CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
                 } else {
-                    CashFlow(iCashFlow).pvKind = pvkNotComputed;
+                    CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
                 }
             }
         }
@@ -1591,14 +1582,14 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
-                if (SELECT_CASE_var == pvkNonEnergy) {
+                if (SELECT_CASE_var == iPrValKind::NonEnergy) {
                     totalPV = 0.0;
                     for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                         CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * SPV(jYear);
                         totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
                     }
                     CashFlow(iCashFlow).presentValue = totalPV;
-                } else if (SELECT_CASE_var == pvkEnergy) {
+                } else if (SELECT_CASE_var == iPrValKind::Energy) {
                     auto curResource = CashFlow(iCashFlow).Resource;
                     if (curResource != DataGlobalConstants::ResourceType::None) {
                         totalPV = 0.0;
@@ -1608,7 +1599,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                         }
                         CashFlow(iCashFlow).presentValue = totalPV;
                     }
-                } else if (SELECT_CASE_var == pvkNotComputed) {
+                } else if (SELECT_CASE_var == iPrValKind::NotComputed) {
                     // do nothing
                 }
             }
@@ -2202,9 +2193,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 columnHead(jObj) = CashFlow(curCashFlow).name;
                 {
                     auto const SELECT_CASE_var(CashFlow(curCashFlow).SourceKind);
-                    if (SELECT_CASE_var == skNonrecurring) {
+                    if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
                         tableBody(jObj, 1) = "Nonrecurring";
-                    } else if (SELECT_CASE_var == skRecurring) {
+                    } else if (SELECT_CASE_var == iSourceKind::Recurring) {
                         tableBody(jObj, 1) = "Recurring";
                     }
                 }
@@ -2609,11 +2600,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 }
                 {
                     auto const SELECT_CASE_var(CashFlow(offset + jObj).SourceKind);
-                    if (SELECT_CASE_var == skNonrecurring) {
+                    if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
                         tableBody(2, jObj) = "Nonrecurring";
-                    } else if (SELECT_CASE_var == skRecurring) {
+                    } else if (SELECT_CASE_var == iSourceKind::Recurring) {
                         tableBody(2, jObj) = "Recurring";
-                    } else if (SELECT_CASE_var == skResource) {
+                    } else if (SELECT_CASE_var == iSourceKind::Resource) {
                         if (CashFlow(offset + jObj).Category == costCatWater) {
                             tableBody(2, jObj) = "Water Cost";
                         } else {

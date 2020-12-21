@@ -126,13 +126,20 @@ namespace EconomicLifeCycleCost {
         BasePeriod,
     };
 
-    extern int const skRecurring;
-    extern int const skNonrecurring;
-    extern int const skResource;
-    extern int const skSum;
-    extern int const pvkEnergy;
-    extern int const pvkNonEnergy;
-    extern int const pvkNotComputed;
+    enum class iSourceKind {
+        Unassigned,
+        Recurring,
+        Nonrecurring,
+        Resource,
+        Sum,
+    };
+
+    enum class iPrValKind {
+        Unassigned,
+        Energy,
+        NonEnergy,
+        NotComputed,
+    };
 
     // present value factors
     extern Array1D<Real64> SPV;
@@ -261,20 +268,22 @@ namespace EconomicLifeCycleCost {
     struct CashFlowType
     {
         // Members
-        std::string name;         // Name - just for labeling output - use Category for aggregation
-        int SourceKind;           // 1=recurring, 2=nonrecurring, 3=resource
-        DataGlobalConstants::ResourceType Resource;             // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int Category;             // uses "costCat" constants above
-        Array1D<Real64> mnAmount; // cashflow dollar amount by month, first year is baseDateYear
+        std::string name;                           // Name - just for labeling output - use Category for aggregation
+        iSourceKind SourceKind;                     // 1=recurring, 2=nonrecurring, 3=resource
+        DataGlobalConstants::ResourceType Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        int Category;                               // uses "costCat" constants above
+        Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
-        int pvKind;                // kind of present value 1=energy, 2=non-energy,3=not computed but summed
+        iPrValKind pvKind;         // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : SourceKind(0), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
+        CashFlowType()
+            : SourceKind(iSourceKind::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(iPrValKind::Unassigned),
+              presentValue(0.), orginalCost(0.)
         {
         }
     };
