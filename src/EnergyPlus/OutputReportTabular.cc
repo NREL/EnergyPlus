@@ -212,7 +212,6 @@ namespace OutputReportTabular {
     int const numSourceTypes(12);
 
     static std::string const validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
-    static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -773,7 +772,7 @@ namespace OutputReportTabular {
                 GatherMonthlyResultsForTimestep(state, t_timeStepType);
                 OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(state, t_timeStepType);
                 GatherBinResultsForTimestep(state, t_timeStepType);
-                GatherBEPSResultsForTimestep(t_timeStepType);
+                GatherBEPSResultsForTimestep(state, t_timeStepType);
                 GatherSourceEnergyEndUseResultsForTimestep(state, t_timeStepType);
                 GatherPeakDemandForTimestep(state, t_timeStepType);
                 GatherHeatGainReport(state, t_timeStepType);
@@ -1946,13 +1945,6 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
 
-        using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("Output:Table:SummaryReports");
 
@@ -2288,31 +2280,31 @@ namespace OutputReportTabular {
             endUseNames(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
             // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-            meterNumEndUseSubBEPS.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             meterNumEndUseSubBEPS = 0;
 
             // loop through all of the resources and end uses and sub end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 meterName = resourceTypeNames(iResource) + ":FACILITY";
-                meterNumber = GetMeterIndex(meterName);
+                meterNumber = GetMeterIndex(state, meterName);
                 meterNumTotalsBEPS(iResource) = meterNumber;
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     meterName = endUseNames(jEndUse) + ':' + resourceTypeNames(iResource); //// ':FACILITY'
-                    meterNumber = GetMeterIndex(meterName);
+                    meterNumber = GetMeterIndex(state, meterName);
                     meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         meterName =
-                            EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + endUseNames(jEndUse) + ':' + resourceTypeNames(iResource);
-                        meterNumber = GetMeterIndex(meterName);
+                            state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + endUseNames(jEndUse) + ':' + resourceTypeNames(iResource);
+                        meterNumber = GetMeterIndex(state, meterName);
                         meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                     }
                 }
             }
 
             for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-                meterNumber = GetMeterIndex(sourceTypeNames(iResource) + "Emissions:Source");
+                meterNumber = GetMeterIndex(state, sourceTypeNames(iResource) + "Emissions:Source");
                 meterNumTotalsSource(iResource) = meterNumber;
             }
 
@@ -2324,28 +2316,28 @@ namespace OutputReportTabular {
             gatherEndUseBEPS = 0.0;
             gatherEndUseBySourceBEPS = 0.0;
             // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-            gatherEndUseSubBEPS.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherEndUseSubBEPS = 0.0;
-            gatherDemandEndUseSub.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherDemandEndUseSub = 0.0;
-            gatherDemandIndEndUseSub.allocate(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
+            gatherDemandIndEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), numResourceTypes);
             gatherDemandIndEndUseSub = 0.0;
 
             // get meter numbers for other meters relating to electric load components
-            meterNumPowerFuelFireGen = GetMeterIndex("Cogeneration:ElectricityProduced");
-            meterNumPowerPV = GetMeterIndex("Photovoltaic:ElectricityProduced");
-            meterNumPowerWind = GetMeterIndex("WindTurbine:ElectricityProduced");
-            meterNumPowerHTGeothermal = GetMeterIndex("HTGeothermal:ElectricityProduced");
-            meterNumElecStorage = GetMeterIndex("ElectricStorage:ElectricityProduced");
-            meterNumPowerConversion = GetMeterIndex("PowerConversion:ElectricityProduced");
-            meterNumElecProduced = GetMeterIndex("ElectricityProduced:Facility");
-            meterNumElecPurchased = GetMeterIndex("ElectricityPurchased:Facility");
-            meterNumElecSurplusSold = GetMeterIndex("ElectricitySurplusSold:Facility");
+            meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
+            meterNumPowerPV = GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
+            meterNumPowerWind = GetMeterIndex(state, "WindTurbine:ElectricityProduced");
+            meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGeothermal:ElectricityProduced");
+            meterNumElecStorage = GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
+            meterNumPowerConversion = GetMeterIndex(state, "PowerConversion:ElectricityProduced");
+            meterNumElecProduced = GetMeterIndex(state, "ElectricityProduced:Facility");
+            meterNumElecPurchased = GetMeterIndex(state, "ElectricityPurchased:Facility");
+            meterNumElecSurplusSold = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
             // if no ElectricityPurchased:Facility meter is defined then no electric load center
             // was created by the user and no power generation will occur in the plant. The amount
             // purchased would be the total end use.
             if (meterNumElecPurchased == 0) {
-                meterNumElecPurchased = GetMeterIndex("Electricity:Facility");
+                meterNumElecPurchased = GetMeterIndex(state, "Electricity:Facility");
             }
 
             // initialize the gathering variables for the electric load components
@@ -2360,12 +2352,12 @@ namespace OutputReportTabular {
             gatherPowerConversion = 0.0;
 
             // get meter numbers for onsite thermal components on BEPS report
-            meterNumWaterHeatRecovery = GetMeterIndex("HeatRecovery:EnergyTransfer");
-            meterNumAirHeatRecoveryCool = GetMeterIndex("HeatRecoveryForCooling:EnergyTransfer");
-            meterNumAirHeatRecoveryHeat = GetMeterIndex("HeatRecoveryForHeating:EnergyTransfer");
-            meterNumHeatHTGeothermal = GetMeterIndex("HTGeothermal:HeatProduced");
-            meterNumHeatSolarWater = GetMeterIndex("SolarWater:Facility");
-            meterNumHeatSolarAir = GetMeterIndex("HeatProduced:SolarAir");
+            meterNumWaterHeatRecovery = GetMeterIndex(state, "HeatRecovery:EnergyTransfer");
+            meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HeatRecoveryForCooling:EnergyTransfer");
+            meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HeatRecoveryForHeating:EnergyTransfer");
+            meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGeothermal:HeatProduced");
+            meterNumHeatSolarWater = GetMeterIndex(state, "SolarWater:Facility");
+            meterNumHeatSolarAir = GetMeterIndex(state, "HeatProduced:SolarAir");
             // initialize the gathering variables for onsite thermal components on BEPS report
             gatherWaterHeatRecovery = 0.0;
             gatherAirHeatRecoveryCool = 0.0;
@@ -2375,11 +2367,11 @@ namespace OutputReportTabular {
             gatherHeatSolarAir = 0.0;
 
             // get meter numbers for water components on BEPS report
-            meterNumRainWater = GetMeterIndex("Rainwater:OnSiteWater");
-            meterNumCondensate = GetMeterIndex("Condensate:OnSiteWater");
-            meterNumGroundwater = GetMeterIndex("Wellwater:OnSiteWater");
-            meterNumMains = GetMeterIndex("MainsWater:Facility");
-            meterNumWaterEndUseTotal = GetMeterIndex("Water:Facility");
+            meterNumRainWater = GetMeterIndex(state, "Rainwater:OnSiteWater");
+            meterNumCondensate = GetMeterIndex(state, "Condensate:OnSiteWater");
+            meterNumGroundwater = GetMeterIndex(state, "Wellwater:OnSiteWater");
+            meterNumMains = GetMeterIndex(state, "MainsWater:Facility");
+            meterNumWaterEndUseTotal = GetMeterIndex(state, "Water:Facility");
 
             // initialize the gathering variables for water components on BEPS report
             gatherRainWater = 0.0;
@@ -4374,7 +4366,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4431,7 +4423,6 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using OutputProcessor::EndUseCategory;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4470,20 +4461,20 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
                 if (curMeterNumber > 0) {
-                    curMeterValue = GetCurrentMeterValue(curMeterNumber);
+                    curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
                     gatherTotalsBEPS(iResource) += curMeterValue;
                 }
 
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
-                        curMeterValue = GetCurrentMeterValue(curMeterNumber);
+                        curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
                         gatherEndUseBEPS(iResource, jEndUse) += curMeterValue;
 
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                             if (curMeterNumber > 0) {
-                                curMeterValue = GetCurrentMeterValue(curMeterNumber);
+                                curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
                                 gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curMeterValue;
                             }
                         }
@@ -4494,34 +4485,34 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsSource(iResource);
                 if (curMeterNumber > 0) {
-                    curMeterValue = GetCurrentMeterValue(curMeterNumber);
+                    curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
                     gatherTotalsSource(iResource) += curMeterValue;
                 }
             }
 
             // gather the electric load components
-            gatherPowerFuelFireGen += GetCurrentMeterValue(meterNumPowerFuelFireGen);
-            gatherPowerPV += GetCurrentMeterValue(meterNumPowerPV);
-            gatherPowerWind += GetCurrentMeterValue(meterNumPowerWind);
-            gatherPowerHTGeothermal += GetCurrentMeterValue(meterNumPowerHTGeothermal);
-            gatherElecProduced += GetCurrentMeterValue(meterNumElecProduced);
-            gatherElecPurchased += GetCurrentMeterValue(meterNumElecPurchased);
-            gatherElecSurplusSold += GetCurrentMeterValue(meterNumElecSurplusSold);
-            gatherElecStorage += GetCurrentMeterValue(meterNumElecStorage);
-            gatherPowerConversion += GetCurrentMeterValue(meterNumPowerConversion);
+            gatherPowerFuelFireGen += GetCurrentMeterValue(state, meterNumPowerFuelFireGen);
+            gatherPowerPV += GetCurrentMeterValue(state, meterNumPowerPV);
+            gatherPowerWind += GetCurrentMeterValue(state, meterNumPowerWind);
+            gatherPowerHTGeothermal += GetCurrentMeterValue(state, meterNumPowerHTGeothermal);
+            gatherElecProduced += GetCurrentMeterValue(state, meterNumElecProduced);
+            gatherElecPurchased += GetCurrentMeterValue(state, meterNumElecPurchased);
+            gatherElecSurplusSold += GetCurrentMeterValue(state, meterNumElecSurplusSold);
+            gatherElecStorage += GetCurrentMeterValue(state, meterNumElecStorage);
+            gatherPowerConversion += GetCurrentMeterValue(state, meterNumPowerConversion);
             // gather the onsite thermal components
-            gatherWaterHeatRecovery += GetCurrentMeterValue(meterNumWaterHeatRecovery);
-            gatherAirHeatRecoveryCool += GetCurrentMeterValue(meterNumAirHeatRecoveryCool);
-            gatherAirHeatRecoveryHeat += GetCurrentMeterValue(meterNumAirHeatRecoveryHeat);
-            gatherHeatHTGeothermal += GetCurrentMeterValue(meterNumHeatHTGeothermal);
-            gatherHeatSolarWater += GetCurrentMeterValue(meterNumHeatSolarWater);
-            gatherHeatSolarAir += GetCurrentMeterValue(meterNumHeatSolarAir);
+            gatherWaterHeatRecovery += GetCurrentMeterValue(state, meterNumWaterHeatRecovery);
+            gatherAirHeatRecoveryCool += GetCurrentMeterValue(state, meterNumAirHeatRecoveryCool);
+            gatherAirHeatRecoveryHeat += GetCurrentMeterValue(state, meterNumAirHeatRecoveryHeat);
+            gatherHeatHTGeothermal += GetCurrentMeterValue(state, meterNumHeatHTGeothermal);
+            gatherHeatSolarWater += GetCurrentMeterValue(state, meterNumHeatSolarWater);
+            gatherHeatSolarAir += GetCurrentMeterValue(state, meterNumHeatSolarAir);
             // gather the water supply components
-            gatherRainWater += GetCurrentMeterValue(meterNumRainWater);
-            gatherCondensate += GetCurrentMeterValue(meterNumCondensate);
-            gatherWellwater += GetCurrentMeterValue(meterNumGroundwater);
-            gatherMains += GetCurrentMeterValue(meterNumMains);
-            gatherWaterEndUseTotal += GetCurrentMeterValue(meterNumWaterEndUseTotal);
+            gatherRainWater += GetCurrentMeterValue(state, meterNumRainWater);
+            gatherCondensate += GetCurrentMeterValue(state, meterNumCondensate);
+            gatherWellwater += GetCurrentMeterValue(state, meterNumGroundwater);
+            gatherMains += GetCurrentMeterValue(state, meterNumMains);
+            gatherWaterEndUseTotal += GetCurrentMeterValue(state, meterNumWaterEndUseTotal);
         }
     }
 
@@ -4591,7 +4582,6 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using OutputProcessor::EndUseCategory;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -4621,13 +4611,13 @@ namespace OutputReportTabular {
                     curMeterNumber = meterNumTotalsBEPS(iResource);
                     if (curMeterNumber > 0) {
                         curMeterValue =
-                            GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
+                            GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
                         gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                     }
                 } else {
                     curMeterNumber = meterNumTotalsBEPS(iResource);
                     if (curMeterNumber > 0) {
-                        curMeterValue = GetCurrentMeterValue(curMeterNumber) * SourceFactors(iResource);
+                        curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * SourceFactors(iResource);
                         gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                     }
                 }
@@ -4637,13 +4627,13 @@ namespace OutputReportTabular {
                         curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
                             curMeterValue =
-                                GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
+                                GetCurrentMeterValue(state, curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
                             gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                         }
                     } else {
                         curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
-                            curMeterValue = GetCurrentMeterValue(curMeterNumber) * SourceFactors(iResource);
+                            curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * SourceFactors(iResource);
                             gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                         }
                     }
@@ -4712,7 +4702,6 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharTab;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-        using OutputProcessor::EndUseCategory;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4740,7 +4729,7 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
                 if (curMeterNumber > 0) {
-                    curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
+                    curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                     // check if current value is greater than existing peak demand value
                     if (curDemandValue > gatherDemandTotal(iResource)) {
                         gatherDemandTotal(iResource) = curDemandValue;
@@ -4754,12 +4743,12 @@ namespace OutputReportTabular {
                         for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                             curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                             if (curMeterNumber > 0) {
-                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
+                                curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                 gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
-                                for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                     curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                                     if (curMeterNumber > 0) {
-                                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
+                                        curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                         gatherDemandEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
                                     }
                                 }
@@ -4777,14 +4766,14 @@ namespace OutputReportTabular {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
-                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
+                        curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                         if (curDemandValue > gatherDemandIndEndUse(iResource, jEndUse)) {
                             gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
                         }
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                             if (curMeterNumber > 0) {
-                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
+                                curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                 // check if current value is greater than existing peak demand value
                                 if (curDemandValue > gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource)) {
                                     gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
@@ -7432,8 +7421,6 @@ namespace OutputReportTabular {
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
-        using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
         using ScheduleManager::GetScheduleName;
 
         // Locals
@@ -7467,7 +7454,7 @@ namespace OutputReportTabular {
         Array2D<Real64> normalVal(13, 4);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
         Real64 totalOnsiteHeat;
         Real64 totalOnsiteWater;
@@ -7586,7 +7573,7 @@ namespace OutputReportTabular {
                                                format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
@@ -7634,7 +7621,7 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
                     }
                 }
@@ -7643,7 +7630,7 @@ namespace OutputReportTabular {
             // do water
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                 collapsedEndUse(13, jEndUse) /= waterConversionFactor;
-                for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
                 }
             }
@@ -8374,11 +8361,11 @@ namespace OutputReportTabular {
             needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         // set the value to the total for the end use
                         endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
                         // subtract off each sub end use category value
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
                         }
                         // if just a small value remains set it to zero
@@ -8396,8 +8383,8 @@ namespace OutputReportTabular {
             // determine the number of rows needed for sub-table
             numRows = 0;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         ++numRows;
                     }
                     // check if an 'other' row is needed
@@ -8420,10 +8407,10 @@ namespace OutputReportTabular {
             // Build row head and subcategories columns
             i = 1;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                rowHead(i) = EndUseCategory(jEndUse).DisplayName;
-                if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                         ++i;
                     }
                     // check if an 'other' row is needed
@@ -8489,8 +8476,8 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 13; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
                             ++i;
                         }
@@ -8566,23 +8553,23 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             PreDefTableEntry(state, resource_entry_map(iResource),
-                                             EndUseCategory(jEndUse).DisplayName + " -- " + EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " + state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                              unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state, resource_entry_map(iResource),
-                                             EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
                                              unconvert * endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
                         PreDefTableEntry(state, resource_entry_map(iResource),
-                                         EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                         state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          unconvert * collapsedEndUse(iResource, jEndUse));
                         ++i;
                     }
@@ -9114,28 +9101,6 @@ namespace OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Create arrays for the call to WriteTable and then call it.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // all arrays are in the format: (row, column)
         Array1D_string columnHead;
         Array1D_int columnWidth;
@@ -9146,7 +9111,7 @@ namespace OutputReportTabular {
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         int iResource;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
@@ -9476,27 +9441,6 @@ namespace OutputReportTabular {
         //   This report actually consists of many sub-tables each with
         //   its own call to WriteTable.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using OutputProcessor::EndUseCategory;
-        using OutputProcessor::MaxNumSubcategories;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // all arrays are in the format: (row, column)
         Array1D_string columnHead;
         Array1D_int columnWidth;
@@ -9509,8 +9453,8 @@ namespace OutputReportTabular {
         Array2D<Real64> collapsedEndUse(13, DataGlobalConstants::iEndUse.size());
         Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstants::iEndUse.size());
         Array1D_int collapsedTimeStep(13);
-        Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
-        Array3D<Real64> collapsedIndEndUseSub(MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
+        Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstants::iEndUse.size(), 13);
         Array2D<Real64> endUseSubOther(13, DataGlobalConstants::iEndUse.size());
         int iResource;
         int kEndUseSub;
@@ -9600,7 +9544,7 @@ namespace OutputReportTabular {
                 collapsedEndUse(13, jEndUse) = gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
@@ -9637,7 +9581,7 @@ namespace OutputReportTabular {
                 collapsedIndEndUse(13, jEndUse) = gatherDemandIndEndUse(7, jEndUse);                 // water
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
@@ -9781,8 +9725,8 @@ namespace OutputReportTabular {
             //---- End Uses By Subcategory Sub-Table
             numRows = 0;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         ++numRows;
                     }
                 } else {
@@ -9802,10 +9746,10 @@ namespace OutputReportTabular {
             // Build row head and subcategories columns
             i = 1;
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                rowHead(i) = EndUseCategory(jEndUse).DisplayName;
-                if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                         ++i;
                     }
                 } else {
@@ -9863,8 +9807,8 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 13; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
                             ++i;
                         }
@@ -9908,12 +9852,12 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (needOtherRowLEED45(jEndUse)) {
-                        if (EndUseCategory(jEndUse).NumSubcategories == 0) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                             endUseSubOther(iResource, jEndUse) =
                                 collapsedIndEndUse(iResource, jEndUse); // often the case that no subcategories are defined
                         } else {
                             Real64 sumOfSubcategories = 0.;
-                            for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 sumOfSubcategories += collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource);
                             }
                             endUseSubOther(iResource, jEndUse) = collapsedIndEndUse(iResource, jEndUse) - sumOfSubcategories;
@@ -9943,22 +9887,22 @@ namespace OutputReportTabular {
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             PreDefTableEntry(state, resource_entry_map(iResource),
-                                             EndUseCategory(jEndUse).DisplayName + " -- " + EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " + state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                              collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state,
-                                resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
+                                resource_entry_map(iResource), state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
                         PreDefTableEntry(state, resource_entry_map(iResource),
-                                         EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                         state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          collapsedIndEndUse(iResource, jEndUse));
                         ++i;
                     }
@@ -15286,8 +15230,6 @@ namespace OutputReportTabular {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
-        using OutputProcessor::isFinalYear;
-
         gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering();
         OutputReportTabularAnnual::ResetAnnualGathering();
@@ -15300,7 +15242,7 @@ namespace OutputReportTabular {
         ThermalComfort::ResetThermalComfortSimpleASH55(state);
         ThermalComfort::ResetSetPointMet(state);
         ResetAdaptiveComfort();
-        isFinalYear = true;
+        state.dataOutputProcessor->isFinalYear = true;
     }
 
     void ResetMonthlyGathering()

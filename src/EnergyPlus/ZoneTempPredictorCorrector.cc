@@ -6808,12 +6808,12 @@ namespace ZoneTempPredictorCorrector {
             SetupOutputVariable(state,
                 "Facility Any Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateInDeadband, "System", "Sum", "Facility");
             // test if the oscillation variables are even used
-            if (ReportingThisVariable("Zone Oscillating Temperatures Time") ||
-                ReportingThisVariable("Zone Oscillating Temperatures During Occupancy Time") ||
-                ReportingThisVariable("Zone Oscillating Temperatures in Deadband Time") ||
-                ReportingThisVariable("Facility Any Zone Oscillating Temperatures Time") ||
-                ReportingThisVariable("Facility Any Zone Oscillating Temperatures During Occupancy Time") ||
-                ReportingThisVariable("Facility Any Zone Oscillating Temperatures in Deadband Time") ) {
+            if (ReportingThisVariable(state, "Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable(state, "Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable(state, "Zone Oscillating Temperatures in Deadband Time") ||
+                ReportingThisVariable(state, "Facility Any Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable(state, "Facility Any Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable(state, "Facility Any Zone Oscillating Temperatures in Deadband Time") ) {
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
             }
             state.dataZoneTempPredictorCorrector->SetupOscillationOutputFlag = false;

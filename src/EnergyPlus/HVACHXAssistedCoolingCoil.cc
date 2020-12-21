@@ -109,10 +109,6 @@ namespace HVACHXAssistedCoolingCoil {
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     int TotalNumHXAssistedCoils(0);             // The total number of HXAssistedCoolingCoil compound objects
     Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object

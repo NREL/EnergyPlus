@@ -96,21 +96,6 @@ namespace TempSolveRoot {
     // intended strictly to provide "interfaces" to routines used by other
     // parts of the simulation.
 
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
-
     // Functions
 
     void SolveRoot(EnergyPlusData &state,

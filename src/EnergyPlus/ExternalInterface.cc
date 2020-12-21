@@ -119,9 +119,6 @@ namespace ExternalInterface {
     int const fmiFatal(4);                        // fmiPending
     int const fmiPending(5);                      // fmiPending
     std::string const socCfgFilNam("socket.cfg"); // socket configuration file
-    std::string const BlankString;
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumExternalInterfaces(0);               // Number of ExternalInterface objects
     int NumExternalInterfacesBCVTB(0);          // Number of BCVTB ExternalInterface objects

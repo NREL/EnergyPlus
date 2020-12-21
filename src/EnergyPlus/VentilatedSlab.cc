@@ -132,8 +132,6 @@ namespace VentilatedSlab {
 
     // Module Object
 
-    static std::string const BlankString;
-
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
 
