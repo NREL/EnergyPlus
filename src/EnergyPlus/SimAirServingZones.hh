@@ -104,10 +104,6 @@ namespace SimAirServingZones {
     constexpr int UnitarySystemModel(29);
     constexpr int ZoneVRFasAirLoopEquip(30);
 
-    extern int NumOfTimeStepInDay;   // number of zone time steps in a day
-
-    void clear_state();
-
     void ManageAirLoops(EnergyPlusData &state, bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,                  // TRUE means air loops must be (re)simulated
                         bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
@@ -185,23 +181,35 @@ namespace SimAirServingZones {
 
     void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
     bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
 } // namespace SimAirServingZones
 
 struct SimAirServingZonesData : BaseGlobalStruct {
 
     bool GetAirLoopInputFlag = true;        // Flag set to make sure you get input once
-//    int NumOfTimeStepInDay = 0;             // number of zone time steps in a day
+    int NumOfTimeStepInDay = 0;             // number of zone time steps in a day
+    bool InitAirLoopsOneTimeFlag = true;
+    int TestUniqueNodesNum = 0;
+    bool SizeAirLoopsOneTimeFlag = true;
+    bool InitAirLoopsBranchSizingFlag = true;
+    bool OutputSetupFlag = false;
+    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
         this->GetAirLoopInputFlag = true;
-//        this->NumOfTimeStepInDay = 0;
+        this->NumOfTimeStepInDay = 0;
+        this->InitAirLoopsOneTimeFlag = true;
+        this->TestUniqueNodesNum = 0;
+        this->SizeAirLoopsOneTimeFlag = true;
+        this->InitAirLoopsBranchSizingFlag = true;
+        this->OutputSetupFlag = false;
+        this->MyEnvrnFlag = true;
     }
 };
 
