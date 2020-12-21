@@ -69,12 +69,16 @@ namespace EconomicLifeCycleCost {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern int const disConvBeginOfYear;
-    extern int const disConvMidYear;
-    extern int const disConvEndOfYear;
+    enum class iDiscConv {
+        BeginOfYear,
+        MidYear,
+        EndOfYear,
+    };
 
-    extern int const inflAppConstantDollar;
-    extern int const inflAppCurrentDollar;
+    enum class iInflAppr {
+        ConstantDollar,
+        CurrentDollar,
+    };
 
     // ModifiedAcceleratedCostRecoverySystem or Straight Line
     extern int const depMethMACRS3;
@@ -127,8 +131,8 @@ namespace EconomicLifeCycleCost {
     // related to LifeCycleCost:Parameters
     extern bool LCCparamPresent;       // If a LifeCycleCost:Parameters object is present
     extern std::string LCCname;        // Name
-    extern int discountConvension;     // Discounting Convention
-    extern int inflationApproach;      // Inflation Approach
+    extern iDiscConv discountConvention;     // Discounting Convention
+    extern iInflAppr inflationApproach;      // Inflation Approach
     extern Real64 realDiscountRate;    // Real Discount Rate
     extern Real64 nominalDiscountRate; // Nominal Discount Rate
     extern Real64 inflation;           // Inflation

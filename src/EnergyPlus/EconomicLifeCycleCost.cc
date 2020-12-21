@@ -104,15 +104,6 @@ namespace EconomicLifeCycleCost {
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const disConvBeginOfYear(1);
-    int const disConvMidYear(2);
-    int const disConvEndOfYear(3);
-
-    int const inflAppConstantDollar(1);
-    int const inflAppCurrentDollar(2);
-
     // ModifiedAcceleratedCostRecoverySystem or Straight Line
     int const depMethMACRS3(1);
     int const depMethMACRS5(2);
@@ -164,8 +155,8 @@ namespace EconomicLifeCycleCost {
     // related to LifeCycleCost:Parameters
     bool LCCparamPresent(false);                  // If a LifeCycleCost:Parameters object is present
     std::string LCCname;                          // Name
-    int discountConvension(disConvEndOfYear);     // Discounting Convention
-    int inflationApproach(inflAppConstantDollar); // Inflation Approach
+    iDiscConv discountConvention(iDiscConv::EndOfYear);     // Discounting Convention
+    iInflAppr inflationApproach(iInflAppr::ConstantDollar); // Inflation Approach
     Real64 realDiscountRate(0.0);                 // Real Discount Rate
     Real64 nominalDiscountRate(0.0);              // Nominal Discount Rate
     Real64 inflation(0.0);                        // Inflation
@@ -408,13 +399,13 @@ namespace EconomicLifeCycleCost {
             //      \key BeginningOfYear
             //      \default EndOfYear
             if (UtilityRoutines::SameString(AlphaArray(2), "EndOfYear")) {
-                discountConvension = disConvEndOfYear;
+                discountConvention = iDiscConv::EndOfYear;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "MidYear")) {
-                discountConvension = disConvMidYear;
+                discountConvention = iDiscConv::MidYear;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "BeginningOfYear")) {
-                discountConvension = disConvBeginOfYear;
+                discountConvention = iDiscConv::BeginOfYear;
             } else {
-                discountConvension = disConvEndOfYear;
+                discountConvention = iDiscConv::EndOfYear;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) + "\". EndOfYear will be used.");
             }
             // A3,  \field Inflation Approach
@@ -423,18 +414,18 @@ namespace EconomicLifeCycleCost {
             //      \key CurrentDollar
             //      \default ConstantDollar
             if (UtilityRoutines::SameString(AlphaArray(3), "ConstantDollar")) {
-                inflationApproach = inflAppConstantDollar;
+                inflationApproach = iInflAppr::ConstantDollar;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "CurrentDollar")) {
-                inflationApproach = inflAppCurrentDollar;
+                inflationApproach = iInflAppr::CurrentDollar;
             } else {
-                inflationApproach = inflAppConstantDollar;
+                inflationApproach = iInflAppr::ConstantDollar;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". ConstantDollar will be used.");
             }
             // N1,  \field Real Discount Rate
             //      \type real
             realDiscountRate = NumArray(1);
-            if ((inflationApproach == inflAppConstantDollar) && lNumericFieldBlanks(1)) {
+            if ((inflationApproach == iInflAppr::ConstantDollar) && lNumericFieldBlanks(1)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(1) +
                                  " to be blank when ConstantDollar analysis is be used.");
             }
@@ -445,7 +436,7 @@ namespace EconomicLifeCycleCost {
             // N2,  \field Nominal Discount Rate
             //      \type real
             nominalDiscountRate = NumArray(2);
-            if ((inflationApproach == inflAppCurrentDollar) && lNumericFieldBlanks(2)) {
+            if ((inflationApproach == iInflAppr::CurrentDollar) && lNumericFieldBlanks(2)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(2) +
                                  " to be blank when CurrentDollar analysis is be used.");
             }
@@ -456,7 +447,7 @@ namespace EconomicLifeCycleCost {
             // N3,  \field Inflation
             //      \type real
             inflation = NumArray(3);
-            if ((inflationApproach == inflAppConstantDollar) && (!lNumericFieldBlanks(3))) {
+            if ((inflationApproach == iInflAppr::ConstantDollar) && (!lNumericFieldBlanks(3))) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(3) +
                                  " contain a value when ConstantDollar analysis is be used.");
             }
@@ -1332,9 +1323,9 @@ namespace EconomicLifeCycleCost {
 
         // pre-compute the inflation factors for each year
         monthlyInflationFactor.allocate(lengthStudyTotalMonths);
-        if (inflationApproach == inflAppConstantDollar) {
+        if (inflationApproach == iInflAppr::ConstantDollar) {
             monthlyInflationFactor = 1.0; // not really used but just in case
-        } else if (inflationApproach == inflAppCurrentDollar) {
+        } else if (inflationApproach == iInflAppr::CurrentDollar) {
             // to allocate an interest rate (in this case inflation) cannot just use 1/12
             // for the monthly value since it will be slightly wrong. Instead use inverse of
             // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
@@ -1652,21 +1643,21 @@ namespace EconomicLifeCycleCost {
 
         // Depending if using Constant or Current Dollar analysis
         // use the appropriate discount rate
-        if (inflationApproach == inflAppConstantDollar) {
+        if (inflationApproach == iInflAppr::ConstantDollar) {
             curDiscountRate = realDiscountRate;
-        } else if (inflationApproach == inflAppCurrentDollar) {
+        } else if (inflationApproach == iInflAppr::CurrentDollar) {
             curDiscountRate = nominalDiscountRate;
         }
         // compute single present values based on real discount rates
         for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
             // NIST 155 D.2.1.1 - Single Present Value (SPV) formula
             {
-                auto const SELECT_CASE_var(discountConvension);
-                if (SELECT_CASE_var == disConvBeginOfYear) {
+                auto const SELECT_CASE_var(discountConvention);
+                if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
                     effectiveYear = double(jYear) - 1.0;
-                } else if (SELECT_CASE_var == disConvMidYear) {
+                } else if (SELECT_CASE_var == iDiscConv::MidYear) {
                     effectiveYear = double(jYear) - 0.5;
-                } else if (SELECT_CASE_var == disConvEndOfYear) {
+                } else if (SELECT_CASE_var == iDiscConv::EndOfYear) {
                     effectiveYear = double(jYear);
                 } else {
                 }
@@ -1686,12 +1677,12 @@ namespace EconomicLifeCycleCost {
                 for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
                     // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                     {
-                        auto const SELECT_CASE_var(discountConvension);
-                        if (SELECT_CASE_var == disConvBeginOfYear) {
+                        auto const SELECT_CASE_var(discountConvention);
+                        if (SELECT_CASE_var == iDiscConv::BeginOfYear) {
                             effectiveYear = double(jYear) - 1.0;
-                        } else if (SELECT_CASE_var == disConvMidYear) {
+                        } else if (SELECT_CASE_var == iDiscConv::MidYear) {
                             effectiveYear = double(jYear) - 0.5;
-                        } else if (SELECT_CASE_var == disConvEndOfYear) {
+                        } else if (SELECT_CASE_var == iDiscConv::EndOfYear) {
                             effectiveYear = double(jYear);
                         } else {
                         }
@@ -2150,29 +2141,29 @@ namespace EconomicLifeCycleCost {
             columnHead(1) = "Value";
 
             tableBody(1, 1) = LCCname;
-            if (discountConvension == disConvEndOfYear) {
+            if (discountConvention == iDiscConv::EndOfYear) {
                 tableBody(1, 2) = "EndOfYear";
-            } else if (discountConvension == disConvMidYear) {
+            } else if (discountConvention == iDiscConv::MidYear) {
                 tableBody(1, 2) = "MidYear";
-            } else if (discountConvension == disConvBeginOfYear) {
+            } else if (discountConvention == iDiscConv::BeginOfYear) {
                 tableBody(1, 2) = "BeginningOfYear";
             }
-            if (inflationApproach == inflAppConstantDollar) {
+            if (inflationApproach == iInflAppr::ConstantDollar) {
                 tableBody(1, 3) = "ConstantDollar";
-            } else if (inflationApproach == inflAppCurrentDollar) {
+            } else if (inflationApproach == iInflAppr::CurrentDollar) {
                 tableBody(1, 3) = "CurrentDollar";
             }
-            if (inflationApproach == inflAppConstantDollar) {
+            if (inflationApproach == iInflAppr::ConstantDollar) {
                 tableBody(1, 4) = RealToStr(realDiscountRate, 4);
             } else {
                 tableBody(1, 4) = "-- N/A --";
             }
-            if (inflationApproach == inflAppCurrentDollar) {
+            if (inflationApproach == iInflAppr::CurrentDollar) {
                 tableBody(1, 5) = RealToStr(nominalDiscountRate, 4);
             } else {
                 tableBody(1, 5) = "-- N/A --";
             }
-            if (inflationApproach == inflAppCurrentDollar) {
+            if (inflationApproach == iInflAppr::CurrentDollar) {
                 tableBody(1, 6) = RealToStr(inflation, 4);
             } else {
                 tableBody(1, 6) = "-- N/A --";
@@ -2915,8 +2906,8 @@ namespace EconomicLifeCycleCost {
     {
         LCCparamPresent = false;
         LCCname = "";
-        discountConvension = disConvEndOfYear;
-        inflationApproach = inflAppConstantDollar;
+        discountConvention = iDiscConv::EndOfYear;
+        inflationApproach = iInflAppr::ConstantDollar;
         realDiscountRate = 0.0;
         nominalDiscountRate = 0.0;
         inflation = 0.0;

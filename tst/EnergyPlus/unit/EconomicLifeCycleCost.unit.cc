@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(disConvEndOfYear, discountConvension);
+    EXPECT_EQ(disConvEndOfYear, discountConvention);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
     EXPECT_EQ(0.03, realDiscountRate);
     EXPECT_EQ(1, baseDateMonth);
@@ -393,7 +393,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_EQ(disConvEndOfYear, discountConvension);
+    EXPECT_EQ(disConvEndOfYear, discountConvention);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
     EXPECT_EQ(0.03, realDiscountRate);
     EXPECT_EQ(1, baseDateMonth);
