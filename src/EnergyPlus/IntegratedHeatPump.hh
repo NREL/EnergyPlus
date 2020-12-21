@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -514,6 +515,14 @@ namespace IntegratedHeatPump {
     );
 
 } // namespace IntegratedHeatPump
+
+struct IntegratedHeatPumpGlobalData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

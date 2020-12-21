@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHVACGlobals.hh>
+
 namespace EnergyPlus {
 
 namespace DataHVACGlobals {

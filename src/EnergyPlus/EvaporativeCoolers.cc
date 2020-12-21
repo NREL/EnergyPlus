@@ -59,7 +59,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -75,7 +74,6 @@
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -136,8 +134,6 @@ namespace EvaporativeCoolers {
     int const ZoneTemperatureDeadBandOnOffCycling(20);
     int const ZoneCoolingLoadOnOffCycling(21);
     int const ZoneCoolingLoadVariableSpeedFan(22);
-
-    static std::string const BlankString;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -345,7 +341,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -418,7 +414,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -521,7 +517,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -615,7 +611,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -757,7 +753,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -942,7 +938,6 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -983,7 +978,7 @@ namespace EvaporativeCoolers {
                             ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                         } else {
                             localSetPointCheck = false;
-                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, iTemperatureSetPoint, localSetPointCheck);
+                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, localSetPointCheck);
                             DataLoopNode::NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                             // Let it slide apparently
                             if (localSetPointCheck) {
@@ -2454,7 +2449,6 @@ namespace EvaporativeCoolers {
         using CurveManager::CurveValue;
         using DataHVACGlobals::SmallLoad;
 
-        using General::SolveRoot;
         using Psychrometrics::PsyHfgAirFnWTdb;
 
         // Locals
@@ -3521,11 +3515,11 @@ namespace EvaporativeCoolers {
         // na
         // report the Evap Cooler energy from this component
         EvapCond(EvapCoolNum).EvapCoolerPower = EvapCond(EvapCoolNum).EvapCoolerPower;
-        EvapCond(EvapCoolNum).EvapCoolerEnergy = EvapCond(EvapCoolNum).EvapCoolerPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        EvapCond(EvapCoolNum).EvapCoolerEnergy = EvapCond(EvapCoolNum).EvapCoolerPower * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // Report Water comsumption in cubic meters per timestep
-        EvapCond(EvapCoolNum).EvapWaterConsump = EvapCond(EvapCoolNum).EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour();
-        EvapCond(EvapCoolNum).EvapWaterStarvMakup = EvapCond(EvapCoolNum).EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        EvapCond(EvapCoolNum).EvapWaterConsump = EvapCond(EvapCoolNum).EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        EvapCond(EvapCoolNum).EvapWaterStarvMakup = EvapCond(EvapCoolNum).EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     //***************
@@ -3694,7 +3688,7 @@ namespace EvaporativeCoolers {
 
                 ZoneEvapUnit(UnitLoop).Name = Alphas(1);
                 if (lAlphaBlanks(2)) {
-                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneEvapUnit(UnitLoop).AvailSchedIndex = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                     if (ZoneEvapUnit(UnitLoop).AvailSchedIndex == 0) {
@@ -4714,7 +4708,6 @@ namespace EvaporativeCoolers {
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
 
-        using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
 
         // Locals
@@ -4972,13 +4965,13 @@ namespace EvaporativeCoolers {
         QSensUnitOut = AirMassFlow * (PsyHFnTdbW(Node(UnitOutletNodeNum).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNodeNum).Temp, MinHumRat));
 
         ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-        ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
-        ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
-        ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-        ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = ZoneEvapUnit(UnitNum).FanSpeedRatio;
     }
 

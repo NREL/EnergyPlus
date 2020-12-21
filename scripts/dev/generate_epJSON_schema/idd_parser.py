@@ -99,6 +99,7 @@ class Data:
 def parse_idd(data):
     root = {'$schema': "http://json-schema.org/draft-04/schema#", 'properties': {}}
     data.file_size = len(data.file)
+    current_group_name = '**ungrouped**'
 
     while data.index < data.file_size:
         token = look_ahead(data)
@@ -111,7 +112,7 @@ def parse_idd(data):
             eat_comment(data)
         elif token == TOKEN_GROUP:
             next_token(data)
-            eat_comment(data)
+            current_group_name = parse_line(data)
         else:
             obj_name = parse_string(data)
             if obj_name is None or obj_name == "":
@@ -119,6 +120,7 @@ def parse_idd(data):
             obj_data = parse_obj(data)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
+            root['properties'][obj_name]['group'] = current_group_name
 
             name_pattern_properties = '.*'
             if 'name' in obj_data:
@@ -481,11 +483,7 @@ def parse_field(data, token):
             next_token(data)
             root['retaincase'] = True
 
-        elif token == TOKEN_GROUP:
-            next_token(data)
-            eat_comment(data)
-
-        elif token == TOKEN_A or token == TOKEN_N or token == TOKEN_END or token == TOKEN_STRING:
+        elif token in [TOKEN_A, TOKEN_N, TOKEN_END, TOKEN_STRING, TOKEN_GROUP]:
             has_default = 'default' in root
             if is_autocalculatable:
                 create_any_of(root, TOKEN_AUTOCALCULATABLE, has_default)

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -506,6 +507,14 @@ namespace EvaporativeCoolers {
     int GetEvapCoolerIndex(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound);
 
 } // namespace EvaporativeCoolers
+
+struct EvaporativeCoolersData :  BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

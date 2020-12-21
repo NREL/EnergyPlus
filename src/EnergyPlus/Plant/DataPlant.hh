@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -116,11 +117,6 @@ namespace DataPlant {
     extern Real64 const LoopDemandTol; // minimum significant loop cooling or heating demand
     extern Real64 const DeltaTempTol;  // minimum significant loop temperature difference
 
-    // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    extern int const LoopType_Plant;
-    extern int const LoopType_Condenser;
-    extern int const LoopType_Both;
-
     // Parameters for FlowLock standardization
     extern int const FlowPumpQuery; // Used to ask the pumps for their min/max avail based on no constraints
     extern int const FlowUnlocked;  // components request flow
@@ -143,7 +139,7 @@ namespace DataPlant {
 
     extern Array1D_string const ccSimPlantEquipTypes;
 
-    extern Array1D_int const ValidLoopEquipTypes;
+    extern Array1D<LoopType> const ValidLoopEquipTypes;
 
     extern int const TypeOf_Other;
     extern int const TypeOf_Boiler_Simple;
@@ -295,6 +291,14 @@ namespace DataPlant {
     void clear_state();
 
 } // namespace DataPlant
+
+struct DataPlantData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

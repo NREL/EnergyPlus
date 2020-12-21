@@ -55,17 +55,17 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -618,19 +618,19 @@ namespace ICEngineElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // IC ENGINE fuel use (J)
-        Real64 FuelEnergyUsed = fuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 FuelEnergyUsed = fuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // water jacket heat recovered (J)
-        Real64 jacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 jacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // lube oil cooler heat recovered (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // exhaust gas heat recovered (J)
-        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
         this->QJacketRecovered = QJacketRec;
@@ -765,7 +765,7 @@ namespace ICEngineElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 

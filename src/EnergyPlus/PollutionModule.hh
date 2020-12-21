@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -455,7 +456,7 @@ namespace PollutionModule {
 
     void CalcPollution(EnergyPlusData &state);
 
-    void ReadEnergyMeters();
+    void ReadEnergyMeters(EnergyPlusData &state);
 
     // *****************************************************************************
     // Utility Routines to allow access to data inside this module.
@@ -476,6 +477,14 @@ namespace PollutionModule {
     );
 
 } // namespace PollutionModule
+
+struct PollutionModuleData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

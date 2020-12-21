@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+
 namespace EnergyPlus {
 
 namespace DataHeatBalFanSys {

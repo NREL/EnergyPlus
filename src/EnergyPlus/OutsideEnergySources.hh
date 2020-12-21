@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -127,6 +128,14 @@ namespace OutsideEnergySources {
     void InitSimVars(int EnergySourceNum, Real64 MyLoad);
 
 } // namespace OutsideEnergySources
+
+struct OutsideEnergySourcesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

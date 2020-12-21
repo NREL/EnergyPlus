@@ -55,20 +55,20 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -961,7 +961,7 @@ namespace MicroturbineElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1786,9 +1786,9 @@ namespace MicroturbineElectricGenerator {
                 DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
         }
 
-        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         if (this->FuelEnergyUseRateLHV > 0.0) {
             this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
             this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1796,8 +1796,8 @@ namespace MicroturbineElectricGenerator {
             this->ElectricEfficiencyLHV = 0.0;
             this->ThermalEfficiencyLHV = 0.0;
         }
-        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace MicroturbineElectricGenerator
