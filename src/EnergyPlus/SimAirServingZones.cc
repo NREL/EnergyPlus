@@ -140,8 +140,6 @@ namespace EnergyPlus::SimAirServingZones {
     using namespace DataZoneEquipment;
     using namespace DataAirSystems;
 
-    bool GetAirLoopInputFlag(true); // Flag set to make sure you get input once
-
     int NumOfTimeStepInDay; // number of zone time steps in a day
 
     namespace {
@@ -161,7 +159,6 @@ namespace EnergyPlus::SimAirServingZones {
     // Functions
     void clear_state()
     {
-        GetAirLoopInputFlag = true;
         InitAirLoopsOneTimeFlag = true;
         SizeAirLoopsOneTimeFlag = true;
         InitAirLoopsBranchSizingFlag = true;
@@ -193,9 +190,9 @@ namespace EnergyPlus::SimAirServingZones {
 
         using MixedAir::ManageOutsideAirSystem;
 
-        if (GetAirLoopInputFlag) { // First time subroutine has been entered
+        if (state.dataSimAirServingZones->GetAirLoopInputFlag) { // First time subroutine has been entered
             GetAirPathData(state); // Get air loop descriptions from input file
-            GetAirLoopInputFlag = false;
+            state.dataSimAirServingZones->GetAirLoopInputFlag = false;
         }
 
         // Initialize air loop related parameters
@@ -7546,7 +7543,7 @@ namespace EnergyPlus::SimAirServingZones {
     }
 
     void CheckWaterCoilIsOnAirLoop(
-        EnergyPlusData &state, int const CompTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop)
+        EnergyPlusData &state, int const CompTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is either on
@@ -7579,9 +7576,9 @@ namespace EnergyPlus::SimAirServingZones {
         // primary air loop branch. Searches for water coil name and type that match
         // components list in primary air systems.
 
-        if (GetAirLoopInputFlag) { // First time subroutine has been entered
+        if (state.dataSimAirServingZones->GetAirLoopInputFlag) { // First time subroutine has been entered
             GetAirPathData(state); // Get air loop descriptions from input file
-            GetAirLoopInputFlag = false;
+            state.dataSimAirServingZones->GetAirLoopInputFlag = false;
         }
 
         if (DataHVACGlobals::NumPrimaryAirSys > 0) {
@@ -7599,7 +7596,7 @@ namespace EnergyPlus::SimAirServingZones {
         return false;
     }
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int const CompTypeNum, std::string const CompName)
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int const CompTypeNum, std::string const &CompName)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
@@ -7632,7 +7629,7 @@ namespace EnergyPlus::SimAirServingZones {
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int const CompTypeNum, std::string const CompName)
     {
         // PURPOSE OF THIS FUNCTION:
-        // This function returns true if a water coil whcih is part of CoilSystem:Cooling:Water:HeatExchangerAssisted
+        // This function returns true if a water coil which is part of CoilSystem:Cooling:Water:HeatExchangerAssisted
         // and that has water controller is on primary air loop branch or outdoor air system. Searches for water coilsystem
         // type and name that match components list in primary air loop or outside air systems.
 

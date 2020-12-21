@@ -104,7 +104,6 @@ namespace SimAirServingZones {
     constexpr int UnitarySystemModel(29);
     constexpr int ZoneVRFasAirLoopEquip(30);
 
-    extern bool GetAirLoopInputFlag; // Flag set to make sure you get input once
     extern int NumOfTimeStepInDay;   // number of zone time steps in a day
 
     void clear_state();
@@ -184,11 +183,11 @@ namespace SimAirServingZones {
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string CompType, std::string CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
 
     bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
 
@@ -196,9 +195,13 @@ namespace SimAirServingZones {
 
 struct SimAirServingZonesData : BaseGlobalStruct {
 
+    bool GetAirLoopInputFlag = true;        // Flag set to make sure you get input once
+//    int NumOfTimeStepInDay = 0;             // number of zone time steps in a day
+
     void clear_state() override
     {
-
+        this->GetAirLoopInputFlag = true;
+//        this->NumOfTimeStepInDay = 0;
     }
 };
 
