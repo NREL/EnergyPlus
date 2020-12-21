@@ -141,16 +141,6 @@ namespace EconomicLifeCycleCost {
         NotComputed,
     };
 
-    // present value factors
-    extern Array1D<Real64> SPV;
-
-    // arrays related to computing after tax cashflow and present value
-    extern Array1D<Real64> DepreciatedCapital;
-    extern Array1D<Real64> TaxableIncome;
-    extern Array1D<Real64> Taxes;
-    extern Array1D<Real64> AfterTaxCashFlow;
-    extern Array1D<Real64> AfterTaxPresentValue;
-
     constexpr const char * MonthNames(int const &i) {
         switch (i) {
         case 1:
@@ -182,12 +172,6 @@ namespace EconomicLifeCycleCost {
             return "";
         }
     }
-
-    // arrays related to escalated energy costs
-    extern Array1D<Real64> EscalatedTotEnergy;
-    extern std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Types
 
@@ -288,13 +272,6 @@ namespace EconomicLifeCycleCost {
         }
     };
 
-    // Object Data
-    extern Array1D<RecurringCostsType> RecurringCosts;
-    extern Array1D<NonrecurringCostType> NonrecurringCost;
-    extern Array1D<UsePriceEscalationType> UsePriceEscalation;
-    extern Array1D<UseAdjustmentType> UseAdjustment;
-    extern Array1D<CashFlowType> CashFlow;
-
     // Functions
 
     void GetInputForLifeCycleCost(EnergyPlusData &state);
@@ -319,7 +296,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
 
-    int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth);
+    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -346,8 +323,6 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
 
     void WriteTabularLifeCycleCostReport(EnergyPlusData &state);
-
-    void clear_state();
 
 } // namespace EconomicLifeCycleCost
 
@@ -377,6 +352,41 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
     int numUseAdjustment = 0;
     int numCashFlow = 0;
     int numResourcesUsed = 0;
+    bool GetInput_GetLifeCycleCostInput = true;
+
+    // from former statics in GetInputLifeCycleCostUsePriceEscalation()
+    int UsePriceEscalation_escStartYear = 0;
+    int UsePriceEscalation_escNumYears = 0;
+    int UsePriceEscalation_escEndYear = 0;
+    int UsePriceEscalation_earlierEndYear = 0;
+    int UsePriceEscalation_laterStartYear = 0;
+    int UsePriceEscalation_curEsc = 0;
+    int UsePriceEscalation_curFld = 0;
+
+    // from former statics in ExpressAsCashFlows
+    int ExpressAsCashFlows_baseMonths1900 = 0;    // number of months since 1900 for base period
+    int ExpressAsCashFlows_serviceMonths1900 = 0; // number of months since 1900 for service period
+
+    // present value factors
+    Array1D<Real64> SPV;
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>>  energySPV; // yearly equivalent to FEMP UPV* values
+
+    // arrays related to computing after tax cashflow and present value
+    Array1D<Real64> DepreciatedCapital;
+    Array1D<Real64> TaxableIncome;
+    Array1D<Real64> Taxes;
+    Array1D<Real64> AfterTaxCashFlow;
+    Array1D<Real64> AfterTaxPresentValue;
+
+    // arrays related to escalated energy costs
+    Array1D<Real64> EscalatedTotEnergy;
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
+
+    Array1D<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
+    Array1D<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
+    Array1D<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
+    Array1D<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
+    Array1D<EconomicLifeCycleCost::CashFlowType> CashFlow;
 
     void clear_state() override
     {
@@ -403,6 +413,30 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
         this->numUseAdjustment = 0;
         this->numCashFlow = 0;
         this->numResourcesUsed = 0;
+        this->GetInput_GetLifeCycleCostInput = true;
+        this->UsePriceEscalation_escStartYear = 0;
+        this->UsePriceEscalation_escNumYears = 0;
+        this->UsePriceEscalation_escEndYear = 0;
+        this->UsePriceEscalation_earlierEndYear = 0;
+        this->UsePriceEscalation_laterStartYear = 0;
+        this->UsePriceEscalation_curEsc = 0;
+        this->UsePriceEscalation_curFld = 0;
+        this->ExpressAsCashFlows_baseMonths1900 = 0;
+        this->ExpressAsCashFlows_serviceMonths1900 = 0;
+        this->SPV.deallocate();
+        this->energySPV.clear();
+        this->DepreciatedCapital.deallocate();
+        this->TaxableIncome.deallocate();
+        this->Taxes.deallocate();
+        this->AfterTaxCashFlow.deallocate();
+        this->AfterTaxPresentValue.deallocate();
+        this->EscalatedTotEnergy.deallocate();
+        this->EscalatedEnergy.clear();
+        this->RecurringCosts.deallocate();
+        this->NonrecurringCost.deallocate();
+        this->UsePriceEscalation.deallocate();
+        this->UseAdjustment.deallocate();
+        this->CashFlow.deallocate();
     }
 };
 

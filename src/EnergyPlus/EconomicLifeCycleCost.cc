@@ -102,53 +102,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
     using namespace DataGlobalConstants;
     using namespace DataIPShortCuts;
 
-    // present value factors
-    Array1D<Real64> SPV;
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>>  energySPV; // yearly equivalent to FEMP UPV* values
-
-    // arrays related to computing after tax cashflow and present value
-    Array1D<Real64> DepreciatedCapital;
-    Array1D<Real64> TaxableIncome;
-    Array1D<Real64> Taxes;
-    Array1D<Real64> AfterTaxCashFlow;
-    Array1D<Real64> AfterTaxPresentValue;
-
-    // arrays related to escalated energy costs
-    Array1D<Real64> EscalatedTotEnergy;
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Object Data
-    Array1D<RecurringCostsType> RecurringCosts;
-    Array1D<NonrecurringCostType> NonrecurringCost;
-    Array1D<UsePriceEscalationType> UsePriceEscalation;
-    Array1D<UseAdjustmentType> UseAdjustment;
-    Array1D<CashFlowType> CashFlow;
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool GetInput_GetLifeCycleCostInput(true);
-
-        // from former statics in GetInputLifeCycleCostUsePriceEscalation()
-        int UsePriceEscalation_escStartYear(0);
-        int UsePriceEscalation_escNumYears(0);
-        int UsePriceEscalation_escEndYear(0);
-        int UsePriceEscalation_earlierEndYear(0);
-        int UsePriceEscalation_laterStartYear(0);
-        int UsePriceEscalation_curEsc(0);
-        int UsePriceEscalation_curFld(0);
-
-        // from former statics in ExpressAsCashFlows
-        int ExpressAsCashFlows_baseMonths1900(0);    // number of months since 1900 for base period
-        int ExpressAsCashFlows_serviceMonths1900(0); // number of months since 1900 for service period
-
-    } // namespace
-
     // Functions
 
     void GetInputForLifeCycleCost(EnergyPlusData &state)
@@ -185,13 +138,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (GetInput_GetLifeCycleCostInput) {
+        if (state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput) {
             GetInputLifeCycleCostParameters(state);
             GetInputLifeCycleCostRecurringCosts(state);
             GetInputLifeCycleCostNonrecurringCost(state);
             GetInputLifeCycleCostUsePriceEscalation(state);
             GetInputLifeCycleCostUseAdjustment(state);
-            GetInput_GetLifeCycleCostInput = false;
+            state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput = false;
         }
     }
 
@@ -502,7 +455,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
         state.dataEconLifeCycleCost->numRecurringCosts = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        RecurringCosts.allocate(state.dataEconLifeCycleCost->numRecurringCosts);
+        state.dataEconLifeCycleCost->RecurringCosts.allocate(state.dataEconLifeCycleCost->numRecurringCosts);
         for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numRecurringCosts; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -527,7 +480,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //   A1,  \field Name
             //        \required-field
             //        \type alpha
-            RecurringCosts(iInObj).name = AlphaArray(1);
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).name = AlphaArray(1);
             //   A2,  \field Category
             //        \type choice
             //        \key Maintenance
@@ -539,38 +492,38 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \key OtherOperational
             //        \default Maintenance
             if (UtilityRoutines::SameString(AlphaArray(2), "Maintenance")) {
-                RecurringCosts(iInObj).category = costCatMaintenance;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatMaintenance;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "Repair")) {
-                RecurringCosts(iInObj).category = costCatRepair;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatRepair;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "Operation")) {
-                RecurringCosts(iInObj).category = costCatOperation;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatOperation;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "Replacement")) {
-                RecurringCosts(iInObj).category = costCatReplacement;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatReplacement;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "MinorOverhaul")) {
-                RecurringCosts(iInObj).category = costCatMinorOverhaul;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatMinorOverhaul;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "MajorOverhaul")) {
-                RecurringCosts(iInObj).category = costCatMajorOverhaul;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatMajorOverhaul;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherOperational")) {
-                RecurringCosts(iInObj).category = costCatOtherOperational;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatOtherOperational;
             } else {
-                RecurringCosts(iInObj).category = costCatMaintenance;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).category = costCatMaintenance;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Maintenance will be used.");
             }
             //   N1,  \field Cost
             //        \type real
-            RecurringCosts(iInObj).cost = NumArray(1);
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).cost = NumArray(1);
             //   A3,  \field Start of Costs
             //        \type choice
             //        \key ServicePeriod
             //        \key BasePeriod
             //        \default ServicePeriod
             if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-                RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-                RecurringCosts(iInObj).startOfCosts = iStartCosts::BasePeriod;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
-                RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).startOfCosts = iStartCosts::ServicePeriod;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
@@ -578,13 +531,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \type integer
             //        \minimum 0
             //        \maximum 100
-            RecurringCosts(iInObj).yearsFromStart = int(NumArray(2));
-            if (RecurringCosts(iInObj).yearsFromStart > 100) {
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).yearsFromStart = int(NumArray(2));
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).yearsFromStart > 100) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
             }
-            if (RecurringCosts(iInObj).yearsFromStart < 0) {
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).yearsFromStart < 0) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
@@ -593,13 +546,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \type integer
             //        \minimum 0
             //        \maximum 1200
-            RecurringCosts(iInObj).monthsFromStart = int(NumArray(3));
-            if (RecurringCosts(iInObj).monthsFromStart > 1200) {
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).monthsFromStart = int(NumArray(3));
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).monthsFromStart > 1200) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
             }
-            if (RecurringCosts(iInObj).monthsFromStart < 0) {
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).monthsFromStart < 0) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                     ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
@@ -608,13 +561,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \type integer
             //        \minimum 1
             //        \maximum 100
-            RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
-            if (RecurringCosts(iInObj).repeatPeriodYears > 100) {
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodYears > 100) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
                                  "for an economic evaluation. ");
             }
-            if (RecurringCosts(iInObj).repeatPeriodYears < 1) {
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodYears < 1) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
                                  ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
                                  "an economic evaluation. ");
@@ -623,36 +576,36 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //        \type integer
             //        \minimum 0
             //        \maximum 1200
-            RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
-            if (RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
                                  "reasonable for an economic evaluation. ");
             }
-            if (RecurringCosts(iInObj).repeatPeriodMonths < 0) {
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodMonths < 0) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
                                  ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
                                  "an economic evaluation. ");
             }
-            if ((RecurringCosts(iInObj).repeatPeriodMonths == 0) && (RecurringCosts(iInObj).repeatPeriodYears == 0)) {
+            if ((state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodMonths == 0) && (state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodYears == 0)) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in fields " + cNumericFieldNames(5) + " and " + cNumericFieldNames(4) +
                                  ".  The repeat period must not be zero months and zero years. ");
             }
             //   N6;  \field Annual escalation rate
             //        \type real
-            RecurringCosts(iInObj).annualEscalationRate = int(NumArray(6));
-            if (RecurringCosts(iInObj).annualEscalationRate > 0.30) {
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).annualEscalationRate = int(NumArray(6));
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).annualEscalationRate > 0.30) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
             }
-            if (RecurringCosts(iInObj).annualEscalationRate < -0.30) {
+            if (state.dataEconLifeCycleCost->RecurringCosts(iInObj).annualEscalationRate < -0.30) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
                                  ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
             }
             // express the years and months fields in total months
-            RecurringCosts(iInObj).totalMonthsFromStart = RecurringCosts(iInObj).yearsFromStart * 12 + RecurringCosts(iInObj).monthsFromStart;
-            RecurringCosts(iInObj).totalRepeatPeriodMonths =
-                RecurringCosts(iInObj).repeatPeriodYears * 12 + RecurringCosts(iInObj).repeatPeriodMonths;
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).totalMonthsFromStart = state.dataEconLifeCycleCost->RecurringCosts(iInObj).yearsFromStart * 12 + state.dataEconLifeCycleCost->RecurringCosts(iInObj).monthsFromStart;
+            state.dataEconLifeCycleCost->RecurringCosts(iInObj).totalRepeatPeriodMonths =
+                state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodYears * 12 + state.dataEconLifeCycleCost->RecurringCosts(iInObj).repeatPeriodMonths;
         }
     }
 
@@ -686,9 +639,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         state.dataEconLifeCycleCost->numNonrecurringCost = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         numComponentCostLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
         if (numComponentCostLineItems > 0) {                    // leave room for component cost total
-            NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost + 1); // add a place for CostEstimate total
+            state.dataEconLifeCycleCost->NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost + 1); // add a place for CostEstimate total
         } else {
-            NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost);
+            state.dataEconLifeCycleCost->NonrecurringCost.allocate(state.dataEconLifeCycleCost->numNonrecurringCost);
         }
         for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numNonrecurringCost; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -714,7 +667,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             // A1,  \field Name
             //      \required-field
             //      \type alpha
-            NonrecurringCost(iInObj).name = AlphaArray(1);
+            state.dataEconLifeCycleCost->NonrecurringCost(iInObj).name = AlphaArray(1);
             // A2,  \field Category
             //      \type choice
             //      \key Construction
@@ -722,30 +675,30 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \key OtherCapital
             //      \default Construction
             if (UtilityRoutines::SameString(AlphaArray(2), "Construction")) {
-                NonrecurringCost(iInObj).category = costCatConstruction;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).category = costCatConstruction;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "Salvage")) {
-                NonrecurringCost(iInObj).category = costCatSalvage;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).category = costCatSalvage;
             } else if (UtilityRoutines::SameString(AlphaArray(2), "OtherCapital")) {
-                NonrecurringCost(iInObj).category = costCatOtherCapital;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).category = costCatOtherCapital;
             } else {
-                NonrecurringCost(iInObj).category = costCatConstruction;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).category = costCatConstruction;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
                                  "\". The category of Construction will be used.");
             }
             // N1,  \field Cost
             //      \type real
-            NonrecurringCost(iInObj).cost = NumArray(1);
+            state.dataEconLifeCycleCost->NonrecurringCost(iInObj).cost = NumArray(1);
             // A3,  \field Start of Costs
             //      \type choice
             //      \key ServicePeriod
             //      \key BasePeriod
             //      \default ServicePeriod
             if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
-                NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
-                NonrecurringCost(iInObj).startOfCosts = iStartCosts::BasePeriod;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).startOfCosts = iStartCosts::BasePeriod;
             } else {
-                NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
+                state.dataEconLifeCycleCost->NonrecurringCost(iInObj).startOfCosts = iStartCosts::ServicePeriod;
                 ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
                                  "\". The start of the service period will be used.");
             }
@@ -753,13 +706,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //      \type integer
             //      \minimum 0
             //      \maximum 100
-            NonrecurringCost(iInObj).yearsFromStart = int(NumArray(2));
-            if (NonrecurringCost(iInObj).yearsFromStart > 100) {
+            state.dataEconLifeCycleCost->NonrecurringCost(iInObj).yearsFromStart = int(NumArray(2));
+            if (state.dataEconLifeCycleCost->NonrecurringCost(iInObj).yearsFromStart > 100) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
             }
-            if (NonrecurringCost(iInObj).yearsFromStart < 0) {
+            if (state.dataEconLifeCycleCost->NonrecurringCost(iInObj).yearsFromStart < 0) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
                     ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
@@ -768,19 +721,19 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             //       \type integer
             //       \minimum 0
             //       \maximum 11
-            NonrecurringCost(iInObj).monthsFromStart = int(NumArray(3));
-            if (NonrecurringCost(iInObj).monthsFromStart > 1200) {
+            state.dataEconLifeCycleCost->NonrecurringCost(iInObj).monthsFromStart = int(NumArray(3));
+            if (state.dataEconLifeCycleCost->NonrecurringCost(iInObj).monthsFromStart > 1200) {
                 ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
                                  "economic evaluation. ");
             }
-            if (NonrecurringCost(iInObj).monthsFromStart < 0) {
+            if (state.dataEconLifeCycleCost->NonrecurringCost(iInObj).monthsFromStart < 0) {
                 ShowWarningError(state,
                     CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                     ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
             }
             // express the years and months fields in total months
-            NonrecurringCost(iInObj).totalMonthsFromStart = NonrecurringCost(iInObj).yearsFromStart * 12 + NonrecurringCost(iInObj).monthsFromStart;
+            state.dataEconLifeCycleCost->NonrecurringCost(iInObj).totalMonthsFromStart = state.dataEconLifeCycleCost->NonrecurringCost(iInObj).yearsFromStart * 12 + state.dataEconLifeCycleCost->NonrecurringCost(iInObj).monthsFromStart;
         }
     }
 
@@ -812,9 +765,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
         state.dataEconLifeCycleCost->numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        UsePriceEscalation.allocate(state.dataEconLifeCycleCost->numUsePriceEscalation);
+        state.dataEconLifeCycleCost->UsePriceEscalation.allocate(state.dataEconLifeCycleCost->numUsePriceEscalation);
         for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++iInObj) {
-            UsePriceEscalation(iInObj).Escalation.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+            state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).Escalation.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
         if (state.dataEconLifeCycleCost->numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++iInObj) {
@@ -841,7 +794,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 // A1,  \field Name
                 //      \required-field
                 //      \type alpha
-                UsePriceEscalation(iInObj).name = AlphaArray(1);
+                state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).name = AlphaArray(1);
                 //  A2,  \field Resource
                 //       \required-field
                 //       \type choice
@@ -857,7 +810,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //       \key Water
                 //       \key OtherFuel1
                 //       \key OtherFuel2
-                UsePriceEscalation(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+                state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
                 if (NumAlphas > 3) {
                     ShowWarningError(state, "In " + CurrentModuleObject + " contains more alpha fields than expected.");
                 }
@@ -865,12 +818,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //      \type integer
                 //      \minimum 1900
                 //      \maximum 2100
-                UsePriceEscalation(iInObj).escalationStartYear = int(NumArray(1));
-                if (UsePriceEscalation(iInObj).escalationStartYear > 2100) {
+                state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).escalationStartYear = int(NumArray(1));
+                if (state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).escalationStartYear > 2100) {
                     ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
                                      ".  Value greater than 2100 yet it is representing a year. ");
                 }
-                if (UsePriceEscalation(iInObj).escalationStartYear < 1900) {
+                if (state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).escalationStartYear < 1900) {
                     ShowWarningError(state, CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
                                      ".  Value less than 1900 yet it is representing a year. ");
                 }
@@ -889,29 +842,29 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //      \key November
                 //      \key December
                 //      \default January
-                UsePriceEscalation(iInObj).escalationStartMonth = MonthToMonthNumber(AlphaArray(3), 1);
+                state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).escalationStartMonth = MonthToMonthNumber(AlphaArray(3), 1);
                 // N2,  \field Year 1 Escalation
                 //      \type real
                 //      \begin-extensible
                 // The array is from the baseDateYear until baseDateYear + lengthStudyYears
                 // Set the array to default to 1.0
                 for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                    UsePriceEscalation(iInObj).Escalation(jYear) = 1.0;
+                    state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).Escalation(jYear) = 1.0;
                 }
                 // Since the years in the UsePriceEscalation may not match up with the baseDateYear and
                 // the lenghtStudyYears, need to make adjustments when reading in the values to align
                 // with the baseDateYear (the first item in all yearly arrays)
-                UsePriceEscalation_escStartYear = UsePriceEscalation(iInObj).escalationStartYear;
-                UsePriceEscalation_escNumYears = NumNums - 1;
-                UsePriceEscalation_escEndYear = UsePriceEscalation_escStartYear + UsePriceEscalation_escNumYears - 1;
-                UsePriceEscalation_earlierEndYear = min(UsePriceEscalation_escEndYear, state.dataEconLifeCycleCost->lastDateYear);   // pick the earlier ending date
-                UsePriceEscalation_laterStartYear = max(UsePriceEscalation_escStartYear, state.dataEconLifeCycleCost->baseDateYear); // pick the later starting date
-                for (jYear = UsePriceEscalation_laterStartYear; jYear <= UsePriceEscalation_earlierEndYear; ++jYear) {
-                    UsePriceEscalation_curFld = 2 + jYear - UsePriceEscalation_escStartYear;
-                    UsePriceEscalation_curEsc = 1 + jYear - state.dataEconLifeCycleCost->baseDateYear;
-                    if ((UsePriceEscalation_curFld <= NumNums) && (UsePriceEscalation_curFld >= 1)) {
-                        if ((UsePriceEscalation_curEsc <= state.dataEconLifeCycleCost->lengthStudyYears) && (UsePriceEscalation_curEsc >= 1)) {
-                            UsePriceEscalation(iInObj).Escalation(UsePriceEscalation_curEsc) = NumArray(UsePriceEscalation_curFld);
+                state.dataEconLifeCycleCost->UsePriceEscalation_escStartYear = state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).escalationStartYear;
+                state.dataEconLifeCycleCost->UsePriceEscalation_escNumYears = NumNums - 1;
+                state.dataEconLifeCycleCost->UsePriceEscalation_escEndYear = state.dataEconLifeCycleCost->UsePriceEscalation_escStartYear + state.dataEconLifeCycleCost->UsePriceEscalation_escNumYears - 1;
+                state.dataEconLifeCycleCost->UsePriceEscalation_earlierEndYear = min(state.dataEconLifeCycleCost->UsePriceEscalation_escEndYear, state.dataEconLifeCycleCost->lastDateYear);   // pick the earlier ending date
+                state.dataEconLifeCycleCost->UsePriceEscalation_laterStartYear = max(state.dataEconLifeCycleCost->UsePriceEscalation_escStartYear, state.dataEconLifeCycleCost->baseDateYear); // pick the later starting date
+                for (jYear = state.dataEconLifeCycleCost->UsePriceEscalation_laterStartYear; jYear <= state.dataEconLifeCycleCost->UsePriceEscalation_earlierEndYear; ++jYear) {
+                    state.dataEconLifeCycleCost->UsePriceEscalation_curFld = 2 + jYear - state.dataEconLifeCycleCost->UsePriceEscalation_escStartYear;
+                    state.dataEconLifeCycleCost->UsePriceEscalation_curEsc = 1 + jYear - state.dataEconLifeCycleCost->baseDateYear;
+                    if ((state.dataEconLifeCycleCost->UsePriceEscalation_curFld <= NumNums) && (state.dataEconLifeCycleCost->UsePriceEscalation_curFld >= 1)) {
+                        if ((state.dataEconLifeCycleCost->UsePriceEscalation_curEsc <= state.dataEconLifeCycleCost->lengthStudyYears) && (state.dataEconLifeCycleCost->UsePriceEscalation_curEsc >= 1)) {
+                            state.dataEconLifeCycleCost->UsePriceEscalation(iInObj).Escalation(state.dataEconLifeCycleCost->UsePriceEscalation_curEsc) = NumArray(state.dataEconLifeCycleCost->UsePriceEscalation_curFld);
                         }
                     }
                 }
@@ -948,9 +901,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
         state.dataEconLifeCycleCost->numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        UseAdjustment.allocate(state.dataEconLifeCycleCost->numUseAdjustment);
+        state.dataEconLifeCycleCost->UseAdjustment.allocate(state.dataEconLifeCycleCost->numUseAdjustment);
         for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++iInObj) {
-            UseAdjustment(iInObj).Adjustment.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+            state.dataEconLifeCycleCost->UseAdjustment(iInObj).Adjustment.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         }
         if (state.dataEconLifeCycleCost->numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++iInObj) {
@@ -977,7 +930,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //  A1,  \field Name
                 //       \required-field
                 //       \type alpha
-                UseAdjustment(iInObj).name = AlphaArray(1);
+                state.dataEconLifeCycleCost->UseAdjustment(iInObj).name = AlphaArray(1);
                 //  A2,  \field Resource
                 //       \required-field
                 //       \type choice
@@ -993,7 +946,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //       \key Water
                 //       \key OtherFuel1
                 //       \key OtherFuel2
-                UseAdjustment(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+                state.dataEconLifeCycleCost->UseAdjustment(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
                 if (NumAlphas > 2) {
                     ShowWarningError(state, "In " + CurrentModuleObject + " contains more alpha fields than expected.");
                 }
@@ -1002,17 +955,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 //       \begin-extensible
                 // Set the array to default to 1.0
                 for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                    UseAdjustment(iInObj).Adjustment(jYear) = 1.0;
+                    state.dataEconLifeCycleCost->UseAdjustment(iInObj).Adjustment(jYear) = 1.0;
                 }
                 numFldsToUse = min(NumNums, state.dataEconLifeCycleCost->lengthStudyYears);
                 for (jYear = 1; jYear <= numFldsToUse; ++jYear) {
-                    UseAdjustment(iInObj).Adjustment(jYear) = NumArray(jYear);
+                    state.dataEconLifeCycleCost->UseAdjustment(iInObj).Adjustment(jYear) = NumArray(jYear);
                 }
             }
         }
     }
 
-    int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth)
+    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth)
     {
 
         // FUNCTION INFORMATION:
@@ -1163,20 +1116,20 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         int iLoop;
 
         // compute months from 1900 for base and service period
-        ExpressAsCashFlows_baseMonths1900 = (state.dataEconLifeCycleCost->baseDateYear - 1900) * 12 + state.dataEconLifeCycleCost->baseDateMonth;
-        ExpressAsCashFlows_serviceMonths1900 = (state.dataEconLifeCycleCost->serviceDateYear - 1900) * 12 + state.dataEconLifeCycleCost->serviceDateMonth;
-        monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
+        state.dataEconLifeCycleCost->ExpressAsCashFlows_baseMonths1900 = (state.dataEconLifeCycleCost->baseDateYear - 1900) * 12 + state.dataEconLifeCycleCost->baseDateMonth;
+        state.dataEconLifeCycleCost->ExpressAsCashFlows_serviceMonths1900 = (state.dataEconLifeCycleCost->serviceDateYear - 1900) * 12 + state.dataEconLifeCycleCost->serviceDateMonth;
+        monthsBaseToService = state.dataEconLifeCycleCost->ExpressAsCashFlows_serviceMonths1900 - state.dataEconLifeCycleCost->ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
         if (state.dataCostEstimateManager->CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
             ++state.dataEconLifeCycleCost->numNonrecurringCost;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).name = "Total of ComponentCost:*";
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).lineItem = "";
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).category = costCatConstruction;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).yearsFromStart = 0;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).monthsFromStart = 0;
-            NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).totalMonthsFromStart = 0;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).name = "Total of ComponentCost:*";
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).lineItem = "";
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).category = costCatConstruction;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).startOfCosts = iStartCosts::BasePeriod;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).yearsFromStart = 0;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).monthsFromStart = 0;
+            state.dataEconLifeCycleCost->NonrecurringCost(state.dataEconLifeCycleCost->numNonrecurringCost).totalMonthsFromStart = 0;
         }
 
         // gather costs from EconomicTariff for each end use
@@ -1202,11 +1155,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             for (auto iResource : DataGlobalConstants::AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
-            EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+            state.dataEconLifeCycleCost->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
         }
 
-        EscalatedTotEnergy.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-        EscalatedTotEnergy = 0.0;
+        state.dataEconLifeCycleCost->EscalatedTotEnergy.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
         // pre-compute the inflation factors for each year
         monthlyInflationFactor.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
@@ -1228,58 +1181,58 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         //   2 recurring costs
         //   3 nonrecurring costs
         //   4 resource costs
-        CashFlow.allocate(state.dataEconLifeCycleCost->numCashFlow);
+        state.dataEconLifeCycleCost->CashFlow.allocate(state.dataEconLifeCycleCost->numCashFlow);
         for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
-            CashFlow(iCashFlow).mnAmount.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
-            CashFlow(iCashFlow).yrAmount.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-            CashFlow(iCashFlow).yrPresVal.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-            CashFlow(iCashFlow).mnAmount = 0.0;  // zero all cash flow values
-            CashFlow(iCashFlow).yrAmount = 0.0;  // zero all cash flow values
-            CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).mnAmount.allocate(state.dataEconLifeCycleCost->lengthStudyTotalMonths);
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).mnAmount = 0.0;  // zero all cash flow values
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount = 0.0;  // zero all cash flow values
+            state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal = 0.0; // zero all present values
         }
         // Put nonrecurring costs into cashflows
         offset = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts;
         for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numNonrecurringCost; ++jCost) {
-            CashFlow(offset + jCost).name = NonrecurringCost(jCost).name;
-            CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
-            CashFlow(offset + jCost).Category = NonrecurringCost(jCost).category;
-            CashFlow(offset + jCost).orginalCost = NonrecurringCost(jCost).cost;
-            CashFlow(offset + jCost).mnAmount = 0.0;
-            if (NonrecurringCost(jCost).startOfCosts == iStartCosts::ServicePeriod) {
-                month = NonrecurringCost(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-            } else if (NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
-                month = NonrecurringCost(jCost).totalMonthsFromStart + 1;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).name = state.dataEconLifeCycleCost->NonrecurringCost(jCost).name;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).SourceKind = iSourceKind::Nonrecurring;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).Category = state.dataEconLifeCycleCost->NonrecurringCost(jCost).category;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).orginalCost = state.dataEconLifeCycleCost->NonrecurringCost(jCost).cost;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).mnAmount = 0.0;
+            if (state.dataEconLifeCycleCost->NonrecurringCost(jCost).startOfCosts == iStartCosts::ServicePeriod) {
+                month = state.dataEconLifeCycleCost->NonrecurringCost(jCost).totalMonthsFromStart + monthsBaseToService + 1;
+            } else if (state.dataEconLifeCycleCost->NonrecurringCost(jCost).startOfCosts == iStartCosts::BasePeriod) {
+                month = state.dataEconLifeCycleCost->NonrecurringCost(jCost).totalMonthsFromStart + 1;
             }
             if ((month >= 1) && (month <= state.dataEconLifeCycleCost->lengthStudyTotalMonths)) {
-                CashFlow(offset + jCost).mnAmount(month) = NonrecurringCost(jCost).cost * monthlyInflationFactor(month);
+                state.dataEconLifeCycleCost->CashFlow(offset + jCost).mnAmount(month) = state.dataEconLifeCycleCost->NonrecurringCost(jCost).cost * monthlyInflationFactor(month);
             } else {
-                ShowWarningError(state, "For life cycle costing a nonrecurring cost named " + NonrecurringCost(jCost).name +
+                ShowWarningError(state, "For life cycle costing a nonrecurring cost named " + state.dataEconLifeCycleCost->NonrecurringCost(jCost).name +
                                  " contains a cost which is not within the study period.");
             }
         }
         // Put recurring costs into cashflows
         offset = countOfCostCat;
         for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numRecurringCosts; ++jCost) {
-            CashFlow(offset + jCost).name = RecurringCosts(jCost).name;
-            CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
-            CashFlow(offset + jCost).Category = RecurringCosts(jCost).category;
-            CashFlow(offset + jCost).orginalCost = RecurringCosts(jCost).cost;
-            if (RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
-                firstMonth = RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
-            } else if (RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
-                firstMonth = RecurringCosts(jCost).totalMonthsFromStart + 1;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).name = state.dataEconLifeCycleCost->RecurringCosts(jCost).name;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).SourceKind = iSourceKind::Recurring;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).Category = state.dataEconLifeCycleCost->RecurringCosts(jCost).category;
+            state.dataEconLifeCycleCost->CashFlow(offset + jCost).orginalCost = state.dataEconLifeCycleCost->RecurringCosts(jCost).cost;
+            if (state.dataEconLifeCycleCost->RecurringCosts(jCost).startOfCosts == iStartCosts::ServicePeriod) {
+                firstMonth = state.dataEconLifeCycleCost->RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
+            } else if (state.dataEconLifeCycleCost->RecurringCosts(jCost).startOfCosts == iStartCosts::BasePeriod) {
+                firstMonth = state.dataEconLifeCycleCost->RecurringCosts(jCost).totalMonthsFromStart + 1;
             }
             if ((firstMonth >= 1) && (firstMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths)) {
                 month = firstMonth;
-                if (RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
+                if (state.dataEconLifeCycleCost->RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
                     for (iLoop = 1; iLoop <= 10000; ++iLoop) { // add a limit to the loop to prevent runaway condition
-                        CashFlow(offset + jCost).mnAmount(month) = RecurringCosts(jCost).cost * monthlyInflationFactor(month);
-                        month += RecurringCosts(jCost).totalRepeatPeriodMonths;
+                        state.dataEconLifeCycleCost->CashFlow(offset + jCost).mnAmount(month) = state.dataEconLifeCycleCost->RecurringCosts(jCost).cost * monthlyInflationFactor(month);
+                        month += state.dataEconLifeCycleCost->RecurringCosts(jCost).totalRepeatPeriodMonths;
                         if (month > state.dataEconLifeCycleCost->lengthStudyTotalMonths) break;
                     }
                 }
             } else {
-                ShowWarningError(state, "For life cycle costing the recurring cost named " + RecurringCosts(jCost).name +
+                ShowWarningError(state, "For life cycle costing the recurring cost named " + state.dataEconLifeCycleCost->RecurringCosts(jCost).name +
                                  " has the first year of the costs that is not within the study period.");
             }
         }
@@ -1297,7 +1250,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     case DataGlobalConstants::ResourceType::RainWater:
                     case DataGlobalConstants::ResourceType::WellWater:
                     case DataGlobalConstants::ResourceType::Condensate:
-                        CashFlow(cashFlowCounter).Category = costCatWater;
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).Category = costCatWater;
                         break;
                     case DataGlobalConstants::ResourceType::Electricity:
                     case DataGlobalConstants::ResourceType::Natural_Gas:
@@ -1316,36 +1269,36 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     case DataGlobalConstants::ResourceType::ElectricityNet:
                     case DataGlobalConstants::ResourceType::SolarWater:
                     case DataGlobalConstants::ResourceType::SolarAir:
-                        CashFlow(cashFlowCounter).Category = costCatEnergy;
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).Category = costCatEnergy;
                         break;
                     default:
-                        CashFlow(cashFlowCounter).Category = costCatOperation;
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).Category = costCatOperation;
                 }
 
-                CashFlow(cashFlowCounter).Resource = iResource;
-                CashFlow(cashFlowCounter).SourceKind = iSourceKind::Resource;
-                CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
+                state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).Resource = iResource;
+                state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).SourceKind = iSourceKind::Resource;
+                state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
                 if (cashFlowCounter <= state.dataEconLifeCycleCost->numCashFlow) {
                     // put the monthly energy costs into the cashflow prior to adjustments
                     // energy costs (a.k.a. resource costs) start at the start of service and repeat
                     // until the end of the study total
                     for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-                        CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
                     }
-                    CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
+                    state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
                     for (int jMonth = monthsBaseToService + 13; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
                         // use the cost from a year earlier
-                        CashFlow(cashFlowCounter).mnAmount(jMonth) = CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).mnAmount(jMonth) = state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
                     }
                     // add in the impact of inflation
                     for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
-                        CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
+                        state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
                     }
                     // now factor in adjustments
                     // need to find the correct adjustment to use for the current resource
                     found = 0;
                     for (jAdj = 1; jAdj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jAdj) {
-                        if (UseAdjustment(jAdj).resource == iResource) {
+                        if (state.dataEconLifeCycleCost->UseAdjustment(jAdj).resource == iResource) {
                             found = jAdj;
                             break;
                         }
@@ -1356,7 +1309,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                                 month = (kYear - 1) * 12 + jMonth;
                                 if (month > state.dataEconLifeCycleCost->lengthStudyTotalMonths) break;
-                                CashFlow(cashFlowCounter).mnAmount(month) *= UseAdjustment(found).Adjustment(kYear);
+                                state.dataEconLifeCycleCost->CashFlow(cashFlowCounter).mnAmount(month) *= state.dataEconLifeCycleCost->UseAdjustment(found).Adjustment(kYear);
                             }
                         }
                     }
@@ -1365,30 +1318,30 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         }
         // put cashflows into categories
         for (jCost = 1; jCost <= countOfCostCat; ++jCost) {
-            CashFlow(jCost).Category = jCost; // make each category the type indicated
-            CashFlow(jCost).SourceKind = iSourceKind::Sum;
+            state.dataEconLifeCycleCost->CashFlow(jCost).Category = jCost; // make each category the type indicated
+            state.dataEconLifeCycleCost->CashFlow(jCost).SourceKind = iSourceKind::Sum;
         }
         // add the cashflows by category
         for (jCost = countOfCostCat + 1; jCost <= state.dataEconLifeCycleCost->numCashFlow; ++jCost) {
-            curCategory = CashFlow(jCost).Category;
+            curCategory = state.dataEconLifeCycleCost->CashFlow(jCost).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
                 for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
-                    CashFlow(curCategory).mnAmount(jMonth) += CashFlow(jCost).mnAmount(jMonth);
+                    state.dataEconLifeCycleCost->CashFlow(curCategory).mnAmount(jMonth) += state.dataEconLifeCycleCost->CashFlow(jCost).mnAmount(jMonth);
                 }
             }
         }
         // create total categories
         for (int jMonth = 1; jMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++jMonth) {
-            CashFlow(costCatTotEnergy).mnAmount(jMonth) = CashFlow(costCatEnergy).mnAmount(jMonth);
-            CashFlow(costCatTotOper).mnAmount(jMonth) = CashFlow(costCatMaintenance).mnAmount(jMonth) + CashFlow(costCatRepair).mnAmount(jMonth) +
-                                                        CashFlow(costCatOperation).mnAmount(jMonth) + CashFlow(costCatReplacement).mnAmount(jMonth) +
-                                                        CashFlow(costCatMinorOverhaul).mnAmount(jMonth) +
-                                                        CashFlow(costCatMajorOverhaul).mnAmount(jMonth) +
-                                                        CashFlow(costCatOtherOperational).mnAmount(jMonth) + CashFlow(costCatWater).mnAmount(jMonth) +
-                                                        CashFlow(costCatEnergy).mnAmount(jMonth);
-            CashFlow(costCatTotCaptl).mnAmount(jMonth) = CashFlow(costCatConstruction).mnAmount(jMonth) + CashFlow(costCatSalvage).mnAmount(jMonth) +
-                                                         CashFlow(costCatOtherCapital).mnAmount(jMonth);
-            CashFlow(costCatTotGrand).mnAmount(jMonth) = CashFlow(costCatTotOper).mnAmount(jMonth) + CashFlow(costCatTotCaptl).mnAmount(jMonth);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).mnAmount(jMonth) = state.dataEconLifeCycleCost->CashFlow(costCatEnergy).mnAmount(jMonth);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotOper).mnAmount(jMonth) = state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).mnAmount(jMonth) + state.dataEconLifeCycleCost->CashFlow(costCatRepair).mnAmount(jMonth) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatOperation).mnAmount(jMonth) + state.dataEconLifeCycleCost->CashFlow(costCatReplacement).mnAmount(jMonth) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).mnAmount(jMonth) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).mnAmount(jMonth) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).mnAmount(jMonth) + state.dataEconLifeCycleCost->CashFlow(costCatWater).mnAmount(jMonth) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatEnergy).mnAmount(jMonth);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).mnAmount(jMonth) = state.dataEconLifeCycleCost->CashFlow(costCatConstruction).mnAmount(jMonth) + state.dataEconLifeCycleCost->CashFlow(costCatSalvage).mnAmount(jMonth) +
+                                                         state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).mnAmount(jMonth);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).mnAmount(jMonth) = state.dataEconLifeCycleCost->CashFlow(costCatTotOper).mnAmount(jMonth) + state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).mnAmount(jMonth);
         }
         // convert all monthly cashflows into yearly cashflows
         for (jCost = 1; jCost <= state.dataEconLifeCycleCost->numCashFlow; ++jCost) {
@@ -1397,17 +1350,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                     month = (kYear - 1) * 12 + jMonth;
                     if (month <= state.dataEconLifeCycleCost->lengthStudyTotalMonths) {
-                        annualCost += CashFlow(jCost).mnAmount(month);
+                        annualCost += state.dataEconLifeCycleCost->CashFlow(jCost).mnAmount(month);
                     }
                 }
-                CashFlow(jCost).yrAmount(kYear) = annualCost;
+                state.dataEconLifeCycleCost->CashFlow(jCost).yrAmount(kYear) = annualCost;
             }
         }
         // generate a warning if resource referenced was not used
         for (int nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
-            auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
+            auto curResource = state.dataEconLifeCycleCost->UsePriceEscalation(nUsePriceEsc).resource;
             if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
-                ShowWarningError(state, "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
+                ShowWarningError(state, "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + state.dataEconLifeCycleCost->UsePriceEscalation(nUsePriceEsc).name +
                                  "\" has no energy cost. ");
                 ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
             }
@@ -1420,28 +1373,28 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         int nUsePriceEsc;
 
          for (int iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
-            if (CashFlow(iCashFlow).pvKind == iPrValKind::Energy) {
+            if (state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind == iPrValKind::Energy) {
                 // make sure this is not water
-                auto curResource = CashFlow(iCashFlow).Resource;
-                if (CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
-                    (CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::OnSiteWater && CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::Condensate)) {
+                auto curResource = state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource;
+                if (state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
+                    (state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::OnSiteWater && state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::Condensate)) {
                     continue;
                 }
                 if ((curResource != DataGlobalConstants::ResourceType::None)) {
                     int found = 0;
                     for (nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
-                        if (UsePriceEscalation(nUsePriceEsc).resource == curResource) {
+                        if (state.dataEconLifeCycleCost->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
                             found = nUsePriceEsc;
                             break;
                         }
                     }
                     if (found > 0) {
                         for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                            EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear) * UsePriceEscalation(found).Escalation(jYear);
+                            state.dataEconLifeCycleCost->EscalatedEnergy.at(jYear).at(curResource) = state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount(jYear) * state.dataEconLifeCycleCost->UsePriceEscalation(found).Escalation(jYear);
                         }
                     } else { // if no escalation than just store the original energy cost
                         for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                            EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear);
+                            state.dataEconLifeCycleCost->EscalatedEnergy.at(jYear).at(curResource) = state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount(jYear);
                         }
                     }
                 }
@@ -1449,7 +1402,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         }
         for (auto kResource : DataGlobalConstants::AllResourceTypes) {
             for (int jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                EscalatedTotEnergy(jYear) += EscalatedEnergy.at(jYear).at(kResource);
+                state.dataEconLifeCycleCost->EscalatedTotEnergy(jYear) += state.dataEconLifeCycleCost->EscalatedEnergy.at(jYear).at(kResource);
             }
         }
     }
@@ -1497,35 +1450,35 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         // identify how each cashflow should be treated
         for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
-                auto const SELECT_CASE_var(CashFlow(iCashFlow).SourceKind);
+                auto const SELECT_CASE_var(state.dataEconLifeCycleCost->CashFlow(iCashFlow).SourceKind);
                 if (SELECT_CASE_var == iSourceKind::Resource) {
                     // only for real fuels purchased such as electricity, natural gas, etc..
-                    if ((CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::Electricity) && (CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
-                        CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
+                    if ((state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::Electricity) && (state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
                     } else {
-                        CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
                     }
                 } else if ((SELECT_CASE_var == iSourceKind::Recurring) || (SELECT_CASE_var == iSourceKind::Nonrecurring)) {
-                    if (CashFlow(iCashFlow).Category == costCatEnergy) {
-                        CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
+                    if (state.dataEconLifeCycleCost->CashFlow(iCashFlow).Category == costCatEnergy) {
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::Energy;
                     } else {
-                        CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::NonEnergy;
                     }
                 } else if (SELECT_CASE_var == iSourceKind::Sum) {
-                    CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
+                    state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
                 } else {
-                    CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
+                    state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind = iPrValKind::NotComputed;
                 }
             }
         }
         // compute the Single Present Value factors based on the discount rate
-        SPV.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->SPV.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
         for (int year = 1; year <= state.dataEconLifeCycleCost->lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
             for (auto iResource : DataGlobalConstants::AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
             }
-            energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+            state.dataEconLifeCycleCost->energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
         }
 
         // Depending if using Constant or Current Dollar analysis
@@ -1549,17 +1502,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 } else {
                 }
             }
-            SPV(jYear) = 1.0 / std::pow(1.0 + curDiscountRate, effectiveYear);
+            state.dataEconLifeCycleCost->SPV(jYear) = 1.0 / std::pow(1.0 + curDiscountRate, effectiveYear);
         }
         // use SPV as default values for all energy types
         for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
             for (auto kResource : DataGlobalConstants::AllResourceTypes) {
-                energySPV.at(jYear).at(kResource) = SPV(jYear);
+                state.dataEconLifeCycleCost->energySPV.at(jYear).at(kResource) = state.dataEconLifeCycleCost->SPV(jYear);
             }
         }
         // loop through the resources and if they match a UseEscalation use those values instead
         for (nUsePriceEsc = 1; nUsePriceEsc <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++nUsePriceEsc) {
-            auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
+            auto curResource = state.dataEconLifeCycleCost->UsePriceEscalation(nUsePriceEsc).resource;
             if (curResource != DataGlobalConstants::ResourceType::None) {
                 for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
                     // the following is based on UPV* formula from NIST 135 supplement but is for a single year
@@ -1574,30 +1527,30 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                         } else {
                         }
                     }
-                    energySPV.at(jYear).at(curResource) =
-                        UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
+                    state.dataEconLifeCycleCost->energySPV.at(jYear).at(curResource) =
+                        state.dataEconLifeCycleCost->UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
                 }
             }
         }
         for (iCashFlow = 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
             {
-                auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
+                auto const SELECT_CASE_var(state.dataEconLifeCycleCost->CashFlow(iCashFlow).pvKind);
                 if (SELECT_CASE_var == iPrValKind::NonEnergy) {
                     totalPV = 0.0;
                     for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                        CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * SPV(jYear);
-                        totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount(jYear) * state.dataEconLifeCycleCost->SPV(jYear);
+                        totalPV += state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal(jYear);
                     }
-                    CashFlow(iCashFlow).presentValue = totalPV;
+                    state.dataEconLifeCycleCost->CashFlow(iCashFlow).presentValue = totalPV;
                 } else if (SELECT_CASE_var == iPrValKind::Energy) {
-                    auto curResource = CashFlow(iCashFlow).Resource;
+                    auto curResource = state.dataEconLifeCycleCost->CashFlow(iCashFlow).Resource;
                     if (curResource != DataGlobalConstants::ResourceType::None) {
                         totalPV = 0.0;
                         for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                            CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * energySPV.at(jYear).at(curResource);
-                            totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
+                            state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrAmount(jYear) * state.dataEconLifeCycleCost->energySPV.at(jYear).at(curResource);
+                            totalPV += state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal(jYear);
                         }
-                        CashFlow(iCashFlow).presentValue = totalPV;
+                        state.dataEconLifeCycleCost->CashFlow(iCashFlow).presentValue = totalPV;
                     }
                 } else if (SELECT_CASE_var == iPrValKind::NotComputed) {
                     // do nothing
@@ -1606,37 +1559,37 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         }
         // sum by category
         for (int i = 1; i <= countOfCostCat; ++i) {
-            CashFlow(i).presentValue = 0; // initialize value to zero before summing in next for loop
+            state.dataEconLifeCycleCost->CashFlow(i).presentValue = 0; // initialize value to zero before summing in next for loop
         }
         for (iCashFlow = countOfCostCat + 1; iCashFlow <= state.dataEconLifeCycleCost->numCashFlow; ++iCashFlow) {
-            curCategory = CashFlow(iCashFlow).Category;
+            curCategory = state.dataEconLifeCycleCost->CashFlow(iCashFlow).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
-                CashFlow(curCategory).presentValue += CashFlow(iCashFlow).presentValue;
+                state.dataEconLifeCycleCost->CashFlow(curCategory).presentValue += state.dataEconLifeCycleCost->CashFlow(iCashFlow).presentValue;
                 for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-                    CashFlow(curCategory).yrPresVal(jYear) += CashFlow(iCashFlow).yrPresVal(jYear);
+                    state.dataEconLifeCycleCost->CashFlow(curCategory).yrPresVal(jYear) += state.dataEconLifeCycleCost->CashFlow(iCashFlow).yrPresVal(jYear);
                 }
             }
         }
         // create total categories
-        CashFlow(costCatTotEnergy).presentValue = CashFlow(costCatEnergy).presentValue;
-        CashFlow(costCatTotOper).presentValue =
-            CashFlow(costCatMaintenance).presentValue + CashFlow(costCatRepair).presentValue + CashFlow(costCatOperation).presentValue +
-            CashFlow(costCatReplacement).presentValue + CashFlow(costCatMinorOverhaul).presentValue + CashFlow(costCatMajorOverhaul).presentValue +
-            CashFlow(costCatOtherOperational).presentValue + CashFlow(costCatWater).presentValue + CashFlow(costCatEnergy).presentValue;
-        CashFlow(costCatTotCaptl).presentValue =
-            CashFlow(costCatConstruction).presentValue + CashFlow(costCatSalvage).presentValue + CashFlow(costCatOtherCapital).presentValue;
-        CashFlow(costCatTotGrand).presentValue = CashFlow(costCatTotOper).presentValue + CashFlow(costCatTotCaptl).presentValue;
+        state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).presentValue = state.dataEconLifeCycleCost->CashFlow(costCatEnergy).presentValue;
+        state.dataEconLifeCycleCost->CashFlow(costCatTotOper).presentValue =
+            state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatRepair).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatOperation).presentValue +
+            state.dataEconLifeCycleCost->CashFlow(costCatReplacement).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).presentValue +
+            state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatWater).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatEnergy).presentValue;
+        state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).presentValue =
+            state.dataEconLifeCycleCost->CashFlow(costCatConstruction).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatSalvage).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).presentValue;
+        state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).presentValue = state.dataEconLifeCycleCost->CashFlow(costCatTotOper).presentValue + state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).presentValue;
         for (jYear = 1; jYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++jYear) {
-            CashFlow(costCatTotEnergy).yrPresVal(jYear) = CashFlow(costCatEnergy).yrPresVal(jYear);
-            CashFlow(costCatTotOper).yrPresVal(jYear) = CashFlow(costCatMaintenance).yrPresVal(jYear) + CashFlow(costCatRepair).yrPresVal(jYear) +
-                                                        CashFlow(costCatOperation).yrPresVal(jYear) + CashFlow(costCatReplacement).yrPresVal(jYear) +
-                                                        CashFlow(costCatMinorOverhaul).yrPresVal(jYear) +
-                                                        CashFlow(costCatMajorOverhaul).yrPresVal(jYear) +
-                                                        CashFlow(costCatOtherOperational).yrPresVal(jYear) + CashFlow(costCatWater).yrPresVal(jYear) +
-                                                        CashFlow(costCatEnergy).yrPresVal(jYear);
-            CashFlow(costCatTotCaptl).yrPresVal(jYear) = CashFlow(costCatConstruction).yrPresVal(jYear) + CashFlow(costCatSalvage).yrPresVal(jYear) +
-                                                         CashFlow(costCatOtherCapital).yrPresVal(jYear);
-            CashFlow(costCatTotGrand).yrPresVal(jYear) = CashFlow(costCatTotOper).yrPresVal(jYear) + CashFlow(costCatTotCaptl).yrPresVal(jYear);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(costCatEnergy).yrPresVal(jYear);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotOper).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).yrPresVal(jYear) + state.dataEconLifeCycleCost->CashFlow(costCatRepair).yrPresVal(jYear) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatOperation).yrPresVal(jYear) + state.dataEconLifeCycleCost->CashFlow(costCatReplacement).yrPresVal(jYear) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).yrPresVal(jYear) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).yrPresVal(jYear) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).yrPresVal(jYear) + state.dataEconLifeCycleCost->CashFlow(costCatWater).yrPresVal(jYear) +
+                                                        state.dataEconLifeCycleCost->CashFlow(costCatEnergy).yrPresVal(jYear);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(costCatConstruction).yrPresVal(jYear) + state.dataEconLifeCycleCost->CashFlow(costCatSalvage).yrPresVal(jYear) +
+                                                         state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).yrPresVal(jYear);
+            state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrPresVal(jYear) = state.dataEconLifeCycleCost->CashFlow(costCatTotOper).yrPresVal(jYear) + state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).yrPresVal(jYear);
         }
     }
 
@@ -1679,11 +1632,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         int iYear;
         int jYear;
 
-        DepreciatedCapital.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-        TaxableIncome.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-        Taxes.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-        AfterTaxCashFlow.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
-        AfterTaxPresentValue.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->DepreciatedCapital.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->TaxableIncome.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->Taxes.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->AfterTaxCashFlow.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
+        state.dataEconLifeCycleCost->AfterTaxPresentValue.allocate(state.dataEconLifeCycleCost->lengthStudyYears);
 
         // Depreciation factors are based on IRS Publication 946 for 2009 "How to Depreciate Property"
         // The MACRS valus are based on Modified Accelerated Cost Recovery System GDS for 3, 5, 7, 10 year
@@ -1917,13 +1870,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             }
         }
         // convert construction costs (not salvage) into depreciation
-        DepreciatedCapital = 0.0; // set all years to zero
+        state.dataEconLifeCycleCost->DepreciatedCapital = 0.0; // set all years to zero
         for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-            curCapital = CashFlow(costCatConstruction).yrAmount(iYear) + CashFlow(costCatOtherCapital).yrAmount(iYear);
+            curCapital = state.dataEconLifeCycleCost->CashFlow(costCatConstruction).yrAmount(iYear) + state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).yrAmount(iYear);
             for (jYear = 1; jYear <= SizeDepr; ++jYear) {
                 curDepYear = iYear + jYear - 1; // start depreciating with the year that the capital was shown and go to years following
                 if (curDepYear <= state.dataEconLifeCycleCost->lengthStudyYears) {
-                    DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercent(jYear) / 100);
+                    state.dataEconLifeCycleCost->DepreciatedCapital(curDepYear) += curCapital * (DepreciationPercent(jYear) / 100);
                 }
             }
         }
@@ -1934,11 +1887,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
         //   income taxes (taxable income x incremental tax rate)
         //   after-tax cash flow (before-tax cash flow - income taxes)
         for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-            TaxableIncome(iYear) = CashFlow(costCatTotGrand).yrAmount(iYear) - DepreciatedCapital(iYear);
-            Taxes(iYear) = TaxableIncome(iYear) * state.dataEconLifeCycleCost->taxRate;
-            AfterTaxCashFlow(iYear) = CashFlow(costCatTotGrand).yrAmount(iYear) - Taxes(iYear);
+            state.dataEconLifeCycleCost->TaxableIncome(iYear) = state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(iYear) - state.dataEconLifeCycleCost->DepreciatedCapital(iYear);
+            state.dataEconLifeCycleCost->Taxes(iYear) = state.dataEconLifeCycleCost->TaxableIncome(iYear) * state.dataEconLifeCycleCost->taxRate;
+            state.dataEconLifeCycleCost->AfterTaxCashFlow(iYear) = state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(iYear) - state.dataEconLifeCycleCost->Taxes(iYear);
             // the present value after taxes is pretax present value minus the present value of the taxes
-            AfterTaxPresentValue(iYear) = CashFlow(costCatTotGrand).yrPresVal(iYear) - Taxes(iYear) * SPV(iYear);
+            state.dataEconLifeCycleCost->AfterTaxPresentValue(iYear) = state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrPresVal(iYear) - state.dataEconLifeCycleCost->Taxes(iYear) * state.dataEconLifeCycleCost->SPV(iYear);
         }
     }
 
@@ -2115,14 +2068,14 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 rowHead(iYear + 2) = fmt::to_string(iYear);
             }
             for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
-                columnHead(jObj) = UsePriceEscalation(jObj).name;
-                tableBody(jObj, 1) = GetResourceTypeChar(UsePriceEscalation(jObj).resource);
+                columnHead(jObj) = state.dataEconLifeCycleCost->UsePriceEscalation(jObj).name;
+                tableBody(jObj, 1) = GetResourceTypeChar(state.dataEconLifeCycleCost->UsePriceEscalation(jObj).resource);
                 tableBody(jObj, 2) =
-                    format("{} {}", MonthNames(UsePriceEscalation(jObj).escalationStartMonth), UsePriceEscalation(jObj).escalationStartYear);
+                    format("{} {}", MonthNames(state.dataEconLifeCycleCost->UsePriceEscalation(jObj).escalationStartMonth), state.dataEconLifeCycleCost->UsePriceEscalation(jObj).escalationStartYear);
             }
             for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUsePriceEscalation; ++jObj) {
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                    tableBody(jObj, iYear + 2) = RealToStr(UsePriceEscalation(jObj).Escalation(iYear), 6);
+                    tableBody(jObj, iYear + 2) = RealToStr(state.dataEconLifeCycleCost->UsePriceEscalation(jObj).Escalation(iYear), 6);
                 }
             }
             WriteSubtitle(state, "Use Price Escalation");
@@ -2154,12 +2107,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     rowHead(iYear + 1) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->serviceDateMonth), state.dataEconLifeCycleCost->serviceDateYear + iYear - 1);
                 }
                 for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
-                    columnHead(jObj) = UseAdjustment(jObj).name;
-                    tableBody(jObj, 1) = GetResourceTypeChar(UseAdjustment(jObj).resource);
+                    columnHead(jObj) = state.dataEconLifeCycleCost->UseAdjustment(jObj).name;
+                    tableBody(jObj, 1) = GetResourceTypeChar(state.dataEconLifeCycleCost->UseAdjustment(jObj).resource);
                 }
                 for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numUseAdjustment; ++jObj) {
                     for (iYear = 1; iYear <= numYears; ++iYear) {
-                        tableBody(jObj, iYear + 1) = RealToStr(UseAdjustment(jObj).Adjustment(iYear), 6);
+                        tableBody(jObj, iYear + 1) = RealToStr(state.dataEconLifeCycleCost->UseAdjustment(jObj).Adjustment(iYear), 6);
                     }
                 }
                 WriteSubtitle(state, "Use Adjustment");
@@ -2190,9 +2143,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             }
             for (jObj = 1; jObj <= (state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost); ++jObj) {
                 curCashFlow = countOfCostCat + jObj;
-                columnHead(jObj) = CashFlow(curCashFlow).name;
+                columnHead(jObj) = state.dataEconLifeCycleCost->CashFlow(curCashFlow).name;
                 {
-                    auto const SELECT_CASE_var(CashFlow(curCashFlow).SourceKind);
+                    auto const SELECT_CASE_var(state.dataEconLifeCycleCost->CashFlow(curCashFlow).SourceKind);
                     if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
                         tableBody(jObj, 1) = "Nonrecurring";
                     } else if (SELECT_CASE_var == iSourceKind::Recurring) {
@@ -2200,7 +2153,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     }
                 }
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                    tableBody(jObj, iYear + 1) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
+                    tableBody(jObj, iYear + 1) = RealToStr(state.dataEconLifeCycleCost->CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
             WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
@@ -2238,14 +2191,14 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             }
             for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + jObj;
-                columnHead(jObj) = CashFlow(curCashFlow).name;
+                columnHead(jObj) = state.dataEconLifeCycleCost->CashFlow(curCashFlow).name;
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                    tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
+                    tableBody(jObj, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
             columnHead(numColumns) = "Total";
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(jObj, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(iYear) + state.dataEconLifeCycleCost->CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2281,21 +2234,21 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             }
             for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + jObj;
-                columnHead(jObj) = CashFlow(curCashFlow).name;
-                auto curResource = CashFlow(curCashFlow).Resource;
-                if (CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
+                columnHead(jObj) = state.dataEconLifeCycleCost->CashFlow(curCashFlow).name;
+                auto curResource = state.dataEconLifeCycleCost->CashFlow(curCashFlow).Resource;
+                if (state.dataEconLifeCycleCost->CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
                     for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                        tableBody(jObj, iYear) = RealToStr(EscalatedEnergy.at(iYear).at(curResource), 2);
+                        tableBody(jObj, iYear) = RealToStr(state.dataEconLifeCycleCost->EscalatedEnergy.at(iYear).at(curResource), 2);
                     }
                 } else { // for water just use the original cashflow since not involved in escalation
                     for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                        tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
+                        tableBody(jObj, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(curCashFlow).yrAmount(iYear), 2);
                     }
                 }
             }
             columnHead(numColumns) = "Total";
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(jObj, iYear) = RealToStr(state.dataEconLifeCycleCost->EscalatedTotEnergy(iYear) + state.dataEconLifeCycleCost->CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2333,10 +2286,10 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             columnHead(4) = "Total";
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(CashFlow(costCatConstruction).yrAmount(iYear), 2);
-                tableBody(2, iYear) = RealToStr(CashFlow(costCatSalvage).yrAmount(iYear), 2);
-                tableBody(3, iYear) = RealToStr(CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
-                tableBody(4, iYear) = RealToStr(CashFlow(costCatTotCaptl).yrAmount(iYear), 2);
+                tableBody(1, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatConstruction).yrAmount(iYear), 2);
+                tableBody(2, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatSalvage).yrAmount(iYear), 2);
+                tableBody(3, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
+                tableBody(4, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2380,16 +2333,16 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(CashFlow(costCatEnergy).yrAmount(iYear), 2);
-                tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
-                tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
-                tableBody(4, iYear) = RealToStr(CashFlow(costCatRepair).yrAmount(iYear), 2);
-                tableBody(5, iYear) = RealToStr(CashFlow(costCatOperation).yrAmount(iYear), 2);
-                tableBody(6, iYear) = RealToStr(CashFlow(costCatReplacement).yrAmount(iYear), 2);
-                tableBody(7, iYear) = RealToStr(CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
-                tableBody(8, iYear) = RealToStr(CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
-                tableBody(9, iYear) = RealToStr(CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
-                tableBody(10, iYear) = RealToStr(CashFlow(costCatTotOper).yrAmount(iYear), 2);
+                tableBody(1, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatEnergy).yrAmount(iYear), 2);
+                tableBody(2, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(3, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).yrAmount(iYear), 2);
+                tableBody(4, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatRepair).yrAmount(iYear), 2);
+                tableBody(5, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOperation).yrAmount(iYear), 2);
+                tableBody(6, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatReplacement).yrAmount(iYear), 2);
+                tableBody(7, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
+                tableBody(8, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
+                tableBody(9, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
+                tableBody(10, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotOper).yrAmount(iYear), 2);
             }
             WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2433,17 +2386,17 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
-                tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
-                tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
-                tableBody(4, iYear) = RealToStr(CashFlow(costCatRepair).yrAmount(iYear), 2);
-                tableBody(5, iYear) = RealToStr(CashFlow(costCatOperation).yrAmount(iYear), 2);
-                tableBody(6, iYear) = RealToStr(CashFlow(costCatReplacement).yrAmount(iYear), 2);
-                tableBody(7, iYear) = RealToStr(CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
-                tableBody(8, iYear) = RealToStr(CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
-                tableBody(9, iYear) = RealToStr(CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
+                tableBody(1, iYear) = RealToStr(state.dataEconLifeCycleCost->EscalatedTotEnergy(iYear), 2);
+                tableBody(2, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(3, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).yrAmount(iYear), 2);
+                tableBody(4, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatRepair).yrAmount(iYear), 2);
+                tableBody(5, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOperation).yrAmount(iYear), 2);
+                tableBody(6, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatReplacement).yrAmount(iYear), 2);
+                tableBody(7, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
+                tableBody(8, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
+                tableBody(9, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
                 Real64 yearly_total_cost =
-                    CashFlow(costCatTotOper).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                    state.dataEconLifeCycleCost->CashFlow(costCatTotOper).yrAmount(iYear) + state.dataEconLifeCycleCost->EscalatedTotEnergy(iYear) - state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(iYear);
                 tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
             }
             WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
@@ -2493,14 +2446,14 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 columnHead(15) = "tCap";
                 columnHead(16) = "Totl";
                 for (jObj = countOfCostCat + 1; jObj <= state.dataEconLifeCycleCost->numCashFlow; ++jObj) {
-                    columnHead(jObj) = CashFlow(jObj).name;
+                    columnHead(jObj) = state.dataEconLifeCycleCost->CashFlow(jObj).name;
                 }
                 for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
                     rowHead(kMonth) = format("{} {}", MonthNames(1 + (kMonth + state.dataEconLifeCycleCost->baseDateMonth - 2) % 12), state.dataEconLifeCycleCost->baseDateYear + int((kMonth - 1) / 12));
                 }
                 for (kMonth = 1; kMonth <= state.dataEconLifeCycleCost->lengthStudyTotalMonths; ++kMonth) {
                     for (jObj = 1; jObj <= state.dataEconLifeCycleCost->numCashFlow; ++jObj) {
-                        tableBody(jObj, kMonth) = RealToStr(CashFlow(jObj).mnAmount(kMonth), 2);
+                        tableBody(jObj, kMonth) = RealToStr(state.dataEconLifeCycleCost->CashFlow(jObj).mnAmount(kMonth), 2);
                     }
                 }
                 WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
@@ -2533,7 +2486,7 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             }
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    tableBody(kMonth, iYear) = RealToStr(CashFlow(costCatTotGrand).mnAmount((iYear - 1) * 12 + kMonth), 2);
+                    tableBody(kMonth, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).mnAmount((iYear - 1) * 12 + kMonth), 2);
                 }
             }
             WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
@@ -2567,9 +2520,9 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             rowHead(numRows + 1) = "TOTAL";
             for (jObj = 1; jObj <= (state.dataEconLifeCycleCost->numRecurringCosts + state.dataEconLifeCycleCost->numNonrecurringCost + state.dataEconLifeCycleCost->numResourcesUsed); ++jObj) {
                 offset = countOfCostCat;
-                rowHead(jObj) = CashFlow(offset + jObj).name;
+                rowHead(jObj) = state.dataEconLifeCycleCost->CashFlow(offset + jObj).name;
                 {
-                    auto const SELECT_CASE_var(CashFlow(offset + jObj).Category);
+                    auto const SELECT_CASE_var(state.dataEconLifeCycleCost->CashFlow(offset + jObj).Category);
                     if (SELECT_CASE_var == costCatMaintenance) {
                         tableBody(1, jObj) = "Maintenance";
                     } else if (SELECT_CASE_var == costCatRepair) {
@@ -2599,13 +2552,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     }
                 }
                 {
-                    auto const SELECT_CASE_var(CashFlow(offset + jObj).SourceKind);
+                    auto const SELECT_CASE_var(state.dataEconLifeCycleCost->CashFlow(offset + jObj).SourceKind);
                     if (SELECT_CASE_var == iSourceKind::Nonrecurring) {
                         tableBody(2, jObj) = "Nonrecurring";
                     } else if (SELECT_CASE_var == iSourceKind::Recurring) {
                         tableBody(2, jObj) = "Recurring";
                     } else if (SELECT_CASE_var == iSourceKind::Resource) {
-                        if (CashFlow(offset + jObj).Category == costCatWater) {
+                        if (state.dataEconLifeCycleCost->CashFlow(offset + jObj).Category == costCatWater) {
                             tableBody(2, jObj) = "Water Cost";
                         } else {
                             tableBody(2, jObj) = "Energy Cost";
@@ -2614,11 +2567,11 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                         tableBody(2, jObj) = "-";
                     }
                 }
-                tableBody(3, jObj) = RealToStr(CashFlow(offset + jObj).orginalCost, 2);
-                tableBody(4, jObj) = RealToStr(CashFlow(offset + jObj).presentValue, 2);
-                totalPV += CashFlow(offset + jObj).presentValue;
-                if (CashFlow(offset + jObj).orginalCost != 0.0) {
-                    tableBody(5, jObj) = RealToStr(CashFlow(offset + jObj).presentValue / CashFlow(offset + jObj).orginalCost, 4);
+                tableBody(3, jObj) = RealToStr(state.dataEconLifeCycleCost->CashFlow(offset + jObj).orginalCost, 2);
+                tableBody(4, jObj) = RealToStr(state.dataEconLifeCycleCost->CashFlow(offset + jObj).presentValue, 2);
+                totalPV += state.dataEconLifeCycleCost->CashFlow(offset + jObj).presentValue;
+                if (state.dataEconLifeCycleCost->CashFlow(offset + jObj).orginalCost != 0.0) {
+                    tableBody(5, jObj) = RealToStr(state.dataEconLifeCycleCost->CashFlow(offset + jObj).presentValue / state.dataEconLifeCycleCost->CashFlow(offset + jObj).orginalCost, 4);
                 } else {
                     tableBody(5, jObj) = "-";
                 }
@@ -2672,22 +2625,22 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             rowHead(16) = "Grand Total";
             columnHead(1) = "Present Value";
 
-            tableBody(1, 1) = RealToStr(CashFlow(costCatConstruction).presentValue, 2);
-            tableBody(1, 2) = RealToStr(CashFlow(costCatSalvage).presentValue, 2);
-            tableBody(1, 3) = RealToStr(CashFlow(costCatOtherCapital).presentValue, 2);
-            tableBody(1, 4) = RealToStr(CashFlow(costCatEnergy).presentValue, 2);
-            tableBody(1, 5) = RealToStr(CashFlow(costCatWater).presentValue, 2);
-            tableBody(1, 6) = RealToStr(CashFlow(costCatMaintenance).presentValue, 2);
-            tableBody(1, 7) = RealToStr(CashFlow(costCatRepair).presentValue, 2);
-            tableBody(1, 8) = RealToStr(CashFlow(costCatOperation).presentValue, 2);
-            tableBody(1, 9) = RealToStr(CashFlow(costCatReplacement).presentValue, 2);
-            tableBody(1, 10) = RealToStr(CashFlow(costCatMinorOverhaul).presentValue, 2);
-            tableBody(1, 11) = RealToStr(CashFlow(costCatMajorOverhaul).presentValue, 2);
-            tableBody(1, 12) = RealToStr(CashFlow(costCatOtherOperational).presentValue, 2);
-            tableBody(1, 13) = RealToStr(CashFlow(costCatTotEnergy).presentValue, 2);
-            tableBody(1, 14) = RealToStr(CashFlow(costCatTotOper).presentValue, 2);
-            tableBody(1, 15) = RealToStr(CashFlow(costCatTotCaptl).presentValue, 2);
-            tableBody(1, 16) = RealToStr(CashFlow(costCatTotGrand).presentValue, 2);
+            tableBody(1, 1) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatConstruction).presentValue, 2);
+            tableBody(1, 2) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatSalvage).presentValue, 2);
+            tableBody(1, 3) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOtherCapital).presentValue, 2);
+            tableBody(1, 4) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatEnergy).presentValue, 2);
+            tableBody(1, 5) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatWater).presentValue, 2);
+            tableBody(1, 6) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMaintenance).presentValue, 2);
+            tableBody(1, 7) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatRepair).presentValue, 2);
+            tableBody(1, 8) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOperation).presentValue, 2);
+            tableBody(1, 9) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatReplacement).presentValue, 2);
+            tableBody(1, 10) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMinorOverhaul).presentValue, 2);
+            tableBody(1, 11) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatMajorOverhaul).presentValue, 2);
+            tableBody(1, 12) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatOtherOperational).presentValue, 2);
+            tableBody(1, 13) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).presentValue, 2);
+            tableBody(1, 14) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotOper).presentValue, 2);
+            tableBody(1, 15) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotCaptl).presentValue, 2);
+            tableBody(1, 16) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).presentValue, 2);
 
             WriteSubtitle(state, "Present Value by Category");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -2717,13 +2670,13 @@ namespace EnergyPlus::EconomicLifeCycleCost {
             totalPV = 0.0;
             for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                 rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(CashFlow(costCatTotGrand).yrAmount(iYear), 2);
+                tableBody(1, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(iYear), 2);
                 // adjust for escalated energy costs
                 Real64 yearly_total_cost =
-                    CashFlow(costCatTotGrand).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                    state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrAmount(iYear) + state.dataEconLifeCycleCost->EscalatedTotEnergy(iYear) - state.dataEconLifeCycleCost->CashFlow(costCatTotEnergy).yrAmount(iYear);
                 tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
-                tableBody(3, iYear) = RealToStr(CashFlow(costCatTotGrand).yrPresVal(iYear), 2);
-                totalPV += CashFlow(costCatTotGrand).yrPresVal(iYear);
+                tableBody(3, iYear) = RealToStr(state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrPresVal(iYear), 2);
+                totalPV += state.dataEconLifeCycleCost->CashFlow(costCatTotGrand).yrPresVal(iYear);
             }
 
             rowHead(state.dataEconLifeCycleCost->lengthStudyYears + 1) = "TOTAL";
@@ -2760,12 +2713,12 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 totalPV = 0.0;
                 for (iYear = 1; iYear <= state.dataEconLifeCycleCost->lengthStudyYears; ++iYear) {
                     rowHead(iYear) = format("{} {}", MonthNames(state.dataEconLifeCycleCost->baseDateMonth), state.dataEconLifeCycleCost->baseDateYear + iYear - 1);
-                    tableBody(1, iYear) = RealToStr(DepreciatedCapital(iYear), 2);
-                    tableBody(2, iYear) = RealToStr(TaxableIncome(iYear), 2);
-                    tableBody(3, iYear) = RealToStr(Taxes(iYear), 2);
-                    tableBody(4, iYear) = RealToStr(AfterTaxCashFlow(iYear), 2);
-                    tableBody(5, iYear) = RealToStr(AfterTaxPresentValue(iYear), 2);
-                    totalPV += AfterTaxPresentValue(iYear);
+                    tableBody(1, iYear) = RealToStr(state.dataEconLifeCycleCost->DepreciatedCapital(iYear), 2);
+                    tableBody(2, iYear) = RealToStr(state.dataEconLifeCycleCost->TaxableIncome(iYear), 2);
+                    tableBody(3, iYear) = RealToStr(state.dataEconLifeCycleCost->Taxes(iYear), 2);
+                    tableBody(4, iYear) = RealToStr(state.dataEconLifeCycleCost->AfterTaxCashFlow(iYear), 2);
+                    tableBody(5, iYear) = RealToStr(state.dataEconLifeCycleCost->AfterTaxPresentValue(iYear), 2);
+                    totalPV += state.dataEconLifeCycleCost->AfterTaxPresentValue(iYear);
                 }
 
                 rowHead(state.dataEconLifeCycleCost->lengthStudyYears + 1) = "TOTAL";
@@ -2787,32 +2740,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 tableBody.deallocate();
             }
         }
-    }
-
-    void clear_state()
-    {
-        SPV.deallocate();
-        DepreciatedCapital.deallocate();
-        TaxableIncome.deallocate();
-        Taxes.deallocate();
-        AfterTaxCashFlow.deallocate();
-        AfterTaxPresentValue.deallocate();
-        RecurringCosts.deallocate();
-        NonrecurringCost.deallocate();
-        UsePriceEscalation.deallocate();
-        UseAdjustment.deallocate();
-        CashFlow.deallocate();
-
-        GetInput_GetLifeCycleCostInput = true;
-        UsePriceEscalation_escStartYear = 0;
-        UsePriceEscalation_escNumYears = 0;
-        UsePriceEscalation_escEndYear = 0;
-        UsePriceEscalation_earlierEndYear = 0;
-        UsePriceEscalation_laterStartYear = 0;
-        UsePriceEscalation_curEsc = 0;
-        UsePriceEscalation_curFld = 0;
-        ExpressAsCashFlows_baseMonths1900 = 0;
-        ExpressAsCashFlows_serviceMonths1900 = 0;
     }
 
 } // namespace EnergyPlus
