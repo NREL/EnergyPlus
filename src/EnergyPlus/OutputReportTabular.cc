@@ -4323,7 +4323,6 @@ namespace EnergyPlus::OutputReportTabular {
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
-        using HVACVariableRefrigerantFlow::NumVRFCond;
         using HVACVariableRefrigerantFlow::VRF;
         using MixedAir::NumOAControllers;
         using MixedAir::OAController;
@@ -4464,7 +4463,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Variable Refrigerant Flow
-        for (iCoil = 1; iCoil <= NumVRFCond; ++iCoil) {
+        for (iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
             if (VRF(iCoil).CondenserType == AirCooled) {
                 SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
                                               VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +

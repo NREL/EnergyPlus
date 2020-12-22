@@ -15811,8 +15811,6 @@ namespace EnergyPlus::DXCoils {
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-        using HVACVariableRefrigerantFlow::OACompOffMassFlow;
-        using HVACVariableRefrigerantFlow::OACompOnMassFlow;
         using namespace HVACVariableRefrigerantFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -16016,9 +16014,9 @@ namespace EnergyPlus::DXCoils {
             TotCap = DXCoil(DXCoilNum).RatedTotCap(Mode);
             QCoilReq = -PartLoadRatio * TotCap;
             if (PartLoadRatio == 0.0) {
-                AirMassFlowMin = OACompOffMassFlow;
+                AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
             } else {
-                AirMassFlowMin = OACompOnMassFlow;
+                AirMassFlowMin = state.dataHVACVarRefFlow->OACompOnMassFlow;
             }
 
             // Call ControlVRFIUCoil to calculate: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
@@ -16265,8 +16263,6 @@ namespace EnergyPlus::DXCoils {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-        using HVACVariableRefrigerantFlow::OACompOffMassFlow;
-        using HVACVariableRefrigerantFlow::OACompOnMassFlow;
         using namespace HVACVariableRefrigerantFlow;
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -16354,9 +16350,9 @@ namespace EnergyPlus::DXCoils {
             TotCap = DXCoil(DXCoilNum).RatedTotCap(Mode);
             QCoilReq = PartLoadRatio * TotCap;
             if (PartLoadRatio == 0.0) {
-                AirMassFlowMin = OACompOffMassFlow;
+                AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
             } else {
-                AirMassFlowMin = OACompOnMassFlow;
+                AirMassFlowMin = state.dataHVACVarRefFlow->OACompOnMassFlow;
             }
 
             // Call ControlVRFIUCoil to calculate: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
