@@ -123,39 +123,9 @@ namespace DXCoils {
     extern Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
     extern Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
 
-    extern int CurDXCoilNum;
-
-    extern int NumDXCoils;                           // Total number of DX coils
     extern Real64 HPWHHeatingCapacity;               // Used by Heat Pump:Water Heater object as total water heating capacity [W]
     extern Real64 HPWHHeatingCOP;                    // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-    extern bool GetCoilsInputFlag;                   // First time, input is "gotten"
-    extern bool MyOneTimeFlag;                       // One time flag used to allocate MyEnvrnFlag and MySizeFlag
-    extern int NumVRFHeatingCoils;                   // number of VRF heat pump heating coils
-    extern int NumVRFCoolingCoils;                   // number of VRF heat pump cooling coils
-    extern int NumDXHeatingCoils;                    // number of DX heat pump heating coils
-    extern int NumDoe2DXCoils;                       // number of doe2 DX  coils
-    extern int NumDXHeatPumpWaterHeaterPumpedCoils;  // number of DX  water heater coils, pumped
-    extern int NumDXHeatPumpWaterHeaterWrappedCoils; // number of wrapped tank HPWH coils
-    extern int NumDXMulSpeedCoils;                   // number of DX coils with multi-speed compressor
-    extern int NumDXMulModeCoils;                    // number of DX coils with multi-mode performance
-
-    extern int NumDXMulSpeedCoolCoils; // number of multispeed DX cooling coils
-    extern int NumDXMulSpeedHeatCoils; // number of multispeed DX heating coils
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
-    // Common routines
-
-    // External function calls
 
     // Types
 
@@ -1005,9 +975,41 @@ namespace DXCoils {
 
 struct DXCoilsData : BaseGlobalStruct {
 
+    bool GetCoilsInputFlag = true; // First time, input is "gotten"
+    bool MyOneTimeFlag = true;     // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+    bool CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
+    int NumVRFHeatingCoils = 0;                   // number of VRF heat pump heating coils
+    int NumVRFCoolingCoils = 0;                   // number of VRF heat pump cooling coils
+    int NumDXCoils = 0;                           // Total number of DX coils
+    int NumVRFHeatingFluidTCtrlCoils = 0;         // number of VRF heat pump heating coils for FluidTCtrl Model
+    int NumVRFCoolingFluidTCtrlCoils = 0;         // number of VRF heat pump cooling coils for FluidTCtrl Model
+    int NumDXHeatingCoils = 0;                    // number of DX heat pump heating coils
+    int NumDoe2DXCoils = 0;                       // number of doe2 DX  coils
+    int NumDXHeatPumpWaterHeaterPumpedCoils = 0;  // number of DX  water heater coils, pumped
+    int NumDXHeatPumpWaterHeaterWrappedCoils = 0; // number of DX  water heater coils, pumped
+    int NumDXMulSpeedCoils = 0;                   // number of DX coils with multi-speed compressor
+    int NumDXMulModeCoils = 0;                    // number of DX coils with multi-mode performance
+    int NumDXMulSpeedCoolCoils = 0;               // number of multispeed DX cooling coils
+    int NumDXMulSpeedHeatCoils = 0;               // number of multispeed DX heating coils
+
     void clear_state() override
     {
-
+        this->GetCoilsInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
+        this->NumVRFHeatingCoils = 0;
+        this->NumVRFCoolingCoils = 0;
+        this->NumDXCoils = 0;
+        this->NumVRFHeatingFluidTCtrlCoils = 0;
+        this->NumVRFCoolingFluidTCtrlCoils = 0;
+        this->NumDXHeatingCoils = 0;
+        this->NumDoe2DXCoils = 0;
+        this->NumDXHeatPumpWaterHeaterPumpedCoils = 0;
+        this->NumDXHeatPumpWaterHeaterWrappedCoils = 0;
+        this->NumDXMulSpeedCoils = 0;
+        this->NumDXMulModeCoils = 0;
+        this->NumDXMulSpeedCoolCoils = 0;
+        this->NumDXMulSpeedHeatCoils = 0;
     }
 };
 

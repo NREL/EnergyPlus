@@ -498,7 +498,6 @@ namespace CostEstimateManager {
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
         using DXCoils::DXCoil;
-        using DXCoils::NumDXCoils;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
 
@@ -596,7 +595,7 @@ namespace CostEstimateManager {
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) {
-                        if (WildcardObjNames) state.dataCostEstimateManager->CostLineItem(Item).Qty = double(NumDXCoils);
+                        if (WildcardObjNames) state.dataCostEstimateManager->CostLineItem(Item).Qty = double(state.dataDXCoils->NumDXCoils);
                         if (thisCoil > 0) state.dataCostEstimateManager->CostLineItem(Item).Qty = 1.0;
                         state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerEach;
                         state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;

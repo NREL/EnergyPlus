@@ -132,6 +132,7 @@ namespace EnergyPlus::DXCoils {
     using namespace ScheduleManager;
 
     // MODULE VARIABLE DECLARATIONS:
+    Array1D_bool CheckEquipName;
     Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
     Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
@@ -144,40 +145,8 @@ namespace EnergyPlus::DXCoils {
     Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
     Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
 
-    int NumDXCoils(0);                           // Total number of DX coils
     Real64 HPWHHeatingCapacity(0.0);             // Used by Heat Pump:Water Heater object as total water heating capacity [W]
     Real64 HPWHHeatingCOP(0.0);                  // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-    bool GetCoilsInputFlag(true);                // First time, input is "gotten"
-    bool MyOneTimeFlag(true);                    // One time flag used to allocate MyEnvrnFlag and MySizeFlag
-    int NumVRFHeatingCoils(0);                   // number of VRF heat pump heating coils
-    int NumVRFCoolingCoils(0);                   // number of VRF heat pump cooling coils
-    int NumVRFHeatingFluidTCtrlCoils(0);         // number of VRF heat pump heating coils for FluidTCtrl Model
-    int NumVRFCoolingFluidTCtrlCoils(0);         // number of VRF heat pump cooling coils for FluidTCtrl Model
-    int NumDXHeatingCoils(0);                    // number of DX heat pump heating coils
-    int NumDoe2DXCoils(0);                       // number of doe2 DX  coils
-    int NumDXHeatPumpWaterHeaterPumpedCoils(0);  // number of DX  water heater coils, pumped
-    int NumDXHeatPumpWaterHeaterWrappedCoils(0); // number of DX  water heater coils, pumped
-    int NumDXMulSpeedCoils(0);                   // number of DX coils with multi-speed compressor
-    int NumDXMulModeCoils(0);                    // number of DX coils with multi-mode performance
-
-    int NumDXMulSpeedCoolCoils(0); // number of multispeed DX cooling coils
-    int NumDXMulSpeedHeatCoils(0); // number of multispeed DX heating coils
-    Array1D_bool CheckEquipName;
-    bool CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite(true);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
-    // Common routines
-
-    // External function calls
 
     // Object Data
     Array1D<DXCoilData> DXCoil;
@@ -224,9 +193,9 @@ namespace EnergyPlus::DXCoils {
         Real64 CompCycRatio; // compressor cycling ratio of VRF condenser
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
+            state.dataDXCoils->GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
         if (CompIndex == 0) {
@@ -237,9 +206,9 @@ namespace EnergyPlus::DXCoils {
             CompIndex = DXCoilNum;
         } else {
             DXCoilNum = CompIndex;
-            if (DXCoilNum > NumDXCoils || DXCoilNum < 1) {
+            if (DXCoilNum > state.dataDXCoils->NumDXCoils || DXCoilNum < 1) {
                 ShowFatalError(
-                    state, format("SimDXCoil: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, NumDXCoils, CompName));
+                    state, format("SimDXCoil: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, state.dataDXCoils->NumDXCoils, CompName));
             }
             if (CheckEquipName(DXCoilNum)) {
                 if (!CompName.empty() && CompName != DXCoil(DXCoilNum).Name) {
@@ -357,9 +326,9 @@ namespace EnergyPlus::DXCoils {
         // FLOW
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
+            state.dataDXCoils->GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
         //  find correct DX Coil
@@ -372,10 +341,10 @@ namespace EnergyPlus::DXCoils {
             CompIndex = DXCoilNum;
         } else {
             DXCoilNum = CompIndex;
-            if (DXCoilNum > NumDXCoils || DXCoilNum < 1) {
+            if (DXCoilNum > state.dataDXCoils->NumDXCoils || DXCoilNum < 1) {
                 ShowFatalError(
                     state,
-                    format("SimDXCoilMultiSpeed: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, NumDXCoils, CompName));
+                    format("SimDXCoilMultiSpeed: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, state.dataDXCoils->NumDXCoils, CompName));
             }
             if (CheckEquipName(DXCoilNum)) {
                 if (!CompName.empty() && CompName != DXCoil(DXCoilNum).Name) {
@@ -509,9 +478,9 @@ namespace EnergyPlus::DXCoils {
         // FLOW
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
+            state.dataDXCoils->GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
         //  find correct DX Coil
@@ -523,10 +492,10 @@ namespace EnergyPlus::DXCoils {
             CompIndex = DXCoilNum;
         } else {
             DXCoilNum = CompIndex;
-            if (DXCoilNum > NumDXCoils || DXCoilNum < 1) {
+            if (DXCoilNum > state.dataDXCoils->NumDXCoils || DXCoilNum < 1) {
                 ShowFatalError(
                     state,
-                    format("SimDXCoilMultiMode: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, NumDXCoils, CompName));
+                    format("SimDXCoilMultiMode: Invalid CompIndex passed={}, Number of DX Coils={}, Coil name={}", DXCoilNum, state.dataDXCoils->NumDXCoils, CompName));
             }
             if (CheckEquipName(DXCoilNum)) {
                 if ((CompName != "") && (CompName != DXCoil(DXCoilNum).Name)) {
@@ -862,22 +831,25 @@ namespace EnergyPlus::DXCoils {
         Real64 CurveInput;  // index used for testing PLF curve output
 
         // find number of each type of DX coil and calculate the total number
-        NumDoe2DXCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
-        NumDXHeatingCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
-        NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
-        NumDXMulModeCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
-        NumDXHeatPumpWaterHeaterPumpedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
-        NumDXHeatPumpWaterHeaterWrappedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
-        NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
-        NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
-        NumVRFCoolingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
-        NumVRFHeatingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
-        NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
-        NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
+        state.dataDXCoils->NumDoe2DXCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
+        state.dataDXCoils->NumDXHeatingCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
+        state.dataDXCoils->NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
+        state.dataDXCoils->NumDXMulModeCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
+        state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
+        state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
+        state.dataDXCoils->NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
+        state.dataDXCoils->NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
+        state.dataDXCoils->NumVRFCoolingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
+        state.dataDXCoils->NumVRFHeatingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
+        state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
+        state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
 
-        NumDXCoils = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterPumpedCoils +
-                     NumDXHeatPumpWaterHeaterWrappedCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils +
-                     NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils + NumVRFHeatingFluidTCtrlCoils;
+        state.dataDXCoils->NumDXCoils =
+            state.dataDXCoils->NumDoe2DXCoils + state.dataDXCoils->NumDXHeatingCoils + state.dataDXCoils->NumDXMulSpeedCoils +
+            state.dataDXCoils->NumDXMulModeCoils + state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils +
+            state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils + state.dataDXCoils->NumDXMulSpeedCoolCoils +
+            state.dataDXCoils->NumDXMulSpeedHeatCoils + state.dataDXCoils->NumVRFCoolingCoils + state.dataDXCoils->NumVRFHeatingCoils +
+            state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils + state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
         inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
@@ -937,23 +909,23 @@ namespace EnergyPlus::DXCoils {
         // allocate the data structure
 
         // Derived types
-        DXCoil.allocate(NumDXCoils);
-        DXCoilNumericFields.allocate(NumDXCoils);
-        HeatReclaimDXCoil.allocate(NumDXCoils);
-        CheckEquipName.dimension(NumDXCoils, true);
+        DXCoil.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilNumericFields.allocate(state.dataDXCoils->NumDXCoils);
+        HeatReclaimDXCoil.allocate(state.dataDXCoils->NumDXCoils);
+        CheckEquipName.dimension(state.dataDXCoils->NumDXCoils, true);
 
         // Module level variable arrays
-        DXCoilOutletTemp.allocate(NumDXCoils);
-        DXCoilOutletHumRat.allocate(NumDXCoils);
-        DXCoilPartLoadRatio.allocate(NumDXCoils);
-        DXCoilFanOpMode.allocate(NumDXCoils);
-        DXCoilFullLoadOutAirTemp.allocate(NumDXCoils);
-        DXCoilFullLoadOutAirHumRat.allocate(NumDXCoils);
-        DXCoilTotalCooling.allocate(NumDXCoils);
-        DXCoilTotalHeating.allocate(NumDXCoils);
-        DXCoilCoolInletAirWBTemp.allocate(NumDXCoils);
-        DXCoilHeatInletAirDBTemp.allocate(NumDXCoils);
-        DXCoilHeatInletAirWBTemp.allocate(NumDXCoils);
+        DXCoilOutletTemp.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilOutletHumRat.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilPartLoadRatio.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilFanOpMode.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilFullLoadOutAirTemp.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilFullLoadOutAirHumRat.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilTotalCooling.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilTotalHeating.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilCoolInletAirWBTemp.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilHeatInletAirDBTemp.allocate(state.dataDXCoils->NumDXCoils);
+        DXCoilHeatInletAirWBTemp.allocate(state.dataDXCoils->NumDXCoils);
 
         // initialize the module level arrays
         DXCoilOutletTemp = 0.0;
@@ -968,7 +940,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the Doe2 DX Coils and get & load the data
         CurrentModuleObject = "Coil:Cooling:DX:SingleSpeed";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDoe2DXCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDoe2DXCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1417,7 +1389,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the Multimode DX Coils and get & load the data
         CurrentModuleObject = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDXMulModeCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulModeCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1937,7 +1909,7 @@ namespace EnergyPlus::DXCoils {
 
         //************* Read Heat Pump (DX Heating Coil) Input **********
         CurrentModuleObject = "Coil:Heating:DX:SingleSpeed";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDXHeatingCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXHeatingCoils; ++DXCoilIndex) {
 
             ++DXCoilNum;
 
@@ -2358,7 +2330,7 @@ namespace EnergyPlus::DXCoils {
         }
 
         CurrentModuleObject = "Coil:Cooling:DX:TwoSpeed";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDXMulSpeedCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulSpeedCoils; ++DXCoilIndex) {
 
             ++DXCoilNum;
 
@@ -2894,7 +2866,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the Pumped DX Water Heater Coils and get & load the data
         CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped);
-        for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum) {
+        for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -3341,7 +3313,7 @@ namespace EnergyPlus::DXCoils {
         }
         // Loop over the Wrapped DX Water Heater Coils and get & load the data
         CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped);
-        for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum) {
+        for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -3689,7 +3661,7 @@ namespace EnergyPlus::DXCoils {
 
         // DX Multispeed cooling coil
         CurrentModuleObject = "Coil:Cooling:DX:MultiSpeed";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDXMulSpeedCoolCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulSpeedCoolCoils; ++DXCoilIndex) {
 
             ++DXCoilNum;
 
@@ -4211,7 +4183,7 @@ namespace EnergyPlus::DXCoils {
 
         // DX multispeed heating coil
         CurrentModuleObject = "Coil:Heating:DX:MultiSpeed";
-        for (DXCoilIndex = 1; DXCoilIndex <= NumDXMulSpeedHeatCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulSpeedHeatCoils; ++DXCoilIndex) {
 
             ++DXCoilNum;
 
@@ -4667,7 +4639,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the VRF Cooling Coils and get & load the data
         CurrentModuleObject = cAllCoilTypes(CoilVRF_Cooling);
-        for (DXCoilIndex = 1; DXCoilIndex <= NumVRFCoolingCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -4791,7 +4763,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the VRF Heating Coils and get & load the data
         CurrentModuleObject = cAllCoilTypes(CoilVRF_Heating);
-        for (DXCoilIndex = 1; DXCoilIndex <= NumVRFHeatingCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -4906,7 +4878,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the VRF Cooling Coils for VRF FluidTCtrl Model_zrp 2015
         CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling);
-        for (DXCoilIndex = 1; DXCoilIndex <= NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -5006,7 +4978,7 @@ namespace EnergyPlus::DXCoils {
 
         // Loop over the VRF Heating Coils for VRF FluidTCtrl Model_zrp 2015
         CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Heating);
-        for (DXCoilIndex = 1; DXCoilIndex <= NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex) {
+        for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -5089,7 +5061,7 @@ namespace EnergyPlus::DXCoils {
             ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination.");
         }
 
-        for (DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum) {
+        for (DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
 
             DXCoilData &Coil = DXCoil(DXCoilNum);
 
@@ -5933,7 +5905,7 @@ namespace EnergyPlus::DXCoils {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             // setup EMS sizing actuators for single speed DX
-            for (DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils; ++DXCoilNum) {
+            for (DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDoe2DXCoils; ++DXCoilNum) {
                 SetupEMSActuator(state, "Coil:Cooling:DX:SingleSpeed",
                                  DXCoil(DXCoilNum).Name,
                                  "Autosized Rated Air Flow Rate",
@@ -6013,13 +5985,13 @@ namespace EnergyPlus::DXCoils {
         int AirInletNode;                  // Air inlet node number
         int SpeedNum;                      // Speed number for multispeed coils
 
-        if (MyOneTimeFlag) {
+        if (state.dataDXCoils->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(NumDXCoils);
-            MySizeFlag.allocate(NumDXCoils);
+            MyEnvrnFlag.allocate(state.dataDXCoils->NumDXCoils);
+            MySizeFlag.allocate(state.dataDXCoils->NumDXCoils);
             MyEnvrnFlag = true;
             MySizeFlag = true;
-            MyOneTimeFlag = false;
+            state.dataDXCoils->MyOneTimeFlag = false;
         }
         // if "ISHundredPercentDOASDXCoil" =.TRUE., then set coil as 100% DOAS dx coil
         if (DXCoil(DXCoilNum).ISHundredPercentDOASDXCoil) {
@@ -6111,7 +6083,7 @@ namespace EnergyPlus::DXCoils {
         if (CrankcaseHeaterReportVarFlag) {
             if (state.dataAirLoop->AirLoopInputsFilled) {
                 //     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
-                for (DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp) {
+                for (DXCoilNumTemp = 1; DXCoilNumTemp <= state.dataDXCoils->NumDXCoils; ++DXCoilNumTemp) {
                     if ((DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) ||
                         (DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_CoolingSingleSpeed) ||
                         (DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_MultiSpeedCooling)) {
@@ -13930,9 +13902,9 @@ namespace EnergyPlus::DXCoils {
         IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 
         // begin output
-        if (CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
+        if (state.dataDXCoils->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
             print(state.files.eio, Header);
-            CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = false;
+            state.dataDXCoils->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = false;
             state.dataOutRptPredefined->pdstVAVDXCoolCoil = newPreDefSubTable(state, state.dataOutRptPredefined->pdrEquip, "VAV DX Cooling Standard Rating Details");
             state.dataOutRptPredefined->pdchVAVDXCoolCoilType = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "DX Cooling Coil Type");
             state.dataOutRptPredefined->pdchVAVDXFanName = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Assocated Fan");
@@ -13953,14 +13925,14 @@ namespace EnergyPlus::DXCoils {
 
             // determine footnote content
             countStaticInputs = 0;
-            for (index = 1; index <= NumDXCoils; ++index) {
+            for (index = 1; index <= state.dataDXCoils->NumDXCoils; ++index) {
 
                 if (DXCoil(index).RateWithInternalStaticAndFanObject && DXCoil(index).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     ++countStaticInputs;
                 }
             }
 
-            if (countStaticInputs == NumDXMulSpeedCoils) {
+            if (countStaticInputs == state.dataDXCoils->NumDXMulSpeedCoils) {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2");
             } else if (countStaticInputs == 0) {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil,
@@ -14262,9 +14234,9 @@ namespace EnergyPlus::DXCoils {
         // This subroutine sets an index for a given DX Coil -- issues error message if that
         // DX Coil is not a legal DX Coil.
 
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         DXCoilIndex = UtilityRoutines::FindItemInList(DXCoilName, DXCoil);
@@ -14294,9 +14266,9 @@ namespace EnergyPlus::DXCoils {
         // This subroutine gets a name for a given DX Coil -- issues error message if that
         // DX Coil is not a legal DX Coil.
 
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (DXCoilIndex == 0) {
@@ -14341,9 +14313,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") ||
@@ -14402,9 +14374,9 @@ namespace EnergyPlus::DXCoils {
         Real64 CoilCapacity; // returned capacity of matched coil
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -14459,9 +14431,9 @@ namespace EnergyPlus::DXCoils {
         bool PrintMessage;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (present(PrintWarning)) {
@@ -14507,9 +14479,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed") ||
@@ -14563,9 +14535,9 @@ namespace EnergyPlus::DXCoils {
         Real64 MinOAT; // returned min oa temperature of matched coil
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -14605,9 +14577,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -14631,9 +14603,9 @@ namespace EnergyPlus::DXCoils {
         int NodeNumber; // returned node number of matched coil
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (CoilIndex != 0) {
@@ -14670,9 +14642,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -14697,9 +14669,9 @@ namespace EnergyPlus::DXCoils {
         int NodeNumber; // returned node number of matched coil
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (CoilIndex != 0) {
@@ -14735,9 +14707,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -14775,9 +14747,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -14912,9 +14884,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -14953,9 +14925,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (present(CoilIndex)) {
@@ -15008,9 +14980,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -15058,9 +15030,9 @@ namespace EnergyPlus::DXCoils {
         int CapFTCurveIndex; // returned coil CapFT curve index
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         if (CoilIndex != 0) {
@@ -15130,15 +15102,15 @@ namespace EnergyPlus::DXCoils {
         // Using/Aliasing
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
-        if (DXCoilNum <= 0 || DXCoilNum > NumDXCoils) {
+        if (DXCoilNum <= 0 || DXCoilNum > state.dataDXCoils->NumDXCoils) {
             ShowSevereError(
                 state,
-                format("SetDXCoolingCoilData: called with DX Cooling Coil Number out of range={} should be >0 and <{}", DXCoilNum, NumDXCoils));
+                format("SetDXCoolingCoilData: called with DX Cooling Coil Number out of range={} should be >0 and <{}", DXCoilNum, state.dataDXCoils->NumDXCoils));
             ErrorsFound = true;
             return;
         }
@@ -15270,9 +15242,9 @@ namespace EnergyPlus::DXCoils {
         int WhichCoil;
 
         // Obtains and Allocates DXCoils
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -15298,9 +15270,9 @@ namespace EnergyPlus::DXCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
 
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -15390,9 +15362,9 @@ namespace EnergyPlus::DXCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
 
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -17105,9 +17077,9 @@ namespace EnergyPlus::DXCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
 
-        if (GetCoilsInputFlag) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
             GetDXCoils(state);
-            GetCoilsInputFlag = false;
+            state.dataDXCoils->GetCoilsInputFlag = false;
         }
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
@@ -17134,25 +17106,9 @@ namespace EnergyPlus::DXCoils {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-
-        NumDXCoils = 0;
         HPWHHeatingCapacity = 0.0;
         HPWHHeatingCOP = 0.0;
-        NumVRFHeatingCoils = 0;
-        NumVRFCoolingCoils = 0;
-        NumDXHeatingCoils = 0;
-        NumDoe2DXCoils = 0;
-        NumDXHeatPumpWaterHeaterPumpedCoils = 0;
-        NumDXHeatPumpWaterHeaterWrappedCoils = 0;
-        NumDXMulSpeedCoils = 0;
-        NumDXMulModeCoils = 0;
-        NumDXMulSpeedCoolCoils = 0;
-        NumDXMulSpeedHeatCoils = 0;
-
-        GetCoilsInputFlag = true;
-        MyOneTimeFlag = true;
         CrankcaseHeaterReportVarFlag = true;
-
         DXCoil.deallocate();
         DXCoilNumericFields.deallocate();
         DXCoilOutletTemp.deallocate();
@@ -17167,7 +17123,6 @@ namespace EnergyPlus::DXCoils {
         DXCoilHeatInletAirDBTemp.deallocate();
         DXCoilHeatInletAirWBTemp.deallocate();
         CheckEquipName.deallocate();
-        CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
     }
 
 } // namespace EnergyPlus

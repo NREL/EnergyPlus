@@ -4315,7 +4315,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
         using DXCoils::DXCoil;
-        using DXCoils::NumDXCoils;
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
@@ -4397,7 +4396,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // DX Coils air to air
-        for (iCoil = 1; iCoil <= NumDXCoils; ++iCoil) {
+        for (iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
             if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
