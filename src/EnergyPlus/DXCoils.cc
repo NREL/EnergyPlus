@@ -131,13 +131,6 @@ namespace EnergyPlus::DXCoils {
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
-    // Water Systems
-    int const CondensateDiscarded(1001); // default mode where water is "lost"
-    int const CondensateToTank(1002);    // collect coil condensate from air and store in water storage tank
-
-    int const WaterSupplyFromMains(101);
-    int const WaterSupplyFromTank(102);
-
     // MODULE VARIABLE DECLARATIONS:
     Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
@@ -1300,9 +1293,9 @@ namespace EnergyPlus::DXCoils {
             //  A12, \field Name of Water Storage Tank for Supply
             DXCoil(DXCoilNum).EvapWaterSupplyName = Alphas(12);
             if (lAlphaBlanks(12)) {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
             } else {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
                 SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
@@ -1314,9 +1307,9 @@ namespace EnergyPlus::DXCoils {
             // A13; \field Name of Water Storage Tank for Condensate Collection
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(13);
             if (lAlphaBlanks(13)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -1876,9 +1869,9 @@ namespace EnergyPlus::DXCoils {
             //  A13, \field Name of Water Storage Tank for Supply
             DXCoil(DXCoilNum).EvapWaterSupplyName = Alphas(13);
             if (lAlphaBlanks(13)) {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
             } else {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
                 SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
@@ -1890,9 +1883,9 @@ namespace EnergyPlus::DXCoils {
             // A14; \field Name of Water Storage Tank for Condensate Collection
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(14);
             if (lAlphaBlanks(14)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -2752,9 +2745,9 @@ namespace EnergyPlus::DXCoils {
             //  A14, \field Name of Water Storage Tank for Supply
             DXCoil(DXCoilNum).EvapWaterSupplyName = Alphas(14);
             if (lAlphaBlanks(14)) {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
             } else {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
                 SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
@@ -2766,9 +2759,9 @@ namespace EnergyPlus::DXCoils {
             // A15; \field Name of Water Storage Tank for Condensate Collection
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(15);
             if (lAlphaBlanks(15)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -3783,9 +3776,9 @@ namespace EnergyPlus::DXCoils {
             //  A8, \field Name of Water Storage Tank for Supply
             DXCoil(DXCoilNum).EvapWaterSupplyName = Alphas(7);
             if (lAlphaBlanks(7)) {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
             } else {
-                DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                DXCoil(DXCoilNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
                 SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
@@ -3797,9 +3790,9 @@ namespace EnergyPlus::DXCoils {
             // A9; \field Name of Water Storage Tank for Condensate Collection
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(8);
             if (lAlphaBlanks(8)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -4780,9 +4773,9 @@ namespace EnergyPlus::DXCoils {
 
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(7);
             if (lAlphaBlanks(7)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -4995,9 +4988,9 @@ namespace EnergyPlus::DXCoils {
 
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(6);
             if (lAlphaBlanks(6)) {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::Discarded;
             } else {
-                DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
+                DXCoil(DXCoilNum).CondensateCollectMode = iCondensate::ToTank;
                 SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
@@ -5148,7 +5141,7 @@ namespace EnergyPlus::DXCoils {
                 }
 
                 // do we report these even if no storage tank?
-                if (Coil.CondensateCollectMode == CondensateToTank) {
+                if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                     SetupOutputVariable(state,
                         "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, Coil.CondensateVdot, "System", "Average", Coil.Name);
                     SetupOutputVariable(state, "Cooling Coil Condensate Volume",
@@ -5824,7 +5817,7 @@ namespace EnergyPlus::DXCoils {
                     "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
                 SetupOutputVariable(state,
                     "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
-                if (Coil.CondensateCollectMode == CondensateToTank) {
+                if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                     SetupOutputVariable(state,
                         "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, Coil.CondensateVdot, "System", "Average", Coil.Name);
                     SetupOutputVariable(state, "Cooling Coil Condensate Volume",
@@ -5895,7 +5888,7 @@ namespace EnergyPlus::DXCoils {
                 SetupOutputVariable(state,
                     "Cooling Coil VRF Super Heating Degrees", OutputProcessor::Unit::C, Coil.ActualSH, "System", "Average", Coil.Name);
 
-                if (Coil.CondensateCollectMode == CondensateToTank) {
+                if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                     SetupOutputVariable(state,
                         "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, Coil.CondensateVdot, "System", "Average", Coil.Name);
                     SetupOutputVariable(state, "Cooling Coil Condensate Volume",
@@ -9386,7 +9379,7 @@ namespace EnergyPlus::DXCoils {
         } // end of on/off if - else
 
         // set water system demand request (if needed)
-        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == iWaterSupply::FromTank) {
             state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }
@@ -10064,7 +10057,7 @@ namespace EnergyPlus::DXCoils {
         } // end of on/off if - else
 
         // set water system demand request (if needed)
-        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == iWaterSupply::FromTank) {
             state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }
@@ -11032,7 +11025,7 @@ namespace EnergyPlus::DXCoils {
                 DXCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater;
                 DXCoil(DXCoilNum).EvapCondPumpElecPower = EvapCondPumpElecPower;
                 // set water system demand request (if needed)
-                if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+                if (DXCoil(DXCoilNum).EvapWaterSupplyMode == iWaterSupply::FromTank) {
 
                     state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                         DXCoil(DXCoilNum).EvapWaterConsumpRate;
@@ -12574,7 +12567,7 @@ namespace EnergyPlus::DXCoils {
                 DXCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater;
                 DXCoil(DXCoilNum).EvapCondPumpElecPower = EvapCondPumpElecPower;
                 // set water system demand request (if needed)
-                if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+                if (DXCoil(DXCoilNum).EvapWaterSupplyMode == iWaterSupply::FromTank) {
                     state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                         DXCoil(DXCoilNum).EvapWaterConsumpRate;
                 }
@@ -13522,7 +13515,7 @@ namespace EnergyPlus::DXCoils {
             }
         }
 
-        if (DXCoil(DXCoilNum).CondensateCollectMode == CondensateToTank) {
+        if (DXCoil(DXCoilNum).CondensateCollectMode == iCondensate::ToTank) {
             // calculate and report condensation rates  (how much water extracted from the air stream)
             // water flow of water in m3/s for water system interactions
             //  put here to catch all types of DX coils
@@ -16234,7 +16227,7 @@ namespace EnergyPlus::DXCoils {
         } // end of on/off
 
         // set water system demand request (if needed)
-        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (DXCoil(DXCoilNum).EvapWaterSupplyMode == iWaterSupply::FromTank) {
             state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }

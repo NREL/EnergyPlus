@@ -104,9 +104,31 @@ namespace HVACVariableRefrigerantFlow {
     };
 
     // VRF System Types (strings used in integer conversions)
-    extern int const NumVRFSystemTypes;
-    extern int const VRF_HeatPump;
-    extern Array1D_string const cVRFTypes;
+    constexpr int VRF_HeatPump(1);
+
+    constexpr auto cVRFTypes(int const &i)
+    {
+        if (i == 1) {
+            return "AirConditioner:VariableRefrigerantFlow";
+        } else {
+            assert(false);
+            return "";
+        }
+    }
+
+    constexpr const char * fluidNameSteam("STEAM");
+
+    // Flag for hex operation
+    enum class iHXOpMode
+    {
+        CondMode,               // Flag for the hex running as condenser [-]
+        EvapMode,               // Flag for the hex running as evaporator [-]
+    };
+
+    // Flag for VRF operational mode
+    constexpr int ModeCoolingOnly = 1;           // Flag for Cooling Only Mode [-]
+    constexpr int ModeHeatingOnly = 2;           // Flag for Heating Only Mode [-]
+    constexpr int ModeCoolingAndHeating = 3;     // Flag for Simultaneous Cooling and Heating Only Mode [-]
 
     extern bool GetVRFInputFlag;                 // Flag set to make sure you get input once
     extern bool MyOneTimeFlag;                   // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -451,7 +473,7 @@ namespace HVACVariableRefrigerantFlow {
         void CalcVRFIUTeTc_FluidTCtrl();
 
         void VRFOU_TeTc(EnergyPlusData &state,
-                        int OperationMode,      // Flag for hex operation
+                        iHXOpMode OperationMode,      // Flag for hex operation
                         Real64 Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                         Real64 SHSC,            // SH at cooling or SC at heating [C]
                         Real64 m_air,           // OU coil air mass flow rate [kg/s]
@@ -463,7 +485,7 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         Real64 VRFOU_FlowRate(EnergyPlusData &state,
-                              int OperationMode, // Flag for hex operation
+                              iHXOpMode OperationMode, // Flag for hex operation
                               Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                               Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                               Real64 Q_coil,     // absolute value of OU coil heat release or heat extract [W]
@@ -472,7 +494,7 @@ namespace HVACVariableRefrigerantFlow {
         ) const;
 
         Real64 VRFOU_Cap(EnergyPlusData &state,
-                         int OperationMode, // Flag for hex operation
+                         iHXOpMode OperationMode, // Flag for hex operation
                          Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                          Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                          Real64 m_air,      // OU coil air mass flow rate [kg/s]
@@ -481,7 +503,7 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         Real64 VRFOU_SCSH(EnergyPlusData &state,
-                          int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
+                          iHXOpMode OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
                           Real64 Q_coil,         // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                           Real64 TeTc,           // VRF Tc at cooling mode, or Te at heating mode [C]
                           Real64 m_air,          // OU coil air mass flow rate [kg/s]
@@ -564,7 +586,7 @@ namespace HVACVariableRefrigerantFlow {
 
         void VRFOU_CompSpd(EnergyPlusData &state,
                            Real64 Q_req,        // Required capacity [W]
-                           int Q_type,          // Required capacity type: 0 for evaporator, 1 for condenser
+                           iHXOpMode Q_type,          // Required capacity type: 0 for evaporator, 1 for condenser
                            Real64 T_suction,    // Compressor suction temperature Te' [C]
                            Real64 T_discharge,  // Compressor discharge temperature Tc' [C]
                            Real64 h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]

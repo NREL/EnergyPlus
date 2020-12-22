@@ -120,22 +120,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     using namespace Psychrometrics;
     using namespace DataPlant;
 
-    // VRF System Types (strings used in integer conversions)
-    int const NumVRFSystemTypes(1);
-    int const VRF_HeatPump(1);
-    Array1D_string const cVRFTypes(NumVRFSystemTypes, std::string("AirConditioner:VariableRefrigerantFlow"));
-
-    constexpr const char * fluidNameSteam("STEAM");
-
-    // Flag for hex operation
-    int const FlagCondMode(0); // Flag for the hex running as condenser [-]
-    int const FlagEvapMode(1); // Flag for the hex running as evaporator [-]
-
-    // Flag for VRF operational mode
-    int const ModeCoolingOnly(1);       // Flag for Cooling Only Mode [-]
-    int const ModeHeatingOnly(2);       // Flag for Heating Only Mode [-]
-    int const ModeCoolingAndHeating(3); // Flag for Simultaneous Cooling and Heating Only Mode [-]
-
     bool GetVRFInputFlag(true);             // Flag set to make sure you get input once
     bool MyOneTimeFlag(true);               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     bool MyOneTimeSizeFlag(true);           // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -405,7 +389,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                 this->WaterCondenserMassFlow,
                                                                 FirstHVACIteration);
         } else {
-            ShowFatalError(state, "SimVRFCondenserPlant:: Invalid loop connection " + cVRFTypes(VRF_HeatPump));
+            ShowFatalError(state, "SimVRFCondenserPlant:: Invalid loop connection " + std::string(cVRFTypes(VRF_HeatPump)));
         }
     }
 
@@ -671,7 +655,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotCoolCapTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
                     if (VRF(VRFCond).CoolCapFTErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(
                             state,
                             format(" Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCoolCapTempModFac));
@@ -696,7 +680,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotCoolEIRTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
                     if (VRF(VRFCond).EIRFTempCoolErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(state,
                                           format(" Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                                  TotCoolEIRTempModFac));
@@ -730,7 +714,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotCoolCapTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
                     if (VRF(VRFCond).CoolCapFTErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(
                             state,
                             format(" Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCoolCapTempModFac));
@@ -754,7 +738,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotCoolEIRTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
                     if (VRF(VRFCond).EIRFTempCoolErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(state,
                                           format(" Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                                  TotCoolEIRTempModFac));
@@ -835,7 +819,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotHeatCapTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInHeatingMode > 0) {
                     if (VRF(VRFCond).HeatCapFTErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(
                             state,
                             format(" Heating Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotHeatCapTempModFac));
@@ -871,7 +855,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (TotHeatEIRTempModFac < 0.0) {
                 if (!state.dataGlobal->WarmupFlag && NumTUInHeatingMode > 0) {
                     if (VRF(VRFCond).EIRFTempHeatErrorIndex == 0) {
-                        ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                        ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                         ShowContinueError(state,
                                           format(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                                  TotHeatEIRTempModFac));
@@ -942,7 +926,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (DefrostEIRTempModFac < 0.0) {
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (VRF(VRFCond).DefrostHeatErrorIndex == 0) {
-                                    ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + VRF(VRFCond).Name + "\":");
+                                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + VRF(VRFCond).Name + "\":");
                                     ShowContinueError(
                                         state,
                                         format(" Defrost Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
@@ -4464,7 +4448,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowContinueError(state, "...This terminal unit contains a cooling coil and rated cooling capacity is also required in the "
                                               "associated condenser object.");
                             ShowContinueError(state, "...Rated Cooling Capacity must also be specified for condenser = " +
-                                              cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum) + " \"" +
+                                              std::string(cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum)) + " \"" +
                                               VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
                             ErrorsFound = true;
                         }
@@ -4511,7 +4495,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowContinueError(state, "...This terminal unit contains a heating coil and rated heating capacity is also required in the "
                                               "associated condenser object.");
                             ShowContinueError(state, "...Rated Heating Capacity must also be specified for condenser = " +
-                                              cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum) + " \"" +
+                                              std::string(cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum)) + " \"" +
                                               VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
                             ErrorsFound = true;
                         }
@@ -4522,7 +4506,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                               "associated condenser object.");
                             ShowContinueError(state,
                                 "...Heating Capacity Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " +
-                                cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum) + " \"" + VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
+                                std::string(cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum)) + " \"" + VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
                             ErrorsFound = true;
                         }
 
@@ -4532,7 +4516,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                               "associated condenser object.");
                             ShowContinueError(state,
                                 "...Heating Energy Input Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " +
-                                cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum) + " \"" + VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
+                                std::string(cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum)) + " \"" + VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
                             ErrorsFound = true;
                         }
 
@@ -4542,7 +4526,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                               "associated condenser object.");
                             ShowContinueError(state, "...Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve must also be specified "
                                               "for condenser = " +
-                                              cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum) + " \"" +
+                                              std::string(cVRFTypes(VRF(VRFTU(VRFTUNum).VRFSysNum).VRFSystemTypeNum)) + " \"" +
                                               VRF(VRFTU(VRFTUNum).VRFSysNum).Name + "\".");
                         }
                     }
@@ -6489,7 +6473,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         } else {
                             if (any(TerminalUnitList(TUListIndex).CoolingCoilAvailable)) {
                                 if (VRF(VRFCond).CoolingMaxTempLimitIndex == 0) {
-                                    ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                                    ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                                     ShowContinueError(state, "...InitVRF: VRF Heat Pump Min/Max Operating Temperature in Cooling Mode Limits have been "
                                                       "exceeded and VRF system is disabled.");
                                     if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
@@ -6506,7 +6490,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                     ShowContinueErrorTimeStamp(state, "... Check VRF Heat Pump Min/Max Outdoor Temperature in Cooling Mode limits.");
                                 }
                                 ShowRecurringWarningErrorAtEnd(state,
-                                    cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                                    std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                         "\" -- Exceeded VRF Heat Pump min/max cooling temperature limit error continues...",
                                     VRF(VRFCond).CoolingMaxTempLimitIndex,
                                     OutsideDryBulbTemp,
@@ -6516,7 +6500,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     } else {
                         if (any(TerminalUnitList(TUListIndex).CoolingCoilAvailable)) {
                             if (VRF(VRFCond).CoolingMaxTempLimitIndex == 0) {
-                                ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                                ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                                 ShowContinueError(state, "...InitVRF: VRF Heat Pump Min/Max Operating Temperature in Cooling Mode Limits have been exceeded "
                                                   "and VRF system is disabled.");
                                 if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
@@ -6532,7 +6516,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                   format("... Cooling Maximum Outdoor Unit Inlet Temperature = {:.3T}", VRF(VRFCond).MaxOATCooling));
                                 ShowContinueErrorTimeStamp(state, "... Check VRF Heat Pump Min/Max Outdoor Temperature in Cooling Mode limits.");
                             }
-                            ShowRecurringWarningErrorAtEnd(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                            ShowRecurringWarningErrorAtEnd(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                                                "\" -- Exceeded VRF Heat Pump min/max cooling temperature limit error continues...",
                                                            VRF(VRFCond).CoolingMaxTempLimitIndex,
                                                            OutsideDryBulbTemp,
@@ -6562,7 +6546,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         } else {
                             if (any(TerminalUnitList(TUListIndex).HeatingCoilAvailable)) {
                                 if (VRF(VRFCond).HeatingMaxTempLimitIndex == 0) {
-                                    ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                                    ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                                     ShowContinueError(state, "...InitVRF: VRF Heat Pump Min/Max Operating Temperature in Heating Mode Limits have been "
                                                       "exceeded and VRF system is disabled.");
                                     if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
@@ -6579,7 +6563,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                     ShowContinueErrorTimeStamp(state, "... Check VRF Heat Pump Min/Max Outdoor Temperature in Heating Mode limits.");
                                 }
                                 ShowRecurringWarningErrorAtEnd(state,
-                                    cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                                    std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                         "\" -- Exceeded VRF Heat Pump min/max heating temperature limit error continues...",
                                     VRF(VRFCond).HeatingMaxTempLimitIndex,
                                     OutsideDryBulbTemp,
@@ -6589,7 +6573,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     } else {
                         if (any(TerminalUnitList(TUListIndex).HeatingCoilAvailable)) {
                             if (VRF(VRFCond).HeatingMaxTempLimitIndex == 0) {
-                                ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                                ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                                 ShowContinueError(state, "...InitVRF: VRF Heat Pump Min/Max Operating Temperature in Heating Mode Limits have been exceeded "
                                                   "and VRF system is disabled.");
                                 if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
@@ -6605,7 +6589,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                   format("... Heating Maximum Outdoor Unit Inlet Temperature = {:.3T}", VRF(VRFCond).MaxOATHeating));
                                 ShowContinueErrorTimeStamp(state, "... Check VRF Heat Pump Min/Max Outdoor Temperature in Heating Mode limits.");
                             }
-                            ShowRecurringWarningErrorAtEnd(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                            ShowRecurringWarningErrorAtEnd(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                                                "\" -- Exceeded VRF Heat Pump min/max heating temperature limit error continues...",
                                                            VRF(VRFCond).HeatingMaxTempLimitIndex,
                                                            OutsideDryBulbTemp,
@@ -6946,7 +6930,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if ((any(TerminalUnitList(TUListIndex).HRCoolRequest) && HeatingLoad(VRFCond)) ||
                     (any(TerminalUnitList(TUListIndex).HRHeatRequest) && CoolingLoad(VRFCond))) {
                     if (VRF(VRFCond).HRMaxTempLimitIndex == 0) {
-                        ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                        ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                         ShowContinueError(state, "...InitVRF: VRF Heat Pump Min/Max Outdoor Temperature in Heat Recovery Mode Limits have been exceeded and "
                                           "VRF heat recovery is disabled.");
                         ShowContinueError(state, format("... Outdoor Dry-Bulb Temperature                       = {:.3T}", OutsideDryBulbTemp));
@@ -6957,7 +6941,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         ShowContinueErrorTimeStamp(state, "... Check VRF Heat Pump Min/Max Outdoor Temperature in Heat Recovery Mode limits.");
                         ShowContinueError(state, "...the system will operate in heat pump mode when applicable.");
                     }
-                    ShowRecurringWarningErrorAtEnd(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                    ShowRecurringWarningErrorAtEnd(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                                        "\" -- Exceeded VRF Heat Recovery min/max outdoor temperature limit error continues...",
                                                    VRF(VRFCond).HRMaxTempLimitIndex,
                                                    OutsideDryBulbTemp,
@@ -7004,11 +6988,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else {
                 if (VRF(VRFCond).HPOperatingModeErrorIndex == 0) {
-                    ShowWarningMessage(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name + "\".");
+                    ShowWarningMessage(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name + "\".");
                     ShowContinueError(state, format("...InitVRF: Illegal HP operating mode = {:.0T}", VRF(VRFCond).EMSValueForHPOperatingMode));
                     ShowContinueError(state, "...InitVRF: VRF HP operating mode will not be controlled by EMS.");
                 }
-                ShowRecurringWarningErrorAtEnd(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + " \"" + VRF(VRFCond).Name +
+                ShowRecurringWarningErrorAtEnd(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + " \"" + VRF(VRFCond).Name +
                                                    "\" -- Illegal HP operating mode error continues...",
                                                VRF(VRFCond).HPOperatingModeErrorIndex,
                                                VRF(VRFCond).EMSValueForHPOperatingMode,
@@ -7994,14 +7978,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 CoolingCapacityDes = TUCoolingCapacity;
                 if (IsAutoSize) {
                     VRF(VRFCond).CoolingCapacity = CoolingCapacityDes;
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityDes);
                 } else {
                     if (VRF(VRFCond).CoolingCapacity > 0.0 && CoolingCapacityDes > 0.0) {
                         CoolingCapacityUser = VRF(VRFCond).CoolingCapacity;
-                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                      CoolingCapacityDes,
@@ -8009,7 +7993,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      CoolingCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             VRFTU(VRFCond).Name);
                                 ShowContinueError(state,
                                                   format("User-Specified Rated Total Cooling Capacity (gross) of {:.2R} [W]", CoolingCapacityUser));
@@ -8038,14 +8022,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
                 if (IsAutoSize) {
                     VRF(VRFCond).HeatingCapacity = HeatingCapacityDes;
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  HeatingCapacityDes);
                 } else {
                     if (VRF(VRFCond).HeatingCapacity > 0.0 && HeatingCapacityDes > 0.0) {
                         HeatingCapacityUser = VRF(VRFCond).HeatingCapacity;
-                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Rated Total Heating Capacity [W]",
                                                      HeatingCapacityDes,
@@ -8053,7 +8037,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      HeatingCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             VRFTU(VRFCond).Name);
                                 ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityUser));
                                 ShowContinueError(state,
@@ -8156,11 +8140,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     VRF(VRFCond).CoolingCapacity = VRF(VRFCond).RatedEvapCapacity;
                     VRF(VRFCond).HeatingCapacity = VRF(VRFCond).RatedEvapCapacity * (1 + VRF(VRFCond).RatedCompPowerPerCapcity);
 
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  VRF(VRFCond).HeatingCapacity);
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  VRF(VRFCond).CoolingCapacity);
@@ -8168,13 +8152,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     CoolingCapacityUser = VRF(VRFCond).RatedEvapCapacity;
                     HeatingCapacityUser = VRF(VRFCond).RatedHeatCapacity;
 
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityDes,
                                                  "User-Specified Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityUser);
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  HeatingCapacityDes,
@@ -8183,7 +8167,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                            ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                         VRFTU(VRFCond).Name);
                             ShowContinueError(state,
                                               format("User-Specified Rated Total Cooling Capacity (gross) of {:.2R} [W]", CoolingCapacityUser));
@@ -8194,7 +8178,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         }
 
                         if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                            ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                         VRFTU(VRFCond).Name);
                             ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityUser));
                             ShowContinueError(state,
@@ -8219,14 +8203,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
                 if (IsAutoSize) {
                     VRF(VRFCond).DefrostCapacity = DefrostCapacityDes;
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Resistive Defrost Heater Capacity",
                                                  DefrostCapacityDes);
                 } else {
                     if (VRF(VRFCond).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0) {
                         DefrostCapacityUser = VRF(VRFCond).DefrostCapacity;
-                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Resistive Defrost Heater Capacity",
                                                      DefrostCapacityDes,
@@ -8234,7 +8218,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      DefrostCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             VRFTU(VRFCond).Name);
                                 ShowContinueError(state,
                                                   format("User-Specified Resistive Defrost Heater Capacity of {:.2R} [W]", DefrostCapacityUser));
@@ -8255,14 +8239,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 EvapCondAirVolFlowRateDes = VRF(VRFCond).CoolingCapacity * 0.000114;
                 if (IsAutoSize) {
                     VRF(VRFCond).EvapCondAirVolFlowRate = EvapCondAirVolFlowRateDes;
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Evaporative Condenser Air Flow Rate [m3/s]",
                                                  EvapCondAirVolFlowRateDes);
                 } else {
                     if (VRF(VRFCond).EvapCondAirVolFlowRate > 0.0 && EvapCondAirVolFlowRateDes > 0.0) {
                         EvapCondAirVolFlowRateUser = VRF(VRFCond).EvapCondAirVolFlowRate;
-                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Evaporative Condenser Air Flow Rate [m3/s]",
                                                      EvapCondAirVolFlowRateDes,
@@ -8271,7 +8255,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(EvapCondAirVolFlowRateDes - EvapCondAirVolFlowRateUser) / EvapCondAirVolFlowRateUser) >
                                 AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             VRFTU(VRFCond).Name);
                                 ShowContinueError(
                                     state, format("User-Specified Evaporative Condenser Air Flow Rate of {:.5R} [m3/s]", EvapCondAirVolFlowRateUser));
@@ -8293,7 +8277,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 EvapCondPumpPowerDes = VRF(VRFCond).CoolingCapacity * 0.004266;
                 if (IsAutoSize) {
                     VRF(VRFCond).EvapCondPumpPower = EvapCondPumpPowerDes;
-                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
                                                  EvapCondPumpPowerDes);
@@ -8301,7 +8285,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 } else {
                     if (VRF(VRFCond).EvapCondPumpPower > 0.0 && EvapCondPumpPowerDes > 0.0) {
                         EvapCondPumpPowerUser = VRF(VRFCond).EvapCondPumpPower;
-                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
                                                      EvapCondPumpPowerDes,
@@ -8309,7 +8293,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      EvapCondPumpPowerUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(EvapCondPumpPowerDes - EvapCondPumpPowerUser) / EvapCondPumpPowerUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
+                                ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             VRFTU(VRFCond).Name);
                                 ShowContinueError(
                                     state,
@@ -10829,7 +10813,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 // *VRF OU TeTc calculations
                 m_air = this->OUAirFlowRate * RhoAir;
                 SC_OU = this->SC;
-                this->VRFOU_TeTc(state, FlagCondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
+                this->VRFOU_TeTc(state, iHXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
                 this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
                 this->SC = SC_OU;
 
@@ -11048,7 +11032,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 // *VRF OU Te calculations
                 m_air = this->OUAirFlowRate * RhoAir;
                 SH_OU = this->SH;
-                this->VRFOU_TeTc(state, FlagEvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
+                this->VRFOU_TeTc(state, iHXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
                 this->SH = SH_OU;
 
                 // *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
@@ -11437,7 +11421,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         if (DefrostEIRTempModFac < 0.0) {
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (this->DefrostHeatErrorIndex == 0) {
-                                    ShowSevereMessage(state, cVRFTypes(VRF_HeatPump) + " \"" + this->Name + "\":");
+                                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + this->Name + "\":");
                                     ShowContinueError(
                                         state,
                                         format(" Defrost Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
@@ -12487,7 +12471,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
 
         // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
-        VRF(VRFCond).VRFOU_TeTc(state, FlagEvapMode, Q_c_OU_temp, VRF(VRFCond).SH, m_air_evap_rated, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress, Tfs, Te_new);
+        VRF(VRFCond).VRFOU_TeTc(state,
+                                iHXOpMode::EvapMode, Q_c_OU_temp, VRF(VRFCond).SH, m_air_evap_rated, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress, Tfs, Te_new);
 
         TeResidual = Te_new - Te;
 
@@ -12527,12 +12512,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     }
 
     void VRFCondenserEquipment::VRFOU_TeTc(EnergyPlusData &state,
-                                           int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
-                                           Real64 const Q_coil,     // // OU coil heat release at cooling mode or heat extract at heating mode [W]
-                                           Real64 const SHSC,       // SC for OU condenser or SH for OU evaporator [C]
-                                           Real64 const m_air,      // OU coil air mass flow rate [kg/s]
-                                           Real64 const T_coil_in,  // Temperature of air at OU coil inlet [C]
-                                           Real64 const W_coil_in,  // Humidity ratio of air at OU coil inlet [kg/kg]
+                                           iHXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
+                                           Real64 const Q_coil,    // // OU coil heat release at cooling mode or heat extract at heating mode [W]
+                                           Real64 const SHSC,      // SC for OU condenser or SH for OU evaporator [C]
+                                           Real64 const m_air,     // OU coil air mass flow rate [kg/s]
+                                           Real64 const T_coil_in, // Temperature of air at OU coil inlet [C]
+                                           Real64 const W_coil_in, // Humidity ratio of air at OU coil inlet [kg/kg]
                                            Real64 const OutdoorPressure, // Outdoor air pressure [Pa]
                                            Real64 &T_coil_surf,          // Air temperature at coil surface [C]
                                            Real64 &TeTc                  // VRF Tc at cooling mode, or Te at heating mode [C]
@@ -12563,7 +12548,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
         Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
 
-        if (OperationMode == FlagCondMode) {
+        if (OperationMode == iHXOpMode::CondMode) {
             // IU Cooling: OperationMode 0
 
             if (m_air <= 0) {
@@ -12581,7 +12566,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
             TeTc = T_coil_surf + deltaT;
 
-        } else if (OperationMode == FlagEvapMode) {
+        } else if (OperationMode == iHXOpMode::EvapMode) {
             // IU Heating: OperationMode 1
 
             if (m_air <= 0) {
@@ -12613,7 +12598,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFCondenserEquipment::VRFOU_Cap(EnergyPlusData &state,
-                                            int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
+                                            iHXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
                                             Real64 const TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                                             Real64 const SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                                             Real64 const m_air,      // OU coil air mass flow rate [kg/s]
@@ -12647,7 +12632,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         Q_coil = 0.0;
 
-        if (OperationMode == FlagCondMode) {
+        if (OperationMode == iHXOpMode::CondMode) {
             // IU Cooling: OperationMode 0
             if (m_air <= 0) {
                 ShowSevereMessage(state, format(" Unreasonable outdoor unit airflow rate ({:.3T} ) for \"{}\":", m_air, this->Name));
@@ -12660,7 +12645,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             T_coil_out = T_coil_in + (T_coil_surf - T_coil_in) * (1 - BF);
             Q_coil = (T_coil_out - T_coil_in) * 1005.0 * m_air;
 
-        } else if (OperationMode == FlagEvapMode) {
+        } else if (OperationMode == iHXOpMode::EvapMode) {
             // IU Heating: OperationMode 1
             if (m_air <= 0) {
                 ShowSevereMessage(state, format(" Unreasonable outdoor unit airflow rate ({:.3T} ) for \"{}\":", m_air, this->Name));
@@ -12695,7 +12680,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFCondenserEquipment::VRFOU_FlowRate(EnergyPlusData &state,
-                                                 int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
+                                                 iHXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
                                                  Real64 const TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                                                  Real64 const SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                                                  Real64 const Q_coil,     // absolute value of OU coil heat release or heat extract [W]
@@ -12729,7 +12714,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         m_air = 0.0;
 
-        if (OperationMode == FlagCondMode) {
+        if (OperationMode == iHXOpMode::CondMode) {
             // IU Cooling: OperationMode 0
 
             BF = this->RateBFOUCond; // 0.219;
@@ -12738,7 +12723,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             T_coil_out = T_coil_in + (T_coil_surf - T_coil_in) * (1 - BF);
             m_air = Q_coil / (T_coil_out - T_coil_in) / 1005.0;
 
-        } else if (OperationMode == FlagEvapMode) {
+        } else if (OperationMode == iHXOpMode::EvapMode) {
             // IU Heating: OperationMode 1
 
             BF = this->RateBFOUEvap; // 0.45581;
@@ -12769,7 +12754,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFCondenserEquipment::VRFOU_SCSH(EnergyPlusData &state,
-                                             int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
+                                             iHXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
                                              Real64 const Q_coil,     // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                                              Real64 const TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                                              Real64 const m_air,      // OU coil air mass flow rate [kg/s]
@@ -12806,7 +12791,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         SHSC = 0.0;
 
-        if (OperationMode == FlagCondMode) {
+        if (OperationMode == iHXOpMode::CondMode) {
             // Cooling: OperationMode 0
             if (m_air <= 0) {
                 ShowSevereMessage(state, format(" Unreasonable outdoor unit airflow rate ({:.3T} ) for \"{}\":", m_air, this->Name));
@@ -12824,7 +12809,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             else
                 SHSC = (-this->C2Tc + std::pow((pow_2(this->C2Tc) - 4 * (this->C1Tc - deltaT) * this->C3Tc), 0.5)) / (2 * this->C3Tc);
 
-        } else if (OperationMode == FlagEvapMode) {
+        } else if (OperationMode == iHXOpMode::EvapMode) {
             // Heating: OperationMode 1
             if (m_air <= 0) {
                 ShowSevereMessage(state, format(" Unreasonable outdoor unit airflow rate ({:.3T} ) for \"{}\":", m_air, this->Name));
@@ -13082,7 +13067,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
     void VRFCondenserEquipment::VRFOU_CompSpd(
         EnergyPlusData &state,
         Real64 const Q_req,        // Required capacity [W]
-        int const Q_type,          // Required capacity type:  0 for condenser, 1 for evaporator
+        iHXOpMode const Q_type,          // Required capacity type:  0 for condenser, 1 for evaporator
         Real64 const T_suction,    // Compressor suction temperature Te' [C]
         Real64 const T_discharge,  // Compressor discharge temperature Tc' [C]
         Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
@@ -13161,7 +13146,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         C_cap_operation = this->VRFOU_CapModFactor(
             state, h_comp_in, h_IU_evap_in, max(min(P_suction, RefPHigh), RefPLow), T_suction + SH_Comp, T_suction + 8, T_discharge - 5);
 
-        if (Q_type == FlagEvapMode) {
+        if (Q_type == iHXOpMode::EvapMode) {
             // Capacity to meet is for evaporator
 
             Q_evap_req = Q_req;
@@ -13652,7 +13637,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     OUCondHeatRelease = TU_load + Pipe_Q + Ncomp; // Pipe_Q is changed when T_suction is changed -> Tc is also changed
 
                     // *VRF OU Tc calculations
-                    this->VRFOU_TeTc(state, FlagCondMode,
+                    this->VRFOU_TeTc(state,
+                                     iHXOpMode::CondMode,
                                      OUCondHeatRelease,
                                      this->SC,
                                      this->OUAirFlowRate * RhoAir,
@@ -13967,8 +13953,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using TempSolveRoot::SolveRoot;
 
         Array1D<Real64> Par(7);     // Parameters passed to RegulaFalsi
-        int const FlagCondMode(0);  // Flag for running as condenser [-]
-        int const FlagEvapMode(1);  // Flag for running as evaporator [-]
         Real64 const ErrorTol(0.1); // tolerance for RegulaFalsi iterations
         int const MaxIte(100);      // maximum number of iterations
         int HRMode(0);              // HR operational mode [W]
@@ -14031,8 +14015,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
 
             // Calculate compressor speed satisfying IU loads: rps1_evap & rps2_cond
-            this->VRFOU_CompSpd(state, Q_c_TU_PL, FlagEvapMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps1_evap);
-            this->VRFOU_CompSpd(state, Q_h_TU_PL, FlagCondMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps2_cond);
+            this->VRFOU_CompSpd(state, Q_c_TU_PL, iHXOpMode::EvapMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps1_evap);
+            this->VRFOU_CompSpd(state, Q_h_TU_PL, iHXOpMode::CondMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps2_cond);
 
             // Determine FlagMode5
             if (rps1_evap <= rps2_cond) {
@@ -14075,7 +14059,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             Q_h_OU = 0;
 
             // OU fan flow rate and power
-            m_air_evap = this->VRFOU_FlowRate(state, FlagEvapMode, Tsuction, this->SH, Q_c_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+            m_air_evap = this->VRFOU_FlowRate(state, iHXOpMode::EvapMode, Tsuction, this->SH, Q_c_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
             m_air_evap_rated = m_air_rated;
             N_fan_OU_evap = this->RatedOUFanPower * m_air_evap / m_air_evap_rated;
             N_fan_OU_cond = 0;
@@ -14107,11 +14091,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
                 // Tsuction_new updated based on OU evaporator air-side calculations (Tsuction_new < To)
                 m_air_evap_rated = m_air_rated;
-                this->VRFOU_TeTc(state, FlagEvapMode, Q_c_OU_temp, this->SH, m_air_evap_rated, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress, Tfs, Tsuction_new);
+                this->VRFOU_TeTc(state,
+                                 iHXOpMode::EvapMode, Q_c_OU_temp, this->SH, m_air_evap_rated, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress, Tfs, Tsuction_new);
                 Tsuction_new = min(Tsuction_new, Tsuction); // should be lower than Tsuction_IU
 
                 // Calculate updated rps corresponding to updated Tsuction_new and Q_c_tot_temp
-                this->VRFOU_CompSpd(state, Q_c_tot_temp, FlagEvapMode, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, CompSpdActual);
+                this->VRFOU_CompSpd(state, Q_c_tot_temp, iHXOpMode::EvapMode, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
                 // Calculate Ncomp_new, using updated CompSpdActual and Tsuction_new
                 this->VRFOU_CompCap(state, CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_new);
@@ -14221,7 +14206,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 Q_c_OU = Q_c_tot - Q_c_TU_PL;
 
                 // OU evaporator fan flow rate and power
-                m_air_evap = this->VRFOU_FlowRate(state, FlagEvapMode, Tsuction, this->SH, Q_c_OU_temp, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+                m_air_evap = this->VRFOU_FlowRate(state, iHXOpMode::EvapMode, Tsuction, this->SH, Q_c_OU_temp, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
             } else {
                 // Need to update Te_update & Pipe_Q_c_new, corresponding to Tsuction update.
@@ -14255,7 +14240,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             Q_h_OU = Q_h_tot - Q_h_TU_PL;
 
             // OU condenser fan flow rate and power
-            m_air_cond = this->VRFOU_FlowRate(state, FlagCondMode, Tdischarge, this->SC, Q_h_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+            m_air_cond = this->VRFOU_FlowRate(state, iHXOpMode::CondMode, Tdischarge, this->SC, Q_h_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
             // OU fan power
             N_fan_OU_evap = this->RatedOUFanPower * m_air_evap / m_air_rated;
@@ -14275,7 +14260,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             Q_c_OU = 0;
 
             // OU fan flow rate and power
-            m_air_cond = this->VRFOU_FlowRate(state, FlagCondMode, Tdischarge, this->SC, Q_h_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+            m_air_cond = this->VRFOU_FlowRate(state, iHXOpMode::CondMode, Tdischarge, this->SC, Q_h_OU, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
             N_fan_OU_cond = this->RatedOUFanPower * m_air_cond / m_air_rated;
             N_fan_OU_evap = 0;
 
