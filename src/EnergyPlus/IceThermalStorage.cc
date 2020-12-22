@@ -2476,7 +2476,7 @@ namespace IceThermalStorage {
 
         this->Urate = Uact;
         this->PcmTSCoolingRate = -Qpcm;
-        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         /*
         std::cout << "Urate =" << Urate << endl;
         std::cout << "PcmTSOutletTemp =" << PcmTSOutletTemp << endl;
@@ -2625,7 +2625,7 @@ namespace IceThermalStorage {
         this->Urate = Uact;
         // Calculate ITSCoolingEnergy [J]
         this->PcmTSCoolingRate = -Qpcm;
-        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void SimplePcmStorageData::CalcQpcmChargeMaxByNtu(EnergyPlusData &state,
