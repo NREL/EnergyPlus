@@ -102,9 +102,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
 
-namespace EnergyPlus {
-
-namespace HVACVariableRefrigerantFlow {
+namespace EnergyPlus::HVACVariableRefrigerantFlow {
     // Module containing the Variable Refrigerant Flow (VRF or VRV) simulation routines
 
     // MODULE INFORMATION:
@@ -122,45 +120,12 @@ namespace HVACVariableRefrigerantFlow {
     using namespace Psychrometrics;
     using namespace DataPlant;
 
-    // Heat Recovery System used
-    int const No(1);  // Heat Pump mode only
-    int const Yes(2); // Heat Pump or Heat Recovery Mode (not available at this time)
-
-    // Defrost strategy
-    int const ReverseCycle(1); // uses reverse cycle defrost strategy
-    int const Resistive(2);    // uses electric resistance heater for defrost
-
-    // Defrost control
-    int const Timed(1);    // defrost cycle is timed
-    int const OnDemand(2); // defrost cycle occurs only when required
-
-    // Thermostat Priority Control Type
-    int const LoadPriority(1);             // total of zone loads dictate operation in cooling or heating
-    int const ZonePriority(2);             // # of zones requiring cooling or heating dictate operation in cooling or heating
-    int const ThermostatOffsetPriority(3); // zone with largest deviation from setpoint dictates operation
-    int const ScheduledPriority(4);        // cooling and heating modes are scheduled
-    int const MasterThermostatPriority(5); // Master zone thermostat dictates operation
-    int const FirstOnPriority(6);          // first unit to respond dictates operation (not used at this time)
-
-    // Water Systems
-    int const CondensateDiscarded(1001); // default mode where water is "lost"
-    int const CondensateToTank(1002);    // collect coil condensate from air and store in water storage tank
-
-    int const WaterSupplyFromMains(101); // mains water line used as water source
-    int const WaterSupplyFromTank(102);  // storage tank used as water source
-
-    Real64 const MaxCap(1.0e+20); // limit of zone terminal unit capacity
-
     // VRF System Types (strings used in integer conversions)
     int const NumVRFSystemTypes(1);
     int const VRF_HeatPump(1);
     Array1D_string const cVRFTypes(NumVRFSystemTypes, std::string("AirConditioner:VariableRefrigerantFlow"));
 
-    static std::string const fluidNameSteam("STEAM");
-
-    // VRF Algorithm Type
-    int const AlgorithmTypeSysCurve(1);   // VRF model based on system curve
-    int const AlgorithmTypeFluidTCtrl(2); // VRF model based on physics, appreciable for Fluid Temperature Control
+    constexpr const char * fluidNameSteam("STEAM");
 
     // Flag for hex operation
     int const FlagCondMode(0); // Flag for the hex running as condenser [-]
@@ -371,7 +336,7 @@ namespace HVACVariableRefrigerantFlow {
         // after all VRF terminal units have been simulated, call the VRF condenser model
         if (all(TerminalUnitList(TUListNum).IsSimulated)) {
 
-            if (VRF(VRFCondenser).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+            if (VRF(VRFCondenser).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 VRF(VRFCondenser).CalcVRFCondenser_FluidTCtrl(state);
             } else {
@@ -1678,7 +1643,7 @@ namespace HVACVariableRefrigerantFlow {
 
             VRF(VRFNum).Name = cAlphaArgs(1);
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-            VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeSysCurve;
+            VRF(VRFNum).VRFAlgorithmTypeNum = iAlgorithmType::SysCurve;
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
@@ -2115,15 +2080,15 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).MasterZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(24), Zone);
 
             if (UtilityRoutines::SameString(cAlphaArgs(25), "LoadPriority")) {
-                VRF(VRFNum).ThermostatPriority = LoadPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::LoadPriority;
             } else if (UtilityRoutines::SameString(cAlphaArgs(25), "ZonePriority")) {
-                VRF(VRFNum).ThermostatPriority = ZonePriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ZonePriority;
             } else if (UtilityRoutines::SameString(cAlphaArgs(25), "ThermostatOffsetPriority")) {
-                VRF(VRFNum).ThermostatPriority = ThermostatOffsetPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ThermostatOffsetPriority;
             } else if (UtilityRoutines::SameString(cAlphaArgs(25), "Scheduled")) {
-                VRF(VRFNum).ThermostatPriority = ScheduledPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ScheduledPriority;
             } else if (UtilityRoutines::SameString(cAlphaArgs(25), "MasterThermostatPriority")) {
-                VRF(VRFNum).ThermostatPriority = MasterThermostatPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::MasterThermostatPriority;
                 if (VRF(VRFNum).MasterZonePtr == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = \"" + VRF(VRFNum).Name + "\"");
                     ShowContinueError(state, cAlphaFieldNames(24) + " must be entered when " + cAlphaFieldNames(25) + " = " + cAlphaArgs(25));
@@ -2137,7 +2102,7 @@ namespace HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             }
 
-            if (VRF(VRFNum).ThermostatPriority == ScheduledPriority) {
+            if (VRF(VRFNum).ThermostatPriority == iThermostatCtrlType::ScheduledPriority) {
                 VRF(VRFNum).SchedPriorityPtr = GetScheduleIndex(state, cAlphaArgs(26));
                 if (VRF(VRFNum).SchedPriorityPtr == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + VRF(VRFNum).Name);
@@ -2354,9 +2319,9 @@ namespace HVACVariableRefrigerantFlow {
             // A37, \field Supply Water Storage Tank Name
             VRF(VRFNum).EvapWaterSupplyName = cAlphaArgs(37);
             if (lAlphaFieldBlanks(37)) {
-                VRF(VRFNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                VRF(VRFNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
             } else {
-                VRF(VRFNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                VRF(VRFNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
                 SetupTankDemandComponent(state,
                                          VRF(VRFNum).Name,
                                          cCurrentModuleObject,
@@ -2529,7 +2494,7 @@ namespace HVACVariableRefrigerantFlow {
 
             VRF(VRFNum).Name = cAlphaArgs(1);
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-            VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
+            VRF(VRFNum).VRFAlgorithmTypeNum = iAlgorithmType::FluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
@@ -2792,15 +2757,15 @@ namespace HVACVariableRefrigerantFlow {
             //@@ The control type
             std::string ThermostatPriorityType = "LoadPriority"; // cAlphaArgs( 25 )
             if (UtilityRoutines::SameString(ThermostatPriorityType, "LoadPriority")) {
-                VRF(VRFNum).ThermostatPriority = LoadPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::LoadPriority;
             } else if (UtilityRoutines::SameString(ThermostatPriorityType, "ZonePriority")) {
-                VRF(VRFNum).ThermostatPriority = ZonePriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ZonePriority;
             } else if (UtilityRoutines::SameString(ThermostatPriorityType, "ThermostatOffsetPriority")) {
-                VRF(VRFNum).ThermostatPriority = ThermostatOffsetPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ThermostatOffsetPriority;
             } else if (UtilityRoutines::SameString(ThermostatPriorityType, "Scheduled")) {
-                VRF(VRFNum).ThermostatPriority = ScheduledPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::ScheduledPriority;
             } else if (UtilityRoutines::SameString(ThermostatPriorityType, "MasterThermostatPriority")) {
-                VRF(VRFNum).ThermostatPriority = MasterThermostatPriority;
+                VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::MasterThermostatPriority;
                 if (VRF(VRFNum).MasterZonePtr == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = \"" + VRF(VRFNum).Name + "\"");
                     //** ShowContinueError(state,  cAlphaFieldNames( 24 ) + " must be entered when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
@@ -2906,10 +2871,10 @@ namespace HVACVariableRefrigerantFlow {
 
             VRF(VRFNum).Name = cAlphaArgs(1);
 
-            VRF(VRFNum).ThermostatPriority = LoadPriority;
+            VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::LoadPriority;
             VRF(VRFNum).HeatRecoveryUsed = true;
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
-            VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
+            VRF(VRFNum).VRFAlgorithmTypeNum = iAlgorithmType::FluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
@@ -3437,7 +3402,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
                     // VRFTU Supply Air Fan Object Type must be Fan:VariableVolume if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl &&
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl &&
                         !(VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleVAV ||
                           VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
@@ -3448,7 +3413,7 @@ namespace HVACVariableRefrigerantFlow {
                         ErrorsFound = true;
                     }
                     // VRFTU Supply Air Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF Algorithm Type is AlgorithmTypeSysCurve
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve &&
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::SysCurve &&
                         !(VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                           VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ||
                           VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
@@ -3604,7 +3569,7 @@ namespace HVACVariableRefrigerantFlow {
                 }
             } else {
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
                         if (UtilityRoutines::SameString(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXCoolCoilType_Num),
@@ -3748,7 +3713,7 @@ namespace HVACVariableRefrigerantFlow {
                 }
             } else {
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
                         if (UtilityRoutines::SameString(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
@@ -4492,7 +4457,7 @@ namespace HVACVariableRefrigerantFlow {
                 //   curve is present if the corresponding coil is entered in the terminal unit.
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
 
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum != iAlgorithmType::FluidTCtrl) {
 
                         if (VRF(VRFTU(VRFTUNum).VRFSysNum).CoolingCapacity <= 0 && VRF(VRFTU(VRFTUNum).VRFSysNum).CoolingCapacity != AutoSize) {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\"");
@@ -4539,7 +4504,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (VRFTU(VRFTUNum).VRFSysNum > 0) {
 
-                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum != iAlgorithmType::FluidTCtrl) {
 
                         if (VRF(VRFTU(VRFTUNum).VRFSysNum).HeatingCapacity <= 0 && VRF(VRFTU(VRFTUNum).VRFSysNum).HeatingCapacity != AutoSize) {
                             ShowSevereError(state, cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\"");
@@ -4662,7 +4627,7 @@ namespace HVACVariableRefrigerantFlow {
                     ErrorsFound = true;
                 }
                 if (VRFTU(VRFNum).VRFSysNum > 0) {
-                    if (TerminalUnitList(NumList).NumTUInList == 1 && VRF(VRFTU(VRFNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve) {
+                    if (TerminalUnitList(NumList).NumTUInList == 1 && VRF(VRFTU(VRFNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::SysCurve) {
                         if (VRF(VRFTU(VRFNum).VRFSysNum).HeatRecoveryUsed) {
                             ShowWarningError(state, "ZoneTerminalUnitList \"" + TerminalUnitList(NumList).Name + "\"");
                             ShowWarningError(state, "...Only 1 Terminal Unit connected to system and heat recovery is selected.");
@@ -4913,7 +4878,7 @@ namespace HVACVariableRefrigerantFlow {
             SetupOutputVariable(
                 state, "VRF Heat Pump COP", OutputProcessor::Unit::None, VRF(NumCond).OperatingCOP, "System", "Average", VRF(NumCond).Name);
 
-            if (VRF(NumCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+            if (VRF(NumCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                 // For VRF_FluidTCtrl Model
                 SetupOutputVariable(state,
                                     "VRF Heat Pump Compressor Electricity Rate",
@@ -6507,11 +6472,11 @@ namespace HVACVariableRefrigerantFlow {
                     // test if heating load exists, account for thermostat control type
                     {
                         auto const SELECT_CASE_var(VRF(VRFCond).ThermostatPriority);
-                        if ((SELECT_CASE_var == LoadPriority) || (SELECT_CASE_var == ZonePriority)) {
+                        if ((SELECT_CASE_var == iThermostatCtrlType::LoadPriority) || (SELECT_CASE_var == iThermostatCtrlType::ZonePriority)) {
                             if (SumHeatingLoads(VRFCond) > 0.0) EnableSystem = true;
-                        } else if (SELECT_CASE_var == ThermostatOffsetPriority) {
+                        } else if (SELECT_CASE_var == iThermostatCtrlType::ThermostatOffsetPriority) {
                             if (MinDeltaT(VRFCond) < 0.0) EnableSystem = true;
-                        } else if ((SELECT_CASE_var == ScheduledPriority) || (SELECT_CASE_var == MasterThermostatPriority)) {
+                        } else if ((SELECT_CASE_var == iThermostatCtrlType::ScheduledPriority) || (SELECT_CASE_var == iThermostatCtrlType::MasterThermostatPriority)) {
                             // can't switch modes if scheduled (i.e., would be switching to unscheduled mode)
                             // or master TSTAT used (i.e., master zone only has a specific load - can't switch)
                         } else {
@@ -6582,11 +6547,11 @@ namespace HVACVariableRefrigerantFlow {
                     // test if cooling load exists, account for thermostat control type
                     {
                         auto const SELECT_CASE_var(VRF(VRFCond).ThermostatPriority);
-                        if ((SELECT_CASE_var == LoadPriority) || (SELECT_CASE_var == ZonePriority)) {
+                        if ((SELECT_CASE_var == iThermostatCtrlType::LoadPriority) || (SELECT_CASE_var == iThermostatCtrlType::ZonePriority)) {
                             if (SumCoolingLoads(VRFCond) < 0.0) EnableSystem = true;
-                        } else if (SELECT_CASE_var == ThermostatOffsetPriority) {
+                        } else if (SELECT_CASE_var == iThermostatCtrlType::ThermostatOffsetPriority) {
                             if (MaxDeltaT(VRFCond) > 0.0) EnableSystem = true;
-                        } else if ((SELECT_CASE_var == ScheduledPriority) || (SELECT_CASE_var == MasterThermostatPriority)) {
+                        } else if ((SELECT_CASE_var == iThermostatCtrlType::ScheduledPriority) || (SELECT_CASE_var == iThermostatCtrlType::MasterThermostatPriority)) {
                         } else {
                         }
                     }
@@ -6736,7 +6701,7 @@ namespace HVACVariableRefrigerantFlow {
         if ((VRFTU(VRFTUNum).OpMode == DataHVACGlobals::ContFanCycCoil || VRFTU(VRFTUNum).ATMixerExists) && !VRFTU(VRFTUNum).isSetPointControlled) {
             SetCompFlowRate(VRFTUNum, VRFCond, true);
 
-            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
             } else {
@@ -6770,7 +6735,7 @@ namespace HVACVariableRefrigerantFlow {
                                 DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             }
 
-                            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                     state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6820,7 +6785,7 @@ namespace HVACVariableRefrigerantFlow {
                                 DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                             }
 
-                            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                     state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6854,7 +6819,7 @@ namespace HVACVariableRefrigerantFlow {
                                 DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                             }
 
-                            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                     state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6902,7 +6867,7 @@ namespace HVACVariableRefrigerantFlow {
                             DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                         }
 
-                        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -6941,7 +6906,7 @@ namespace HVACVariableRefrigerantFlow {
                             DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                         }
 
-                        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                                 state, VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -7985,7 +7950,7 @@ namespace HVACVariableRefrigerantFlow {
 
             Real64 SuppHeatCoilLoad = 0.0;
             // simulate the TU to size the coils
-            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                 VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(state, VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat, SuppHeatCoilLoad);
             } else {
@@ -8018,7 +7983,7 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
-            if (FoundAll && (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve)) {
+            if (FoundAll && (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::SysCurve)) {
                 // Size VRF rated cooling/heating capacity (VRF-SysCurve Model)
 
                 // Size VRF( VRFCond ).CoolingCapacity
@@ -8163,7 +8128,7 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
-            if (FoundAll && (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl)) {
+            if (FoundAll && (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl)) {
                 // Size VRF rated evaporative capacity (VRF-FluidTCtrl Model)
                 // Set piping correction factors to 1.0 here for reporting to eio output - recalculated every time step in
                 // VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl
@@ -8493,7 +8458,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 PartLoadRatio(1.0);
         Real64 SuppHeatCoilLoad(0.0); // supplemental heating coil load (W)
 
-        if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+        if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(state, VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
@@ -8593,7 +8558,7 @@ namespace HVACVariableRefrigerantFlow {
         bool HRCoolingMode = TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
         bool HRHeatingMode = TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
 
-        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
@@ -8629,7 +8594,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Otherwise the coil needs to turn on. Get full load result
         PartLoadRatio = 1.0;
-        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
@@ -8743,7 +8708,7 @@ namespace HVACVariableRefrigerantFlow {
                 while (ContinueIter && TempMaxPLR < 1.0) {
                     TempMaxPLR += 0.1;
 
-                    if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
@@ -8760,7 +8725,7 @@ namespace HVACVariableRefrigerantFlow {
                     TempMaxPLR = TempMinPLR;
                     TempMinPLR -= 0.01;
 
-                    if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     } else {
@@ -8780,7 +8745,7 @@ namespace HVACVariableRefrigerantFlow {
                                 format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                             ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadRatio));
 
-                            if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                            if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                 // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                 this->CalcVRF_FluidTCtrl(
                                     state, VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9349,7 +9314,7 @@ namespace HVACVariableRefrigerantFlow {
         OnOffAirFlowRatio = Par(6);
         SuppHeatCoilLoad = 0.0;
 
-        if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+        if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
@@ -9615,7 +9580,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 getVRFTUZoneLoad(TUIndex, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, true);
 
-                if (VRF(VRFCond).ThermostatPriority == ThermostatOffsetPriority) {
+                if (VRF(VRFCond).ThermostatPriority == iThermostatCtrlType::ThermostatOffsetPriority) {
                     //         for TSTATPriority, just check difference between zone temp and thermostat setpoint
                     if (ThisZoneNum > 0) {
                         SPTempHi = ZoneThermostatSetPointHi(ThisZoneNum);
@@ -9651,11 +9616,11 @@ namespace HVACVariableRefrigerantFlow {
                             }
                         }
                     }
-                } else if (VRF(VRFCond).ThermostatPriority == LoadPriority || VRF(VRFCond).ThermostatPriority == ZonePriority) {
+                } else if (VRF(VRFCond).ThermostatPriority == iThermostatCtrlType::LoadPriority || VRF(VRFCond).ThermostatPriority == iThermostatCtrlType::ZonePriority) {
                     if (VRFTU(TUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
                         SetCompFlowRate(TUIndex, VRFCond);
 
-                        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                 state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9683,7 +9648,7 @@ namespace HVACVariableRefrigerantFlow {
                                         }
 
                                         // recalculate using correct flow rate
-                                        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                                        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                                 state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9730,7 +9695,7 @@ namespace HVACVariableRefrigerantFlow {
                                             DataLoopNode::Node(VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate = VRFTU(TUIndex).MaxCoolAirMassFlow;
                                         }
 
-                                        if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                                        if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                                             // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                                 state, TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -9772,7 +9737,7 @@ namespace HVACVariableRefrigerantFlow {
                             ++NumCoolingLoads(VRFCond);
                             SumCoolingLoads(VRFCond) += ZoneLoad;
                         }
-                    } // IF(VRFTU(TUIndex)%OpMode == DataHVACGlobals::ContFanCycCoil)THEN
+                    }
                 }
             }
         }
@@ -9780,7 +9745,7 @@ namespace HVACVariableRefrigerantFlow {
         // Determine operating mode based on VRF type and thermostat control selection
         {
             auto const SELECT_CASE_var(VRF(VRFCond).ThermostatPriority);
-            if (SELECT_CASE_var == ThermostatOffsetPriority) {
+            if (SELECT_CASE_var == iThermostatCtrlType::ThermostatOffsetPriority) {
                 if (MaxDeltaT(VRFCond) > std::abs(MinDeltaT(VRFCond)) && MaxDeltaT(VRFCond) > 0.0) {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = true;
@@ -9791,7 +9756,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = false;
                 }
-            } else if (SELECT_CASE_var == LoadPriority) {
+            } else if (SELECT_CASE_var == iThermostatCtrlType::LoadPriority) {
                 if (SumHeatingLoads(VRFCond) > std::abs(SumCoolingLoads(VRFCond)) && SumHeatingLoads(VRFCond) > 0.0) {
                     HeatingLoad(VRFCond) = true;
                     CoolingLoad(VRFCond) = false;
@@ -9802,7 +9767,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = false;
                 }
-            } else if (SELECT_CASE_var == ZonePriority) {
+            } else if (SELECT_CASE_var == iThermostatCtrlType::ZonePriority) {
                 if (NumHeatingLoads(VRFCond) > NumCoolingLoads(VRFCond) && NumHeatingLoads(VRFCond) > 0) {
                     HeatingLoad(VRFCond) = true;
                     CoolingLoad(VRFCond) = false;
@@ -9813,7 +9778,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = false;
                 }
-            } else if (SELECT_CASE_var == ScheduledPriority) {
+            } else if (SELECT_CASE_var == iThermostatCtrlType::ScheduledPriority) {
                 if (GetCurrentScheduleValue(state, VRF(VRFCond).SchedPriorityPtr) == 0) {
                     HeatingLoad(VRFCond) = true;
                     CoolingLoad(VRFCond) = false;
@@ -9824,13 +9789,13 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = false;
                 }
-            } else if (SELECT_CASE_var == MasterThermostatPriority) {
+            } else if (SELECT_CASE_var == iThermostatCtrlType::MasterThermostatPriority) {
                 ZoneLoad = ZoneSysEnergyDemand(VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
                            VRFTU(VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
                 if (VRFTU(VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
                     SetCompFlowRate(VRF(VRFCond).MasterZoneTUIndex, VRFCond);
 
-                    if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
+                    if (VRF(VRFCond).VRFAlgorithmTypeNum == iAlgorithmType::FluidTCtrl) {
                         // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                         VRFTU(VRF(VRFCond).MasterZoneTUIndex)
                             .CalcVRF_FluidTCtrl(
@@ -9865,7 +9830,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingLoad(VRFCond) = false;
                     CoolingLoad(VRFCond) = false;
                 }
-            } else if (SELECT_CASE_var == FirstOnPriority) {
+            } else if (SELECT_CASE_var == iThermostatCtrlType::FirstOnPriority) {
                 // na
             } else {
             }
@@ -14894,7 +14859,5 @@ namespace HVACVariableRefrigerantFlow {
         MyVRFCondFlag.deallocate();
         MyZoneEqFlag.deallocate();
     }
-
-} // namespace HVACVariableRefrigerantFlow
 
 } // namespace EnergyPlus

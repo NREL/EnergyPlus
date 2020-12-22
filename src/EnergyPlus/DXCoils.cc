@@ -96,9 +96,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 
-namespace EnergyPlus {
-
-namespace DXCoils {
+namespace EnergyPlus::DXCoils {
 
     // Module containing the DX coil simulation routines
 
@@ -133,31 +131,6 @@ namespace DXCoils {
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // Defrost strategy (heat pump only)
-    int const ReverseCycle(1); // uses reverse cycle defrost strategy
-    int const Resistive(2);    // uses electric resistance heater for defrost
-    // Defrost control  (heat pump only)
-    int const Timed(1);    // defrost cycle is timed
-    int const OnDemand(2); // defrost cycle occurs only when required
-
-    Real64 const RatedInletAirTemp(26.6667);          // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.4444);      // 19.44 or 67F
-    Real64 const RatedInletAirHumRat(0.0111847);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedOutdoorAirTemp(35.0);           // 35 C or 95F
-    Real64 const RatedInletAirTempHeat(21.1111);      // 21.11C or 70F
-    Real64 const RatedOutdoorAirTempHeat(8.3333);     // 8.33 C or 47F
-    Real64 const RatedOutdoorWetBulbTempHeat(6.1111); // 6.11 C or 43F
-    Real64 const RatedInletWetBulbTempHeat(15.5556);  // 15.55 or 60F
-
-    Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
-
-    // Multimode DX Coil
-    int const MaxCapacityStages(2);                               // Maximum number of capacity stages supported
-    int const MaxDehumidModes(1);                                 // Maximum number of enhanced dehumidification modes supported
-    int const MaxModes(MaxCapacityStages *(MaxDehumidModes + 1)); // Maximum number of performance modes
-
     // Water Systems
     int const CondensateDiscarded(1001); // default mode where water is "lost"
     int const CondensateToTank(1002);    // collect coil condensate from air and store in water storage tank
@@ -177,8 +150,6 @@ namespace DXCoils {
     Array1D<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
     Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
     Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
-
-    int CurDXCoilNum(0);
 
     int NumDXCoils(0);                           // Total number of DX coils
     Real64 HPWHHeatingCapacity(0.0);             // Used by Heat Pump:Water Heater object as total water heating capacity [W]
@@ -300,8 +271,6 @@ namespace DXCoils {
         } else {
             CompCycRatio = 1.0;
         }
-
-        CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
         InitDXCoil(state, DXCoilNum);
@@ -432,8 +401,6 @@ namespace DXCoils {
         } else {
             SingleModeOper = 0;
         }
-
-        CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
         InitDXCoil(state, DXCoilNum);
@@ -579,8 +546,6 @@ namespace DXCoils {
                 CheckEquipName(DXCoilNum) = false;
             }
         }
-
-        CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
         InitDXCoil(state, DXCoilNum);
@@ -17181,7 +17146,6 @@ namespace DXCoils {
     void clear_state()
     {
 
-        CurDXCoilNum = 0;
         NumDXCoils = 0;
         HPWHHeatingCapacity = 0.0;
         HPWHHeatingCOP = 0.0;
@@ -17216,7 +17180,5 @@ namespace DXCoils {
         CheckEquipName.deallocate();
         CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
     }
-
-} // namespace DXCoils
 
 } // namespace EnergyPlus

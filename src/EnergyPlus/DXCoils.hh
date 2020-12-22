@@ -70,33 +70,32 @@ namespace DXCoils {
     using DataHVACGlobals::AirCooled;
     using DataHVACGlobals::DryBulbIndicator;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Defrost strategy (heat pump only)
-    extern int const ReverseCycle; // uses reverse cycle defrost strategy
-    extern int const Resistive;    // uses electric resistance heater for defrost
+    constexpr int ReverseCycle(1);      // uses reverse cycle defrost strategy
+    constexpr int Resistive(2);         // uses electric resistance heater for defrost
+
     // Defrost control  (heat pump only)
-    extern int const Timed;    // defrost cycle is timed
-    extern int const OnDemand; // defrost cycle occurs only when required
+    constexpr int Timed(1);             // defrost cycle is timed
+    constexpr int OnDemand(2);          // defrost cycle occurs only when required
+
     // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);                // normal compressor operation
+    constexpr int Off(0);               // signal DXCoil that compressor shouldn't run
 
-    extern Real64 const RatedInletAirTemp;           // 26.6667C or 80F
-    extern Real64 const RatedInletWetBulbTemp;       // 19.44 or 67F
-    extern Real64 const RatedInletAirHumRat;         // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    extern Real64 const RatedOutdoorAirTemp;         // 35 C or 95F
-    extern Real64 const RatedInletAirTempHeat;       // 21.11C or 70F
-    extern Real64 const RatedOutdoorAirTempHeat;     // 8.33 C or 47F
-    extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
-    extern Real64 const RatedInletWetBulbTempHeat;   // 15.55 or 60F
-
-    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgWater/kgDryAir
+    constexpr Real64 RatedInletAirTemp(26.6667);            // 26.6667C or 80F
+    constexpr Real64 RatedInletWetBulbTemp(19.4444);        // 19.44 or 67F
+    constexpr Real64 RatedInletAirHumRat(0.0111847);        // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    constexpr Real64 RatedOutdoorAirTemp(35.0);             // 35 C or 95F
+    constexpr Real64 RatedInletAirTempHeat(21.1111);        // 21.11C or 70F
+    constexpr Real64 RatedOutdoorAirTempHeat(8.3333);       // 8.33 C or 47F
+    constexpr Real64 RatedOutdoorWetBulbTempHeat(6.1111);   // 6.11 C or 43F
+    constexpr Real64 RatedInletWetBulbTempHeat(15.5556);    // 15.55 or 60F
+    constexpr Real64 DryCoilOutletHumRatioMin(0.00001);     // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
     // Multimode DX Coil
-    extern int const MaxCapacityStages; // Maximum number of capacity stages supported
-    extern int const MaxDehumidModes;   // Maximum number of enhanced dehumidification modes supported
-    extern int const MaxModes;          // Maximum number of performance modes
+    constexpr int MaxCapacityStages(2);                               // Maximum number of capacity stages supported
+    constexpr int MaxDehumidModes(1);                                 // Maximum number of enhanced dehumidification modes supported
+    constexpr int MaxModes(MaxCapacityStages *(MaxDehumidModes + 1)); // Maximum number of performance modes
 
     // Water Systems
     extern int const CondensateDiscarded; // default mode where water is "lost"
