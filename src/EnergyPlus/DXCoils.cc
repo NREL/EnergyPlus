@@ -15887,7 +15887,7 @@ namespace EnergyPlus::DXCoils {
         DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 0.0;
         DXCoil(DXCoilNum).PartLoadRatio = 0.0;
         DXCoil(DXCoilNum).BasinHeaterPower = 0.0;
-        DXCoil(DXCoilNum).EvaporatingTemp = VRF(DXCoil(DXCoilNum).VRFOUPtr).IUEvaporatingTemp;
+        DXCoil(DXCoilNum).EvaporatingTemp = state.dataHVACVarRefFlow->VRF(DXCoil(DXCoilNum).VRFOUPtr).IUEvaporatingTemp;
 
         if (DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
             OutdoorDryBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
@@ -16335,7 +16335,7 @@ namespace EnergyPlus::DXCoils {
         InletAirWetBulbC = PsyTwbFnTdbWPb(state, InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
         PLRHeating = 0.0;
         DXCoil(DXCoilNum).HeatingCoilRuntimeFraction = 0.0;
-        DXCoil(DXCoilNum).CondensingTemp = VRF(DXCoil(DXCoilNum).VRFOUPtr).IUCondensingTemp;
+        DXCoil(DXCoilNum).CondensingTemp = state.dataHVACVarRefFlow->VRF(DXCoil(DXCoilNum).VRFOUPtr).IUCondensingTemp;
 
         // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
         if (OutdoorDryBulb < DXCoil(DXCoilNum).MaxOATCrankcaseHeater) {

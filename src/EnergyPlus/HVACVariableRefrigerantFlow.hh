@@ -130,28 +130,6 @@ namespace HVACVariableRefrigerantFlow {
     constexpr int ModeHeatingOnly = 2;           // Flag for Heating Only Mode [-]
     constexpr int ModeCoolingAndHeating = 3;     // Flag for Simultaneous Cooling and Heating Only Mode [-]
 
-    extern Array1D_bool CheckEquipName;          // Flag set to check equipment connections once
-    extern Array1D_bool MyEnvrnFlag;             // Flag for initializing at beginning of each new environment
-    extern Array1D_bool MySizeFlag;              // False after TU has been sized
-    extern Array1D_bool MyBeginTimeStepFlag;     // Flag to sense beginning of time step
-    extern Array1D_bool MyVRFFlag;               // used for sizing VRF inputs one time
-    extern Array1D_bool MyVRFCondFlag;           // used to reset timer counter
-    extern Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
-    extern Array1D_bool HeatingLoad;             // defines a heating load on VRFTerminalUnits
-    extern Array1D_bool CoolingLoad;             // defines a cooling load on VRFTerminalUnits
-    extern Array1D_bool LastModeHeating;         // defines last mode was heating mode
-    extern Array1D_bool LastModeCooling;         // defines last mode was cooling mode
-    extern Array1D_int NumCoolingLoads;          // number of TU's requesting cooling
-    extern Array1D_int NumHeatingLoads;          // number of TU's requesting heating
-    extern Array1D<Real64> MaxCoolingCapacity;   // maximum capacity of any terminal unit
-    extern Array1D<Real64> MaxHeatingCapacity;   // maximum capacity of any terminal unit
-    extern Array1D<Real64> CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
-    extern Array1D<Real64> HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
-    extern Array1D<Real64> MaxDeltaT;            // maximum zone temperature difference from setpoint
-    extern Array1D<Real64> MinDeltaT;            // minimum zone temperature difference from setpoint
-    extern Array1D<Real64> SumCoolingLoads;      // sum of cooling loads
-    extern Array1D<Real64> SumHeatingLoads;      // sum of heating loads
-
     // Subroutine Specifications for the Module
     struct VRFCondenserEquipment : PlantComponent
     {
@@ -880,12 +858,6 @@ namespace HVACVariableRefrigerantFlow {
         VRFTUNumericFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<VRFCondenserEquipment> VRF;                // AirConditioner:VariableRefrigerantFlow object
-    extern Array1D<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-    extern Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
-    extern Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
-
     // Functions
 
     void SimulateVRF(EnergyPlusData &state, std::string const &CompName,
@@ -930,15 +902,13 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const VRFTUName, bool &errorsFound);
 
-    int GetVRFTUMixedAirNode(EnergyPlusData &state,int const VRFTUNum);
-
     int GetVRFTUReturnAirNode(EnergyPlusData &state, int const VRFTUNum);
 
-    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
+    void getVRFTUZoneLoad(EnergyPlusData &state, int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
     void ReportVRFTerminalUnit(EnergyPlusData &state, int VRFTUNum); // index to VRF terminal unit
 
-    void ReportVRFCondenser(int VRFCond); // index to VRF condensing unit
+    void ReportVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
 
     void UpdateVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
 
@@ -960,7 +930,8 @@ namespace HVACVariableRefrigerantFlow {
                                  Real64 &OnOffAirFlowRatio      // ratio of on to off flow rate
     );
 
-    void LimitTUCapacity(int VRFCond,              // Condenser Unit index
+    void LimitTUCapacity(EnergyPlusData &state,
+                         int VRFCond,              // Condenser Unit index
                          int NumTUInList,          // Number of terminal units in list
                          Real64 StartingCapacity,  // temporary variable holding condenser capacity [W]
                          const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
@@ -975,8 +946,6 @@ namespace HVACVariableRefrigerantFlow {
                            const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                            Real64 &MaxLimit                // Maximum terminal unit capacity for coils in same operating mode [W]
     );
-
-    void clear_state();
 
     Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1D<Real64> const &Par // par(1) = VRFTUNum
@@ -1017,6 +986,34 @@ struct HVACVarRefFlowData : BaseGlobalStruct {
     Real64 LoopDXHeatCoilRTF = 0.0;          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate = 0.0; // VRF water-cooled condenser mass flow rate (kg/s)
     Real64 CurrentEndTimeLast = 0.0;         // end time of last time step
+    Array1D_bool HeatingLoad;               // defines a heating load on VRFTerminalUnits
+    Array1D_bool CoolingLoad;               // defines a cooling load on VRFTerminalUnits
+    Array1D_bool LastModeHeating;           // defines last mode was heating mode
+    Array1D_bool LastModeCooling;           // defines last mode was cooling mode
+    Array1D_bool CheckEquipName;            // Flag set to check equipment connections once
+    Array1D_bool MyEnvrnFlag;               // Flag for initializing at beginning of each new environment
+    Array1D_bool MySizeFlag;                // False after TU has been sized
+    Array1D_bool MyBeginTimeStepFlag;       // Flag to sense beginning of time step
+    Array1D_bool MyVRFFlag;                 // used for sizing VRF inputs one time
+    Array1D_bool MyVRFCondFlag;             // used to reset timer counter
+    Array1D_bool MyZoneEqFlag;              // used to set up zone equipment availability managers
+    Array1D_int NumCoolingLoads;            // number of TU's requesting cooling
+    Array1D_int NumHeatingLoads;            // number of TU's requesting heating
+    Array1D<Real64> MaxCoolingCapacity;     // maximum capacity of any terminal unit
+    Array1D<Real64> MaxHeatingCapacity;     // maximum capacity of any terminal unit
+    Array1D<Real64> CoolCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
+    Array1D<Real64> HeatCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
+    Array1D<Real64> MaxDeltaT;              // maximum zone temperature difference from setpoint
+    Array1D<Real64> MinDeltaT;              // minimum zone temperature difference from setpoint
+    Array1D<Real64> SumCoolingLoads;        // sum of cooling loads
+    Array1D<Real64> SumHeatingLoads;        // sum of heating loads
+
+    // Object Data
+    Array1D<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
+    std::unordered_map<std::string, std::string> VrfUniqueNames;
+    Array1D<HVACVariableRefrigerantFlow::VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+    Array1D<HVACVariableRefrigerantFlow::TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
+    Array1D<HVACVariableRefrigerantFlow::VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
     void clear_state() override
     {
@@ -1041,6 +1038,32 @@ struct HVACVarRefFlowData : BaseGlobalStruct {
         this->LoopDXHeatCoilRTF = 0.0;
         this->CondenserWaterMassFlowRate = 0.0;
         this->CurrentEndTimeLast = 0.0;
+        this->HeatingLoad.deallocate();
+        this->CoolingLoad.deallocate();
+        this->LastModeHeating.deallocate();
+        this->LastModeCooling.deallocate();
+        this->CheckEquipName.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MySizeFlag.deallocate();
+        this->MyBeginTimeStepFlag.deallocate();
+        this->MyVRFFlag.deallocate();
+        this->MyVRFCondFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->NumCoolingLoads.deallocate();
+        this->NumHeatingLoads.deallocate();
+        this->MaxCoolingCapacity.deallocate();
+        this->MaxHeatingCapacity.deallocate();
+        this->CoolCombinationRatio.deallocate();
+        this->HeatCombinationRatio.deallocate();
+        this->MaxDeltaT.deallocate();
+        this->MinDeltaT.deallocate();
+        this->SumCoolingLoads.deallocate();
+        this->SumHeatingLoads.deallocate();
+        this->VRF.deallocate();
+        this->VrfUniqueNames.clear();
+        this->VRFTU.deallocate();
+        this->TerminalUnitList.deallocate();
+        this->VRFTUNumericFields.deallocate();
     }
 };
 
