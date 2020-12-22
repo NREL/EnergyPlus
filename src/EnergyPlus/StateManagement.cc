@@ -53,7 +53,6 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -206,7 +205,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
-    DXCoils::clear_state();
     clearFacilityElectricPowerServiceObject();
     EarthTube::clear_state();
     ElectricBaseboardRadiator::clear_state();

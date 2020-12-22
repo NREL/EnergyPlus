@@ -147,9 +147,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Simulate all terminal units
         // Once all terminal units have been simulated, simulate VRF condenser
 
-        using DXCoils::DXCoilTotalCooling;
-        using DXCoils::DXCoilTotalHeating;
-
         int VRFTUNum;             // current VRF system terminal unit index
         int VRFCondenser;         // index to VRF AC system object - AirConditioner:VariableRefrigerantFlow
         int TUListNum;            // index to VRF AC system terminal unit list
@@ -249,12 +246,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         // keep track of individual coil loads
         if (DXCoolingCoilIndex > 0) {
-            state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(IndexToTUInTUList) = DXCoilTotalCooling(DXCoolingCoilIndex);
+            state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(IndexToTUInTUList) = state.dataDXCoils->DXCoilTotalCooling(DXCoolingCoilIndex);
         } else {
             state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(IndexToTUInTUList) = 0.0;
         }
         if (DXHeatingCoilIndex > 0) {
-            state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(IndexToTUInTUList) = DXCoilTotalHeating(DXHeatingCoilIndex);
+            state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(IndexToTUInTUList) = state.dataDXCoils->DXCoilTotalHeating(DXHeatingCoilIndex);
         } else {
             state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(IndexToTUInTUList) = 0.0;
         }
@@ -356,9 +353,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // If terminal units require more capacity than can be delivered by condenser, a limit is set.
 
         using CurveManager::CurveValue;
-        using DXCoils::DXCoilCoolInletAirWBTemp;
-        using DXCoils::DXCoilHeatInletAirDBTemp;
-        using DXCoils::DXCoilHeatInletAirWBTemp;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -568,12 +562,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             TUFanPower += state.dataHVACVarRefFlow->VRFTU(TUIndex).FanPower;
 
             if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0.0) {
-                SumCoolInletWB += DXCoilCoolInletAirWBTemp(CoolCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) / TUCoolingLoad;
+                SumCoolInletWB += state.dataDXCoils->DXCoilCoolInletAirWBTemp(CoolCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) / TUCoolingLoad;
                 ++NumTUInCoolingMode;
             }
             if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) > 0.0) {
-                SumHeatInletDB += DXCoilHeatInletAirDBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TUHeatingLoad;
-                SumHeatInletWB += DXCoilHeatInletAirWBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TUHeatingLoad;
+                SumHeatInletDB += state.dataDXCoils->DXCoilHeatInletAirDBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TUHeatingLoad;
+                SumHeatInletWB += state.dataDXCoils->DXCoilHeatInletAirWBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TUHeatingLoad;
                 ++NumTUInHeatingMode;
             }
         }
@@ -3542,22 +3536,22 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 SetDXCoolingCoilData(
                                     state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, _, _, _, _, state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling);
 
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFIUPtr = VRFTUNum;
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFOUPtr = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).SupplyFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFIUPtr = VRFTUNum;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFOUPtr = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).SupplyFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
                                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > -1) {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) =
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) =
                                             HVACFan::fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                                     } else {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
                                 } else {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) =
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) =
                                             EnergyPlus::Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
                                     } else {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
                                 }
 
@@ -3813,22 +3807,22 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      _,
                                                      1.0); // DefrostCapacity=1.0
 
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).VRFIUPtr = VRFTUNum;
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).VRFOUPtr = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
-                                DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).SupplyFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).VRFIUPtr = VRFTUNum;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).VRFOUPtr = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).SupplyFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
                                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > -1) {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) =
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) =
                                             HVACFan::fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                                     } else {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
                                 } else {
                                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) =
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) =
                                             EnergyPlus::Fans::Fan(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex).MaxAirFlowRate;
                                     } else {
-                                        DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
+                                        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                                     }
                                 }
 
@@ -8402,11 +8396,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (PartLoadRatio ==
                 0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolingCoilPresent) {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).Temp;
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).HumRat;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).Temp;
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).AirInNode).HumRat;
                 }
             }
             // CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
@@ -8973,8 +8967,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // This subroutine updates the report variables for the VRF Terminal Units.
 
         using namespace DataSizing;
-        using DXCoils::DXCoilTotalCooling;
-        using DXCoils::DXCoilTotalHeating;
 
         int DXCoolingCoilIndex;      // - index to DX cooling coil
         int DXHeatingCoilIndex;      // - index to DX heating coil
@@ -10174,7 +10166,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       A new physics based VRF model applicable for Fluid Temperature Control.
 
         using namespace DataZoneEnergyDemands;
-        using DXCoils::DXCoil;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
@@ -10228,14 +10219,14 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         CondTempMax = state.dataHVACVarRefFlow->VRF(VRFNum).IUCondTempHigh;
 
         // Coefficients describing coil performance
-        SH = DXCoil(CoolCoilNum).SH;
-        SC = DXCoil(HeatCoilNum).SC;
-        C1Tevap = DXCoil(CoolCoilNum).C1Te;
-        C2Tevap = DXCoil(CoolCoilNum).C2Te;
-        C3Tevap = DXCoil(CoolCoilNum).C3Te;
-        C1Tcond = DXCoil(HeatCoilNum).C1Tc;
-        C2Tcond = DXCoil(HeatCoilNum).C2Tc;
-        C3Tcond = DXCoil(HeatCoilNum).C3Tc;
+        SH = state.dataDXCoils->DXCoil(CoolCoilNum).SH;
+        SC = state.dataDXCoils->DXCoil(HeatCoilNum).SC;
+        C1Tevap = state.dataDXCoils->DXCoil(CoolCoilNum).C1Te;
+        C2Tevap = state.dataDXCoils->DXCoil(CoolCoilNum).C2Te;
+        C3Tevap = state.dataDXCoils->DXCoil(CoolCoilNum).C3Te;
+        C1Tcond = state.dataDXCoils->DXCoil(HeatCoilNum).C1Tc;
+        C2Tcond = state.dataDXCoils->DXCoil(HeatCoilNum).C2Tc;
+        C3Tcond = state.dataDXCoils->DXCoil(HeatCoilNum).C3Tc;
 
         VRFInletNode = this->VRFTUInletNodeNum;
         T_TU_in = DataLoopNode::Node(VRFInletNode).Temp;
@@ -10303,11 +10294,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       A new physics based VRF model applicable for Fluid Temperature Control.
 
         using CurveManager::CurveValue;
-        using DXCoils::DXCoil;
-        using DXCoils::DXCoilCoolInletAirWBTemp;
-        using DXCoils::DXCoilHeatInletAirDBTemp;
-        using DXCoils::DXCoilHeatInletAirWBTemp;
-        using DXCoils::DXCoilTotalHeating;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatPressureRefrig;
@@ -10528,12 +10514,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             HeatCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex;
 
             if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0.0) {
-                SumCoolInletWB += DXCoilCoolInletAirWBTemp(CoolCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) / TU_CoolingLoad;
+                SumCoolInletWB += state.dataDXCoils->DXCoilCoolInletAirWBTemp(CoolCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) / TU_CoolingLoad;
                 ++NumTUInCoolingMode;
             }
             if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) > 0.0) {
-                SumHeatInletDB += DXCoilHeatInletAirDBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TU_HeatingLoad;
-                SumHeatInletWB += DXCoilHeatInletAirWBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TU_HeatingLoad;
+                SumHeatInletDB += state.dataDXCoils->DXCoilHeatInletAirDBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TU_HeatingLoad;
+                SumHeatInletWB += state.dataDXCoils->DXCoilHeatInletAirWBTemp(HeatCoilIndex) * state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / TU_HeatingLoad;
                 ++NumTUInHeatingMode;
             }
         }
@@ -10675,7 +10661,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
                         h_IU_evap_out_i = GetSupHeatEnthalpyRefrig(state,
                                                                    this->RefrigerantName,
-                                                                   max(RefTSat, this->IUEvaporatingTemp + DXCoil(CoolCoilIndex).ActualSH),
+                                                                   max(RefTSat, this->IUEvaporatingTemp + state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH),
                                                                    max(min(Pevap, RefPHigh), RefPLow),
                                                                    RefrigerantIndex,
                                                                    RoutineName);
@@ -10687,7 +10673,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      (h_IU_evap_out_i - h_IU_evap_in)); // Ref Flow Rate in the IU( kg/s )
                             m_ref_IU_evap = m_ref_IU_evap + m_ref_IU_evap_i;
                             h_IU_evap_out = h_IU_evap_out + m_ref_IU_evap_i * h_IU_evap_out_i;
-                            SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * DXCoil(CoolCoilIndex).ActualSH;
+                            SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH;
                         }
                     }
                 }
@@ -10892,7 +10878,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             state,
                             this->RefrigerantName,
                             GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pcond, RefPHigh), RefPLow), RefrigerantIndex, RoutineName) -
-                                DXCoil(HeatCoilIndex).ActualSC,
+                                state.dataDXCoils->DXCoil(HeatCoilIndex).ActualSC,
                             0.0,
                             RefrigerantIndex,
                             RoutineName); // Quality=0
@@ -10901,7 +10887,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                               : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / (h_IU_cond_in - h_IU_cond_out_i));
                         m_ref_IU_cond = m_ref_IU_cond + m_ref_IU_cond_i;
                         h_IU_cond_out_ave = h_IU_cond_out_ave + m_ref_IU_cond_i * h_IU_cond_out_i;
-                        SC_IU_merged = SC_IU_merged + m_ref_IU_cond_i * DXCoil(HeatCoilIndex).ActualSC;
+                        SC_IU_merged = SC_IU_merged + m_ref_IU_cond_i * state.dataDXCoils->DXCoil(HeatCoilIndex).ActualSC;
                     }
                 }
                 if (m_ref_IU_cond > 0) {
@@ -11111,7 +11097,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         state,
                         this->RefrigerantName,
                         GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pcond, RefPHigh), RefPLow), RefrigerantIndex, RoutineName) -
-                            DXCoil(HeatCoilIndex).ActualSC,
+                            state.dataDXCoils->DXCoil(HeatCoilIndex).ActualSC,
                         0.0,
                         RefrigerantIndex,
                         RoutineName); // Quality=0
@@ -11120,7 +11106,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                           : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU) / (h_IU_cond_in - h_IU_cond_out_i));
                     m_ref_IU_cond = m_ref_IU_cond + m_ref_IU_cond_i;
                     h_IU_cond_out_ave = h_IU_cond_out_ave + m_ref_IU_cond_i * h_IU_cond_out_i;
-                    SC_IU_merged = SC_IU_merged + m_ref_IU_cond_i * DXCoil(HeatCoilIndex).ActualSC;
+                    SC_IU_merged = SC_IU_merged + m_ref_IU_cond_i * state.dataDXCoils->DXCoil(HeatCoilIndex).ActualSC;
                 }
             }
             if (m_ref_IU_cond > 0) {
@@ -11160,7 +11146,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
                     h_IU_evap_out_i = GetSupHeatEnthalpyRefrig(state,
                                                                this->RefrigerantName,
-                                                               max(RefTSat, this->IUEvaporatingTemp + DXCoil(CoolCoilIndex).ActualSH),
+                                                               max(RefTSat, this->IUEvaporatingTemp + state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH),
                                                                max(min(Pevap, RefPHigh), RefPLow),
                                                                RefrigerantIndex,
                                                                RoutineName);
@@ -11172,7 +11158,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                  (h_IU_evap_out_i - h_IU_evap_in)); // Ref Flow Rate in the IU( kg/s )
                         m_ref_IU_evap = m_ref_IU_evap + m_ref_IU_evap_i;
                         h_IU_evap_out = h_IU_evap_out + m_ref_IU_evap_i * h_IU_evap_out_i;
-                        SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * DXCoil(CoolCoilIndex).ActualSH;
+                        SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH;
                     }
                 }
             }
@@ -11769,11 +11755,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         PartLoadRatio = 1.0;
         this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         if (this->CoolingCoilPresent) {
-            this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).Temp;
-            this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
+            this->coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->CoolCoilIndex).AirInNode).HumRat;
         } else {
-            this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).Temp;
-            this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
+            this->coilInNodeT = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).Temp;
+            this->coilInNodeW = DataLoopNode::Node(state.dataDXCoils->DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
         }
 
         // set supplemental heating coil calculation if the condition requires
@@ -12172,7 +12158,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //  coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
         //  OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
-        using DXCoils::DXCoil;
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
 
@@ -12202,7 +12187,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on cooling mode
             DXCoilNum = this->CoolCoilIndex;
-            QCoilReq = -PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
+            QCoilReq = -PartLoadRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = state.dataHVACVarRefFlow->VRF(VRFCond).IUEvaporatingTemp;
 
             // For HR operations, Te is lower than the outdoor air temperature because of outdoor evaporator operations
@@ -12213,7 +12198,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                    (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on heating mode
             DXCoilNum = this->HeatCoilIndex;
-            QCoilReq = PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
+            QCoilReq = PartLoadRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = state.dataHVACVarRefFlow->VRF(VRFCond).IUCondensingTemp;
 
         } else {
@@ -12224,8 +12209,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         }
 
         // minimum airflow rate
-        if (DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) > 0.0) {
-            FanSpdRatioMin = min(state.dataHVACVarRefFlow->OACompOnMassFlow / DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode), 1.0);
+        if (state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) > 0.0) {
+            FanSpdRatioMin = min(state.dataHVACVarRefFlow->OACompOnMassFlow / state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode), 1.0);
         } else {
             // VRF terminal unit is off
             QCoilAct = 0.0;
@@ -12249,7 +12234,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par);
         if (SolFla < 0) FanSpdRatio = FanSpdRatioMax; // over capacity
 
-        AirMassFlowRate = FanSpdRatio * DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        AirMassFlowRate = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
 
         return AirMassFlowRate;
     }
@@ -12275,7 +12260,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // 		OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
         using DXCoils::ControlVRFIUCoil;
-        using DXCoils::DXCoil;
         using Fans::Fan;
         using Fans::SimulateFanComponents;
         using MixedAir::OAMixer;
@@ -12335,7 +12319,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             FanSpdRatioBase = FanSpdRatio;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * DXCoil(CoilIndex).RatedAirMassFlowRate(Mode);
+        state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode);
         SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
         Tin = DataLoopNode::Node(VRFInletNode).Temp;
         Win = DataLoopNode::Node(VRFInletNode).HumRat;
@@ -12374,7 +12358,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         ControlVRFIUCoil(state, CoilIndex, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
 
         Hin = PsyHFnTdbW(Tin, Win);
-        QCoilAct = FanSpdRatioAct * DXCoil(CoilIndex).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
+        QCoilAct = FanSpdRatioAct * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
 
         AirFlowRateResidual = (FanSpdRatioAct - FanSpdRatio);
 
@@ -12904,7 +12888,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // This is part of the VRF-FluidTCtrl Model.
 
-        using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatPressureRefrig;
         using FluidProperties::GetSatTemperatureRefrig;
@@ -12961,7 +12944,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
 
                 // The IU coil surface temperature should be the same.
-                Tfs = Te_up + (this->C3Te * pow_2(DXCoil(CoolCoilIndex).ActualSH) + this->C2Te * DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
+                Tfs = Te_up + (this->C3Te * pow_2(state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH) + this->C2Te * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
 
                 // SH_IU_update is the updated SH for a specific IU
                 if (this->C3Te == 0)
@@ -13326,7 +13309,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // This is part of the VRF-FluidTCtrl Model.
 
         using CurveManager::CurveValue;
-        using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatPressureRefrig;
@@ -13502,7 +13484,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                 CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
 
                                 Tfs = this->EvaporatingTemp +
-                                      (this->C3Te * pow_2(DXCoil(CoolCoilIndex).ActualSH) + this->C2Te * DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
+                                      (this->C3Te * pow_2(state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH) + this->C2Te * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
 
                                 // Modifi_SH is the updated SH for a specific IU
                                 if (this->C3Te == 0)
@@ -13682,7 +13664,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // This is part of the VRF-FluidTCtrl Model.
 
         using CurveManager::CurveValue;
-        using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatPressureRefrig;
@@ -14292,7 +14273,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSupHeatDensityRefrig;
         using FluidProperties::RefrigData;
@@ -14344,8 +14324,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             CoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
 
-            if (DXCoil(CoilIndex).TotalCoolingEnergyRate > 0.0) {
-                Pipe_T_room = Pipe_T_room + DXCoil(CoilIndex).InletAirTemp;
+            if (state.dataDXCoils->DXCoil(CoilIndex).TotalCoolingEnergyRate > 0.0) {
+                Pipe_T_room = Pipe_T_room + state.dataDXCoils->DXCoil(CoilIndex).InletAirTemp;
                 NumIUActivated = NumIUActivated + 1;
             }
         }
@@ -14444,7 +14424,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatTemperatureRefrig;
         using FluidProperties::GetSupHeatDensityRefrig;
@@ -14513,8 +14492,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             CoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex;
 
-            if (DXCoil(CoilIndex).TotalHeatingEnergyRate > 0.0) {
-                Pipe_T_room = Pipe_T_room + DXCoil(CoilIndex).InletAirTemp;
+            if (state.dataDXCoils->DXCoil(CoilIndex).TotalHeatingEnergyRate > 0.0) {
+                Pipe_T_room = Pipe_T_room + state.dataDXCoils->DXCoil(CoilIndex).InletAirTemp;
                 NumIUActivated = NumIUActivated + 1;
             }
         }

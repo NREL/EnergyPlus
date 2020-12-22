@@ -2657,7 +2657,7 @@ namespace HeatingCoils {
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                HeatingCoil(CoilNum).RTF = DXCoil(SourceID).CoolingCoilRuntimeFraction;
+                HeatingCoil(CoilNum).RTF = state.dataDXCoils->DXCoil(SourceID).CoolingCoilRuntimeFraction;
                 HeatingCoil(CoilNum).NominalCapacity =
                     HeatReclaimDXCoil(SourceID).AvailCapacity * Effic - HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {

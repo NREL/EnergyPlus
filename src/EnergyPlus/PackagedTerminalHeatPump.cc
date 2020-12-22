@@ -136,7 +136,6 @@ namespace PackagedTerminalHeatPump {
     using namespace DataLoopNode;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
-    using DXCoils::DXCoilPartLoadRatio;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -5999,7 +5998,7 @@ namespace PackagedTerminalHeatPump {
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
                     }
-                    SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
@@ -6130,7 +6129,7 @@ namespace PackagedTerminalHeatPump {
                                   PTUnit(PTUnitNum).OpMode,
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
-                        SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
+                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                         SimWatertoAirHPSimple(state,

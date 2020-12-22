@@ -4314,7 +4314,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using DXCoils::DXCoil;
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
@@ -4397,24 +4396,24 @@ namespace EnergyPlus::OutputReportTabular {
 
         // DX Coils air to air
         for (iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
-            if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
-                                                  DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
-                } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
-                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+            if (state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                if (state.dataDXCoils->DXCoil(iCoil).CondenserType(1) == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).ElecCoolingConsumption + state.dataDXCoils->DXCoil(iCoil).DefrostConsumption +
+                                                  state.dataDXCoils->DXCoil(iCoil).CrankcaseHeaterConsumption + state.dataDXCoils->DXCoil(iCoil).TotalCoolingEnergy;
+                } else if (state.dataDXCoils->DXCoil(iCoil).CondenserType(1) == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).EvapCondPumpElecConsumption + state.dataDXCoils->DXCoil(iCoil).BasinHeaterConsumption +
+                                                  state.dataDXCoils->DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
-                if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
+                if (state.dataDXCoils->DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
-            } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
-                       DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
-                                              DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
+            } else if (state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
+                       state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).ElecHeatingConsumption + state.dataDXCoils->DXCoil(iCoil).DefrostConsumption + state.dataDXCoils->DXCoil(iCoil).FuelConsumed +
+                                              state.dataDXCoils->DXCoil(iCoil).CrankcaseHeaterConsumption - state.dataDXCoils->DXCoil(iCoil).TotalHeatingEnergy;
             }
         }
         // VAV coils - air to air

@@ -2436,7 +2436,7 @@ namespace HVACUnitaryBypassVAV {
                                 }
                             }
                         }
-                        SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
                         Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
@@ -2960,7 +2960,7 @@ namespace HVACUnitaryBypassVAV {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-                        SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
 
                     } else {
                         ShowFatalError(state, "SimCBVAV System: Invalid DX Cooling Coil=" + CBVAV(CBVAVNum).DXCoolCoilType);
@@ -2977,7 +2977,7 @@ namespace HVACUnitaryBypassVAV {
                                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                         DataHVACGlobals::ContFanCycCoil,
                                                                         HXUnitOn);
-                    SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     DXCoils::SimDXCoil(state,
                                        CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2987,7 +2987,7 @@ namespace HVACUnitaryBypassVAV {
                                        DataHVACGlobals::ContFanCycCoil,
                                        0.0,
                                        OnOffAirFlowRatio);
-                    SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     DXCoils::SimDXCoilMultiMode(state,
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2997,7 +2997,7 @@ namespace HVACUnitaryBypassVAV {
                                                 0,
                                                 CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                 DataHVACGlobals::ContFanCycCoil);
-                    SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
                     Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
@@ -3141,7 +3141,7 @@ namespace HVACUnitaryBypassVAV {
                                            0.0,
                                            OnOffAirFlowRatio);
                     }
-                    SaveCompressorPLR = DXCoils::DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
                 } else { // HeatCoolMode = CoolingMode
                     //     simulate DX heating coil with compressor off when cooling load is required
                     DXCoils::SimDXCoil(state,
@@ -3798,7 +3798,7 @@ namespace HVACUnitaryBypassVAV {
 
         DXCoils::CalcDoe2DXCoil(state, CoilIndex, On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
 
-        Real64 OutletAirTemp = DXCoils::DXCoilOutletTemp(CoilIndex);
+        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3864,7 +3864,7 @@ namespace HVACUnitaryBypassVAV {
 
         DXCoils::CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, OnOffAirFlowFrac);
 
-        Real64 OutletAirTemp = DXCoils::DXCoilOutletTemp(CoilIndex);
+        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3896,7 +3896,7 @@ namespace HVACUnitaryBypassVAV {
         int DehumidMode = int(Par(3));
         int FanOpMode = 2;
         DXCoils::SimDXCoilMultiMode(state, "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
-        Real64 OutletAirTemp = DXCoils::DXCoilOutletTemp(CoilIndex);
+        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;

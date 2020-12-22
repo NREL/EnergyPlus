@@ -237,7 +237,6 @@ namespace CostEstimateManager {
         using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
-        using DXCoils::DXCoil;
         using HeatingCoils::HeatingCoil;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -309,7 +308,7 @@ namespace CostEstimateManager {
                         ErrorsFound = true;
 
                     } else { // assume name is probably useful
-                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, DXCoil);
+                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataDXCoils->DXCoil);
                         if (thisCoil == 0) {
                             ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\", Coil:DX, invalid coil specified");
                             ShowContinueError(state, "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
@@ -497,7 +496,6 @@ namespace CostEstimateManager {
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
-        using DXCoils::DXCoil;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
 
@@ -573,13 +571,13 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, DXCoil);
+                        thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataDXCoils->DXCoil);
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
-                            for (auto const &e : DXCoil)
+                            for (auto const &e : state.dataDXCoils->DXCoil)
                                 Qty += e.RatedTotCap(1);
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot cool cap.)";
@@ -587,7 +585,7 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (thisCoil > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = DXCoil(thisCoil).RatedTotCap(1) / 1000.0;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDXCoils->DXCoil(thisCoil).RatedTotCap(1) / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW (tot cool cap.)";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap;
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
@@ -605,7 +603,7 @@ namespace CostEstimateManager {
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0) {
                         if (WildcardObjNames) {
                             Real64 Qty(0.0);
-                            for (auto const &e : DXCoil)
+                            for (auto const &e : state.dataDXCoils->DXCoil)
                                 Qty += e.RatedCOP(1) * e.RatedTotCap(1);
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = Qty / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
@@ -613,7 +611,7 @@ namespace CostEstimateManager {
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
                         }
                         if (thisCoil > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = DXCoil(thisCoil).RatedCOP(1) * DXCoil(thisCoil).RatedTotCap(1) / 1000.0;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDXCoils->DXCoil(thisCoil).RatedCOP(1) * state.dataDXCoils->DXCoil(thisCoil).RatedTotCap(1) / 1000.0;
                             state.dataCostEstimateManager->CostLineItem(Item).Units = "kW*COP (total, rated) ";
                             state.dataCostEstimateManager->CostLineItem(Item).ValuePer = state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP;
                             state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;

@@ -225,7 +225,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         // Initialize HXAssistedCoolingCoil Flows
-        InitHXAssistedCoolingCoil(HXAssistedCoilNum);
+        InitHXAssistedCoolingCoil(state, HXAssistedCoilNum);
 
         if (present(HXUnitEnable)) {
             HXUnitOn = HXUnitEnable;
@@ -794,7 +794,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHXAssistedCoolingCoil(int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
+    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
     {
 
         // SUBROUTINE INFORMATION:
@@ -809,33 +809,12 @@ namespace HVACHXAssistedCoolingCoil {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-
-        // Using/Aliasing
-        using DXCoils::DXCoilFullLoadOutAirHumRat;
-        using DXCoils::DXCoilFullLoadOutAirTemp;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  na
-
         // Do these initializations every time
         HXAssistedCoil(HXAssistedCoilNum).MassFlowRate = Node(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum).MassFlowRate;
 
         if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            DXCoilFullLoadOutAirTemp(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
-            DXCoilFullLoadOutAirHumRat(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+            state.dataDXCoils->DXCoilFullLoadOutAirTemp(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
         } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             //
         }

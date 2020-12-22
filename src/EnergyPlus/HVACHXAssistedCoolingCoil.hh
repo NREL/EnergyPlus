@@ -169,12 +169,13 @@ namespace HVACHXAssistedCoolingCoil {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHXAssistedCoolingCoil(int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
+    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
 
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
+                                   int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,           // FirstHVACIteration flag
                                    int const CompOp,                        // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,              // Cooling coil part load ratio
