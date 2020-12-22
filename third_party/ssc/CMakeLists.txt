@@ -4,7 +4,7 @@
 #
 #####################################################################################################################
 
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.10)
 
 if(POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
