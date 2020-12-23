@@ -48,21 +48,22 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataBSDFWindow.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataVectorTypes.hh>
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Shape.hh>
+// C++ Headers
+#include <cstddef>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Vector4.hh>
 
-// C++ Headers
-#include <cstddef>
-#include <vector>
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Shape.hh>
 
 namespace EnergyPlus {
 
@@ -1467,6 +1468,14 @@ namespace DataSurfaces {
     std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
+
+struct SurfacesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

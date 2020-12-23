@@ -333,11 +333,11 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
 
     print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
     // add to tabular output reports
-    OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
+    OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, VarDesc, VarValue);
 
     if (present(UsrDesc) && present(UsrValue)) {
         print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
-        OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
+        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc, UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
         ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
     }

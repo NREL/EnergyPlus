@@ -270,7 +270,7 @@ namespace EnergyPlus::DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
 
-        BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv();
+        BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv;
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;

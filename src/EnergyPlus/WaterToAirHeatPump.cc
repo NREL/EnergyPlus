@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -67,6 +66,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
@@ -104,7 +104,6 @@ namespace WaterToAirHeatPump {
     using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
     static std::string const fluidNameWater("WATER");
-    static std::string const BlankString;
 
     void SimWatertoAirHP(EnergyPlusData &state,
                          std::string const &CompName,   // component name
@@ -325,7 +324,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(7);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff = NumArray(8);
 
-            if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue())) {
+            if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue)) {
                 ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                 ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -423,12 +422,12 @@ namespace WaterToAirHeatPump {
             RegisterPlantCompDesignFlow(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
 
             // create predefined report entries
-            PreDefTableEntry(pdchCoolCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);
-            PreDefTableEntry(pdchCoolCoilTotCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CoolingCapacity);
-            PreDefTableEntry(pdchCoolCoilSensCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
-            PreDefTableEntry(pdchCoolCoilLatCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
-            PreDefTableEntry(pdchCoolCoilSHR, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
-            PreDefTableEntry(pdchCoolCoilNomEff, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CoolingCapacity);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
         }
 
         CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:ParameterEstimation";
@@ -472,7 +471,7 @@ namespace WaterToAirHeatPump {
                 AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
-            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue()) {
+            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
                 ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                 ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -557,9 +556,9 @@ namespace WaterToAirHeatPump {
             RegisterPlantCompDesignFlow(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
 
             // create predefined report entries
-            PreDefTableEntry(pdchHeatCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);
-            PreDefTableEntry(pdchHeatCoilNomCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HeatingCapacity);
-            PreDefTableEntry(pdchHeatCoilNomEff, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HeatingCapacity);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, "-");
         }
 
         AlphArray.deallocate();
@@ -854,7 +853,7 @@ namespace WaterToAirHeatPump {
                                     _);
 
             if (PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
-                if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue()) {
+                if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
                     ShowSevereError(state, "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
                     ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -862,7 +861,7 @@ namespace WaterToAirHeatPump {
                     errFlag = true;
                 }
             } else {
-                if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < DataGlobalConstants::rTinyValue())) {
+                if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < DataGlobalConstants::rTinyValue) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < DataGlobalConstants::rTinyValue)) {
                     ShowSevereError(state, "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
                     ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -911,9 +910,9 @@ namespace WaterToAirHeatPump {
 
             // The rest of the one time initializations
             rho = GetDensityGlycol(
-                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
+                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
             Cp = GetSpecificHeatGlycol(
-                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
+                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = rho * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
@@ -2201,7 +2200,7 @@ namespace WaterToAirHeatPump {
         int WaterOutletNode;
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // state.dataWaterToAirHeatPump->WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag) {
             // Heatpump is off; just pass through conditions

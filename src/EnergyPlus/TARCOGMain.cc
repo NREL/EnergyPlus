@@ -55,7 +55,6 @@
 #include <EnergyPlus/TARCOGMain.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalEN673Calc.hh>
 #include <EnergyPlus/ThermalISO15099Calc.hh>
 
@@ -343,7 +342,6 @@ namespace TARCOGMain {
     using namespace TARCOGOutput;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
-    using namespace TarcogShading;
     using namespace TARCOGArgs;
     using namespace ThermalISO15099Calc;
     using namespace ThermalEN673Calc;

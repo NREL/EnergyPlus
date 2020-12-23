@@ -56,20 +56,17 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -77,6 +74,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -422,7 +420,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).DehumTypeCode = Solid;
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -784,7 +782,7 @@ namespace DesiccantDehumidifiers {
 
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -1721,7 +1719,6 @@ namespace DesiccantDehumidifiers {
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
@@ -1794,7 +1791,7 @@ namespace DesiccantDehumidifiers {
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(state,
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp(),
+                                                        DataGlobalConstants::HWInitConvTemp,
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                         initCBVAV);
                         DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
@@ -1862,7 +1859,7 @@ namespace DesiccantDehumidifiers {
                                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(state, ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                    CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                         ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
@@ -1919,7 +1916,7 @@ namespace DesiccantDehumidifiers {
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(state,
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                                    DataGlobalConstants::HWInitConvTemp(),
+                                                                    DataGlobalConstants::HWInitConvTemp,
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                                     RoutineName);
                                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
@@ -1967,7 +1964,7 @@ namespace DesiccantDehumidifiers {
                                 ShowContinueError(state, "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
                                 SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                     ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
@@ -3191,7 +3188,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
         {
             auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).DehumTypeCode);
@@ -3235,7 +3232,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
 
-        using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;

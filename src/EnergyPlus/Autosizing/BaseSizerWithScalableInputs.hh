@@ -48,10 +48,10 @@
 #ifndef BaseSizerWithScalableInputs_hh_INCLUDED
 #define BaseSizerWithScalableInputs_hh_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
-//#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <string>
 
 namespace EnergyPlus {
@@ -126,6 +126,14 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
 
     void setHVACSizingIndexData(int const index);
 
+};
+
+struct BaseSizerWithScalableInputsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
 };
 
 } // namespace EnergyPlus

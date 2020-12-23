@@ -780,7 +780,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -829,7 +829,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -926,7 +926,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     state->dataEnvrn->Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
@@ -1135,7 +1135,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     state->dataEnvrn->Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
