@@ -758,9 +758,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
 
-    if (GetPurchAirInputFlag) {
+    if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
         GetPurchasedAir(*state);
-        GetPurchAirInputFlag = false;
+        state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
     }
 
     InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
@@ -771,5 +771,5 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
 
     EXPECT_EQ(SysOutputProvided, 0.0);
     // #8365 Supply air mass flow rate should be zero during heating mode when capacity is limited to zero
-    EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyAirMassFlowRate, 0.0);
 }
