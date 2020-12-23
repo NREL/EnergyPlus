@@ -1013,6 +1013,8 @@ struct SQLiteProceduresData : BaseGlobalStruct {
     }
 };
 
+extern int unitSQLiteTable; 
+
 } // namespace EnergyPlus
 
 #endif

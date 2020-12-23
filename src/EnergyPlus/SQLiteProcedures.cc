@@ -79,6 +79,8 @@ const int SQLite::RowNameId = 4;
 const int SQLite::ColumnNameId = 5;
 const int SQLite::UnitsId = 6;
 
+int unitSQLiteTable = 0;
+
 std::unique_ptr<SQLite> sqlite;
 
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
@@ -107,6 +109,33 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
                     writeTabularDataToSQLite = true;
                     writeOutputToSQLite = true;
+
+                    // Maybe: can do it here or do it in the OutputReportTabular::WriteTable(). But here is natural since this needs to be processed only once. 
+                    // set global flags for sqlite dual unit input
+                    if (numAlphas > 1) {
+                        std::string option2 = alphas(2);
+                        if (UtilityRoutines::SameString(option, "UseOutputControlTableStyles")) {
+                            // set a global flag variable
+                            unitSQLiteTable = 0;
+                        } else if (UtilityRoutines::SameString(option, "None")) {
+                            unitSQLiteTable = 1;
+                        } else if (UtilityRoutines::SameString(option, "JtoKWH")) {
+                            unitSQLiteTable = 2;
+                        } else if (UtilityRoutines::SameString(option, "JtoMJ")) {
+                            unitSQLiteTable = 3;
+                        } else if (UtilityRoutines::SameString(option, "JtoGJ")) {
+                            unitSQLiteTable = 4;
+                        } else if (UtilityRoutines::SameString(option, "InchPound")) {
+                            unitSQLiteTable = 5;
+                        }
+       //\key UseOutputControlTableStyle
+       //\key None
+       //\key JtoKWH
+       //\key JtoMJ
+       //\key JtoGJ
+       //\key InchPound
+                    }
+
                 } else if (UtilityRoutines::SameString(option, "Simple")) {
                     writeOutputToSQLite = true;
                 }
