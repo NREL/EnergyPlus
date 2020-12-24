@@ -250,9 +250,9 @@ ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
 set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-CalcEngine)
 
-set(SAM_SKIP_TOOLS ON)
-set(SAM_SKIP_TESTS ON)
-set(SAMAPI_EXPORT OFF)
+set(SAM_SKIP_TOOLS ON CACHE BOOL "Skips the sdktool and tcsconsole builds" FORCE)
+set(SAM_SKIP_TESTS ON CACHE BOOL "Skips building tests" FORCE)
+set(SAMAPI_EXPORT OFF CACHE BOOL "Export of ssc binaries to the SAM_api directory; for Unix, compile ssc libraries for SAM_api" FORCE)
 ADD_SUBDIRECTORY(third_party/ssc)
 set_target_properties(ssc PROPERTIES FOLDER ThirdParty/ssc)
 IF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
