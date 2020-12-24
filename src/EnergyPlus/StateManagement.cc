@@ -138,7 +138,6 @@
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -272,7 +271,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
-    OutputProcessor::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();

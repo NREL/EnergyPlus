@@ -115,8 +115,6 @@ namespace TranspiredCollector {
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
-    static std::string const BlankString;
-
     void SimTranspiredCollector(EnergyPlusData &state,
                                 std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)

@@ -10423,7 +10423,7 @@ namespace AirflowNetworkBalanceManager {
             if (ErrorsFound) {
                 ShowFatalError(state, RoutineName + "Program terminates for preceding reason(s).");
             }
-        } // End if OneTimeFlag
+        } // End if OneTimeFlag_FindFirstLastPtr
     }
 
     void HybridVentilationControl(EnergyPlusData &state)

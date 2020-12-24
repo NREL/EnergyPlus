@@ -128,7 +128,6 @@ namespace SurfaceGroundHeatExchanger {
     Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
     Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
     Real64 const SurfaceHXHeight(0.0);      // Surface Height above ground -- used in height dependent calcs.
-    static std::string const BlankString;
 
     int const SurfCond_Ground(1);
     int const SurfCond_Exposed(2);

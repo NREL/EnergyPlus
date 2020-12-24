@@ -240,8 +240,6 @@ namespace MixedAir {
     int const CMO_MechVentilation(7);
     int const CMO_OAMixer(8);
 
-    static std::string const BlankString;
-
     // Type declarations in MixedAir module
 
     // MODULE VARIABLE DECLARATIONS:
