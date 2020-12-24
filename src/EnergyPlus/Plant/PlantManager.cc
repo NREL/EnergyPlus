@@ -88,6 +88,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
+#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -1027,6 +1028,10 @@ namespace EnergyPlus {
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, TypeOf_GrndHtExchgSlinky,
                                                                                             CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")) {
+                                this_comp.TypeOf_Num = TypeOf_IceRink;
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = IceRink::IceRinkData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric:EIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
                                 if (LoopSideNum == DemandSide) {
@@ -4181,6 +4186,10 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                                     this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                     this_component.HowLoadServed = HowMet_PassiveCap;
+                                } else if (SELECT_CASE_var == TypeOf_IceRink) { //                   = 97 (demand side component)
+                                    this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                    this_component.HowLoadServed = HowMet_NoneDemand;
                                 } else if (SELECT_CASE_var == TypeOf_HeatPumpEIRCooling ||
                                            SELECT_CASE_var == TypeOf_HeatPumpEIRHeating) { // 95, 96
                                     this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;

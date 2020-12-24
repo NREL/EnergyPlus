@@ -400,6 +400,8 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
+  IndoorIceRink.cc
+  IndoorIceRink.hh
   InputProcessing/DataStorage.hh
   InputProcessing/EmbeddedEpJSONSchema.hh
   "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
