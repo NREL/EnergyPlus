@@ -122,7 +122,7 @@ namespace DataPlant {
     Array1D_string const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    int const NumSimPlantEquipTypes(96);
+    int const NumSimPlantEquipTypes(97);
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",

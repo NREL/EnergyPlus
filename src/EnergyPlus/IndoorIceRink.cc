@@ -678,7 +678,7 @@ namespace IceRink {
                                 "Sum",
                                 this->Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "REFRIGERATION",
                                 _,
                                 "System");
