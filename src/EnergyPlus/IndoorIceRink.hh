@@ -132,9 +132,7 @@ namespace IceRink {
         Real64 IceTemp;
         int NumOfSurfaces;         // Total number of surfaces in the ice rink arena
         Real64 DesignMassFlowRate; // Design flow rate through the rink HX [kg/s]
-        Real64 DesignCapacity;     // design cooling capacity
-        // Real64 MinRefrigMassFlow;  // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
-        // Real64 MaxRefrigMassFlow;  // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        
         Real64 hrstofreeze;  // Desired hours to freeze the water of the ice rink
         Real64 deltatemp;    // Design delta T for heat exchanger
         Real64 maxmdot;      // maximum mass flowrate
@@ -178,18 +176,13 @@ namespace IceRink {
 
         bool MyFlag;
         bool MyEnvrnFlag;
-        // Real64 QSrc;
-        // Real64 QSrcAvg;
-        // Real64 LastQSrc;
-        // Real64 LastSysTimeElapsed;
-        // Real64 LastTimeStepSys;
         Real64 IceTemperature;
         Real64 Tsurfin1;      // inside surface temperature in previous timestep.
         Real64 Tsurfin2;      // inside surface temperature in current timestep.
         Real64 Qsource2;      // Q used to report data after calling heat balance. This is used to find any irregularities.
         Real64 Qsetpoint;     // Required Q to bring the inside surface temperature to ice setpoint.
         Real64 Qsrcmax;       // maximum Q to freeze water. This is used to calculate the design load and maximum mass flowrate.
-        Real64 Tsrc;          // Source Temperature
+        Real64 Tsrc;          // Source Temperature. Only used to track simulation results.
         Real64 Effectiveness; // effectiveness of HX
         Real64 ReqMassFlow;   // Required mass flowarate
         Real64 CpRefrig;      // Specific heat of refrigerant
@@ -197,16 +190,16 @@ namespace IceRink {
         Real64 CpWater;       // Specific heat of water
         Real64 Qfusion;       // Enthalpy of water transformation to ice
         Real64 Q;             // Final Q to be reported to EnergyPlus
-        Real64 SecInHour = 3600;
-        Real64 Increments = 0.1667;
+        Real64 SecInHour = 3600; 
+        Real64 Increments = 0.1667; 
         Real64 TRefigOutCheck;     // Outlet temperature of refrigerant
         Real64 RefrigTempIn;       // Inlet temperature of refrigerant
         Real64 RefrigMassFlow;     // Refrigerant mass flow rate
         Real64 PastRefrigMassFlow; // to keep track of previous mass flow rate
         Real64 LoadMet;
-        Real64 COP = 2.5; // hardwired COP. This will be changed later
-        Real64 IceSetPointTemp;
-        Real64 operation;
+        Real64 COP = 2.5; // hardwired COP. This will be changed later.
+        Real64 IceSetPointTemp; //Ice rink setpoint
+        Real64 operation; //used to determine whether the ice rink is ON or OFF. 1: ON; 0: OFF
 
         Real64 FreezingLoad;
 
