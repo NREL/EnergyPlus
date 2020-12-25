@@ -5982,7 +5982,7 @@ namespace IntegratedHeatPump {
 
             dDesignAir = state.dataWaterCoils->WaterCoil(iCoilID).DesAirVolFlowRate; 
             dDesignWater = state.dataWaterCoils->WaterCoil(iCoilID).MaxWaterVolFlowRate;
-            SizeWaterCoil(state, iCoilID);
+           // SizeWaterCoil(state, iCoilID);
         }
 
         IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;

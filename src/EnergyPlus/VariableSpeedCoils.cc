@@ -2948,13 +2948,6 @@ namespace VariableSpeedCoils {
             }
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = NumArray(3);
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
-                ShowSevereError(
-                    state, RoutineName + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                ShowContinueError(state, format("...{} must be > 0.0, entered value=[{:.2T}].", cNumericFields(3), NumArray(3)));
-                ErrorsFound = true;
-            }
-
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWaterTemp = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(6);
@@ -6426,15 +6419,16 @@ namespace VariableSpeedCoils {
                 UtilityRoutines::SameString(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Pcm:Simple")) 
             {
                 const double dNormCapacity =
-                    CoolCapAtPeak * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 / 1.0e9; // GJ
+                    CoolCapAtPeak * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 ; // J
                 IceThermalStorage::SetIceStoreNormCapacity(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType,
                                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageName,
                                                            dNormCapacity);
 
+                const double dNormCapaOut = dNormCapacity / 1.0e9; 
                 BaseSizer::reportSizerOutput(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                    "Storage tank capacity [GJ]",
-                                   dNormCapacity);
+                                             dNormCapaOut);
             } 
             else if (UtilityRoutines::SameString(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType, "WaterHeater:Mixed") ||
                        UtilityRoutines::SameString(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType, "WaterHeater:Stratified"))
@@ -9011,14 +9005,21 @@ namespace VariableSpeedCoils {
         if (CompIndex > 0) {
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex >= -3) &&
                 (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex != 0)) {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -1)
-                    dGridSignal = state.dataEnvrn->OutDryBulbTemp; 
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -2)
-                    dGridSignal = state.dataEnvrn->OutRelHum; 
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -3)
-                    dGridSignal = state.dataEnvrn->OutHumRat; 
-                else
-                 dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
+
+                switch (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex) {
+                case -1:
+                    dGridSignal = state.dataEnvrn->OutDryBulbTemp;
+                    break;
+                case -2:
+                    dGridSignal = state.dataEnvrn->OutRelHum;
+                    break;
+                case -3:
+                    dGridSignal = state.dataEnvrn->OutHumRat;
+                    break;
+                default:
+                    dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
+                    break;
+                }
 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridHighBound)) {
@@ -9048,14 +9049,21 @@ namespace VariableSpeedCoils {
         if (CompIndex > 0) {
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex >= -3) &&
                 (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex != 0)) {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -1)
+                
+                switch (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex) {
+                case -1:
                     dGridSignal = state.dataEnvrn->OutDryBulbTemp;
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -2)
+                    break;
+                case -2:
                     dGridSignal = state.dataEnvrn->OutRelHum;
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -3)
+                    break;
+                case -3:
                     dGridSignal = state.dataEnvrn->OutHumRat;
-                else
+                    break;
+                default:
                     dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
+                    break;
+                }
 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridHighBound)) {
@@ -9571,15 +9579,23 @@ namespace VariableSpeedCoils {
         if (DXCoilNum > 0) {
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex >= -3) &&
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex != 0)) {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -1)
-                    dGridSignal = state.dataEnvrn->OutDryBulbTemp;
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -2)
-                    dGridSignal = state.dataEnvrn->OutRelHum;
-                else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -3)
-                    dGridSignal = state.dataEnvrn->OutHumRat;
-                else
-                    dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex);
 
+                switch (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex) 
+                {
+                case -1:
+                    dGridSignal = state.dataEnvrn->OutDryBulbTemp;
+                    break; 
+                case -2: 
+                    dGridSignal = state.dataEnvrn->OutRelHum;
+                    break; 
+                case -3:
+                    dGridSignal = state.dataEnvrn->OutHumRat;
+                    break; 
+                default:
+                    dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex);
+                    break;                 
+                }
+                 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridHighBound)) {
                     bIsGridResponse = true; 

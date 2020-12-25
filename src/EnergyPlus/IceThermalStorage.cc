@@ -2797,7 +2797,7 @@ namespace IceThermalStorage {
             IndexNum = UtilityRoutines::FindItemInList(sName, DetailedIceStorage);
 
             if (IndexNum != 0) {
-                DetailedIceStorage(IndexNum).NomCapacity = dNormCapacity;
+                DetailedIceStorage(IndexNum).NomCapacity = dNormCapacity/3600.0; // J to w-hr
             }
         } 
         else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
@@ -2805,6 +2805,10 @@ namespace IceThermalStorage {
             IndexNum = UtilityRoutines::FindItemInList(sName, SimplePcmStorage);
 
             if (IndexNum != 0) {
+                SimplePcmStorage(IndexNum).OnsetUA = 
+                    dNormCapacity / SimplePcmStorage(IndexNum).PcmTSNomCap * SimplePcmStorage(IndexNum).OnsetUA;
+                SimplePcmStorage(IndexNum).FinishUA = 
+                    dNormCapacity / SimplePcmStorage(IndexNum).PcmTSNomCap * SimplePcmStorage(IndexNum).FinishUA;
                 SimplePcmStorage(IndexNum).PcmTSNomCap = dNormCapacity;
             }
         }
