@@ -84,14 +84,6 @@ ENERGYPLUSLIB_API char * listAllAPIDataCSV(EnergyPlusState state);
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \return Returns 0 (success) once the data is ready, otherwise returns 1.
 ENERGYPLUSLIB_API int apiDataFullyReady(EnergyPlusState state);
-/// \brief Provides a user-facing check for whether the CondFD API data is ready to be accessed
-/// \details Many parts of a simulation need to be set up to complete a run.
-///          At the early stages of a simulation, most data has not been allocated and set up.
-///          This function allows a user to call the simulation to check whether the CondFD data is ready for access.
-///          Do not call for CondFD data prior to this returning true.
-/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \return Returns 0 (success) once the data is ready, otherwise returns 1.
-ENERGYPLUSLIB_API int condFDReady(EnergyPlusState state);
 /// \brief Provides a user-facing check on the API error flag
 /// \details Some API functions return a value of 0, which could potentially indicate an error, or an actual 0 value.
 ///          This function provides a way to disambiguate the response value.

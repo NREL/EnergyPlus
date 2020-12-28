@@ -236,7 +236,6 @@ struct PluginManagerData : BaseGlobalStruct {
     std::vector<Real64> globalVariableValues;
     bool fullyReady = false;
     bool apiErrorFlag = false;
-    bool condFDReadyFlag = false;
 
     void clear_state() override {
         callbacks.clear();
@@ -250,7 +249,6 @@ struct PluginManagerData : BaseGlobalStruct {
         plugins.clear();
         fullyReady = false;
         apiErrorFlag = false;
-        condFDReadyFlag = false;
         auto * p = pluginManager.release();
         delete p;
 #endif

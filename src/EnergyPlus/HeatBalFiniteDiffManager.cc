@@ -1044,9 +1044,6 @@ namespace HeatBalFiniteDiffManager {
 
         ReportFiniteDiffInits(state); // Report the results from the Finite Diff Inits
 
-        if (!state.dataGlobal->eplusRunningViaAPI) {
-            state.dataPluginManager->condFDReadyFlag = true;
-        }
     }
 
     int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)

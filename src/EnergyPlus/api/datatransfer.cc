@@ -130,14 +130,6 @@ int apiDataFullyReady(EnergyPlusState state) {
     return 1;
 }
 
-int condFDReady(EnergyPlusState state) {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (thisState->dataPluginManager->condFDReadyFlag) {
-        return 0;
-    }
-    return 1;
-}
-
 int apiErrorFlag(EnergyPlusState state) {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->apiErrorFlag) {

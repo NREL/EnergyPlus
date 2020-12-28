@@ -86,7 +86,7 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
 
     def on_begin_timestep_before_predictor(self, state) -> int:
         if self.need_to_get_handles:
-            if self.api.exchange.cond_fd_ready(state) and self.api.exchange.api_data_fully_ready(state):
+            if self.api.exchange.api_data_fully_ready(state):
                 self.get_handles(state)
             else:
                 return 0

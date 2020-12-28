@@ -42,8 +42,6 @@ class DataExchange:
         self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.apiDataFullyReady.argtypes = [c_void_p]
         self.api.apiDataFullyReady.restype = c_int
-        self.api.condFDReady.argtypes = [c_void_p]
-        self.api.condFDReady.restype = c_int
         self.api.apiErrorFlag.argtypes = [c_void_p]
         self.api.apiErrorFlag.restype = c_int
         self.api.resetErrorFlag.argtypes = [c_void_p]
@@ -211,19 +209,6 @@ class DataExchange:
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
         success = self.api.apiDataFullyReady(state)
-        if success == 0:
-            return True
-        return False
-
-    def cond_fd_ready(self, state: c_void_p) -> bool:
-        """
-        Check whether the CondFD data exchange API is ready.
-        Handles to variables, actuators, and other data are not reliably defined prior to this being true.
-
-        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
-        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
-        """
-        success = self.api.condFDReady(state)
         if success == 0:
             return True
         return False
