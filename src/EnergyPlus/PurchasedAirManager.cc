@@ -2166,6 +2166,15 @@ namespace EnergyPlus::PurchasedAirManager {
                     }
                 }
 
+                // If cooling capacity is limited to zero, SupplyMassFlowRate* should be set to zero
+                if (((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity) ||
+                    (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) &&
+                    (PurchAir(PurchAirNum).MaxCoolTotCap == 0)) {
+                    SupplyMassFlowRateForCool = 0;
+                    SupplyMassFlowRateForDehum = 0;
+                    SupplyMassFlowRateForHumid = 0;
+                }
+
                 // Supply mass flow is greatest of these, but limit to cooling max flow rate, if applicable
                 SupplyMassFlowRate = max(0.0, OAMassFlowRate, SupplyMassFlowRateForCool, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid);
                 // EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
@@ -2419,6 +2428,15 @@ namespace EnergyPlus::PurchasedAirManager {
                             SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
                         }
                     }
+                }
+
+                // If heating capacity is limited to zero, SupplyMassFlowRate* should be set to zero
+                if (((PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitCapacity) ||
+                    (PurchAir(PurchAirNum).HeatingLimit == LimitType::LimitFlowRateAndCapacity)) &&
+                    (PurchAir(PurchAirNum).MaxHeatSensCap == 0)) {
+                    SupplyMassFlowRateForHeat = 0;
+                    SupplyMassFlowRateForDehum = 0;
+                    SupplyMassFlowRateForHumid = 0;
                 }
 
                 // Supply mass flow is greatest of these, but limit to heating max flow rate, if applicable
