@@ -324,7 +324,7 @@ namespace HeatBalFiniteDiffManager {
                                               cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), dataMaterial.Material);
+                MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                     ", must match to a valid Material name.");
@@ -332,9 +332,9 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (dataMaterial.Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
                     ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
-                                    dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                    state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
 
@@ -416,7 +416,7 @@ namespace HeatBalFiniteDiffManager {
                                               cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), dataMaterial.Material);
+                MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                     ", must match to a valid Material name.");
@@ -424,9 +424,9 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (dataMaterial.Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
                     ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
-                                    dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                    state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
 
@@ -662,7 +662,7 @@ namespace HeatBalFiniteDiffManager {
         fracTimeStepZone_Hour = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
 
         for (index = 1; index <= 20; ++index) {
-            Delt = (fracTimeStepZone_Hour * DataGlobalConstants::SecInHour()) / index; // TimeStepZone = Zone time step in fractional hours
+            Delt = (fracTimeStepZone_Hour * DataGlobalConstants::SecInHour) / index; // TimeStepZone = Zone time step in fractional hours
             if (Delt <= 200) break;
         }
 
@@ -698,33 +698,33 @@ namespace HeatBalFiniteDiffManager {
 
                 CurrentLayer = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-                ConstructFD(ConstrNum).Name(Layer) = dataMaterial.Material(CurrentLayer).Name;
-                ConstructFD(ConstrNum).Thickness(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
+                ConstructFD(ConstrNum).Name(Layer) = state.dataMaterial->Material(CurrentLayer).Name;
+                ConstructFD(ConstrNum).Thickness(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
 
                 // Do some quick error checks for this section.
 
-                if (dataMaterial.Material(CurrentLayer).ROnly) { // Rlayer
+                if (state.dataMaterial->Material(CurrentLayer).ROnly) { // Rlayer
 
                     //  These values are only needed temporarily and to calculate flux,
                     //   Layer will be handled
                     //  as a pure R in the temperature calc.
                     // assign other properties based on resistance
 
-                    dataMaterial.Material(CurrentLayer).SpecHeat = 0.0001;
-                    dataMaterial.Material(CurrentLayer).Density = 1.0;
-                    dataMaterial.Material(CurrentLayer).Thickness = 0.1; //  arbitrary thickness for R layer
-                    dataMaterial.Material(CurrentLayer).Conductivity = dataMaterial.Material(CurrentLayer).Thickness / dataMaterial.Material(CurrentLayer).Resistance;
-                    kt = dataMaterial.Material(CurrentLayer).Conductivity;
-                    ConstructFD(ConstrNum).Thickness(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
+                    state.dataMaterial->Material(CurrentLayer).SpecHeat = 0.0001;
+                    state.dataMaterial->Material(CurrentLayer).Density = 1.0;
+                    state.dataMaterial->Material(CurrentLayer).Thickness = 0.1; //  arbitrary thickness for R layer
+                    state.dataMaterial->Material(CurrentLayer).Conductivity = state.dataMaterial->Material(CurrentLayer).Thickness / state.dataMaterial->Material(CurrentLayer).Resistance;
+                    kt = state.dataMaterial->Material(CurrentLayer).Conductivity;
+                    ConstructFD(ConstrNum).Thickness(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
 
-                    SigmaR(ConstrNum) += dataMaterial.Material(CurrentLayer).Resistance; // add resistance of R layer
+                    SigmaR(ConstrNum) += state.dataMaterial->Material(CurrentLayer).Resistance; // add resistance of R layer
                     SigmaC(ConstrNum) += 0.0;                               //  no capacitance for R layer
 
-                    Alpha = kt / (dataMaterial.Material(CurrentLayer).Density * dataMaterial.Material(CurrentLayer).SpecHeat);
+                    Alpha = kt / (state.dataMaterial->Material(CurrentLayer).Density * state.dataMaterial->Material(CurrentLayer).SpecHeat);
 
                     mAlpha = 0.0;
 
-                } else if (dataMaterial.Material(CurrentLayer).Group == 1) { //  Group 1 = Air
+                } else if (state.dataMaterial->Material(CurrentLayer).Group == 1) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -732,19 +732,19 @@ namespace HeatBalFiniteDiffManager {
                     // assign
                     // other properties based on resistance
 
-                    dataMaterial.Material(CurrentLayer).SpecHeat = 0.0001;
-                    dataMaterial.Material(CurrentLayer).Density = 1.0;
-                    dataMaterial.Material(CurrentLayer).Thickness = 0.1; //  arbitrary thickness for R layer
-                    dataMaterial.Material(CurrentLayer).Conductivity = dataMaterial.Material(CurrentLayer).Thickness / dataMaterial.Material(CurrentLayer).Resistance;
-                    kt = dataMaterial.Material(CurrentLayer).Conductivity;
-                    ConstructFD(ConstrNum).Thickness(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
+                    state.dataMaterial->Material(CurrentLayer).SpecHeat = 0.0001;
+                    state.dataMaterial->Material(CurrentLayer).Density = 1.0;
+                    state.dataMaterial->Material(CurrentLayer).Thickness = 0.1; //  arbitrary thickness for R layer
+                    state.dataMaterial->Material(CurrentLayer).Conductivity = state.dataMaterial->Material(CurrentLayer).Thickness / state.dataMaterial->Material(CurrentLayer).Resistance;
+                    kt = state.dataMaterial->Material(CurrentLayer).Conductivity;
+                    ConstructFD(ConstrNum).Thickness(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
 
-                    SigmaR(ConstrNum) += dataMaterial.Material(CurrentLayer).Resistance; // add resistance of R layer
+                    SigmaR(ConstrNum) += state.dataMaterial->Material(CurrentLayer).Resistance; // add resistance of R layer
                     SigmaC(ConstrNum) += 0.0;                               //  no capacitance for R layer
 
-                    Alpha = kt / (dataMaterial.Material(CurrentLayer).Density * dataMaterial.Material(CurrentLayer).SpecHeat);
+                    Alpha = kt / (state.dataMaterial->Material(CurrentLayer).Density * state.dataMaterial->Material(CurrentLayer).SpecHeat);
                     mAlpha = 0.0;
-                } else if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT || state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
+                } else if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) { // make similar to air? (that didn't seem to work well)
                     ShowSevereError(state, "InitHeatBalFiniteDiff: Construction =\"" + state.dataConstruction->Construct(ConstrNum).Name +
                                     "\" uses Material:InfraredTransparent. Cannot be used currently with finite difference calculations.");
                     if (state.dataConstruction->Construct(ConstrNum).IsUsed) {
@@ -756,19 +756,19 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 } else {
                     //    Regular material Properties
-                    a = dataMaterial.Material(CurrentLayer).MoistACoeff;
-                    b = dataMaterial.Material(CurrentLayer).MoistBCoeff;
-                    c = dataMaterial.Material(CurrentLayer).MoistCCoeff;
-                    d = dataMaterial.Material(CurrentLayer).MoistDCoeff;
-                    kt = dataMaterial.Material(CurrentLayer).Conductivity;
-                    RhoS = dataMaterial.Material(CurrentLayer).Density;
-                    Por = dataMaterial.Material(CurrentLayer).Porosity;
-                    Cp = dataMaterial.Material(CurrentLayer).SpecHeat;
+                    a = state.dataMaterial->Material(CurrentLayer).MoistACoeff;
+                    b = state.dataMaterial->Material(CurrentLayer).MoistBCoeff;
+                    c = state.dataMaterial->Material(CurrentLayer).MoistCCoeff;
+                    d = state.dataMaterial->Material(CurrentLayer).MoistDCoeff;
+                    kt = state.dataMaterial->Material(CurrentLayer).Conductivity;
+                    RhoS = state.dataMaterial->Material(CurrentLayer).Density;
+                    Por = state.dataMaterial->Material(CurrentLayer).Porosity;
+                    Cp = state.dataMaterial->Material(CurrentLayer).SpecHeat;
                     // Need Resistance for reg layer
-                    dataMaterial.Material(CurrentLayer).Resistance = dataMaterial.Material(CurrentLayer).Thickness / dataMaterial.Material(CurrentLayer).Conductivity;
-                    Dv = dataMaterial.Material(CurrentLayer).VaporDiffus;
-                    SigmaR(ConstrNum) += dataMaterial.Material(CurrentLayer).Resistance; // add resistance
-                    SigmaC(ConstrNum) += dataMaterial.Material(CurrentLayer).Density * dataMaterial.Material(CurrentLayer).SpecHeat * dataMaterial.Material(CurrentLayer).Thickness;
+                    state.dataMaterial->Material(CurrentLayer).Resistance = state.dataMaterial->Material(CurrentLayer).Thickness / state.dataMaterial->Material(CurrentLayer).Conductivity;
+                    Dv = state.dataMaterial->Material(CurrentLayer).VaporDiffus;
+                    SigmaR(ConstrNum) += state.dataMaterial->Material(CurrentLayer).Resistance; // add resistance
+                    SigmaC(ConstrNum) += state.dataMaterial->Material(CurrentLayer).Density * state.dataMaterial->Material(CurrentLayer).SpecHeat * state.dataMaterial->Material(CurrentLayer).Thickness;
                     Alpha = kt / (RhoS * Cp);
                     mAlpha = 0.0;
 
@@ -776,21 +776,21 @@ namespace HeatBalFiniteDiffManager {
                     if (Alpha > HighDiffusivityThreshold) {
                         DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                        if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
+                        if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
                             ShowSevereError(state,
                                 "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive, material name = " +
-                                dataMaterial.Material(CurrentLayer).Name);
+                                state.dataMaterial->Material(CurrentLayer).Name);
                             ShowContinueError(state,
                                               format("High conductivity Material layers are not well supported by Conduction Finite Difference, "
                                                      "material conductivity = {:.3R} [W/m-K]",
-                                                     dataMaterial.Material(CurrentLayer).Conductivity));
+                                                     state.dataMaterial->Material(CurrentLayer).Conductivity));
                             ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                             ShowContinueError(
                                 state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                            if (dataMaterial.Material(CurrentLayer).Thickness < ThinMaterialLayerThreshold) {
+                            if (state.dataMaterial->Material(CurrentLayer).Thickness < ThinMaterialLayerThreshold) {
                                 ShowContinueError(state,
                                                   format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                         dataMaterial.Material(CurrentLayer).Thickness));
+                                                         state.dataMaterial->Material(CurrentLayer).Thickness));
                                 ShowContinueError(
                                     state,
                                     format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThinMaterialLayerThreshold));
@@ -806,15 +806,15 @@ namespace HeatBalFiniteDiffManager {
                 dxn = std::sqrt(Alpha * Delt * SpaceDescritConstant); // The Fourier number is set using user constant
 
                 // number of nodes=thickness/spacing.  This is number of full size node spaces across layer.
-                Ipts1 = int(dataMaterial.Material(CurrentLayer).Thickness / dxn);
+                Ipts1 = int(state.dataMaterial->Material(CurrentLayer).Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (dataMaterial.Material(CurrentLayer).ROnly || dataMaterial.Material(CurrentLayer).Group == 1) {
+                if (state.dataMaterial->Material(CurrentLayer).ROnly || state.dataMaterial->Material(CurrentLayer).Group == 1) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
 
-                dxn = dataMaterial.Material(CurrentLayer).Thickness / double(Ipts1); // full node thickness
+                dxn = state.dataMaterial->Material(CurrentLayer).Thickness / double(Ipts1); // full node thickness
 
                 StabilityTemp = Alpha * Delt / pow_2(dxn);
                 StabilityMoist = mAlpha * Delt / pow_2(dxn);
@@ -1252,7 +1252,6 @@ namespace HeatBalFiniteDiffManager {
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
-                if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
@@ -1261,7 +1260,7 @@ namespace HeatBalFiniteDiffManager {
                       ThisNum,
                       state.dataConstruction->Construct(ThisNum).TotLayers,
                       int(ConstructFD(ThisNum).TotNodes + 1),
-                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour());
+                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour);
 
                 for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
@@ -1529,7 +1528,7 @@ namespace HeatBalFiniteDiffManager {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-                auto const &mat(dataMaterial.Material(MatLay));
+                auto const &mat(state.dataMaterial->Material(MatLay));
                 auto const &matFD(MaterialFD(MatLay));
 
                 // regular outside conditions
@@ -1686,7 +1685,7 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(Surface(Surf).Construction);
 
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-        auto const &mat(dataMaterial.Material(MatLay));
+        auto const &mat(state.dataMaterial->Material(MatLay));
         auto const &matFD(MaterialFD(MatLay));
 
         auto const TD_i(TD(i));
@@ -1794,10 +1793,10 @@ namespace HeatBalFiniteDiffManager {
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
             int const MatLay(construct.LayerPoint(Lay));
-            auto const &mat(dataMaterial.Material(MatLay));
+            auto const &mat(state.dataMaterial->Material(MatLay));
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
-            auto const &mat2(dataMaterial.Material(MatLay2));
+            auto const &mat2(state.dataMaterial->Material(MatLay2));
 
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
@@ -2121,7 +2120,7 @@ namespace HeatBalFiniteDiffManager {
                           QRadThermInFD + QCoolingPanelSurfFD);
         if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
-            auto const &mat(dataMaterial.Material(MatLay));
+            auto const &mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));
 
             // Calculate the Dry Heat Conduction Equation

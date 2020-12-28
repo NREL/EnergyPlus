@@ -58,7 +58,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
@@ -96,21 +95,6 @@ namespace TempSolveRoot {
     // This module should not contain variables in the module sense as it is
     // intended strictly to provide "interfaces" to routines used by other
     // parts of the simulation.
-
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
 
     // Functions
 

@@ -53,7 +53,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -92,15 +91,6 @@ namespace OutAirNodeManager {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataEnvironment;
-    // USE DataHVACGlobals, ONLY: FirstTimeStepSysFlag
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // Type declarations in OutAirNodeManager module
-
-    // MODULE VARIABLE DECLARATIONS:
 
     Array1D_int OutsideAirNodeList;     // List of all outside air inlet nodes
     int NumOutsideAirNodes(0);          // Number of single outside air nodes

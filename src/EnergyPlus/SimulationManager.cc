@@ -69,12 +69,9 @@ extern "C" {
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -99,7 +96,6 @@ extern "C" {
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
@@ -203,8 +199,6 @@ namespace SimulationManager {
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using CostEstimateManager::SimCostEstimate;
         using CurveManager::InitCurveReporting;
-        using DataErrorTracking::AskForConnectionsReport;
-        using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
@@ -234,7 +228,6 @@ namespace SimulationManager {
         using SystemReports::ReportAirLoopConnections;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::isFinalYear;
         using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
@@ -289,7 +282,7 @@ namespace SimulationManager {
         DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
-        AskForConnectionsReport = false; // set to false until sizing is finished
+        state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
         GetProjectData(state);
@@ -316,7 +309,7 @@ namespace SimulationManager {
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
         if (!state.dataGlobal->eplusRunningViaAPI) {
-            EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
+            state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
             bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
@@ -361,7 +354,7 @@ namespace SimulationManager {
 
         InitCurveReporting(state);
 
-        AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
+        state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;
         state.dataGlobal->WarmupFlag = false;
         DoWeatherInitReporting = true;
@@ -377,7 +370,7 @@ namespace SimulationManager {
             state.dataGlobal->MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
-            if (EnergyPlus::PluginManagement::pluginManager) {
+            if (state.dataPluginManager->pluginManager) {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
@@ -421,7 +414,7 @@ namespace SimulationManager {
         }
 
         // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
-        PluginManagement::fullyReady = true;
+        state.dataPluginManager->fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -468,7 +461,7 @@ namespace SimulationManager {
                 sqlite->sqliteCommit();
             }
 
-            ExitDuringSimulations = true;
+            state.dataErrTracking->ExitDuringSimulations = true;
             SimsDone = true;
             DisplayString(state, "Initializing New Environment Parameters");
 
@@ -489,11 +482,11 @@ namespace SimulationManager {
             NumOfWarmupDays = 0;
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             } else {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 365) {
-                    isFinalYear = true;
+                    state.dataOutputProcessor->isFinalYear = true;
                 }
             }
 
@@ -530,7 +523,7 @@ namespace SimulationManager {
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
-                    ResetAccumulationWhenWarmupComplete();
+                    ResetAccumulationWhenWarmupComplete(state);
                 } else if (DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
@@ -949,7 +942,7 @@ namespace SimulationManager {
 
         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1286,7 +1279,7 @@ namespace SimulationManager {
                         state.dataGlobal->NumOfTimeStepInHour = 1;
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
@@ -1845,21 +1838,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataOutputs;
-        using OutputProcessor::InstMeterCacheSize;
-        using OutputProcessor::MaxIVariable;
-        using OutputProcessor::MaxRVariable;
-        using OutputProcessor::NumEnergyMeters;
-        using OutputProcessor::NumOfIVariable;
-        using OutputProcessor::NumOfIVariable_Setup;
-        using OutputProcessor::NumOfIVariable_Sum;
-        using OutputProcessor::NumOfRVariable;
-        using OutputProcessor::NumOfRVariable_Meter;
-        using OutputProcessor::NumOfRVariable_Setup;
-        using OutputProcessor::NumOfRVariable_Sum;
-        using OutputProcessor::NumReportList;
-        using OutputProcessor::NumTotalIVariable;
-        using OutputProcessor::NumTotalRVariable;
-        using OutputProcessor::NumVarMeterArrays;
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
         using namespace DataRuntimeLanguage;
@@ -1890,25 +1868,25 @@ namespace SimulationManager {
         state.files.audit.ensure_open(state, "CloseOutputFiles", state.files.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        print(state.files.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
-        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
-        print(state.files.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
-        print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
-        print(state.files.audit, variable_fmt, "MaxRVariable", MaxRVariable);
-        print(state.files.audit, variable_fmt, "MaxIVariable", MaxIVariable);
-        print(state.files.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
-        print(state.files.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
+        print(state.files.audit, variable_fmt, "NumOfRVariable", state.dataOutputProcessor->NumOfRVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", state.dataOutputProcessor->NumTotalRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", state.dataOutputProcessor->NumOfRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", state.dataOutputProcessor->NumOfRVariable_Sum);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", state.dataOutputProcessor->NumOfRVariable_Meter);
+        print(state.files.audit, variable_fmt, "NumOfIVariable", state.dataOutputProcessor->NumOfIVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", state.dataOutputProcessor->NumTotalIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", state.dataOutputProcessor->NumOfIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", state.dataOutputProcessor->NumOfIVariable_Sum);
+        print(state.files.audit, variable_fmt, "MaxRVariable", state.dataOutputProcessor->MaxRVariable);
+        print(state.files.audit, variable_fmt, "MaxIVariable", state.dataOutputProcessor->MaxIVariable);
+        print(state.files.audit, variable_fmt, "NumEnergyMeters", state.dataOutputProcessor->NumEnergyMeters);
+        print(state.files.audit, variable_fmt, "NumVarMeterArrays", state.dataOutputProcessor->NumVarMeterArrays);
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
-        print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
-        print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
+        print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
+        print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
@@ -1922,12 +1900,12 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
         print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        print(state.files.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
-        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
-        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "numActuatorsUsed", state.dataRuntimeLang->numActuatorsUsed);
+        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", state.dataRuntimeLang->numEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", state.dataRuntimeLang->maxEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", state.dataRuntimeLang->NumInternalVariablesUsed);
+        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", state.dataRuntimeLang->numEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", state.dataRuntimeLang->maxEMSInternalVarsAvailable);
 
         print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
         print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);
@@ -2279,8 +2257,6 @@ namespace SimulationManager {
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataZoneEquipment;
-        using DataErrorTracking::AbortProcessing; // used here to turn off Node Connection Error reporting
-        using DataErrorTracking::AskForConnectionsReport;
         using DualDuct::ReportDualDuctConnections;
         using OutAirNodeManager::NumOutsideAirNodes;
         using OutAirNodeManager::OutsideAirNodeList;
@@ -2328,7 +2304,7 @@ namespace SimulationManager {
 
             if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2343,7 +2319,7 @@ namespace SimulationManager {
                 }
             }
             if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2362,7 +2338,7 @@ namespace SimulationManager {
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2776,7 +2752,7 @@ namespace SimulationManager {
             }
         }
 
-        AskForConnectionsReport = false;
+        state.dataErrTracking->AskForConnectionsReport = false;
     }
 
     void ReportParentChildren(EnergyPlusData &state)
@@ -2943,7 +2919,7 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
+            NumVariables = GetNumMeteredVariables(state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
             print(state.files.debug, "CompSet, {}, {}, {:5}\n", state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
@@ -3094,9 +3070,6 @@ void Resimulate(EnergyPlusData &state,
     // Using/Aliasing
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
-    using DemandManager::DemandManagerExtIterations;
-    using DemandManager::DemandManagerHBIterations;
-    using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3115,7 +3088,7 @@ void Resimulate(EnergyPlusData &state,
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 
-        ++DemandManagerExtIterations;
+        ++state.dataDemandManager->DemandManagerExtIterations;
     }
 
     if (ResimHB) {
@@ -3128,7 +3101,7 @@ void Resimulate(EnergyPlusData &state,
         InitAirHeatBalance(state);
         ManageRefrigeratedCaseRacks(state);
 
-        ++DemandManagerHBIterations;
+        ++state.dataDemandManager->DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
     }
 
@@ -3141,7 +3114,7 @@ void Resimulate(EnergyPlusData &state,
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
-        ++DemandManagerHVACIterations;
+        ++state.dataDemandManager->DemandManagerHVACIterations;
     }
 }
 

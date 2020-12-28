@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -86,6 +87,14 @@ namespace DataMoistureBalanceEMPD {
     void clear_state();
 
 } // namespace DataMoistureBalanceEMPD
+
+struct MoistureBalanceEMPDData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

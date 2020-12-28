@@ -136,8 +136,6 @@ namespace HeatingCoils {
     int NumFuelCoil;
     int NumGasCoilMultiStage;
 
-    static std::string const BlankString;
-
     // reclaim heat object types
     int const COMPRESSORRACK_REFRIGERATEDCASE(1);
     int const COIL_DX_COOLING(2); // single speed DX
@@ -444,7 +442,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -545,7 +543,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -655,7 +653,7 @@ namespace HeatingCoils {
             coil.Name = Alphas(1);
             coil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 coil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (coil.SchedPtr == 0) {
@@ -792,7 +790,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -953,7 +951,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -1253,7 +1251,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;                         // coil air inlet node number
@@ -1339,7 +1336,7 @@ namespace HeatingCoils {
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
                             HeatingCoilFatalError = true;
                         } else {
-                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, iTemperatureSetPoint, HeatingCoilFatalError);
+                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, HeatingCoilFatalError);
                             if (HeatingCoilFatalError) {
                                 ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                                 ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
@@ -1664,27 +1661,27 @@ namespace HeatingCoils {
         {
             auto const SELECT_CASE_var(HeatingCoil(CoilNum).HCoilType_Num);
             if (SELECT_CASE_var == Coil_HeatingElectric) {
-                PreDefTableEntry(pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric");
-                PreDefTableEntry(pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             } else if (SELECT_CASE_var == Coil_HeatingElectric_MultiStage) {
-                PreDefTableEntry(pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric:MultiStage");
-                PreDefTableEntry(
-                    pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric:MultiStage");
+                PreDefTableEntry(state,
+                    state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
             } else if (SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) {
-                PreDefTableEntry(pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Fuel");
-                PreDefTableEntry(pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Fuel");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             } else if (SELECT_CASE_var == Coil_HeatingGas_MultiStage) {
-                PreDefTableEntry(pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Gas:MultiStage");
-                PreDefTableEntry(
-                    pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Gas:MultiStage");
+                PreDefTableEntry(state,
+                    state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
             } else if (SELECT_CASE_var == Coil_HeatingDesuperheater) {
-                PreDefTableEntry(pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Desuperheater");
-                PreDefTableEntry(pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Desuperheater");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
             }
         }
     }
@@ -2878,7 +2875,7 @@ namespace HeatingCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // report the HeatingCoil energy from this component
         HeatingCoil(CoilNum).HeatingCoilRate = HeatingCoil(CoilNum).HeatingCoilLoad;
         HeatingCoil(CoilNum).HeatingCoilLoad *= ReportingConstant;

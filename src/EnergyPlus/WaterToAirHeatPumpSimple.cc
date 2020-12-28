@@ -129,8 +129,6 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
 
-    static std::string const BlankString;
-
     void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
@@ -446,16 +444,16 @@ namespace WaterToAirHeatPumpSimple {
                                 "System");
 
             // create predefined report entries
-            PreDefTableEntry(pdchCoolCoilType, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
-            PreDefTableEntry(pdchCoolCoilTotCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-            PreDefTableEntry(pdchCoolCoilSensCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            PreDefTableEntry(pdchCoolCoilLatCap,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            PreDefTableEntry(pdchCoolCoilSHR,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-            PreDefTableEntry(pdchCoolCoilNomEff,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerCool / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
         }
@@ -548,9 +546,9 @@ namespace WaterToAirHeatPumpSimple {
                                 "System");
 
             // create predefined report entries
-            PreDefTableEntry(pdchHeatCoilType, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
-            PreDefTableEntry(pdchHeatCoilNomCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
-            PreDefTableEntry(pdchHeatCoilNomEff,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerHeat / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
         }
@@ -939,11 +937,11 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).PartLoadRatio = 0.0;
 
             rho = GetDensityGlycol(state, PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
-                                   DataGlobalConstants::InitConvTemp(),
+                                   DataGlobalConstants::InitConvTemp,
                                    PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
                                    RoutineName);
             Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
-                                       DataGlobalConstants::InitConvTemp(),
+                                       DataGlobalConstants::InitConvTemp,
                                        PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
                                        RoutineName);
 
@@ -1675,20 +1673,20 @@ namespace WaterToAirHeatPumpSimple {
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                                  "Design Size Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalDes);
-                    PreDefTableEntry(pdchCoolCoilTotCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-                    PreDefTableEntry(pdchCoolCoilLatCap,
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal != 0.0) {
-                        PreDefTableEntry(pdchCoolCoilSHR,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-                        PreDefTableEntry(pdchCoolCoilNomEff,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerCool / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     } else {
-                        PreDefTableEntry(pdchCoolCoilSHR, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
-                        PreDefTableEntry(pdchCoolCoilNomEff, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
                     }
                 } else { // Hardsized with sizing data
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 && !HardSizeNoDesRun) {
@@ -1733,16 +1731,16 @@ namespace WaterToAirHeatPumpSimple {
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                                  "Design Size Rated Sensible Cooling Capacity [W]",
                                                  RatedCapCoolSensDes);
-                    PreDefTableEntry(pdchCoolCoilSensCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-                    PreDefTableEntry(pdchCoolCoilLatCap,
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal != 0.0) {
-                        PreDefTableEntry(pdchCoolCoilSHR,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     } else {
-                        PreDefTableEntry(pdchCoolCoilSHR, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
                     }
                 } else {
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens > 0.0 && RatedCapCoolSensDes > 0.0) {
@@ -1861,13 +1859,13 @@ namespace WaterToAirHeatPumpSimple {
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                              "Design Size Rated Heating Capacity [W]",
                                              RatedCapHeatDes);
-                PreDefTableEntry(pdchHeatCoilNomCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
                 if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat != 0.0) {
-                    PreDefTableEntry(pdchHeatCoilNomEff,
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerHeat / state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
                 } else {
-                    PreDefTableEntry(pdchHeatCoilNomEff, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, 0.0);
                 }
             } else {
                 if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0 && !HardSizeNoDesRun) {
@@ -2343,7 +2341,7 @@ namespace WaterToAirHeatPumpSimple {
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = state.dataWaterToAirHeatPumpSimple->Winput;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
         if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
@@ -2586,7 +2584,7 @@ namespace WaterToAirHeatPumpSimple {
         //  Add power to global variable so power can be summed by parent object
         DXElecHeatingPower = state.dataWaterToAirHeatPumpSimple->Winput;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // Update heat pump data structure
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power = state.dataWaterToAirHeatPumpSimple->Winput;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal = state.dataWaterToAirHeatPumpSimple->QLoadTotal;
@@ -2732,7 +2730,7 @@ namespace WaterToAirHeatPumpSimple {
         Node(WaterOutletNode).Temp = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp;
         Node(WaterOutletNode).Enthalpy = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Energy = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLoadTotal = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySensible = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible * ReportingConstant;

@@ -53,16 +53,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -233,7 +233,7 @@ namespace PlantLoadProfile {
             Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
@@ -332,7 +332,7 @@ namespace PlantLoadProfile {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FLOW:
-        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (this->Energy >= 0.0) {
             this->HeatingEnergy = this->Energy;
@@ -478,13 +478,13 @@ namespace PlantLoadProfile {
                                     "Plant");
 
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("Plant Load Profile",
+                    SetupEMSActuator(state, "Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Mass Flow Rate",
                                      "[kg/s]",
                                      PlantProfile(ProfileNum).EMSOverrideMassFlow,
                                      PlantProfile(ProfileNum).EMSMassFlowValue);
-                    SetupEMSActuator("Plant Load Profile",
+                    SetupEMSActuator(state, "Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Power",
                                      "[W]",

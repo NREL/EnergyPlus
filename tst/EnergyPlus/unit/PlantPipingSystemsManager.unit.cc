@@ -1894,11 +1894,11 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     Real64 Thickness;
     int MaterialIndex;
 
-    dataMaterial.Material.allocate(1);
+    state->dataMaterial->Material.allocate(1);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1908,7 +1908,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     // Test 2a: Material has a valid thickness but is R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1918,7 +1918,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1927,7 +1927,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
 
     // Test 3: Material does not have a valid thickness and is not R-only, result should be true
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);

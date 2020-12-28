@@ -773,7 +773,7 @@ namespace OutputReportTabular {
 
     void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -1046,6 +1046,14 @@ namespace OutputReportTabular {
     Real64 getSpecificUnitIndex(std::string const &SIunit, std::string const &IPunit);
 
 } // namespace OutputReportTabular
+
+struct OutputReportTabularData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

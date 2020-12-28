@@ -49,6 +49,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

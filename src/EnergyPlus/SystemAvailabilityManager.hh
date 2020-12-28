@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -616,7 +617,7 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
     }
 
     // Default Constructor
-    SystemAvailabilityManagerData() : 
+    SystemAvailabilityManagerData() :
         cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
             {"AvailabilityManager:Scheduled",
             "AvailabilityManager:ScheduledOn",

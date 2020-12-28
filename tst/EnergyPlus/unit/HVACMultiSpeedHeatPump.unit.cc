@@ -1381,7 +1381,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     // Heating
     QZnReq = 10000.00;
-    MSHeatPump(2).HeatCoolMode = HeatingMode;
+    MSHeatPump(2).HeatCoolMode = EnergyPlus::HVACMultiSpeedHeatPump::ModeOfOperation::HeatingMode;
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     state->dataEnvrn->OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
