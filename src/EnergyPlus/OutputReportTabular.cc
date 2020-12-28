@@ -9711,6 +9711,10 @@ namespace OutputReportTabular {
             // complete the LEED end use table using the same values
             unconvert = 1 / powerConversion;
 
+            // temporary testing the sqlit newly added flag status
+            int unitsqltab = 0;
+            unitsqltab = unitSQLiteTable;
+
             WriteSubtitle("End Uses");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
             if (sqlite) {
@@ -9835,10 +9839,6 @@ namespace OutputReportTabular {
             // Erase the SubCategory (first column), using slicing
             Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
             Array1D_string columnHeadTemp(columnHead({2, _, _}));
-
-            //temporary testing the sqlit newly added flag status
-            int unitsqltab = 0;
-            unitsqltab = unitSQLiteTable;
 
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
