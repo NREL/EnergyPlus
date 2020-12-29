@@ -115,18 +115,25 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                     if (numAlphas > 1) {
                         std::string option2 = alphas(2);
                         if (UtilityRoutines::SameString(option, "UseOutputControlTableStyles")) {
-                            // set a global flag variable
-                            unitSQLiteTable = 0;
-                        } else if (UtilityRoutines::SameString(option, "None")) {
-                            unitSQLiteTable = 1;
-                        } else if (UtilityRoutines::SameString(option, "JtoKWH")) {
-                            unitSQLiteTable = 2;
-                        } else if (UtilityRoutines::SameString(option, "JtoMJ")) {
-                            unitSQLiteTable = 3;
-                        } else if (UtilityRoutines::SameString(option, "JtoGJ")) {
-                            unitSQLiteTable = 4;
-                        } else if (UtilityRoutines::SameString(option, "InchPound")) {
+                            // set a global flag variable 
+                            // see definition in OutputReportTabular.cc
+                            //int const unitsStyleNone(0); // no change to any units
+                            //int const unitsStyleJtoKWH(1);
+                            //int const unitsStyleJtoMJ(2);
+                            //int const unitsStyleJtoGJ(3);
+                            //int const unitsStyleInchPound(4);
+                            //int const unitsStyleNotFound(5);
                             unitSQLiteTable = 5;
+                        } else if (UtilityRoutines::SameString(option, "None")) {
+                            unitSQLiteTable = 0;
+                        } else if (UtilityRoutines::SameString(option, "JtoKWH")) {
+                            unitSQLiteTable = 1;
+                        } else if (UtilityRoutines::SameString(option, "JtoMJ")) {
+                            unitSQLiteTable = 2;
+                        } else if (UtilityRoutines::SameString(option, "JtoGJ")) {
+                            unitSQLiteTable = 3;
+                        } else if (UtilityRoutines::SameString(option, "InchPound")) {
+                            unitSQLiteTable = 4;
                         }
        //\key UseOutputControlTableStyle
        //\key None
