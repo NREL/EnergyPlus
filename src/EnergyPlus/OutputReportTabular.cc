@@ -9523,13 +9523,13 @@ namespace OutputReportTabular {
             int unitsStyle_temp = 0;
             unitsStyle_temp = unitsStyle;
 
-            int iDualUnit = 1; 
+            // int iUnitSystem = 1; 
 
-            for (iDualUnit = 0; iDualUnit <= 1; iDualUnit++) {
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-                if ((iDualUnit == 1) && (unitsqltab == unitSQLiteTable)) break;
+                if ((iUnitSystem == 1) && (unitsqltab == unitSQLiteTable)) break;
 
-                if (iDualUnit == 0)
+                if (iUnitSystem == 0)
                     unitsStyle_temp = unitsStyle;
                 else
                     unitsStyle_temp = unitSQLiteTable;
@@ -9733,17 +9733,17 @@ namespace OutputReportTabular {
                 // complete the LEED end use table using the same values
                 unconvert = 1 / powerConversion;
 
-                if (iDualUnit == 0) {
+                if (iUnitSystem == 0) {
                     WriteSubtitle("End Uses");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
-                if (iDualUnit == 1 || (iDualUnit == 0 && unitsqltab == unitSQLiteTable)) {
+                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitSQLiteTable)) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                     }
                 }
-                if (iDualUnit == 0) {
+                if (iUnitSystem == 0) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
@@ -9848,7 +9848,7 @@ namespace OutputReportTabular {
                 }
 
                 // heading for the entire sub-table
-                if (iDualUnit == 0) {
+                if (iUnitSystem == 0) {
                     WriteSubtitle("End Uses By Subcategory");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
@@ -9866,7 +9866,7 @@ namespace OutputReportTabular {
                 Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                 Array1D_string columnHeadTemp(columnHead({2, _, _}));
                 
-                if (iDualUnit == 1 || (iDualUnit == 0 && unitsqltab == unitSQLiteTable)) {
+                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitSQLiteTable)) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                rowHeadTemp,
@@ -9877,7 +9877,7 @@ namespace OutputReportTabular {
                     }
                 }
 
-                if (iDualUnit == 0) {
+                if (iUnitSystem == 0) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
                                                                                                     rowHeadTemp,
