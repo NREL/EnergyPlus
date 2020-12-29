@@ -142,6 +142,11 @@ namespace LowTempRadiantSystem {
 
     // Types
 
+    struct RadDesignData {
+        std::string name;
+    };
+
+
     struct RadiantSystemBaseData
     {
         // Members
@@ -291,6 +296,7 @@ namespace LowTempRadiantSystem {
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
     {
         // Members
+        RadDesignData MyDesignData;
         Real64 WaterVolFlowMaxHeat;      // maximum water flow rate for heating, m3/s
         Real64 WaterFlowMaxHeat;         // maximum water flow rate for heating, kg/s
         Real64 HotThrottlRange;          // Throttling range for heating [C]
