@@ -636,7 +636,6 @@ namespace HeatBalanceManager {
         }
 
         // construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor,
-        // Construction:InternalSource
     }
 
     void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors detected during getting data
@@ -4205,7 +4204,7 @@ namespace HeatBalanceManager {
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
-        int TotSourceConstructs;  // Number of constructions with embedded sources or sinks
+        //int TotSourceConstructs;  // Number of constructions with embedded sources or sinks
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
@@ -4219,7 +4218,6 @@ namespace HeatBalanceManager {
 
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound(state, "Construction");
-        TotSourceConstructs = inputProcessor->getNumObjectsFound(state, "Construction:InternalSource");
         int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
@@ -4239,7 +4237,7 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + totAirBoundaryConstructs +
                         state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
@@ -4382,102 +4380,64 @@ namespace HeatBalanceManager {
             TotRegConstructs += state.dataBSDFWindow->TotComplexFenStates;
         }
 
-        ConstrNum = 0;
+        CurrentModuleObject = "ConstructionProperty:InternalHeatSource";
 
-        CurrentModuleObject = "Construction:InternalSource";
-        if (TotSourceConstructs > 0) AnyConstructInternalSourceInInput = true;
-        for (Loop = 1; Loop <= TotSourceConstructs; ++Loop) { // Loop through all constructs with sources in the input...
+        auto instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != inputProcessor->epJSON.end()) {
+            AnyInternalHeatSourceInInput = true;
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-            // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          Loop,
-                                          ConstructAlphas,
-                                          ConstructNumAlpha,
-                                          DummyProps,
-                                          DummyNumProp,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            if (GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueConstructNames, ConstructAlphas(0), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
-                continue;
-            }
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name"))};
+                int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};
+                int calculation_after_layer_number{fields.at("temperature_calculation_requested_after_layer_number")};
+                int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
+                if ((ctf_dimensions < 1) || (ctf_dimensions > 2)) {
+                    ShowWarningError(state, "ConstructionProperty:InternalHeatSource must be either 1- or 2-D.  Reset to 1-D solution.");
+                    ShowContinueError(state, "Construction=" + construction_name + " is affected.");
+                    ctf_dimensions = 1;
+                }
+                Real64 tube_spacing{fields.at("tube_spacing")};
+                Real64 calculation_position{fields.at("two_dimensional_temperature_calculation_position")};
 
-            ++ConstrNum;
-            auto &thisConstruct (state.dataConstruction->Construct(TotRegConstructs + ConstrNum));
+                // Find the construction
+                int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
 
-            // Assign Construction name to the Derived Type using the zeroth position of the array
-            thisConstruct.Name = ConstructAlphas(0);
-
-            // Obtain the source/sink data
-            if (DummyNumProp != 5) {
-                ShowSevereError(state, CurrentModuleObject + ": Wrong number of numerical inputs for " + state.dataConstruction->Construct(ConstrNum).Name);
-                ErrorsFound = true;
-            }
-            thisConstruct.SourceSinkPresent = true;
-            thisConstruct.SourceAfterLayer = int(DummyProps(1));
-            thisConstruct.TempAfterLayer = int(DummyProps(2));
-            thisConstruct.SolutionDimensions = int(DummyProps(3));
-            if ((thisConstruct.SolutionDimensions < 1) ||
-                (thisConstruct.SolutionDimensions > 2)) {
-                ShowWarningError(state, "Construction:InternalSource must be either 1- or 2-D.  Reset to 1-D solution.");
-                ShowContinueError(state, "Construction=" + thisConstruct.Name + " is affected.");
-                thisConstruct.SolutionDimensions = 1;
-            }
-            thisConstruct.ThicknessPerpend = DummyProps(4) / 2.0;
-            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(state, DummyProps(5));
-
-            // Set the total number of layers for the construction
-            thisConstruct.TotLayers = ConstructNumAlpha - 1;
-            if (thisConstruct.TotLayers <= 1) {
-                ShowSevereError(state, "Construction " + thisConstruct.Name +
-                                " has an internal source or sink and thus must have more than a single layer");
-                ErrorsFound = true;
-            }
-            if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) ||
-                (thisConstruct.SourceAfterLayer <= 0)) {
-                ShowWarningError(state, "Construction " + thisConstruct.Name + " must have a source that is between two layers");
-                ShowContinueError(state, "The source after layer parameter has been set to one less than the number of layers.");
-                thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
-            }
-            if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) ||
-                (thisConstruct.TempAfterLayer <= 0)) {
-                ShowWarningError(state, "Construction " + thisConstruct.Name +
-                                 " must have a temperature calculation that is between two layers");
-                ShowContinueError(state, "The temperature calculation after layer parameter has been set to one less than the number of layers.");
-                thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
-            }
-
-            // Loop through all of the layers of the construct to match the material names.
-            // The loop index is the number minus 1
-            for (Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
-
-                // Find the material in the list of materials
-
-                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataMaterial->Material);
-
-                if (thisConstruct.LayerPoint(Layer) == 0) {
-                    ShowSevereError(state, "Did not find matching material for " + CurrentModuleObject + ' ' + state.dataConstruction->Construct(ConstrNum).Name +
-                                    ", missing material = " + ConstructAlphas(Layer));
+                if (construction_index == 0) {
+                    ShowSevereError(state, "Did not find matching construction for " + CurrentModuleObject + ' ' + thisObjectName +
+                                        ", missing construction = " + construction_name);
                     ErrorsFound = true;
-                } else {
-                    NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                        NominalR(thisConstruct.LayerPoint(Layer));
-                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
-                        !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).ROnly) {
-                        NoRegularMaterialsUsed = false;
-                    }
+                    continue;
                 }
 
-            } // ...end of the Layer DO loop
+                auto &thisConstruct(state.dataConstruction->Construct(construction_index));
 
-        } // ...end of Source Construction DO loop
+                // May need some additional validation of the construction here
 
-        TotSourceConstructs = ConstrNum;
-        TotRegConstructs += TotSourceConstructs;
+                thisConstruct.SourceSinkPresent = true;
+                thisConstruct.SourceAfterLayer = source_after_layer_number;
+                thisConstruct.TempAfterLayer = calculation_after_layer_number;
+                thisConstruct.SolutionDimensions = ctf_dimensions;
+                thisConstruct.ThicknessPerpend = tube_spacing / 2.0;
+                thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(state, calculation_position);
+
+                // Set the total number of layers for the construction
+                if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) || (thisConstruct.SourceAfterLayer <= 0)) {
+                    ShowWarningError(state, "Construction " + thisConstruct.Name + " must have a source that is between two layers");
+                    ShowContinueError(state, "The source after layer parameter has been set to one less than the number of layers.");
+                    thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
+                }
+                if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) || (thisConstruct.TempAfterLayer <= 0)) {
+                    ShowWarningError(state, "Construction " + thisConstruct.Name + " must have a temperature calculation that is between two layers");
+                    ShowContinueError(state, "The temperature calculation after layer parameter has been set to one less than the number of layers.");
+                    thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
+                }
+
+            }
+        }
+
         TotConstructs = TotRegConstructs;
 
         if (TotConstructs > 0 && (NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed)) {

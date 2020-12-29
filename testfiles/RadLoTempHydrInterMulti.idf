@@ -412,38 +412,50 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    Slab Floor with Radiant, !- Name
+  ConstructionProperty:InternalHeatSource,
+    Floor Source,            !- Name
+    Slab Floor with Radiant, !- Construction Name
     4,                       !- Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  ConstructionProperty:InternalHeatSource,
+    PARTITION SOURCE,        !- Name
+    PARTITION06,             !- Construction Name
+    2,                       !- Source Present After Layer Number
+    2,                       !- Temperature Calculation Requested After Layer Number
+    1,                       !- Dimensions for the CTF Calculation
+    0.1524,                  !- Tube Spacing {m}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  ConstructionProperty:InternalHeatSource,
+    ROOF SOURCE,             !- Name
+    ROOF34,                  !- Construction Name
+    3,                       !- Source Present After Layer Number
+    3,                       !- Temperature Calculation Requested After Layer Number
+    1,                       !- Dimensions for the CTF Calculation
+    0.1524,                  !- Tube Spacing {m}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  Construction,
+    Slab Floor with Radiant, !- Name
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
     GYP2,                    !- Layer 4
     FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5
 
-  Construction:InternalSource,
+  Construction,
     PARTITION06,             !- Name
-    2,                       !- Source Present After Layer Number
-    2,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
     1 IN LW CONCRETE,        !- Layer 2
     1 IN LW CONCRETE,        !- Layer 3
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
-  Construction:InternalSource,
+  Construction,
     ROOF34,                  !- Name
-    3,                       !- Source Present After Layer Number
-    3,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
     E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
     B5 - 1 IN DENSE INSULATION,  !- Layer 3
