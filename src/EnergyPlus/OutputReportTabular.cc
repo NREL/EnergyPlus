@@ -9517,340 +9517,380 @@ namespace OutputReportTabular {
             collapsedTimeStep(12) = gatherDemandTimeStamp(distrHeatSelected);
             collapsedTotal(12) = gatherDemandTotal(distrHeatSelected);
 
-            // establish unit conversion factors
-            if (unitsStyle == unitsStyleInchPound) {
-                powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
-                flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
-            } else {
-                powerConversion = 1.0;
-                flowConversion = 1.0;
-            }
-
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            collapsedEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
-                collapsedEndUse(2, jEndUse) = gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
-                collapsedEndUse(3, jEndUse) = gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
-                collapsedEndUse(4, jEndUse) = gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
-                collapsedEndUse(5, jEndUse) = gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
-                collapsedEndUse(6, jEndUse) = gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
-                collapsedEndUse(7, jEndUse) = gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
-                collapsedEndUse(8, jEndUse) = gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
-                collapsedEndUse(9, jEndUse) = gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
-                collapsedEndUse(10, jEndUse) = gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
-                collapsedEndUse(11, jEndUse) = gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
-                collapsedEndUse(12, jEndUse) = gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
-                collapsedEndUse(13, jEndUse) = gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
-            }
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion;   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion;  // fuel oil no 1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion;  // fuel oil no 2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion;  // propane
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion;  // otherfuel1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion;  // purch cooling
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
-                        gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion;                            // district heating
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion;   // water
-                }
-            }
-            // collapse the individual peaks for the end use subcategories for the LEED report
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            // no unit conversion, it is done at the reporting stage if necessary
-            collapsedIndEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedIndEndUse(1, jEndUse) = gatherDemandIndEndUse(1, jEndUse);                  // electricity
-                collapsedIndEndUse(2, jEndUse) = gatherDemandIndEndUse(2, jEndUse);                  // natural gas
-                collapsedIndEndUse(3, jEndUse) = gatherDemandIndEndUse(6, jEndUse);                  // gasoline
-                collapsedIndEndUse(4, jEndUse) = gatherDemandIndEndUse(8, jEndUse);                  // diesel
-                collapsedIndEndUse(5, jEndUse) = gatherDemandIndEndUse(9, jEndUse);                  // coal
-                collapsedIndEndUse(6, jEndUse) = gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
-                collapsedIndEndUse(7, jEndUse) = gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
-                collapsedIndEndUse(8, jEndUse) = gatherDemandIndEndUse(12, jEndUse);                 // propane
-                collapsedIndEndUse(9, jEndUse) = gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
-                collapsedIndEndUse(10, jEndUse) = gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
-                collapsedIndEndUse(11, jEndUse) = gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
-                collapsedIndEndUse(12, jEndUse) = gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
-                collapsedIndEndUse(13, jEndUse) = gatherDemandIndEndUse(7, jEndUse);                 // water
-            }
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 12) =
-                        gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                               // district heating
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7);  // water
-                }
-            }
-
-            // convert totals
-            collapsedTotal(1) *= powerConversion;  // electricity
-            collapsedTotal(2) *= powerConversion;  // natural gas
-            collapsedTotal(3) *= powerConversion;  // gasoline
-            collapsedTotal(4) *= powerConversion;  // diesel
-            collapsedTotal(5) *= powerConversion;  // coal
-            collapsedTotal(6) *= powerConversion;  // fuel oil no 1
-            collapsedTotal(7) *= powerConversion;  // fuel oil no 2
-            collapsedTotal(8) *= powerConversion;  // propane
-            collapsedTotal(9) *= powerConversion;  // otherfuel1
-            collapsedTotal(10) *= powerConversion; // otherfuel2
-            collapsedTotal(11) *= powerConversion; // purchased cooling
-            collapsedTotal(12) *= powerConversion; // district heating
-            collapsedTotal(13) *= flowConversion;  // water
-            //---- End Use Sub-Table
-            rowHead.allocate(17);
-            columnHead.allocate(13);
-            columnWidth.allocate(13);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(13, 17);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
-                useVal(iResource, 15) = collapsedTotal(iResource); // totals
-            }
-
-            rowHead(1) = "Time of Peak";
-            rowHead(2) = "Heating";
-            rowHead(3) = "Cooling";
-            rowHead(4) = "Interior Lighting";
-            rowHead(5) = "Exterior Lighting";
-            rowHead(6) = "Interior Equipment";
-            rowHead(7) = "Exterior Equipment";
-            rowHead(8) = "Fans";
-            rowHead(9) = "Pumps";
-            rowHead(10) = "Heat Rejection";
-            rowHead(11) = "Humidification";
-            rowHead(12) = "Heat Recovery";
-            rowHead(13) = "Water Systems";
-            rowHead(14) = "Refrigeration";
-            rowHead(15) = "Generators";
-            rowHead(16) = "";
-            rowHead(17) = "Total End Uses";
-
-            if (unitsStyle == unitsStyleInchPound) {
-                columnHead(1) = "Electricity [kBtuh]";
-                columnHead(2) = "Natural Gas [kBtuh]";
-                columnHead(3) = "Gasoline [kBtuh]";
-                columnHead(4) = "Diesel [kBtuh]";
-                columnHead(5) = "Coal [kBtuh]";
-                columnHead(6) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(7) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(8) = "Propane [kBtuh]";
-                columnHead(9) = "Other Fuel 1 [kBtuh]";
-                columnHead(10) = "Other Fuel 2 [kBtuh]";
-                columnHead(11) = "District Cooling [kBtuh]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(12) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(12) = "Steam [kBtuh]";
-                    }
-                }
-                columnHead(13) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Electricity [W]";
-                columnHead(2) = "Natural Gas [W]";
-                columnHead(3) = "Gasoline [W]";
-                columnHead(4) = "Diesel [W]";
-                columnHead(5) = "Coal [W]";
-                columnHead(6) = "Fuel Oil No 1 [W]";
-                columnHead(7) = "Fuel Oil No 2 [W]";
-                columnHead(8) = "Propane [W]";
-                columnHead(9) = "Other Fuel 1 [W]";
-                columnHead(10) = "Other Fuel 2 [W]";
-                columnHead(11) = "District Cooling [W]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(12) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(12) = "Steam [W]";
-                    }
-                }
-                columnHead(13) = "Water [m3/s]";
-            }
-
-            tableBody = "";
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                    tableBody(iResource, 1 + jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
-                }
-                tableBody(iResource, 1) = DateToString(collapsedTimeStep(iResource));
-                tableBody(iResource, 17) = RealToStr(collapsedTotal(iResource), 2);
-            }
-
-            // complete the LEED end use table using the same values
-            unconvert = 1 / powerConversion;
-
             // temporary testing the sqlit newly added flag status
             int unitsqltab = 0;
             unitsqltab = unitSQLiteTable;
+            int unitsStyle_temp = 0;
+            unitsStyle_temp = unitsStyle;
 
-            WriteSubtitle("End Uses");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
-            }
+            int iDualUnit = 1; 
 
-            //---- End Uses By Subcategory Sub-Table
-            numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        ++numRows;
-                    }
+            for (iDualUnit = 0; iDualUnit <= 1; iDualUnit++) {
+
+                if ((iDualUnit == 1) && (unitsqltab == unitSQLiteTable)) break;
+
+                if (iDualUnit == 0)
+                    unitsStyle_temp = unitsStyle;
+                else
+                    unitsStyle_temp = unitSQLiteTable;
+
+                // unit conversion factors
+                if (unitsStyle_temp == unitsStyleInchPound) {
+                    powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
+                    flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
                 } else {
-                    ++numRows;
+                    powerConversion = 1.0;
+                    flowConversion = 1.0;
                 }
-            }
 
-            rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(14, numRows);
-
-            rowHead = "";
-            tableBody = "";
-
-            // Build row head and subcategories columns
-            i = 1;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
+                collapsedEndUse = 0.0;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    collapsedEndUse(1, jEndUse) = gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
+                    collapsedEndUse(2, jEndUse) = gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
+                    collapsedEndUse(3, jEndUse) = gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
+                    collapsedEndUse(4, jEndUse) = gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
+                    collapsedEndUse(5, jEndUse) = gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
+                    collapsedEndUse(6, jEndUse) = gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
+                    collapsedEndUse(7, jEndUse) = gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
+                    collapsedEndUse(8, jEndUse) = gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
+                    collapsedEndUse(9, jEndUse) = gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
+                    collapsedEndUse(10, jEndUse) = gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
+                    collapsedEndUse(11, jEndUse) = gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
+                    collapsedEndUse(12, jEndUse) = gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
+                    collapsedEndUse(13, jEndUse) = gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
+                }
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                        ++i;
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion; // natural gas
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion; // gasoline
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion; // diesel
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion; // coal
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 6) =
+                            gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion; // fuel oil no 1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 7) =
+                            gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion; // fuel oil no 2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion;  // propane
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion;  // otherfuel1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 11) =
+                            gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion; // purch cooling
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
+                            gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion; // district heating
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion; // water
                     }
+                }
+                // collapse the individual peaks for the end use subcategories for the LEED report
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
+                // no unit conversion, it is done at the reporting stage if necessary
+                collapsedIndEndUse = 0.0;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    collapsedIndEndUse(1, jEndUse) = gatherDemandIndEndUse(1, jEndUse);                  // electricity
+                    collapsedIndEndUse(2, jEndUse) = gatherDemandIndEndUse(2, jEndUse);                  // natural gas
+                    collapsedIndEndUse(3, jEndUse) = gatherDemandIndEndUse(6, jEndUse);                  // gasoline
+                    collapsedIndEndUse(4, jEndUse) = gatherDemandIndEndUse(8, jEndUse);                  // diesel
+                    collapsedIndEndUse(5, jEndUse) = gatherDemandIndEndUse(9, jEndUse);                  // coal
+                    collapsedIndEndUse(6, jEndUse) = gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
+                    collapsedIndEndUse(7, jEndUse) = gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
+                    collapsedIndEndUse(8, jEndUse) = gatherDemandIndEndUse(12, jEndUse);                 // propane
+                    collapsedIndEndUse(9, jEndUse) = gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
+                    collapsedIndEndUse(10, jEndUse) = gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
+                    collapsedIndEndUse(11, jEndUse) = gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
+                    collapsedIndEndUse(12, jEndUse) = gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
+                    collapsedIndEndUse(13, jEndUse) = gatherDemandIndEndUse(7, jEndUse);                 // water
+                }
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 12) =
+                            gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                              // district heating
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7); // water
+                    }
+                }
+
+                // convert totals
+                collapsedTotal(1) *= powerConversion;  // electricity
+                collapsedTotal(2) *= powerConversion;  // natural gas
+                collapsedTotal(3) *= powerConversion;  // gasoline
+                collapsedTotal(4) *= powerConversion;  // diesel
+                collapsedTotal(5) *= powerConversion;  // coal
+                collapsedTotal(6) *= powerConversion;  // fuel oil no 1
+                collapsedTotal(7) *= powerConversion;  // fuel oil no 2
+                collapsedTotal(8) *= powerConversion;  // propane
+                collapsedTotal(9) *= powerConversion;  // otherfuel1
+                collapsedTotal(10) *= powerConversion; // otherfuel2
+                collapsedTotal(11) *= powerConversion; // purchased cooling
+                collapsedTotal(12) *= powerConversion; // district heating
+                collapsedTotal(13) *= flowConversion;  // water
+                //---- End Use Sub-Table
+                rowHead.allocate(17);
+                columnHead.allocate(13);
+                columnWidth.allocate(13);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(13, 17);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 5) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                    useVal(iResource, 6) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                    useVal(iResource, 15) = collapsedTotal(iResource); // totals
+                }
+
+                rowHead(1) = "Time of Peak";
+                rowHead(2) = "Heating";
+                rowHead(3) = "Cooling";
+                rowHead(4) = "Interior Lighting";
+                rowHead(5) = "Exterior Lighting";
+                rowHead(6) = "Interior Equipment";
+                rowHead(7) = "Exterior Equipment";
+                rowHead(8) = "Fans";
+                rowHead(9) = "Pumps";
+                rowHead(10) = "Heat Rejection";
+                rowHead(11) = "Humidification";
+                rowHead(12) = "Heat Recovery";
+                rowHead(13) = "Water Systems";
+                rowHead(14) = "Refrigeration";
+                rowHead(15) = "Generators";
+                rowHead(16) = "";
+                rowHead(17) = "Total End Uses";
+
+                if (unitsStyle_temp == unitsStyleInchPound) {
+                    columnHead(1) = "Electricity [kBtuh]";
+                    columnHead(2) = "Natural Gas [kBtuh]";
+                    columnHead(3) = "Gasoline [kBtuh]";
+                    columnHead(4) = "Diesel [kBtuh]";
+                    columnHead(5) = "Coal [kBtuh]";
+                    columnHead(6) = "Fuel Oil No 1 [kBtuh]";
+                    columnHead(7) = "Fuel Oil No 2 [kBtuh]";
+                    columnHead(8) = "Propane [kBtuh]";
+                    columnHead(9) = "Other Fuel 1 [kBtuh]";
+                    columnHead(10) = "Other Fuel 2 [kBtuh]";
+                    columnHead(11) = "District Cooling [kBtuh]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(12) = "District Heating [kBtuh]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(12) = "Steam [kBtuh]";
+                        }
+                    }
+                    columnHead(13) = "Water [gal/min]";
                 } else {
-                    tableBody(1, i) = "General";
-                    ++i;
+                    columnHead(1) = "Electricity [W]";
+                    columnHead(2) = "Natural Gas [W]";
+                    columnHead(3) = "Gasoline [W]";
+                    columnHead(4) = "Diesel [W]";
+                    columnHead(5) = "Coal [W]";
+                    columnHead(6) = "Fuel Oil No 1 [W]";
+                    columnHead(7) = "Fuel Oil No 2 [W]";
+                    columnHead(8) = "Propane [W]";
+                    columnHead(9) = "Other Fuel 1 [W]";
+                    columnHead(10) = "Other Fuel 2 [W]";
+                    columnHead(11) = "District Cooling [W]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(12) = "District Heating [W]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(12) = "Steam [W]";
+                        }
+                    }
+                    columnHead(13) = "Water [m3/s]";
                 }
-            }
 
-            if (unitsStyle == unitsStyleInchPound) {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [kBtuh]";
-                columnHead(3) = "Natural Gas [kBtuh]";
-                columnHead(4) = "Gasoline [kBtuh]";
-                columnHead(5) = "Diesel [kBtuh]";
-                columnHead(6) = "Coal [kBtuh]";
-                columnHead(7) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(8) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(9) = "Propane [kBtuh]";
-                columnHead(10) = "Other Fuel 1 [kBtuh]";
-                columnHead(11) = "Other Fuel 2 [kBtuh]";
-                columnHead(12) = "District Cooling [kBtuh]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(13) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(13) = "Steam [kBtuh]";
+                tableBody = "";
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        tableBody(iResource, 1 + jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
+                    }
+                    tableBody(iResource, 1) = DateToString(collapsedTimeStep(iResource));
+                    tableBody(iResource, 17) = RealToStr(collapsedTotal(iResource), 2);
+                }
+
+                // complete the LEED end use table using the same values
+                unconvert = 1 / powerConversion;
+
+                if (iDualUnit == 0) {
+                    WriteSubtitle("End Uses");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                }
+                if (iDualUnit == 1 || (iDualUnit == 0 && unitsqltab == unitSQLiteTable)) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                     }
                 }
-                columnHead(14) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [W]";
-                columnHead(3) = "Natural Gas [W]";
-                columnHead(4) = "Gasoline [W]";
-                columnHead(5) = "Diesel [W]";
-                columnHead(6) = "Coal [W]";
-                columnHead(7) = "Fuel Oil No 1 [W]";
-                columnHead(8) = "Fuel Oil No 2 [W]";
-                columnHead(9) = "Propane [W]";
-                columnHead(10) = "Other Fuel 1 [W]";
-                columnHead(11) = "Other Fuel 2 [W]";
-                columnHead(12) = "District Cooling [W]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(13) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(13) = "Steam [W]";
+                if (iDualUnit == 0) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
                     }
                 }
-                columnHead(14) = "Water [m3/s]";
-            }
 
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                i = 1;
+                //---- End Uses By Subcategory Sub-Table
+                numRows = 0;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
+                            ++numRows;
+                        }
+                    } else {
+                        ++numRows;
+                    }
+                }
+
+                rowHead.allocate(numRows);
+                columnHead.allocate(14);
+                columnWidth.allocate(14);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(14, numRows);
+
+                rowHead = "";
+                tableBody = "";
+
+                // Build row head and subcategories columns
+                i = 1;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                             ++i;
                         }
                     } else {
-                        tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                        tableBody(1, i) = "General";
                         ++i;
                     }
                 }
+
+                if (unitsStyle_temp == unitsStyleInchPound) {
+                    columnHead(1) = "Subcategory";
+                    columnHead(2) = "Electricity [kBtuh]";
+                    columnHead(3) = "Natural Gas [kBtuh]";
+                    columnHead(4) = "Gasoline [kBtuh]";
+                    columnHead(5) = "Diesel [kBtuh]";
+                    columnHead(6) = "Coal [kBtuh]";
+                    columnHead(7) = "Fuel Oil No 1 [kBtuh]";
+                    columnHead(8) = "Fuel Oil No 2 [kBtuh]";
+                    columnHead(9) = "Propane [kBtuh]";
+                    columnHead(10) = "Other Fuel 1 [kBtuh]";
+                    columnHead(11) = "Other Fuel 2 [kBtuh]";
+                    columnHead(12) = "District Cooling [kBtuh]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(13) = "District Heating [kBtuh]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(13) = "Steam [kBtuh]";
+                        }
+                    }
+                    columnHead(14) = "Water [gal/min]";
+                } else {
+                    columnHead(1) = "Subcategory";
+                    columnHead(2) = "Electricity [W]";
+                    columnHead(3) = "Natural Gas [W]";
+                    columnHead(4) = "Gasoline [W]";
+                    columnHead(5) = "Diesel [W]";
+                    columnHead(6) = "Coal [W]";
+                    columnHead(7) = "Fuel Oil No 1 [W]";
+                    columnHead(8) = "Fuel Oil No 2 [W]";
+                    columnHead(9) = "Propane [W]";
+                    columnHead(10) = "Other Fuel 1 [W]";
+                    columnHead(11) = "Other Fuel 2 [W]";
+                    columnHead(12) = "District Cooling [W]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(13) = "District Heating [W]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(13) = "Steam [W]";
+                        }
+                    }
+                    columnHead(14) = "Water [m3/s]";
+                }
+
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    i = 1;
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
+                                ++i;
+                            }
+                        } else {
+                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                            ++i;
+                        }
+                    }
+                }
+
+                // heading for the entire sub-table
+                if (iDualUnit == 0) {
+                    WriteSubtitle("End Uses By Subcategory");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                }
+
+                Array1D_string rowHeadTemp(rowHead);
+                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // for better sql queries
+                FillRowHead(rowHeadTemp);
+
+                for (int i = 1; i <= numRows; ++i) {
+                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                }
+
+                // Erase the SubCategory (first column), using slicing
+                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _}));
+                
+                if (iDualUnit == 1 || (iDualUnit == 0 && unitsqltab == unitSQLiteTable)) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                                                               rowHeadTemp,
+                                                               columnHeadTemp,
+                                                               "DemandEndUseComponentsSummary",
+                                                               "Entire Facility",
+                                                               "End Uses By Subcategory");
+                    }
+                }
+
+                if (iDualUnit == 0) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                    rowHeadTemp,
+                                                                                                    columnHeadTemp,
+                                                                                                    "Demand End Use Components Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "End Uses By Subcategory");
+                    }
+                }
+                rowHeadTemp.deallocate();
+                tableBodyTemp.deallocate();
+                columnHeadTemp.deallocate();
             }
-
-            // heading for the entire sub-table
-            WriteSubtitle("End Uses By Subcategory");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-
-            Array1D_string rowHeadTemp(rowHead);
-            // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
-            // for better sql queries
-            FillRowHead(rowHeadTemp);
-
-            for (int i = 1; i <= numRows; ++i) {
-                rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
-            }
-
-            // Erase the SubCategory (first column), using slicing
-            Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-            Array1D_string columnHeadTemp(columnHead({2, _, _}));
-
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
-            }
-            rowHeadTemp.deallocate();
-            tableBodyTemp.deallocate();
-            columnHeadTemp.deallocate();
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 13; ++iResource) {
