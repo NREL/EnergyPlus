@@ -3634,6 +3634,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                              "",
                                                              "",
                                                              "",
+															 "",
+															 "",
                                                              "COOLCAPFT",
                                                              "COOLCAPFFF",
                                                              "COOLEIRFT",
@@ -3676,21 +3678,21 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                              "COOLEIRFFF"}),
                                    Alphas));
     EXPECT_TRUE(compare_containers(
-        std::vector<bool>({false, false, false, false, true,  false, true,  true,  true,  false, false, false, false, false, false, false, false,
+        std::vector<bool>({false, false, false, false, true,  false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false,
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
         lAlphaBlanks));
 
     EXPECT_EQ(72, NumNumbers);
     EXPECT_TRUE(compare_containers(
-        std::vector<Real64>({10.0,      10.0, 32000, 1.6,       0,    0,   0,         200,  10.0, -25.0,    0,    2,   1524.1,     .75,  4,
+        std::vector<Real64>({10.0,      10.0, 32000, 1.6,       0,    0,   0,         200,  10.0, -25.0,    0,    2,  1000.0, 1000.0, 0.0, 1524.1,     .75,  4,
                              0.1359072, 0.26, 0,     1877.9,    0.75, 4.0, 0.151008,  0.30, 0,    2226.6,   .75,  4.0, 0.1661088,  0.33, 0,
                              2911.3,    0.75, 4.0,   0.1963104, 0.38, 0,   3581.7,    0.75, 4.0,  0.226512, 0.44, 0,   4239.5,     0.75, 4.0,
                              0.2567136, 0.5,  0,     4885.7,    0.75, 4.0, 0.2869152, 0.57, 0,    5520.7,   0.75, 4.0, 0.31711680, 0.63, 0,
                              6144.8,    .75,  4.0,   0.3473184, 0.69, 0,   6758.0,    0.75, 4.0,  0.37752,  0.74, 0}),
         Numbers));
     EXPECT_TRUE(
-        compare_containers(std::vector<bool>({false, false, false, false, false, false, true,  false, false, true,  true,  true,  false, false, false,
+        compare_containers(std::vector<bool>({false, false, false, false, false, false, true,  false, false, true,  true,  true,  false, false, false, false, false, false,
                                               false, false, true,  false, false, false, false, false, true,  false, false, false, false, false, true,
                                               false, false, false, false, false, true,  false, false, false, false, false, true,  false, false, false,
                                               false, false, true,  false, false, false, false, false, true,  false, false, false, false, false, true,

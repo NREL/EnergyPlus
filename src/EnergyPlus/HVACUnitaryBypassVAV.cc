@@ -2233,7 +2233,7 @@ namespace HVACUnitaryBypassVAV {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinHumRat;       // Minimum humidity ratio for sensible capacity calculation (kg/kg)
-        Array1D<Real64> Par(6); // RegulaFalsi parameters
+        Array1D<Real64> Par(7); // RegulaFalsi parameters
         int SolFla;             // Flag of RegulaFalsi solver
         Real64 QHeater;         // Load to be met by heater [W]
         Real64 QHeaterActual;   // actual heating load met [W]
@@ -2244,6 +2244,8 @@ namespace HVACUnitaryBypassVAV {
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
         Real64 OutdoorBaroPress;   // Barometric pressure at outdoor condenser
         // FLOW
+
+        Par(6) = 0.0;//field used for integrated heat pump index in CoilSystem:DX:Cooling/:Heating
 
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;

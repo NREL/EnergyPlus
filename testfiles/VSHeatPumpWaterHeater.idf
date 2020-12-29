@@ -2233,6 +2233,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -2575,6 +2579,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -2813,6 +2821,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -3076,6 +3088,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -4268,6 +4284,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
