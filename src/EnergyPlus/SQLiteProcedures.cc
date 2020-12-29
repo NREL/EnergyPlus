@@ -114,7 +114,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                     // set global flags for sqlite dual unit input
                     if (numAlphas > 1) {
                         std::string option2 = alphas(2);
-                        if (UtilityRoutines::SameString(option, "UseOutputControlTableStyles")) {
+                        if (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
                             // set a global flag variable 
                             // see definition in OutputReportTabular.cc
                             //int const unitsStyleNone(0); // no change to any units
@@ -124,15 +124,15 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                             //int const unitsStyleInchPound(4);
                             //int const unitsStyleNotFound(5);
                             unitSQLiteTable = 5;
-                        } else if (UtilityRoutines::SameString(option, "None")) {
+                        } else if (UtilityRoutines::SameString(option2, "None")) {
                             unitSQLiteTable = 0;
-                        } else if (UtilityRoutines::SameString(option, "JtoKWH")) {
+                        } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
                             unitSQLiteTable = 1;
-                        } else if (UtilityRoutines::SameString(option, "JtoMJ")) {
+                        } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
                             unitSQLiteTable = 2;
-                        } else if (UtilityRoutines::SameString(option, "JtoGJ")) {
+                        } else if (UtilityRoutines::SameString(option2, "JtoGJ")) {
                             unitSQLiteTable = 3;
-                        } else if (UtilityRoutines::SameString(option, "InchPound")) {
+                        } else if (UtilityRoutines::SameString(option2, "InchPound")) {
                             unitSQLiteTable = 4;
                         }
        //\key UseOutputControlTableStyle
