@@ -2734,15 +2734,15 @@ namespace EnergyPlus {
                     e.EnthalpyLastTimestep = e.Enthalpy;
                 }
             }
-            if (DataPlant::TotNumLoops > 0) {
+            if (DataPlant::TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
                 for (auto &loop : PlantLoop) {
                     for (auto &side : loop.LoopSide) {
-                        if (!state.dataGlobal->WarmupFlag && (loop.OutletNodeFlowrate > 0.0)) {
+                        if (loop.OutletNodeFlowrate > DataHVACGlobals::SmallMassFlow) {
                             // Accumulate total time loop is active
                             side.LoopSideInlet_TotalTime += TimeStepSys;
                             // Determine excessive storage
-                            if ((side.LoopSideInlet_McpDTdt > DataHVACGlobals::SmallLoad) &&
-                                (abs(side.LoopSideInlet_MdotCpDeltaT) < side.LoopSideInlet_McpDTdt)) {
+                            if ((abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
+                                (abs(side.LoopSideInlet_MdotCpDeltaT) < abs(side.LoopSideInlet_McpDTdt))) {
                                 side.LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
                                 side.LoopSideInlet_CapExcessStorageTime += TimeStepSys;
                             } else {

@@ -706,7 +706,7 @@ namespace HVACInterfaceManager {
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet = TankFinalTemp;
 
         // update heat transport and heat storage rates
-        PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_MdotCpDeltaT = (TankInletTemp - TankFinalTemp) * Cp * MassFlowRate;
+        PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_MdotCpDeltaT = (TankInletTemp - TankAverageTemp) * Cp * MassFlowRate;
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_McpDTdt =
             (ThisTankMass * Cp * (TankFinalTemp - LastTankOutletTemp)) / TimeStepSeconds;
 
