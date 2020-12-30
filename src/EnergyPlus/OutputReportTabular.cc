@@ -9014,12 +9014,28 @@ namespace EnergyPlus::OutputReportTabular {
             collapsedTotal(12) = ort->gatherDemandTotal(distrHeatSelected);
 
             // temporary testing the sqlit newly added flag status
-            int unitsqltab = 0;
-            unitsqltab = unitSQLiteTable;
-            if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            // int unitsqltab = 0;
+            // unitsqltab = unitSQLiteTable;
 
-            int unitsStyle_temp = 0;
-            unitsStyle_temp = ort->unitsStyle;
+            // iUnitStyle unitSQLstyle =
+            iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
+
+            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            if (unitSQLiteTable == 5) {
+                unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            } else if (unitSQLiteTable == 0) {
+                unitsql_unitconv = iUnitsStyle::None;
+            } else if (unitSQLiteTable == 1) {
+                unitsql_unitconv = iUnitsStyle::JtoKWH;
+            } else if (unitSQLiteTable == 2) {
+                unitsql_unitconv = iUnitsStyle::JtoMJ;
+            } else if (unitSQLiteTable == 3) {
+                unitsql_unitconv = iUnitsStyle::JtoGJ;
+            } else if (unitSQLiteTable == 4) {
+                unitsql_unitconv = iUnitsStyle::InchPound;
+            }
+
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
 
             // int iUnitSystem = 1; 
 
@@ -9032,21 +9048,23 @@ namespace EnergyPlus::OutputReportTabular {
 
                 if (iUnitSystem == 0) {
                     produceTabular = true;
-                    unitsStyle_temp = ort->unitsStyle;
-                    if (unitsqltab == ort->unitsStyle)
+                    if (unitsql_unitconv == ort->unitsStyle) {
                         produceSQLite = true;
-                    else
+                    } else {
                         produceSQLite = false;
+                    }
+                    unitsStyle_temp = ort->unitsStyle;
                 } 
                 else { // iUnitSystem == 1
-                    if (unitsqltab == ort->unitsStyle) break;
+                    if (unitsql_unitconv == ort->unitsStyle) break;
+                    
                     produceTabular = false;
                     produceSQLite = true;
-                    unitsStyle_temp = unitSQLiteTable;
+                    unitsStyle_temp = unitsql_unitconv;
                 }
 
             // establish unit conversion factors
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
+            if (unitsStyle_temp == iUnitsStyle::InchPound) {
                 powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
                 flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
             } else {
