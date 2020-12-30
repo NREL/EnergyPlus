@@ -154,8 +154,43 @@ namespace HeatBalanceHAMTManager {
         }
     };
 
+    // structure internal moisture source
+    struct InternalMoistureSource
+    {
+        int id; // Internal moisture source id
+        int surface_id;   // Surface id
+        int layer_id;   // Layer id
+
+        //int SourceType; // (1 = air flow input; 2 = infiltration model (Kuenzel); 3 = multi zone air flow model)
+        enum class Type { UserDefined = 1, StackAndOverPressure, AirflowNetwork};
+        Type type;
+
+        // SourceType == 1: Air Flow input
+        Real64 moist_airflow_input; // moist air flow input for source type 1 in m3 / m2 s
+
+        // Source Type == 2: Air infiltration model
+        Real64 stack_height;                       // Stack height in m to create pressure difference for source type 2
+        Real64 component_air_permeance;             // Component air permeance in
+        Real64 mechanical_ventilation_overpressure; // Additional mechanical ventilation overpressure in Pa
+        Real64 delta_pressure;                     // Pressure difference over component in Pa
+
+        // Source Type == 3: Air flow network
+        int afn_id; // Id of the component element in the airflow network
+
+        Real64 moist_airflow;
+
+        InternalMoistureSource(int id=-1, int surface_id=-1, int layer_id=-1, Type type=Type::UserDefined, Real64 moist_airflow_input=0.0, Real64 stack_height=0.0,
+            Real64 component_air_permeance=0.0, Real64 mechanical_ventilation_overpressure=0.0, Real64 delta_pressure=0.0, int afn_id=0, Real64 moist_airflow=0.0)
+            : id(id), surface_id(surface_id), layer_id(layer_id), type(type), moist_airflow_input(moist_airflow_input), stack_height(stack_height),
+            component_air_permeance(component_air_permeance), mechanical_ventilation_overpressure(mechanical_ventilation_overpressure), delta_pressure(delta_pressure),
+            afn_id(afn_id), moist_airflow(moist_airflow)
+        {
+        }
+    };
+
     // Object Data
     extern Array1D<subcell> cells;
+    extern Array1D<InternalMoistureSource> sources;
 
     // Functions
 

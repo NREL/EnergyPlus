@@ -4480,6 +4480,7 @@ namespace HeatBalanceManager {
             TotRegConstructs += state.dataBSDFWindow->TotComplexFenStates;
         }
 
+        // Internal heat sources
         CurrentModuleObject = "ConstructionProperty:InternalHeatSource";
 
         auto instances = inputProcessor->epJSON.find(CurrentModuleObject);
