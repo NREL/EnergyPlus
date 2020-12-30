@@ -3624,7 +3624,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     inputProcessor->getObjectItem(*state,
         CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
-    EXPECT_EQ(49, NumAlphas);
+    EXPECT_EQ(51, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"FURNACE ACDXCOIL 1",
                                                              "DX COOLING COIL AIR INLET NODE",
                                                              "HEATING COIL AIR INLET NODE",
@@ -3635,7 +3635,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                              "",
                                                              "",
 															 "",
-															 "",
+															 "SENLAT",
                                                              "COOLCAPFT",
                                                              "COOLCAPFFF",
                                                              "COOLEIRFT",
@@ -3683,9 +3683,9 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
         lAlphaBlanks));
 
-    EXPECT_EQ(72, NumNumbers);
+    EXPECT_EQ(75, NumNumbers);
     EXPECT_TRUE(compare_containers(
-        std::vector<Real64>({10.0,      10.0, 32000, 1.6,       0,    0,   0,         200,  10.0, -25.0,    0,    2,  1000.0, 1000.0, 0.0, 1524.1,     .75,  4,
+        std::vector<Real64>({10.0,      10.0, 32000, 1.6,       0,    0,   0,         200,  10.0, -25.0,    0,    2,  100.0, -100.0, 0.0, 1524.1,     .75,  4,
                              0.1359072, 0.26, 0,     1877.9,    0.75, 4.0, 0.151008,  0.30, 0,    2226.6,   .75,  4.0, 0.1661088,  0.33, 0,
                              2911.3,    0.75, 4.0,   0.1963104, 0.38, 0,   3581.7,    0.75, 4.0,  0.226512, 0.44, 0,   4239.5,     0.75, 4.0,
                              0.2567136, 0.5,  0,     4885.7,    0.75, 4.0, 0.2869152, 0.57, 0,    5520.7,   0.75, 4.0, 0.31711680, 0.63, 0,
