@@ -76,9 +76,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace ChillerAbsorption {
+namespace EnergyPlus::ChillerAbsorption {
 
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
@@ -231,7 +229,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        static std::string const RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
+        constexpr const char * RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
 
         int AbsorberNum; // Absorber counter
         int NumAlphas;   // Number of elements in the alpha array
@@ -602,7 +600,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitBLASTAbsorberModel");
+        constexpr const char * RoutineName("InitBLASTAbsorberModel");
 
         // Init more variables
         if (this->MyOneTimeFlag) {
@@ -870,8 +868,8 @@ namespace ChillerAbsorption {
 
         //        Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
-        static std::string const RoutineName("SizeAbsorpChiller");
-        static std::string const RoutineNameLong("SizeAbsorptionChiller");
+        constexpr const char * RoutineName("SizeAbsorpChiller");
+        constexpr const char * RoutineNameLong("SizeAbsorptionChiller");
 
         int PltSizSteamNum(0);   // Plant Sizing index for steam heating loop
         int PltSizHeatingNum(0); // Plant Sizing index for how water heating loop
@@ -1371,7 +1369,7 @@ namespace ChillerAbsorption {
         // 1.  BLAST User Manual
         // 2.  Absorber User Manual
 
-        static std::string const RoutineName("CalcBLASTAbsorberModel");
+        constexpr const char * RoutineName("CalcBLASTAbsorberModel");
 
         Real64 EvapDeltaTemp(0.0); // C - evaporator temperature difference, water side
 
@@ -1801,7 +1799,5 @@ namespace ChillerAbsorption {
             }
         }
     }
-
-} // namespace ChillerAbsorption
 
 } // namespace EnergyPlus

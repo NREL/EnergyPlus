@@ -689,8 +689,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::WriteTabularFiles = true;
-    OutputReportTabular::displayEioSummary = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
+    state->dataOutRptTab->displayEioSummary = true;
 
     std::string const idf_objects = delimited_string({
 

@@ -460,7 +460,7 @@ namespace HVACManager {
             // Update the plant and condenser loop capacitance model temperature history.
             PlantManager::UpdateNodeThermalHistory(state);
 
-            if (OutputReportTabular::displayHeatEmissionsSummary) {
+            if (state.dataOutRptTab->displayHeatEmissionsSummary) {
                 OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
