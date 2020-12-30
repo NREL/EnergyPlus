@@ -2368,9 +2368,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
     DataHVACGlobals::TimeStepSys = 0.1;
 
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
-    AirflowNetwork::AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
-    AirflowNetwork::AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
 
     ReportAirflowNetwork(*state);
 
@@ -2386,12 +2386,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
     Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
     Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
-    Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
+    Real64 hdiff = state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum =
         AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
     // Existing code uses T_average to calculate hg, get close results
     EXPECT_NEAR(hdiff, sum, 0.4);
-    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
+    Real64 dhlatent = state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).FLOW2 * hg *
+                      (DataHeatBalFanSys::ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
     // when hg is calculated with indoor temperature, get exact results
     sum = AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
     EXPECT_NEAR(hdiff, sum, 0.001);
@@ -13174,11 +13175,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     CalcAirflowNetworkAirBalance(*state);
 
     // Check mass flow rate
-    EXPECT_NEAR(1.40, AirflowNetwork::AirflowNetworkLinkSimu(42).FLOW, 0.0001);
-    EXPECT_NEAR(0.52, AirflowNetwork::AirflowNetworkLinkSimu(67).FLOW, 0.0001);
-    EXPECT_NEAR(0.2795108, AirflowNetwork::AirflowNetworkLinkSimu(51).FLOW, 0.0001);
-    EXPECT_NEAR(0.1095108, AirflowNetwork::AirflowNetworkLinkSimu(66).FLOW, 0.0001);
-    EXPECT_NEAR(0.1005046, AirflowNetwork::AirflowNetworkLinkSimu(15).FLOW, 0.0001);
+    EXPECT_NEAR(1.40, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(42).FLOW, 0.0001);
+    EXPECT_NEAR(0.52, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(67).FLOW, 0.0001);
+    EXPECT_NEAR(0.2795108, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(51).FLOW, 0.0001);
+    EXPECT_NEAR(0.1095108, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(66).FLOW, 0.0001);
+    EXPECT_NEAR(0.1005046, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(15).FLOW, 0.0001);
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
     // #7977
@@ -13201,7 +13202,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(5).IsControlled = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
     ReportAirflowNetwork(*state);
 
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
@@ -15627,7 +15628,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     CalcAirflowNetworkAirBalance(*state);
     // Fan:SystemModel
-    EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
+    EXPECT_NEAR(1.23, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
     EXPECT_TRUE(AirflowNetwork::DisSysCompCVFData(1).FanModelFlag);
 
     for (i = 1; i <= 21; ++i) {
@@ -15642,7 +15643,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     // Fan:OnOff
     AirflowNetwork::DisSysCompCVFData(1).FanModelFlag = false;
     CalcAirflowNetworkAirBalance(*state);
-    EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
+    EXPECT_NEAR(1.23, state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     state->dataAirLoop->AirLoopAFNInfo.deallocate();
 }
@@ -15769,7 +15770,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
-    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkNumOfZones = 1;
     AirflowNetwork::MultizoneZoneData.allocate(1);
     AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
     AirflowNetwork::MultizoneZoneData(1).ZoneName = "ATTIC ZONE";

@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -589,13 +590,13 @@ namespace RoomAirModelAirflowNetwork {
                     NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
                     ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(Link).FLOW2;
                 }
                 if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
                     NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
                     ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
+                    ThisRAFNNode.Link(linkNum).MdotIn = state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 

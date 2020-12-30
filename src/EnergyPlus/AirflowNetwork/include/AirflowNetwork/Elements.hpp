@@ -216,7 +216,7 @@ namespace AirflowNetwork {
     // = NumOfLinksMultiZone+NumOfLinksDistribution
     // RoomAirManager use
     //extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
-    extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
+    //extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
 
     extern bool RollBackFlag;                         // Roll back flag when system time step down shifting
     extern Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
@@ -1637,7 +1637,7 @@ namespace AirflowNetwork {
 
     // Object Data
     extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+    //extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
     extern AirflowNetworkSimuProp AirflowNetworkSimu;
     // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr

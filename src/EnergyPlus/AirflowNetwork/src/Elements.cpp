@@ -166,7 +166,7 @@ namespace AirflowNetwork {
     // = NumOfLinksMultiZone+NumOfLinksDistribution
     // RoomAirManager use
     //int AirflowNetworkNumOfSurfaces(0); // The number of surfaces for multizone calculation
-    int AirflowNetworkNumOfZones(0);    // The number of zones for multizone calculation
+    //int AirflowNetworkNumOfZones(0);    // The number of zones for multizone calculation
 
     bool RollBackFlag(false);                  // Roll back flag when system time step down shifting
     Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
@@ -188,7 +188,7 @@ namespace AirflowNetwork {
 
     // Object Data
     Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+    //Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
     //Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
     //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
@@ -3837,7 +3837,7 @@ namespace AirflowNetwork {
         AirflowNetworkNumOfComps = 0;
         AirflowNetworkNumOfLinks = 0;
         //AirflowNetworkNumOfSurfaces = 0;
-        AirflowNetworkNumOfZones = 0;
+        //AirflowNetworkNumOfZones = 0;
         RollBackFlag = false;
         ANZT.deallocate();
         ANZW.deallocate();
@@ -3851,7 +3851,7 @@ namespace AirflowNetwork {
         VAVTerminalRatio = 0.0;
         VAVSystem = false;
         AirflowNetworkNodeSimu.deallocate();
-        AirflowNetworkLinkSimu.deallocate();
+        //AirflowNetworkLinkSimu.deallocate();
         //AirflowNetworkExchangeData.deallocate();
         //AirflowNetworkMultiExchangeData.deallocate();
         //AirflowNetworkLinkReport.deallocate();
