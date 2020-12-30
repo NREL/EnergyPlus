@@ -57,8 +57,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp>
+#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
