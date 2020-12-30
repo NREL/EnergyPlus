@@ -9527,14 +9527,27 @@ namespace OutputReportTabular {
 
             // int iUnitSystem = 1; 
 
+            bool produceTabular = true; 
+            bool produceSQLite = false;
+
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-                if ((iUnitSystem == 1) && (unitsqltab == unitsStyle)) break;
+                // if ((iUnitSystem == 1) && (unitsqltab == unitsStyle)) break;
 
-                if (iUnitSystem == 0)
+                if (iUnitSystem == 0) {
+                    produceTabular = true;
                     unitsStyle_temp = unitsStyle;
-                else
+                    if (unitsqltab == unitsStyle)
+                        produceSQLite = true;
+                    else
+                        produceSQLite = false;
+                } 
+                else { // iUnitSystem == 1
+                    if (unitsqltab == unitsStyle) break;
+                    produceTabular = false;
+                    produceSQLite = true;
                     unitsStyle_temp = unitSQLiteTable;
+                }
 
                 // unit conversion factors
                 if (unitsStyle_temp == unitsStyleInchPound) {
@@ -9735,17 +9748,17 @@ namespace OutputReportTabular {
                 // complete the LEED end use table using the same values
                 unconvert = 1 / powerConversion;
 
-                if (iUnitSystem == 0) {
+                if (produceTabular == true) {
                     WriteSubtitle("End Uses");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
-                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitsStyle)) {
+                if (produceSQLite == true) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                     }
                 }
-                if (iUnitSystem == 0) {
+                if (produceTabular == true) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
@@ -9850,7 +9863,7 @@ namespace OutputReportTabular {
                 }
 
                 // heading for the entire sub-table
-                if (iUnitSystem == 0) {
+                if (produceTabular == true) {
                     WriteSubtitle("End Uses By Subcategory");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
@@ -9868,7 +9881,7 @@ namespace OutputReportTabular {
                 Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                 Array1D_string columnHeadTemp(columnHead({2, _, _}));
                 
-                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitsStyle)) {
+                if (produceSQLite == true) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                rowHeadTemp,
@@ -9879,7 +9892,7 @@ namespace OutputReportTabular {
                     }
                 }
 
-                if (iUnitSystem == 0) {
+                if (produceTabular == true) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
                                                                                                     rowHeadTemp,
