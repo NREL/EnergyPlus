@@ -8966,6 +8966,45 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayDemandEndUse) {
+
+            iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
+
+            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            if (unitSQLiteTable == 5) {
+                unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            } else if (unitSQLiteTable == 0) {
+                unitsql_unitconv = iUnitsStyle::None;
+            } else if (unitSQLiteTable == 1) {
+                unitsql_unitconv = iUnitsStyle::JtoKWH;
+            } else if (unitSQLiteTable == 2) {
+                unitsql_unitconv = iUnitsStyle::JtoMJ;
+            } else if (unitSQLiteTable == 3) {
+                unitsql_unitconv = iUnitsStyle::JtoGJ;
+            } else if (unitSQLiteTable == 4) {
+                unitsql_unitconv = iUnitsStyle::InchPound;
+            }
+
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                if (iUnitSystem == 0) {
+                    produceTabular = true;
+                    if (unitsql_unitconv == ort->unitsStyle) {
+                        produceSQLite = true;
+                    } else {
+                        produceSQLite = false;
+                    }
+                    unitsStyle_temp = ort->unitsStyle;
+                } else { // iUnitSystem == 1
+                    if (unitsql_unitconv == ort->unitsStyle) break;
+
+                    produceTabular = false;
+                    produceSQLite = true;
+                    unitsStyle_temp = unitsql_unitconv;
+                }
+
             // show the headers of the report
             WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // totals - select which additional fuel to display and which other district heating
@@ -9012,56 +9051,6 @@ namespace EnergyPlus::OutputReportTabular {
             // set the time of peak demand and total demand for the purchased heating/steam
             collapsedTimeStep(12) = ort->gatherDemandTimeStamp(distrHeatSelected);
             collapsedTotal(12) = ort->gatherDemandTotal(distrHeatSelected);
-
-            // temporary testing the sqlit newly added flag status
-            // int unitsqltab = 0;
-            // unitsqltab = unitSQLiteTable;
-
-            // iUnitStyle unitSQLstyle =
-            iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
-
-            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            if (unitSQLiteTable == 5) {
-                unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            } else if (unitSQLiteTable == 0) {
-                unitsql_unitconv = iUnitsStyle::None;
-            } else if (unitSQLiteTable == 1) {
-                unitsql_unitconv = iUnitsStyle::JtoKWH;
-            } else if (unitSQLiteTable == 2) {
-                unitsql_unitconv = iUnitsStyle::JtoMJ;
-            } else if (unitSQLiteTable == 3) {
-                unitsql_unitconv = iUnitsStyle::JtoGJ;
-            } else if (unitSQLiteTable == 4) {
-                unitsql_unitconv = iUnitsStyle::InchPound;
-            }
-
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
-
-            // int iUnitSystem = 1; 
-
-            bool produceTabular = true; 
-            bool produceSQLite = false;
-
-            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                // if ((iUnitSystem == 1) && (unitsqltab == unitsStyle)) break;
-
-                if (iUnitSystem == 0) {
-                    produceTabular = true;
-                    if (unitsql_unitconv == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                    unitsStyle_temp = ort->unitsStyle;
-                } 
-                else { // iUnitSystem == 1
-                    if (unitsql_unitconv == ort->unitsStyle) break;
-                    
-                    produceTabular = false;
-                    produceSQLite = true;
-                    unitsStyle_temp = unitsql_unitconv;
-                }
 
             // establish unit conversion factors
             if (unitsStyle_temp == iUnitsStyle::InchPound) {
