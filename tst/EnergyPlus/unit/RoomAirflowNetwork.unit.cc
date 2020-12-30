@@ -125,7 +125,7 @@ protected:
         ZoneAirHumRat.allocate(1);
         AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
         AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
-        AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
+        state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu.allocate(5);
         RAFN.allocate(state->dataGlobal->NumOfZones);
     }
 
@@ -222,16 +222,16 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     AirflowNetwork::AirflowNetworkNodeSimu(5).WZ = 0.0015;
     AirflowNetwork::AirflowNetworkNodeSimu(6).TZ = 20.0;
     AirflowNetwork::AirflowNetworkNodeSimu(6).WZ = 0.002;
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW = 0.0;
-    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW = 0.01;
-    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).FLOW = 0.0;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(2).FLOW = 0.0;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(3).FLOW = 0.01;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(4).FLOW = 0.0;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(5).FLOW = 0.01;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
 
     ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
     ZoneEquipList(ZoneNum).EquipName.allocate(1);

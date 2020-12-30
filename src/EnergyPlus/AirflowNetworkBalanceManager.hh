@@ -228,6 +228,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
     void calculateWindPressureCoeffs(EnergyPlusData &state);
 
     int AirflowNetworkNumOfSurfaces = 0; // The number of surfaces for multizone calculation
+    int AirflowNetworkNumOfZones = 0;    // The number of zones for multizone calculation
 
     Array1D<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
     Array1D_int SplitterNodeNumbers;
@@ -293,6 +294,8 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
     Array1D<AirflowNetwork::AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
+    Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+
     //AirflowNetwork::Solver solver;
 
     // Output and reporting
@@ -304,6 +307,10 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        this->AirflowNetworkNumOfSurfaces = 0;
+        this->AirflowNetworkNumOfZones = 0;
+        this->AirflowNetworkLinkSimu.deallocate();
+
         this->OccupantVentilationControl.deallocate();
         this->SplitterNodeNumbers.deallocate();
         this->AirflowNetworkNumOfExtSurfaces = 0;
