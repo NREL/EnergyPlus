@@ -212,7 +212,7 @@ namespace HVACManager {
         using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
-        using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+        using AirflowNetwork::ManageAirflowNetworkBalance;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -461,7 +461,7 @@ namespace HVACManager {
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
 
-            if (OutputReportTabular::displayHeatEmissionsSummary) {
+            if (state.dataOutRptTab->displayHeatEmissionsSummary) {
                 OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
@@ -1749,7 +1749,7 @@ namespace HVACManager {
         // Each flag is checked and the appropriate manager is then called.
 
         // Using/Aliasing
-        using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+        using AirflowNetwork::ManageAirflowNetworkBalance;
         using DataPlant::FlowLocked;
         using DataPlant::FlowUnlocked;
         using NonZoneEquipmentManager::ManageNonZoneEquipment;
@@ -2338,7 +2338,7 @@ namespace HVACManager {
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        using AirflowNetworkBalanceManager::ReportAirflowNetwork;
+        using AirflowNetwork::ReportAirflowNetwork;
         using DataZoneEquipment::ZoneEquipAvail;
 
         using DataZoneEquipment::CrossMixingReportFlag;

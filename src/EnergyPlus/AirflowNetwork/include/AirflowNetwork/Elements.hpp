@@ -215,7 +215,7 @@ namespace AirflowNetwork {
     extern int AirflowNetworkNumOfLinks; // Number of links for AirflowNetwork calculation
     // = NumOfLinksMultiZone+NumOfLinksDistribution
     // RoomAirManager use
-    extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
+    //extern int AirflowNetworkNumOfSurfaces; // The number of surfaces for multizone calculation
     extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
 
     extern bool RollBackFlag;                         // Roll back flag when system time step down shifting

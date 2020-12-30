@@ -691,13 +691,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(*state);
-    totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
+    totConvGains = state->dataOutRptTab->peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2
