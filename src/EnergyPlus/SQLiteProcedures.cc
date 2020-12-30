@@ -123,6 +123,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                             //int const unitsStyleJtoGJ(3);
                             //int const unitsStyleInchPound(4);
                             //int const unitsStyleNotFound(5);
+                            
                             unitSQLiteTable = 5;
                         } else if (UtilityRoutines::SameString(option2, "None")) {
                             unitSQLiteTable = 0;

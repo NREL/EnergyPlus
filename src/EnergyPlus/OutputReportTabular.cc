@@ -9520,6 +9520,8 @@ namespace OutputReportTabular {
             // temporary testing the sqlit newly added flag status
             int unitsqltab = 0;
             unitsqltab = unitSQLiteTable;
+            if (unitsqltab == 5) unitsqltab = unitsStyle; // This is the default UseOutputControlTableStyles
+
             int unitsStyle_temp = 0;
             unitsStyle_temp = unitsStyle;
 
@@ -9527,7 +9529,7 @@ namespace OutputReportTabular {
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-                if ((iUnitSystem == 1) && (unitsqltab == unitSQLiteTable)) break;
+                if ((iUnitSystem == 1) && (unitsqltab == unitsStyle)) break;
 
                 if (iUnitSystem == 0)
                     unitsStyle_temp = unitsStyle;
@@ -9737,7 +9739,7 @@ namespace OutputReportTabular {
                     WriteSubtitle("End Uses");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
-                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitSQLiteTable)) {
+                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitsStyle)) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
@@ -9866,7 +9868,7 @@ namespace OutputReportTabular {
                 Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                 Array1D_string columnHeadTemp(columnHead({2, _, _}));
                 
-                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitSQLiteTable)) {
+                if (iUnitSystem == 1 || (iUnitSystem == 0 && unitsqltab == unitsStyle)) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                rowHeadTemp,
