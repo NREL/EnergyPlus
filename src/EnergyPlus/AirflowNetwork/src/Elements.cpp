@@ -165,7 +165,7 @@ namespace AirflowNetwork {
     int AirflowNetworkNumOfLinks(0); // Number of links for AirflowNetwork calculation
     // = NumOfLinksMultiZone+NumOfLinksDistribution
     // RoomAirManager use
-    int AirflowNetworkNumOfSurfaces(0); // The number of surfaces for multizone calculation
+    //int AirflowNetworkNumOfSurfaces(0); // The number of surfaces for multizone calculation
     int AirflowNetworkNumOfZones(0);    // The number of zones for multizone calculation
 
     bool RollBackFlag(false);                  // Roll back flag when system time step down shifting
@@ -3836,7 +3836,7 @@ namespace AirflowNetwork {
         AirflowNetworkNumOfNodes = 0;
         AirflowNetworkNumOfComps = 0;
         AirflowNetworkNumOfLinks = 0;
-        AirflowNetworkNumOfSurfaces = 0;
+        //AirflowNetworkNumOfSurfaces = 0;
         AirflowNetworkNumOfZones = 0;
         RollBackFlag = false;
         ANZT.deallocate();

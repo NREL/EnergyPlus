@@ -61,7 +61,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::AirflowNetworkBalanceManager;
+using namespace EnergyPlus::AirflowNetwork;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using DataHeatBalFanSys::MAT;
