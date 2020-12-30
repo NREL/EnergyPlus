@@ -411,7 +411,7 @@ namespace SizingManager {
                 // call the routine that computes the decay curve
                 ComputeLoadComponentDecayCurve(state);
                 // remove some of the arrays used to derive the decay curves
-                DeallocateLoadComponentArrays();
+                DeallocateLoadComponentArrays(state);
             }
         }
 
