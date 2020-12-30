@@ -1331,9 +1331,9 @@ namespace HeatBalanceHAMTManager {
                         if (!sources(cells(cid).source_id).afn_id) {
                             if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurfaces) {
                                 for (ii = 1; ii <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurfaces; ++ii) {
-                                    if (Surface(sources(cells(cid).source_id).surface_id).Name.compare(AirflowNetworkLinkageData(ii).Name) == 0) {
+                                    if (Surface(sources(cells(cid).source_id).surface_id).Name.compare(AirflowNetwork::AirflowNetworkLinkageData(ii).Name) == 0) {
                                         // assign network link to cell with internal moisture source type 3
-                                        sources(cells(cid).source_id).afn_id = AirflowNetworkLinkageData(ii).LinkNum;
+                                        sources(cells(cid).source_id).afn_id = AirflowNetwork::AirflowNetworkLinkageData(ii).LinkNum;
                                         break;
                                     }
                                 }
@@ -1491,7 +1491,7 @@ namespace HeatBalanceHAMTManager {
                         sources(imsid).moist_airflow = std::abs(sources(imsid).delta_pressure) * (sources(imsid).component_air_permeance) / 3600;
                     } else if (sources(imsid).type == InternalMoistureSource::Type::AirflowNetwork) {  // air flow through component from multizone airflow network
                         if (sources(imsid).afn_id) {
-                            sources(imsid).moist_airflow = AirflowNetworkLinkSimu(sources(imsid).afn_id).VolFLOW / Surface(sources(imsid).surface_id).Area;
+                            sources(imsid).moist_airflow = state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(sources(imsid).afn_id).VolFLOW / Surface(sources(imsid).surface_id).Area;
                         } else {
                             sources(imsid).moist_airflow = 0;
                         }
@@ -1509,7 +1509,7 @@ namespace HeatBalanceHAMTManager {
                     }
 
                     if (internal_moisture_source > 0) {
-                        cells(cid).Wadds = Surface(sid).Area * (cells(cid).length(1) / Material(matid).Thickness) * internal_moisture_source;
+                        cells(cid).Wadds = Surface(sid).Area * (cells(cid).length(1) / state.dataMaterial->Material(matid).Thickness) * internal_moisture_source;
                     } else {
                         cells(cid).Wadds = 0;
                     }
