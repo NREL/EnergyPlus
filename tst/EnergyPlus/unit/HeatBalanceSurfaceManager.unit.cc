@@ -2616,7 +2616,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
-    OutputReportTabular::displayThermalResilienceSummary = true;
+    state->dataOutRptTab->displayThermalResilienceSummary = true;
     state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 1;
 
@@ -2754,7 +2754,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     ScheduleManager::Schedule(1).CurrentValue = 1;
-    OutputReportTabular::displayCO2ResilienceSummary = true;
+    state->dataOutRptTab->displayCO2ResilienceSummary = true;
     state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
@@ -2769,7 +2769,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataDaylightingData->ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
     state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
     state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1) = 400;
-    OutputReportTabular::displayVisualResilienceSummary = true;
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);
