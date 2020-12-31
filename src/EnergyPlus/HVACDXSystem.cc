@@ -2581,7 +2581,9 @@ namespace HVACDXSystem {
                                                     PartLoadFrac);
                                             }
                                         } else if (SolFla == -2) {
-                                            PartLoadFrac = TempSpeedReqst / TempSpeedOut;
+                                            if ((SpeedNum > 1) && (TempOut2 != TempOut1))
+                                                SpeedRatio = max(0.0, (DesOutTemp - TempOut1) / (TempOut2 - TempOut1));
+                                            else PartLoadFrac = TempSpeedReqst / TempSpeedOut;
                                             if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                     ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
@@ -2619,6 +2621,8 @@ namespace HVACDXSystem {
                         // then overcool to meet moisture load
 
                         if ((OutletHumRatDXCoil > DesOutHumRat) && (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat)) {
+
+                            Real64 TempHum1 = NoLoadHumRatOut; 
 
                             if ((NumOfSpeeds > 1 && SpeedNum == NumOfSpeeds && SpeedRatio == 1.0) || (NumOfSpeeds == 1 && CycRatio == 1.0)) {
                                 PartLoadFrac = 1.0;
@@ -2710,6 +2714,7 @@ namespace HVACDXSystem {
                                         if ((DesOutHumRat - TempSpeedOut) > -HumRatAcc) {
                                             break;
                                         }
+                                        TempHum1 = TempSpeedOut;
                                     }
                                     if ((DesOutHumRat - TempSpeedOut) > HumRatAcc) {
                                         Par(1) = double(VSCoilIndex);
@@ -2748,7 +2753,10 @@ namespace HVACDXSystem {
                                                                                PartLoadFrac);
                                             }
                                         } else if (SolFla == -2) {
-                                            PartLoadFrac = SpeedRatio;
+                                            if ((SpeedNum > 1) && (TempHum1 != TempSpeedOut))
+                                                SpeedRatio = max(0.0, (DesOutHumRat - TempHum1) / (TempSpeedOut - TempHum1));
+                                            else
+                                                PartLoadFrac = max(0.0, (DesOutHumRat - NoLoadHumRatOut) / (TempSpeedOut - NoLoadHumRatOut)); 
                                             if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                     ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRFail;
@@ -2806,7 +2814,10 @@ namespace HVACDXSystem {
                                                 PartLoadFrac);
                                         }
                                     } else if (SolFla == -2) {
-                                        PartLoadFrac = 1.0;
+                                        if ((SpeedNum > 1) && (TempHum1 != TempSpeedOut))
+                                            SpeedRatio = max(0.0, (DesOutHumRat - TempHum1) / (TempSpeedOut - TempHum1));
+                                        else
+                                            PartLoadFrac = max(0.0, (DesOutHumRat - NoLoadHumRatOut) / (TempSpeedOut - NoLoadHumRatOut)); 
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail < 1) {
                                                 ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail;
@@ -3801,7 +3812,6 @@ namespace HVACDXSystem {
         IHPIndex = int(Par(6)); 
 
         if (IHPIndex != 0 )
-            if (IHPIndex != 0)
                 SimIHP(state,
                        "",
                        IHPIndex,
@@ -3902,7 +3912,6 @@ namespace HVACDXSystem {
         IHPIndex = int(Par(6));
 
         if (IHPIndex != 0)
-            if (IHPIndex != 0)
                 SimIHP(state,
                         "",
                         IHPIndex,
@@ -4000,7 +4009,6 @@ namespace HVACDXSystem {
         IHPIndex = int(Par(6));
 
         if (IHPIndex != 0)
-            if (IHPIndex != 0)
                 SimIHP(state,
                        "",
                        IHPIndex,
@@ -4102,7 +4110,6 @@ namespace HVACDXSystem {
         IHPIndex = int(Par(6));
 
         if (IHPIndex != 0)
-            if (IHPIndex != 0)
                 SimIHP(state,
                        "",
                        IHPIndex,

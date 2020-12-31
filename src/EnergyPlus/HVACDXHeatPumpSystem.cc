@@ -1134,7 +1134,9 @@ namespace HVACDXHeatPumpSystem {
                                                 }
                                             }
                                         } else if (SolFla == -2) {
-                                            PartLoadFrac = ReqOutput / FullOutput;
+                                            if ((SpeedNum > 1) && (TempSpeedOut != TempOut1))
+                                                SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
+                                            else PartLoadFrac = ReqOutput / FullOutput;
                                             if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                     ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
