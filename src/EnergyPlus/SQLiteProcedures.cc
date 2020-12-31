@@ -112,12 +112,10 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                     writeTabularDataToSQLite = true;
                     writeOutputToSQLite = true;
 
-                    // Maybe: can do it here or do it in the OutputReportTabular::WriteTable(). But here is natural since this needs to be processed only once. 
-                    // set global flags for sqlite dual unit input
                     if (numAlphas > 1) {
                         std::string option2 = alphas(2);
                         if (UtilityRoutines::SameString(option2, "None")) {
-                            unitSQLiteTable = 0; //sql_ort->unitsStyle_SQLite = EnergyPlus::OutputReportTabular::iUnitsStyle::None; 
+                            unitSQLiteTable = 0; 
                         } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
                             unitSQLiteTable = 1;
                         } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
@@ -127,19 +125,9 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                         } else if (UtilityRoutines::SameString(option2, "InchPound")) {
                             unitSQLiteTable = 4;
                         } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
-                            // set a global flag variable
-                            // see definition in OutputReportTabular.cc
-                            // int const unitsStyleNone(0); // no change to any units
-                            // int const unitsStyleJtoKWH(1);
-                            // int const unitsStyleJtoMJ(2);
-                            // int const unitsStyleJtoGJ(3);
-                            // int const unitsStyleInchPound(4);
-                            // int const unitsStyleNotFound(5);
-
                             unitSQLiteTable = 5;
                         } 
                     }
-
                 } else if (UtilityRoutines::SameString(option, "Simple")) {
                     writeOutputToSQLite = true;
                 }

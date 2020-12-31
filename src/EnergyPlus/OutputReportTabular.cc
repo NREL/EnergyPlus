@@ -8985,22 +8985,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayDemandEndUse) {
 
-            //iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
-            //// if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            //if (unitSQLiteTable == 5) {
-            //    unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            //} else if (unitSQLiteTable == 0) {
-            //    unitsql_unitconv = iUnitsStyle::None;
-            //} else if (unitSQLiteTable == 1) {
-            //    unitsql_unitconv = iUnitsStyle::JtoKWH;
-            //} else if (unitSQLiteTable == 2) {
-            //    unitsql_unitconv = iUnitsStyle::JtoMJ;
-            //} else if (unitSQLiteTable == 3) {
-            //    unitsql_unitconv = iUnitsStyle::JtoGJ;
-            //} else if (unitSQLiteTable == 4) {
-            //    unitsql_unitconv = iUnitsStyle::InchPound;
-            //}
-
             iUnitsStyle unitsStyle_temp = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
@@ -9017,7 +9001,6 @@ namespace EnergyPlus::OutputReportTabular {
                     unitsStyle_temp = ort->unitsStyle;
                 } else { // iUnitSystem == 1
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-
                     produceTabular = false;
                     produceSQLite = true;
                     unitsStyle_temp = ort->unitsStyle_SQLite;
