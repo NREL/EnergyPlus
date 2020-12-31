@@ -8174,7 +8174,6 @@ namespace ConvectionCoefficients {
         using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TH;
 
-
         Real64 TSurf;
         Real64 Tair;
         Real64 DeltaTemp; // temp diff between TSurf and Tair
