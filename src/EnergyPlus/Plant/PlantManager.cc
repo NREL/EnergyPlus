@@ -4331,11 +4331,19 @@ namespace EnergyPlus {
                     PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
                     ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Demand Side is storing excess heat the majority of the time.");
+                    ShowContinueError(state,
+                                      format("Excesss Storage Time=[{:.2R}], Total Time=[{:.2R}]",
+                                             PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
                 if (PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime >
                     PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TotalTime / 2) {
                     ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Supply Side is storing excess heat the majority of the time.");
+                    ShowContinueError(state,
+                                      format("Excesss Storage Time=[{:.2R}], Total Loop Active Time=[{:.2R}]",
+                                             PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
             }
         }
