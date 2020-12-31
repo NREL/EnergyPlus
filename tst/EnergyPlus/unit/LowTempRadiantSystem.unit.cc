@@ -541,13 +541,17 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "    6.096000,6.096000,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
         "    6.096000, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
 
-        "  Construction:InternalSource,",
-        "    Slab Floor with Radiant, !- Name",
+        "  ConstructionProperty:InternalHeatSource,",
+        "    Radiant Source,          !- Name",
+        "    Slab Floor with Radiant, !- Construction Name",
         "    4,                       !- Source Present After Layer Number",
         "    4,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
-        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request"
+        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+        "  Construction,",
+        "    Slab Floor with Radiant, !- Name",
         "    CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
         "    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
         "    GYP1,                    !- Layer 3",

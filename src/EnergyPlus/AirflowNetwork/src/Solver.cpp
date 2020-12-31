@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 
 #include "../../Data/EnergyPlusData.hh"
 
@@ -569,34 +570,34 @@ namespace AirflowNetwork {
             if (AFLOW2(i) != 0.0) {
             }
             if (AFLOW(i) > 0.0) {
-                AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
             } else {
-                AirflowNetworkLinkSimu(i).FLOW = 0.0;
-                AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = 0.0;
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
                 if (AFLOW(i) > 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i) + AFLOW2(i);
                 }
             }
             if (AirflowNetworkLinkageData(i).DetOpenNum > 0) {
                 if (AFLOW2(i) != 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i) + AFLOW2(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = AFLOW2(i);
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SOP && AFLOW2(i) != 0.0) {
                 if (AFLOW(i) >= 0.0) {
-                    AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
-                    AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = AFLOW(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = std::abs(AFLOW2(i));
                 } else {
-                    AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
-                    AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW = std::abs(AFLOW2(i));
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).FLOW2 = -AFLOW(i);
                 }
             }
         }
@@ -913,7 +914,7 @@ namespace AirflowNetwork {
                 DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
             }
 
-            AirflowNetworkLinkSimu(i).DP = DP;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(i).DP = DP;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
             if (AirflowNetworkCompData(j).CompTypeNum == CompTypeNum_DOP) {

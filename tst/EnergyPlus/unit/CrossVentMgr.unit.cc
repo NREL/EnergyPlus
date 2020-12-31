@@ -116,8 +116,8 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::DataHeatBalance::Zone(1).Volume = 996.75300003839993;
     EnergyPlus::DataHeatBalance::Zone(1).FloorArea = 297.28972800000003;
 
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
-    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu.allocate(1);
+    state->dataAirflowNetworkBalanceManager->AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
     state->dataEnvrn->WindDir = 271.66666666666669;
 

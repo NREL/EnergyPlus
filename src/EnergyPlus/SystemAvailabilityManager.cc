@@ -4489,8 +4489,8 @@ namespace SystemAvailabilityManager {
         // on and open windows or doors.
 
         using namespace DataAirLoop;
-        using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
-        using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+        using AirflowNetwork::GetZoneInfilAirChangeRate;
+        using AirflowNetwork::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
