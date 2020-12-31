@@ -53,8 +53,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -189,6 +190,14 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
                             Real64 const WZone,    // humidity ratio at zone air node
                             Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
 );
+
+struct GeneralRoutinesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

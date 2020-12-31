@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -80,6 +81,14 @@ namespace DataReportingFlags {
     void clear_state();
 
 } // namespace DataReportingFlags
+
+struct ReportFlagData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

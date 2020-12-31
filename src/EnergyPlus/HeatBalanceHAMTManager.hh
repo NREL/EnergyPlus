@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -196,6 +197,14 @@ namespace HeatBalanceHAMTManager {
     //        thereof or any information disclosed therein.
 
 } // namespace HeatBalanceHAMTManager
+
+struct HeatBalHAMTMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

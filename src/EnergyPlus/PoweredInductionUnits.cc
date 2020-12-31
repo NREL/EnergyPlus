@@ -340,7 +340,7 @@ namespace PoweredInductionUnits {
             PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
@@ -535,7 +535,7 @@ namespace PoweredInductionUnits {
             PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
@@ -854,7 +854,7 @@ namespace PoweredInductionUnits {
                 // plant upgrade note? why no separate handling of steam coil? add it ?
                 rho = GetDensityGlycol(state,
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp(),
+                                       DataGlobalConstants::HWInitConvTemp,
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
@@ -1327,12 +1327,12 @@ namespace PoweredInductionUnits {
 
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp(),
+                                                       DataGlobalConstants::HWInitConvTemp,
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp(),
+                                                           DataGlobalConstants::HWInitConvTemp,
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -2108,8 +2108,8 @@ namespace PoweredInductionUnits {
 
         // FLOW
 
-        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
-        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set zone OA Volume flow rate
         PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);

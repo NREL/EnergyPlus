@@ -416,8 +416,6 @@
 
   Construction:AirBoundary,
     Air Wall,                !- Name
-    GroupedZones,            !- Solar and Daylighting Method
-    GroupedZones,            !- Radiant Exchange Method
     SimpleMixing,            !- Air Exchange Method
     0.5,                     !- Simple Mixing Air Changes per Hour {1/hr}
     ;                        !- Simple Mixing Schedule Name

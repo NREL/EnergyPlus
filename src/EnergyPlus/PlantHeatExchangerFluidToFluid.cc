@@ -270,7 +270,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 FluidHX(CompLoop).Name = cAlphaArgs(1);
 
                 if (lAlphaFieldBlanks(2)) {
-                    FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+                    FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
                     if (FluidHX(CompLoop).AvailSchedNum <= 0) {
@@ -411,7 +411,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
                                     ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
@@ -433,9 +433,9 @@ namespace PlantHeatExchangerFluidToFluid {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
                                     ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
@@ -787,7 +787,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                            RoutineNameNoColon);
             this->DemandSideLoop.MassFlowRateMax = rho * this->DemandSideLoop.DesignVolumeFlowRate;
@@ -802,7 +802,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                    DataGlobalConstants::InitConvTemp(),
+                                                    DataGlobalConstants::InitConvTemp,
                                                     DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                     RoutineNameNoColon);
             this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
@@ -943,13 +943,13 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                       DataGlobalConstants::InitConvTemp(),
+                                                                       DataGlobalConstants::InitConvTemp,
                                                                        DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                        RoutineName);
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                   DataGlobalConstants::InitConvTemp(),
+                                                                   DataGlobalConstants::InitConvTemp,
                                                                    DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -1028,13 +1028,13 @@ namespace PlantHeatExchangerFluidToFluid {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 SupSideMdot = this->SupplySideLoop.DesignVolumeFlowRate * rho;
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                    DataGlobalConstants::InitConvTemp(),
+                                                    DataGlobalConstants::InitConvTemp,
                                                     DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                     RoutineName);
             Real64 DmdSideMdot = this->DemandSideLoop.DesignVolumeFlowRate * rho;
@@ -1043,8 +1043,8 @@ namespace PlantHeatExchangerFluidToFluid {
             this->SupplySideLoop.MaxLoad = std::abs(this->HeatTransferRate);
         }
         if (DataPlant::PlantFinalSizesOkayToReport) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "HeatExchanger:FluidToFluid");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->SupplySideLoop.MaxLoad);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "HeatExchanger:FluidToFluid");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->SupplySideLoop.MaxLoad);
         }
     }
 
@@ -2095,7 +2095,7 @@ namespace PlantHeatExchangerFluidToFluid {
         DataLoopNode::Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
         DataLoopNode::Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
 
-        this->HeatTransferEnergy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatTransferEnergy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
             (this->SupplySideLoop.InletMassFlowRate > 0.0)) {

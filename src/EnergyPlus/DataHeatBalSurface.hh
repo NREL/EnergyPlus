@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -262,6 +263,14 @@ namespace DataHeatBalSurface {
     void clear_state();
 
 } // namespace DataHeatBalSurface
+
+struct HeatBalSurfData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

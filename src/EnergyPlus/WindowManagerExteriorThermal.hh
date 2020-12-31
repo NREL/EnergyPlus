@@ -48,8 +48,6 @@
 #ifndef WindowManagerExteriorThermal_hh_INCLUDED
 #define WindowManagerExteriorThermal_hh_INCLUDED
 
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 namespace EnergyPlus {
 
 namespace DataSurfaces {
@@ -143,7 +141,7 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
         std::shared_ptr<Gases::CGas> getAir() const;

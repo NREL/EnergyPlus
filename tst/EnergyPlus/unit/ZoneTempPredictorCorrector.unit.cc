@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneAirHumRatTemp.allocate(1);
     ZoneW1.allocate(1);
 
-    AirModel.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(1);
     ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat

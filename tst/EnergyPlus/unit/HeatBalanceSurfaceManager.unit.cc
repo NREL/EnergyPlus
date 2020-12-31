@@ -107,8 +107,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
     state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Name = "TestMaterial";
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Name = "TestMaterial";
 
     DataHeatBalSurface::HcExtSurf.allocate(SurfNum);
     DataHeatBalSurface::HcExtSurf(SurfNum) = 1.0;
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
-    dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
+    state->dataMaterial->Material.allocate(DataHeatBalance::TotMaterials);
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
@@ -284,11 +284,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    dataMaterial.Material(1).AbsorpThermal = 0.2;
-    dataMaterial.Material(1).AbsorpSolar = 0.5;
+    state->dataMaterial->Material(1).AbsorpThermal = 0.2;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.5;
 
     DataSurfaces::Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
-    dataMaterial.Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Resistance = 1.25;
 
     ComputeIntThermalAbsorpFactors(*state);
 
@@ -1912,17 +1912,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.3 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(15.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 15.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(15.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 15.0)),
                      DataHeatBalSurface::HSkyExtSurf(1));
-    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.1 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(22.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 22.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + DataGlobalConstants::KelvinConv) - pow_4(22.0 + DataGlobalConstants::KelvinConv)) / (20.0 - 22.0)),
                      DataHeatBalSurface::HGrdExtSurf(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(1));
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 *
-                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())) + 0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv()))),
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 *
+                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)) + 0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv))),
                      DataHeatBalSurface::SurfQRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.5 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(3));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(20.0 + DataGlobalConstants::KelvinConv)), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::SurfQRadLWOutSrdSurfs(4));
 }
 
@@ -1964,7 +1964,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);
 
-    EXPECT_EQ(OutputProcessor::ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
+    EXPECT_EQ(state->dataOutputProcessor->ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceAddSourceTerm)
@@ -2616,7 +2616,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
-    OutputReportTabular::displayThermalResilienceSummary = true;
+    state->dataOutRptTab->displayThermalResilienceSummary = true;
     state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 1;
 
@@ -2754,7 +2754,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     ScheduleManager::Schedule(1).CurrentValue = 1;
-    OutputReportTabular::displayCO2ResilienceSummary = true;
+    state->dataOutRptTab->displayCO2ResilienceSummary = true;
     state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
@@ -2769,7 +2769,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataDaylightingData->ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
     state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
     state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1) = 400;
-    OutputReportTabular::displayVisualResilienceSummary = true;
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);

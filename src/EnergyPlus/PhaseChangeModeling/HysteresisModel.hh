@@ -51,6 +51,7 @@
 #include <string>
 #include <vector>
 
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -142,6 +143,14 @@ namespace HysteresisPhaseChange {
     void clear_state();
 
 } // namespace HysteresisPhaseChange
+
+struct HysteresisPhaseChangeData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -73,7 +73,9 @@
 ! HVAC:                           The VRF system uses DX cooling and DX heating coils in each of 5 terminal units.
 !                                 Once all terminal units are simulated, the condenser attached to those terminal
 !                                 units is then simulated. The input is partially autosized.
-!                                 Terminal units are set to provide a fixed amount of outdoor air.
+!                                 Terminal units are set to provide a fixed amount of outdoor air. A night cycle
+!                                 availability manager is associated with terminal unit TU1 wihch operates from 7AM to 5PM.
+!                                 TU1 operated during the day and cycles at night as needed. All other TUs operate 24 hrs per day.
 !
 ! Zonal Equipment:                ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
 ! Central Air Handling Equipment: No (uses AirConditioner:VariableRefrigerantFlow condenser object)
@@ -516,11 +518,44 @@
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
     20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
     ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
-    ,                        !- Availability Manager List Name
+    TU1-NightCycleManagerList, !- Availability Manager List Name
     ,                        !- Design Specification ZoneHVAC Sizing Object Name
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
+
+  AvailabilityManagerAssignmentList,
+    TU1-NightCycleManagerList,      !- Name
+    AvailabilityManager:NightCycle, !- Availability Manager Object Type 1
+    TU1-NightCycleManager;          !- Availability Manager Name 1
+
+  AvailabilityManager:NightCycle,
+    TU1-NightCycleManager,         !- Name
+    NightCycleAvailSched,          !- Applicability Schedule Name
+    TU1FanAvailSched,              !- Fan Schedule Name
+    CycleOnControlZone,            !- Control Type
+    0.2,                           !- Thermostat Tolerance {deltaC}
+    ThermostatWithMinimumRuntime,  !- Cycling Run Time Control Type
+    300,                           !- Cycling Run Time {s}
+    SPACE1-1;                      !- Control Zone or Zone List Name
+
+  Schedule:Compact,
+    TU1FanAvailSched,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 7:00, 0.0,        !- Field 3
+    Until: 17:00, 1.0,       !- Field 5
+    Until: 24:00, 0.0;       !- Field 7
+
+  Schedule:Compact,
+    NightCycleAvailSched,    !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 7:00, 1.0,        !- Field 3
+    Until: 17:00, 0.0,       !- Field 5
+    Until: 24:00, 1.0;       !- Field 7
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU2,                     !- Zone Terminal Unit Name
@@ -683,7 +718,7 @@
 
   Fan:SystemModel,
     TU1 VRF Supply Fan,      !- Name
-    VRFAvailSched,           !- Availability Schedule Name
+    TU1FanAvailSched,        !- Availability Schedule Name
     TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
     TU1 Outlet Node,         !- Air Outlet Node Name
     AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}

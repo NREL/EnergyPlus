@@ -67,8 +67,8 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -4627,7 +4627,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesMainVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Volume Flow Rate",
                                  "[m3/s]",
@@ -4638,7 +4638,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Coincident Peak Cooling Mass Flow Rate",
                                  "[kg/s]",
@@ -4649,7 +4649,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Coincident Peak Heating Mass Flow Rate",
                                  "[kg/s]",
@@ -4660,7 +4660,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Noncoincident Peak Cooling Mass Flow Rate",
                                  "[kg/s]",
@@ -4670,7 +4670,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Noncoincident Peak Heating Mass Flow Rate",
                                  "[kg/s]",
@@ -4681,7 +4681,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Heating Volume Flow Rate",
                                  "[m3/s]",
@@ -4692,7 +4692,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Cooling Volume Flow Rate",
                                  "[m3/s]",
@@ -5918,7 +5918,7 @@ namespace SimAirServingZones {
                                             // single-path ventilation system
                                             SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
                                             // Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-                                            LimitZoneVentEff(Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
+                                            LimitZoneVentEff(state, Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
                                         }
                                         if (SysCoolingEv < MinCoolingEvz) MinCoolingEvz = SysCoolingEv;
                                         EvzByZoneCoolPrev(TermUnitSizingIndex) = EvzByZoneCool(TermUnitSizingIndex); // Save previous EvzByZoneCool
@@ -6184,7 +6184,7 @@ namespace SimAirServingZones {
                                             // single-path ventilation system
                                             SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
                                             // Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-                                            LimitZoneVentEff(Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
+                                            LimitZoneVentEff(state, Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
                                         }
                                         if (SysCoolingEv < MinCoolingEvz) MinCoolingEvz = SysCoolingEv;
                                         EvzByZoneCoolPrev(TermUnitSizingIndex) = EvzByZoneCool(TermUnitSizingIndex);
@@ -7738,7 +7738,8 @@ namespace SimAirServingZones {
     //        Utility Subroutines for the SimAir Module
     // *****************************************************************************
 
-    void LimitZoneVentEff(Real64 Xs,               // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+    void LimitZoneVentEff(EnergyPlusData &state,
+                          Real64 Xs,               // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
                           Real64 Voz,              // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
                           int TermUnitSizingIndex, // terminal unit sizing index
                           Real64 &SystemCoolingEv  // system ventilation efficiency
@@ -7794,13 +7795,13 @@ namespace SimAirServingZones {
             }
 
             // Update VRP table entries:
-            PreDefTableEntry(pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
-            PreDefTableEntry(pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
-            PreDefTableEntry(pdchS62zcdVpzmin,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpzmin,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin,
                              4); // Vpz-min
-            PreDefTableEntry(pdchS62zcdZpz,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdZpz,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone,
                              3); // Zpz = Voz/Vpz		}
