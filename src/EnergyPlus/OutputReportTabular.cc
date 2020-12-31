@@ -5136,6 +5136,24 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->WriteTabularFiles) {
+
+            //iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
+            ort->unitsStyle_SQLite = iUnitsStyle::None;
+            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            if (unitSQLiteTable == 0) {
+                ort->unitsStyle_SQLite = iUnitsStyle::None;
+            } else if (unitSQLiteTable == 1) {
+                ort->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
+            } else if (unitSQLiteTable == 2) {
+                ort->unitsStyle_SQLite = iUnitsStyle::JtoMJ;
+            } else if (unitSQLiteTable == 3) {
+                ort->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
+            } else if (unitSQLiteTable == 4) {
+                ort->unitsStyle_SQLite = iUnitsStyle::InchPound;
+            } else {
+                ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            }
+
             // call each type of report in turn
             WriteBEPSTable(state);
             WriteTableOfContents(state);
@@ -8967,42 +8985,42 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayDemandEndUse) {
 
-            iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
-
-            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            if (unitSQLiteTable == 5) {
-                unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            } else if (unitSQLiteTable == 0) {
-                unitsql_unitconv = iUnitsStyle::None;
-            } else if (unitSQLiteTable == 1) {
-                unitsql_unitconv = iUnitsStyle::JtoKWH;
-            } else if (unitSQLiteTable == 2) {
-                unitsql_unitconv = iUnitsStyle::JtoMJ;
-            } else if (unitSQLiteTable == 3) {
-                unitsql_unitconv = iUnitsStyle::JtoGJ;
-            } else if (unitSQLiteTable == 4) {
-                unitsql_unitconv = iUnitsStyle::InchPound;
-            }
+            //iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
+            //// if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            //if (unitSQLiteTable == 5) {
+            //    unitsql_unitconv = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            //} else if (unitSQLiteTable == 0) {
+            //    unitsql_unitconv = iUnitsStyle::None;
+            //} else if (unitSQLiteTable == 1) {
+            //    unitsql_unitconv = iUnitsStyle::JtoKWH;
+            //} else if (unitSQLiteTable == 2) {
+            //    unitsql_unitconv = iUnitsStyle::JtoMJ;
+            //} else if (unitSQLiteTable == 3) {
+            //    unitsql_unitconv = iUnitsStyle::JtoGJ;
+            //} else if (unitSQLiteTable == 4) {
+            //    unitsql_unitconv = iUnitsStyle::InchPound;
+            //}
 
             iUnitsStyle unitsStyle_temp = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                
                 if (iUnitSystem == 0) {
                     produceTabular = true;
-                    if (unitsql_unitconv == ort->unitsStyle) {
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
                     } else {
                         produceSQLite = false;
                     }
                     unitsStyle_temp = ort->unitsStyle;
                 } else { // iUnitSystem == 1
-                    if (unitsql_unitconv == ort->unitsStyle) break;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
 
                     produceTabular = false;
                     produceSQLite = true;
-                    unitsStyle_temp = unitsql_unitconv;
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
                 }
 
                 // show the headers of the report
