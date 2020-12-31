@@ -817,6 +817,7 @@ namespace OutputReportTabular {
 struct OutputReportTabularData : BaseGlobalStruct {
 
     OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
+    OutputReportTabular::iUnitsStyle unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
     int OutputTableBinnedCount = 0;
     int BinResultsTableCount = 0;
     int BinResultsIntervalCount = 0;
@@ -1066,6 +1067,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
+        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
         this->OutputTableBinnedCount = 0;
         this->BinResultsTableCount = 0;
         this->BinResultsIntervalCount = 0;

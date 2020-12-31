@@ -103,6 +103,8 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             int numNumbers;
             int status;
 
+            auto &sql_ort(state.dataOutRptTab);
+
             inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
@@ -115,7 +117,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                     if (numAlphas > 1) {
                         std::string option2 = alphas(2);
                         if (UtilityRoutines::SameString(option2, "None")) {
-                            unitSQLiteTable = 0;
+                            unitSQLiteTable = 0; //sql_ort->unitsStyle_SQLite = EnergyPlus::OutputReportTabular::iUnitsStyle::None; 
                         } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
                             unitSQLiteTable = 1;
                         } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
