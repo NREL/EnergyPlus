@@ -10037,15 +10037,15 @@ namespace EnergyPlus::OutputReportTabular {
         static Array1D<Real64> zstPeople(4);
         static Array1D<Real64> zstPlug(4);
 
-        zstArea = 0.0;
-        zstVolume = 0.0;
-        zstWallArea = 0.0;
-        zstUndWallArea = 0.0;
-        zstWindowArea = 0.0;
-        zstOpeningArea = 0.0;
-        zstLight = 0.0;
-        zstPeople = 0.0;
-        zstPlug = 0.0;
+        //zstArea = 0.0;
+        //zstVolume = 0.0;
+        //zstWallArea = 0.0;
+        //zstUndWallArea = 0.0;
+        //zstWindowArea = 0.0;
+        //zstOpeningArea = 0.0;
+        //zstLight = 0.0;
+        //zstPeople = 0.0;
+        //zstPlug = 0.0;
 
         // misc
         Real64 pdiff;
@@ -10056,667 +10056,799 @@ namespace EnergyPlus::OutputReportTabular {
 
         Array1D<Real64> zoneOpeningArea;
         zoneOpeningArea.allocate(state.dataGlobal->NumOfZones);
-        zoneOpeningArea = 0.0;
+        // zoneOpeningArea = 0.0;
 
         Array1D<Real64> zoneGlassArea;
         zoneGlassArea.allocate(state.dataGlobal->NumOfZones);
-        zoneGlassArea = 0.0;
+        // zoneGlassArea = 0.0;
         auto &ort(state.dataOutRptTab);
 
         // all arrays are in the format: (row, columnm)
         if (ort->displayTabularVeriSum) {
-            // show the headers of the report
-            WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
-            // do unit conversions if necessary
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                SIunit = "[m]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
-                m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[m2]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-                m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[m3]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
-                m3_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[W/m2]";
-                LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
-                Wm2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-            } else {
-                m_unitName = "[m]";
-                m_unitConv = 1.0;
-                m2_unitName = "[m2]";
-                m2_unitConv = 1.0;
-                m3_unitName = "[m3]";
-                m3_unitConv = 1.0;
-                Wm2_unitName = "[W/m2]";
-                Wm2_unitConv = 1.0;
-            }
-            //---- General Sub-Table
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
 
-            // since a variable number of design days is possible, first read them before sizing the arrays
-            rowHead.allocate(10);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 10);
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-            columnHead(1) = "Value";
-            rowHead(1) = "Program Version and Build";
-            rowHead(2) = "RunPeriod";
-            rowHead(3) = "Weather File";
-            rowHead(4) = "Latitude [deg]";
-            rowHead(5) = "Longitude [deg]";
-
-            rowHead(6) = "Elevation " + m_unitName;
-            rowHead(7) = "Time Zone";
-            rowHead(8) = "North Axis Angle [deg]";
-            rowHead(9) = "Rotation for Appendix G [deg]";
-            rowHead(10) = "Hours Simulated [hrs]";
-            //  rowHead(9)  = 'Num Table Entries' !used for debugging
-
-            tableBody = "";
-
-            tableBody(1, 1) = VerString;                               // program
-            tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                         // runperiod name
-            tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;                // weather
-            tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
-            tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
-            tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
-            tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
-            tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
-            tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
-            tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);    // hours simulated
-            //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
-
-            WriteSubtitle(state, "General");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
-            }
-
-            //---- Window Wall Ratio Sub-Table
-            WriteTextLine(state, "ENVELOPE", true);
-
-            rowHead.allocate(5);
-            columnHead.allocate(5);
-            columnWidth.allocate(5);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(5, 5);
-
-            columnHead(wwrcTotal) = "Total";
-            columnHead(wwrcNorth) = "North (315 to 45 deg)";
-            columnHead(wwrcEast) = "East (45 to 135 deg)";
-            columnHead(wwrcSouth) = "South (135 to 225 deg)";
-            columnHead(wwrcWest) = "West (225 to 315 deg)";
-
-            rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-            rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-            rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
-            rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
-            rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
-
-            wallAreaN = 0.0;
-            wallAreaS = 0.0;
-            wallAreaE = 0.0;
-            wallAreaW = 0.0;
-            aboveGroundWallAreaN = 0.0;
-            aboveGroundWallAreaS = 0.0;
-            aboveGroundWallAreaE = 0.0;
-            aboveGroundWallAreaW = 0.0;
-            windowAreaN = 0.0;
-            windowAreaS = 0.0;
-            windowAreaE = 0.0;
-            windowAreaW = 0.0;
-            wallAreaNcond = 0.0;
-            wallAreaScond = 0.0;
-            wallAreaEcond = 0.0;
-            wallAreaWcond = 0.0;
-            aboveGroundWallAreaNcond = 0.0;
-            aboveGroundWallAreaScond = 0.0;
-            aboveGroundWallAreaEcond = 0.0;
-            aboveGroundWallAreaWcond = 0.0;
-            windowAreaNcond = 0.0;
-            windowAreaScond = 0.0;
-            windowAreaEcond = 0.0;
-            windowAreaWcond = 0.0;
-            roofArea = 0.0;
-            skylightArea = 0.0;
-            totLightPower = 0.0;
-            totNumPeople = 0.0;
-            totPlugProcess = 0.0;
-            kOpaque = 0;
-
-            DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
-
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
-                print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
-            }
-
-            for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
-                // only exterior surfaces including underground
-                if (!Surface(iSurf).HeatTransSurf) continue;
-                isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
-                if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
-                    (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
-                    curAzimuth = Surface(iSurf).Azimuth;
-                    // Round to two decimals, like the display in tables
-                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    curArea = Surface(iSurf).GrossArea;
-                    if (Surface(iSurf).FrameDivider != 0) {
-                        frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
-                        frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
-                                    (Surface(iSurf).Height * Surface(iSurf).Width);
-                        curArea += frameArea;
+                if (iUnitSystem == 0) {
+                    unitsStyle_temp = ort->unitsStyle;
+                    produceTabular = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                        produceSQLite = true;
+                    } else {
+                        produceSQLite = false;
                     }
-                    zonePt = Surface(iSurf).Zone;
-                    isConditioned = false;
-                    if (zonePt > 0) {
-                        if (Zone(zonePt).SystemZoneNodeNumber > 0) {
-                            isConditioned = true;
-                        }
-                    }
-                    if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
-                        // vertical walls and windows
-                        {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    wallAreaN += curArea * mult;
-                                    if (isConditioned) wallAreaNcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaN += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    wallAreaE += curArea * mult;
-                                    if (isConditioned) wallAreaEcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaE += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    wallAreaS += curArea * mult;
-                                    if (isConditioned) wallAreaScond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaS += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    wallAreaW += curArea * mult;
-                                    if (isConditioned) wallAreaWcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaW += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
-                                    }
-                                }
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    windowAreaN += curArea * mult;
-                                    if (isConditioned) windowAreaNcond += curArea * mult;
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    windowAreaE += curArea * mult;
-                                    if (isConditioned) windowAreaEcond += curArea * mult;
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    windowAreaS += curArea * mult;
-                                    if (isConditioned) windowAreaScond += curArea * mult;
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    windowAreaW += curArea * mult;
-                                    if (isConditioned) windowAreaWcond += curArea * mult;
-                                }
-                                zoneOpeningArea(zonePt) +=
-                                    curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            }
-                        }
-                    } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
-                        {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                roofArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
-                                skylightArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            }
-                        }
-                    } else { // floors
-                             // ignored
+                } else { // iUnitSystem == 1
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    produceTabular = false;
+                    produceSQLite = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+                }
+
+                // show the headers of the report
+                if (produceTabular == true) {
+                    WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                }
+
+                // Moved these initializations into the loop
+                zstArea = 0.0;
+                zstVolume = 0.0;
+                zstWallArea = 0.0;
+                zstUndWallArea = 0.0;
+                zstWindowArea = 0.0;
+                zstOpeningArea = 0.0;
+                zstLight = 0.0;
+                zstPeople = 0.0;
+                zstPlug = 0.0;
+
+                zoneOpeningArea = 0.0;
+
+                zoneGlassArea = 0.0;
+
+                // do unit conversions if necessary
+                // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                        SIunit = "[m]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
+                    m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[m2]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
+                    m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[m3]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
+                    m3_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[W/m2]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
+                    Wm2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                } else {
+                    m_unitName = "[m]";
+                    m_unitConv = 1.0;
+                    m2_unitName = "[m2]";
+                    m2_unitConv = 1.0;
+                    m3_unitName = "[m3]";
+                    m3_unitConv = 1.0;
+                    Wm2_unitName = "[W/m2]";
+                    Wm2_unitConv = 1.0;
+                }
+                //---- General Sub-Table
+
+                // since a variable number of design days is possible, first read them before sizing the arrays
+                rowHead.allocate(10);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(1, 10);
+
+                columnHead(1) = "Value";
+                rowHead(1) = "Program Version and Build";
+                rowHead(2) = "RunPeriod";
+                rowHead(3) = "Weather File";
+                rowHead(4) = "Latitude [deg]";
+                rowHead(5) = "Longitude [deg]";
+
+                rowHead(6) = "Elevation " + m_unitName;
+                rowHead(7) = "Time Zone";
+                rowHead(8) = "North Axis Angle [deg]";
+                rowHead(9) = "Rotation for Appendix G [deg]";
+                rowHead(10) = "Hours Simulated [hrs]";
+                //  rowHead(9)  = 'Num Table Entries' !used for debugging
+
+                tableBody = "";
+
+                tableBody(1, 1) = VerString;                                             // program
+                tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                      // runperiod name
+                tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;             // weather
+                tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);               // latitude
+                tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);              // longitude
+                tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2); // Elevation
+                tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);         // Time Zone
+                tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);                         // north axis angle
+                tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2);               // Rotation for Appendix G
+                tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);             // hours simulated
+                //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
+
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "General");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                     }
                 }
-            }
+                if (produceTabular == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
+                    }
+                }
 
-            TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
-            TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
-            TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "========================");
-                print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
-                print(state.files.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
-                print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
-                print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
-            }
+                //---- Window Wall Ratio Sub-Table
+                if (produceTabular == true) {
+                    WriteTextLine(state, "ENVELOPE", true);
+                }
 
-            tableBody = "";
+                rowHead.allocate(5);
+                columnHead.allocate(5);
+                columnWidth.allocate(5);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(5, 5);
 
-            tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                columnHead(wwrcTotal) = "Total";
+                columnHead(wwrcNorth) = "North (315 to 45 deg)";
+                columnHead(wwrcEast) = "East (45 to 135 deg)";
+                columnHead(wwrcSouth) = "South (135 to 225 deg)";
+                columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-            tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
+                rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
-            tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                wallAreaN = 0.0;
+                wallAreaS = 0.0;
+                wallAreaE = 0.0;
+                wallAreaW = 0.0;
+                aboveGroundWallAreaN = 0.0;
+                aboveGroundWallAreaS = 0.0;
+                aboveGroundWallAreaE = 0.0;
+                aboveGroundWallAreaW = 0.0;
+                windowAreaN = 0.0;
+                windowAreaS = 0.0;
+                windowAreaE = 0.0;
+                windowAreaW = 0.0;
+                wallAreaNcond = 0.0;
+                wallAreaScond = 0.0;
+                wallAreaEcond = 0.0;
+                wallAreaWcond = 0.0;
+                aboveGroundWallAreaNcond = 0.0;
+                aboveGroundWallAreaScond = 0.0;
+                aboveGroundWallAreaEcond = 0.0;
+                aboveGroundWallAreaWcond = 0.0;
+                windowAreaNcond = 0.0;
+                windowAreaScond = 0.0;
+                windowAreaEcond = 0.0;
+                windowAreaWcond = 0.0;
+                roofArea = 0.0;
+                skylightArea = 0.0;
+                totLightPower = 0.0;
+                totNumPeople = 0.0;
+                totPlugProcess = 0.0;
+                kOpaque = 0;
 
-            tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
-            tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
-            tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
-            tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+                DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
+                if (produceTabular == true) {
+                    if (DetailedWWR) {
+                        print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
+                        print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
+                    }
+                }
 
-            tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
-            tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
-            tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
-            tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+                for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+                    // only exterior surfaces including underground
+                    if (!Surface(iSurf).HeatTransSurf) continue;
+                    isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
+                    if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
+                        (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
+                        curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        curAzimuth = round(curAzimuth * 100.0) / 100.0;
+                        curArea = Surface(iSurf).GrossArea;
+                        if (Surface(iSurf).FrameDivider != 0) {
+                            frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
+                            frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
+                                        (Surface(iSurf).Height * Surface(iSurf).Width);
+                            curArea += frameArea;
+                        }
+                        zonePt = Surface(iSurf).Zone;
+                        isConditioned = false;
+                        if (zonePt > 0) {
+                            if (Zone(zonePt).SystemZoneNodeNumber > 0) {
+                                isConditioned = true;
+                            }
+                        }
+                        if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
+                            // vertical walls and windows
+                            {
+                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                    (SELECT_CASE_var == SurfaceClass::Roof)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                        wallAreaN += curArea * mult;
+                                        if (isConditioned) wallAreaNcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaN += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                        wallAreaE += curArea * mult;
+                                        if (isConditioned) wallAreaEcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaE += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                        wallAreaS += curArea * mult;
+                                        if (isConditioned) wallAreaScond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaS += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                        wallAreaW += curArea * mult;
+                                        if (isConditioned) wallAreaWcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaW += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
+                                        }
+                                    }
+                                    if (produceTabular == true) {
+                                        if (DetailedWWR) {
+                                            print(state.files.debug,
+                                                  "{},Wall,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                        windowAreaN += curArea * mult;
+                                        if (isConditioned) windowAreaNcond += curArea * mult;
+                                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                        windowAreaE += curArea * mult;
+                                        if (isConditioned) windowAreaEcond += curArea * mult;
+                                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                        windowAreaS += curArea * mult;
+                                        if (isConditioned) windowAreaScond += curArea * mult;
+                                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                        windowAreaW += curArea * mult;
+                                        if (isConditioned) windowAreaWcond += curArea * mult;
+                                    }
+                                    zoneOpeningArea(zonePt) +=
+                                        curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                                    zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
+                                    if (produceTabular == true) {
+                                        if (DetailedWWR) {
+                                            print(state.files.debug,
+                                                  "{},Window,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
+                            {
+                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                    (SELECT_CASE_var == SurfaceClass::Roof)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                                    roofArea += curArea * mult;
+                                    if (produceTabular == true) {
+                                        if (DetailedWWR) {
+                                            print(state.files.debug,
+                                                  "{},Roof,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    skylightArea += curArea * mult;
+                                    if (produceTabular == true) {
+                                        if (DetailedWWR) {
+                                            print(state.files.debug,
+                                                  "{},Skylight,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                }
+                            }
+                        } else { // floors
+                                 // ignored
+                        }
+                    }
+                }
 
-            WriteSubtitle(state, "Window-Wall Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
-            }
+                TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
+                TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
+                TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
+                if (produceTabular == true) {
+                    if (DetailedWWR) {
+                        print(state.files.debug, "{}\n", "========================");
+                        print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
+                        print(state.files.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
+                        print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
+                        print(state.files.debug,
+                              "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              TotalWindowArea,
+                              windowAreaN,
+                              windowAreaS,
+                              windowAreaE,
+                              windowAreaW);
+                    }
+                }
 
-            //---- Conditioned Window Wall Ratio Sub-Table
-            rowHead.allocate(5);
-            columnHead.allocate(5);
-            columnWidth.allocate(5);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(5, 5);
+                tableBody = "";
 
-            columnHead(wwrcTotal) = "Total";
-            columnHead(wwrcNorth) = "North (315 to 45 deg)";
-            columnHead(wwrcEast) = "East (45 to 135 deg)";
-            columnHead(wwrcSouth) = "South (135 to 225 deg)";
-            columnHead(wwrcWest) = "West (225 to 315 deg)";
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
 
-            rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-            rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-            rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
-            rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
-            rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
 
-            // calculations appear in last block with normal window-wall ratio table
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
 
-            TotalWallArea = wallAreaNcond + wallAreaScond + wallAreaEcond + wallAreaWcond;
-            TotalAboveGroundWallArea = aboveGroundWallAreaNcond + aboveGroundWallAreaScond + aboveGroundWallAreaEcond + aboveGroundWallAreaWcond;
-            TotalWindowArea = windowAreaNcond + windowAreaScond + windowAreaEcond + windowAreaWcond;
+                tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
+                tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
+                tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
+                tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
+                tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
-            tableBody = "";
+                tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
+                tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
+                tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
+                tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
+                tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-            tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "Window-Wall Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
+                    }
+                }
+                if (produceTabular == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
+                    }
+                }
 
-            tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                //---- Conditioned Window Wall Ratio Sub-Table
+                rowHead.allocate(5);
+                columnHead.allocate(5);
+                columnWidth.allocate(5);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(5, 5);
 
-            tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                columnHead(wwrcTotal) = "Total";
+                columnHead(wwrcNorth) = "North (315 to 45 deg)";
+                columnHead(wwrcEast) = "East (45 to 135 deg)";
+                columnHead(wwrcSouth) = "South (135 to 225 deg)";
+                columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-            tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
-            tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
-            tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
-            tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
+                rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
-            tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
-            tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
-            tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
-            tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+                // calculations appear in last block with normal window-wall ratio table
 
-            WriteSubtitle(state, "Conditioned Window-Wall Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
-            }
+                TotalWallArea = wallAreaNcond + wallAreaScond + wallAreaEcond + wallAreaWcond;
+                TotalAboveGroundWallArea = aboveGroundWallAreaNcond + aboveGroundWallAreaScond + aboveGroundWallAreaEcond + aboveGroundWallAreaWcond;
+                TotalWindowArea = windowAreaNcond + windowAreaScond + windowAreaEcond + windowAreaWcond;
 
-            //---- Skylight Roof Ratio Sub-Table
-            rowHead.allocate(3);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 3);
+                tableBody = "";
 
-            columnHead(1) = "Total";
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
 
-            rowHead(1) = "Gross Roof Area " + m2_unitName;
-            rowHead(2) = "Skylight Area " + m2_unitName;
-            rowHead(3) = "Skylight-Roof Ratio [%]";
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
 
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "========================");
-                print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
-                print(state.files.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
-            }
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
 
-            tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
-            tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
-            tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
+                tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
+                tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
+                tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
+                tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
+                tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
-            WriteSubtitle(state, "Skylight-Roof Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
-            }
+                tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
+                tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
+                tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
+                tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
+                tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-            //---- Hybrid Model: Internal Thermal Mass Sub-Table
-            if (FlagHybridModel_TM) {
-                rowHead.allocate(state.dataGlobal->NumOfZones);
-                NumOfCol = 2;
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "Conditioned Window-Wall Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
+                    }
+                }
+                if (produceTabular == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                    rowHead,
+                                                                                                    columnHead,
+                                                                                                    "Input Verification and Results Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "Conditioned Window-Wall Ratio");
+                    }
+                }
+
+                //---- Skylight Roof Ratio Sub-Table
+                rowHead.allocate(3);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(1, 3);
+
+                columnHead(1) = "Total";
+
+                rowHead(1) = "Gross Roof Area " + m2_unitName;
+                rowHead(2) = "Skylight Area " + m2_unitName;
+                rowHead(3) = "Skylight-Roof Ratio [%]";
+
+                if (produceTabular == true) {
+                    if (DetailedWWR) {
+                        print(state.files.debug, "{}\n", "========================");
+                        print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
+                        print(state.files.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
+                    }
+                }
+
+                tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
+                tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
+                tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
+
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "Skylight-Roof Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
+                    }
+                }
+                if (produceTabular == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
+                    }
+                }
+
+                //---- Hybrid Model: Internal Thermal Mass Sub-Table
+                if (FlagHybridModel_TM) {
+                    rowHead.allocate(state.dataGlobal->NumOfZones);
+                    NumOfCol = 2;
+                    columnHead.allocate(NumOfCol);
+                    columnWidth.allocate(NumOfCol);
+                    columnWidth = 14; // array assignment - same for all columns
+                    tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones);
+
+                    columnHead(1) = "Hybrid Modeling (Y/N)";
+                    columnHead(2) = "Temperature Capacitance Multiplier ";
+
+                    rowHead = "";
+                    tableBody = "";
+
+                    for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        rowHead(iZone) = Zone(iZone).Name;
+                        if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
+                            tableBody(1, iZone) = "Yes";
+                        } else {
+                            tableBody(1, iZone) = "No";
+                        }
+                        tableBody(2, iZone) = RealToStr(Zone(iZone).ZoneVolCapMultpSensHMAverage, 2);
+                    }
+
+                    if (produceTabular == true) {
+                        WriteSubtitle(state, "Hybrid Model: Internal Thermal Mass");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite == true) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "InputVerificationandResultsSummary",
+                                                                   "Entire Facility",
+                                                                   "Hybrid Model: Internal Thermal Mass");
+                        }
+                    }
+                }
+
+                Real64 const totExtGrossWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossWallArea_Multiplied));
+                Real64 const totExtGrossGroundWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied));
+                if (totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0) {
+                    pdiff = std::abs((wallAreaN + wallAreaS + wallAreaE + wallAreaW) -
+                                     (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
+                            (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
+                    if (pdiff > 0.019) {
+                        if (produceTabular == true) {
+                            ShowWarningError(
+                                state,
+                                "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
+                            ShowContinueError(state,
+                                              format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE "
+                                                     "90.1 wall definitions.",
+                                                     pdiff * 100.0));
+                            //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
+                            //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
+                            //         '] m2, Calculated from user entered Wall class surfaces=['//  &
+                            //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:state.dataGlobal->NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
+                            ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
+                            ShowContinueError(state,
+                                              "Total wall area by ASHRAE 90.1 definition=" +
+                                                  stripped(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW), 3)) + " m2.");
+                            ShowContinueError(state,
+                                              "Total exterior wall area from user entered classes=" +
+                                                  stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) + " m2.");
+                            ShowContinueError(state,
+                                              "Total ground contact wall area from user entered classes=" +
+                                                  stripped(RealToStr(totExtGrossGroundWallArea_Multiplied, 3)) + " m2.");
+                        }
+                    }
+                }
+                //---- Space Summary Sub-Table
+                if (produceTabular == true) {
+                    WriteTextLine(state, "PERFORMANCE", true);
+                }
+
+                rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+                NumOfCol = 12;
                 columnHead.allocate(NumOfCol);
                 columnWidth.allocate(NumOfCol);
                 columnWidth = 14; // array assignment - same for all columns
-                tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones);
+                tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones + 4);
 
-                columnHead(1) = "Hybrid Modeling (Y/N)";
-                columnHead(2) = "Temperature Capacitance Multiplier ";
+                columnHead(1) = "Area " + m2_unitName;
+                columnHead(2) = "Conditioned (Y/N)";
+                columnHead(3) = "Part of Total Floor Area (Y/N)";
+                columnHead(4) = "Volume " + m3_unitName;
+                columnHead(5) = "Multipliers";
+                columnHead(6) = "Above Ground Gross Wall Area " + m2_unitName;
+                columnHead(7) = "Underground Gross Wall Area " + m2_unitName;
+                columnHead(8) = "Window Glass Area " + m2_unitName;
+                columnHead(9) = "Opening Area " + m2_unitName;
+                columnHead(10) = "Lighting " + Wm2_unitName;
+                columnHead(11) = "People " + m2_unitName.substr(0, len(m2_unitName) - 1) + " per person" + m2_unitName[len(m2_unitName) - 1];
+                columnHead(12) = "Plug and Process " + Wm2_unitName;
 
                 rowHead = "";
+                rowHead(state.dataGlobal->NumOfZones + grandTotal) = "Total";
+                rowHead(state.dataGlobal->NumOfZones + condTotal) = "Conditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + uncondTotal) = "Unconditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + notpartTotal) = "Not Part of Total";
+
                 tableBody = "";
 
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                    mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                     rowHead(iZone) = Zone(iZone).Name;
-                    if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
-                        tableBody(1, iZone) = "Yes";
+                    // Conditioned or not
+                    if (Zone(iZone).SystemZoneNodeNumber > 0) {
+                        tableBody(2, iZone) = "Yes";
+                        zoneIsCond = true;
                     } else {
-                        tableBody(1, iZone) = "No";
+                        tableBody(2, iZone) = "No";
+                        zoneIsCond = false;
                     }
-                    tableBody(2, iZone) = RealToStr(Zone(iZone).ZoneVolCapMultpSensHMAverage, 2);
-                }
-
-                WriteSubtitle(state, "Hybrid Model: Internal Thermal Mass");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "InputVerificationandResultsSummary",
-                                                           "Entire Facility",
-                                                           "Hybrid Model: Internal Thermal Mass");
-                }
-            }
-
-            Real64 const totExtGrossWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossWallArea_Multiplied));
-            Real64 const totExtGrossGroundWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied));
-            if (totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0) {
-                pdiff = std::abs((wallAreaN + wallAreaS + wallAreaE + wallAreaW) -
-                                 (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
-                        (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
-                if (pdiff > 0.019) {
-                    ShowWarningError(state,
-                        "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
-                    ShowContinueError(
-                        state,
-                        format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.",
-                               pdiff * 100.0));
-                    //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
-                    //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
-                    //         '] m2, Calculated from user entered Wall class surfaces=['//  &
-                    //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:state.dataGlobal->NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
-                    ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
-                    ShowContinueError(state, "Total wall area by ASHRAE 90.1 definition=" +
-                                      stripped(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW), 3)) + " m2.");
-                    ShowContinueError(state, "Total exterior wall area from user entered classes=" + stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) +
-                                      " m2.");
-                    ShowContinueError(state, "Total ground contact wall area from user entered classes=" +
-                                      stripped(RealToStr(totExtGrossGroundWallArea_Multiplied, 3)) + " m2.");
-                }
-            }
-            //---- Space Summary Sub-Table
-            WriteTextLine(state, "PERFORMANCE", true);
-
-            rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-            NumOfCol = 12;
-            columnHead.allocate(NumOfCol);
-            columnWidth.allocate(NumOfCol);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones + 4);
-
-            columnHead(1) = "Area " + m2_unitName;
-            columnHead(2) = "Conditioned (Y/N)";
-            columnHead(3) = "Part of Total Floor Area (Y/N)";
-            columnHead(4) = "Volume " + m3_unitName;
-            columnHead(5) = "Multipliers";
-            columnHead(6) = "Above Ground Gross Wall Area " + m2_unitName;
-            columnHead(7) = "Underground Gross Wall Area " + m2_unitName;
-            columnHead(8) = "Window Glass Area " + m2_unitName;
-            columnHead(9) = "Opening Area " + m2_unitName;
-            columnHead(10) = "Lighting " + Wm2_unitName;
-            columnHead(11) = "People " + m2_unitName.substr(0, len(m2_unitName) - 1) + " per person" + m2_unitName[len(m2_unitName) - 1];
-            columnHead(12) = "Plug and Process " + Wm2_unitName;
-
-            rowHead = "";
-            rowHead(state.dataGlobal->NumOfZones + grandTotal) = "Total";
-            rowHead(state.dataGlobal->NumOfZones + condTotal) = "Conditioned Total";
-            rowHead(state.dataGlobal->NumOfZones + uncondTotal) = "Unconditioned Total";
-            rowHead(state.dataGlobal->NumOfZones + notpartTotal) = "Not Part of Total";
-
-            tableBody = "";
-
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                rowHead(iZone) = Zone(iZone).Name;
-                // Conditioned or not
-                if (Zone(iZone).SystemZoneNodeNumber > 0) {
-                    tableBody(2, iZone) = "Yes";
-                    zoneIsCond = true;
-                } else {
-                    tableBody(2, iZone) = "No";
-                    zoneIsCond = false;
-                }
-                // Part of Total Floor Area or not
-                if (Zone(iZone).isPartOfTotalArea) {
-                    tableBody(3, iZone) = "Yes";
-                    usezoneFloorArea = true;
-                } else {
-                    tableBody(3, iZone) = "No";
-                    usezoneFloorArea = false;
-                }
-                tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
-                tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
-                // no unit conversion necessary since done automatically
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                if (zoneIsCond) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
-                } else {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                }
-                tableBody(5, iZone) = RealToStr(mult, 2);
-                tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
-                tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
-                tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * m2_unitConv, 2);
-                tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
-                // lighting density
-                totLightPower = 0.0;
-                for (iLight = 1; iLight <= TotLights; ++iLight) {
-                    if (iZone == Lights(iLight).ZonePtr) {
-                        totLightPower += Lights(iLight).DesignLevel;
+                    // Part of Total Floor Area or not
+                    if (Zone(iZone).isPartOfTotalArea) {
+                        tableBody(3, iZone) = "Yes";
+                        usezoneFloorArea = true;
+                    } else {
+                        tableBody(3, iZone) = "No";
+                        usezoneFloorArea = false;
                     }
-                }
-                if (Zone(iZone).FloorArea > 0) {
-                    tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
-                }
-                // people density
-                totNumPeople = 0.0;
-                for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                    if (iZone == People(iPeople).ZonePtr) {
-                        totNumPeople += People(iPeople).NumberOfPeople;
+                    tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
+                    tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
+                    // no unit conversion necessary since done automatically
+                    if (produceTabular == true) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                     }
-                }
-                if (totNumPeople > 0) {
-                    tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv / totNumPeople, 2);
-                }
-                // plug and process density
-                totPlugProcess = 0.0;
-                for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
-                    if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
-                    if (iZone == ZoneGas(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
-                    if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
-                    if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
-                    }
-                }
-                if (Zone(iZone).FloorArea > 0) {
-                    tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
-                }
-
-                // total rows for Total / Not Part of Total
-                // In "Total": break between conditioned/unconditioned
-
-                // If not part of total, goes directly to this row
-                if (!usezoneFloorArea) {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
-                } else {
-                    // Add it to the 'Total'
-                    zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(grandTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(grandTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(grandTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(grandTotal) += mult * totLightPower;
-                    zstPeople(grandTotal) += mult * totNumPeople;
-                    zstPlug(grandTotal) += mult * totPlugProcess;
-
-                    // Subtotal between cond/unconditioned
                     if (zoneIsCond) {
-                        zstArea(condTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(condTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(condTotal) += mult * totLightPower;
-                        zstPeople(condTotal) += mult * totNumPeople;
-                        zstPlug(condTotal) += mult * totPlugProcess;
-                    } else if (!zoneIsCond) {
-                        zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(uncondTotal) += mult * totLightPower;
-                        zstPeople(uncondTotal) += mult * totNumPeople;
-                        zstPlug(uncondTotal) += mult * totPlugProcess;
+                        if (produceTabular == true) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
+                        }
+                    } else {
+                        if (produceTabular == true) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                        }
+                    }
+                    tableBody(5, iZone) = RealToStr(mult, 2);
+                    tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
+                    tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
+                    tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * m2_unitConv, 2);
+                    tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
+                    // lighting density
+                    totLightPower = 0.0;
+                    for (iLight = 1; iLight <= TotLights; ++iLight) {
+                        if (iZone == Lights(iLight).ZonePtr) {
+                            totLightPower += Lights(iLight).DesignLevel;
+                        }
+                    }
+                    if (Zone(iZone).FloorArea > 0) {
+                        tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
+                    }
+                    // people density
+                    totNumPeople = 0.0;
+                    for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                        if (iZone == People(iPeople).ZonePtr) {
+                            totNumPeople += People(iPeople).NumberOfPeople;
+                        }
+                    }
+                    if (totNumPeople > 0) {
+                        tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv / totNumPeople, 2);
+                    }
+                    // plug and process density
+                    totPlugProcess = 0.0;
+                    for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
+                        if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
+                        if (iZone == ZoneGas(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
+                        if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
+                        if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
+                        }
+                    }
+                    if (Zone(iZone).FloorArea > 0) {
+                        tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
+                    }
+
+                    // total rows for Total / Not Part of Total
+                    // In "Total": break between conditioned/unconditioned
+
+                    // If not part of total, goes directly to this row
+                    if (!usezoneFloorArea) {
+                        zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(notpartTotal) += mult * totLightPower;
+                        zstPeople(notpartTotal) += mult * totNumPeople;
+                        zstPlug(notpartTotal) += mult * totPlugProcess;
+                    } else {
+                        // Add it to the 'Total'
+                        zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(grandTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(grandTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(grandTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(grandTotal) += mult * totLightPower;
+                        zstPeople(grandTotal) += mult * totNumPeople;
+                        zstPlug(grandTotal) += mult * totPlugProcess;
+
+                        // Subtotal between cond/unconditioned
+                        if (zoneIsCond) {
+                            zstArea(condTotal) += mult * Zone(iZone).FloorArea;
+                            zstVolume(condTotal) += mult * Zone(iZone).Volume;
+                            zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
+                            zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
+                            zstLight(condTotal) += mult * totLightPower;
+                            zstPeople(condTotal) += mult * totNumPeople;
+                            zstPlug(condTotal) += mult * totPlugProcess;
+                        } else if (!zoneIsCond) {
+                            zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
+                            zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
+                            zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
+                            zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
+                            zstLight(uncondTotal) += mult * totLightPower;
+                            zstPeople(uncondTotal) += mult * totNumPeople;
+                            zstPlug(uncondTotal) += mult * totPlugProcess;
+                        }
                     }
                 }
-            }
-            for (iTotal = 1; iTotal <= 4; ++iTotal) {
-                tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv, 2);
-                tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstVolume(iTotal) * m3_unitConv, 2);
-                tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWallArea(iTotal) * m2_unitConv, 2);
-                tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstUndWallArea(iTotal) * m2_unitConv, 2);
-                tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWindowArea(iTotal) * m2_unitConv, 2);
-                tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstOpeningArea(iTotal) * m2_unitConv, 2);
-                if (zstArea(iTotal) != 0) {
-                    tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstLight(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
-                    tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstPlug(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                for (iTotal = 1; iTotal <= 4; ++iTotal) {
+                    tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv, 2);
+                    tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstVolume(iTotal) * m3_unitConv, 2);
+                    tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWallArea(iTotal) * m2_unitConv, 2);
+                    tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstUndWallArea(iTotal) * m2_unitConv, 2);
+                    tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWindowArea(iTotal) * m2_unitConv, 2);
+                    tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstOpeningArea(iTotal) * m2_unitConv, 2);
+                    if (zstArea(iTotal) != 0) {
+                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstLight(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstPlug(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                    }
+                    if (zstPeople(iTotal) != 0) {
+                        tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
+                    }
                 }
-                if (zstPeople(iTotal) != 0) {
-                    tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
+                if (produceTabular == true) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
                 }
-            }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
 
-            WriteSubtitle(state, "Zone Summary");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "Zone Summary");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
+                    }
+                }
+                if (produceSQLite == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                    }
+                }
             }
         }
     }
