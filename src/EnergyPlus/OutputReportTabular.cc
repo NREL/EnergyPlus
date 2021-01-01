@@ -10843,7 +10843,7 @@ namespace EnergyPlus::OutputReportTabular {
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
                     }
                 }
-                if (produceSQLite == true) {
+                if (produceTabular == true) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
