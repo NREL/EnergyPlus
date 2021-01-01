@@ -8780,309 +8780,360 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displaySourceEnergyEndUseSummary) {
-            // show the headers of the report
-            WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            // show the number of hours that the table applies to
-            WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
-            if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
-                WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
-            }
-            WriteTextLine(state, "", true);
-            // determine building floor areas
-            DetermineBuildingFloorArea(state);
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
-                collapsedEndUse(12, jEndUse) =
-                    ort->gatherEndUseBySourceBEPS(4, jEndUse) + ort->gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
-                collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse);             // water
-            }
-            // repeat with totals
-            collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);                                // electricity
-            collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);                                // natural gas
-            collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);                                // gasoline
-            collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);                                // diesel
-            collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);                                // coal
-            collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);                               // Fuel Oil No1
-            collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);                               // Fuel Oil No2
-            collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);                               // propane
-            collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);                               // otherfuel1
-            collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14);                              // otherfuel2
-            collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);                               // district cooling <- purchased cooling
-            collapsedTotal(12) = ort->gatherTotalsBySourceBEPS(4) + ort->gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
-            collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(7);                               // water
+            
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
 
-            // unit conversion - all values are used as divisors
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000.0; // to MJ
-                    areaConversionFactor = 1.0;
+                if (iUnitSystem == 0) {
+                    unitsStyle_temp = ort->unitsStyle;
+                    produceTabular = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                        produceSQLite = true;
+                    } else {
+                        produceSQLite = false;
+                    }
+                } else { // iUnitSystem == 1
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    produceTabular = false;
+                    produceSQLite = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
                 }
-            }
 
-            // convert units into MJ (divide by 1,000,000) if J otherwise kWh
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                if (produceTabular == true) {
+                    // show the headers of the report
+                    WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                    // show the number of hours that the table applies to
+                    WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
+                    if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
+                        WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
+                    }
+                    WriteTextLine(state, "", true);
+                }
+                // determine building floor areas
+                DetermineBuildingFloorArea(state);
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                    collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
+                    collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
+                    collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
+                    collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
+                    collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
+                    collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
+                    collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
+                    collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
+                    collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
+                    collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
+                    collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
+                    collapsedEndUse(12, jEndUse) = ort->gatherEndUseBySourceBEPS(4, jEndUse) +
+                                                   ort->gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
+                    collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse); // water
                 }
-                collapsedTotal(iResource) /= largeConversionFactor;
-            }
+                // repeat with totals
+                collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);   // electricity
+                collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);   // natural gas
+                collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);   // gasoline
+                collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);   // diesel
+                collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);   // coal
+                collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);  // Fuel Oil No1
+                collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);  // Fuel Oil No2
+                collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);  // propane
+                collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);  // otherfuel1
+                collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14); // otherfuel2
+                collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);  // district cooling <- purchased cooling
+                collapsedTotal(12) =
+                    ort->gatherTotalsBySourceBEPS(4) + ort->gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
+                collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(7);                   // water
 
-            rowHead.allocate(16);
-            columnHead.allocate(12);
-            columnWidth.allocate(12);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(12, 16);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                // unit conversion - all values are used as divisors
 
-                useVal(iResource, 15) = collapsedTotal(iResource); // totals
-            }
-
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
-            rowHead(15) = "";
-            rowHead(16) = "Total Source Energy End Use Components";
-
-            largeConversionFactor = 1.0;
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh]";
-                    columnHead(2) = "Source Natural Gas [kWh]";
-                    columnHead(3) = "Source Gasoline [kWh]";
-                    columnHead(4) = "Source Diesel [kWh]";
-                    columnHead(5) = "Source Coal [kWh]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Source Propane [kWh]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh]";
-                    columnHead(11) = "Source District Cooling [kWh]";
-                    columnHead(12) = "Source District Heating [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu]";
-                    columnHead(2) = "Source Natural Gas [kBtu]";
-                    columnHead(3) = "Source Gasoline [kBtu]";
-                    columnHead(4) = "Source Diesel [kBtu]";
-                    columnHead(5) = "Source Coal [kBtu]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Source Propane [kBtu]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu]";
-                    columnHead(11) = "Source District Cooling [kBtu]";
-                    columnHead(12) = "Source District Heating [kBtu]";
-                } else {
-                    columnHead(1) = "Source Electricity [GJ]";
-                    columnHead(2) = "Source Natural Gas [GJ]";
-                    columnHead(3) = "Source Gasoline [GJ]";
-                    columnHead(4) = "Source Diesel [GJ]";
-                    columnHead(5) = "Source Coal [GJ]";
-                    columnHead(6) = "Source Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Source Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Source Propane [GJ]";
-                    columnHead(9) = "Source Other Fuel 1 [GJ]";
-                    columnHead(10) = "Source Other Fuel 2 [GJ]";
-                    columnHead(11) = "Source District Cooling [GJ]";
-                    columnHead(12) = "Source District Heating [GJ]";
-                    largeConversionFactor = 1000.0; // for converting MJ to GJ
-                }
-            }
-
-            //---- End Uses by Source Energy Sub-Table
-
-            tableBody = "";
-            for (iResource = 1; iResource <= 12; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                    tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
-                }
-                tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
-            }
-
-            // heading for the entire sub-table
-            WriteSubtitle(state, "Source Energy End Use Components Summary");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Components Summary");
-            }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Source Energy End Use Components Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Source Energy End Use Components Summary");
-            }
-
-            // Normalized by Area tables
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh/m2]";
-                    columnHead(2) = "Source Natural Gas [kWh/m2]";
-                    columnHead(3) = "Source Gasoline [kWh/m2]";
-                    columnHead(4) = "Source Diesel [kWh/m2]";
-                    columnHead(5) = "Source Coal [kWh/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
-                    columnHead(8) = "Source Propane [kWh/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
-                    columnHead(11) = "Source District Cooling [kWh/m2]";
-                    columnHead(12) = "Source District Heating [kWh/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu/ft2]";
-                    columnHead(2) = "Source Natural Gas [kBtu/ft2]";
-                    columnHead(3) = "Source Gasoline [kBtu/ft2]";
-                    columnHead(4) = "Source Diesel [kBtu/ft2]";
-                    columnHead(5) = "Source Coal [kBtu/ft2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
-                    columnHead(8) = "Source Propane [kBtu/ft2]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
-                    columnHead(11) = "Source District Cooling [kBtu/ft2]";
-                    columnHead(12) = "Source District Heating [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Source Electricity [MJ/m2]";
-                    columnHead(2) = "Source Natural Gas [MJ/m2]";
-                    columnHead(3) = "Source Gasoline [MJ/m2]";
-                    columnHead(4) = "Source Diesel [MJ/m2]";
-                    columnHead(5) = "Source Coal [MJ/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
-                    columnHead(8) = "Source Propane [MJ/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
-                    columnHead(11) = "Source District Cooling [MJ/m2]";
-                    columnHead(12) = "Source District Heating [MJ/m2]";
-                }
-            }
-
-            //---- Normalized by Conditioned Area Sub-Table
-            {
-                tableBody = "";
-                // convert floor area
-                Real64 convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
-                if (convBldgCondFloorArea > 0) {
-                    for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
-                        }
-                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
+                {
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        largeConversionFactor = 3600000.0;
+                        areaConversionFactor = 1.0;
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                        areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+                    } else {
+                        largeConversionFactor = 1000000.0; // to MJ
+                        areaConversionFactor = 1.0;
                     }
                 }
 
-                WriteTextLine(state, "Normalized Metrics", true);
-
-                // heading for the entire sub-table
-                WriteSubtitle(state, "Source Energy End Use Components Per Conditioned Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "SourceEnergyEndUseComponentsSummary",
-                                                           "Entire Facility",
-                                                           "Source Energy End Use Component Per Conditioned Floor Area");
+                // convert units into MJ (divide by 1,000,000) if J otherwise kWh
+                for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                    }
+                    collapsedTotal(iResource) /= largeConversionFactor;
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody,
-                        rowHead,
-                        columnHead,
-                        "Source Energy End Use Components Summary",
-                        "Entire Facility",
-                        "Source Energy End Use Component Per Conditioned Floor Area");
+
+                rowHead.allocate(16);
+                columnHead.allocate(12);
+                columnWidth.allocate(12);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(12, 16);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 5) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                    useVal(iResource, 6) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+
+                    useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
-            } // End of Normalized by Conditioned Area
 
-            //---- Normalized by Total Area Sub-Table
-            {
-                tableBody = "";
-                Real64 convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
+                rowHead(1) = "Heating";
+                rowHead(2) = "Cooling";
+                rowHead(3) = "Interior Lighting";
+                rowHead(4) = "Exterior Lighting";
+                rowHead(5) = "Interior Equipment";
+                rowHead(6) = "Exterior Equipment";
+                rowHead(7) = "Fans";
+                rowHead(8) = "Pumps";
+                rowHead(9) = "Heat Rejection";
+                rowHead(10) = "Humidification";
+                rowHead(11) = "Heat Recovery";
+                rowHead(12) = "Water Systems";
+                rowHead(13) = "Refrigeration";
+                rowHead(14) = "Generators";
+                rowHead(15) = "";
+                rowHead(16) = "Total Source Energy End Use Components";
 
-                if (convBldgGrossFloorArea > 0) {
-                    for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
-                        }
-                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                largeConversionFactor = 1.0;
+
+                {
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Source Electricity [kWh]";
+                        columnHead(2) = "Source Natural Gas [kWh]";
+                        columnHead(3) = "Source Gasoline [kWh]";
+                        columnHead(4) = "Source Diesel [kWh]";
+                        columnHead(5) = "Source Coal [kWh]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+                        columnHead(8) = "Source Propane [kWh]";
+                        columnHead(9) = "Source Other Fuel 1 [kWh]";
+                        columnHead(10) = "Source Other Fuel 2 [kWh]";
+                        columnHead(11) = "Source District Cooling [kWh]";
+                        columnHead(12) = "Source District Heating [kWh]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Source Electricity [kBtu]";
+                        columnHead(2) = "Source Natural Gas [kBtu]";
+                        columnHead(3) = "Source Gasoline [kBtu]";
+                        columnHead(4) = "Source Diesel [kBtu]";
+                        columnHead(5) = "Source Coal [kBtu]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+                        columnHead(8) = "Source Propane [kBtu]";
+                        columnHead(9) = "Source Other Fuel 1 [kBtu]";
+                        columnHead(10) = "Source Other Fuel 2 [kBtu]";
+                        columnHead(11) = "Source District Cooling [kBtu]";
+                        columnHead(12) = "Source District Heating [kBtu]";
+                    } else {
+                        columnHead(1) = "Source Electricity [GJ]";
+                        columnHead(2) = "Source Natural Gas [GJ]";
+                        columnHead(3) = "Source Gasoline [GJ]";
+                        columnHead(4) = "Source Diesel [GJ]";
+                        columnHead(5) = "Source Coal [GJ]";
+                        columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+                        columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+                        columnHead(8) = "Source Propane [GJ]";
+                        columnHead(9) = "Source Other Fuel 1 [GJ]";
+                        columnHead(10) = "Source Other Fuel 2 [GJ]";
+                        columnHead(11) = "Source District Cooling [GJ]";
+                        columnHead(12) = "Source District Heating [GJ]";
+                        largeConversionFactor = 1000.0; // for converting MJ to GJ
                     }
                 }
 
-                // heading for the entire sub-table
-                WriteSubtitle(state, "Source Energy End Use Components Per Total Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "SourceEnergyEndUseComponentsSummary",
-                                                           "Entire Facility",
-                                                           "Source Energy End Use Components Per Total Floor Area");
-                }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Source Energy End Use Components Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Source Energy End Use Components Per Total Floor Area");
-                }
-            } // End of Normalized by Total Area
+                //---- End Uses by Source Energy Sub-Table
 
+                tableBody = "";
+                for (iResource = 1; iResource <= 12; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
+                    }
+                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
+                }
+
+                // heading for the entire sub-table
+                if (produceTabular == true) {
+                    WriteSubtitle(state, "Source Energy End Use Components Summary");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite == true) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                               rowHead,
+                                                               columnHead,
+                                                               "SourceEnergyEndUseComponentsSummary",
+                                                               "Entire Facility",
+                                                               "Source Energy End Use Components Summary");
+                    }
+                }
+                if (produceTabular == true) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                    rowHead,
+                                                                                                    columnHead,
+                                                                                                    "Source Energy End Use Components Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "Source Energy End Use Components Summary");
+                    }
+                }
+
+                // Normalized by Area tables
+
+                {
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Source Electricity [kWh/m2]";
+                        columnHead(2) = "Source Natural Gas [kWh/m2]";
+                        columnHead(3) = "Source Gasoline [kWh/m2]";
+                        columnHead(4) = "Source Diesel [kWh/m2]";
+                        columnHead(5) = "Source Coal [kWh/m2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
+                        columnHead(8) = "Source Propane [kWh/m2]";
+                        columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
+                        columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
+                        columnHead(11) = "Source District Cooling [kWh/m2]";
+                        columnHead(12) = "Source District Heating [kWh/m2]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Source Electricity [kBtu/ft2]";
+                        columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+                        columnHead(3) = "Source Gasoline [kBtu/ft2]";
+                        columnHead(4) = "Source Diesel [kBtu/ft2]";
+                        columnHead(5) = "Source Coal [kBtu/ft2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+                        columnHead(8) = "Source Propane [kBtu/ft2]";
+                        columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+                        columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+                        columnHead(11) = "Source District Cooling [kBtu/ft2]";
+                        columnHead(12) = "Source District Heating [kBtu/ft2]";
+                    } else {
+                        columnHead(1) = "Source Electricity [MJ/m2]";
+                        columnHead(2) = "Source Natural Gas [MJ/m2]";
+                        columnHead(3) = "Source Gasoline [MJ/m2]";
+                        columnHead(4) = "Source Diesel [MJ/m2]";
+                        columnHead(5) = "Source Coal [MJ/m2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
+                        columnHead(8) = "Source Propane [MJ/m2]";
+                        columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
+                        columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
+                        columnHead(11) = "Source District Cooling [MJ/m2]";
+                        columnHead(12) = "Source District Heating [MJ/m2]";
+                    }
+                }
+
+                //---- Normalized by Conditioned Area Sub-Table
+                {
+                    tableBody = "";
+                    // convert floor area
+                    Real64 convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
+                    if (convBldgCondFloorArea > 0) {
+                        for (iResource = 1; iResource <= 12; ++iResource) {
+                            for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                                tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                            }
+                            tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
+                        }
+                    }
+
+                    if (produceTabular == true) {
+                        WriteTextLine(state, "Normalized Metrics", true);
+                    }
+
+                    // heading for the entire sub-table
+                    if (produceTabular == true) {
+                        WriteSubtitle(state, "Source Energy End Use Components Per Conditioned Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite == true) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "SourceEnergyEndUseComponentsSummary",
+                                                                   "Entire Facility",
+                                                                   "Source Energy End Use Component Per Conditioned Floor Area");
+                        }
+                    }
+                    if (produceTabular == true) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Source Energy End Use Components Summary",
+                                "Entire Facility",
+                                "Source Energy End Use Component Per Conditioned Floor Area");
+                        }
+                    }
+                } // End of Normalized by Conditioned Area
+
+                //---- Normalized by Total Area Sub-Table
+                {
+                    tableBody = "";
+                    Real64 convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
+
+                    if (convBldgGrossFloorArea > 0) {
+                        for (iResource = 1; iResource <= 12; ++iResource) {
+                            for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                                tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
+                            }
+                            tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                        }
+                    }
+
+                    // heading for the entire sub-table
+                    if (produceTabular == true) {
+                        WriteSubtitle(state, "Source Energy End Use Components Per Total Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite == true) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "SourceEnergyEndUseComponentsSummary",
+                                                                   "Entire Facility",
+                                                                   "Source Energy End Use Components Per Total Floor Area");
+                        }
+                    }
+                    if (produceTabular == true) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Source Energy End Use Components Summary",
+                                "Entire Facility",
+                                "Source Energy End Use Components Per Total Floor Area");
+                        }
+                    }
+                } // End of Normalized by Total Area
+            }
         } // end if displaySourceEnergyEndUseSummary
     }
 
