@@ -9742,190 +9742,237 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!state.dataCostEstimateManager->DoCostEstimate) return;
 
-        WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        bool produceTabular = true;
+        bool produceSQLite = false;
 
-        // compute floor area if no ABUPS
-        if (ort->buildingConditionedFloorArea == 0.0) {
-            DetermineBuildingFloorArea(state);
-        }
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-        // 1st sub-table with total Costs and normalized with area
-        rowHead.allocate(10);
-        columnHead.allocate(3);
-        columnWidth.allocate(3);
-        columnWidth = 14; // array assignment - same for all columns
-        tableBody.allocate(3, 10);
+            if (iUnitSystem == 0) {
+                unitsStyle_temp = ort->unitsStyle;
+                produceTabular = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                    produceSQLite = true;
+                } else {
+                    produceSQLite = false;
+                }
+            } else { // iUnitSystem == 1
+                unitsStyle_temp = ort->unitsStyle_SQLite;
+                produceTabular = false;
+                produceSQLite = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+            }
 
-        columnHead(1) = "Reference Bldg.";
-        columnHead(2) = "Current Bldg. Model";
-        columnHead(3) = "Difference";
+            if (produceTabular == true) {
+                WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            }
 
-        rowHead(1) = "Line Item SubTotal (~~$~~)";
-        rowHead(2) = "Misc. Costs (~~$~~)";
-        rowHead(3) = "Regional Adjustment (~~$~~)";
-        rowHead(4) = "Design Fee (~~$~~)";
-        rowHead(5) = "Contractor Fee (~~$~~)";
-        rowHead(6) = "Contingency (~~$~~)";
-        rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
-        rowHead(8) = "Commissioning (~~$~~)";
-        rowHead(9) = "Cost Estimate Total (~~$~~)";
-        if (ort->unitsStyle == iUnitsStyle::InchPound) {
-            SIunit = "[m2]";
-            LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-            m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
-        } else {
-            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
-            m2_unitConv = 1.0;
-        }
-        TableBodyData = 0.0;
-        tableBody = "";
+            // compute floor area if no ABUPS
+            if (ort->buildingConditionedFloorArea == 0.0) {
+                DetermineBuildingFloorArea(state);
+            }
 
-        TableBodyData(1, 1) = state.dataCostEstimateManager->RefrncBldg.LineItemTot;
-        tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
-        TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
-        tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
+            // 1st sub-table with total Costs and normalized with area
+            rowHead.allocate(10);
+            columnHead.allocate(3);
+            columnWidth.allocate(3);
+            columnWidth = 14; // array assignment - same for all columns
+            tableBody.allocate(3, 10);
 
-        if (state.dataCostEstimateManager->RefrncBldg.RegionalModifier != 1.0) {
-            TableBodyData(1, 3) =
-                (state.dataCostEstimateManager->RefrncBldg.LineItemTot + state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) * (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
-        } else {
-            TableBodyData(1, 3) = 0.0;
-        }
+            columnHead(1) = "Reference Bldg.";
+            columnHead(2) = "Current Bldg. Model";
+            columnHead(3) = "Difference";
 
-        RefBldgConstCost = sum(TableBodyData(1, {1, 3}));
+            rowHead(1) = "Line Item SubTotal (~~$~~)";
+            rowHead(2) = "Misc. Costs (~~$~~)";
+            rowHead(3) = "Regional Adjustment (~~$~~)";
+            rowHead(4) = "Design Fee (~~$~~)";
+            rowHead(5) = "Contractor Fee (~~$~~)";
+            rowHead(6) = "Contingency (~~$~~)";
+            rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
+            rowHead(8) = "Commissioning (~~$~~)";
+            rowHead(9) = "Cost Estimate Total (~~$~~)";
+            // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+            if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                    SIunit = "[m2]";
+                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
+                m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
+            } else {
+                rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
+                m2_unitConv = 1.0;
+            }
+            TableBodyData = 0.0;
+            tableBody = "";
 
-        tableBody(1, 3) = RealToStr(TableBodyData(1, 3), 2);
-        TableBodyData(1, 4) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac;
-        tableBody(1, 4) = RealToStr(TableBodyData(1, 4), 2);
-        TableBodyData(1, 5) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac;
-        tableBody(1, 5) = RealToStr(TableBodyData(1, 5), 2);
-        TableBodyData(1, 6) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContingencyFrac;
-        tableBody(1, 6) = RealToStr(TableBodyData(1, 6), 2);
-        TableBodyData(1, 7) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.BondCostFrac;
-        tableBody(1, 7) = RealToStr(TableBodyData(1, 7), 2);
-        TableBodyData(1, 8) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.CommissioningFrac;
-        tableBody(1, 8) = RealToStr(TableBodyData(1, 8), 2);
-        state.dataCostEstimateManager->RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
-        TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
-        tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
-        if (ort->buildingConditionedFloorArea > 0.0) {
-            TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
-        }
-        tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
+            TableBodyData(1, 1) = state.dataCostEstimateManager->RefrncBldg.LineItemTot;
+            tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
+            TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
+            tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
 
-        TableBodyData(2, 1) = state.dataCostEstimateManager->CurntBldg.LineItemTot;
-        tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
-        TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
-        tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
-        if (state.dataCostEstimateManager->CurntBldg.RegionalModifier != 1.0) {
-            TableBodyData(2, 3) =
-                (state.dataCostEstimateManager->CurntBldg.LineItemTot + state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) * (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
-        } else {
-            TableBodyData(2, 3) = 0.0;
-        }
-        tableBody(2, 3) = RealToStr(TableBodyData(2, 3), 2);
+            if (state.dataCostEstimateManager->RefrncBldg.RegionalModifier != 1.0) {
+                TableBodyData(1, 3) = (state.dataCostEstimateManager->RefrncBldg.LineItemTot +
+                                       state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) *
+                                      (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
+            } else {
+                TableBodyData(1, 3) = 0.0;
+            }
 
-        CurntBldgConstCost = sum(TableBodyData(2, {1, 3}));
+            RefBldgConstCost = sum(TableBodyData(1, {1, 3}));
 
-        TableBodyData(2, 4) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.DesignFeeFrac;
-        tableBody(2, 4) = RealToStr(TableBodyData(2, 4), 2);
+            tableBody(1, 3) = RealToStr(TableBodyData(1, 3), 2);
+            TableBodyData(1, 4) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac;
+            tableBody(1, 4) = RealToStr(TableBodyData(1, 4), 2);
+            TableBodyData(1, 5) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac;
+            tableBody(1, 5) = RealToStr(TableBodyData(1, 5), 2);
+            TableBodyData(1, 6) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContingencyFrac;
+            tableBody(1, 6) = RealToStr(TableBodyData(1, 6), 2);
+            TableBodyData(1, 7) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.BondCostFrac;
+            tableBody(1, 7) = RealToStr(TableBodyData(1, 7), 2);
+            TableBodyData(1, 8) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.CommissioningFrac;
+            tableBody(1, 8) = RealToStr(TableBodyData(1, 8), 2);
+            state.dataCostEstimateManager->RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
+            TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
+            tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
+            if (ort->buildingConditionedFloorArea > 0.0) {
+                TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+            }
+            tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
 
-        TableBodyData(2, 5) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac;
-        tableBody(2, 5) = RealToStr(TableBodyData(2, 5), 2);
-        TableBodyData(2, 6) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContingencyFrac;
-        tableBody(2, 6) = RealToStr(TableBodyData(2, 6), 2);
-        TableBodyData(2, 7) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.BondCostFrac;
-        tableBody(2, 7) = RealToStr(TableBodyData(2, 7), 2);
-        TableBodyData(2, 8) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.CommissioningFrac;
-        tableBody(2, 8) = RealToStr(TableBodyData(2, 8), 2);
+            TableBodyData(2, 1) = state.dataCostEstimateManager->CurntBldg.LineItemTot;
+            tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
+            TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
+            tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
+            if (state.dataCostEstimateManager->CurntBldg.RegionalModifier != 1.0) {
+                TableBodyData(2, 3) = (state.dataCostEstimateManager->CurntBldg.LineItemTot +
+                                       state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) *
+                                      (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
+            } else {
+                TableBodyData(2, 3) = 0.0;
+            }
+            tableBody(2, 3) = RealToStr(TableBodyData(2, 3), 2);
 
-        state.dataCostEstimateManager->CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
-        TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-        tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
-        if (ort->buildingConditionedFloorArea > 0) {
-            TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
-        }
-        tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
+            CurntBldgConstCost = sum(TableBodyData(2, {1, 3}));
 
-        TableBodyData(3, {1, 10}) = TableBodyData(2, {1, 10}) - TableBodyData(1, {1, 10});
-        tableBody(3, 1) = RealToStr(TableBodyData(3, 1), 2);
-        tableBody(3, 2) = RealToStr(TableBodyData(3, 2), 2);
-        tableBody(3, 3) = RealToStr(TableBodyData(3, 3), 2);
-        tableBody(3, 4) = RealToStr(TableBodyData(3, 4), 2);
-        tableBody(3, 5) = RealToStr(TableBodyData(3, 5), 2);
-        tableBody(3, 6) = RealToStr(TableBodyData(3, 6), 2);
-        tableBody(3, 7) = RealToStr(TableBodyData(3, 7), 2);
-        tableBody(3, 8) = RealToStr(TableBodyData(3, 8), 2);
-        tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
-        tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
+            TableBodyData(2, 4) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.DesignFeeFrac;
+            tableBody(2, 4) = RealToStr(TableBodyData(2, 4), 2);
 
-        WriteSubtitle(state, "Construction Cost Estimate Summary");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
-        }
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
-        }
+            TableBodyData(2, 5) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac;
+            tableBody(2, 5) = RealToStr(TableBodyData(2, 5), 2);
+            TableBodyData(2, 6) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContingencyFrac;
+            tableBody(2, 6) = RealToStr(TableBodyData(2, 6), 2);
+            TableBodyData(2, 7) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.BondCostFrac;
+            tableBody(2, 7) = RealToStr(TableBodyData(2, 7), 2);
+            TableBodyData(2, 8) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.CommissioningFrac;
+            tableBody(2, 8) = RealToStr(TableBodyData(2, 8), 2);
 
-        NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
-        NumCols = 6;                // Line no., Line name, Qty, Units, ValperQty, Subtotal
-        rowHead.allocate(NumRows);
-        columnHead.allocate(NumCols);
-        columnWidth.dimension(NumCols, 14); // array assignment - same for all columns
-        tableBody.allocate(NumCols, NumRows);
-        tableBody = "--";                        // array init
-        rowHead = "--";                          // array init
-        rowHead(NumRows) = "Line Item SubTotal"; // last line in table will be a total
-        // setup up column headers
-        columnHead(1) = "Line No.";
-        columnHead(2) = "Item Name";
-        columnHead(3) = "Quantity.";
-        columnHead(4) = "Units";
-        columnHead(5) = "~~$~~ per Qty.";
-        columnHead(6) = "SubTotal ~~$~~";
+            state.dataCostEstimateManager->CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
+            TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+            tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
+            if (ort->buildingConditionedFloorArea > 0) {
+                TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+            }
+            tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
 
-        columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
+            TableBodyData(3, {1, 10}) = TableBodyData(2, {1, 10}) - TableBodyData(1, {1, 10});
+            tableBody(3, 1) = RealToStr(TableBodyData(3, 1), 2);
+            tableBody(3, 2) = RealToStr(TableBodyData(3, 2), 2);
+            tableBody(3, 3) = RealToStr(TableBodyData(3, 3), 2);
+            tableBody(3, 4) = RealToStr(TableBodyData(3, 4), 2);
+            tableBody(3, 5) = RealToStr(TableBodyData(3, 5), 2);
+            tableBody(3, 6) = RealToStr(TableBodyData(3, 6), 2);
+            tableBody(3, 7) = RealToStr(TableBodyData(3, 7), 2);
+            tableBody(3, 8) = RealToStr(TableBodyData(3, 8), 2);
+            tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
+            tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
+            
+            if (produceTabular == true) {
+                WriteSubtitle(state, "Construction Cost Estimate Summary");
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            }
+            if (produceSQLite == true) {
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "Construction Cost Estimate Summary",
+                                                           "Entire Facility",
+                                                           "Construction Cost Estimate Summary");
+                }
+            }
+            if (produceTabular == true) {
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Construction Cost Estimate Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Construction Cost Estimate Summary");
+                }
+            }
 
-        for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
-            tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
-            tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
-                if (unitConvIndex != 0) {
-                    IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
-                    tableBody(3, item) = RealToStr(IPqty, 2);
-                    tableBody(4, item) = IPunitName;
-                    IPsingleValue = ConvertIP(state, unitConvIndex, 1.0);
-                    if (IPsingleValue != 0.0) {
-                        IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
-                        tableBody(5, item) = RealToStr(IPvaluePer, 2);
+            NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
+            NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
+            rowHead.allocate(NumRows);
+            columnHead.allocate(NumCols);
+            columnWidth.dimension(NumCols, 14); // array assignment - same for all columns
+            tableBody.allocate(NumCols, NumRows);
+            tableBody = "--";                        // array init
+            rowHead = "--";                          // array init
+            rowHead(NumRows) = "Line Item SubTotal"; // last line in table will be a total
+            // setup up column headers
+            columnHead(1) = "Line No.";
+            columnHead(2) = "Item Name";
+            columnHead(3) = "Quantity.";
+            columnHead(4) = "Units";
+            columnHead(5) = "~~$~~ per Qty.";
+            columnHead(6) = "SubTotal ~~$~~";
+
+            columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
+
+            for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
+                tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
+                tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
+                if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                    LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
+                    if (unitConvIndex != 0) {
+                        IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
+                        tableBody(3, item) = RealToStr(IPqty, 2);
+                        tableBody(4, item) = IPunitName;
+                        IPsingleValue = ConvertIP(state, unitConvIndex, 1.0);
+                        if (IPsingleValue != 0.0) {
+                            IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
+                            tableBody(5, item) = RealToStr(IPvaluePer, 2);
+                        }
+                    } else {
+                        tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
+                        tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
+                        tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                     }
                 } else {
                     tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
                     tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                     tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                 }
-            } else {
-                tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
-                tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
-                tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
+                tableBody(6, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).LineSubTotal, 2);
             }
-            tableBody(6, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).LineSubTotal, 2);
-        }
-        tableBody(6, NumRows) = RealToStr(state.dataCostEstimateManager->CurntBldg.LineItemTot, 2);
-        WriteSubtitle(state, "Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
-        }
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+            tableBody(6, NumRows) = RealToStr(state.dataCostEstimateManager->CurntBldg.LineItemTot, 2);
+            if (produceTabular == true) {
+                WriteSubtitle(state, "Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            }
+            if (produceSQLite == true) {
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+                }
+            }
+            if (produceTabular = true) {
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+                }
+            }
         }
     }
 
