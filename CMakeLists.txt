@@ -200,7 +200,7 @@ set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 
 if( OPENGL_FOUND )
-  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+  set(BUILD_PENUMBRA_TESTING OFF CACHE BOOL "")
 endif()
 
 if( BUILD_TESTING )
@@ -313,7 +313,7 @@ if( BUILD_TESTING )
 
   set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
   set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if( OPENGL_FOUND )
+  if( OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
     set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
   endif()
 endif()

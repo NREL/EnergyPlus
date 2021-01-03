@@ -22,6 +22,7 @@ endif()
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # COMPILER FLAGS
+    ADD_COMPILE_OPTIONS("/bigobj")
     ADD_COMPILE_OPTIONS("/nologo")
     ADD_COMPILE_OPTIONS("/EHsc")
     ADD_COMPILE_OPTIONS("/MP") # Enables multi-processor compilation of source within a single project
@@ -104,7 +105,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
-    ADD_CXX_DEFINITIONS("-Werror") # Treat warnings as errors
+#    ADD_CXX_DEFINITIONS("-Werror") # Treat warnings as errors
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
       ADD_CXX_DEFINITIONS("-Wno-deprecated-copy")

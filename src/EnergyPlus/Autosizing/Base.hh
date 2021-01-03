@@ -48,7 +48,9 @@
 #ifndef Base_hh_INCLUDED
 #define Base_hh_INCLUDED
 
+// EnergyPlus headers
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -316,6 +318,14 @@ public:
 void autosizing_clear_state();
 
 extern bool oneTimeCompRptHeaderFlag;
+
+struct AutoSizingBaseData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

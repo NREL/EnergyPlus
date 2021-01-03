@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -103,8 +104,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         //  that is supposed to be proportional to the theoretical power
         Real64 HighPressCutoff; // Maximum Design Pressure on the Load Side
         Real64 LowPressCutoff;  // Minimum Design Pressure on the Source Side
-        // Added by Arun 6-27-02
-        // to implement cycletime - removed 9/10/2013 LKL
         bool IsOn;
         bool MustRun;
         // loop topology variables
@@ -181,6 +180,14 @@ namespace HeatPumpWaterToWaterCOOLING {
     void GetGshpInput(EnergyPlusData &state);
 
 } // namespace HeatPumpWaterToWaterCOOLING
+
+struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

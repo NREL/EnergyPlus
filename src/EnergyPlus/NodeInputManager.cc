@@ -285,32 +285,8 @@ namespace NodeInputManager {
         // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
         // complete, whichever condition is reached first.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (!NodeVarsSetup) {
-            if (!AbortProcessing) {
+            if (!state.dataErrTracking->AbortProcessing) {
                 MoreNodeInfo.allocate(NumOfUniqueNodeNames);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
@@ -1108,9 +1084,7 @@ namespace NodeInputManager {
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::NumOfGlycols;
-        using OutputProcessor::NumOfReqVariables;
         using OutputProcessor::ReqReportVariables;
-        using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -1153,7 +1127,7 @@ namespace NodeInputManager {
 
         if (CalcMoreNodeInfoMyOneTimeFlag) {
             RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
+            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp);
             NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
             NodeRelHumidityRepReq.allocate(NumOfNodes);
@@ -1176,36 +1150,36 @@ namespace NodeInputManager {
             for (iNode = 1; iNode <= NumOfNodes; ++iNode) {
                 nodeReportingStrings.push_back(std::string(NodeReportingCalc + NodeID(iNode)));
                 nodeFluidNames.push_back(GetGlycolNameByIndex(Node(iNode).FluidIndex));
-                for (iReq = 1; iReq <= NumOfReqVariables; ++iReq) {
-                    if (UtilityRoutines::SameString(ReqRepVars(iReq).Key, NodeID(iNode)) || ReqRepVars(iReq).Key.empty()) {
-                        if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
+                for (iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
+                    if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, NodeID(iNode)) || state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
+                        if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
                             NodeWetBulbRepReq(iNode) = true;
-                            NodeWetBulbSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
+                            NodeWetBulbSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
                             NodeRelHumidityRepReq(iNode) = true;
-                            NodeRelHumiditySchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
+                            NodeRelHumiditySchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
                             NodeDewPointRepReq(iNode) = true;
-                            NodeDewPointSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
+                            NodeDewPointSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
                             NodeSpecificHeatRepReq(iNode) = true;
-                            NodeSpecificHeatSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
+                            NodeSpecificHeatSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
                         }
                     }
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Wetbulb Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
                     NodeWetBulbRepReq(iNode) = true;
                     NodeWetBulbSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Relative Humidity")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
                     NodeRelHumidityRepReq(iNode) = true;
                     NodeRelHumiditySchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Dewpoint Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
                     NodeDewPointRepReq(iNode) = true;
                     NodeDewPointSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Specific Heat")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
                     NodeSpecificHeatRepReq(iNode) = true;
                     NodeSpecificHeatSchedPtr(iNode) = 0;
                 }
@@ -1282,7 +1256,7 @@ namespace NodeInputManager {
                 } else {
                     Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rhoStd = GetDensityGlycol(
-                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp(), Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                 }
 

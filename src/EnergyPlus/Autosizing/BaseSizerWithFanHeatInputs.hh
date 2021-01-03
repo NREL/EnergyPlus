@@ -48,9 +48,10 @@
 #ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
 #define BaseSizerWithFanHeatInputs_hh_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <string>
 
 namespace EnergyPlus {
@@ -101,6 +102,14 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
         motInPower = 0.0;
     }
 
+};
+
+struct BaseSizerWithFanHeatInputsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
 };
 
 } // namespace EnergyPlus

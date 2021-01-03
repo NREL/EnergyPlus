@@ -50,9 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -108,9 +106,9 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
         if (PlantLoopName == PlantLoop(i).Name) { // found it
 
             density = GetDensityGlycol(
-                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
             cp = GetSpecificHeatGlycol(
-                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
@@ -211,7 +209,6 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataErrorTracking::ExitDuringSimulations;
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
@@ -269,7 +266,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     sqlite->sqliteCommit();
                 }
             }
-            ExitDuringSimulations = true;
+            state.dataErrTracking->ExitDuringSimulations = true;
 
             DisplayString(state, "Initializing New Environment Parameters, HVAC Sizing Simulation");
 

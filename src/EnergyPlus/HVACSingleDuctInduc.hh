@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -208,6 +209,14 @@ namespace HVACSingleDuctInduc {
     bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
 
 } // namespace HVACSingleDuctInduc
+
+struct HVACSingleDuctInducData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
