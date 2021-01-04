@@ -144,8 +144,6 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/PipeHeatTransfer.hh>
-#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
@@ -271,8 +269,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    Pipes::clear_state();
-    PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
     PlantComponentTemperatureSources::clear_state();
     PlantCondLoopOperation::clear_state();
