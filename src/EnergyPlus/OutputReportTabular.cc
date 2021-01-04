@@ -11907,102 +11907,132 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayEioSummary) {
-            Array1D_string columnHead;
-            Array1D_int columnWidth;
-            Array1D_string rowHead;
-            Array2D_string tableBody; // in the format: (row, column)
-            Array1D_int colUnitConv;
 
-            // setting up  report header
-            WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
 
-            std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
-            std::vector<std::string> bodyLines;   // holds the data records only
-            for (auto const &line : state.files.eio.getLines()) {
-                if (line.at(0) == '!') {
-                    headerLines.push_back(line);
-                } else {
-                    if (line.at(0) == ' ') {
-                        bodyLines.push_back(line.substr(1)); // remove leading space
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+
+                if (iUnitSystem == 0) {
+                    unitsStyle_temp = ort->unitsStyle;
+                    produceTabular = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                        produceSQLite = true;
                     } else {
-                        bodyLines.push_back(line);
+                        produceSQLite = false;
                     }
+                } else { // iUnitSystem == 1
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    produceTabular = false;
+                    produceSQLite = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
                 }
-            }
 
-            // now go through each header and create a report for each one
-            for (auto headerLine : headerLines) {
-                std::vector<std::string> headerFields = splitCommaString(headerLine);
-                std::string tableNameWithSigns = headerFields.at(0);
-                std::string tableName =
-                    tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
-                // first count the number of matching lines
-                int countOfMatchingLines = 0;
-                for (auto bodyLine : bodyLines) {
-                    if (bodyLine.size() > tableName.size()) {
-                        if (bodyLine.substr(0, tableName.size() + 1) ==
-                            tableName + ",") { // this needs to match the test used to populate the body of table below
-                            ++countOfMatchingLines;
+                Array1D_string columnHead;
+                Array1D_int columnWidth;
+                Array1D_string rowHead;
+                Array2D_string tableBody; // in the format: (row, column)
+                Array1D_int colUnitConv;
+
+                // setting up  report header
+                if (produceTabular == true) {
+                    WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                }
+                std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
+                std::vector<std::string> bodyLines;   // holds the data records only
+                for (auto const &line : state.files.eio.getLines()) {
+                    if (line.at(0) == '!') {
+                        headerLines.push_back(line);
+                    } else {
+                        if (line.at(0) == ' ') {
+                            bodyLines.push_back(line.substr(1)); // remove leading space
+                        } else {
+                            bodyLines.push_back(line);
                         }
                     }
                 }
-                int numRows = countOfMatchingLines;
-                int numCols = headerFields.size() - 1;
 
-                if (numRows >= 1) {
-                    rowHead.allocate(numRows);
-                    columnHead.allocate(numCols);
-                    columnWidth.allocate(numCols);
-                    columnWidth = 14; // array assignment - same for all columns
-                    tableBody.allocate(numCols, numRows);
-                    tableBody = ""; // make sure everything is blank
-                    std::string footnote = "";
-                    colUnitConv.allocate(numCols);
-                    // transfer the header row into column headings
-                    for (int iCol = 1; iCol <= numCols; ++iCol) {
-                        columnHead(iCol) = headerFields.at(iCol);
-                        // set the unit conversions
-                        colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
-                    }
-                    // look for data lines
-                    int rowNum = 0;
+                // now go through each header and create a report for each one
+                for (auto headerLine : headerLines) {
+                    std::vector<std::string> headerFields = splitCommaString(headerLine);
+                    std::string tableNameWithSigns = headerFields.at(0);
+                    std::string tableName = tableNameWithSigns.substr(
+                        3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
+                    // first count the number of matching lines
+                    int countOfMatchingLines = 0;
                     for (auto bodyLine : bodyLines) {
                         if (bodyLine.size() > tableName.size()) {
                             if (bodyLine.substr(0, tableName.size() + 1) ==
-                                tableName + ",") { // this needs to match the test used in the original counting
-                                ++rowNum;
-                                if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
-                                std::vector<std::string> dataFields = splitCommaString(bodyLine);
-                                rowHead(rowNum) = fmt::to_string(rowNum);
-                                for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                    if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                        if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
-                                            int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
-                                            Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
-                                            tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
-                                        } else if (iCol == numCols && columnHead(iCol) == "Value" && iCol > 1) { // if it is the last column and the
-                                                                                                                 // header is Value then treat the
-                                                                                                                 // previous column as source of units
-                                            int indexUnitConv = unitsFromHeading(state, tableBody(iCol - 1, rowNum));   // base units on previous column
-                                            int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
-                                            Real64 convertedVal = ConvertIP(state, indexUnitConv, StrToReal(dataFields[iCol]));
-                                            tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                tableName + ",") { // this needs to match the test used to populate the body of table below
+                                ++countOfMatchingLines;
+                            }
+                        }
+                    }
+                    int numRows = countOfMatchingLines;
+                    int numCols = headerFields.size() - 1;
+
+                    if (numRows >= 1) {
+                        rowHead.allocate(numRows);
+                        columnHead.allocate(numCols);
+                        columnWidth.allocate(numCols);
+                        columnWidth = 14; // array assignment - same for all columns
+                        tableBody.allocate(numCols, numRows);
+                        tableBody = ""; // make sure everything is blank
+                        std::string footnote = "";
+                        colUnitConv.allocate(numCols);
+                        // transfer the header row into column headings
+                        for (int iCol = 1; iCol <= numCols; ++iCol) {
+                            columnHead(iCol) = headerFields.at(iCol);
+                            // set the unit conversions
+                            colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
+                        }
+                        // look for data lines
+                        int rowNum = 0;
+                        for (auto bodyLine : bodyLines) {
+                            if (bodyLine.size() > tableName.size()) {
+                                if (bodyLine.substr(0, tableName.size() + 1) ==
+                                    tableName + ",") { // this needs to match the test used in the original counting
+                                    ++rowNum;
+                                    if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
+                                    std::vector<std::string> dataFields = splitCommaString(bodyLine);
+                                    rowHead(rowNum) = fmt::to_string(rowNum);
+                                    for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
+                                        if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
+                                            if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
+                                                int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+                                                Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
+                                                tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                            } else if (iCol == numCols && columnHead(iCol) == "Value" &&
+                                                       iCol > 1) { // if it is the last column and the
+                                                                   // header is Value then treat the
+                                                                   // previous column as source of units
+                                                int indexUnitConv =
+                                                    unitsFromHeading(state, tableBody(iCol - 1, rowNum)); // base units on previous column
+                                                int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+                                                Real64 convertedVal = ConvertIP(state, indexUnitConv, StrToReal(dataFields[iCol]));
+                                                tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                            } else {
+                                                tableBody(iCol, rowNum) = dataFields[iCol];
+                                            }
                                         } else {
                                             tableBody(iCol, rowNum) = dataFields[iCol];
                                         }
-                                    } else {
-                                        tableBody(iCol, rowNum) = dataFields[iCol];
                                     }
                                 }
                             }
                         }
-                    }
 
-                    WriteSubtitle(state, tableName);
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                        if (produceTabular) {
+                            WriteSubtitle(state, tableName);
+                            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                        }
+                        if (produceSQLite) {
+                            if (sqlite) {
+                                sqlite->createSQLiteTabularDataRecords(
+                                    tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                            }
+                        }
                     }
                 }
             }
