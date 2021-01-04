@@ -721,7 +721,7 @@ namespace DataPlant {
             {
                 auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;
@@ -731,7 +731,7 @@ namespace DataPlant {
                     // Calculate the demand on the loop
                     LoadToLoopSetPoint = SumMdot * Cp * DeltaTemp;
 
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
 
                     // Get the range of setpoints
                     Real64 LoopSetPointTemperatureHi = DataLoopNode::Node(thisPlantLoop.TempSetPointNodeNum).TempSetPointHi;
@@ -798,7 +798,7 @@ namespace DataPlant {
             {
                 auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;

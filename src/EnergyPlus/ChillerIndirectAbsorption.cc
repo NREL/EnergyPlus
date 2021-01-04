@@ -1673,9 +1673,9 @@ namespace ChillerIndirectAbsorption {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {
                         assert(false);
@@ -1697,9 +1697,9 @@ namespace ChillerIndirectAbsorption {
                                                          this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
-                        } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
@@ -1743,7 +1743,7 @@ namespace ChillerIndirectAbsorption {
             } else {
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (DataPlant::PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
@@ -1755,7 +1755,7 @@ namespace ChillerIndirectAbsorption {
                         } else {
                             TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
-                    } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                             (DataPlant::PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)

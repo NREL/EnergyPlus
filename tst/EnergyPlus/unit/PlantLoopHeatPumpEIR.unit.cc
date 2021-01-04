@@ -1197,7 +1197,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
@@ -1206,7 +1206,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
@@ -1378,7 +1378,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
@@ -1388,7 +1388,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(2).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
     DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
@@ -1496,7 +1496,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
@@ -1630,7 +1630,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
@@ -1859,7 +1859,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     DataPlant::TotNumLoops = 1;
     DataPlant::PlantLoop.allocate(1);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
@@ -1976,7 +1976,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     DataPlant::TotNumLoops = 1;
     DataPlant::PlantLoop.allocate(1);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
@@ -2689,14 +2689,14 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
@@ -2747,7 +2747,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
@@ -2847,7 +2847,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;

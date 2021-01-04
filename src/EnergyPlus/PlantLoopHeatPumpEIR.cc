@@ -125,14 +125,14 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
         auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
         auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
-        if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+        if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
                 return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
             } else { // use plant loop overall set-point
                 return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
             }
-        } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
+        } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
                 return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;

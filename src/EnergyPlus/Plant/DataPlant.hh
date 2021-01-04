@@ -80,9 +80,6 @@ namespace DataPlant {
     constexpr Real64 CriteriaDelta_Temperature(0.010);
     constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
 
-    // Parameters for use in Loop Demand Calculation Schemes
-    extern int const SingleSetPoint;       // Uses a single temp setpoint to calculate loop demand
-    extern int const DualSetPointDeadBand; // Uses a dual temp setpoint with a deadband between the high
     //  and the low to calculate loop demand
     // Parameters for loop setpoint reference
     extern int const Air;

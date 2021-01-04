@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     Real64 MyLoad(-18000.0);
     openOutputFiles(*state);
 
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
     DataLoopNode::Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
     // init and size

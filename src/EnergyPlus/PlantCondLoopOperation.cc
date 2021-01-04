@@ -1480,7 +1480,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         // check that setpoint node has valid setpoint managers or EMS
                         {
                             auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
-                            if (SELECT_CASE_var == SingleSetPoint) {
+                            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                                 if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
                                     SensedNodeFlagValue) {
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -1516,7 +1516,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         }
                                     }
                                 }
-                            } else if (SELECT_CASE_var == DualSetPointDeadBand) {
+                            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == CoolingOp) {
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                         SensedNodeFlagValue) {
@@ -2928,9 +2928,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
         {
             auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 TempSetPt = Node(SetPtNode).TempSetPoint;
-            } else if (SELECT_CASE_var == DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 if (PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == CoolingOp) {
                     TempSetPt = Node(SetPtNode).TempSetPointHi;
                 } else if (PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == HeatingOp) {

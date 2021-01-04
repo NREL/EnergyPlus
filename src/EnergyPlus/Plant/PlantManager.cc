@@ -514,7 +514,7 @@ namespace EnergyPlus {
                 if (this_loop.TypeOfLoop == LoopType::Plant) {
                     // Get the Loop Demand Calculation Scheme
                     if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                         if (this_loop.FluidType == NodeType_Steam) {
                             ShowWarningError(state,
@@ -523,20 +523,20 @@ namespace EnergyPlus {
                                               cAlphaFieldNames(2) + "= Steam");
                             ShowContinueError(state, "Will reset " + cAlphaFieldNames(16) +
                                               " = SingleSetPoint and simulation will continue.");
-                            this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                            this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                         } else {
-                            this_loop.LoopDemandCalcScheme = DualSetPointDeadBand;
+                            this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
                         }
                     } else if (UtilityRoutines::SameString(Alpha(16), "")) {
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError(state, "..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                         ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     }
                 } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
-                    this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                    this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                 }
 
                 // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
@@ -2319,7 +2319,7 @@ namespace EnergyPlus {
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         // check if setpoints being placed on node properly
-                        if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
+                        if (PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
@@ -2464,10 +2464,10 @@ namespace EnergyPlus {
                         {
                             auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
 
-                            if (SELECT_CASE_var == SingleSetPoint) {
+                            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                                 LoopSetPointTemp = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
-                            } else if (SELECT_CASE_var == DualSetPointDeadBand) {
+                            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                                 // Get the range of setpoints
                                 LoopSetPointTemperatureHi = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
                                 LoopSetPointTemperatureLo = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
@@ -2641,7 +2641,7 @@ namespace EnergyPlus {
                 PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
 
                 // Update supply side hi-lo setpoints for dual SP control
-                if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
+                if (PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     LoopSetPointTempHi = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
                     LoopSetPointTempLo = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
                     LoopSetPointTempHi = min(LoopMaxTemp, LoopSetPointTempHi);
@@ -2680,7 +2680,7 @@ namespace EnergyPlus {
                     }
                 } else { // no secondary loop, so use supply side loop SP on demand side too.
                     PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
-                    if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
+                    if (PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = LoopSetPointTempHi;
                         PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = LoopSetPointTempLo;
                     }

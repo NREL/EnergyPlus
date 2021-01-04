@@ -142,6 +142,12 @@ namespace EnergyPlus::DataPlant {
         Loop,               // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
     };
 
+    enum class iLoopDemandCalcScheme {
+        Unassigned,
+        SingleSetPoint,       // Uses a single temp setpoint to calculate loop demand
+        DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
+    };
+
 } // namespace EnergyPlus
 
 #endif

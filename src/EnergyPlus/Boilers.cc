@@ -516,10 +516,10 @@ namespace EnergyPlus::Boilers {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+            if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint =
                     DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
-            } else { // DataPlant::DualSetPointDeadBand
+            } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
                 DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo =
                     DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
             }
@@ -779,9 +779,9 @@ namespace EnergyPlus::Boilers {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 
-                if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+                if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPoint - DataLoopNode::Node(BoilerInletNode).Temp;
-                } else { // DataPlant::DualSetPointDeadBand
+                } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
                     BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPointLo - DataLoopNode::Node(BoilerInletNode).Temp;
                 }
 

@@ -410,10 +410,10 @@ namespace BoilerSteam {
             //  could be removed with transition, testing , model change, period of being obsolete.
             {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     DataLoopNode::Node(BoilerOutletNode).TempSetPoint =
                         DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     DataLoopNode::Node(BoilerOutletNode).TempSetPointLo =
                         DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
                 }
@@ -582,9 +582,9 @@ namespace BoilerSteam {
 
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo;
             }
         }
@@ -627,9 +627,9 @@ namespace BoilerSteam {
 
             {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else { // DataPlant::DualSetPointDeadBand
+                } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
                     BoilerDeltaTemp =
                         DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 }
@@ -658,9 +658,9 @@ namespace BoilerSteam {
             // Assume that it can meet the setpoint
             {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     BoilerDeltaTemp =
                         DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 }
@@ -669,9 +669,9 @@ namespace BoilerSteam {
             if (BoilerDeltaTemp < 0.0) {
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo;
                     }
                 }
@@ -686,9 +686,9 @@ namespace BoilerSteam {
 
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo;
                     }
                 }
@@ -709,9 +709,9 @@ namespace BoilerSteam {
                 // Reset later , here just for calculating latent heat
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                    if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                    } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo;
                     }
                 }

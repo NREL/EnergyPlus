@@ -1000,10 +1000,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
             } else { // don't rely on sizing, use loop setpoints
                 // loop supply side
-                if (DataPlant::PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+                if (DataPlant::PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).Temp =
                         DataLoopNode::Node(DataPlant::PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
-                } else if (DataPlant::PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
+                } else if (DataPlant::PlantLoop(this->SupplySideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).Temp =
                         (DataLoopNode::Node(DataPlant::PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                          DataLoopNode::Node(DataPlant::PlantLoop(this->SupplySideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /
@@ -1015,10 +1015,10 @@ namespace PlantHeatExchangerFluidToFluid {
                 DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).Temp = DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp;
             } else { // don't rely on sizing, use loop setpoints
                 // loop demand side
-                if (DataPlant::PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+                if (DataPlant::PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).Temp =
                         DataLoopNode::Node(DataPlant::PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPoint;
-                } else if (DataPlant::PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
+                } else if (DataPlant::PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).Temp =
                         (DataLoopNode::Node(DataPlant::PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointHi +
                          DataLoopNode::Node(DataPlant::PlantLoop(this->DemandSideLoop.loopNum).TempSetPointNodeNum).TempSetPointLo) /

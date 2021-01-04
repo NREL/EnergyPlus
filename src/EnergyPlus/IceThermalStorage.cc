@@ -233,9 +233,9 @@ namespace IceThermalStorage {
         Real64 TempIn = DataLoopNode::Node(this->PltInletNodeNum).Temp;
         {
             auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             } else {
                 assert(false);
@@ -354,9 +354,9 @@ namespace IceThermalStorage {
         Real64 TempSetPt(0.0);                              // Setpoint temperature defined by loop controls [C]
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(this->PlantLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 TempSetPt = DataLoopNode::Node(NodeNumOut).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 TempSetPt = DataLoopNode::Node(NodeNumOut).TempSetPointHi;
             } else {
                 assert(false);
@@ -1356,9 +1356,9 @@ namespace IceThermalStorage {
         this->ITSOutletTemp = this->ITSInletTemp;                            //[C]
         {
             auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1385,9 +1385,9 @@ namespace IceThermalStorage {
         this->ITSOutletTemp = this->ITSInletTemp;                            //[C]
         {
             auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1533,9 +1533,9 @@ namespace IceThermalStorage {
 
         {
             auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var1 == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
@@ -1624,9 +1624,9 @@ namespace IceThermalStorage {
         Real64 ITSOutletTemp_loc = 0.0;
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 ITSOutletTemp_loc = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                 ITSOutletTemp_loc = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             } else {
                 assert(false);

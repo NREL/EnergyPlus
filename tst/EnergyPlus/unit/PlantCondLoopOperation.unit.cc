@@ -127,7 +127,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 {
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialLoading;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Sequential;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
@@ -293,7 +293,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 {
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::UniformLoading;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Uniform;
 
     // Start with 5 components
     DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -410,7 +410,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 {
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::OptimalLoading;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Optimal;
 
     // Start with 5 components and smaller component 4
     DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -541,7 +541,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 {
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::UniformPLRLoading;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
 
     // Start with 5 components and smaller component 4
     DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -664,7 +664,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
     auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialUniformPLRLoading;
+    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
 
     // Start with 5 components and smaller component 4
     DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;

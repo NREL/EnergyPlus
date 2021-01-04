@@ -62,9 +62,6 @@ namespace EnergyPlus::DataPlant {
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 
-    // Parameters for use in Loop Demand Calculation Schemes
-    int const SingleSetPoint(1);       // Uses a single temp setpoint to calculate loop demand
-    int const DualSetPointDeadBand(2); // Uses a dual temp setpoint with a deadband between the high
     //  and the low to calculate loop demand
     // Parameters for loop setpoint reference
     int const Air(1);
