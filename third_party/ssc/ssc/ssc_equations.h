@@ -41,6 +41,7 @@ struct ssc_equation_entry{
  */
 
 static ssc_equation_entry ssc_equation_table [] = {
+    {}
 //        // Marine energy
 //		{"me_array_cable_length", me_array_cable_length,
 //            "Marine energy", me_array_cable_length_doc,
