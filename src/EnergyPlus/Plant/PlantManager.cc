@@ -494,23 +494,23 @@ namespace EnergyPlus {
                 // Load the load distribution scheme.
                 LoadingScheme = Alpha(14);
                 if (UtilityRoutines::SameString(LoadingScheme, "Optimal")) {
-                    this_loop.LoadDistribution = OptimalLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Optimal;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialLoad")) {
-                    this_loop.LoadDistribution = SequentialLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "UniformLoad")) {
-                    this_loop.LoadDistribution = UniformLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Uniform;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "UniformPLR")) {
-                    this_loop.LoadDistribution = UniformPLRLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
-                    this_loop.LoadDistribution = SequentialUniformPLRLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
                 } else {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError(state, "..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
                     ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
-                    this_loop.LoadDistribution = SequentialLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
                 }
 
-                // When dual setpoint is allowed in condenser loop modify this code. Sankar 06/29/2009
+                // When dual setpoint is allowed in condenser loop modify this code.
                 if (this_loop.TypeOfLoop == LoopType::Plant) {
                     // Get the Loop Demand Calculation Scheme
                     if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {

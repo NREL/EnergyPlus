@@ -52,9 +52,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 
-namespace EnergyPlus {
-
-namespace DataPlant {
+namespace EnergyPlus::DataPlant {
 
     // PURPOSE OF THIS MODULE:
     // This data-only module contains the structures for various parts of the Plant and
@@ -480,7 +478,5 @@ namespace DataPlant {
         VentRepCondDemandSide.deallocate();
         PlantCallingOrderInfo.deallocate();
     }
-
-} // namespace DataPlant
 
 } // namespace EnergyPlus

@@ -72,12 +72,6 @@ namespace DataPlant {
     // Using/Aliasing
     using DataLoopNode::SensedNodeFlagValue;
 
-    int const OptimalLoading(1);              // Optimal Load Distribution Scheme
-    int const SequentialLoading(2);           // Sequential Load Distribution Scheme
-    int const UniformLoading(3);              // Uniform Load Distribution Scheme
-    int const UniformPLRLoading(4);           // Uniform PLR Load Distribution Scheme
-    int const SequentialUniformPLRLoading(5); // Sequential Uniform PLR Load Distribution Scheme
-
     extern int const LoadRangeBasedMin;
     extern int const LoadRangeBasedMax;
 
@@ -260,18 +254,18 @@ namespace DataPlant {
     // Enum classes
     enum class FlowMode
     {
-        NOTSET,
-        CONSTANT,
-        NOTMODULATED,
-        LEAVINGSETPOINTMODULATED
+        Unassigned,
+        Constant,
+        NotModulated,
+        LeavingSetpointModulated,
     };
 
     enum class CondenserType
     {
-        NOTSET,
-        AIRCOOLED,
-        WATERCOOLED,
-        EVAPCOOLED
+        Unassigned,
+        AirCooled,
+        WaterCooled,
+        EvapCooled,
     };
 
     // Object Data

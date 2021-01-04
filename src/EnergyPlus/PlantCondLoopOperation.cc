@@ -2207,7 +2207,6 @@ CurrentModuleObject, PlantOpSchemeName);
         Real64 LargestMinCompPLR;
         Real64 PlantPLR;
         Real64 CompLoad;
-        int LoadFlag;
 
         int BranchNum;
         int CompNum;
@@ -2239,16 +2238,14 @@ CurrentModuleObject, PlantOpSchemeName);
         accrued_load_plr_values.reserve(NumCompsOnList);
         RemLoopDemand = LoopDemand;
         if (NumCompsOnList <= 0) return;
-        // set flag to specify optimal or sequential loading of equipment
-        LoadFlag = this_loop.LoadDistribution;
 
         if (std::abs(RemLoopDemand) < SmallLoad) {
             // no load to distribute
         } else {
 
             // OPTIMAL DISTRIBUTION SCHEME
-            switch (LoadFlag) {
-            case OptimalLoading:
+            switch (this_loop.LoadDistribution) {
+            case DataPlant::iLoadingScheme::Optimal:
                 // step 1: load all machines to optimal PLR
                 numAvail = 0;
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2331,7 +2328,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 break;
 
             // SEQUENTIALLOAD DISTRIBUTION SCHEME
-            case SequentialLoading:
+            case DataPlant::iLoadingScheme::Sequential:
 
                 // step 1: Load machines in list order
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2366,7 +2363,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 break;
 
             // UNIFORMLOAD DISTRIBUTION SCHEME
-            case UniformLoading:
+            case DataPlant::iLoadingScheme::Uniform:
 
                 // step 1: distribute load equally to all available machines
                 numAvail = 0;
@@ -2434,7 +2431,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 break;
 
             // UNIFORMPLR LOAD DISTRIBUTION SCHEME
-            case UniformPLRLoading:
+            case DataPlant::iLoadingScheme::UniformPLR:
                 // Get total plant capacity and remove last component from list if load is less
                 // than plant capacity at min PLR
                 PlantCapacity = 0.0;
@@ -2538,7 +2535,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 break;
 
             // SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
-            case SequentialUniformPLRLoading:
+            case DataPlant::iLoadingScheme::SequentialUniformPLR:
 
                 PlantCapacity = 0.0;
                 PlantPLR = 0.0;
@@ -2616,6 +2613,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     if (std::abs(RemLoopDemand) < SmallLoad) RemLoopDemand = 0.0;
                 }
+            default:
+                assert(false);
             }
 
         } // load is small check

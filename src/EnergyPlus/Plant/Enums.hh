@@ -82,7 +82,7 @@ namespace EnergyPlus::DataPlant {
         DryBulbTDBOpSchemeType = 7,         // Scheme Type for relative humidity range based Operation
         WetBulbTDBOpSchemeType = 8,         // Scheme Type for Wet bulb range based Operation
         DewPointTDBOpSchemeType = 9,        // Scheme Type for Wet bulb range based Operation
-        CompSetPtBasedSchemeType = 10,      // *Sankar Temp Based Control
+        CompSetPtBasedSchemeType = 10,      // Temp Based Control
         UncontrolledOpSchemeType = 11,      // Scheme Type for Uncontrolled Operation
         EMSOpSchemeType = 12,               // Scheme Type for EMS based operation user Define scheme
         PumpOpSchemeType = 13,              // Not really an OpScheme, just a placeholder
@@ -102,6 +102,15 @@ namespace EnergyPlus::DataPlant {
     int const HowMet_ByNominalCapHiOutLimit(55);               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
     int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
     int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+
+    enum class iLoadingScheme {
+        Unassigned,
+        Optimal,                    // Optimal Load Distribution Scheme
+        Sequential,                 // Sequential Load Distribution Scheme
+        Uniform,                    // Uniform Load Distribution Scheme
+        UniformPLR,                 // Uniform PLR Load Distribution Scheme
+        SequentialUniformPLR,       // Sequential Uniform PLR Load Distribution Scheme
+    };
 
 } // namespace EnergyPlus
 
