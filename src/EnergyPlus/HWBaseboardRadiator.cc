@@ -1793,9 +1793,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::CriteriaType_HeatTransferRate;
-        using DataPlant::CriteriaType_MassFlowRate;
-        using DataPlant::CriteriaType_Temperature;
         using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
 
         using PlantUtilities::PullCompInterconnectTrigger;
@@ -1852,7 +1849,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_HeatTransferRate,
+                                    DataPlant::iCriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum,
@@ -1862,7 +1859,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_MassFlowRate,
+                                    DataPlant::iCriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
         PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum,
@@ -1872,7 +1869,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_Temperature,
+                                    DataPlant::iCriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 

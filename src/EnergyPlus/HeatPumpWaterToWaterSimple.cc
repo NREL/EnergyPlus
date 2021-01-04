@@ -853,7 +853,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum, // IS THIS RIGHT?
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             // Set flows if the heat pump is running
         } else { // the heat pump must run
@@ -903,7 +903,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                             this->CondMassFlowIndex,
                                                             this->SourceLoopNum,
                                                             this->LoadLoopSideNum,
-                                                            DataPlant::CriteriaType_MassFlowRate,
+                                                            DataPlant::iCriteriaType::MassFlowRate,
                                                             this->reportSourceSideMassFlowRate);
                 return;
             }
@@ -914,7 +914,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
         }
 

@@ -628,7 +628,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             // now initialize simulation variables for "heat pump off"
             this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
@@ -678,7 +678,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                             this->CondMassFlowIndex,
                                                             this->SourceLoopNum,
                                                             this->LoadLoopSideNum,
-                                                            DataPlant::CriteriaType_MassFlowRate,
+                                                            DataPlant::iCriteriaType::MassFlowRate,
                                                             this->SourceSideWaterMassFlowRate);
                 this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
                 this->SourceSideWaterOutletTemp = this->SourceSideWaterInletTemp;
@@ -691,7 +691,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
         }
 

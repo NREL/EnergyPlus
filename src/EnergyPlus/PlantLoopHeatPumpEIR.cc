@@ -186,7 +186,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                         this->condMassFlowRateTriggerIndex,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->sourceSideMassFlowRate);
             // Set flows if the heat pump is running
         } else { // the heat pump must run
@@ -234,7 +234,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                         this->condMassFlowRateTriggerIndex,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->sourceSideMassFlowRate);
         }
     }

@@ -950,7 +950,7 @@ namespace PlantUtilities {
                                      int &UniqueCriteriaCheckIndex, // An integer given to this particular check
                                      int const ConnectedLoopNum,    // Component's interconnected loop number
                                      int const ConnectedLoopSide,   // Component's interconnected loop side number
-                                     int const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     DataPlant::iCriteriaType const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      Real64 const CriteriaValue     // The value of the criteria check to evaluate
     )
     {
@@ -983,9 +983,6 @@ namespace PlantUtilities {
         using DataPlant::CriteriaDelta_HeatTransferRate;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::CriteriaDelta_Temperature;
-        using DataPlant::CriteriaType_HeatTransferRate;
-        using DataPlant::CriteriaType_MassFlowRate;
-        using DataPlant::CriteriaType_Temperature;
         using DataPlant::PlantLoop;
 
         CriteriaData CurCriteria; // for convenience
@@ -1026,17 +1023,17 @@ namespace PlantUtilities {
             // Initialize, then check if we are out of range
             {
                 auto const SELECT_CASE_var(CriteriaType);
-                if (SELECT_CASE_var == CriteriaType_MassFlowRate) {
+                if (SELECT_CASE_var == DataPlant::iCriteriaType::MassFlowRate) {
                     if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
                         PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                     }
 
-                } else if (SELECT_CASE_var == CriteriaType_Temperature) {
+                } else if (SELECT_CASE_var == DataPlant::iCriteriaType::Temperature) {
                     if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
                         PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                     }
 
-                } else if (SELECT_CASE_var == CriteriaType_HeatTransferRate) {
+                } else if (SELECT_CASE_var == DataPlant::iCriteriaType::HeatTransferRate) {
                     if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
                         PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                     }

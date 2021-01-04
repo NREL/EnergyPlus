@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -113,7 +114,7 @@ namespace PlantUtilities {
                                      int &UniqueCriteriaCheckIndex, // An integer given to this particular check
                                      int const ConnectedLoopNum,    // Component's interconnected loop number
                                      int const ConnectedLoopSide,   // Component's interconnected loop side number
-                                     int const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     DataPlant::iCriteriaType const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      Real64 const CriteriaValue     // The value of the criteria check to evaluate
     );
 

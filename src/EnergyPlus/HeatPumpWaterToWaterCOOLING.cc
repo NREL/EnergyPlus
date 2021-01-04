@@ -672,7 +672,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             // now initialize simulation variables for "heat pump off"
             this->QLoad = 0.0;
@@ -731,7 +731,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                                             this->CondMassFlowIndex,
                                                             this->SourceLoopNum,
                                                             this->LoadLoopSideNum,
-                                                            DataPlant::CriteriaType_MassFlowRate,
+                                                            DataPlant::iCriteriaType::MassFlowRate,
                                                             this->SourceSideWaterMassFlowRate);
                 this->QLoad = 0.0;
                 this->QSource = 0.0;
@@ -749,7 +749,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
         }
 

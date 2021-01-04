@@ -732,13 +732,13 @@ namespace PlantHeatExchangerFluidToFluid {
                     auto const SELECT_CASE_var(this->ControlSignalTemp);
                     if (SELECT_CASE_var == WetBulbTemperature) {
                         DataPlant::PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                            DataPlant::FreeCoolControlMode_WetBulb;
+                            DataPlant::iFreeCoolControlMode::WetBulb;
                     } else if (SELECT_CASE_var == DryBulbTemperature) {
                         DataPlant::PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                            DataPlant::FreeCoolControlMode_DryBulb;
+                            DataPlant::iFreeCoolControlMode::DryBulb;
                     } else if (SELECT_CASE_var == LoopTemperature) {
                         DataPlant::PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                            DataPlant::FreeCoolControlMode_Loop;
+                            DataPlant::iFreeCoolControlMode::Loop;
                         DataPlant::PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
                             this->OtherCompDemandSideLoop.inletNodeNum;
                     }

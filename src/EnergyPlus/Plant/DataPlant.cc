@@ -62,23 +62,6 @@ namespace EnergyPlus::DataPlant {
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 
-    int const LoadRangeBasedMin(0);
-    int const LoadRangeBasedMax(2);
-
-    // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
-    int const CriteriaType_MassFlowRate(1);
-    int const CriteriaType_Temperature(2);
-    int const CriteriaType_HeatTransferRate(3);
-
-    // Criteria percentage limits for determining re-simulation of connected loop sides
-    Real64 const CriteriaDelta_MassFlowRate(0.001);
-    Real64 const CriteriaDelta_Temperature(0.010);
-    Real64 const CriteriaDelta_HeatTransferRate(0.100);
-
-    int const FreeCoolControlMode_WetBulb(1); // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
-    int const FreeCoolControlMode_DryBulb(2); // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
-    int const FreeCoolControlMode_Loop(3);    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
-
     // Parameters for use in Loop Demand Calculation Schemes
     int const SingleSetPoint(1);       // Uses a single temp setpoint to calculate loop demand
     int const DualSetPointDeadBand(2); // Uses a dual temp setpoint with a deadband between the high

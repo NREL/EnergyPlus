@@ -1906,7 +1906,7 @@ namespace ChillerReformulatedEIR {
                                                         this->CondMassFlowIndex,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->CondMassFlowRate);
 
             if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;

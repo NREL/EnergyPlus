@@ -72,22 +72,13 @@ namespace DataPlant {
     // Using/Aliasing
     using DataLoopNode::SensedNodeFlagValue;
 
-    extern int const LoadRangeBasedMin;
-    extern int const LoadRangeBasedMax;
-
-    // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
-    extern int const CriteriaType_MassFlowRate;
-    extern int const CriteriaType_Temperature;
-    extern int const CriteriaType_HeatTransferRate;
+    constexpr int LoadRangeBasedMin(0);
+    constexpr int LoadRangeBasedMax(2);
 
     // Criteria percentage limits for determining re-simulation of connected loop sides
-    extern Real64 const CriteriaDelta_MassFlowRate;
-    extern Real64 const CriteriaDelta_Temperature;
-    extern Real64 const CriteriaDelta_HeatTransferRate;
-
-    extern int const FreeCoolControlMode_WetBulb; // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
-    extern int const FreeCoolControlMode_DryBulb; // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
-    extern int const FreeCoolControlMode_Loop;    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
+    constexpr Real64 CriteriaDelta_MassFlowRate(0.001);
+    constexpr Real64 CriteriaDelta_Temperature(0.010);
+    constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
 
     // Parameters for use in Loop Demand Calculation Schemes
     extern int const SingleSetPoint;       // Uses a single temp setpoint to calculate loop demand
@@ -252,21 +243,6 @@ namespace DataPlant {
     extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
 
     // Enum classes
-    enum class FlowMode
-    {
-        Unassigned,
-        Constant,
-        NotModulated,
-        LeavingSetpointModulated,
-    };
-
-    enum class CondenserType
-    {
-        Unassigned,
-        AirCooled,
-        WaterCooled,
-        EvapCooled,
-    };
 
     // Object Data
     extern Array1D<PlantLoopData> PlantLoop;

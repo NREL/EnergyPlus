@@ -112,6 +112,36 @@ namespace EnergyPlus::DataPlant {
         SequentialUniformPLR,       // Sequential Uniform PLR Load Distribution Scheme
     };
 
+    enum class FlowMode
+    {
+        Unassigned,
+        Constant,
+        NotModulated,
+        LeavingSetpointModulated,
+    };
+
+    enum class CondenserType
+    {
+        Unassigned,
+        AirCooled,
+        WaterCooled,
+        EvapCooled,
+    };
+
+    // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
+    enum class iCriteriaType {
+        MassFlowRate,
+        Temperature,
+        HeatTransferRate,
+    };
+
+    enum class iFreeCoolControlMode {
+        Unassigned,
+        WetBulb,            // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
+        DryBulb,            // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
+        Loop,               // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
+    };
+
 } // namespace EnergyPlus
 
 #endif

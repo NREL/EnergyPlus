@@ -2764,11 +2764,11 @@ CurrentModuleObject, PlantOpSchemeName);
                 TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
                 {
                     auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                    if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
+                    if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
                         Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                    } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
+                    } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
                         Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                    } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
+                    } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
                             Tsensor = Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
@@ -2793,11 +2793,11 @@ CurrentModuleObject, PlantOpSchemeName);
                 TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
                 {
                     auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                    if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
+                    if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
                         Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                    } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
+                    } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
                         Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                    } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
+                    } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
                             Tsensor = Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
