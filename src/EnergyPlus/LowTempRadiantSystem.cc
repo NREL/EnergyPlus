@@ -157,6 +157,7 @@ namespace LowTempRadiantSystem {
     std::string const cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
     std::string const cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
     std::string const cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
+
     // Operating modes:
     int const NotOperating(0); // Parameter for use with OperatingMode variable, set for heating
     int const HeatingMode(1);  // Parameter for use with OperatingMode variable, set for heating
@@ -183,6 +184,7 @@ namespace LowTempRadiantSystem {
     // Standard, run-of-the-mill variables...
     bool GetInputFlag = true;
     int NumOfHydrLowTempRadSys(0); // Number of hydronic low tempererature radiant systems
+    int NumOfHydrLowTempRadSysDes(0); // Number of hydronic low tempererature radiant design systems
     int NumOfCFloLowTempRadSys(0); // Number of constant flow (hydronic) low tempererature radiant systems
     int NumOfElecLowTempRadSys(0); // Number of electric low tempererature radiant systems
     int CFloCondIterNum(0);        // Number of iterations for a constant flow radiant system--controls variable cond sys ctrl
@@ -213,6 +215,7 @@ namespace LowTempRadiantSystem {
     std::unordered_map<std::string, std::string> LowTempRadUniqueNames;
     Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
     Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
+    Array1D<RadDesignData> HydronicRadiantSysDesign;
 
     bool FirstTimeFlag = true; // for setting size of Ckj, Cmj, WaterTempOut arrays
     bool MyEnvrnFlagGeneral = true;
@@ -441,6 +444,8 @@ namespace LowTempRadiantSystem {
         NumOfCFloLowTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
         NumOfElecLowTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:Electric");
 
+        NumOfHydrLowTempRadSysDes = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design");
+
         TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
         RadSysTypes.allocate(TotalNumOfRadSystems);
         LowTempRadUniqueNames.reserve(static_cast<unsigned>(TotalNumOfRadSystems));
@@ -477,9 +482,43 @@ namespace LowTempRadiantSystem {
         ElecRadSys.allocate(NumOfElecLowTempRadSys);
         ElecRadSysNumericFields.allocate(NumOfElecLowTempRadSys);
         HydronicRadiantSysNumericFields.allocate(NumOfHydrLowTempRadSys);
+        HydronicRadiantSysDesign.allocate(NumOfHydrLowTempRadSysDes);
 
         // make sure data is gotten for surface lists
         GetNumberOfSurfaceLists(state);
+
+        // Obtain all of the design data related to hydronic low temperature radiant systems...
+        BaseNum = 0;
+        CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design";
+        for (Item = 1; Item <= NumOfHydrLowTempRadSysDes; ++Item) {
+
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
+                                          Item,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields
+            );
+
+
+            HydronicRadiantSysDesign(Item).FieldNames.allocate(NumNumbers);
+            HydronicRadiantSysDesign(Item).FieldNames = "";
+            HydronicRadiantSysDesign(Item).FieldNames = cNumericFields;
+            GlobalNames::VerifyUniqueInterObjectName(state, LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+
+            ++BaseNum;
+            auto &thisRadSysDesign(HydronicRadiantSysDesign(Item));
+
+            // General user input data
+            thisRadSysDesign.designName         = Alphas(1);
+            thisRadSysDesign.HotThrottlRange    = Numbers(1);
+        }
 
         // Obtain all of the user data related to hydronic low temperature radiant systems...
         BaseNum = 0;
@@ -664,7 +703,7 @@ namespace LowTempRadiantSystem {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(9), Alphas(10), "Hot Water Nodes");
             }
 
-            thisRadSys.HotThrottlRange = Numbers(9);
+//            thisRadSys.HotThrottlRange = Numbers(9);
 
             thisRadSys.HotSetptSched = Alphas(11);
             thisRadSys.HotSetptSchedPtr = GetScheduleIndex(state, Alphas(11));
@@ -787,7 +826,11 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.CircLength = Numbers(16);
 
-            thisRadSys.schedNameChangeoverDelay = Alphas(18);
+            thisRadSys.designObjectName = Alphas(18);
+            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList(Alphas(18), HydronicRadiantSysDesign);
+
+
+            thisRadSys.schedNameChangeoverDelay = Alphas(19);
             if (!lAlphaBlanks(18)) {
                 thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(18));
                 if (thisRadSys.schedPtrChangeoverDelay == 0) {
@@ -3238,6 +3281,8 @@ namespace LowTempRadiantSystem {
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
+        RadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(2)}; // Contains the data for variable flow hydronic systems
+
         ControlNode = 0;
         MaxWaterFlow = 0.0;
         ActWaterFlow = 0.0;
@@ -3271,7 +3316,8 @@ namespace LowTempRadiantSystem {
             ControlTemp = this->setRadiantSystemControlTemperature(state);
 
             if (this->HotSetptSchedPtr > 0) {
-                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, this->HotThrottlRange);
+//                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, this->HotThrottlRange);
+                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, variableFlowDesignDataObject.HotThrottlRange );
             } else { // This system is not capable of heating, set OffTempHeat to something really low
                 OffTempHeat = LowTempHeating;
             }
@@ -3301,7 +3347,8 @@ namespace LowTempRadiantSystem {
                 if (this->OperatingMode == HeatingMode) {
                     ControlNode = this->HotWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxHeat;
-                    MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, this->HotThrottlRange);
+                    MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, variableFlowDesignDataObject.HotThrottlRange);
+//                    MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, this->HotThrottlRange);
                 } else if (this->OperatingMode == CoolingMode) {
                     ControlNode = this->ColdWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxCool;

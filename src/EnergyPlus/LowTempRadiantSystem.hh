@@ -116,6 +116,7 @@ namespace LowTempRadiantSystem {
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables...
     extern int NumOfHydrLowTempRadSys;    // Number of hydronic low tempererature radiant systems
+    extern int NumOfHydrLowTempRadSysDes; // Number of hydronic low tempererature radiant design systems
     extern int NumOfCFloLowTempRadSys;    // Number of constant flow (hydronic) low tempererature radiant systems
     extern int NumOfElecLowTempRadSys;    // Number of electric low tempererature radiant systems
     extern int CFloCondIterNum;           // Number of iterations for a constant flow radiant system--controls variable cond sys ctrl
@@ -142,11 +143,6 @@ namespace LowTempRadiantSystem {
 
     // Types
 
-    struct RadDesignData {
-        std::string name;
-    };
-
-
     struct RadiantSystemBaseData
     {
         // Members
@@ -155,6 +151,7 @@ namespace LowTempRadiantSystem {
         int SchedPtr;                    // index to schedule
         std::string ZoneName;            // Name of zone the system is serving
         int ZonePtr;                     // Point to this zone in the Zone derived type
+        int DesignObjectPtr;
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
@@ -243,6 +240,7 @@ namespace LowTempRadiantSystem {
         int NumCircCalcMethod;    // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;        // Circuit length {m}
         std::string schedNameChangeoverDelay;   // changeover delay schedule
+        std::string designObjectName;   // Design Object
         int schedPtrChangeoverDelay;    // Pointer to the schedule for the changeover delay in hours
         int lastOperatingMode; // Last mode of operation (heating or cooling)
         int lastDayOfSim;   // Last day of simulation radiant system operated in lastOperatingMode
@@ -296,7 +294,7 @@ namespace LowTempRadiantSystem {
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
     {
         // Members
-        RadDesignData MyDesignData;
+//        RadDesignData MyDesignData;
         Real64 WaterVolFlowMaxHeat;      // maximum water flow rate for heating, m3/s
         Real64 WaterFlowMaxHeat;         // maximum water flow rate for heating, kg/s
         Real64 HotThrottlRange;          // Throttling range for heating [C]
@@ -333,6 +331,23 @@ namespace LowTempRadiantSystem {
 
         void reportLowTemperatureRadiantSystem(EnergyPlusData &state);
 
+    };
+
+    struct RadDesignData : VariableFlowRadiantSystemData
+    {
+
+        // Members
+        // This data could be shared between multiple Var flow LowTempRad Systems
+        std::string designName;           // name of the design object+
+        Real64 HotThrottlRange;          // Throttling range for heating [C]
+        Array1D_string FieldNames;
+
+        // Default Constructor
+        RadDesignData()
+        :
+                HotThrottlRange(0.0)
+        {
+        }
     };
 
     struct ConstantFlowRadiantSystemData : HydronicSystemBaseData
@@ -487,6 +502,8 @@ namespace LowTempRadiantSystem {
     extern Array1D<RadSysTypeData> RadSysTypes;
     extern Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
     extern Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
+
+    extern Array1D<RadDesignData> HydronicRadiantSysDesign;
 
     // Functions
 
