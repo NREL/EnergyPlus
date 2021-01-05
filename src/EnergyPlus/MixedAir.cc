@@ -4086,8 +4086,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         if (ADEffSchPtr > 0) {
                             // Get schedule value for the zone air distribution effectiveness
                             ZoneEz = GetCurrentScheduleValue(state, ADEffSchPtr);
-                        }
-                        else {
+                        } else {
                             ZoneLoad = ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
 
                             // Zone in cooling mode
