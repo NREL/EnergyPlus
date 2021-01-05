@@ -208,26 +208,26 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum).Enthalpy = 43970.75;
 
     TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
 
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "ChilledWaterLoop";
-    PlantLoop(1).FluidName = "ChilledWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
     bool InitFlag(true);
     Real64 MaxONOFFCyclesperHour(4.0);
@@ -256,13 +256,13 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     HPNum = 2;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 2;
-    PlantLoop(2).Name = "HotWaterLoop";
-    PlantLoop(2).FluidName = "HotWater";
-    PlantLoop(2).FluidIndex = 1;
-    PlantLoop(2).FluidName = "WATER";
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
     DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;
     DataLoopNode::Node(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum).Enthalpy = 43950.0;

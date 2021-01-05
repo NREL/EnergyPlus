@@ -252,7 +252,7 @@ namespace ChillerElectricEIR {
                               Real64 &QHeatRec      // Amount of heat recovered [W]
         );
 
-        void update(Real64 MyLoad, bool RunFlag);
+        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

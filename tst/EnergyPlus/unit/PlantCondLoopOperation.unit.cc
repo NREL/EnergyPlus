@@ -81,19 +81,19 @@ public:
                                     // unit test for plant equipment list load distribution
                                     // set up one plantloop side with 1 branches, 12 components
                                     // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
-        DataPlant::PlantLoop.allocate(1);
-        DataPlant::PlantLoop(1).OpScheme.allocate(1);
-        DataPlant::PlantLoop(1).OpScheme(1).EquipList.allocate(1);
-        auto &thisEquipList(DataPlant::PlantLoop(1).OpScheme(1).EquipList(1));
+        state->dataPlnt->PlantLoop.allocate(1);
+        state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
+        state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList.allocate(1);
+        auto &thisEquipList(state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1));
         thisEquipList.NumComps = 12;
         thisEquipList.Comp.allocate(thisEquipList.NumComps);
 
-        DataPlant::PlantLoop(1).LoopSide.allocate(1);
-        DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-        DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
-        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+        state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+        for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             // set up equipment list data
             thisEquipList.Comp(compNum).CompNumPtr = compNum;
 
@@ -111,8 +111,8 @@ public:
     virtual void ResetLoads()
     {
         // reset loads
-        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
-        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
+        for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             thisBranch.Comp(compNum).MyLoad = 0.0;
         }
     }
@@ -125,9 +125,9 @@ public:
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Sequential;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Sequential;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
@@ -218,7 +218,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 
 
     //Duplicate tests from engineering reference examples for Sequential
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -291,12 +291,12 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Uniform;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Uniform;
 
     // Start with 5 components
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
@@ -342,7 +342,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -408,12 +408,12 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Optimal;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Optimal;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
@@ -463,7 +463,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -539,12 +539,12 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
@@ -596,7 +596,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -662,12 +662,12 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
@@ -719,7 +719,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -837,10 +837,10 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
 
     // Setup the plant itself manually
     DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
 
-    DataPlant::PlantLoop(1).OpScheme.allocate(1);
-    DataPlant::PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
+    state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
+    state->dataPlnt->PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
 
     state->dataSetPointManager->NumAllSetPtMgrs = 0;
     state->dataSetPointManager->NumSchTESSetPtMgrs = 0;
@@ -864,19 +864,19 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
     // Might as well check that the Chiller is also Ok
     {
         int CompNum = 1;
-        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
-        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        int CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
         EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::CoolingOp);
     }
 
     {
         int CompNum = 2;
-        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         // Ensure we have the right component (the TES tank)
         EXPECT_EQ(compName, "ICE THERMAL STORAGE");
 
-        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        int CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
 
         // Could just test this, but want to improve reporting
         // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);

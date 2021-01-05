@@ -85,11 +85,11 @@ namespace PlantPressureSystem {
 
     void DistributePressureOnBranch(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
 
-    void PassPressureAcrossMixer(int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide);
+    void PassPressureAcrossMixer(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide);
 
-    void PassPressureAcrossSplitter(int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure);
+    void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure);
 
-    void PassPressureAcrossInterface(int const LoopNum);
+    void PassPressureAcrossInterface(EnergyPlusData &state, int const LoopNum);
 
     Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
                                      int const LoopNum,            // - Index of which plant/condenser loop is being simulated

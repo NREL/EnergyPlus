@@ -81,7 +81,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
     Node(thisEIR.EvapInletNodeNum).Temp = 18.0;
     Node(thisEIR.CondInletNodeNum).Temp = 35.0;
 
-    thisEIR.update(-2000, true);
+    thisEIR.update(*state, -2000, true);
 
     EXPECT_EQ(18, thisEIR.EvapOutletTemp);
     EXPECT_EQ(35, thisEIR.CondOutletTemp);
@@ -107,18 +107,18 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     thisEIR.RefCap = 10000;
     thisEIR.RefCOP = 3.0;
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(2);
     // chilled water loop
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
     // condenser water loop
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     DataSizing::PlantSizData(2).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(2).DeltaT = 5.0;
 
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
@@ -192,15 +192,15 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -208,15 +208,15 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     GetElectricEIRChillerInput(*state);
     auto &thisEIR = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
-    DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "ChilledWater";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisEIR.Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ElectricEIR;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIR.EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIR.EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisEIR.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ElectricEIR;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIR.EvapInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIR.EvapOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -299,15 +299,15 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
 
     Psychrometrics::InitializePsychRoutines();
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -315,15 +315,15 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     GetElectricEIRChillerInput(*state);
     auto &thisEIRChiller = state->dataChillerElectricEIR->ElectricEIRChiller(1);
 
-    DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "ChilledWater";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisEIRChiller.Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ElectricEIR;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIRChiller.EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIRChiller.EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisEIRChiller.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ElectricEIR;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIRChiller.EvapInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIRChiller.EvapOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     Real64 MyLoad(-18000.0);
     openOutputFiles(*state);
 
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
     DataLoopNode::Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
     // init and size

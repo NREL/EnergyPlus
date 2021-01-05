@@ -108,40 +108,40 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
     ElectricChillerSpecs::getInput(*state);
 
-    DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "ChilledWater";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
-    DataPlant::PlantLoop(2).Name = "CondenserWaterLoop";
-    DataPlant::PlantLoop(2).FluidName = "CondenserWater";
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "CondenserWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "CondenserWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -235,40 +235,40 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
     ElectricChillerSpecs::getInput(*state);
 
-    DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "ChilledWater";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
-    DataPlant::PlantLoop(2).Name = "CondenserWaterLoop";
-    DataPlant::PlantLoop(2).FluidName = "CondenserWater";
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "CondenserWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "CondenserWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;

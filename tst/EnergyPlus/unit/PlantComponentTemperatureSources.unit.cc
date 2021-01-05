@@ -74,19 +74,19 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
 
     // Setup the plant itself manually
     DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_WaterSource;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_WaterSource;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
     // define the INOUT variables that are passed back
     Real64 myLoad = 0.0;

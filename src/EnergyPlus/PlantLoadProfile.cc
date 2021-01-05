@@ -88,7 +88,6 @@ namespace PlantLoadProfile {
     // manager (see NonZoneEquipmentManager.cc).
 
     // Using/Aliasing
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_PlantLoadProfile;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -160,7 +159,7 @@ namespace PlantLoadProfile {
 
         if (this->MassFlowRate > 0.0) {
             Real64 Cp =
-                GetSpecificHeatGlycol(state, PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->InletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
             DeltaTemp = this->Power / (this->MassFlowRate * Cp);
         } else {
             this->Power = 0.0;
@@ -209,7 +208,7 @@ namespace PlantLoadProfile {
 
         // Do the one time initializations
         if (this->SetLoopIndexFlag) {
-            if (allocated(PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
@@ -231,7 +230,7 @@ namespace PlantLoadProfile {
             Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
@@ -258,7 +257,7 @@ namespace PlantLoadProfile {
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
 
-        FluidDensityInit = GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        FluidDensityInit = GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->InletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Get the scheduled mass flow rate
         this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(state, this->FlowRateFracSchedule);

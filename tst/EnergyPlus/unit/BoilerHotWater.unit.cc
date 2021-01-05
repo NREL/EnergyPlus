@@ -81,12 +81,12 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     state->dataBoilers->Boiler(1).VolFlowRate = 1.0;
     state->dataBoilers->Boiler(1).VolFlowRateWasAutoSized = false;
 
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataSizing::PlantSizData.allocate(1);
     // Hot Water Loop
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     // clear
     state->dataBoilers->Boiler.deallocate();
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 {
@@ -126,26 +126,26 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
     state->dataBoilers->Boiler(1).VolFlowRate = DataSizing::AutoSize;
     state->dataBoilers->Boiler(1).VolFlowRateWasAutoSized = true;
 
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataSizing::PlantSizData.allocate(1);
     // Hot Water Loop
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // calculate nominal capacity at 60.0 C hot water temperature
     Real64 rho = FluidProperties::GetDensityGlycol(*state,
-                                                   DataPlant::PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
+                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
                                                    60.0,
-                                                   DataPlant::PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
+                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                    "Boiler_HotWaterAutoSizeTempTest");
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state,
-                                                       DataPlant::PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
+                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
                                                        60.0,
-                                                       DataPlant::PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
+                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                        "Boiler_HotWaterAutoSizeTempTest");
 
     Real64 NomCapBoilerExpected = rho * PlantSizData(1).DesVolFlowRate * Cp * PlantSizData(1).DeltaT * state->dataBoilers->Boiler(1).SizFac;
@@ -237,14 +237,14 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -252,15 +252,15 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilers->Boiler(1);
 
-    DataPlant::PlantLoop(1).Name = "HotWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "HotWater";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;

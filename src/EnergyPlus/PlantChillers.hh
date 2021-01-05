@@ -252,7 +252,8 @@ namespace PlantChillers {
                        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void update(Real64 MyLoad, // current load
+        void update(EnergyPlusData &state,
+                    Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
         );
 
@@ -356,7 +357,8 @@ namespace PlantChillers {
                               Real64 &HeatRecRatio    // Max Heat recovery ratio
         );
 
-        void update(Real64 MyLoad, // current load
+        void update(EnergyPlusData &state,
+                    Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
         );
     };
@@ -445,7 +447,8 @@ namespace PlantChillers {
                        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void update(Real64 MyLoad, // current load
+        void update(EnergyPlusData &state,
+                    Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
         );
     };

@@ -273,7 +273,7 @@ namespace ChillerReformulatedEIR {
 
         void calcHeatRecovery(EnergyPlusData &state, Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
-        void update(Real64 MyLoad, bool RunFlag);
+        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
 

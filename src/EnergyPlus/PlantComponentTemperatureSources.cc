@@ -172,9 +172,9 @@ namespace PlantComponentTemperatureSources {
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
             PlantUtilities::InitComponentNodes(0.0,
@@ -201,9 +201,9 @@ namespace PlantComponentTemperatureSources {
 
         // Calculate specific heat
         Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
                                                            this->BoundaryTemp,
-                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
 
         // Calculate deltaT
@@ -300,7 +300,7 @@ namespace PlantComponentTemperatureSources {
         bool ErrorsFound(false);        // If errors detected in input
         Real64 DesVolFlowRateUser(0.0); // Hardsized design volume flow rate for reporting
         Real64 tmpVolFlowRate = this->DesVolFlowRate;
-        int PltSizNum = DataPlant::PlantLoop(this->Location.loopNum).PlantSizNum;
+        int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
@@ -380,9 +380,9 @@ namespace PlantComponentTemperatureSources {
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
                                                                this->BoundaryTemp,
-                                                               DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             this->HeatEnergy = this->HeatRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;

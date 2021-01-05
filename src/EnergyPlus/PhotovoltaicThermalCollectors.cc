@@ -155,7 +155,7 @@ namespace PhotovoltaicThermalCollectors {
         this->initialize(state, FirstHVACIteration);
         this->control();
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void GetPVTcollectorsInput(EnergyPlusData &state)
@@ -470,7 +470,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         if (this->SetLoopIndexFlag) {
-            if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -578,9 +578,9 @@ namespace PhotovoltaicThermalCollectors {
                 if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   DataPlant::PlantLoop(this->WLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
                                                                    DataGlobalConstants::HWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
                                                                    RoutineName);
 
                     this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
@@ -658,10 +658,10 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
             if (!allocated(DataSizing::PlantSizData)) return;
-            if (!allocated(DataPlant::PlantLoop)) return;
+            if (!allocated(state.dataPlnt->PlantLoop)) return;
 
             if (this->WLoopNum > 0) {
-                PltSizNum = DataPlant::PlantLoop(this->WLoopNum).PlantSizNum;
+                PltSizNum = state.dataPlnt->PlantLoop(this->WLoopNum).PlantSizNum;
             }
             if (this->WLoopSideNum == DataPlant::SupplySide) {
                 if (PltSizNum > 0) {
@@ -1031,7 +1031,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::update()
+    void PVTCollectorStruct::update(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1049,7 +1049,7 @@ namespace PhotovoltaicThermalCollectors {
                 InletNode = this->PlantInletNodeNum;
                 OutletNode = this->PlantOutletNodeNum;
 
-                PlantUtilities::SafeCopyPlantNode(InletNode, OutletNode);
+                PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
                 DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
 
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {

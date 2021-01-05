@@ -196,7 +196,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                 ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(this->LoadLoopNum,
+            PlantUtilities::InterConnectTwoPlantLoopSides(state, this->LoadLoopNum,
                                                           this->LoadLoopSideNum,
                                                           this->SourceLoopNum,
                                                           this->SourceLoopSideNum,
@@ -526,9 +526,9 @@ namespace HeatPumpWaterToWaterCOOLING {
 
             this->beginEnvironFlag = false;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName,
                                                            DataGlobalConstants::CWInitConvTemp,
-                                                           DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
 
@@ -542,9 +542,9 @@ namespace HeatPumpWaterToWaterCOOLING {
                                this->LoadCompNum);
 
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                     DataGlobalConstants::CWInitConvTemp,
-                                                    DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
 
@@ -665,7 +665,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                  this->SourceLoopSideNum,
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
-            PlantUtilities::PullCompInterconnectTrigger(this->LoadLoopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->LoadLoopNum,
                                                         this->LoadLoopSideNum,
                                                         this->LoadBranchNum,
                                                         this->LoadCompNum,
@@ -724,7 +724,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                      this->SourceLoopSideNum,
                                      this->SourceBranchNum,
                                      this->SourceCompNum);
-                PlantUtilities::PullCompInterconnectTrigger(this->LoadLoopNum,
+                PlantUtilities::PullCompInterconnectTrigger(state, this->LoadLoopNum,
                                                             this->LoadLoopSideNum,
                                                             this->LoadBranchNum,
                                                             this->LoadCompNum,
@@ -742,7 +742,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                 this->SourceSideWaterOutletTemp = SourceSideWaterInletTemp;
                 return;
             }
-            PlantUtilities::PullCompInterconnectTrigger(this->LoadLoopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->LoadLoopNum,
                                                         this->LoadLoopSideNum,
                                                         this->LoadBranchNum,
                                                         this->LoadCompNum,
@@ -761,13 +761,13 @@ namespace HeatPumpWaterToWaterCOOLING {
         IterationCount = 0;
 
         CpSourceSide = FluidProperties::GetSpecificHeatGlycol(state,
-                                                              DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
+                                                              state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                               this->SourceSideWaterInletTemp,
-                                                              DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                              state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                               RoutineName);
 
         CpLoadSide = FluidProperties::GetSpecificHeatGlycol(
-                state, DataPlant::PlantLoop(this->LoadLoopNum).FluidName, this->LoadSideWaterInletTemp, DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex, RoutineName);
+                state, state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName, this->LoadSideWaterInletTemp, state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex, RoutineName);
 
         // Determine effectiveness of Load Side
         LoadSideEffect = 1.0 - std::exp(-this->LoadSideUACoeff / (CpLoadSide * this->LoadSideWaterMassFlowRate));

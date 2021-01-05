@@ -241,29 +241,29 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
-    PlantLoop.allocate(1);
-    PlantLoop(1).Name = "MyPlant";
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "MyPlant";
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // create 2 components on a single branch to simulate water flow control for entire branch
-    PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
     PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
@@ -287,13 +287,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
     // SetActuatedBranchFlowRate(*state, CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
@@ -317,13 +317,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(3).MassFlowRateRequest, NodeMdot);
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
     SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
@@ -347,8 +347,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     // override flag should also be true
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
     SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
@@ -405,29 +405,29 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
-    PlantLoop.allocate(1);
-    PlantLoop(1).Name = "MyPlant";
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "MyPlant";
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // create 2 components on a single branch to simulate water flow control for entire branch
-    PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
     PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
@@ -450,13 +450,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     // set up EMS
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
     // SetComponentFlowRate(*state, CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
@@ -480,13 +480,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(3).MassFlowRateRequest, NodeMdot);
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
 
     // expect node data to represent full flow
     SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
@@ -512,8 +512,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     // override flag should also be true
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
     Real64 tempNodeMdot(NodeMdot);
 
     // expect node data to represent no flow. Max, MaxAvail, and Request are not changed

@@ -318,28 +318,28 @@ protected:
 
         // set up plant loop for water equipment
         DataPlant::TotNumLoops = 2;
-        DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+        state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
         DataSizing::PlantSizData.allocate(DataPlant::TotNumLoops);
         // int NumPltSizInput = DataPlant::TotNumLoops;
         DataSizing::NumPltSizInput = 2;
 
         for (int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex) {
-            auto &loop(DataPlant::PlantLoop(loopindex));
+            auto &loop(state->dataPlnt->PlantLoop(loopindex));
             loop.LoopSide.allocate(2);
-            auto &loopside(DataPlant::PlantLoop(loopindex).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(DataPlant::PlantLoop(loopindex).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 2;
             loopsidebranch.Comp.allocate(2);
         }
-        DataPlant::PlantLoop(1).Name = "Hot Water Loop";
-        DataPlant::PlantLoop(1).FluidName = "WATER";
-        DataPlant::PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).Name = "Hot Water Loop";
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
-        DataPlant::PlantLoop(2).Name = "Chilled Water Loop";
-        DataPlant::PlantLoop(2).FluidName = "WATER";
-        DataPlant::PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).Name = "Chilled Water Loop";
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
 
         DataSizing::PlantSizData(1).PlantLoopName = "Hot Water Loop";
         DataSizing::PlantSizData(1).ExitTemp = 80.0;
@@ -5599,7 +5599,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
     // call air-side VRF
@@ -5659,15 +5659,15 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
     rho = GetDensityGlycol(*state,
-        PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     Cp = GetSpecificHeatGlycol(*state,
-        PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) / (PlantSizData(1).DeltaT * Cp * rho);
 
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(*state,
-        PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow, (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
@@ -8104,24 +8104,24 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 
     // set up plant loop
     TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(1).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(1).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "HotWaterLoop";
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataWaterCoils->CheckEquipName.dimension(state->dataWaterCoils->NumWaterCoils, true);
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(CoilNum);
@@ -8220,24 +8220,24 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     PlantSizData(NumPltSizInput).PlantLoopName = "SteamLoop";
     // set up plant loop
     TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(1).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(1).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "SteamLoop";
-    PlantLoop(1).FluidName = "STEAM";
-    PlantLoop(1).FluidIndex = state->dataSteamCoils->SteamIndex;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataSteamCoils->SteamCoil(CoilNum).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
+    state->dataPlnt->PlantLoop(1).FluidIndex = state->dataSteamCoils->SteamIndex;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataSteamCoils->SteamCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;

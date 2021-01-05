@@ -162,8 +162,9 @@ namespace PlantCondLoopOperation {
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand);
 
-    void AdjustChangeInLoadForLastStageUpperRangeLimit(int const LoopNum,         // component topology
-                                                       int const CurOpSchemePtr,  // currect active operation scheme
+    void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
+                                                       int const LoopNum,         // component topology
+                                                       int const CurOpSchemePtr,  // current active operation scheme
                                                        int const CurEquipListPtr, // current equipment list
                                                        Real64 &ChangeInLoad       // positive magnitude of load change
     );
@@ -210,11 +211,11 @@ namespace PlantCondLoopOperation {
     // Begin Plant Loop ON/OFF Utility Subroutines
     //******************************************************************************
 
-    void TurnOnPlantLoopPipes(int const LoopNum, int const LoopSideNum);
+    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    void TurnOffLoopEquipment(int const LoopNum);
+    void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum);
 
-    void TurnOffLoopSideEquipment(int const LoopNum, int const LoopSideNum);
+    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
     // End Plant Loop ON/OFF Utility Subroutines
     //******************************************************************************
@@ -226,7 +227,8 @@ namespace PlantCondLoopOperation {
 
     void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
-    void AdjustChangeInLoadByEMSControls(int const LoopNum,
+    void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
+                                         int const LoopNum,
                                          int const LoopSideNum,
                                          int const BranchNum,
                                          int const CompNum,

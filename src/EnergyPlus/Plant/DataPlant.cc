@@ -66,7 +66,6 @@ namespace EnergyPlus::DataPlant {
     };
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    int const NumSimPlantEquipTypes(96);
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",
@@ -278,104 +277,6 @@ namespace EnergyPlus::DataPlant {
          LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
          LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both});
 
-    int const TypeOf_Other(-1);
-    int const TypeOf_Boiler_Simple(1);
-    int const TypeOf_Boiler_Steam(2);
-    int const TypeOf_Chiller_Absorption(3);          // older BLAST absorption chiller
-    int const TypeOf_Chiller_Indirect_Absorption(4); // revised absorption chiller
-    int const TypeOf_Chiller_CombTurbine(5);
-    int const TypeOf_Chiller_ConstCOP(6);
-    int const TypeOf_Chiller_DFAbsorption(7);
-    int const TypeOf_Chiller_Electric(8); // basic BLAST Chiller
-    int const TypeOf_Chiller_ElectricEIR(9);
-    int const TypeOf_Chiller_ElectricReformEIR(10);
-    int const TypeOf_Chiller_EngineDriven(11);
-    int const TypeOf_CoolingTower_SingleSpd(12);
-    int const TypeOf_CoolingTower_TwoSpd(13);
-    int const TypeOf_CoolingTower_VarSpd(14);
-    int const TypeOf_Generator_FCExhaust(15);
-    int const TypeOf_HeatPumpWtrHeaterPumped(16);
-    int const TypeOf_HPWaterEFCooling(17);
-    int const TypeOf_HPWaterEFHeating(18);
-    int const TypeOf_HPWaterPECooling(19);
-    int const TypeOf_HPWaterPEHeating(20);
-    int const TypeOf_Pipe(21);
-    int const TypeOf_PipeSteam(22);
-    int const TypeOf_PipeExterior(23);
-    int const TypeOf_PipeInterior(24);
-    int const TypeOf_PipeUnderground(25);
-    int const TypeOf_PurchChilledWater(26);
-    int const TypeOf_PurchHotWater(27);
-    int const TypeOf_TS_IceDetailed(28);
-    int const TypeOf_TS_IceSimple(29);
-    int const TypeOf_ValveTempering(30);
-    int const TypeOf_WtrHeaterMixed(31);
-    int const TypeOf_WtrHeaterStratified(32);
-    int const TypeOf_PumpVariableSpeed(33);
-    int const TypeOf_PumpConstantSpeed(34);
-    int const TypeOf_PumpCondensate(35);
-    int const TypeOf_PumpBankVariableSpeed(36);
-    int const TypeOf_PumpBankConstantSpeed(37);
-    int const TypeOf_WaterUseConnection(38);
-    int const TypeOf_CoilWaterCooling(39);             // demand side component
-    int const TypeOf_CoilWaterDetailedFlatCooling(40); // demand side component
-    int const TypeOf_CoilWaterSimpleHeating(41);       // demand side component
-    int const TypeOf_CoilSteamAirHeating(42);          // demand side component
-    int const TypeOf_SolarCollectorFlatPlate(43);      // demand side component
-    int const TypeOf_PlantLoadProfile(44);             // demand side component
-    int const TypeOf_GrndHtExchgSystem(45);
-    int const TypeOf_GrndHtExchgSurface(46);
-    int const TypeOf_GrndHtExchgPond(47);
-    int const TypeOf_Generator_MicroTurbine(48); // newer FSEC turbine
-    int const TypeOf_Generator_ICEngine(49);
-    int const TypeOf_Generator_CTurbine(50); // older BLAST turbine
-    int const TypeOf_Generator_MicroCHP(51);
-    int const TypeOf_Generator_FCStackCooler(52);
-    int const TypeOf_FluidCooler_SingleSpd(53);
-    int const TypeOf_FluidCooler_TwoSpd(54);
-    int const TypeOf_EvapFluidCooler_SingleSpd(55);
-    int const TypeOf_EvapFluidCooler_TwoSpd(56);
-    int const TypeOf_ChilledWaterTankMixed(57);
-    int const TypeOf_ChilledWaterTankStratified(58);
-    int const TypeOf_PVTSolarCollectorFlatPlate(59);
-    int const TypeOf_Baseboard_Conv_Water(60);
-    int const TypeOf_Baseboard_Rad_Conv_Steam(61);
-    int const TypeOf_Baseboard_Rad_Conv_Water(62);
-    int const TypeOf_LowTempRadiant_VarFlow(63);
-    int const TypeOf_LowTempRadiant_ConstFlow(64);
-    int const TypeOf_CooledBeamAirTerminal(65);
-    int const TypeOf_CoilWAHPHeatingEquationFit(66);
-    int const TypeOf_CoilWAHPCoolingEquationFit(67);
-    int const TypeOf_CoilWAHPHeatingParamEst(68);
-    int const TypeOf_CoilWAHPCoolingParamEst(69);
-    int const TypeOf_RefrigSystemWaterCondenser(70);
-    int const TypeOf_RefrigerationWaterCoolRack(71);
-    int const TypeOf_MultiSpeedHeatPumpRecovery(72);
-    int const TypeOf_Chiller_ExhFiredAbsorption(73);
-    int const TypeOf_PipingSystemPipeCircuit(74);
-    int const TypeOf_SolarCollectorICS(75);
-    int const TypeOf_CoilVSWAHPHeatingEquationFit(76);
-    int const TypeOf_CoilVSWAHPCoolingEquationFit(77);
-    int const TypeOf_PlantComponentUserDefined(78);
-    int const TypeOf_CoilUserDefined(79);
-    int const TypeOf_ZoneHVACAirUserDefined(80);
-    int const TypeOf_AirTerminalUserDefined(81);
-    int const TypeOf_HeatPumpVRF(82);
-    int const TypeOf_GrndHtExchgHorizTrench(83);
-    int const TypeOf_FluidToFluidPlantHtExchg(84);
-    int const TypeOf_WaterSource(85);
-    int const TypeOf_CentralGroundSourceHeatPump(86);
-    int const TypeOf_UnitarySysRecovery(87);
-    int const TypeOf_PackagedTESCoolingCoil(88);
-    int const TypeOf_CoolingTower_VarSpdMerkel(89);
-    int const TypeOf_SwimmingPool_Indoor(90);
-    int const TypeOf_GrndHtExchgSlinky(91);
-    int const TypeOf_HeatPumpWtrHeaterWrapped(92);
-    int const TypeOf_FourPipeBeamAirTerminal(93);
-    int const TypeOf_CoolingPanel_Simple(94);
-    int const TypeOf_HeatPumpEIRCooling(95);
-    int const TypeOf_HeatPumpEIRHeating(96);
-
     Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
     Real64 const sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
@@ -394,7 +295,6 @@ namespace EnergyPlus::DataPlant {
     int PlantManageHalfLoopCalls(0); // tracks number of half loop calls
 
     // Object Data
-    Array1D<PlantLoopData> PlantLoop;
     Array1D<PlantAvailMgrData> PlantAvailMgr;
     Array1D<ReportLoopData> VentRepPlantSupplySide;
     Array1D<ReportLoopData> VentRepPlantDemandSide;
@@ -416,7 +316,6 @@ namespace EnergyPlus::DataPlant {
         AnyEMSPlantOpSchemesInModel = false;
         PlantManageSubIterations = 0;
         PlantManageHalfLoopCalls = 0;
-        PlantLoop.deallocate();
         PlantAvailMgr.deallocate();
         VentRepPlantSupplySide.deallocate();
         VentRepPlantDemandSide.deallocate();

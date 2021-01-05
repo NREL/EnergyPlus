@@ -113,14 +113,14 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // De-allocate temporary arrays (happens in GetInput too...)
     PlantCentralGSHP::ChillerHeater.deallocate();
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(2);
 
     // Chilled Water Loop
     int PltSizNum = 1;
-    DataPlant::PlantLoop(PltSizNum).PlantSizNum = 1;
-    DataPlant::PlantLoop(PltSizNum).FluidIndex = 1;
-    DataPlant::PlantLoop(PltSizNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(PltSizNum).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(PltSizNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(PltSizNum).FluidName = "WATER";
     DataSizing::PlantSizData(PltSizNum).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(PltSizNum).DeltaT = 10.0;
     DataSizing::PlantSizData(PltSizNum).LoopType = DataSizing::CoolingLoop;
@@ -129,9 +129,9 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // Condenser Loop
     int PltSizCondNum = 2;
-    DataPlant::PlantLoop(PltSizCondNum).PlantSizNum = PltSizCondNum;
-    DataPlant::PlantLoop(PltSizCondNum).FluidIndex = 1;
-    DataPlant::PlantLoop(PltSizCondNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(PltSizCondNum).PlantSizNum = PltSizCondNum;
+    state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(PltSizCondNum).FluidName = "WATER";
     // DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate = 1.5;
     DataSizing::PlantSizData(PltSizCondNum).DeltaT = 5.6;
     DataSizing::PlantSizData(PltSizCondNum).LoopType = DataSizing::CondenserLoop;
@@ -139,24 +139,24 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::Wrapper(1).GLHELoopNum = PltSizCondNum;
 
     // Calculate expected values
-    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
+    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state, state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp,
-                                                        DataPlant::PlantLoop(PltSizNum).FluidIndex,
+                                                        state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
+    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state, state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            DataPlant::PlantLoop(PltSizNum).FluidIndex,
+                                                            state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
+    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state, state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp,
-                                                        DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
+                                                        state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
+    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state, state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                             PlantCentralGSHP::Wrapper(1).ChillerHeater(1).TempRefCondInCooling,
-                                                            DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
+                                                            state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
     // Note: Each individual chiller heater module is sized to be capable of supporting the total load on the wrapper

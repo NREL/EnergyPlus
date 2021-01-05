@@ -449,35 +449,35 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     GetPTUnit(*state);
 
     TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
 
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    PlantLoop(2).Name = "ChilledWaterLoop";
-    PlantLoop(2).FluidName = "ChilledWater";
-    PlantLoop(2).FluidIndex = 1;
-    PlantLoop(2).FluidName = "WATER";
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
 
-    PlantLoop(1).Name = "HotWaterLoop";
-    PlantLoop(1).FluidName = "HotWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(2).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(2).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneSizingRunDone = true;

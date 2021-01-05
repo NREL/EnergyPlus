@@ -788,7 +788,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -978,8 +977,8 @@ namespace EnergyPlus::PipeHeatTransfer {
         // Thus, this is called at the beginning of every time step once.
 
         this->FluidSpecHeat =
-            GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, state.dataPipeHT->nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-        this->FluidDensity = GetDensityGlycol(state, PlantLoop(this->LoopNum).FluidName, state.dataPipeHT->nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, state.dataPipeHT->nsvInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        this->FluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, state.dataPipeHT->nsvInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
         this->FluidHeatLossRate = 0.0;
@@ -1415,7 +1414,6 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // INTEGER, INTENT(IN) :: PipeHTNum       ! Index for the surface
@@ -1443,7 +1441,7 @@ namespace EnergyPlus::PipeHeatTransfer {
         Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMaxAvail = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
         Node(state.dataPipeHT->nsvOutletNodeNum).Quality = Node(state.dataPipeHT->nsvInletNodeNum).Quality;
         // Only pass pressure if we aren't doing a pressure simulation
-        switch (PlantLoop(this->LoopNum).PressureSimType) {
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
         case DataPlant::iPressSimType::NoPressure:
             Node(state.dataPipeHT->nsvOutletNodeNum).Press = Node(state.dataPipeHT->nsvInletNodeNum).Press;
             break;
@@ -1573,7 +1571,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetViscosityGlycol;
 
@@ -1647,8 +1644,8 @@ namespace EnergyPlus::PipeHeatTransfer {
         }
 
         // look up conductivity and viscosity
-        Kactual = GetConductivityGlycol(state, PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName); // W/m-K
-        MUactual = GetViscosityGlycol(state, PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName) /
+        Kactual = GetConductivityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, this->FluidTemp(0), state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName); // W/m-K
+        MUactual = GetViscosityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, this->FluidTemp(0), state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName) /
                    1000.0; // Note fluid properties routine returns mPa-s, we need Pa-s
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp

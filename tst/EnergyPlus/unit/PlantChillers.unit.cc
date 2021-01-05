@@ -79,11 +79,11 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->GTChiller(1).COP = 3.0;
     state->dataPlantChillers->GTChiller(1).engineCapacityScalar = 1.0;
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 
     state->dataPlantChillers->GTChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
@@ -115,11 +115,11 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->EngineDrivenChiller(1).NomCap = 10000;
     state->dataPlantChillers->EngineDrivenChiller(1).COP = 3.0;
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 
     state->dataPlantChillers->EngineDrivenChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)

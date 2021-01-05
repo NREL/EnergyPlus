@@ -131,7 +131,7 @@ namespace EnergyPlus::ChillerAbsorption {
     void BLASTAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
-        this->EquipFlowCtrl = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
+        this->EquipFlowCtrl = state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             // called from dominant chilled water connection loop side
@@ -139,7 +139,7 @@ namespace EnergyPlus::ChillerAbsorption {
             // Calculate Load
             this->initialize(state, RunFlag, CurLoad);
             this->calculate(state, CurLoad, RunFlag);
-            this->updateRecords(CurLoad, RunFlag);
+            this->updateRecords(state, CurLoad, RunFlag);
 
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
@@ -157,7 +157,8 @@ namespace EnergyPlus::ChillerAbsorption {
 
         } else if (calledFromLocation.loopNum == this->GenLoopNum) {
             // Called from non-dominant generator hot water or steam connection loop side
-            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(calledFromLocation.loopNum,
+            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
+                                                                        calledFromLocation.loopNum,
                                                                         calledFromLocation.loopSideNum,
                                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                                         this->GeneratorInletNodeNum,
@@ -636,7 +637,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                         _,
                                                         this->CondInletNodeNum,
                                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
             if (this->GeneratorInletNodeNum > 0) {
@@ -653,13 +654,13 @@ namespace EnergyPlus::ChillerAbsorption {
                                                         _,
                                                         this->GeneratorInletNodeNum,
                                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,
                     this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
 
             // Fill in connection data
             if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,
                     this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Absorption, false);
             }
             if (errFlag) {
@@ -667,12 +668,12 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
-                DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-                DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -705,9 +706,9 @@ namespace EnergyPlus::ChillerAbsorption {
 
                     this->ModulatedFlowSetToLoop = true;
                     DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint =
-                        DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi =
-                        DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
 
@@ -717,9 +718,9 @@ namespace EnergyPlus::ChillerAbsorption {
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                            DataGlobalConstants::CWInitConvTemp,
-                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
@@ -734,9 +735,9 @@ namespace EnergyPlus::ChillerAbsorption {
                                                this->CWCompNum);
 
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                     DataGlobalConstants::CWInitConvTemp,
-                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                     RoutineName);
 
             this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
@@ -755,9 +756,9 @@ namespace EnergyPlus::ChillerAbsorption {
 
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                             DataGlobalConstants::HWInitConvTemp,
-                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->GenLoopNum).FluidIndex,
                                                             RoutineName);
 
                     this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
@@ -810,9 +811,9 @@ namespace EnergyPlus::ChillerAbsorption {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint =
-                DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
             DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi =
-                DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
 
         Real64 mdotEvap; // local fluid mass flow rate thru evaporator
@@ -893,8 +894,8 @@ namespace EnergyPlus::ChillerAbsorption {
         Real64 tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
 
         // find the appropriate Plant Sizing object
-        int PltSizNum = DataPlant::PlantLoop(this->CWLoopNum).PlantSizNum;
-        int PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
+        int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
+        int PltSizCondNum = state.dataPlnt->PlantLoop(this->CDLoopNum).PlantSizNum;
 
         if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
@@ -924,15 +925,15 @@ namespace EnergyPlus::ChillerAbsorption {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
                 if (!this->NomCapWasAutoSized) tmpNomCap = this->NomCap;
@@ -1090,15 +1091,15 @@ namespace EnergyPlus::ChillerAbsorption {
                 //       QCondenser = QEvaporator + QGenerator + PumpingPower
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                                    this->TempDesCondIn,
-                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                RoutineName);
                 tmpCondVolFlowRate =
                     tmpNomCap * (1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
@@ -1168,15 +1169,15 @@ namespace EnergyPlus::ChillerAbsorption {
             if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                            state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                             DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp,
-                                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                            state.dataPlnt->PlantLoop(this->GenLoopNum).FluidIndex,
                                                                             RoutineName);
                     Real64 SteamDeltaT = max(0.5, DataSizing::PlantSizData(PltSizHeatingNum).DeltaT);
                     Real64 RhoWater = FluidProperties::GetDensityGlycol(state,
-                                                                        DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                        state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                         (DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp - SteamDeltaT),
-                                                                        DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                        state.dataPlnt->PlantLoop(this->GenLoopNum).FluidIndex,
                                                                         RoutineName);
                     tmpGeneratorVolFlowRate = (this->NomCap * SteamInputRatNom) / (CpWater * SteamDeltaT * RhoWater);
                     if (!this->GeneratorVolFlowRateWasAutoSized) tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
@@ -1321,14 +1322,14 @@ namespace EnergyPlus::ChillerAbsorption {
             } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                       DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                       state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                        DataGlobalConstants::HWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->GenLoopNum).FluidIndex,
                                                                        RoutineName);
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                    DataGlobalConstants::HWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->GenLoopNum).FluidIndex,
                                                                    RoutineName);
 
                     this->GeneratorDeltaTemp = (SteamInputRatNom * this->NomCap) / (Cp * rho * this->GeneratorVolFlowRate);
@@ -1386,9 +1387,9 @@ namespace EnergyPlus::ChillerAbsorption {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                 DataLoopNode::Node(this->EvapInletNodeNum).Temp,
-                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                 RoutineName);
 
         // If there is a fault of Chiller SWT Sensor
@@ -1406,7 +1407,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = std::abs(MyLoad);
             // limit by max capacity
@@ -1426,7 +1427,7 @@ namespace EnergyPlus::ChillerAbsorption {
             } else if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
@@ -1450,7 +1451,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                          this->CWBranchNum,
                                                          this->CWCompNum);
                     {
-                        auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
+                        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
@@ -1499,10 +1500,10 @@ namespace EnergyPlus::ChillerAbsorption {
                 Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
 
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
-                            (DataPlant::PlantLoop(this->CWLoopNum)
+                            (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
@@ -1510,11 +1511,11 @@ namespace EnergyPlus::ChillerAbsorption {
                             (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                            TempEvapOutSetPoint = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
                     } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
-                            (DataPlant::PlantLoop(this->CWLoopNum)
+                            (state.dataPlnt->PlantLoop(this->CWLoopNum)
                                  .LoopSide(this->CWLoopSideNum)
                                  .Branch(this->CWBranchNum)
                                  .Comp(this->CWCompNum)
@@ -1522,7 +1523,7 @@ namespace EnergyPlus::ChillerAbsorption {
                             (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                            TempEvapOutSetPoint = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                         }
                     } else {
                         assert(false);
@@ -1624,9 +1625,9 @@ namespace EnergyPlus::ChillerAbsorption {
         this->QCondenser = this->QEvaporator + this->QGenerator + this->PumpingPower;
 
         CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                          RoutineName);
 
         if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1645,11 +1646,11 @@ namespace EnergyPlus::ChillerAbsorption {
                 Real64 GenMassFlowRate;
                 //  Hot water plant is used for the generator
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                 DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                 state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                  DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
-                                                                 DataPlant::PlantLoop(GenLoopSideNum).FluidIndex,
+                                                                 state.dataPlnt->PlantLoop(GenLoopSideNum).FluidIndex,
                                                                  RoutineName);
-                if (DataPlant::PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+                if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
                     if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
                         GenMassFlowRate = this->GenMassFlowRateMax;
                     } else { // LeavingSetpointModulated
@@ -1730,7 +1731,7 @@ namespace EnergyPlus::ChillerAbsorption {
         this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    void BLASTAbsorberSpecs::updateRecords(Real64 MyLoad, bool RunFlag)
+    void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1741,8 +1742,8 @@ namespace EnergyPlus::ChillerAbsorption {
 
         if (MyLoad >= 0 || !RunFlag) {
             // set node conditions
-            PlantUtilities::SafeCopyPlantNode(this->EvapInletNodeNum, this->EvapOutletNodeNum);
-            PlantUtilities::SafeCopyPlantNode(this->CondInletNodeNum, this->CondOutletNodeNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->EvapInletNodeNum, this->EvapOutletNodeNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->CondInletNodeNum, this->CondOutletNodeNum);
 
             this->Report.PumpingPower = 0.0;
             this->Report.QEvap = 0.0;
@@ -1762,13 +1763,13 @@ namespace EnergyPlus::ChillerAbsorption {
             this->Report.ActualCOP = 0.0;
 
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::SafeCopyPlantNode(this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
+                PlantUtilities::SafeCopyPlantNode(state, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
             }
 
         } else {
             // set node conditions
-            PlantUtilities::SafeCopyPlantNode(this->EvapInletNodeNum, this->EvapOutletNodeNum);
-            PlantUtilities::SafeCopyPlantNode(this->CondInletNodeNum, this->CondOutletNodeNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->EvapInletNodeNum, this->EvapOutletNodeNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->CondInletNodeNum, this->CondOutletNodeNum);
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
 
@@ -1794,7 +1795,7 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::SafeCopyPlantNode(this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
+                PlantUtilities::SafeCopyPlantNode(state, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
                 DataLoopNode::Node(this->GeneratorOutletNodeNum).Temp = this->GenOutletTemp;
             }
         }

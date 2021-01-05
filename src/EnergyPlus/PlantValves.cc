@@ -111,7 +111,7 @@ namespace PlantValves {
     {
         this->initialize(state);
         this->calculate(state);
-        PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
+        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
             PlantUtilities::SetComponentFlowRate(state,
@@ -280,7 +280,7 @@ namespace PlantValves {
                 IsBranchActive = false;
 
                 // . A) find indexes of PlantLoop, Half loop, and Branch by searching CompData
-                for (auto & thisPlantLoop : DataPlant::PlantLoop) {
+                for (auto & thisPlantLoop : state.dataPlnt->PlantLoop) {
                     for (auto & thisLoopSide : thisPlantLoop.LoopSide) {
                         int branchCtr = 0;
                         for (auto & thisBranch : thisLoopSide.Branch) {
@@ -447,7 +447,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -461,7 +461,7 @@ namespace PlantValves {
                     this->FlowDivFract = 1.0;
                 }
             }
-        } else if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
+        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {

@@ -230,7 +230,7 @@ namespace ChillerIndirectAbsorption {
 
         void sizeChiller(EnergyPlusData &state);
 
-        void updateRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void calculate(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };

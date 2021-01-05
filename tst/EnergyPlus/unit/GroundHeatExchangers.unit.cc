@@ -183,11 +183,11 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     // Initializations
     GLHESlinky thisGLHE;
 
-    PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     thisGLHE.loopNum = 1;
 
-    PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
-    PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
 
     thisGLHE.inletTemp = 5.0;
     thisGLHE.massFlowRate = 0.01;

@@ -121,7 +121,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
     {
-        auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+        auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
         auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
         auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
@@ -179,7 +179,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                  this->sourceSideLocation.loopSideNum,
                                                  this->sourceSideLocation.branchNum,
                                                  this->sourceSideLocation.compNum);
-            PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->loadSideLocation.loopNum,
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
@@ -227,7 +227,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                      this->sourceSideLocation.branchNum,
                                                      this->sourceSideLocation.compNum);
             }
-            PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->loadSideLocation.loopNum,
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
@@ -305,7 +305,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         // evaluate the actual current operating load side heat transfer rate
-        auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+        auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
             state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
@@ -466,7 +466,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     errFlag = true;
                 } else {
 
-                    PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
+                    PlantUtilities::InterConnectTwoPlantLoopSides(state, this->loadSideLocation.loopNum,
                                                                   this->loadSideLocation.loopSideNum,
                                                                   this->sourceSideLocation.loopNum,
                                                                   this->sourceSideLocation.loopSideNum,
@@ -485,9 +485,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
             PlantUtilities::InitComponentNodes(0.0,
@@ -501,9 +501,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
             if (this->waterSource) {
                 rho = FluidProperties::GetDensityGlycol(state,
-                                                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidName,
                                                         DataGlobalConstants::InitConvTemp,
-                                                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
                 PlantUtilities::InitComponentNodes(0.0,
@@ -567,17 +567,17 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                             DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                              loadSideInitTemp,
-                                                             DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                              "EIRPlantLoopHeatPump::size()");
         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                 DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                 state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                  loadSideInitTemp,
-                                                                 DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                 state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                  "EIRPlantLoopHeatPump::size()");
 
-        int pltLoadSizNum = DataPlant::PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
+        int pltLoadSizNum = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
         if (pltLoadSizNum > 0) {
             // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
             // these represent what the unit would size those to, whether it is doing auto-sizing or not
@@ -746,14 +746,14 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
-                                                                DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                 sourceSideInitTemp,
-                                                                DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                 "EIRPlantLoopHeatPump::size()");
         Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                    state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                     sourceSideInitTemp,
-                                                                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                    state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                     "EIRPlantLoopHeatPump::size()");
 
         // To start we need to override the calculated load side flow
@@ -761,7 +761,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (!this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
         // calculate an auto-sized value for source design flow regardless of whether it was auto-sized or not
-        int plantSourceSizingIndex = DataPlant::PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
+        int plantSourceSizingIndex = state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
         if (plantSourceSizingIndex > 0) {
             // to get the source flow, we first must calculate the required heat impact on the source side
             // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP

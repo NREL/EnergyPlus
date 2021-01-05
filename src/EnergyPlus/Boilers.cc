@@ -118,10 +118,10 @@ namespace EnergyPlus::Boilers {
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
-        auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
+        auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->InitBoiler(state);
         this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
-        this->UpdateBoilerRecords(CurLoad, RunFlag);
+        this->UpdateBoilerRecords(state, CurLoad, RunFlag);
     }
 
     void BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
@@ -448,7 +448,7 @@ namespace EnergyPlus::Boilers {
 
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
                 // reset flow priority
-                DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
+                state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
@@ -458,9 +458,9 @@ namespace EnergyPlus::Boilers {
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                  DataGlobalConstants::HWInitConvTemp,
-                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
             this->DesMassFlowRate = this->VolFlowRate * rho;
 
@@ -516,12 +516,12 @@ namespace EnergyPlus::Boilers {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                 DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint =
-                    DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
+                    DataLoopNode::Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
             } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
                 DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo =
-                    DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                    DataLoopNode::Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
             }
         }
     }
@@ -553,20 +553,20 @@ namespace EnergyPlus::Boilers {
         Real64 tmpNomCap = this->NomCap;                 // local nominal capacity cooling power
         Real64 tmpBoilerVolFlowRate = this->VolFlowRate; // local boiler design volume flow rate
 
-        int const PltSizNum = DataPlant::PlantLoop(this->LoopNum).PlantSizNum; // Plant Sizing index corresponding to CurLoopNum
+        int const PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum; // Plant Sizing index corresponding to CurLoopNum
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
 
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                                     DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                      DataGlobalConstants::HWInitConvTemp,
-                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                      RoutineName);
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                          DataGlobalConstants::HWInitConvTemp,
-                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                 tmpNomCap = Cp * rho * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
@@ -726,9 +726,9 @@ namespace EnergyPlus::Boilers {
         Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                            DataLoopNode::Node(BoilerInletNode).Temp,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);
 
         // If the specified load is 0.0 or the boiler should not run then we leave this subroutine. Before leaving
@@ -760,7 +760,7 @@ namespace EnergyPlus::Boilers {
         // Initialize the delta temperature to zero
         Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
                 // Then find the flow rate and outlet temp
@@ -779,7 +779,7 @@ namespace EnergyPlus::Boilers {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 
-                if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPoint - DataLoopNode::Node(BoilerInletNode).Temp;
                 } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
                     BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPointLo - DataLoopNode::Node(BoilerInletNode).Temp;
@@ -910,7 +910,8 @@ namespace EnergyPlus::Boilers {
         if (this->BoilerLoad > 0.0) this->ParasiticElecPower = this->ParasiticElecLoad * this->BoilerPLR;
     }
 
-    void BoilerSpecs::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
+    void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
+                                          Real64 const MyLoad, // boiler operating load
                                           bool const RunFlag   // boiler on when TRUE
     )
     {
@@ -926,7 +927,7 @@ namespace EnergyPlus::Boilers {
         int const BoilerOutletNode = this->BoilerOutletNodeNum;
 
         if (MyLoad <= 0 || !RunFlag) {
-            PlantUtilities::SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
+            PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
             DataLoopNode::Node(BoilerOutletNode).Temp = DataLoopNode::Node(BoilerInletNode).Temp;
             this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
             this->BoilerLoad = 0.0;
@@ -935,7 +936,7 @@ namespace EnergyPlus::Boilers {
             this->BoilerPLR = 0.0;
             this->BoilerEff = 0.0;
         } else {
-            PlantUtilities::SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
+            PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
             DataLoopNode::Node(BoilerOutletNode).Temp = this->BoilerOutletTemp;
         }
 

@@ -93,7 +93,7 @@ namespace DataPlant {
         // the flow resolver and locking those flows down.  Available components are then re-simulated using the
         // corrected flow rates.
 
-        auto &thisPlantLoop = DataPlant::PlantLoop(this->myLoopNum);
+        auto &thisPlantLoop = state.dataPlnt->PlantLoop(this->myLoopNum);
         int ThisSideInletNode = this->NodeNumIn;
 
         this->InitialDemandToLoopSetPoint = 0.0;
@@ -164,9 +164,9 @@ namespace DataPlant {
                                                            thisPlantLoop.CommonPipeType);
 
             // Update the loop outlet node conditions
-            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
+            state.dataPlnt->PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
 
-            DataPlant::PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
+            state.dataPlnt->PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
                                                                            this->LoadToLoopSetPointThatWasntMet);
 
         }
@@ -589,9 +589,9 @@ namespace DataPlant {
                 this->SimulateLoopSideBranchGroup(state, 1, 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
                 break;
             case ParallelBranchSet:
-                this->UpdatePlantSplitter();
+                this->UpdatePlantSplitter(state);
                 this->SimulateLoopSideBranchGroup(state, 2, this->TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
-                this->UpdatePlantMixer();
+                this->UpdatePlantMixer(state);
                 break;
             case OutletBranch:
                 this->SimulateLoopSideBranchGroup(state, this->TotalBranches, this->TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
@@ -673,7 +673,7 @@ namespace DataPlant {
         Real64 SumMdotTimesTemp = 0.0;
         Real64 SumMdot = 0.0;
 
-        auto &thisPlantLoop = DataPlant::PlantLoop(this->myLoopNum);
+        auto &thisPlantLoop = state.dataPlnt->PlantLoop(this->myLoopNum);
 
         // We will place one specialized case in here for common pipe simulations.
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
@@ -848,7 +848,7 @@ namespace DataPlant {
         return this->EvaluateLoopSetPointLoad(state, 1, 1, ThisLoopSideFlow);
     }
 
-    Real64 HalfLoopData::SetupLoopFlowRequest(int const OtherSide) {
+    Real64 HalfLoopData::SetupLoopFlowRequest(EnergyPlusData &state, int const OtherSide) {
 
         // FUNCTION INFORMATION:
         //       AUTHOR:          Dan Fisher, Edwin Lee
@@ -870,7 +870,7 @@ namespace DataPlant {
         Real64 LoopFlow = 0.0; // Once all flow requests are evaluated, this is the desired flow on this side
 
         // reference
-        auto &loop(DataPlant::PlantLoop(this->myLoopNum));
+        auto &loop(state.dataPlnt->PlantLoop(this->myLoopNum));
 
         //~ First we need to set up the flow requests on each LoopSide
         for (int LoopSideCounter = DataPlant::DemandSide;
@@ -1218,7 +1218,7 @@ namespace DataPlant {
         bool LoopShutDownFlag = false;
 
         // First thing is to setup mass flow request information
-        Real64 ThisLoopSideFlowRequest = this->SetupLoopFlowRequest(OtherSide);
+        Real64 ThisLoopSideFlowRequest = this->SetupLoopFlowRequest(state, OtherSide);
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
@@ -1758,7 +1758,7 @@ namespace DataPlant {
                     if (this->myLoopSideNum == DataPlant::SupplySide) {
                         int const curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
                         int const OpSchemePtr = this_comp.OpScheme(curCompOpSchemePtr).OpSchemePtr;
-                        DataPlant::PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
+                        state.dataPlnt->PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
                     }
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                         this->myLoopNum,
@@ -1957,7 +1957,6 @@ namespace DataPlant {
         using DataLoopNode::Node;
         using DataPlant::LoadRangeBasedMax;
         using DataPlant::LoadRangeBasedMin;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2010,7 +2009,7 @@ namespace DataPlant {
         Real64 const OutletTemp(Node(OutletNode).Temp);
         Real64 const AverageTemp((InletTemp + OutletTemp) / 2.0);
         Real64 const ComponentCp(
-            GetSpecificHeatGlycol(state, PlantLoop(this->myLoopNum).FluidName, AverageTemp, PlantLoop(this->myLoopNum).FluidIndex, RoutineName));
+            GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->myLoopNum).FluidName, AverageTemp, state.dataPlnt->PlantLoop(this->myLoopNum).FluidIndex, RoutineName));
 
         // Calculate the load altered by this component
         Real64 const LoadAlteration(ComponentMassFlowRate * ComponentCp * (OutletTemp - InletTemp));
@@ -2029,7 +2028,7 @@ namespace DataPlant {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        auto &loop(DataPlant::PlantLoop(SpecificPumpLocation.loopNum));
+        auto &loop(state.dataPlnt->PlantLoop(SpecificPumpLocation.loopNum));
         auto &loop_side(loop.LoopSide(SpecificPumpLocation.loopSideNum));
         auto &loop_side_branch(loop_side.Branch(SpecificPumpLocation.branchNum));
         auto &comp(loop_side_branch.Comp(SpecificPumpLocation.compNum));
@@ -2081,7 +2080,7 @@ namespace DataPlant {
             PumpLoopSideNum = SpecificPumpLocation().loopSideNum;
             int const PumpBranchNum = SpecificPumpLocation().branchNum;
             int const PumpCompNum = SpecificPumpLocation().compNum;
-            PumpIndexStart = DataPlant::PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(
+            PumpIndexStart = state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(
                 PumpCompNum).IndexInLoopSidePumps;
             PumpIndexEnd = PumpIndexStart;
         } else {
@@ -2100,7 +2099,7 @@ namespace DataPlant {
         }
 
         //~ Now loop through all the pumps and simulate them, keeping track of their status
-        auto &loop_side(DataPlant::PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
+        auto &loop_side(state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
         auto &loop_side_branch(loop_side.Branch);
         for (int PumpCounter = PumpIndexStart; PumpCounter <= PumpIndexEnd; ++PumpCounter) {
 
@@ -2177,7 +2176,7 @@ namespace DataPlant {
         return ThisLoopSideFlow;
     }
 
-    void HalfLoopData::UpdatePlantMixer()
+    void HalfLoopData::UpdatePlantMixer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2234,7 +2233,7 @@ namespace DataPlant {
 
         DataLoopNode::Node(MixerOutletNode).MassFlowRate = MixerOutletMassFlow;
         DataLoopNode::Node(MixerOutletNode).Temp = MixerOutletTemp;
-        if (DataPlant::PlantLoop(this->myLoopNum).HasPressureComponents) {
+        if (state.dataPlnt->PlantLoop(this->myLoopNum).HasPressureComponents) {
             // Don't update pressure, let pressure system handle this...
         } else {
             // Go ahead and update!
@@ -2252,7 +2251,7 @@ namespace DataPlant {
             max(MixerOutletMassFlowMinAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail);
     }
 
-    void HalfLoopData::UpdatePlantSplitter()
+    void HalfLoopData::UpdatePlantSplitter(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2278,7 +2277,7 @@ namespace DataPlant {
                 DataLoopNode::Node(SplitterOutletNode).Temp = DataLoopNode::Node(SplitterInletNode).Temp;
                 DataLoopNode::Node(SplitterOutletNode).TempMin = DataLoopNode::Node(SplitterInletNode).TempMin;
                 DataLoopNode::Node(SplitterOutletNode).TempMax = DataLoopNode::Node(SplitterInletNode).TempMax;
-                if (DataPlant::PlantLoop(this->myLoopNum).HasPressureComponents) {
+                if (state.dataPlnt->PlantLoop(this->myLoopNum).HasPressureComponents) {
                     // Don't update pressure, let pressure system handle this...
                 } else {
                     // Go ahead and update!

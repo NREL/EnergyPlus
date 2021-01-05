@@ -127,7 +127,7 @@ namespace Pipes {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
             PlantUtilities::InitComponentNodes(0.0,
-                                               DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
                                                this->LoopNum,
@@ -139,7 +139,7 @@ namespace Pipes {
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
-        PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
     void GetPipeInput(EnergyPlusData &state)

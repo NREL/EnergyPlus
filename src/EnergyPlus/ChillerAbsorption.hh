@@ -214,7 +214,7 @@ namespace ChillerAbsorption {
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetBLASTAbsorberInput(EnergyPlusData &state);

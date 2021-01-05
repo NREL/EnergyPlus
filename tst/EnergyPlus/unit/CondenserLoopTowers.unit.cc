@@ -3043,7 +3043,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3435,7 +3435,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3909,7 +3909,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3939,8 +3939,8 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     Real64 WaterFlowRateRatio = 0.75;
     Real64 AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
 
-    DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
-    DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
+    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
     VSTower.calculateVariableSpeedTower(*state);

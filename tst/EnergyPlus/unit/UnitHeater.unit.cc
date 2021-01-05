@@ -1140,13 +1140,13 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     EXPECT_FALSE(ErrorsFound);
 
     HWMaxVolFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
-    HWDensity = GetDensityGlycol(*state, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+    HWDensity = GetDensityGlycol(*state, state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                  DataGlobalConstants::HWInitConvTemp,
-                                 PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
-    CpHW = GetSpecificHeatGlycol(*state, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+    CpHW = GetSpecificHeatGlycol(*state, state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                  DataGlobalConstants::HWInitConvTemp,
-                                 PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
@@ -1306,27 +1306,27 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     DataSizing::CurZoneEqNum = 1;
 
     TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
 
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    PlantLoop(1).Name = "HotWaterLoop";
-    PlantLoop(1).FluidName = "HotWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
@@ -1371,7 +1371,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     // verify the heat rate delivered by the hot water heating coil
     HWMassFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
     CpHW = GetSpecificHeatGlycol(*state,
-        PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
+        state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
     HWCoilHeatingRate = HWMassFlowRate * CpHW * (Node(WCWaterInletNode).Temp - Node(WCWaterOutletNode).Temp);
     EXPECT_NEAR(HWCoilHeatingRate, state->dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, ConvTol);
 }

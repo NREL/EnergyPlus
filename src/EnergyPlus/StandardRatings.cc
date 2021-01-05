@@ -256,7 +256,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using FluidProperties::GetDensityGlycol;
@@ -383,10 +382,10 @@ namespace StandardRatings {
 
                 } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
                     Cp = GetSpecificHeatGlycol(
-                        state, PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
+                        state, state.dataPlnt->PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex, RoutineName);
 
                     Rho =
-                        GetDensityGlycol(state, PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
+                        GetDensityGlycol(state, state.dataPlnt->PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex, RoutineName);
 
                     Par(1) = EnteringWaterTempReduced;
                     Par(2) = EvapOutletTemp;

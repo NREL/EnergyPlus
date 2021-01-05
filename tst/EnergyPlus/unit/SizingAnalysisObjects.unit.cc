@@ -120,16 +120,16 @@ protected:
         PlantSizData(1).DeltaT = 10;
 
         TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
         for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
         }
-        PlantLoop(1).Name = "Test Plant Loop 1";
-        PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
-        PlantLoop(1).MaxVolFlowRate = 0.002;
-        PlantLoop(1).MaxMassFlowRate = 2.0;
-        PlantLoop(1).VolumeWasAutoSized = true;
+        state->dataPlnt->PlantLoop(1).Name = "Test Plant Loop 1";
+        state->dataPlnt->PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
+        state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 0.002;
+        state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 2.0;
+        state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
 
         SetPredefinedTables(*state);
 
@@ -360,12 +360,12 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
     TestAnalysisObj.peakDemandMassFlow = 1.5;
     TestAnalysisObj.peakDemandReturnTemp = 10.0;
 
-    EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
+    EXPECT_DOUBLE_EQ(0.002, state->dataPlnt->PlantLoop(1).MaxVolFlowRate); //  m3/s
 
     TestAnalysisObj.ResolveDesignFlowRate(*state, 1);
 
-    EXPECT_DOUBLE_EQ(0.0015, PlantLoop(1).MaxVolFlowRate); //  m3/s
-    EXPECT_DOUBLE_EQ(1.5, PlantLoop(1).MaxMassFlowRate);   //  m3/s
+    EXPECT_DOUBLE_EQ(0.0015, state->dataPlnt->PlantLoop(1).MaxVolFlowRate); //  m3/s
+    EXPECT_DOUBLE_EQ(1.5, state->dataPlnt->PlantLoop(1).MaxMassFlowRate);   //  m3/s
     EXPECT_TRUE(TestAnalysisObj.anotherIterationDesired);
 }
 
@@ -516,11 +516,11 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
     TestAnalysisObj.peakDemandMassFlow = 1.5;
     TestAnalysisObj.peakDemandReturnTemp = 10.0;
 
-    EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
+    EXPECT_DOUBLE_EQ(0.002, state->dataPlnt->PlantLoop(1).MaxVolFlowRate); //  m3/s
 
     TestAnalysisObj.ResolveDesignFlowRate(*state, 1);
 
-    EXPECT_NEAR(0.00015, PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
-    EXPECT_NEAR(0.15, PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s
+    EXPECT_NEAR(0.00015, state->dataPlnt->PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
+    EXPECT_NEAR(0.15, state->dataPlnt->PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s
     EXPECT_TRUE(TestAnalysisObj.anotherIterationDesired);
 }

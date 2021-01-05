@@ -260,10 +260,10 @@ namespace PlantCentralGSHP {
                 ErrorsFound = false;
 
                 // find the appropriate Plant Sizing object
-                int PltSizNum = DataPlant::PlantLoop(this->CWLoopNum).PlantSizNum;
+                int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
 
                 // if ( Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate == AutoSize ) {
-                int PltSizCondNum = DataPlant::PlantLoop(this->GLHELoopNum).PlantSizNum;
+                int PltSizCondNum = state.dataPlnt->PlantLoop(this->GLHELoopNum).PlantSizNum;
                 //}
 
                 Real64 tmpNomCap = this->ChillerHeater(NumChillerHeater).RefCapCooling;
@@ -349,14 +349,14 @@ namespace PlantCentralGSHP {
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                            RoutineName);
 
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                         tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
                         if (!this->ChillerHeater(NumChillerHeater).RefCapCoolingWasAutoSized)
@@ -442,14 +442,14 @@ namespace PlantCentralGSHP {
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                        RoutineName);
                         // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidName,
                                                                            this->ChillerHeater(NumChillerHeater).TempRefCondInCooling,
-                                                                           DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                            RoutineName);
                         tmpCondVolFlowRate =
                             tmpNomCap *
@@ -1492,22 +1492,22 @@ namespace PlantCentralGSHP {
                                                     this->GLHEInletNodeNum,
                                                     _);
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
                 this->CWLoopNum, this->CWLoopSideNum, this->GLHELoopNum, this->GLHELoopSideNum, DataPlant::TypeOf_CentralGroundSourceHeatPump, true);
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
                 this->HWLoopNum, this->HWLoopSideNum, this->GLHELoopNum, this->GLHELoopSideNum, DataPlant::TypeOf_CentralGroundSourceHeatPump, true);
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
                 this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_CentralGroundSourceHeatPump, true);
 
             if (this->VariableFlowCH) {
                 // Reset flow priority
                 if (LoopNum == this->CWLoopNum) {
-                    DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                    state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
                         DataPlant::LoopFlowStatus_NeedyIfLoopOn;
                 } else if (LoopNum == this->HWLoopNum) {
-                    DataPlant::PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSideNum).Branch(this->HWBranchNum).Comp(this->HWCompNum).FlowPriority =
+                    state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSideNum).Branch(this->HWBranchNum).Comp(this->HWCompNum).FlowPriority =
                         DataPlant::LoopFlowStatus_NeedyIfLoopOn;
                 }
 
@@ -1539,7 +1539,7 @@ namespace PlantCentralGSHP {
                     }
                     this->CoolSetPointSetToLoop = true;
                     DataLoopNode::Node(this->CHWOutletNodeNum).TempSetPoint =
-                        DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
 
                 if (DataLoopNode::Node(this->HWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
@@ -1569,7 +1569,7 @@ namespace PlantCentralGSHP {
                     }
                     this->HeatSetPointSetToLoop = true;
                     DataLoopNode::Node(this->HWOutletNodeNum).TempSetPoint =
-                        DataLoopNode::Node(DataPlant::PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                        DataLoopNode::Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
             }
             this->MyWrapperFlag = false;
@@ -1590,9 +1590,9 @@ namespace PlantCentralGSHP {
                 }
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
 
                 this->CHWMassFlowRateMax = this->CHWVolFlowRate * rho;
@@ -1651,12 +1651,12 @@ namespace PlantCentralGSHP {
         if (this->CoolSetPointSetToLoop) {
             // IF (CurCoolingLoad > 0.0d0) THEN
             DataLoopNode::Node(this->CHWOutletNodeNum).TempSetPoint =
-                DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
         }
         // IF (CurHeatingLoad > 0.0d0) THEN
         if (this->HeatSetPointSetToLoop) {
             DataLoopNode::Node(this->HWOutletNodeNum).TempSetPoint =
-                DataLoopNode::Node(DataPlant::PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                DataLoopNode::Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
             // ENDIF
         }
 
@@ -1834,14 +1834,14 @@ namespace PlantCentralGSHP {
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 // Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
                 Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
-                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
                 Real64 CondDensity = FluidProperties::GetDensityGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
 
@@ -1956,10 +1956,10 @@ namespace PlantCentralGSHP {
 
                 // Calculate the specific heat of chilled water
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate cooling load this chiller should meet and the other chillers are demanded
-                EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                EvapOutletTempSetPoint = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
 
                 // Minimum capacity of the evaporator
                 Real64 EvaporatorCapMin =
@@ -2086,9 +2086,9 @@ namespace PlantCentralGSHP {
                 }
 
                 if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidName,
                                                                 CondInletTemp,
-                                                                DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                 RoutineNameElecEIRChiller);
                     CondOutletTemp = QCondenser / CondMassFlowRate / Cp + CondInletTemp;
                 } else {
@@ -2262,14 +2262,14 @@ namespace PlantCentralGSHP {
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 // Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
                 Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
-                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
                 Real64 CondDensity = FluidProperties::GetDensityGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 Real64 HWDensityRatio = CondDensity / InitDensity;
@@ -2356,9 +2356,9 @@ namespace PlantCentralGSHP {
                 // Mode 4 uses all data from the chilled water loop due to no heating demand
                 if (this->SimulClgDominant || CurrentMode == 3) {
                     CurrentMode = 3;
-                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                                        CondInletTemp,
-                                                                       DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                                        RoutineName);
 
                     QCondenser = this->ChillerHeater(ChillerHeaterNum).Report.QCondSimul;
@@ -2416,7 +2416,7 @@ namespace PlantCentralGSHP {
                         ShowContinueError(state,
                                           format("Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
                                                  ChillerCapFT));
-                        CondTempforCurve = DataLoopNode::Node(DataPlant::PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                        CondTempforCurve = DataLoopNode::Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                     }
 
                     Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -2468,9 +2468,9 @@ namespace PlantCentralGSHP {
                         PartLoadRat = 0.0;
                     }
 
-                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                                        this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp,
-                                                                       DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                                        RoutineName);
 
                     // Calculate evaporator heat transfer
@@ -2553,9 +2553,9 @@ namespace PlantCentralGSHP {
                     // Set load this chiller heater should meet and temperatures given
                     QCondenser = min(HeatingLoadToMeet, QCondenser);
 
-                    Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                                 CondInletTemp,
-                                                                DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                                 RoutineNameElecEIRChiller);
 
                     // Calculate temperatures for constant flow and mass flow rate for variable flow
@@ -2719,7 +2719,7 @@ namespace PlantCentralGSHP {
             CurCoolingLoad = std::abs(MyLoad);
             this->WrapperCoolingLoad = CurCoolingLoad;
             // Set actual mass flow rate at the nodes when it's locked
-            if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
                 CHWInletMassFlowRate = DataLoopNode::Node(this->CHWInletNodeNum).MassFlowRate;
             }
             if (CHWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
@@ -2733,7 +2733,7 @@ namespace PlantCentralGSHP {
             CurHeatingLoad = MyLoad;
             this->WrapperHeatingLoad = CurHeatingLoad;
             // Set actual mass flow rate at the nodes when it's locked
-            if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
                 HWInletMassFlowRate = DataLoopNode::Node(this->HWInletNodeNum).MassFlowRate;
             }
             if (HWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;

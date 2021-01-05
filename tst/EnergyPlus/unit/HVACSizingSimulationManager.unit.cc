@@ -104,19 +104,19 @@ protected:
 
         // set up a plant loop
         TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
         for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
         }
-        PlantLoop(1).Name = "Test Plant Loop 1";
-        PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
-        PlantLoop(1).MaxVolFlowRate = 0.002;
-        PlantLoop(1).MaxMassFlowRate = 2.0;
-        PlantLoop(1).VolumeWasAutoSized = true;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).LoopSide(SupplySide).NodeNumIn = 1;
+        state->dataPlnt->PlantLoop(1).Name = "Test Plant Loop 1";
+        state->dataPlnt->PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
+        state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 0.002;
+        state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 2.0;
+        state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).LoopSide(SupplySide).NodeNumIn = 1;
 
         SetPredefinedTables(*state);
 
@@ -200,7 +200,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
@@ -224,7 +224,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
@@ -250,7 +250,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
                     Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                     Node(1).Temp = 10.0;
-                    PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                    state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
                 state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
@@ -276,7 +276,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
                     Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                     Node(1).Temp = 10.0;
-                    PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                    state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
                 state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
@@ -288,9 +288,9 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     testSizeSimManagerObj.PostProcessLogs();
 
     // check plant resizing
-    EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
+    EXPECT_DOUBLE_EQ(2.0, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // original size
     testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(*state, 1);
-    EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
+    EXPECT_DOUBLE_EQ(2.4, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // resize check
 
     // check that the data are as expected in the logs
     // first timestep
@@ -393,7 +393,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute += (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
@@ -416,7 +416,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
@@ -428,9 +428,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     testSizeSimManagerObj.PostProcessLogs();
 
     // check plant resizing
-    EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
+    EXPECT_DOUBLE_EQ(2.0, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // original size
     testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(*state, 1);
-    EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
+    EXPECT_DOUBLE_EQ(2.4, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // resize check
 
     // check that the data are as expected in the logs
     // first timestep
@@ -526,7 +526,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
@@ -551,7 +551,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
@@ -562,9 +562,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
     testSizeSimManagerObj.PostProcessLogs();
 
-    EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
+    EXPECT_DOUBLE_EQ(2.0, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // original size
     testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(*state, 1);
-    EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
+    EXPECT_DOUBLE_EQ(2.4, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // resize check
 }
 
 TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
@@ -613,7 +613,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
@@ -640,7 +640,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
                 Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 Node(1).Temp = 10.0;
-                PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
+                state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
@@ -651,9 +651,9 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
     testSizeSimManagerObj.PostProcessLogs();
 
-    EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
+    EXPECT_DOUBLE_EQ(2.0, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // original size
     testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(*state, 1);
-    EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
+    EXPECT_DOUBLE_EQ(2.4, state->dataPlnt->PlantLoop(1).MaxMassFlowRate); // resize check
 
     testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(*state, 1);
 

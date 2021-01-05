@@ -148,14 +148,14 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
     for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -163,15 +163,15 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
 
-    DataPlant::PlantLoop(1).Name = "SteamLoop";
-    DataPlant::PlantLoop(1).FluidName = "Steam";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "STEAM";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Steam;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "Steam";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Steam;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;

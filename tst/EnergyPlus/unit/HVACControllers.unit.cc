@@ -255,17 +255,17 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // state->dataWaterCoils->WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     bool SimZoneEquipment(false);
     SimAirServingZones::SimAirLoops(*state, true, SimZoneEquipment);
 
@@ -963,21 +963,21 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).Name = "CHW LOOP";
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataPlnt->PlantLoop(1).Name = "CHW LOOP";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
     DataSizing::NumPltSizInput = 1;
     DataSizing::PlantSizData.allocate(1);

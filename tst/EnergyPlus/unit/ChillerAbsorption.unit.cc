@@ -1812,11 +1812,11 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // lock the evap flow at test condition specified
     int LoopNum = thisChiller.CWLoopNum;
     int LoopSideNum = thisChiller.CWLoopSideNum;
-    PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
     int GenLoopSideNum = thisChiller.GenLoopSideNum;
-    PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
     thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);

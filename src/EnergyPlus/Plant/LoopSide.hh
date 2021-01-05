@@ -174,9 +174,9 @@ namespace DataPlant {
                                          bool FirstHVACIteration,
                                          bool &LoopShutDownFlag);
 
-        void UpdatePlantSplitter();
+        void UpdatePlantSplitter(EnergyPlusData &state);
 
-        void UpdatePlantMixer();
+        void UpdatePlantMixer(EnergyPlusData &state);
 
         void TurnOnAllLoopSideBranches();
 
@@ -186,7 +186,7 @@ namespace DataPlant {
 
         Real64 CalcOtherSideDemand(EnergyPlusData &state, Real64 ThisLoopSideFlow);
 
-        Real64 SetupLoopFlowRequest(int OtherSide);
+        Real64 SetupLoopFlowRequest(EnergyPlusData &state, int OtherSide);
 
         Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state,
                                         int FirstBranchNum,

@@ -2456,7 +2456,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2635,11 +2634,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
-    PlantLoop.allocate(LoopNum);
-    PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
-    PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
-    auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
+    state->dataPlnt->PlantLoop.allocate(LoopNum);
+    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));

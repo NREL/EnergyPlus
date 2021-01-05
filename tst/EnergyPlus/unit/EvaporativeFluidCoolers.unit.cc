@@ -130,25 +130,25 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     DataLoopNode::Node(1).MassFlowRateMin = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.05;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.05;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
     thisEFC.DesignWaterFlowRateWasAutoSized = false;
     thisEFC.LowSpeedAirFlowRateWasAutoSized = false;
     thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = false;
     thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantFinalSizesOkayToReport = false;
     DataSizing::SaveNumPlantComps = 0;
     thisEFC.DesignWaterFlowRate = 0.001;
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).ExitTemp = 20.0;
 
     // Now set the specific data for the actual test

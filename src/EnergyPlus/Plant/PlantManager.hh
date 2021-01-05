@@ -99,7 +99,7 @@ namespace PlantManager {
 
     void CheckPlantOnAbort(EnergyPlusData &state);
 
-    void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
+    void InitOneTimePlantSizingInfo(EnergyPlusData &state, int LoopNum); // loop being initialized for sizing
 
     void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
