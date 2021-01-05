@@ -11248,38 +11248,87 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
+        auto &ort(state.dataOutRptTab);
 
         if (state.dataOutRptTab->displayHeatEmissionsSummary) {
+ 
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
 
-            WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            WriteSubtitle(state, "Heat Emission by Components");
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-            columnWidth.allocate(6);
-            columnWidth = 10;
+                if (iUnitSystem == 0) {
+                    unitsStyle_temp = ort->unitsStyle;
+                    produceTabular = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                        produceSQLite = true;
+                    } else {
+                        produceSQLite = false;
+                    }
+                } else { // iUnitSystem == 1
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    produceTabular = false;
+                    produceSQLite = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+                }
 
-            rowHead.allocate(1);
-            tableBody.allocate(6, 1);
+                if (produceTabular) {
+                    WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                    WriteSubtitle(state, "Heat Emission by Components");
+                }
 
-            rowHead(1) = "Heat Emissions [GJ]";
-            columnHead(1) = "Envelope Convection";
-            columnHead(2) = "Zone Exfiltration";
-            columnHead(3) = "Zone Exhaust Air";
-            columnHead(4) = "HVAC Relief Air";
-            columnHead(5) = "HVAC Reject Heat";
-            columnHead(6) = "Total";
+                columnWidth.allocate(6);
+                columnWidth = 10;
 
-            tableBody = "";
-            tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv, 2);
-            tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
-            tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
-            tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
-            tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
-            tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
+                rowHead.allocate(1);
+                tableBody.allocate(6, 1);
 
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                Real64 energyconversion = 1.0;
+                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                    rowHead(1) = "Heat Emissions [kBtu]";
+                    energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
+                } else if (unitsStyle_temp == iUnitsStyle::JtoGJ) {
+                    rowHead(1) = "Heat Emissions [GJ]";
+                    energyconversion = 1.0;
+                } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                    rowHead(1) = "Heat Emissions [kWh]";
+                    energyconversion = 1.0e3 / 3.6;
+                } else if (unitsStyle_temp == iUnitsStyle::JtoMJ) {
+                    rowHead(1) = "Heat Emissions [MJ]";
+                    energyconversion = 1.0e3;
+                } else if (unitsStyle_temp == iUnitsStyle::None) {
+                    rowHead(1) = "Heat Emissions [J]"; 
+                    energyconversion = 1.0e9;
+                } else {
+                    rowHead(1) = "Heat Emissions [GJ]";
+                    energyconversion = 1.0;
+                }
+
+                columnHead(1) = "Envelope Convection";
+                columnHead(2) = "Zone Exfiltration";
+                columnHead(3) = "Zone Exhaust Air";
+                columnHead(4) = "HVAC Relief Air";
+                columnHead(5) = "HVAC Reject Heat";
+                columnHead(6) = "Total";
+
+                tableBody = "";
+                tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv * energyconversion, 2);
+                tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration * energyconversion, 2);
+                tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust * energyconversion, 2);
+                tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief * energyconversion, 2);
+                tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject * energyconversion, 2);
+                tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat * energyconversion, 2);
+
+                if (produceTabular) {
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                    }
+                }
             }
         }
     }
