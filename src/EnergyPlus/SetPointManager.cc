@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataConvergParams.hh>
@@ -61,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -69,11 +69,11 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -3806,7 +3806,6 @@ namespace EnergyPlus::SetPointManager {
                                         LookForFan = true;
                                     }
                                     if (LookForFan) {
-                                        // cpw22Aug2010 Add Fan:ComponentModel (new)
                                         if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
@@ -3822,7 +3821,6 @@ namespace EnergyPlus::SetPointManager {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                     CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                    // cpw22Aug2010 Add Fan:ComponentModel (new)
                                     if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
@@ -5624,7 +5622,6 @@ namespace EnergyPlus::SetPointManager {
         // Using/Aliasing
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5666,7 +5663,7 @@ namespace EnergyPlus::SetPointManager {
                     SetPointErrorFlag = true;
                 } else {
                     // need call to check if this is the target of an EnergyManagementSystem:Actuator object
-                    CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, SetPointErrorFlag);
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                         ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
@@ -5724,10 +5721,6 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
-        using EMSManager::iHumidityRatioMinSetPoint;
-        using EMSManager::iHumidityRatioSetPoint;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5798,13 +5791,13 @@ namespace EnergyPlus::SetPointManager {
                     {
                         auto const SELECT_CASE_var(this->CtrlTypeMode);
                         if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) { // 'HUMRATMIN'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::HumRat) { // 'HumidityRatio'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioSetPoint, LocalSetPointCheckFailed);
                         }
                     }
                     if (LocalSetPointCheckFailed) {
@@ -7521,7 +7514,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
         NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7541,7 +7534,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
         NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7563,7 +7556,7 @@ namespace EnergyPlus::SetPointManager {
         for (int i = 1; i <= this->numTowers; i++) {
             TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).TypeOf;
             NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).Name;
-            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
             VarIndexes.allocate(NumVariables);
             VarTypes.allocate(NumVariables);
             IndexTypes.allocate(NumVariables);
@@ -7586,7 +7579,7 @@ namespace EnergyPlus::SetPointManager {
 
         TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
         NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7655,7 +7648,6 @@ namespace EnergyPlus::SetPointManager {
         // Using/Aliasing
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:

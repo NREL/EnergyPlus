@@ -164,9 +164,7 @@ namespace MixedAir {
     int const FixedDewPointAndDryBulb(5);
     int const ElectronicEnthalpy(6);
     int const DifferentialDryBulbAndEnthalpy(7);
-    // coil operation
-    int const On(1);  // normal coil operation
-    int const Off(0); // signal coil shouldn't run
+
     // component types addressed by this module
     int const OAMixer_Num(1);
     int const Fan_Simple_CV(2);
@@ -185,13 +183,13 @@ namespace MixedAir {
     int const Unglazed_SolarCollector(15);
     int const EvapCooler(16);
     int const PVT_AirBased(17);
-    int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
+    int const Fan_ComponentModel(18);
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
-    int const VRFTerminalUnit(24); // new Jan 2020
+    int const VRFTerminalUnit(24);
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -239,8 +237,6 @@ namespace MixedAir {
     int const CMO_ERVController(6);
     int const CMO_MechVentilation(7);
     int const CMO_OAMixer(8);
-
-    static std::string const BlankString;
 
     // Type declarations in MixedAir module
 
@@ -636,7 +632,6 @@ namespace MixedAir {
                 if (Sim) {
                     HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
                 }
-                // cpw22Aug2010 Add Fan:ComponentModel (new num=18)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 if (Sim) {
                     Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -1230,7 +1225,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         // construct fan object
                         HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)));
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = HVACFan::fanObjs.size();
-                        // cpw22Aug2010 Add Fan:ComponentModel (new)
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Fan_ComponentModel;
 
@@ -1533,7 +1527,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
                 thisVentilationMechanical.SchName = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisVentilationMechanical.SchPtr = GetScheduleIndex(state, AlphArray(2)); // convert schedule name to pointer
                     if (thisVentilationMechanical.SchPtr == 0) {
@@ -1857,7 +1851,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = 0.0;
                         thisVentilationMechanical.ZoneOAACHRate = 0.0;
                         thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowPPer;
-                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn();
+                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                         ShowContinueError(state, "Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" +
                                           thisVentilationMechanical.VentMechZoneName(ventMechZoneNum) + "\".");
@@ -2663,7 +2657,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         using namespace OutputReportPredefined;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
         static Array1D_bool OAControllerMyEnvrnFlag;   // One-time initialization flag
@@ -2793,7 +2786,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             SetPointErrorFlag = true;
                         } else {
                             // add call to check node in EMS
-                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag);
+                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                             if (SetPointErrorFlag) {
                                 ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                                 ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
@@ -2884,40 +2877,40 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // 90.1 descriptor for economizer controls
                 // Changed by Amit for New Feature implementation
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "DifferentialEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialEnthalpy");
                 } else if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "DifferentialDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialDryBulb");
                 } else if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "FixedEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedEnthalpy");
                 } else if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "FixedDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedDryBulb");
                 } else {
-                    PreDefTableEntry(pdchEcoKind, equipName, "Other");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "Other");
                 }
 
-                PreDefTableEntry(pdchEcoMinOA, equipName, thisOAController.MinOA);
-                PreDefTableEntry(pdchEcoMaxOA, equipName, thisOAController.MaxOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMinOA, equipName, thisOAController.MinOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMaxOA, equipName, thisOAController.MaxOA);
                 // EnergyPlus input echos for economizer controls
                 // Chnged by Amit for new feature implementation
                 if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.TempLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.TempLim);
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
                 if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.EnthLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.EnthLim);
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
             }
         }
@@ -3003,27 +2996,27 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // predefined report
                 for (jZone = 1; jZone <= vent_mech.NumofVentMechZones; ++jZone) {
                     zoneName = Zone(vent_mech.VentMechZone(jZone)).Name;
-                    PreDefTableEntry(pdchDCVventMechName, zoneName, vent_mech.Name);
-                    PreDefTableEntry(pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVventMechName, zoneName, vent_mech.Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
                     if (vent_mech.ZoneOASchPtr(jZone) > 0) {
-                        PreDefTableEntry(pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(pdchDCVOASchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, "");
                     }
 
                     // added for new DCV inputs
                     if (vent_mech.ZoneADEffSchPtr(jZone) > 0) {
-                        PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, "");
-                        PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, "");
-                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
-                        PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
-                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, "");
                     }
                 }
 
@@ -3247,7 +3240,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             "Outdoor Air Controller Maximum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MaxOAMassFlowRate);
                         SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Minimum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MinOAMassFlowRate);
-                        SetupEMSActuator("Outdoor Air Controller",
+                        SetupEMSActuator(state, "Outdoor Air Controller",
                                          loopOAController.Name,
                                          "Air Mass Flow Rate",
                                          "[kg/s]",

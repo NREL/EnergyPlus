@@ -106,7 +106,6 @@ namespace SteamCoils {
     using namespace ScheduleManager;
 
     static std::string const fluidNameSteam("STEAM");
-    static std::string const BlankString;
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
                                      std::string const &CompName,
@@ -284,7 +283,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).Name = AlphArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
@@ -1474,7 +1473,7 @@ namespace SteamCoils {
         // This subroutine updates the report variable for the coils.
 
         // Report the SteamCoil energy from this component
-        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     // End of Reporting subroutines for the SteamCoil Module

@@ -64,9 +64,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -76,7 +74,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -139,7 +136,6 @@ namespace PackagedTerminalHeatPump {
     using namespace DataLoopNode;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
-    using DXCoils::DXCoilPartLoadRatio;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -149,17 +145,12 @@ namespace PackagedTerminalHeatPump {
         bool MyOneTimeFlag(true);               // initialization flag
         bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                           // namespace
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
 
     // Last mode of operation
     int const CoolingMode(1); // last compressor operating mode was in cooling
     int const HeatingMode(2); // last compressor operating mode was in heating
 
-    // Airflow control for contant fan mode
+    // Airflow control for constant fan mode
     int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
     int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
 
@@ -751,7 +742,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPAirToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -1647,7 +1638,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTACUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermACAirToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -2452,7 +2443,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTWSHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPWaterToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -3895,7 +3886,7 @@ namespace PackagedTerminalHeatPump {
                     if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp(),
+                                               DataGlobalConstants::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
                                                RoutineName);
 
@@ -3968,7 +3959,7 @@ namespace PackagedTerminalHeatPump {
 
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state, PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp(),
+                                               DataGlobalConstants::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
                                                RoutineName);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
@@ -4336,7 +4327,7 @@ namespace PackagedTerminalHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state, PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp(),
+                                                   DataGlobalConstants::HWInitConvTemp,
                                                    PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
                                                    RoutineNameSpace);
                             PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -4374,7 +4365,7 @@ namespace PackagedTerminalHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state, PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp(),
+                                                   DataGlobalConstants::HWInitConvTemp,
                                                    PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
                                                    RoutineNameSpace);
                             PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -6007,7 +5998,7 @@ namespace PackagedTerminalHeatPump {
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
                     }
-                    SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
@@ -6138,7 +6129,7 @@ namespace PackagedTerminalHeatPump {
                                   PTUnit(PTUnitNum).OpMode,
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
-                        SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
+                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                         SimWatertoAirHPSimple(state,
@@ -6883,7 +6874,7 @@ namespace PackagedTerminalHeatPump {
 
         // FLOW
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         PTUnit(PTUnitNum).TotCoolEnergy = PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
         PTUnit(PTUnitNum).TotHeatEnergy = PTUnit(PTUnitNum).TotHeatEnergyRate * ReportingConstant;
         PTUnit(PTUnitNum).SensCoolEnergy = PTUnit(PTUnitNum).SensCoolEnergyRate * ReportingConstant;

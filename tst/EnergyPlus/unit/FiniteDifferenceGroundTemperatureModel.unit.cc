@@ -99,8 +99,8 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     for (int day = 1; day <= state->dataWeatherManager->NumDaysInYear; ++day) {
         auto &tdwd = thisModel->weatherDataArray(day); // "This day weather data"
 
-        Real64 theta = 2 * DataGlobalConstants::Pi() * day / state->dataWeatherManager->NumDaysInYear;
-        Real64 omega = 2 * DataGlobalConstants::Pi() * 130 / state->dataWeatherManager->NumDaysInYear; // Shifts min to around the end of Jan
+        Real64 theta = 2 * DataGlobalConstants::Pi * day / state->dataWeatherManager->NumDaysInYear;
+        Real64 omega = 2 * DataGlobalConstants::Pi * 130 / state->dataWeatherManager->NumDaysInYear; // Shifts min to around the end of Jan
 
         tdwd.dryBulbTemp = drybulb_amp * std::sin(theta - omega) + (drybulb_minTemp + drybulb_amp);
         tdwd.relativeHumidity = relHum_const;

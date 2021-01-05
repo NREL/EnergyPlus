@@ -777,12 +777,12 @@ namespace ZoneEquipmentManager {
         int ZoneSizNum;                  // zone sizing input index
         Real64 TotPeopleInZone;          // total (maximum) number of people in a zone
         int PeopleNum;                   // index of People structure
-        static Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
-        static Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
+        Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
+        Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
         int ZoneIndex;                   // index of Zone Sizing zone name in zone array
         int ZoneSizIndex;                // zone sizing do loop index
         bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
-        static Real64 SchMax(0.0);       // maximum people multiplier value
+        Real64 SchMax(0.0);       // maximum people multiplier value
         Real64 OAVolumeFlowRate;         // outside air flow rate (m3/s)
         bool UseOccSchFlag;              // flag to use occupancy schedule when calculating OA
         bool UseMinOASchFlag;            // flag to use min OA schedule when calculating OA
@@ -1148,7 +1148,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Air Mass Flow Rate",
                                  "[kg/s]",
@@ -1164,7 +1164,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolMassFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Air Mass Flow Rate",
                                  "[kg/s]",
@@ -1178,7 +1178,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Load",
                                  "[W]",
@@ -1192,7 +1192,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Load",
                                  "[W]",
@@ -1227,7 +1227,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Vol Flow",
                                  "[m3/s]",
@@ -1243,7 +1243,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Vol Flow",
                                  "[m3/s]",
@@ -2599,7 +2599,6 @@ namespace ZoneEquipmentManager {
         using HWBaseboardRadiator::SimHWBaseboard;
         using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
         using LowTempRadiantSystem::SimLowTempRadiantSystem;
-        using OutdoorAirUnit::SimOutdoorAirUnit;
         using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
         using PurchasedAirManager::SimPurchasedAir;
         using RefrigeratedCase::SimAirChillerSet;
@@ -3042,7 +3041,7 @@ namespace ZoneEquipmentManager {
                                           LatOutputProvided,
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) { // 'ZoneHVAC:OutdoorAirUnit'
-                        SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                        OutdoorAirUnit::SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,
@@ -4348,7 +4347,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
-        using DataRoomAirModel::AirPatternZoneInfo;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -4401,9 +4399,9 @@ namespace ZoneEquipmentManager {
                 MassFlowRA = Node(ReturnNode).MassFlowRate / ZoneMult;
 
                 // user defined room air model may feed temp that differs from zone node
-                if (allocated(AirPatternZoneInfo)) {
-                    if ((AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
-                        TempZoneAir = AirPatternZoneInfo(ActualZoneNum).Tleaving;
+                if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
+                    if ((state.dataRoomAirMod->AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
+                        TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ActualZoneNum).Tleaving;
                         TempRetAir = TempZoneAir;
                     } else {
                         TempZoneAir = Node(ZoneNode).Temp;
@@ -4575,7 +4573,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
         using DataHVACGlobals::TimeStepSys;
-        using DataRoomAirModel::ZTJET;
         using DataZoneEquipment::ZHumRat;
         using DataZoneEquipment::ZMAT;
         using DataZoneEquipment::ZoneEquipAvail;
@@ -4883,12 +4880,12 @@ namespace ZoneEquipmentManager {
                         if (!state.dataGlobal->KickOffSimulation) {
                             if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
                                 !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
-                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {
-                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                         }
                     } else {
-                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                     }
                 }
                 // Intake fans will add some heat to the air, raising the temperature for an intake fan...
@@ -4914,7 +4911,7 @@ namespace ZoneEquipmentManager {
             }
 
             if (Ventilation(j).ModelType == VentilationWindAndStack) {
-                if (Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate()) {
+                if (Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate) {
                     Cw = Ventilation(j).OpenEff;
                 } else {
                     // linear interpolation between effective angle and wind direction
@@ -4922,7 +4919,7 @@ namespace ZoneEquipmentManager {
                     if (angle > 180.0) angle -= 180.0;
                     Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
                 }
-                if (Ventilation(j).DiscCoef != DataGlobalConstants::AutoCalculate()) {
+                if (Ventilation(j).DiscCoef != DataGlobalConstants::AutoCalculate) {
                     Cd = Ventilation(j).DiscCoef;
                 } else {
                     Cd = 0.40 + 0.0045 * std::abs(TempExt - ZMAT(NZ));

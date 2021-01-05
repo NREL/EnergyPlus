@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -123,6 +124,14 @@ namespace MatrixDataManager {
                                int &NumCols);
 
 } // namespace MatrixDataManager
+
+struct MatrixDataManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

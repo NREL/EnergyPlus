@@ -222,8 +222,8 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 

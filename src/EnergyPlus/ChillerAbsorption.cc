@@ -57,29 +57,26 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace ChillerAbsorption {
+namespace EnergyPlus::ChillerAbsorption {
 
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
@@ -232,7 +229,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        static std::string const RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
+        constexpr const char * RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
 
         int AbsorberNum; // Absorber counter
         int NumAlphas;   // Number of elements in the alpha array
@@ -603,7 +600,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitBLASTAbsorberModel");
+        constexpr const char * RoutineName("InitBLASTAbsorberModel");
 
         // Init more variables
         if (this->MyOneTimeFlag) {
@@ -691,7 +688,7 @@ namespace ChillerAbsorption {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -721,7 +718,7 @@ namespace ChillerAbsorption {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp(),
+                                                           DataGlobalConstants::CWInitConvTemp,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -738,7 +735,7 @@ namespace ChillerAbsorption {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp(),
+                                                    DataGlobalConstants::CWInitConvTemp,
                                                     DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                     RoutineName);
 
@@ -759,7 +756,7 @@ namespace ChillerAbsorption {
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                                            DataGlobalConstants::HWInitConvTemp(),
+                                                            DataGlobalConstants::HWInitConvTemp,
                                                             DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
                                                             RoutineName);
 
@@ -871,8 +868,8 @@ namespace ChillerAbsorption {
 
         //        Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
-        static std::string const RoutineName("SizeAbsorpChiller");
-        static std::string const RoutineNameLong("SizeAbsorptionChiller");
+        constexpr const char * RoutineName("SizeAbsorpChiller");
+        constexpr const char * RoutineNameLong("SizeAbsorptionChiller");
 
         int PltSizSteamNum(0);   // Plant Sizing index for steam heating loop
         int PltSizHeatingNum(0); // Plant Sizing index for how water heating loop
@@ -928,13 +925,13 @@ namespace ChillerAbsorption {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp(),
+                                                                   DataGlobalConstants::CWInitConvTemp,
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp(),
+                                                               DataGlobalConstants::CWInitConvTemp,
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
@@ -1100,7 +1097,7 @@ namespace ChillerAbsorption {
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp(),
+                                                               DataGlobalConstants::CWInitConvTemp,
                                                                DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                RoutineName);
                 tmpCondVolFlowRate =
@@ -1325,12 +1322,12 @@ namespace ChillerAbsorption {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                                                       DataGlobalConstants::HWInitConvTemp(),
+                                                                       DataGlobalConstants::HWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
                                                                        RoutineName);
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp(),
+                                                                   DataGlobalConstants::HWInitConvTemp,
                                                                    DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -1346,9 +1343,9 @@ namespace ChillerAbsorption {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             std::string equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, moduleObjectType);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, "n/a");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, moduleObjectType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, "n/a");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
         }
     }
 
@@ -1372,7 +1369,7 @@ namespace ChillerAbsorption {
         // 1.  BLAST User Manual
         // 2.  Absorber User Manual
 
-        static std::string const RoutineName("CalcBLASTAbsorberModel");
+        constexpr const char * RoutineName("CalcBLASTAbsorberModel");
 
         Real64 EvapDeltaTemp(0.0); // C - evaporator temperature difference, water side
 
@@ -1727,10 +1724,10 @@ namespace ChillerAbsorption {
         } // IF(GeneratorInletNode .GT. 0)THEN
 
         // convert power to energy
-        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void BLASTAbsorberSpecs::updateRecords(Real64 MyLoad, bool RunFlag)
@@ -1802,7 +1799,5 @@ namespace ChillerAbsorption {
             }
         }
     }
-
-} // namespace ChillerAbsorption
 
 } // namespace EnergyPlus

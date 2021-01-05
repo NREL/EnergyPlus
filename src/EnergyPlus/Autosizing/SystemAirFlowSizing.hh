@@ -48,6 +48,7 @@
 #ifndef SystemAirFlowSizing_hh_INCLUDED
 #define SystemAirFlowSizing_hh_INCLUDED
 
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 
@@ -67,6 +68,14 @@ struct SystemAirFlowSizer : BaseSizerWithScalableInputs
     Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
+};
+
+struct SystemAirFlowSizerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
 };
 
 } // namespace EnergyPlus

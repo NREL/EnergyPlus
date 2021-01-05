@@ -102,5 +102,14 @@ namespace HybridUnitaryAirConditioners {
     int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
+
+struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 #endif
