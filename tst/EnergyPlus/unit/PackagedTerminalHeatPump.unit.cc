@@ -858,8 +858,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
-    DXCoil(1).RatedCBF(1) = 0.05;
-    DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
     Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
@@ -1204,8 +1204,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
-    DXCoil(1).RatedCBF(1) = 0.05;
-    DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
     Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;

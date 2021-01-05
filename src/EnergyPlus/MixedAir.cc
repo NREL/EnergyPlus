@@ -164,9 +164,7 @@ namespace MixedAir {
     int const FixedDewPointAndDryBulb(5);
     int const ElectronicEnthalpy(6);
     int const DifferentialDryBulbAndEnthalpy(7);
-    // coil operation
-    int const On(1);  // normal coil operation
-    int const Off(0); // signal coil shouldn't run
+
     // component types addressed by this module
     int const OAMixer_Num(1);
     int const Fan_Simple_CV(2);
@@ -185,13 +183,13 @@ namespace MixedAir {
     int const Unglazed_SolarCollector(15);
     int const EvapCooler(16);
     int const PVT_AirBased(17);
-    int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
+    int const Fan_ComponentModel(18);
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
-    int const VRFTerminalUnit(24); // new Jan 2020
+    int const VRFTerminalUnit(24);
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -634,7 +632,6 @@ namespace MixedAir {
                 if (Sim) {
                     HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
                 }
-                // cpw22Aug2010 Add Fan:ComponentModel (new num=18)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 if (Sim) {
                     Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -1228,7 +1225,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         // construct fan object
                         HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)));
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = HVACFan::fanObjs.size();
-                        // cpw22Aug2010 Add Fan:ComponentModel (new)
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Fan_ComponentModel;
 

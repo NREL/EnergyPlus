@@ -1429,8 +1429,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
     // leaving a little wiggle room on these
-    EXPECT_NEAR(10.0, (DXCoils::DXCoil(2).RatedTotCap(1) / DXCoils::DXCoil(1).RatedTotCap(1)), 0.00001);
-    EXPECT_NEAR(10.0, (DXCoils::DXCoil(2).RatedAirVolFlowRate(1) / DXCoils::DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedTotCap(1) / state->dataDXCoils->DXCoil(1).RatedTotCap(1)), 0.00001);
+    EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1) / state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
     EXPECT_NEAR(
         10.0,
         (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
@@ -3739,22 +3739,22 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     EXPECT_EQ(condenserReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(condenserReject * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
 
-    DXCoils::NumDXCoils = 2;
-    DXCoils::DXCoil.allocate(2);
-    DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-    DXCoils::DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
-    DXCoils::DXCoil(1).FuelType = "NaturalGas";
-    DXCoils::DXCoil(1).ElecCoolingConsumption = 100.0;
-    DXCoils::DXCoil(1).TotalCoolingEnergy = 100.0;
-    DXCoils::DXCoil(1).MSFuelWasteHeat = 1.0;
-    DXCoils::DXCoil(1).DefrostConsumption = 0.0;
-    DXCoils::DXCoil(1).CrankcaseHeaterConsumption = 0.0;
-    DXCoils::DXCoil(2).DXCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
-    DXCoils::DXCoil(2).ElecHeatingConsumption = 50.0;
-    DXCoils::DXCoil(2).TotalHeatingEnergy = 40.0;
-    DXCoils::DXCoil(2).DefrostConsumption = 0.0;
-    DXCoils::DXCoil(2).FuelConsumed = 0.0;
-    DXCoils::DXCoil(2).CrankcaseHeaterConsumption = 0.0;
+    state->dataDXCoils->NumDXCoils = 2;
+    state->dataDXCoils->DXCoil.allocate(2);
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
+    state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
+    state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
+    state->dataDXCoils->DXCoil(1).MSFuelWasteHeat = 1.0;
+    state->dataDXCoils->DXCoil(1).DefrostConsumption = 0.0;
+    state->dataDXCoils->DXCoil(1).CrankcaseHeaterConsumption = 0.0;
+    state->dataDXCoils->DXCoil(2).DXCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+    state->dataDXCoils->DXCoil(2).ElecHeatingConsumption = 50.0;
+    state->dataDXCoils->DXCoil(2).TotalHeatingEnergy = 40.0;
+    state->dataDXCoils->DXCoil(2).DefrostConsumption = 0.0;
+    state->dataDXCoils->DXCoil(2).FuelConsumed = 0.0;
+    state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
