@@ -1687,7 +1687,7 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
         state.dataSysRpts->ZoneOAVolCrntRho.allocate(state.dataGlobal->NumOfZones);
         state.dataSysRpts->ZoneMechACH.allocate(state.dataGlobal->NumOfZones);
-        ZoneTargetVentilationFlowVoz.allocate(state.dataGlobal->NumOfZones);
+        state.dataSysRpts->ZoneTargetVentilationFlowVoz.allocate(state.dataGlobal->NumOfZones);
 
         state.dataSysRpts->SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -1765,7 +1765,7 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->ZoneOAVolFlowCrntRho = 0.0;
         state.dataSysRpts->ZoneOAVolCrntRho = 0.0;
         state.dataSysRpts->ZoneMechACH = 0.0;
-        ZoneTargetVentilationFlowVoz = 0.0;
+        state.dataSysRpts->ZoneTargetVentilationFlowVoz = 0.0;
 
         // SYSTEM LOADS REPORT
         state.dataSysRpts->SysTotZoneLoadHTNG = 0.0;
@@ -2157,7 +2157,7 @@ namespace EnergyPlus::SystemReports {
 
             SetupOutputVariable(state, "Zone Target Voz Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                ZoneTargetVentilationFlowVoz(ZoneIndex),
+                                state.dataSysRpts->ZoneTargetVentilationFlowVoz(ZoneIndex),
                                 "HVAC",
                                 "Sum",
                                 ZoneEquipConfig(ZoneIndex).ZoneName);
@@ -4238,11 +4238,11 @@ namespace EnergyPlus::SystemReports {
 
             bool UseOccSchFlag = true;
             bool UseMinOASchFlag = true;
-            ZoneTargetVentilationFlowVoz = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+            state.dataSysRpts->ZoneTargetVentilationFlowVoz = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
                 state, ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
             if (ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
-                ZoneTargetVentilationFlowVoz =
-                    ZoneTargetVentilationFlowVoz /
+                state.dataSysRpts->ZoneTargetVentilationFlowVoz =
+                    state.dataSysRpts->ZoneTargetVentilationFlowVoz /
                     DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
@@ -4570,8 +4570,7 @@ namespace EnergyPlus::SystemReports {
             if (ZonePreDefRep(ActualZoneNum).isOccupied) {
                 // accumulate the occupied time
                 ZonePreDefRep(ActualZoneNum).TotTimeOcc += TimeStepSys;
-                // mechnical ventilation
-                if ((state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) < ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
+                // mechanical ventilation
                 ZonePreDefRep(ActualZoneNum).MechVentVolTotalOcc += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
                 if ((state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) / TimeStepSys) < ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
                     ZonePreDefRep(ActualZoneNum).MechVentVolMin = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) / TimeStepSys;
@@ -4588,7 +4587,7 @@ namespace EnergyPlus::SystemReports {
                 }
             }
             // accumulate during occupancy or not
-            ZonePreDefRep(ActualZoneNum).MechVentVolTotal += ZoneOAVolCrntRho(CtrlZoneNum);
+            ZonePreDefRep(ActualZoneNum).MechVentVolTotal += state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum);
             ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
             ZonePreDefRep(ActualZoneNum).SimpVentVolTotal += ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
 

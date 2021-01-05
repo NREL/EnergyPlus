@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataSysRpts->ZoneOAVolStdRho.allocate(state->dataGlobal->NumOfZones);
     state->dataSysRpts->ZoneOAVolCrntRho.allocate(state->dataGlobal->NumOfZones);
     state->dataSysRpts->ZoneMechACH.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     MAT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     state->dataSysRpts->MaxHeatingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);

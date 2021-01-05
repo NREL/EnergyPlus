@@ -298,6 +298,7 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D<Real64> ZoneOAVolFlowCrntRho;   // zone mech vent volume flow rate at current density {m3/s}
     Array1D<Real64> ZoneOAVolCrntRho;       // zone mech vent total volume OA at current density {m3/s}
     Array1D<Real64> ZoneMechACH;            // zone mech vent air changes per hour {ACH}
+    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz {m3/s}
 
     bool AirLoopLoadsReportEnabled = true;
     bool VentLoadsReportEnabled = true;
@@ -397,6 +398,7 @@ struct SystemReportsData : BaseGlobalStruct {
         this->ZoneOAVolFlowCrntRho.deallocate();
         this->ZoneOAVolCrntRho.deallocate();
         this->ZoneMechACH.deallocate();
+        this->ZoneTargetVentilationFlowVoz.deallocate();
         this->AirLoopLoadsReportEnabled = true;
         this->VentLoadsReportEnabled = true;
         this->VentEnergyReportEnabled = false;

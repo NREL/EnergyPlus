@@ -679,6 +679,75 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaoMinSimpVent = 0;
     int pdchOaoMinTotVent = 0;
 
+    int pdstOAmechVentParByZone = 0;
+    int pdchOaMvAirLpNm = 0;
+    int pdchOaMvAvgNumOcc = 0;
+    int pdchOaMvNomNumOcc = 0;
+    int pdchOaMvZoneVol = 0;
+    int pdchOaMvZoneArea = 0;
+    int pdchOaMvDesZnOa = 0;
+    int pdchOaMvMinDynTrgVent = 0;
+
+    int pdstOAtotAirByZone = 0;
+    int pdchOaTaBzMechVent = 0;
+    int pdchOaTaBzNatVent = 0;
+    int pdchOaTaBzTotVent = 0;
+    int pdchOaTaBzInfil = 0;
+    int pdchOaTaBzTotVentInfil = 0;
+    int pdchOaTaBzDynTrgVent = 0;
+    int pdchOaTaBzTmBelow = 0;
+    int pdchOaTaBzTmAt = 0;
+    int pdchOaTaBzTmAbove = 0;
+    int pdchOaTaBzTmAboveUnocc = 0;
+
+    int pdstOAavgOccByZone = 0;
+    int pdchOaOccBzMechVent = 0;
+    int pdchOaOccBzNatVent = 0;
+    int pdchOaOccBzTotVent = 0;
+    int pdchOaOccBzInfil = 0;
+    int pdchOaOccBzTotVentInfil = 0;
+    int pdchOaOccBzDynTrgVent = 0;
+    int pdchOaOccBzTmBelow = 0;
+    int pdchOaOccBzTmAt = 0;
+    int pdchOaOccBzTmAbove = 0;
+
+    int pdstOAtotAirByLoop = 0;
+    int pdchOaTaAlMechVent = 0;
+    int pdchOaTaAlSumDynTrgVent = 0;
+    int pdchOaTaAlTmBelow = 0;
+    int pdchOaTaAlTmAt = 0;
+    int pdchOaTaAlTmAbove = 0;
+    int pdchOaTaAlTmAboveUnocc = 0;
+
+    int pdstOAavgOccByLoop = 0;
+    int pdchOaOccAlMechVent = 0;
+    int pdchOaOccAlSumDynTrgVent = 0;
+    int pdchOaOccAlTmBelow = 0;
+    int pdchOaOccAlTmAt = 0;
+    int pdchOaOccAlTmAbove = 0;
+
+    int pdstOAtimeFactorsDurOcc = 0;
+    int pdchOaTmFctNoLimit = 0;
+    int pdchOaTmFctHiHumid = 0;
+    int pdchOaTmFctNiteVent = 0;
+    int pdchOaTmFctEcono = 0;
+    int pdchOaTmFctDCV = 0;
+    int pdchOaTmFctExhaust = 0;
+    int pdchOaTmFctLimit = 0;
+    int pdchOaTmFctDemand = 0;
+    int pdchOaTmFctEMS = 0;
+
+    int pdstOAavgFactorsDurOcc = 0;
+    int pdchOaAvFctNoLimit = 0;
+    int pdchOaAvFctHiHumid = 0;
+    int pdchOaAvFctNiteVent = 0;
+    int pdchOaAvFctEcono = 0;
+    int pdchOaAvFctDCV = 0;
+    int pdchOaAvFctExhaust = 0;
+    int pdchOaAvFctLimit = 0;
+    int pdchOaAvFctDemand = 0;
+    int pdchOaAvFctEMS = 0;
+
     // Object Count Report
     int pdrObjCnt = 0;
     int pdstSurfCnt = 0;
@@ -1522,6 +1591,75 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->pdchOaoMinAFNInfil = 0;
         this->pdchOaoMinSimpVent = 0;
         this->pdchOaoMinTotVent = 0;
+        this->pdstOAmechVentParByZone = 0;
+        this->pdchOaMvAirLpNm = 0;
+        this->pdchOaMvAvgNumOcc = 0;
+        this->pdchOaMvNomNumOcc = 0;
+        this->pdchOaMvZoneVol = 0;
+        this->pdchOaMvZoneArea = 0;
+        this->pdchOaMvDesZnOa = 0;
+        this->pdchOaMvMinDynTrgVent = 0;
+
+        this->pdstOAtotAirByZone = 0;
+        this->pdchOaTaBzMechVent = 0;
+        this->pdchOaTaBzNatVent = 0;
+        this->pdchOaTaBzTotVent = 0;
+        this->pdchOaTaBzInfil = 0;
+        this->pdchOaTaBzTotVentInfil = 0;
+        this->pdchOaTaBzDynTrgVent = 0;
+        this->pdchOaTaBzTmBelow = 0;
+        this->pdchOaTaBzTmAt = 0;
+        this->pdchOaTaBzTmAbove = 0;
+        this->pdchOaTaBzTmAboveUnocc = 0;
+
+        this->pdstOAavgOccByZone = 0;
+        this->pdchOaOccBzMechVent = 0;
+        this->pdchOaOccBzNatVent = 0;
+        this->pdchOaOccBzTotVent = 0;
+        this->pdchOaOccBzInfil = 0;
+        this->pdchOaOccBzTotVentInfil = 0;
+        this->pdchOaOccBzDynTrgVent = 0;
+        this->pdchOaOccBzTmBelow = 0;
+        this->pdchOaOccBzTmAt = 0;
+        this->pdchOaOccBzTmAbove = 0;
+
+        this->pdstOAtotAirByLoop = 0;
+        this->pdchOaTaAlMechVent = 0;
+        this->pdchOaTaAlSumDynTrgVent = 0;
+        this->pdchOaTaAlTmBelow = 0;
+        this->pdchOaTaAlTmAt = 0;
+        this->pdchOaTaAlTmAbove = 0;
+        this->pdchOaTaAlTmAboveUnocc = 0;
+
+        this->pdstOAavgOccByLoop = 0;
+        this->pdchOaOccAlMechVent = 0;
+        this->pdchOaOccAlSumDynTrgVent = 0;
+        this->pdchOaOccAlTmBelow = 0;
+        this->pdchOaOccAlTmAt = 0;
+        this->pdchOaOccAlTmAbove = 0;
+
+        this->pdstOAtimeFactorsDurOcc = 0;
+        this->pdchOaTmFctNoLimit = 0;
+        this->pdchOaTmFctHiHumid = 0;
+        this->pdchOaTmFctNiteVent = 0;
+        this->pdchOaTmFctEcono = 0;
+        this->pdchOaTmFctDCV = 0;
+        this->pdchOaTmFctExhaust = 0;
+        this->pdchOaTmFctLimit = 0;
+        this->pdchOaTmFctDemand = 0;
+        this->pdchOaTmFctEMS = 0;
+
+        this->pdstOAavgFactorsDurOcc = 0;
+        this->pdchOaAvFctNoLimit = 0;
+        this->pdchOaAvFctHiHumid = 0;
+        this->pdchOaAvFctNiteVent = 0;
+        this->pdchOaAvFctEcono = 0;
+        this->pdchOaAvFctDCV = 0;
+        this->pdchOaAvFctExhaust = 0;
+        this->pdchOaAvFctLimit = 0;
+        this->pdchOaAvFctDemand = 0;
+        this->pdchOaAvFctEMS = 0;
+
         this->pdrObjCnt = 0;
         this->pdstSurfCnt = 0;
         this->pdchSurfCntTot = 0;
