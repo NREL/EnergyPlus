@@ -11589,180 +11589,221 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayComponentSizing) {
-            WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            // The arrays that look for unique headers are dimensioned in the
-            // running program since the size of the number of entries is
-            // not previouslly known. Use the size of all entries since that
-            // is the maximum possible.
-            uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
-            uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
-            // initially clear the written flags for entire array
-            // The following line is not really necessary and it is possible that the array has
-            // not been allocated when this is first called.
-            //  CompSizeTableEntry%written = .FALSE.
-            // repeat the following loop until everything in array has been
-            // written into a table
-            loopLimit = 0;
-            while (loopLimit <= 100) { // put a maximum count since complex loop that could run indefinitely if error
-                foundEntry = 0;
-                ++loopLimit;
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
-                        foundEntry = iTableEntry;
-                        break;
-                    }
-                }
-                if (foundEntry == 0) break; // leave main loop - all items put into tables
-                // clear active items
-                for (auto &e : state.dataOutRptPredefined->CompSizeTableEntry)
-                    e.active = false;
-                // make an unwritten item that is of the same type active - these will be the
-                // entries for the particular subtable.
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
-                        if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
-                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
-                        }
-                    }
-                }
-                // identify unique descriptions and objects (columns and rows) in order
-                // to size the table arrays properly.
-                // reset the counters for the arrays looking for unique rows and columns
-                numUniqueDesc = 0;
-                numUniqueObj = 0;
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    // search for descriptions
-                    foundDesc = 0;
-                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
-                        // look through the list of unique items to see if it matches
-                        for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                            if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
-                                foundDesc = jUnique;
-                                break;
-                            }
-                        }
-                        // if not found add to the list
-                        if (foundDesc == 0) {
-                            ++numUniqueDesc;
-                            uniqueDesc(numUniqueDesc) = curDesc;
-                        }
-                        // search for objects
-                        foundObj = 0;
-                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
-                        for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                            if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
-                                foundObj = jUnique;
-                                break;
-                            }
-                        }
-                        // if not found add to the list
-                        if (foundObj == 0) {
-                            ++numUniqueObj;
-                            uniqueObj(numUniqueObj) = curObj;
-                        }
-                    }
-                }
-                // make sure the table has at least one row and columns
-                if (numUniqueDesc == 0) numUniqueDesc = 1;
-                if (numUniqueObj == 0) numUniqueObj = 1;
-                // now that the unique row and column headers are known the array
-                // sizes can be set for the table arrays
-                rowHead.allocate(numUniqueObj);
-                columnHead.allocate(numUniqueDesc);
-                columnWidth.dimension(numUniqueDesc, 14); // array assignment - same for all columns
-                colUnitConv.allocate(numUniqueDesc);
-                tableBody.allocate(numUniqueDesc, numUniqueObj);
-                // initialize table body to blanks (in case entries are incomplete)
-                tableBody = "";
-                // transfer the row and column headings first
-                for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                    // do the unit conversions
-                    curColHeadWithSI = uniqueDesc(jUnique);
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
-                        colUnitConv(jUnique) = indexUnitConv;
+
+            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+
+                if (iUnitSystem == 0) {
+                    unitsStyle_temp = ort->unitsStyle;
+                    produceTabular = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                        produceSQLite = true;
                     } else {
-                        curColHead = curColHeadWithSI;
-                        colUnitConv(jUnique) = 0;
+                        produceSQLite = false;
                     }
-                    columnHead(jUnique) = curColHead;
+                } else { // iUnitSystem == 1
+                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    produceTabular = false;
+                    produceSQLite = true;
+                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
                 }
-                for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                    rowHead(jUnique) = uniqueObj(jUnique);
-                }
-                // fill the table
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    // find the row and column for the specific entry
-                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+
+                if (produceTabular) {
+                    WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                } 
+                // The arrays that look for unique headers are dimensioned in the
+                // running program since the size of the number of entries is
+                // not previouslly known. Use the size of all entries since that
+                // is the maximum possible.
+                uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
+                uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
+                // initially clear the written flags for entire array
+                // The following line is not really necessary and it is possible that the array has
+                // not been allocated when this is first called.
+                //  CompSizeTableEntry%written = .FALSE.
+                // repeat the following loop until everything in array has been
+                // written into a table
+                loopLimit = 0;
+                while (loopLimit <= 100) { // put a maximum count since complex loop that could run indefinitely if error
+                    foundEntry = 0;
+                    ++loopLimit;
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
+                            foundEntry = iTableEntry;
+                            break;
+                        }
+                    }
+                    if (foundEntry == 0) break; // leave main loop - all items put into tables
+                    // clear active items
+                    for (auto &e : state.dataOutRptPredefined->CompSizeTableEntry)
+                        e.active = false;
+                    // make an unwritten item that is of the same type active - these will be the
+                    // entries for the particular subtable.
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
+                            if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField,
+                                                            state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
+                                state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
+                            }
+                        }
+                    }
+                    // identify unique descriptions and objects (columns and rows) in order
+                    // to size the table arrays properly.
+                    // reset the counters for the arrays looking for unique rows and columns
+                    numUniqueDesc = 0;
+                    numUniqueObj = 0;
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        // search for descriptions
                         foundDesc = 0;
-                        for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                            if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
-                                foundDesc = jUnique;
-                                break;
+                        if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                            curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+                            // look through the list of unique items to see if it matches
+                            for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                                if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
+                                    foundDesc = jUnique;
+                                    break;
+                                }
+                            }
+                            // if not found add to the list
+                            if (foundDesc == 0) {
+                                ++numUniqueDesc;
+                                uniqueDesc(numUniqueDesc) = curDesc;
+                            }
+                            // search for objects
+                            foundObj = 0;
+                            curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
+                            for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                                if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
+                                    foundObj = jUnique;
+                                    break;
+                                }
+                            }
+                            // if not found add to the list
+                            if (foundObj == 0) {
+                                ++numUniqueObj;
+                                uniqueObj(numUniqueObj) = curObj;
                             }
                         }
-                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
-                        foundObj = 0;
-                        for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                            if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
-                                foundObj = jUnique;
-                                break;
-                            }
+                    }
+                    // make sure the table has at least one row and columns
+                    if (numUniqueDesc == 0) numUniqueDesc = 1;
+                    if (numUniqueObj == 0) numUniqueObj = 1;
+                    // now that the unique row and column headers are known the array
+                    // sizes can be set for the table arrays
+                    rowHead.allocate(numUniqueObj);
+                    columnHead.allocate(numUniqueDesc);
+                    columnWidth.dimension(numUniqueDesc, 14); // array assignment - same for all columns
+                    colUnitConv.allocate(numUniqueDesc);
+                    tableBody.allocate(numUniqueDesc, numUniqueObj);
+                    // initialize table body to blanks (in case entries are incomplete)
+                    tableBody = "";
+                    // transfer the row and column headings first
+                    for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                        // do the unit conversions
+                        curColHeadWithSI = uniqueDesc(jUnique);
+                        // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                        if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                                LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
+                            colUnitConv(jUnique) = indexUnitConv;
+                        } else {
+                            curColHead = curColHeadWithSI;
+                            colUnitConv(jUnique) = 0;
                         }
-                        if ((foundDesc >= 1) && (foundObj >= 1)) {
-                            curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
-                            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                if (colUnitConv(foundDesc) != 0) {
-                                    curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
+                        columnHead(jUnique) = curColHead;
+                    }
+                    for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                        rowHead(jUnique) = uniqueObj(jUnique);
+                    }
+                    // fill the table
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        // find the row and column for the specific entry
+                        if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                            curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+                            foundDesc = 0;
+                            for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                                if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
+                                    foundDesc = jUnique;
+                                    break;
+                                }
+                            }
+                            curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
+                            foundObj = 0;
+                            for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                                if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
+                                    foundObj = jUnique;
+                                    break;
+                                }
+                            }
+                            if ((foundDesc >= 1) && (foundObj >= 1)) {
+                                curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
+                                // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                                    if (colUnitConv(foundDesc) != 0) {
+                                        curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
+                                    } else {
+                                        curValue = curValueSI;
+                                    }
                                 } else {
                                     curValue = curValueSI;
                                 }
-                            } else {
-                                curValue = curValueSI;
+                                if (std::abs(curValue) >= 1.0) {
+                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 2);
+                                } else {
+                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
+                                }
+                                state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                             }
-                            if (std::abs(curValue) >= 1.0) {
-                                tableBody(foundDesc, foundObj) = RealToStr(curValue, 2);
-                            } else {
-                                tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
-                            }
-                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                         }
                     }
-                }
-                // write the table
-                WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
-                if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
-                    state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
-                    WriteTable(state, tableBody,
-                               rowHead,
-                               columnHead,
-                               columnWidth,
-                               false,
-                               "User-Specified values were used. Design Size values were used if no User-Specified values were provided. Design Size "
-                               "values may be derived from alternate User-Specified values.");
-                } else {
-                    WriteTable(state, tableBody,
-                               rowHead,
-                               columnHead,
-                               columnWidth,
-                               false,
-                               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-                }
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
-                }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody,
-                        rowHead,
-                        columnHead,
-                        "Component Sizing Summary",
-                        "Entire Facility",
-                        state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
-                        "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                    // write the table
+                    if (produceTabular) {
+                        WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
+                        if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
+                            state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
+                            WriteTable(state,
+                                       tableBody,
+                                       rowHead,
+                                       columnHead,
+                                       columnWidth,
+                                       false,
+                                       "User-Specified values were used. Design Size values were used if no User-Specified values were provided. "
+                                       "Design Size "
+                                       "values may be derived from alternate User-Specified values.");
+                        } else {
+                            WriteTable(state,
+                                       tableBody,
+                                       rowHead,
+                                       columnHead,
+                                       columnWidth,
+                                       false,
+                                       "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                        }
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "ComponentSizingSummary",
+                                                                   "Entire Facility",
+                                                                   state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Component Sizing Summary",
+                                "Entire Facility",
+                                state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
+                                "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                        }
+                    }
                 }
             }
         }
