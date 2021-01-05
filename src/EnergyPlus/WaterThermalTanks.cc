@@ -304,7 +304,7 @@ namespace WaterThermalTanks {
         if (this->UseSide.loopNum > 0 && this->UseSide.loopSideNum > 0 && !state.dataGlobal->KickOffSimulation) {
             this->UseCurrentFlowLock = DataPlant::PlantLoop(this->UseSide.loopNum).LoopSide(this->UseSide.loopSideNum).FlowLock;
         } else {
-            this->UseCurrentFlowLock = 1;
+            this->UseCurrentFlowLock = DataPlant::iFlowLock::Locked;
         }
         this->initialize(state, FirstHVACIteration);
         //       Plant connected water heaters may have a desuperheater heating coil attached
@@ -394,7 +394,7 @@ namespace WaterThermalTanks {
         if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !state.dataGlobal->KickOffSimulation) {
             Tank.UseCurrentFlowLock = DataPlant::PlantLoop(Tank.UseSide.loopNum).LoopSide(Tank.UseSide.loopSideNum).FlowLock;
         } else {
-            Tank.UseCurrentFlowLock = 1;
+            Tank.UseCurrentFlowLock = DataPlant::iFlowLock::Locked;
         }
 
         Tank.initialize(state, FirstHVACIteration);
@@ -9991,7 +9991,7 @@ namespace WaterThermalTanks {
         } else if (PlantLoopSide == DataPlant::SupplySide) {
             // If FlowLock is False (0), the tank sets the plant loop mdot
             // If FlowLock is True (1),  the new resolved plant loop mdot is used
-            if (this->UseCurrentFlowLock == 0) {
+            if (this->UseCurrentFlowLock == DataPlant::iFlowLock::Unlocked) {
                 CurrentMode = PassingFlowThru;
                 if ((this->UseSideLoadRequested > 0.0) && (WaterThermalTankSide == SideEnum::Use)) {
                     CurrentMode = MaybeRequestingFlow;

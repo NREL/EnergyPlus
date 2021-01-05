@@ -398,7 +398,7 @@ namespace HVACInterfaceManager {
                                   int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                                   bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
-                                  int const CommonPipeType)
+                                  DataPlant::iCommonPipeType const CommonPipeType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -476,12 +476,12 @@ namespace HVACInterfaceManager {
         // update the temperatures and flow rates
         auto &flow_demand_to_supply_tol(convergence.PlantFlowDemandToSupplyTolValue);
         auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
-        if (CommonPipeType == 1 || CommonPipeType == 2) {
+        if (CommonPipeType == DataPlant::iCommonPipeType::Single || CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
             // update the temperature
             UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
             Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
             TankOutletTemp = MixedOutletTemp;
-            if (ThisLoopSideNum == DemandSide) {
+            if (ThisLoopSideNum == DataPlant::DemandSide) {
                 rshift1(flow_demand_to_supply_tol);
                 flow_demand_to_supply_tol(1) = std::abs(OldOtherLoopSideInletMdot - Node(OtherLoopSideInletNode).MassFlowRate);
                 if (flow_demand_to_supply_tol(1) > DataConvergParams::PlantFlowRateToler) {
@@ -505,7 +505,7 @@ namespace HVACInterfaceManager {
             // update the temperature
             Node(OtherLoopSideInletNode).Temp = TankOutletTemp;
             // Set the flow tolerance array
-            if (ThisLoopSideNum == DemandSide) {
+            if (ThisLoopSideNum == DataPlant::DemandSide) {
                 rshift1(flow_demand_to_supply_tol);
                 flow_demand_to_supply_tol(1) = std::abs(Node(ThisLoopSideOutletNode).MassFlowRate - Node(OtherLoopSideInletNode).MassFlowRate);
                 if (flow_demand_to_supply_tol(1) > DataConvergParams::PlantFlowRateToler) {
@@ -536,7 +536,7 @@ namespace HVACInterfaceManager {
         }
 
         // temperature
-        if (ThisLoopSideNum == DemandSide) {
+        if (ThisLoopSideNum == DataPlant::DemandSide) {
             auto &temp_demand_to_supply_tol(convergence.PlantTempDemandToSupplyTolValue);
             rshift1(temp_demand_to_supply_tol);
             temp_demand_to_supply_tol(1) = std::abs(OldTankOutletTemp - Node(OtherLoopSideInletNode).Temp);
@@ -553,7 +553,7 @@ namespace HVACInterfaceManager {
         }
 
         // Set out of tolerance flags
-        if (ThisLoopSideNum == DemandSide) {
+        if (ThisLoopSideNum == DataPlant::DemandSide) {
             if (convergence.PlantMassFlowNotConverged || convergence.PlantTempNotConverged) {
                 OutOfToleranceFlag = true;
             }
@@ -726,7 +726,11 @@ namespace HVACInterfaceManager {
         TankOutletTemp = TankAverageTemp;
     }
 
-    void UpdateCommonPipe(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
+    void UpdateCommonPipe(EnergyPlusData &state,
+                          int const LoopNum,
+                          int const TankInletLoopSide,
+                          DataPlant::iCommonPipeType const CommonPipeType,
+                          Real64 &MixedOutletTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -760,8 +764,6 @@ namespace HVACInterfaceManager {
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataPlant::CommonPipe_Single;
-        using DataPlant::CommonPipe_TwoWay;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -806,7 +808,7 @@ namespace HVACInterfaceManager {
 
         TankInletTemp = Node(TankInletNode).Temp;
 
-        if (TankInletLoopSide == DemandSide) {
+        if (TankInletLoopSide == DataPlant::DemandSide) {
             // for common pipe loops, assume 75% of plant loop volume is on the demand side
             FracTotLoopMass = 0.25;
         } else {
@@ -868,10 +870,10 @@ namespace HVACInterfaceManager {
             }
         }
         // Common Pipe Simulation
-        if (CommonPipeType == CommonPipe_Single) {
+        if (CommonPipeType == DataPlant::iCommonPipeType::Single) {
             ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
             // 2-way (controlled) common pipe simulation
-        } else if (CommonPipeType == CommonPipe_TwoWay) {
+        } else if (CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
 
             ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
             MixedOutletTemp = Node(TankOutletNode).Temp;
@@ -1330,11 +1332,11 @@ namespace HVACInterfaceManager {
 
             {
                 auto const SELECT_CASE_var(PlantLoop(CurLoopNum).CommonPipeType);
-                if (SELECT_CASE_var == CommonPipe_No) {
-                    PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_No;
+                if (SELECT_CASE_var == DataPlant::iCommonPipeType::No) {
+                    PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::No;
 
-                } else if (SELECT_CASE_var == CommonPipe_Single) { // Uncontrolled ('single') common pipe
-                    PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_Single;
+                } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::Single) { // Uncontrolled ('single') common pipe
+                    PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::Single;
                     SetupOutputVariable(state, "Plant Common Pipe Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).Flow,
@@ -1362,8 +1364,8 @@ namespace HVACInterfaceManager {
                         ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                     }
 
-                } else if (SELECT_CASE_var == CommonPipe_TwoWay) { // Controlled ('two-way') common pipe
-                    PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_TwoWay;
+                } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
+                    PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
                     SetupOutputVariable(state, "Plant Common Pipe Primary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).PriCPLegFlow,

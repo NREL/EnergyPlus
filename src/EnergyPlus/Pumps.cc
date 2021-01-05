@@ -199,7 +199,6 @@ namespace Pumps {
         // the necessary loop and the PumpRunning has been correctly set.
 
         // Using/Aliasing
-        using DataPlant::FlowPumpQuery;
         using DataPlant::PlantLoop;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -247,7 +246,7 @@ namespace Pumps {
         InitializePumps(state, PumpNum);
 
         // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
-        if (PlantLoop(LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).FlowLock == FlowPumpQuery) {
+        if (PlantLoop(LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).FlowLock == DataPlant::iFlowLock::PumpQuery) {
             SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
             return;
         }

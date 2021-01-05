@@ -80,29 +80,14 @@ namespace DataPlant {
     constexpr Real64 CriteriaDelta_Temperature(0.010);
     constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
 
-    //  and the low to calculate loop demand
-    // Parameters for loop setpoint reference
-    extern int const Air;
-    extern int const Ground;
-
-    // Parameters for common pipe
-    extern int const CommonPipe_No;
-    extern int const CommonPipe_Single;
-    extern int const CommonPipe_TwoWay;
-
     // Parameters for loop side location
-    extern int const DemandSupply_No;
-    extern int const DemandSide;
-    extern int const SupplySide;
+    constexpr int DemandSupply_No(0);
+    constexpr int DemandSide(1);
+    constexpr int SupplySide(2);
 
     // Parameters for tolerance
     extern Real64 const LoopDemandTol; // minimum significant loop cooling or heating demand
     extern Real64 const DeltaTempTol;  // minimum significant loop temperature difference
-
-    // Parameters for FlowLock standardization
-    extern int const FlowPumpQuery; // Used to ask the pumps for their min/max avail based on no constraints
-    extern int const FlowUnlocked;  // components request flow
-    extern int const FlowLocked;    // components take their inlet flow
 
     // Pressure Routine Call Enumeration
     extern int const PressureCall_Init;

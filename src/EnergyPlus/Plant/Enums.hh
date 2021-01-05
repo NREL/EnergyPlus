@@ -148,6 +148,18 @@ namespace EnergyPlus::DataPlant {
         DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
     };
 
+    enum class iCommonPipeType {
+        No,
+        Single,
+        TwoWay,
+    };
+
+    enum class iFlowLock {
+        PumpQuery,      // Used to ask the pumps for their min/max avail based on no constraints
+        Unlocked,       // components request flow
+        Locked,         // components take their inlet flow
+    };
+
 } // namespace EnergyPlus
 
 #endif

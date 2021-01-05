@@ -278,7 +278,7 @@ namespace PlantUtilities {
         }
 
         // Set loop flow rate
-        if (loop_side.FlowLock == DataPlant::FlowUnlocked) {
+        if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
             if (DataPlant::PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
                 DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
@@ -357,7 +357,7 @@ namespace PlantUtilities {
                     DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
                 }
             }
-        } else if (loop_side.FlowLock == DataPlant::FlowLocked) {
+        } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
             DataLoopNode::Node(OutletNode).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
             CompFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
         } else {
@@ -411,7 +411,7 @@ namespace PlantUtilities {
         a_node.MassFlowRateRequest = CompFlow;
         if (LoopNum > 0 && LoopSideNum > 0 && (!ResetMode)) {
             if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
-                if ((std::abs(MdotOldRequest - a_node.MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) && (loop_side.FlowLock == DataPlant::FlowUnlocked)) {
+                if ((std::abs(MdotOldRequest - a_node.MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) && (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked)) {
                     loop_side.SimLoopSideNeeded = true;
                 }
             }
@@ -420,7 +420,7 @@ namespace PlantUtilities {
 
         if (LoopNum > 0 && LoopSideNum > 0) {
             auto const &branch(loop_side.Branch(BranchNum));
-            if (loop_side.FlowLock == DataPlant::FlowUnlocked) {
+            if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
                 if (DataPlant::PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                     a_node.MassFlowRate = CompFlow;
                 } else { // bound the flow by Min/Max available across entire branch
@@ -469,7 +469,7 @@ namespace PlantUtilities {
                     }
                 }
 
-            } else if (loop_side.FlowLock == DataPlant::FlowLocked) {
+            } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
 
                 CompFlow = a_node.MassFlowRate;
                 // do not change requested flow rate either
@@ -900,7 +900,7 @@ namespace PlantUtilities {
         }
     }
 
-    void SetAllFlowLocks(int const Value)
+    void SetAllFlowLocks(DataPlant::iFlowLock const Value)
     {
 
         // SUBROUTINE INFORMATION:

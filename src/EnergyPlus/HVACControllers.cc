@@ -301,7 +301,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using namespace DataSystemVariables;
-        using DataPlant::FlowLocked;
         using DataPlant::PlantLoop;
 
         // Locals
@@ -370,7 +369,7 @@ namespace HVACControllers {
 
             if (PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
                     .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoopSide)
-                    .FlowLock == FlowLocked) {
+                    .FlowLock == DataPlant::iFlowLock::Locked) {
                 // plant is rigid so controller cannot change anything.
                 // Update the current Controller to the outlet nodes
                 UpdateController(state, ControlNum);

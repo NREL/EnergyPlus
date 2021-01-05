@@ -203,8 +203,8 @@ namespace EnergyPlus {
             int CurntMinPlantSubIterations;
 
             if (std::any_of(PlantLoop.begin(), PlantLoop.end(), [](DataPlant::PlantLoopData const &e) {
-                return (e.CommonPipeType == DataPlant::CommonPipe_Single) ||
-                       (e.CommonPipeType == DataPlant::CommonPipe_TwoWay);
+                return (e.CommonPipeType == DataPlant::iCommonPipeType::Single) ||
+                       (e.CommonPipeType == DataPlant::iCommonPipeType::TwoWay);
             })) {
                 CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
             } else {
@@ -542,11 +542,11 @@ namespace EnergyPlus {
                 // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
                 if (this_loop.TypeOfLoop == LoopType::Plant) {
                     if (UtilityRoutines::SameString(Alpha(17), "CommonPipe")) {
-                        this_loop.CommonPipeType = CommonPipe_Single;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::Single;
                     } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
-                        this_loop.CommonPipeType = CommonPipe_TwoWay;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
                     } else if (UtilityRoutines::SameString(Alpha(17), "None") || lAlphaFieldBlanks(17)) {
-                        this_loop.CommonPipeType = CommonPipe_No;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
@@ -554,10 +554,10 @@ namespace EnergyPlus {
                         ErrorsFound = true;
                     }
                 } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
-                    this_loop.CommonPipeType = CommonPipe_No;
+                    this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
                 }
 
-                if (this_loop.CommonPipeType == CommonPipe_TwoWay) {
+                if (this_loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
                     if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
                         ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
@@ -1633,12 +1633,12 @@ namespace EnergyPlus {
                 // a nice little spot to report out bad pump/common-pipe configurations
                 bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
                 bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
-                if ((plantLoop.CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
+                if ((plantLoop.CommonPipeType != DataPlant::iCommonPipeType::No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
                     ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop");
                     ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError(state, "Make sure both demand and supply sides have a pump");
                     ErrorsFound = true;
-                } else if ((plantLoop.CommonPipeType == CommonPipe_No) && ThisSideHasPumps && OtherSideHasPumps) {
+                } else if ((plantLoop.CommonPipeType == DataPlant::iCommonPipeType::No) && ThisSideHasPumps && OtherSideHasPumps) {
                     ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe");
                     ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError(state, "Add common pipe or remove one loop side pump");
@@ -2176,7 +2176,7 @@ namespace EnergyPlus {
             //*****************************************************************
             if (!PlantFirstSizeCompleted) {
 
-                SetAllFlowLocks(FlowUnlocked);
+                SetAllFlowLocks(DataPlant::iFlowLock::Unlocked);
                 FinishSizingFlag = false;
                 PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
                 PlantFirstSizesOkayToReport = false;
@@ -2475,7 +2475,7 @@ namespace EnergyPlus {
                             }
                         }
 
-                        if ((PlantLoop(LoopNum).CommonPipeType == CommonPipe_TwoWay) && (LoopSideNum == DemandSide) &&
+                        if ((PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) && (LoopSideNum == DemandSide) &&
                             (PlantLoop(LoopNum).LoopSide(
                                     DemandSide).InletNodeSetPt)) { // get a second setpoint for secondaryLoop
                             // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
@@ -2505,7 +2505,7 @@ namespace EnergyPlus {
                                 e.PumpHeatToFluid = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 0;
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
@@ -2653,7 +2653,7 @@ namespace EnergyPlus {
                 }
 
                 // update demand side loop setpoint in plant data structure
-                if (PlantLoop(LoopNum).CommonPipeType == CommonPipe_TwoWay) { // get a second setpoint for secondaryLoop
+                if (PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) { // get a second setpoint for secondaryLoop
                     // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
                     // we want to initialize the demand side of the loop using that setpoint
                     if (PlantLoop(LoopNum).LoopSide(DemandSide).InletNodeSetPt) {

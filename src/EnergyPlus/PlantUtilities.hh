@@ -103,7 +103,7 @@ namespace PlantUtilities {
 
     void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    void SetAllFlowLocks(int const Value);
+    void SetAllFlowLocks(DataPlant::iFlowLock const Value);
 
     void ResetAllPlantInterConnectFlags();
 

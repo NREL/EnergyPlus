@@ -1750,8 +1750,6 @@ namespace HVACManager {
 
         // Using/Aliasing
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataPlant::FlowLocked;
-        using DataPlant::FlowUnlocked;
         using NonZoneEquipmentManager::ManageNonZoneEquipment;
         using PlantManager::ManagePlantLoops;
         using PlantUtilities::AnyPlantLoopSidesNeedSim;
@@ -1776,9 +1774,9 @@ namespace HVACManager {
         // This requires that the plant flow resolver carefully set the min/max avail limits on
         //  air side components to ensure they request within bounds.
         if (LockPlantFlows) {
-            SetAllFlowLocks(FlowLocked);
+            SetAllFlowLocks(DataPlant::iFlowLock::Locked);
         } else {
-            SetAllFlowLocks(FlowUnlocked);
+            SetAllFlowLocks(DataPlant::iFlowLock::Unlocked);
         }
         ResetAllPlantInterConnectFlags();
 

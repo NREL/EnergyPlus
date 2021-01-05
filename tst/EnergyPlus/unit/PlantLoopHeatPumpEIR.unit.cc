@@ -1299,7 +1299,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
@@ -1308,8 +1308,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
@@ -1318,8 +1318,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
@@ -1328,8 +1328,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on both sides
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
@@ -1338,8 +1338,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
@@ -2234,7 +2234,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2242,7 +2242,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2250,7 +2250,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2258,7 +2258,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
     // call with run flag ON, flow locked at zero on both sides
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2266,7 +2266,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);

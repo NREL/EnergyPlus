@@ -99,7 +99,7 @@ namespace DataPlant {
         int PlantSizNum;                 // index to corresponding plant sizing data array
         DataPlant::iLoopDemandCalcScheme LoopDemandCalcScheme;        // Load distribution scheme 1 SingleSetPoint,
         // 2 DualSetPointwithDeadBand
-        int CommonPipeType;
+        DataPlant::iCommonPipeType CommonPipeType;
         int EconPlantSideSensedNodeNum;
         int EconCondSideSensedNodeNum;
         int EconPlacement;
@@ -130,14 +130,14 @@ namespace DataPlant {
             : FluidType(0), FluidIndex(1), // default to water
               MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
-              MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), // true if Volume was set to autocalculate
-              CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0), NumOpSchemes(0),
-              LoadDistribution(DataPlant::iLoadingScheme::Unassigned), PlantSizNum(0),
-              LoopDemandCalcScheme(DataPlant::iLoopDemandCalcScheme::Unassigned), CommonPipeType(0), EconPlantSideSensedNodeNum(0),
-              EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false),
-              TypeOfLoop(LoopType::Unassigned), PressureSimType(1), HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false),
-              PressureEffectiveK(0.0), CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0),
-              InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
+              MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),
+              NumOpSchemes(0), LoadDistribution(DataPlant::iLoadingScheme::Unassigned), PlantSizNum(0),
+              LoopDemandCalcScheme(DataPlant::iLoopDemandCalcScheme::Unassigned), CommonPipeType(DataPlant::iCommonPipeType::No),
+              EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
+              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(1), HasPressureComponents(false), PressureDrop(0.0),
+              UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0),
+              UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0),
+              OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
         {
         }
 

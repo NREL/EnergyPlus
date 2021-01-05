@@ -62,29 +62,9 @@ namespace EnergyPlus::DataPlant {
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 
-    //  and the low to calculate loop demand
-    // Parameters for loop setpoint reference
-    int const Air(1);
-    int const Ground(2);
-
-    // Parameters for common pipe
-    int const CommonPipe_No(0);
-    int const CommonPipe_Single(1);
-    int const CommonPipe_TwoWay(2);
-
-    // Parameters for loop side location
-    int const DemandSupply_No(0);
-    int const DemandSide(1);
-    int const SupplySide(2);
-
     // Parameters for tolerance
     Real64 const LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     Real64 const DeltaTempTol(0.0001); // minimum significant loop temperature difference
-
-    // Parameters for FlowLock standardization
-    int const FlowPumpQuery(-1); // Used to ask the pumps for their min/max avail based on no constraints
-    int const FlowUnlocked(0);   // components request flow
-    int const FlowLocked(1);     // components take their inlet flow
 
     // Pressure Routine Call Enumeration
     int const PressureCall_Init(-1);

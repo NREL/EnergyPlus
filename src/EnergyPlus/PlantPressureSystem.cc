@@ -171,7 +171,6 @@ namespace EnergyPlus::PlantPressureSystem {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::CommonPipe_No;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
         using DataPlant::Press_NoPressure;
@@ -348,7 +347,7 @@ namespace EnergyPlus::PlantPressureSystem {
         // Before we leave, override any settings in case we are doing common pipe simulation
         if (loop.HasPressureComponents) {
             // We need to make sure we aren't doing an invalid configuration here
-            if (loop.CommonPipeType != CommonPipe_No) {
+            if (loop.CommonPipeType != DataPlant::iCommonPipeType::No) {
                 // There is a common pipe!
                 if (!CommonPipeErrorEncountered) {
                     ShowSevereError(state, "Invalid pressure simulation configuration for Plant Loop=" + loop.Name);
