@@ -109,11 +109,11 @@ namespace EnergyPlus::PlantPressureSystem {
     }
 
     void SimPressureDropSystem(EnergyPlusData &state,
-                               int const LoopNum,              // Plant Loop to update pressure information
-                               bool const FirstHVACIteration,  // System flag
-                               int const CallType,             // Enumerated call type
-                               Optional_int_const LoopSideNum, // Loop side num for specific branch simulation
-                               Optional_int_const BranchNum    // Branch num for specific branch simulation
+                               int const LoopNum,                       // Plant Loop to update pressure information
+                               bool const FirstHVACIteration,           // System flag
+                               DataPlant::iPressureCall const CallType, // Enumerated call type
+                               Optional_int_const LoopSideNum,          // Loop side num for specific branch simulation
+                               Optional_int_const BranchNum             // Branch num for specific branch simulation
     )
     {
 
@@ -132,23 +132,19 @@ namespace EnergyPlus::PlantPressureSystem {
 
         // Using/Aliasing
         using DataPlant::PlantLoop;
-        using DataPlant::Press_NoPressure;
-        using DataPlant::PressureCall_Calc;
-        using DataPlant::PressureCall_Init;
-        using DataPlant::PressureCall_Update;
 
         // Exit out of any calculation routines if we don't do pressure simulation for this loop
-        if ((PlantLoop(LoopNum).PressureSimType == Press_NoPressure) && ((CallType == PressureCall_Calc) || (CallType == PressureCall_Update)))
+        if ((PlantLoop(LoopNum).PressureSimType == DataPlant::iPressSimType::NoPressure) && ((CallType == DataPlant::iPressureCall::Calc) || (CallType == DataPlant::iPressureCall::Update)))
             return;
 
         // Pass to another routine based on calling flag
         {
             auto const SELECT_CASE_var(CallType);
-            if (SELECT_CASE_var == PressureCall_Init) {
+            if (SELECT_CASE_var == DataPlant::iPressureCall::Init) {
                 InitPressureDrop(state, LoopNum, FirstHVACIteration);
-            } else if (SELECT_CASE_var == PressureCall_Calc) {
+            } else if (SELECT_CASE_var == DataPlant::iPressureCall::Calc) {
                 BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
-            } else if (SELECT_CASE_var == PressureCall_Update) {
+            } else if (SELECT_CASE_var == DataPlant::iPressureCall::Update) {
                 UpdatePressureDrop(state, LoopNum);
             } else {
                 // Calling routines should only use the three possible keywords here
@@ -173,7 +169,6 @@ namespace EnergyPlus::PlantPressureSystem {
         using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
-        using DataPlant::Press_NoPressure;
         using DataPlant::SupplySide;
 
         static Array1D_bool LoopInit;
@@ -300,13 +295,13 @@ namespace EnergyPlus::PlantPressureSystem {
             if (ErrorsFound) ShowFatalError(state, "Preceding errors cause program termination");
 
             // Also issue one time warning if there is a mismatch between plant loop simulation type and whether objects were entered
-            if (loop.HasPressureComponents && (loop.PressureSimType == Press_NoPressure)) {
+            if (loop.HasPressureComponents && (loop.PressureSimType == DataPlant::iPressSimType::NoPressure)) {
                 // Then we found pressure components on the branches, but the plant loop said it didn't want to do pressure simulation
                 ShowWarningError(state, "Error for pressure simulation on plant loop: " + loop.Name);
                 ShowContinueError(state, "Plant loop contains pressure simulation components on the branches,");
                 ShowContinueError(state, " yet in the PlantLoop object, there is no pressure simulation specified.");
                 ShowContinueError(state, "Simulation continues, ignoring pressure simulation data.");
-            } else if ((!loop.HasPressureComponents) && (loop.PressureSimType != Press_NoPressure)) {
+            } else if ((!loop.HasPressureComponents) && (loop.PressureSimType != DataPlant::iPressSimType::NoPressure)) {
                 // Then we don't have any pressure components on the branches, yet the plant loop wants to do some sort of pressure simulation
                 ShowWarningError(state, "Error for pressure simulation on plant loop: " + loop.Name);
                 ShowContinueError(state, "Plant loop is requesting a pressure simulation,");

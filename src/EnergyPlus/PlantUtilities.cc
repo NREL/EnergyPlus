@@ -1548,10 +1548,12 @@ namespace PlantUtilities {
 
         // Only pass pressure if we aren't doing a pressure simulation
         if (present(LoopNum)) {
-            if (PlantLoop(LoopNum).PressureSimType > 1) {
-                // Don't do anything
-            } else {
+            switch (PlantLoop(LoopNum).PressureSimType) {
+            case DataPlant::iPressSimType::NoPressure:
                 Node(OutletNodeNum).Press = Node(InletNodeNum).Press;
+            default:
+                // Don't do anything
+                break;
             }
         }
     }

@@ -1443,10 +1443,13 @@ namespace EnergyPlus::PipeHeatTransfer {
         Node(state.dataPipeHT->nsvOutletNodeNum).MassFlowRateMaxAvail = Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
         Node(state.dataPipeHT->nsvOutletNodeNum).Quality = Node(state.dataPipeHT->nsvInletNodeNum).Quality;
         // Only pass pressure if we aren't doing a pressure simulation
-        if (PlantLoop(this->LoopNum).PressureSimType > 1) {
-            // Don't do anything
-        } else {
+        switch (PlantLoop(this->LoopNum).PressureSimType) {
+        case DataPlant::iPressSimType::NoPressure:
             Node(state.dataPipeHT->nsvOutletNodeNum).Press = Node(state.dataPipeHT->nsvInletNodeNum).Press;
+            break;
+        default:
+            // Don't do anything
+            break;
         }
         Node(state.dataPipeHT->nsvOutletNodeNum).Enthalpy = Node(state.dataPipeHT->nsvInletNodeNum).Enthalpy;
         Node(state.dataPipeHT->nsvOutletNodeNum).HumRat = Node(state.dataPipeHT->nsvInletNodeNum).HumRat;

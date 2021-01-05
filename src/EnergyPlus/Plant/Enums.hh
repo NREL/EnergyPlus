@@ -103,13 +103,14 @@ namespace EnergyPlus::DataPlant {
     int const HowMet_ByNominalCapFreeCoolCntrl(56);            // HowMet_ByNominalCap with free cool shutdown
     int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl(57); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
 
-    enum class iLoadingScheme {
+    enum class iLoadingScheme
+    {
         Unassigned,
-        Optimal,                    // Optimal Load Distribution Scheme
-        Sequential,                 // Sequential Load Distribution Scheme
-        Uniform,                    // Uniform Load Distribution Scheme
-        UniformPLR,                 // Uniform PLR Load Distribution Scheme
-        SequentialUniformPLR,       // Sequential Uniform PLR Load Distribution Scheme
+        Optimal,              // Optimal Load Distribution Scheme
+        Sequential,           // Sequential Load Distribution Scheme
+        Uniform,              // Uniform Load Distribution Scheme
+        UniformPLR,           // Uniform PLR Load Distribution Scheme
+        SequentialUniformPLR, // Sequential Uniform PLR Load Distribution Scheme
     };
 
     enum class FlowMode
@@ -129,37 +130,57 @@ namespace EnergyPlus::DataPlant {
     };
 
     // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
-    enum class iCriteriaType {
+    enum class iCriteriaType
+    {
         MassFlowRate,
         Temperature,
         HeatTransferRate,
     };
 
-    enum class iFreeCoolControlMode {
+    enum class iFreeCoolControlMode
+    {
         Unassigned,
-        WetBulb,            // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
-        DryBulb,            // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
-        Loop,               // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
+        WetBulb, // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
+        DryBulb, // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
+        Loop,    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
     };
 
-    enum class iLoopDemandCalcScheme {
+    enum class iLoopDemandCalcScheme
+    {
         Unassigned,
         SingleSetPoint,       // Uses a single temp setpoint to calculate loop demand
         DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
     };
 
-    enum class iCommonPipeType {
+    enum class iCommonPipeType
+    {
         No,
         Single,
         TwoWay,
     };
 
-    enum class iFlowLock {
-        PumpQuery,      // Used to ask the pumps for their min/max avail based on no constraints
-        Unlocked,       // components request flow
-        Locked,         // components take their inlet flow
+    enum class iFlowLock
+    {
+        PumpQuery, // Used to ask the pumps for their min/max avail based on no constraints
+        Unlocked,  // components request flow
+        Locked,    // components take their inlet flow
     };
 
-} // namespace EnergyPlus
+    enum class iPressureCall
+    {
+        Init,
+        Calc,
+        Update,
+    };
+
+    enum class iPressSimType
+    {
+        NoPressure,          // Nothing for that particular loop
+        PumpPowerCorrection, // Only updating the pump power
+        FlowCorrection,      // Update pump flow rate based on pump curve
+        FlowSimulation,      // Full pressure network simulation
+    };
+
+    } // namespace EnergyPlus
 
 #endif

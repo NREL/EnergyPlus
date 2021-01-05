@@ -58,26 +58,12 @@ namespace EnergyPlus::DataPlant {
     // This data-only module contains the structures for various parts of the Plant and
     // Condenser Loops.
 
-    // Using/Aliasing
-    using DataLoopNode::NodeID;
-    using DataLoopNode::SensedNodeFlagValue;
-
-    // Parameters for tolerance
-    Real64 const LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
-    Real64 const DeltaTempTol(0.0001); // minimum significant loop temperature difference
-
-    // Pressure Routine Call Enumeration
-    int const PressureCall_Init(-1);
-    int const PressureCall_Calc(-2);
-    int const PressureCall_Update(-3);
-
-    // Pressure Simulation Types
-    int const Press_NoPressure(1);          // Nothing for that particular loop
-    int const Press_PumpPowerCorrection(2); // Only updating the pump power
-    int const Press_FlowCorrection(3);      // Update pump flow rate based on pump curve
-    int const Press_FlowSimulation(4);      // Full pressure network simulation
-
-    Array1D_string const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
+    std::map<DataPlant::iPressSimType, std::string> cPressureSimType {
+        {DataPlant::iPressSimType::NoPressure, "NONE"},
+        {DataPlant::iPressSimType::PumpPowerCorrection, "PUMPPOWERCORRECTION"},
+        {DataPlant::iPressSimType::FlowCorrection, "LOOPFLOWCORRECTION"},
+        {DataPlant::iPressSimType::FlowSimulation, "PRESSURESIMULATION"},
+    };
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     int const NumSimPlantEquipTypes(96);

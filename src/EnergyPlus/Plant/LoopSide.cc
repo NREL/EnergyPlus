@@ -122,7 +122,7 @@ namespace DataPlant {
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
         if (this->myLoopSideNum == DataPlant::DemandSide) {
-            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Init);
         }
 
         // Turn on any previously disabled branches due to constant speed branch pump issue
@@ -153,7 +153,7 @@ namespace DataPlant {
         } else { // LoopSide == SupplySide
 
             // Update pressure drop reporting, calculate total loop pressure drop for use elsewhere
-            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Update);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Update);
 
             // Pass the loop information via the HVAC interface manager (only the flow)
             HVACInterfaceManager::UpdatePlantLoopInterface(state, this->myLoopNum,
@@ -1792,7 +1792,7 @@ namespace DataPlant {
 
             if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1868,7 +1868,7 @@ namespace DataPlant {
             //~ If we are locked, go ahead and simulate the pressure components on this branch
             if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1919,7 +1919,7 @@ namespace DataPlant {
 
             if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter

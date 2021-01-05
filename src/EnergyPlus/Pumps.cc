@@ -1561,7 +1561,6 @@ namespace Pumps {
         // Using/Aliasing
         using DataPlant::PlantAvailMgr;
         using DataPlant::PlantLoop;
-        using DataPlant::Press_FlowCorrection;
         using FluidProperties::GetDensityGlycol;
         using PlantPressureSystem::ResolveLoopFlowVsPressure;
         using PlantUtilities::BoundValueToWithinTwoValues;
@@ -1643,7 +1642,7 @@ namespace Pumps {
                             PumpEquip(PumpNum).RotSpeed = PumpSchedRPM / 60.0;
                             // Resolve the new mass flow rate based on current pressure characteristics
                             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
-                                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
+                                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::iPressSimType::FlowCorrection &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
                                 PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
@@ -1662,7 +1661,7 @@ namespace Pumps {
                         } else if (SELECT_CASE_var1 == ControlTypeVFD::VFDAutomatic) {
 
                             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
-                                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
+                                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::iPressSimType::FlowCorrection &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
                                 GetRequiredMassFlowRate(state,
@@ -1691,7 +1690,7 @@ namespace Pumps {
                 // Override (lock down flow) for pressure drop if applicable
                 if (PumpEquip(PumpNum).LoopNum > 0) {
                     if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
-                        PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
+                        PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::iPressSimType::FlowCorrection &&
                         PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
                         PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
                                                                      PumpEquip(PumpNum).LoopNum,
@@ -2396,7 +2395,6 @@ namespace Pumps {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
-        using DataPlant::Press_FlowCorrection;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2422,7 +2420,7 @@ namespace Pumps {
         // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
         if (PumpEquip(PumpNum).LoopNum > 0) {
             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
-                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
+                PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == DataPlant::iPressSimType::FlowCorrection &&
                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
                 PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state, PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,

@@ -108,7 +108,7 @@ namespace DataPlant {
         Real64 EconControlTempDiff;
         bool LoopHasConnectionComp;
         LoopType TypeOfLoop;
-        int PressureSimType;
+        DataPlant::iPressSimType PressureSimType;
         bool HasPressureComponents;
         Real64 PressureDrop;
         bool UsePressureForPumpCalcs;
@@ -134,10 +134,10 @@ namespace DataPlant {
               NumOpSchemes(0), LoadDistribution(DataPlant::iLoadingScheme::Unassigned), PlantSizNum(0),
               LoopDemandCalcScheme(DataPlant::iLoopDemandCalcScheme::Unassigned), CommonPipeType(DataPlant::iCommonPipeType::No),
               EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
-              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(1), HasPressureComponents(false), PressureDrop(0.0),
-              UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0),
-              UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0),
-              OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
+              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(DataPlant::iPressSimType::NoPressure),
+              HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0),
+              HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0),
+              OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
         {
         }
 

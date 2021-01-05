@@ -86,20 +86,11 @@ namespace DataPlant {
     constexpr int SupplySide(2);
 
     // Parameters for tolerance
-    extern Real64 const LoopDemandTol; // minimum significant loop cooling or heating demand
-    extern Real64 const DeltaTempTol;  // minimum significant loop temperature difference
+    constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
+    constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    // Pressure Routine Call Enumeration
-    extern int const PressureCall_Init;
-    extern int const PressureCall_Calc;
-    extern int const PressureCall_Update;
+    extern std::map<DataPlant::iPressSimType, std::string> cPressureSimType;
 
-    // Pressure Simulation Types
-    extern int const Press_NoPressure;          // Nothing for that particular loop
-    extern int const Press_PumpPowerCorrection; // Only updating the pump power
-    extern int const Press_FlowCorrection;      // Update pump flow rate based on pump curve
-    extern int const Press_FlowSimulation;      // Full pressure network simulation
-    extern Array1D_string const PressureSimType;
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     extern int const NumSimPlantEquipTypes;
     extern Array1D_string const SimPlantEquipTypes;
