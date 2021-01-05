@@ -1339,10 +1339,10 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     Fans::Fan(2).MaxAirMassFlowRate = DataLoopNode::Node(16).MassFlowRateMaxAvail;
     Fans::Fan(2).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(1) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(2) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedCBF(1) = 0.2;
-    DXCoils::DXCoil(2).MSRatedCBF(2) = 0.2;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedCBF(1) = 0.2;
+    state->dataDXCoils->DXCoil(2).MSRatedCBF(2) = 0.2;
 
     Real64 QSensUnitOut;
     // Cooling
