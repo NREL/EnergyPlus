@@ -144,7 +144,6 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
@@ -188,7 +187,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
-    DataPlant::clear_state();
     DataReportingFlags::clear_state();
     DataSizing::clear_state();
     DataStringGlobals::clear_state();

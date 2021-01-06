@@ -1380,9 +1380,9 @@ namespace PlantUtilities {
         }
 
         // store copy of prior structure
-        Array1D<PlantCallingOrderInfoStruct> TempPlantCallingOrderInfo(PlantCallingOrderInfo);
+        Array1D<PlantCallingOrderInfoStruct> TempPlantCallingOrderInfo(state.dataPlnt->PlantCallingOrderInfo);
 
-        RecordToMoveInPlantCallingOrderInfo = PlantCallingOrderInfo(OldIndex);
+        RecordToMoveInPlantCallingOrderInfo = state.dataPlnt->PlantCallingOrderInfo(OldIndex);
 
         if (OldIndex == NewIndex) {
             // do nothing, no shift needed.
@@ -1390,43 +1390,43 @@ namespace PlantUtilities {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 1, NI = 5)
             // example shifted:  2  3  4  5  1  6  7  8
 
-            PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
+            state.dataPlnt->PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
         } else if ((OldIndex == 1) && (NewIndex > OldIndex) && (NewIndex == state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 1, NI = 8)
             // example shifted:  2  3  4  5  6  7  8  1
 
-            PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
         } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex < state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 6)
             // example shifted:  1  2  4  5  6  3  7  8
-            PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
-            PlantCallingOrderInfo({OldIndex, NewIndex - 1}) = TempPlantCallingOrderInfo({OldIndex + 1, NewIndex});
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
+            state.dataPlnt->PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
+            state.dataPlnt->PlantCallingOrderInfo({OldIndex, NewIndex - 1}) = TempPlantCallingOrderInfo({OldIndex + 1, NewIndex});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
         } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex == state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 8)
             // example shifted:  1  2  4  5  6  7  8  3
-            PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
-            PlantCallingOrderInfo({OldIndex, NewIndex - 1}) = TempPlantCallingOrderInfo({OldIndex + 1, NewIndex});
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
+            state.dataPlnt->PlantCallingOrderInfo({OldIndex, NewIndex - 1}) = TempPlantCallingOrderInfo({OldIndex + 1, NewIndex});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
         } else if ((OldIndex > 1) && (NewIndex < OldIndex) && (NewIndex == 1)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 1)
             // example shifted:  3  1  2  4  5  6  7  8
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
-            PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
+            state.dataPlnt->PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
         } else if ((OldIndex > 1) && (NewIndex < OldIndex) && (NewIndex > 1)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 2)
             // example shifted:  1  3  2  4  5  6  7  8
-            PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({1, NewIndex - 1});
-            PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({NewIndex, NewIndex + (OldIndex - NewIndex) - 1});
-            PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
+            state.dataPlnt->PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({1, NewIndex - 1});
+            state.dataPlnt->PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
+            state.dataPlnt->PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({NewIndex, NewIndex + (OldIndex - NewIndex) - 1});
+            state.dataPlnt->PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
         } else {
             ShowSevereError(state, "ShiftPlantLoopSideCallingOrder: developer error notice, caught unexpected logical case in "

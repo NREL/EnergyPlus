@@ -1009,8 +1009,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSolarShading->clear_state();
-
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
 
@@ -1087,7 +1085,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
-    state->dataSolarShading->clear_state();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
@@ -1419,8 +1416,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
-    state->dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;

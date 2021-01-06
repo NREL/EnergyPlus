@@ -1552,7 +1552,6 @@ namespace Pumps {
         //  These values are also bounded by EMS overridable limit of max flow rate.
 
         // Using/Aliasing
-        using DataPlant::PlantAvailMgr;
         using FluidProperties::GetDensityGlycol;
         using PlantPressureSystem::ResolveLoopFlowVsPressure;
         using PlantUtilities::BoundValueToWithinTwoValues;
@@ -1700,8 +1699,8 @@ namespace Pumps {
         }
 
         // Override pump operation based on System Availability Managers, should be done elsewhere?  I suppose this should be OK though
-        if (allocated(PlantAvailMgr)) {
-            if (PlantAvailMgr(LoopNum).AvailStatus == ForceOff) {
+        if (allocated(state.dataPlnt->PlantAvailMgr)) {
+            if (state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus == ForceOff) {
                 PumpMassFlowRateMax = 0.0;
                 PumpMassFlowRateMin = 0.0;
             }

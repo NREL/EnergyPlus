@@ -284,10 +284,6 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-//        state->dataWaterCoils->NumWaterCoils = 0;
-//        state->dataWaterCoils->WaterCoil.clear();
-//        state->dataWaterCoils->WaterCoilNumericFields.clear();
-        state->dataPlnt->PlantLoop.clear();
         DataSizing::PlantSizData.clear();
         DataSizing::ZoneEqSizing.clear();
         DataSizing::UnitarySysEqSizing.clear();
@@ -297,8 +293,6 @@ public:
         DataSizing::FinalSysSizing.clear();
         DataSizing::SysSizPeakDDNum.clear();
         DataHVACGlobals::NumPrimaryAirSys = 0;
-//        state->dataAirSystemsData->PrimaryAirSystems.clear();
-//        state->dataAirLoop->AirLoopControlInfo.clear();
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
         DataLoopNode::Node.clear();
@@ -309,7 +303,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 {
 
     // Set up raw water coil sizes as coil-on-branch configuration then
-    // test against sizing of same water coils in UntarySystem
+    // test against sizing of same water coils in UnitarySystem
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);

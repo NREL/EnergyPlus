@@ -472,7 +472,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
 
 TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTimestamp)
 {
-    // similar to PlantCoincidentAnalyObjTest but excersize logic problem resolved as issue #5665
+    // similar to PlantCoincidentAnalyObjTest but exercise logic problem resolved as issue #5665
     std::string loopName;
     int loopNum;
     int nodeNum;

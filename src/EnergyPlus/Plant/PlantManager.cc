@@ -220,8 +220,8 @@ namespace EnergyPlus::PlantManager {
                 // go through half loops in predetermined calling order
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSide = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSide = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     OtherSide = 3 - LoopSide; // will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
                     auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
@@ -344,8 +344,8 @@ namespace EnergyPlus::PlantManager {
             if (state.dataPlnt->TotNumLoops > 0) {
                 state.dataPlnt->PlantLoop.allocate(state.dataPlnt->TotNumLoops);
                 state.dataConvergeParams->PlantConvergence.allocate(state.dataPlnt->TotNumLoops);
-                if (!allocated(PlantAvailMgr)) {
-                    PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
+                if (!allocated(state.dataPlnt->PlantAvailMgr)) {
+                    state.dataPlnt->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
                 }
             } else {
                 return;
@@ -727,7 +727,7 @@ namespace EnergyPlus::PlantManager {
                 SetupOutputVariable(state,
                                     "Plant System Cycle On Off Status",
                                     OutputProcessor::Unit::None,
-                                    PlantAvailMgr(LoopNum).AvailStatus,
+                                    state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
                                     "Plant",
                                     "Average",
                                     state.dataPlnt->PlantLoop(LoopNum).Name);
@@ -1667,17 +1667,17 @@ namespace EnergyPlus::PlantManager {
                 ShowFatalError(state, "GetPlantInput: Errors in getting PlantLoop Input");
             }
 
-            if (NumPlantLoops > 0) VentRepPlantSupplySide.allocate(NumPlantLoops);
-            if (NumPlantLoops > 0) VentRepPlantDemandSide.allocate(NumPlantLoops);
+            if (NumPlantLoops > 0) state.dataPlnt->VentRepPlantSupplySide.allocate(NumPlantLoops);
+            if (NumPlantLoops > 0) state.dataPlnt->VentRepPlantDemandSide.allocate(NumPlantLoops);
 
             for (LoopNum = 1; LoopNum <= NumPlantLoops; ++LoopNum) {
 
                 // set up references for this loop
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 auto &this_plant_supply(this_plant_loop.LoopSide(SupplySide));
-                auto &this_vent_plant_supply(VentRepPlantSupplySide(LoopNum));
+                auto &this_vent_plant_supply(state.dataPlnt->VentRepPlantSupplySide(LoopNum));
                 auto &this_plant_demand(this_plant_loop.LoopSide(DemandSide));
-                auto &this_vent_plant_demand(VentRepPlantDemandSide(LoopNum));
+                auto &this_vent_plant_demand(state.dataPlnt->VentRepPlantDemandSide(LoopNum));
 
                 this_vent_plant_supply.Name = this_plant_loop.Name;
                 this_vent_plant_supply.NodeNumIn = this_plant_supply.NodeNumIn;
@@ -1692,7 +1692,7 @@ namespace EnergyPlus::PlantManager {
                 for (BranchNum = 1; BranchNum <= this_vent_plant_supply.TotalBranches; ++BranchNum) {
 
                     auto &this_plant_supply_branch(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum));
-                    auto &this_vent_plant_supply_branch(VentRepPlantSupplySide(LoopNum).Branch(BranchNum));
+                    auto &this_vent_plant_supply_branch(state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum));
 
                     this_vent_plant_supply_branch.Name = this_plant_supply_branch.Name;
                     this_vent_plant_supply_branch.NodeNumIn = this_plant_supply_branch.NodeNumIn;
@@ -1704,12 +1704,12 @@ namespace EnergyPlus::PlantManager {
                     }
 
                     for (CompNum = 1;
-                         CompNum <= VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                         CompNum <= state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 
                         auto &this_plant_supply_comp(
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum));
                         auto &this_vent_plant_supply_comp(
-                                VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(CompNum));
 
                         this_vent_plant_supply_comp.Name = this_plant_supply_comp.Name;
                         this_vent_plant_supply_comp.TypeOf = this_plant_supply_comp.TypeOf;
@@ -1735,7 +1735,7 @@ namespace EnergyPlus::PlantManager {
                 for (BranchNum = 1; BranchNum <= this_vent_plant_demand.TotalBranches; ++BranchNum) {
 
                     auto &this_plant_demand_branch(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum));
-                    auto &this_vent_plant_demand_branch(VentRepPlantDemandSide(LoopNum).Branch(BranchNum));
+                    auto &this_vent_plant_demand_branch(state.dataPlnt->VentRepPlantDemandSide(LoopNum).Branch(BranchNum));
 
                     this_vent_plant_demand_branch.Name = this_plant_demand_branch.Name;
                     this_vent_plant_demand_branch.NodeNumIn = this_plant_demand_branch.NodeNumIn;
@@ -1751,7 +1751,7 @@ namespace EnergyPlus::PlantManager {
                         auto &this_plant_demand_comp(
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum));
                         auto &this_vent_plant_demand_comp(
-                                VentRepPlantDemandSide(LoopNum).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->VentRepPlantDemandSide(LoopNum).Branch(BranchNum).Comp(CompNum));
 
                         this_vent_plant_demand_comp.Name = this_plant_demand_comp.Name;
                         this_vent_plant_demand_comp.TypeOf = this_plant_demand_comp.TypeOf;
@@ -1766,8 +1766,8 @@ namespace EnergyPlus::PlantManager {
 
             } // loop over plant supply loops (ventilation report data)
 
-            if (NumCondLoops > 0) VentRepCondSupplySide.allocate(NumCondLoops);
-            if (NumCondLoops > 0) VentRepCondDemandSide.allocate(NumCondLoops);
+            if (NumCondLoops > 0) state.dataPlnt->VentRepCondSupplySide.allocate(NumCondLoops);
+            if (NumCondLoops > 0) state.dataPlnt->VentRepCondDemandSide.allocate(NumCondLoops);
 
             for (LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum) {
 
@@ -1776,9 +1776,9 @@ namespace EnergyPlus::PlantManager {
                 // set up references for this loop
                 auto &this_cond_loop(state.dataPlnt->PlantLoop(LoopNumInArray));
                 auto &this_cond_supply(this_cond_loop.LoopSide(SupplySide));
-                auto &this_vent_cond_supply(VentRepCondSupplySide(LoopNum));
+                auto &this_vent_cond_supply(state.dataPlnt->VentRepCondSupplySide(LoopNum));
                 auto &this_cond_demand(this_cond_loop.LoopSide(DemandSide));
-                auto &this_vent_cond_demand(VentRepCondDemandSide(LoopNum));
+                auto &this_vent_cond_demand(state.dataPlnt->VentRepCondDemandSide(LoopNum));
 
                 this_vent_cond_supply.Name = this_cond_loop.Name;
                 this_vent_cond_supply.NodeNumIn = this_cond_supply.NodeNumIn;
@@ -2188,8 +2188,8 @@ namespace EnergyPlus::PlantManager {
 
                     // Step 2, call component models it  using PlantCallingOrderInfo for sizing
                     for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-                        LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                        LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                        LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                        LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
 
                         for (BranchNum = 1;
@@ -2210,8 +2210,8 @@ namespace EnergyPlus::PlantManager {
 
                     for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                        LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                        LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                        LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                        LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
                         if (LoopSideNum == SupplySide) {
                             SizePlantLoop(state, LoopNum, FinishSizingFlag);
@@ -2233,8 +2233,8 @@ namespace EnergyPlus::PlantManager {
                         state.dataPlnt->PlantFirstSizesOkayToReport = false;
                         state.dataPlnt->PlantFinalSizesOkayToReport = true;
                     }
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
                     if (LoopSideNum == SupplySide) {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
@@ -2267,8 +2267,8 @@ namespace EnergyPlus::PlantManager {
                 InitLoopEquip = true;
                 GetCompSizFac = false;
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
@@ -2290,8 +2290,8 @@ namespace EnergyPlus::PlantManager {
 
                 // now call everything again to reporting turned on
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
@@ -3387,33 +3387,33 @@ namespace EnergyPlus::PlantManager {
 
             // first allocate to total number of plant half loops
 
-            if (!allocated(PlantCallingOrderInfo)) PlantCallingOrderInfo.allocate(state.dataPlnt->TotNumHalfLoops);
+            if (!allocated(state.dataPlnt->PlantCallingOrderInfo)) state.dataPlnt->PlantCallingOrderInfo.allocate(state.dataPlnt->TotNumHalfLoops);
 
             // set plant loop demand sides
             for (I = 1; I <= NumPlantLoops; ++I) {
-                PlantCallingOrderInfo(I).LoopIndex = I;
-                PlantCallingOrderInfo(I).LoopSide = DemandSide;
+                state.dataPlnt->PlantCallingOrderInfo(I).LoopIndex = I;
+                state.dataPlnt->PlantCallingOrderInfo(I).LoopSide = DemandSide;
             }
 
             // set plant loop supply sides
             for (I = 1; I <= NumPlantLoops; ++I) {
                 OrderIndex = I + NumPlantLoops;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
             // set condenser Loop demand sides
             for (I = 1; I <= NumCondLoops; ++I) {
                 OrderIndex = 2 * NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = DemandSide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = DemandSide;
             }
 
             // set condenser Loop supply sides
             for (I = 1; I <= NumCondLoops; ++I) {
                 OrderIndex = 2 * NumPlantLoops + NumCondLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
         }
@@ -3467,8 +3467,8 @@ namespace EnergyPlus::PlantManager {
 
             for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
 
                 if (allocated(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected)) {
                     for (ConnctNum = 1;
@@ -3559,8 +3559,8 @@ namespace EnergyPlus::PlantManager {
             CallingIndex = 0;
 
             for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
-                if ((LoopNum == PlantCallingOrderInfo(HalfLoopNum).LoopIndex) &&
-                    (LoopSide == PlantCallingOrderInfo(HalfLoopNum).LoopSide)) {
+                if ((LoopNum == state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex) &&
+                    (LoopSide == state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide)) {
 
                     CallingIndex = HalfLoopNum;
                 }

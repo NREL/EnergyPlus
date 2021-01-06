@@ -89,9 +89,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     Real64 EvapRate;
 
     // Tests for CalcSwimmingPoolEvap--Evaporate Rate Calculation for Swimming Pools
-    state->dataSwimmingPools->clear_state();
-    DataSurfaces::clear_state();
-
     state->dataSwimmingPools->NumSwimmingPools = 1;
     state->dataSwimmingPools->Pool.allocate(1);
     DataSurfaces::Surface.allocate(1);
@@ -130,9 +127,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     bool MyPlantScanFlagPool;
 
     // Tests for InitSwimmingPoolPlantLoopIndex
-    state->dataSwimmingPools->clear_state();
-    DataPlant::clear_state();
-
     state->dataSwimmingPools->NumSwimmingPools = 2;
     state->dataPlnt->TotNumLoops = 2;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
@@ -193,10 +187,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     int PoolNum;
 
     // Tests for InitSwimmingPoolPlantLoopIndex
-    state->dataSwimmingPools->clear_state();
-    DataPlant::clear_state();
-    DataLoopNode::clear_state();
-
     state->dataSwimmingPools->NumSwimmingPools = 1;
     state->dataPlnt->TotNumLoops = 1;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
@@ -261,7 +251,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
 {
 
     // Tests for InitSwimmingPoolPlantLoopIndex
-    state->dataSwimmingPools->clear_state();
     state->dataSwimmingPools->NumSwimmingPools = 1;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
     DataSurfaces::Surface.allocate(1);

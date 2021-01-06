@@ -282,24 +282,4 @@ namespace EnergyPlus::DataPlant {
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
 
-    // Object Data
-    Array1D<PlantAvailMgrData> PlantAvailMgr;
-    Array1D<ReportLoopData> VentRepPlantSupplySide;
-    Array1D<ReportLoopData> VentRepPlantDemandSide;
-    Array1D<ReportLoopData> VentRepCondSupplySide;
-    Array1D<ReportLoopData> VentRepCondDemandSide;
-    Array1D<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
-
-    // Clears the global data in DataPlant.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        PlantAvailMgr.deallocate();
-        VentRepPlantSupplySide.deallocate();
-        VentRepPlantDemandSide.deallocate();
-        VentRepCondSupplySide.deallocate();
-        VentRepCondDemandSide.deallocate();
-        PlantCallingOrderInfo.deallocate();
-    }
-
 } // namespace EnergyPlus

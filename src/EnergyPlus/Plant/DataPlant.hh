@@ -200,18 +200,6 @@ namespace DataPlant {
     extern Real64 const square_sum_ConvergenceHistoryARR;
     extern Real64 const sum_square_ConvergenceHistoryARR;
 
-    // Object Data
-    extern Array1D<PlantAvailMgrData> PlantAvailMgr;
-    extern Array1D<ReportLoopData> VentRepPlantSupplySide;
-    extern Array1D<ReportLoopData> VentRepPlantDemandSide;
-    extern Array1D<ReportLoopData> VentRepCondSupplySide;
-    extern Array1D<ReportLoopData> VentRepCondDemandSide;
-    extern Array1D<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
-
-    // Clears the global data in DataPlant.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataPlant
 
 struct DataPlantData : BaseGlobalStruct {
@@ -227,12 +215,12 @@ struct DataPlantData : BaseGlobalStruct {
     int PlantManageSubIterations = 0; // tracks plant iterations to characterize solver
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
-//    Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
-//    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
-//    Array1D<DataPlant::ReportLoopData> VentRepPlantDemandSide;
-//    Array1D<DataPlant::ReportLoopData> VentRepCondSupplySide;
-//    Array1D<DataPlant::ReportLoopData> VentRepCondDemandSide;
-//    Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
+    Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
+    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
+    Array1D<DataPlant::ReportLoopData> VentRepPlantDemandSide;
+    Array1D<DataPlant::ReportLoopData> VentRepCondSupplySide;
+    Array1D<DataPlant::ReportLoopData> VentRepCondDemandSide;
+    Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     void clear_state() override
     {
@@ -247,12 +235,12 @@ struct DataPlantData : BaseGlobalStruct {
         this->PlantManageSubIterations = 0;
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
-//        this->PlantAvailMgr.deallocate();
-//        this->VentRepPlantSupplySide.deallocate();
-//        this->VentRepPlantDemandSide.deallocate();
-//        this->VentRepCondSupplySide.deallocate();
-//        this->VentRepCondDemandSide.deallocate();
-//        this->PlantCallingOrderInfo.deallocate();
+        this->PlantAvailMgr.deallocate();
+        this->VentRepPlantSupplySide.deallocate();
+        this->VentRepPlantDemandSide.deallocate();
+        this->VentRepCondSupplySide.deallocate();
+        this->VentRepCondDemandSide.deallocate();
+        this->PlantCallingOrderInfo.deallocate();
     }
 };
 
