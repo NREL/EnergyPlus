@@ -48,6 +48,9 @@
 #ifndef DataPlant_hh_INCLUDED
 #define DataPlant_hh_INCLUDED
 
+// C++ Headers
+#include <numeric>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -89,7 +92,22 @@ namespace DataPlant {
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    extern std::map<DataPlant::iPressSimType, std::string> cPressureSimType;
+    constexpr std::string_view cPressureSimType(DataPlant::iPressSimType const &d) {
+        switch (d) {
+        case DataPlant::iPressSimType::NoPressure:
+            return "NONE";
+        case DataPlant::iPressSimType::PumpPowerCorrection:
+            return "PUMPPOWERCORRECTION";
+        case DataPlant::iPressSimType::FlowCorrection:
+            return "LOOPFLOWCORRECTION";
+        case DataPlant::iPressSimType::FlowSimulation:
+            return "PRESSURESIMULATION";
+        default:
+            assert(false);
+            return "";
+        }
+
+    }
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     constexpr int NumSimPlantEquipTypes(96);
@@ -196,9 +214,14 @@ namespace DataPlant {
     constexpr int TypeOf_HeatPumpEIRHeating(96);
 
     extern Array1D<Real64> const ConvergenceHistoryARR;
-    extern Real64 const sum_ConvergenceHistoryARR;
-    extern Real64 const square_sum_ConvergenceHistoryARR;
-    extern Real64 const sum_square_ConvergenceHistoryARR;
+
+    // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this
+    // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
+    // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
+    // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
+     constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
+     constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
+     constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
 
 } // namespace DataPlant
 

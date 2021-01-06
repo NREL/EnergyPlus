@@ -588,16 +588,16 @@ namespace EnergyPlus::PlantManager {
                     MatchedPressureString = false;
 
                     // Check all types
-                    if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), cPressureSimType.at(DataPlant::iPressSimType::NoPressure))) {
+                    if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)))) {
                         this_loop.PressureSimType = DataPlant::iPressSimType::NoPressure;
                         MatchedPressureString = true;
-                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), cPressureSimType.at(DataPlant::iPressSimType::PumpPowerCorrection))) {
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)))) {
                         this_loop.PressureSimType = DataPlant::iPressSimType::PumpPowerCorrection;
                         MatchedPressureString = true;
-                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), cPressureSimType.at(DataPlant::iPressSimType::FlowSimulation))) {
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::FlowSimulation)))) {
                         this_loop.PressureSimType = DataPlant::iPressSimType::FlowSimulation;
                         MatchedPressureString = true;
-                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), cPressureSimType.at(DataPlant::iPressSimType::FlowCorrection))) {
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)))) {
                         this_loop.PressureSimType = DataPlant::iPressSimType::FlowCorrection;
                         MatchedPressureString = true;
                     }
@@ -616,9 +616,9 @@ namespace EnergyPlus::PlantManager {
                             ShowContinueError(state, "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
                                               Alpha(PressSimAlphaIndex) + "\".");
                             ShowContinueError(state, "Currently only options are: ");
-                            ShowContinueError(state, "  - " + cPressureSimType.at(DataPlant::iPressSimType::NoPressure));
-                            ShowContinueError(state, "  - " + cPressureSimType.at(DataPlant::iPressSimType::PumpPowerCorrection));
-                            ShowContinueError(state, "  - " + cPressureSimType.at(DataPlant::iPressSimType::FlowCorrection));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)));
                             ErrorsFound = true;
                         }
                     }

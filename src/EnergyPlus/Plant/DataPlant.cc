@@ -58,13 +58,6 @@ namespace EnergyPlus::DataPlant {
     // This data-only module contains the structures for various parts of the Plant and
     // Condenser Loops.
 
-    std::map<DataPlant::iPressSimType, std::string> cPressureSimType {
-        {DataPlant::iPressSimType::NoPressure, "NONE"},
-        {DataPlant::iPressSimType::PumpPowerCorrection, "PUMPPOWERCORRECTION"},
-        {DataPlant::iPressSimType::FlowCorrection, "LOOPFLOWCORRECTION"},
-        {DataPlant::iPressSimType::FlowSimulation, "PRESSURESIMULATION"},
-    };
-
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
@@ -278,8 +271,5 @@ namespace EnergyPlus::DataPlant {
          LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both});
 
     Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
-    Real64 const sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
-    Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
-    Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
 
 } // namespace EnergyPlus
