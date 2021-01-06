@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -71,7 +70,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -139,7 +137,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     SumLatentHTRadSys(1) = 0.0;
     SumLatentPool.allocate(1);
     SumLatentPool(1) = 0.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     ZT.allocate(1); // Zone temperature C
     ZT(1) = 24.0;
     ZoneAirHumRat.allocate(1);
@@ -168,7 +166,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneAirHumRatTemp.allocate(1);
     ZoneW1.allocate(1);
 
-    AirModel.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(1);
     ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat
@@ -190,7 +188,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.008;
+    state->dataEnvrn->OutHumRat = 0.008;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
@@ -220,7 +218,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
@@ -247,7 +245,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.02 * 0.008;
     MixingMassFlowZone(1) = 0.02;
     MDotOA(1) = 0.0;
@@ -274,7 +272,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
@@ -631,7 +629,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
 {
     // AUTHOR: Xuan Luo
     // DATE WRITTEN: Jan 2017
-    using DataEnvironment::DayOfYear;
 
     std::string const idf_objects = delimited_string({
         "Zone,",
@@ -824,7 +821,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     int const ASH55_CENTRAL(2);
     int const CEN15251_CENTRAL(5);
 
-    DayOfYear = 1;
+    state->dataEnvrn->DayOfYear = 1;
     state->dataWeatherManager->Envrn = 1;
     state->dataWeatherManager->Environment.allocate(1);
     state->dataWeatherManager->DesDayInput.allocate(1);
@@ -843,25 +840,25 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     Array1D<Real64> runningAverageCEN_1(365, 0.0);
     CalculateAdaptiveComfortSetPointSchl(*state, runningAverageASH_1, runningAverageCEN_1);
     // Tstat should show flage that adaptive comfort is not applicable (-1)
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(state->dataEnvrn->DayOfYear));
 
     Array1D<Real64> runningAverageASH_2(365, 40.0);
     Array1D<Real64> runningAverageCEN_2(365, 40.0);
     CalculateAdaptiveComfortSetPointSchl(*state, runningAverageASH_2, runningAverageCEN_2);
     // Tstat should show flage that adaptive comfort is not applicable (-1)
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear));
-    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(state->dataEnvrn->DayOfYear));
+    ASSERT_EQ(-1, state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(state->dataEnvrn->DayOfYear));
 
     Array1D<Real64> runningAverageASH(365, 25.0);
     Array1D<Real64> runningAverageCEN(365, 25.0);
@@ -869,25 +866,25 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ASSERT_TRUE(state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is initialized
     ASSERT_EQ(
         25.55,
-        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
+        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(state->dataEnvrn->DayOfYear)); // Tstat should show ASH 55 CENTRAL LINE model set point
     ASSERT_EQ(
         28.05,
-        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
+        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(state->dataEnvrn->DayOfYear)); // Tstat should show ASH 55 Upper 90 LINE model set point
     ASSERT_EQ(
         29.05,
-        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
+        state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(state->dataEnvrn->DayOfYear)); // Tstat should show ASH 55 Upper 80 LINE model set point
     ASSERT_EQ(27.05,
               state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(
-                  DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
+                  state->dataEnvrn->DayOfYear)); // Tstat should show CEN 15251 CENTRAL LINE model set point
     ASSERT_EQ(29.05,
               state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(
-                  DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
+                  state->dataEnvrn->DayOfYear)); // Tstat should show CEN 15251 Upper I LINE model set point
     ASSERT_EQ(30.05,
               state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(
-                  DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
+                  state->dataEnvrn->DayOfYear)); // Tstat should show CEN 15251 Upper II LINE model set point
     ASSERT_EQ(31.05,
               state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
-                  DayOfYear));                            // Tstat should show CEN 15251 Upper III LINE model set point
+                  state->dataEnvrn->DayOfYear));                            // Tstat should show CEN 15251 Upper III LINE model set point
     ASSERT_EQ(25.55, state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(1)); // Tstat should show ASH 55 CENTRAL LINE model set point
     ASSERT_EQ(27.05, state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(4)); // Tstat should show CEN 15251 CENTRAL LINE model set point
 
@@ -910,7 +907,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ASSERT_EQ(27.05, ZoneAirSetPoint); // Tstat should show set point overwritten by CEN 15251 CENTRAL LINE model
 
     ZoneAirSetPoint = 0.0;
-    state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear) = -1;
+    state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(state->dataEnvrn->DayOfYear) = -1;
     AdjustOperativeSetPointsforAdapComfort(*state, NoneAdapZoneNum, ZoneAirSetPoint);
     ASSERT_EQ(0, ZoneAirSetPoint); // Tstat should show set point is not overwritten
 
@@ -997,7 +994,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     SumLatentHTRadSys(1) = 0.0;
     SumLatentPool.allocate(1);
     SumLatentPool(1) = 0.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     MAT.allocate(1); // Zone temperature C
     MAT(1) = 24.0;
     ZoneAirHumRat.allocate(1);
@@ -1150,14 +1147,14 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
-    DataEnvironment::CurrentYearIsLeapYear = false;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
 
     Real64 valueAtTime;
     int numDays;
     std::string monthAssumed;
     const int wednesday = 4;
 
-    DataEnvironment::Latitude = 30.; // northern hemisphere
+    state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched1Index = GetScheduleIndex(*state, "SCHED1");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, false, wednesday, 11);
 
@@ -1169,14 +1166,14 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, true, wednesday, 11);
     EXPECT_EQ("July", monthAssumed);
 
-    DataEnvironment::Latitude = -30.; // southern hemisphere
+    state->dataEnvrn->Latitude = -30.; // southern hemisphere
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, false, wednesday, 11);
     EXPECT_EQ("July", monthAssumed);
 
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, true, wednesday, 11);
     EXPECT_EQ("January", monthAssumed);
 
-    DataEnvironment::Latitude = 30.; // northern hemisphere
+    state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched2Index = GetScheduleIndex(*state, "SCHED2");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched2Index, false, wednesday, 11);
 

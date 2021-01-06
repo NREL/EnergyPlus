@@ -34,6 +34,8 @@ if(USE_PSYCH_ERRORS)
 endif()
 
 SET( SRC
+  StateManagement.cc
+  StateManagement.hh
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
@@ -163,23 +165,16 @@ SET( SRC
   DataBranchNodeConnections.hh
   DataComplexFenestration.hh
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
-  DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
   DataErrorTracking.cc
   DataErrorTracking.hh
-  DataGenerators.cc
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
@@ -420,7 +415,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  Material.cc
   Material.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
@@ -592,8 +586,6 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
-  StateManagement.cc
-  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -799,6 +791,9 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )

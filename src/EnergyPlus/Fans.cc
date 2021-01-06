@@ -66,7 +66,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -102,7 +101,6 @@ namespace Fans {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::Cooling;
@@ -120,7 +118,7 @@ namespace Fans {
     using DataHVACGlobals::Other;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::TurnFansOff;
-    using DataHVACGlobals::TurnFansOn; // cpw22Aug2010 Added FanType_ComponentModel
+    using DataHVACGlobals::TurnFansOn;
     using DataHVACGlobals::UnbalExhMassFlow;
     using EMSManager::ManageEMS;
     using Psychrometrics::PsyCpAirFnW;
@@ -256,7 +254,6 @@ namespace Fans {
             SimOnOffFan(state, FanNum, SpeedRatio);
         } else if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
             SimZoneExhaustFan(state, FanNum);
-            // cpw22Aug2010 Add call for Component Model fan
         } else if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
             SimComponentModelFan(state, FanNum);
         }
@@ -303,8 +300,8 @@ namespace Fans {
         int ExhFanNum;
         int NVPerfNum;
         bool NVPerfFanFound;
-        int NumCompModelFan; // cpw22Aug2010 The number of Component Model Fans
-        int CompModelFanNum; // cpw22Aug2010 Component Model Fan index
+        int NumCompModelFan;
+        int CompModelFanNum;
         int NumAlphas;
         int NumNums;
         int checkNum;
@@ -357,7 +354,6 @@ namespace Fans {
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        // cpw22Aug2010 Added get max alphas and numbers for ComponentModel fan
         NumCompModelFan = inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
         if (NumCompModelFan > 0) {
             inputProcessor->getObjectDefMaxArgs(state, "Fan:ComponentModel", NumParams, NumAlphas, NumNums);
@@ -372,7 +368,7 @@ namespace Fans {
         lNumericFieldBlanks.dimension(MaxNumbers, false);
         rNumericArgs.dimension(MaxNumbers, 0.0);
 
-        state.dataFans->NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
+        state.dataFans->NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan;
         if (state.dataFans->NumFans > 0) {
             Fan.allocate(state.dataFans->NumFans);
             FanNumericFields.allocate(state.dataFans->NumFans);
@@ -405,7 +401,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -468,7 +464,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -551,7 +547,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -574,7 +570,7 @@ namespace Fans {
             Fan(FanNum).MotEff = 1.0;
             Fan(FanNum).MotInAirFrac = 1.0;
             Fan(FanNum).MinAirFlowRate = 0.0;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             if (Fan(FanNum).MaxAirFlowRate == 0.0) {
@@ -609,7 +605,7 @@ namespace Fans {
                     }
                 }
             } else {
-                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
 
             if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -689,7 +685,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -710,7 +706,7 @@ namespace Fans {
             Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
             //       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
             //       (Standard Rating procedure may be called before BeginEnvirFlag is set to TRUE, if so MaxAirMassFlowRate = 0)
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             Fan(FanNum).MotEff = rNumericArgs(4);
@@ -791,7 +787,6 @@ namespace Fans {
             }
         }
 
-        // cpw22Aug2010 Added get input for Component Fan Model
         for (CompModelFanNum = 1; CompModelFanNum <= NumCompModelFan; ++CompModelFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
@@ -858,7 +853,7 @@ namespace Fans {
             Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
             Fan(FanNum).MinAirFlowRate = rNumericArgs(2);
 
-            Fan(FanNum).FanSizingFactor = rNumericArgs(3);                       // Fan max airflow sizing factor [-] cpw31Aug2010
+            Fan(FanNum).FanSizingFactor = rNumericArgs(3);                       // Fan max airflow sizing factor [-]
             Fan(FanNum).FanWheelDia = rNumericArgs(4);                           // Fan wheel outer diameter [m]
             Fan(FanNum).FanOutletArea = rNumericArgs(5);                         // Fan outlet area [m2]
             Fan(FanNum).FanMaxEff = rNumericArgs(6);                             // Fan maximum static efficiency [-]
@@ -874,7 +869,7 @@ namespace Fans {
             Fan(FanNum).MotInAirFrac = rNumericArgs(16);                         // Fraction of fan and motor losses to airstream [-]
             Fan(FanNum).VFDEffType = cAlphaArgs(5);                              // VFD efficiency type [Speed or Power]
             Fan(FanNum).VFDMaxOutPwr = rNumericArgs(17);                         // VFD maximum output power [W, autosizable]
-            Fan(FanNum).VFDSizingFactor = rNumericArgs(18);                      // VFD sizing factor [-] cpw31Aug2010
+            Fan(FanNum).VFDSizingFactor = rNumericArgs(18);                      // VFD sizing factor [-]
             Fan(FanNum).PressRiseCurveIndex = GetCurveIndex(state, cAlphaArgs(6));      // Fan pressure rise curve
             Fan(FanNum).PressResetCurveIndex = GetCurveIndex(state, cAlphaArgs(7));     // Duct static pressure reset curve
             Fan(FanNum).PLFanEffNormCurveIndex = GetCurveIndex(state, cAlphaArgs(8));   // Fan part-load eff (normal) curve
@@ -966,20 +961,20 @@ namespace Fans {
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Air Mass Flow Rate",
                                  "[kg/s]",
                                  Fan(FanNum).EMSMaxMassFlowOverrideOn,
                                  Fan(FanNum).EMSAirMassFlowValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", Fan(FanNum).FanName, "[Pa]", Fan(FanNum).DeltaPress);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Pressure Rise", "[Pa]", Fan(FanNum).EMSFanPressureOverrideOn, Fan(FanNum).EMSFanPressureValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", Fan(FanNum).FanName, "[fraction]", Fan(FanNum).FanEff);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Total Efficiency", "[fraction]", Fan(FanNum).EMSFanEffOverrideOn, Fan(FanNum).EMSFanEffValue);
 
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Autosized Air Flow Rate",
                                  "[m3/s]",
@@ -1088,7 +1083,7 @@ namespace Fans {
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
             OutNode = Fan(FanNum).OutletNodeNum;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -1107,7 +1102,10 @@ namespace Fans {
 
             // Init the Node Control variables
             Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
-            Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
+            // According to the IO Ref guide:
+            // "Note that this field is only used to calculate the fan power.
+            // This field does not enforce the system air flow rate during simulation"
+            // Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
 
             // Initialize all report variables to a known state at beginning of simulation
             Fan(FanNum).FanPower = 0.0;
@@ -1257,7 +1255,6 @@ namespace Fans {
         DataEMSOverrideON = false;
         DataEMSOverride = 0.0;
 
-        // cpw31Aug2010 Add fan, belt, motor and VFD component autosizing and maximum efficiency calculations
         FanVolFlow = Fan(FanNum).MaxAirFlowRate; // Maximum volumetric airflow through fan [m3/s at standard conditions]
         if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
             // Get air density at standard conditions and get mass airflow through fan
@@ -1267,7 +1264,7 @@ namespace Fans {
             // From PsychRoutines:
             //   w=MAX(dw,1.0d-5)
             //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // Adjust max fan volumetric airflow using fan sizing factor
             FanVolFlow *= Fan(FanNum).FanSizingFactor; //[m3/s at standard conditions]
@@ -1318,7 +1315,7 @@ namespace Fans {
             // For direct-drive, should have PulleyDiaRatio = 1
             MotorSpeed = Fan(FanNum).FanSpd / Fan(FanNum).PulleyDiaRatio; //[rpm]
 
-            // Check for inconsistent drive ratio and motor speed, and report design fan speed with warning cpw14Sep2010
+            // Check for inconsistent drive ratio and motor speed, and report design fan speed with warning
             if (MotorSpeed > (Fan(FanNum).MotorMaxSpd + 1.e-5)) {
                 ShowWarningError(state, "Drive ratio for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is too low at design conditions -- check motor speed and drive ratio inputs");
@@ -1334,7 +1331,7 @@ namespace Fans {
             // Adjust max belt torque using belt sizing factor
             Fan(FanNum).BeltMaxTorque *= Fan(FanNum).BeltSizingFactor; //[N-m]
 
-            // Check for undersized belt and report design size with warning cpw14Sep2010
+            // Check for undersized belt and report design size with warning
             if (Fan(FanNum).FanTrq > (Fan(FanNum).BeltMaxTorque + 1.e-5)) {
                 ShowWarningError(state, "Belt for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check belt inputs");
@@ -1376,7 +1373,7 @@ namespace Fans {
             // Adjust max motor output power using motor sizing factor
             Fan(FanNum).MotorMaxOutPwr *= Fan(FanNum).MotorSizingFactor; //[W]
 
-            // Check for undersized motor and report design size with warning cpw14Sep2010
+            // Check for undersized motor and report design size with warning
             if (Fan(FanNum).BeltInputPower > (Fan(FanNum).MotorMaxOutPwr + 1.e-5)) {
                 ShowWarningError(state, "Motor for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check motor inputs");
@@ -1417,7 +1414,7 @@ namespace Fans {
                     // Adjust max VFD output power using VFD sizing factor
                     Fan(FanNum).VFDMaxOutPwr *= Fan(FanNum).VFDSizingFactor; //[W]
 
-                    // Check for undersized VFD and report design size with warning cpw14Sep2010
+                    // Check for undersized VFD and report design size with warning
                     if (Fan(FanNum).MotorInputPower > (Fan(FanNum).VFDMaxOutPwr + 1.e-5)) {
                         ShowWarningError(state, "VFD for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                          " is undersized at design conditions -- check VFD inputs");
@@ -1441,7 +1438,7 @@ namespace Fans {
             // Equivalent to Fan(FanNum)%FanAirPower / Fan(FanNum)%FanPower
             Fan(FanNum).FanEff = Fan(FanNum).FanWheelEff * Fan(FanNum).BeltEff * Fan(FanNum).MotEff * Fan(FanNum).VFDEff;
 
-            // Report fan, belt, motor, and VFD characteristics at design condition to .eio file cpw14Sep2010
+            // Report fan, belt, motor, and VFD characteristics at design condition to .eio file
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Static Pressure Rise [Pa]", Fan(FanNum).DeltaPress);
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Shaft Power [W]", Fan(FanNum).FanShaftPower);
@@ -1457,53 +1454,27 @@ namespace Fans {
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
             BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
-
-            // cpw31Aug2010 Temporary code for debugging fan component model
-            //    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &
-            //    //','//TRIM(RoundSigDigits(FanOutletVelPress,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%DeltaPress,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanAirPower,4))//','//TRIM(RoundSigDigits(EulerNum,4)) &
-            //    //','//TRIM(RoundSigDigits(NormalizedEulerNum,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanWheelEff,4))
-            //    WRITE(301,*) TRIM(RoundSigDigits(Fan(FanNum)%FanShaftPower,4))//','//TRIM(RoundSigDigits(FanDimFlow,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanTrq,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanSpd,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanShaftPwrMax,4))//','//TRIM(RoundSigDigits(XbeltMax,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%BeltMaxEff,4))//','//TRIM(RoundSigDigits(FanTrqRatio,4))
-            //    WRITE(302,*) TRIM(RoundSigDigits(BeltPLEff,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%BeltEff,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%BeltInputPower,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorMaxOutPwr,4)) &
-            //    //','//TRIM(RoundSigDigits(XmotorMax,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorMaxEff,4)) &
-            //    //','//TRIM(RoundSigDigits(MotorOutPwrRatio,4))//','//TRIM(RoundSigDigits(MotorPLEff,4))
-            //    WRITE(303,*) TRIM(RoundSigDigits(Fan(FanNum)%MotEff,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorInputPower,4)) &
-            //    //','//TRIM(RoundSigDigits(VFDOutPwrRatio,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%VFDEff,4)) &
-            //    //','//TRIM(RoundSigDigits(RatedPower,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanEff,4)) &
-            //    //','//TRIM(RoundSigDigits(0.0d0,4))//','//TRIM(RoundSigDigits(0.0d0,4))
-            //    WRITE(304,*) TRIM("Fan")//','//TRIM("Sizing")
-
-            // cpw31Aug2010 Temporary code to write headers for component fan model debug files
-            //    WRITE(300,*) 'Rho,VolFLOW,dPvOut,dP,AirPwr,Eu,NrmEu,FWEff'
-            //    WRITE(301,*) 'ShftPwr,DimFlow,Trq,FSpd,BPwrOut,XBmax,BMaxEff,TrqRat'
-            //    WRITE(302,*) 'BPLEff,BEff,BPwrIn,MPwrOut,XMmax,MMaxEff,MPwrRat,MPLEff'
-            //    WRITE(303,*) 'MEff,MPwrIn,VPwrRat,VEff,FanPwr,FanEff,PwrLoss,dEnthalpy'
-            //    WRITE(304,*) 'Date,Period'
         } // End fan component sizing
 
         equipName = Fan(FanNum).FanName;
 
-        // cpw31Aug2010 Rearrange order to match table and use FanVolFlow to calculate RatedPower
+        // Rearrange order to match table and use FanVolFlow to calculate RatedPower
         // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-        PreDefTableEntry(pdchFanType, equipName, Fan(FanNum).FanType);
-        PreDefTableEntry(pdchFanTotEff, equipName, Fan(FanNum).FanEff);
-        PreDefTableEntry(pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
-        PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, Fan(FanNum).FanType);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, Fan(FanNum).FanEff);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
-            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, StdRhoAir);
+            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, state.dataEnvrn->StdRhoAir);
         }
-        PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
-            PreDefTableEntry(pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
         }
-        PreDefTableEntry(pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
-        PreDefTableEntry(pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
-        PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         if (NVPerfNum > 0) {
@@ -2194,8 +2165,6 @@ namespace Fans {
         }
     }
 
-    // cpw22Aug2010 Added Component Model fan algorithm
-
     void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -2233,10 +2202,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-        using General::CreateSysTimeIntervalString;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2434,26 +2399,6 @@ namespace Fans {
             Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat; //[-]
             Fan(FanNum).OutletAirMassFlowRate = MassFlow;             //[kg/s]
             Fan(FanNum).OutletAirTemp = PsyTdbFnHW(Fan(FanNum).OutletAirEnthalpy, Fan(FanNum).OutletAirHumRat);
-
-            // cpw31Aug2010 Temporary code for debugging fan component model
-            //    WRITE(300,*) TRIM(RoundSigDigits(Fan(FanNum)%RhoAirStdInit,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &
-            //    //','//TRIM(RoundSigDigits(FanOutletVelPress,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%DeltaPress,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanAirPower,4))//','//TRIM(RoundSigDigits(EulerNum,4)) &
-            //    //','//TRIM(RoundSigDigits(NormalizedEulerNum,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanWheelEff,4))
-            //    WRITE(301,*) TRIM(RoundSigDigits(Fan(FanNum)%FanShaftPower,4))//','//TRIM(RoundSigDigits(FanDimFlow,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanTrq,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanSpd,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanShaftPwrMax,4))//','//TRIM(" ") &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%BeltMaxEff,4))//','//TRIM(RoundSigDigits(FanTrqRatio,4))
-            //    WRITE(302,*) TRIM(RoundSigDigits(BeltPLEff,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%BeltEff,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%BeltInputPower,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorMaxOutPwr,4)) &
-            //    //','//TRIM(" ")//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorMaxEff,4)) &
-            //    //','//TRIM(RoundSigDigits(MotorOutPwrRatio,4))//','//TRIM(RoundSigDigits(MotorPLEff,4))
-            //    WRITE(303,*) TRIM(RoundSigDigits(Fan(FanNum)%MotEff,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%MotorInputPower,4)) &
-            //    //','//TRIM(RoundSigDigits(VFDOutPwrRatio,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%VFDEff,4)) &
-            //    //','//TRIM(RoundSigDigits(Fan(FanNum)%FanPower,4))//','//TRIM(RoundSigDigits(Fan(FanNum)%FanEff,4)) &
-            //    //','//TRIM(RoundSigDigits(PowerLossToAir,4))//','//TRIM(RoundSigDigits(FanEnthalpyChange,4))
-            //    WRITE(304,*) TRIM(CurMnDy)//','//TRIM(CreateSysTimeIntervalString())
-
         } else {
             // Fan is OFF and not operating -- no power consumed and zero mass flow rate
             Fan(FanNum).FanPower = 0.0;
@@ -2592,7 +2537,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
@@ -3088,7 +3033,8 @@ namespace Fans {
         }
     }
 
-    Real64 FanDesDT(int const FanNum,                        // index of fan in Fan array
+    Real64 FanDesDT(EnergyPlusData &state,
+                    int const FanNum,                        // index of fan in Fan array
                     [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
@@ -3126,7 +3072,7 @@ namespace Fans {
             TotEff = Fan(FanNum).FanEff;
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {

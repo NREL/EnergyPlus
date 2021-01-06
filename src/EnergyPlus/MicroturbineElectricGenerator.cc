@@ -55,20 +55,20 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -961,7 +961,7 @@ namespace MicroturbineElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1148,9 +1148,9 @@ namespace MicroturbineElectricGenerator {
 
         //   Set combustion inlet air temperature, humidity ratio and pressure local variables
         if (this->CombustionAirInletNodeNum == 0) { // no inlet air node specified, so use weather file values
-            CombustionAirInletTemp = DataEnvironment::OutDryBulbTemp;
-            CombustionAirInletW = DataEnvironment::OutHumRat;
-            CombustionAirInletPress = DataEnvironment::OutBaroPress;
+            CombustionAirInletTemp = state.dataEnvrn->OutDryBulbTemp;
+            CombustionAirInletW = state.dataEnvrn->OutHumRat;
+            CombustionAirInletPress = state.dataEnvrn->OutBaroPress;
         } else { // use inlet node information
             CombustionAirInletTemp = DataLoopNode::Node(this->CombustionAirInletNodeNum).Temp;
             CombustionAirInletW = DataLoopNode::Node(this->CombustionAirInletNodeNum).HumRat;
@@ -1178,7 +1178,7 @@ namespace MicroturbineElectricGenerator {
 
         //   Calculate power modifier curve value (function of inlet air temperature and elevation)
         // Power ratio as a function of inlet air temperature and elevation
-        Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+        Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
 
         //   Warn user if power modifier curve output is less than 0
         if (PowerFTempElev < 0.0) {
@@ -1190,7 +1190,7 @@ namespace MicroturbineElectricGenerator {
                     format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
                            PowerFTempElev));
                 ShowContinueError(state, format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
-                ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
+                ShowContinueError(state, format("... and an elevation of {:.2T} m.", state.dataEnvrn->Elevation));
                 ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
             }
             ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1375,7 +1375,7 @@ namespace MicroturbineElectricGenerator {
             // Thermal efficiency as a function of air temperature and elevation
             Real64 ThermalEffFTempElev;
             if (this->ThermEffFTempElevCurveNum > 0) {
-                ThermalEffFTempElev = CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+                ThermalEffFTempElev = CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
                 //       Warn user if power modifier curve output is less than 0
                 if (ThermalEffFTempElev < 0.0) {
                     if (this->ThermEffFTempElevErrorIndex == 0) {
@@ -1386,7 +1386,7 @@ namespace MicroturbineElectricGenerator {
                                    PowerFTempElev));
                         ShowContinueError(state,
                                           format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
-                        ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
+                        ShowContinueError(state, format("... and an elevation of {:.2T} m.", state.dataEnvrn->Elevation));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1786,9 +1786,9 @@ namespace MicroturbineElectricGenerator {
                 DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
         }
 
-        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         if (this->FuelEnergyUseRateLHV > 0.0) {
             this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
             this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1796,8 +1796,8 @@ namespace MicroturbineElectricGenerator {
             this->ElectricEfficiencyLHV = 0.0;
             this->ThermalEfficiencyLHV = 0.0;
         }
-        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace MicroturbineElectricGenerator

@@ -51,12 +51,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HybridUnitaryAirConditioners {
 
@@ -98,5 +102,14 @@ namespace HybridUnitaryAirConditioners {
     int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
+
+struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 #endif

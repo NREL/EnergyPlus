@@ -56,7 +56,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -283,7 +282,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     {
 
-        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -333,7 +332,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
                 state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
-            CpSrc = Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat);
+            CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         }
         Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -487,7 +486,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
+                                                           DataGlobalConstants::InitConvTemp,
                                                            DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
@@ -503,7 +502,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             if (this->waterSource) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
+                                                        DataGlobalConstants::InitConvTemp,
                                                         DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
@@ -516,7 +515,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                    this->sourceSideLocation.branchNum,
                                                    this->sourceSideLocation.compNum);
             } else if (this->airSource) {
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, DataEnvironment::OutDryBulbTemp, 0.0, routineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
             }
 
@@ -562,9 +561,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp();
+        Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            loadSideInitTemp = DataGlobalConstants::HWInitConvTemp();
+            loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
         }
 
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -741,9 +740,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 tmpSourceVolFlow;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp();
+        Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp();
+            sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
         }
 
         Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
@@ -826,9 +825,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->name, typeName);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->name, this->referenceCOP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->name, this->referenceCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->name, typeName);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->name, this->referenceCOP);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->name, this->referenceCapacity);
         }
 
         if (errorsFound) {
@@ -857,7 +856,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             sourceSideInitTemp = 20;
         }
 
-        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
+        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
         Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate

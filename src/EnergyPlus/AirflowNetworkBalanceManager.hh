@@ -56,10 +56,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "AirflowNetwork/Elements.hpp"
+#include "AirflowNetwork/Solver.hpp"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "AirflowNetwork/Solver.hpp"
-#include "AirflowNetwork/Elements.hpp"
 
 namespace EnergyPlus {
 
@@ -162,7 +162,7 @@ namespace AirflowNetworkBalanceManager {
 
     void ValidateDistributionSystem(EnergyPlusData &state);
 
-    void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
+    void ValidateFanFlowRate(EnergyPlusData &state); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
     void ValidateExhaustFanInput(EnergyPlusData &state);
 

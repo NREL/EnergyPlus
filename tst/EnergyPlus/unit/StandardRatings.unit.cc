@@ -75,36 +75,35 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 {
     // Test that the standard ratings calculation with negative curve value
 
-    using DXCoils::DXCoil;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
 
     // Set up heating coil and curves.
     int DXCoilNum;
-    NumDXCoils = 1;
+    state->dataDXCoils->NumDXCoils = 1;
     DXCoilNum = 1;
-    DXCoil.allocate(NumDXCoils);
-    DXCoilNumericFields.allocate(1);
-    DXCoilOutletTemp.allocate(NumDXCoils);
-    DXCoilOutletHumRat.allocate(NumDXCoils);
-    DXCoilFanOpMode.allocate(NumDXCoils);
-    DXCoilPartLoadRatio.allocate(NumDXCoils);
-    DXCoilTotalHeating.allocate(NumDXCoils);
-    DXCoilHeatInletAirDBTemp.allocate(NumDXCoils);
-    DXCoilHeatInletAirWBTemp.allocate(NumDXCoils);
-    DXCoilData &Coil = DXCoil(DXCoilNum);
+    state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilNumericFields.allocate(1);
+    state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilTotalHeating.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(state->dataDXCoils->NumDXCoils);
+    DXCoilData &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 4.0;
     Coil.RatedEIR(1) = 1 / Coil.RatedCOP(1);
     Coil.RatedAirVolFlowRate(1) = 0.50;
     Coil.RatedAirMassFlowRate(1) =
-        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
     Coil.MinOATCompressor = -10.0;
     Coil.CrankcaseHeaterCapacity = 0.0;
@@ -451,7 +450,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     GetDXCoils(*state);
 
-    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
@@ -724,7 +723,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     GetDXCoils(*state);
 
-    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.MSPLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);

@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
 
     OutputReportPredefined::SetPredefinedTables(*state);
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
@@ -230,13 +230,13 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
-    DataConvergParams::AirLoopConvergence.allocate(1);
-    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence.allocate(1);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
@@ -411,7 +411,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state->dataWaterCoils->WaterCoil_Cooling);
 
     OutputReportPredefined::SetPredefinedTables(*state);
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -504,7 +504,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state->dataWaterCoils->WaterCoil_SimpleHeating);
 
     OutputReportPredefined::SetPredefinedTables(*state);
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
 
     state->dataAirLoop->NumOASystems = 1;
     state->dataAirLoop->OutsideAirSys.allocate(1);
@@ -636,7 +636,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state->dataWaterCoils->WaterCoil_DetFlatFinCooling);
 
     OutputReportPredefined::SetPredefinedTables(*state);
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
 
     state->dataAirLoop->NumOASystems = 1;
     state->dataAirLoop->OutsideAirSys.allocate(1);
@@ -928,7 +928,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
 
     OutputReportPredefined::SetPredefinedTables(*state);
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
@@ -938,13 +938,13 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
-    DataConvergParams::AirLoopConvergence.allocate(1);
-    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence.allocate(1);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;

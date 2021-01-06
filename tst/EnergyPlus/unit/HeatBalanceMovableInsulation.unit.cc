@@ -82,25 +82,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     DataSurfaces::Surface(SurfNum).SchedMovInsulExt = -1;
     DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
 
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Resistance = 1.25;
-    dataMaterial.Material(1).Roughness = 1;
-    dataMaterial.Material(1).Group = 0;
-    dataMaterial.Material(1).AbsorpSolar = 0.75;
-    dataMaterial.Material(1).Trans = 0.25;
-    dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Group = 0;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
     EvalOutsideMovableInsulation(*state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
@@ -117,25 +117,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     DataSurfaces::Surface(SurfNum).SchedMovInsulInt = -1;
     DataSurfaces::Surface(SurfNum).MaterialMovInsulInt = 1;
 
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Resistance = 1.25;
-    dataMaterial.Material(1).Roughness = 1;
-    dataMaterial.Material(1).Group = 0;
-    dataMaterial.Material(1).AbsorpSolar = 0.75;
-    dataMaterial.Material(1).Trans = 0.25;
-    dataMaterial.Material(1).ReflectSolBeamFront = 0.20;
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Group = 0;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.75;
+    state->dataMaterial->Material(1).Trans = 0.25;
+    state->dataMaterial->Material(1).ReflectSolBeamFront = 0.20;
 
     AbsExt = 0.0;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.75, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::WindowGlass;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::WindowGlass;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 
     AbsExt = 0.0;
-    dataMaterial.Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
+    state->dataMaterial->Material(1).Group = DataHeatBalance::GlassEquivalentLayer;
     EvalInsideMovableInsulation(*state, SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, DataHeatBalance::TotMaterials);
-    EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
@@ -267,8 +267,8 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // check movable insulation material
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
-    EXPECT_EQ(dataMaterial.Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
-    EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
+    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
     EXPECT_TRUE(ErrorsFound);                                                            // error found due to invalid material
 }
 } // namespace EnergyPlus

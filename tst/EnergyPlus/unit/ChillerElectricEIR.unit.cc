@@ -140,8 +140,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     Real64 MyLoad(-10000.0);
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -291,8 +291,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_TRUE(process_idf(idf_objects, false));
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -333,13 +333,13 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    DataEnvironment::OutDryBulbTemp = 29.4;
-    DataEnvironment::OutWetBulbTemp = 23.0;
-    DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = DataEnvironment::OutHumRat;
+    state->dataEnvrn->OutDryBulbTemp = 29.4;
+    state->dataEnvrn->OutWetBulbTemp = 23.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
 
     // set load and run flag
     bool RunFlag(true);
@@ -365,8 +365,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     // run chiller
     thisEIRChiller.calculate(*state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
-    Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
-                                      Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
+    Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - state->dataEnvrn->OutHumRat) /
+                                      Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
     // check evap-cooled condenser water consumption rate
     EXPECT_NEAR(2.31460814, thisEIRChiller.CondMassFlowRate, 0.0000001);
     EXPECT_NEAR(6.22019725E-06, EvapCondWaterVolFlowRate, 0.000000001);

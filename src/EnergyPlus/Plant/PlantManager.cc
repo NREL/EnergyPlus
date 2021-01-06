@@ -147,8 +147,6 @@ namespace EnergyPlus {
         using namespace FluidProperties;
 
         // MODULE PARAMETER DEFINITIONS
-        int const Plant(1);
-        int const Condenser(2);
         int const TempSetPt(1001);
         bool InitLoopEquip(true);
         bool GetCompSizFac(true);
@@ -192,8 +190,6 @@ namespace EnergyPlus {
             // Reset the flags as necessary
 
             // Using/Aliasing
-            using DataConvergParams::MaxPlantSubIterations;
-            using DataConvergParams::MinPlantSubIterations;
             using PlantUtilities::LogPlantConvergencePoints;
 
             // SUBROUTINE VARIABLE DEFINITIONS
@@ -210,9 +206,9 @@ namespace EnergyPlus {
                 return (e.CommonPipeType == DataPlant::CommonPipe_Single) ||
                        (e.CommonPipeType == DataPlant::CommonPipe_TwoWay);
             })) {
-                CurntMinPlantSubIterations = max(7, MinPlantSubIterations);
+                CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
             } else {
-                CurntMinPlantSubIterations = MinPlantSubIterations;
+                CurntMinPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations;
             }
 
             if (TotNumLoops <= 0) { // quick return if no plant in model
@@ -223,7 +219,7 @@ namespace EnergyPlus {
             IterPlant = 0;
             InitializeLoops(state, FirstHVACIteration);
 
-            while ((SimPlantLoops) && (IterPlant <= MaxPlantSubIterations)) {
+            while ((SimPlantLoops) && (IterPlant <= state.dataConvergeParams->MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
                 for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
 
@@ -314,7 +310,6 @@ namespace EnergyPlus {
             auto localTempSetPt = SetPointManager::iCtrlVarType::Temp;
             using NodeInputManager::GetOnlySingleNode;
             using namespace BranchInputManager;
-            using DataConvergParams::PlantConvergence;
             using DataSizing::AutoSize;
             using FluidProperties::CheckFluidPropertyName;
             using FluidProperties::FindGlycol;
@@ -352,7 +347,7 @@ namespace EnergyPlus {
 
             if (TotNumLoops > 0) {
                 PlantLoop.allocate(TotNumLoops);
-                PlantConvergence.allocate(TotNumLoops);
+                state.dataConvergeParams->PlantConvergence.allocate(TotNumLoops);
                 if (!allocated(PlantAvailMgr)) {
                     PlantAvailMgr.allocate(TotNumLoops);
                 }
@@ -371,7 +366,7 @@ namespace EnergyPlus {
                 auto &this_supply_side(this_loop.LoopSide(2));
                 if (LoopNum <= NumPlantLoops) {
                     PlantLoopNum = LoopNum;
-                    this_loop.TypeOfLoop = Plant;
+                    this_loop.TypeOfLoop = LoopType::Plant;
                     CurrentModuleObject = "PlantLoop";
                     inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
@@ -387,7 +382,7 @@ namespace EnergyPlus {
                                                   cNumericFieldNames);
                 } else {
                     CondLoopNum = LoopNum - NumPlantLoops;
-                    this_loop.TypeOfLoop = Condenser;
+                    this_loop.TypeOfLoop = LoopType::Condenser;
                     CurrentModuleObject = "CondenserLoop";
                     inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
@@ -454,8 +449,8 @@ namespace EnergyPlus {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate();
-                if (this_loop.Volume == DataGlobalConstants::AutoCalculate()) {
+                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
+                if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
@@ -516,7 +511,7 @@ namespace EnergyPlus {
                 }
 
                 // When dual setpoint is allowed in condenser loop modify this code. Sankar 06/29/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     // Get the Loop Demand Calculation Scheme
                     if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
@@ -540,12 +535,12 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
                     }
-                } else if (this_loop.TypeOfLoop == Condenser) {
+                } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
                     this_loop.LoopDemandCalcScheme = SingleSetPoint;
                 }
 
                 // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     if (UtilityRoutines::SameString(Alpha(17), "CommonPipe")) {
                         this_loop.CommonPipeType = CommonPipe_Single;
                     } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
@@ -558,7 +553,7 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Refer to I/O reference document for more details.");
                         ErrorsFound = true;
                     }
-                } else if (this_loop.TypeOfLoop == Condenser) {
+                } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
                     this_loop.CommonPipeType = CommonPipe_No;
                 }
 
@@ -587,7 +582,7 @@ namespace EnergyPlus {
                 // Pressure Simulation Type Input
                 // First set the alpha index in the object as it is different for plant/condenser
                 // When CommonPipe, etc., is allowed in condenser loop, modify this code.  Edwin/Sankar 08/12/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     PressSimAlphaIndex = 18;
                 } else {
                     PressSimAlphaIndex = 15;
@@ -647,7 +642,7 @@ namespace EnergyPlus {
 
                 ErrFound = false;
 
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     GetPlantAvailabilityManager(state, Alpha(15), LoopNum, TotNumLoops, ErrFound);
                 }
 
@@ -813,13 +808,13 @@ namespace EnergyPlus {
                     NumOfPipesInLoop = 0; // Initialization
                     ++HalfLoopNum;
                     loopSide.BypassExists = false;
-                    if (plantLoop.TypeOfLoop == Plant && LoopSideNum == DemandSide) {
+                    if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Plant Demand";
-                    } else if (plantLoop.TypeOfLoop == Plant && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Plant Supply";
-                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == DemandSide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Condenser && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Condenser Demand";
-                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Condenser && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Condenser Supply";
                     }
 
@@ -2094,10 +2089,7 @@ namespace EnergyPlus {
             using DataHVACGlobals::NumPlantLoops;
             using DataPlant::PlantFirstSizesOkayToReport;
             using EMSManager::CheckIfNodeSetPointManagedByEMS;
-            using EMSManager::iTemperatureMaxSetPoint;
-            using EMSManager::iTemperatureMinSetPoint;
-            using EMSManager::iTemperatureSetPoint;
-            ;
+
             using PlantUtilities::SetAllFlowLocks;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2160,7 +2152,7 @@ namespace EnergyPlus {
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
@@ -2339,7 +2331,7 @@ namespace EnergyPlus {
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMaxSetPoint, SetPointErrorFlag);
+                                                                    EMSManager::SPControlType::iTemperatureMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
@@ -2363,7 +2355,7 @@ namespace EnergyPlus {
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMinSetPoint, SetPointErrorFlag);
+                                                                    EMSManager::SPControlType::iTemperatureMinSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
@@ -2425,7 +2417,6 @@ namespace EnergyPlus {
             // this contains all the initializations
 
             // Using/Aliasing
-            using DataEnvironment::StdBaroPress;
             using HVACInterfaceManager::PlantCommonPipe;
             using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2587,7 +2578,7 @@ namespace EnergyPlus {
 
                                 Node(ComponentInlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentInlet).Quality = StartQuality;
-                                Node(ComponentInlet).Press = StdBaroPress;
+                                Node(ComponentInlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentInlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentInlet).HumRat = StartHumRat;
 
@@ -2603,7 +2594,7 @@ namespace EnergyPlus {
                                 Node(ComponentOutlet).MassFlowRateMaxAvail = Node(BranchInlet).MassFlowRateMaxAvail;
                                 Node(ComponentOutlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentOutlet).Quality = StartQuality;
-                                Node(ComponentOutlet).Press = StdBaroPress;
+                                Node(ComponentOutlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentOutlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentOutlet).HumRat = StartHumRat;
                             } // COMPONENT LOOP
@@ -2786,9 +2777,6 @@ namespace EnergyPlus {
             //       then another branch in the s/m needs to be active
             //  other checks could/should be added!
 
-            // Using/Aliasing
-            using DataErrorTracking::AskForPlantCheckOnAbort;
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum;           // DO loop counter for loops
             bool ActiveCntrlfound; // used to search for active control branches in parallel with bypass branches
@@ -2801,7 +2789,7 @@ namespace EnergyPlus {
             int CompNum;   // do loop for multiple components on a branch
             bool ShouldBeACTIVE;
 
-            if (!(AskForPlantCheckOnAbort)) {
+            if (!(state.dataErrTracking->AskForPlantCheckOnAbort)) {
                 return;
             }
 
@@ -3141,22 +3129,22 @@ namespace EnergyPlus {
                     }
                     if (Finalize) {
                         if (PlantFinalSizesOkayToReport) {
-                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
-                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                                 BaseSizer::reportSizerOutput(state,
                                         "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
                             }
                         }
                         if (PlantFirstSizesOkayToReport) {
-                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
-                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                                 BaseSizer::reportSizerOutput(state,
                                         "CondenserLoop", PlantLoop(LoopNum).Name,
                                         "Initial Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
@@ -3180,21 +3168,21 @@ namespace EnergyPlus {
                 PlantLoop(LoopNum).Volume =
                         PlantLoop(LoopNum).MaxVolFlowRate * PlantLoop(LoopNum).CirculationTime * 60.0;
                 if (PlantFinalSizesOkayToReport) {
-                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
                         BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                         BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
                     }
                 }
                 if (PlantFirstSizesOkayToReport) {
-                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
                         BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                         BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name,
                                            "Initial Condenser Loop Volume [m3]", PlantLoop(LoopNum).Volume);
                     }
@@ -3203,7 +3191,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
@@ -3304,10 +3292,10 @@ namespace EnergyPlus {
                         }
                     }
                     if (PlantFinalSizesOkayToReport) {
-                        if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                             BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                                PlantLoop(LoopNum).MaxVolFlowRate);
-                        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                             BaseSizer::reportSizerOutput(state,
                                     "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                     PlantLoop(LoopNum).MaxVolFlowRate);
@@ -3322,11 +3310,11 @@ namespace EnergyPlus {
                 // Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate
                 PlantLoop(LoopNum).Volume =
                         PlantLoop(LoopNum).MaxVolFlowRate * PlantLoop(LoopNum).CirculationTime * 60.0;
-                if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                     // condenser loop vs plant loop breakout needed.
                     BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
                                        PlantLoop(LoopNum).Volume);
-                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                     BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
                                        PlantLoop(LoopNum).Volume);
                 }
@@ -3334,7 +3322,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,

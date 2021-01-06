@@ -319,8 +319,8 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -336,13 +336,13 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     ScheduleManager::ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
@@ -351,11 +351,11 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    EXPECT_EQ(1, TotDElightCFS);
+    EXPECT_EQ(1, state->dataDaylightingData->TotDElightCFS);
 
-    EXPECT_EQ("TEST CFS", DElightComplexFene(1).Name);
-    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", DElightComplexFene(1).ComplexFeneType);
-    EXPECT_EQ("ZN001:WALL001", DElightComplexFene(1).surfName);
-    EXPECT_EQ("ZN001:WALL001:WIN001", DElightComplexFene(1).wndwName);
-    EXPECT_EQ(0., DElightComplexFene(1).feneRota);
+    EXPECT_EQ("TEST CFS", state->dataDaylightingData->DElightComplexFene(1).Name);
+    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", state->dataDaylightingData->DElightComplexFene(1).ComplexFeneType);
+    EXPECT_EQ("ZN001:WALL001", state->dataDaylightingData->DElightComplexFene(1).surfName);
+    EXPECT_EQ("ZN001:WALL001:WIN001", state->dataDaylightingData->DElightComplexFene(1).wndwName);
+    EXPECT_EQ(0., state->dataDaylightingData->DElightComplexFene(1).feneRota);
 }

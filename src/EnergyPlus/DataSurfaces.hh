@@ -48,21 +48,22 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataBSDFWindow.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataVectorTypes.hh>
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Shape.hh>
+// C++ Headers
+#include <cstddef>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Vector4.hh>
 
-// C++ Headers
-#include <cstddef>
-#include <vector>
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Shape.hh>
 
 namespace EnergyPlus {
 
@@ -956,11 +957,11 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
         void SetWindDirAt(Real64 const fac);
 
-        void SetWindSpeedAt(Real64 const fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
@@ -1452,13 +1453,13 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSurfaceOutBulbTempAt();
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
     void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 
-    void SetSurfaceWindSpeedAt();
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state);
 
-    void SetSurfaceWindDirAt();
+    void SetSurfaceWindDirAt(EnergyPlusData &state);
 
     Real64 AbsFrontSide(int SurfNum);
 
@@ -1467,6 +1468,14 @@ namespace DataSurfaces {
     std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
+
+struct SurfacesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

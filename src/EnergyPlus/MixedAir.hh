@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -83,8 +84,8 @@ namespace MixedAir {
     extern int const ElectronicEnthalpy;
     extern int const DifferentialDryBulbAndEnthalpy;
     // coil operation
-    extern int const On;  // normal coil operation
-    extern int const Off; // signal coil shouldn't run
+    constexpr int On(1);  // normal coil operation
+    constexpr int Off(0); // signal coil shouldn't run
     // component types addressed by this module
     extern int const OAMixer_Num;
     extern int const Fan_Simple_CV;
@@ -103,7 +104,7 @@ namespace MixedAir {
     extern int const Unglazed_SolarCollector;
     extern int const EvapCooler;
     extern int const PVT_AirBased;
-    extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
+    extern int const Fan_ComponentModel;
     extern int const DXHeatPumpSystem;
     extern int const Coil_UserDefined;
     extern int const Humidifier;
@@ -424,13 +425,13 @@ namespace MixedAir {
 
     // Functions
 
-    Real64 OAGetFlowRate(int OAPtr);
+    Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr);
 
     Real64 OAGetMinFlowRate(int OAPtr);
 
     void OASetDemandManagerVentilationState(int OAPtr, bool aState);
 
-    void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow);
+    void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow);
 
     int GetOAController(std::string const &OAName);
 
@@ -598,6 +599,14 @@ namespace MixedAir {
     //******************************************************************************
 
 } // namespace MixedAir
+
+struct MixedAirData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

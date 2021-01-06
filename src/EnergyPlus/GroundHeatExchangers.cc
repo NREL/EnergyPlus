@@ -59,23 +59,23 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -612,7 +612,7 @@ namespace GroundHeatExchangers {
         // Determine how many g-function pairs to generate based on user defined maximum simulation time
         while (true) {
             Real64 maxPossibleSimTime = exp(tempLNTTS.back()) * t_s;
-            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay() * DataGlobalConstants::SecInHour()) {
+            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay * DataGlobalConstants::SecInHour) {
                 tempLNTTS.push_back(tempLNTTS.back() + lnttsStepSize);
             } else {
                 break;
@@ -760,7 +760,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_conv + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_convection);
+            thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_convection);
             thisCell.rhoCp = 1;
             Cells.push_back(thisCell);
         }
@@ -773,7 +773,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_pipe_in + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_tube_grout);
+            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
             thisCell.rhoCp = pipe.rhoCp;
             Cells.push_back(thisCell);
         }
@@ -786,7 +786,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_pipe_out + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_tube_grout);
+            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
             thisCell.rhoCp = grout.rhoCp;
             Cells.push_back(thisCell);
         }
@@ -806,7 +806,7 @@ namespace GroundHeatExchangers {
 
         // other non-geometric specific setup
         for (auto &thisCell : Cells) {
-            thisCell.vol = DataGlobalConstants::Pi() * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
+            thisCell.vol = DataGlobalConstants::Pi * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
             thisCell.temperature = initial_temperature;
         }
 
@@ -841,8 +841,8 @@ namespace GroundHeatExchangers {
                     auto &thisCell = Cells[cell_index];
                     auto &eastCell = Cells[cell_index + 1];
 
-                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
-                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi() * eastCell.conductivity);
+                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
+                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
                     Real64 AE = 1 / (FE1 + FE2);
 
                     Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -869,12 +869,12 @@ namespace GroundHeatExchangers {
                     auto &thisCell = Cells[cell_index];
                     auto &eastCell = Cells[cell_index + 1];
 
-                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
-                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi() * eastCell.conductivity);
+                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
+                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
                     Real64 AE = 1 / (FE1 + FE2);
 
-                    Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * DataGlobalConstants::Pi() * westCell.conductivity);
-                    Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
+                    Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * DataGlobalConstants::Pi * westCell.conductivity);
+                    Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
                     Real64 AW = -1 / (FW1 + FW2);
 
                     Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -901,8 +901,8 @@ namespace GroundHeatExchangers {
 
                 if (leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL) {
 
-                    Real64 left_conductance = 2 * DataGlobalConstants::Pi() * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
-                    Real64 right_conductance = 2 * DataGlobalConstants::Pi() * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
+                    Real64 left_conductance = 2 * DataGlobalConstants::Pi * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
+                    Real64 right_conductance = 2 * DataGlobalConstants::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
 
                     T_bhWall = (left_conductance * leftCell.temperature + right_conductance * rightCell.temperature) /
                                (left_conductance + right_conductance);
@@ -912,7 +912,7 @@ namespace GroundHeatExchangers {
 
             total_time += time_step;
 
-            GFNC_shortTimestep.push_back(2 * DataGlobalConstants::Pi() * soil.k * ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
+            GFNC_shortTimestep.push_back(2 * DataGlobalConstants::Pi * soil.k * ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
             LNTTS_shortTimestep.push_back(log(total_time / t_s));
 
         } // end timestep loop
@@ -1354,7 +1354,7 @@ namespace GroundHeatExchangers {
                 }         // n1
             }             // m1
 
-            myRespFactors->GFNC(NT) = (gFunc * (coilDiameter / 2.0)) / (4 * DataGlobalConstants::Pi() * fraction * numTrenches * numCoils);
+            myRespFactors->GFNC(NT) = (gFunc * (coilDiameter / 2.0)) / (4 * DataGlobalConstants::Pi * fraction * numTrenches * numCoils);
             myRespFactors->LNTTS(NT) = tLg;
 
         } // NT time
@@ -1445,7 +1445,7 @@ namespace GroundHeatExchangers {
         errFunc1 = std::erfc(0.5 * distance / sqrtAlphaT);
         errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
 
-        return 4 * pow_2(DataGlobalConstants::Pi()) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
+        return 4 * pow_2(DataGlobalConstants::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
     }
 
     //******************************************************************************
@@ -1586,7 +1586,7 @@ namespace GroundHeatExchangers {
         Real64 sumIntF(0.0);
         Real64 theta(0.0);
         Real64 theta1(0.0);
-        Real64 theta2(2 * DataGlobalConstants::Pi());
+        Real64 theta2(2 * DataGlobalConstants::Pi);
         Real64 h;
         int j;
         Array1D<Real64> f(J0, 0.0);
@@ -1635,7 +1635,7 @@ namespace GroundHeatExchangers {
         Real64 sumIntF(0.0);
         Real64 eta(0.0);
         Real64 eta1(0.0);
-        Real64 eta2(2 * DataGlobalConstants::Pi());
+        Real64 eta2(2 * DataGlobalConstants::Pi);
         Real64 h;
         int i;
         Array1D<Real64> g(I0, 0.0);
@@ -1675,7 +1675,7 @@ namespace GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate annual time constant for ground conduction
 
-        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / DataGlobalConstants::SecInHour() / 8760.0;
+        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / DataGlobalConstants::SecInHour / 8760.0;
         timeSSFactor = timeSS * 8760.0;
     }
 
@@ -1778,7 +1778,7 @@ namespace GroundHeatExchangers {
         cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
         fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
 
-        kGroundFactor = 2.0 * DataGlobalConstants::Pi() * soil.k;
+        kGroundFactor = 2.0 * DataGlobalConstants::Pi * soil.k;
 
         // Get time constants
         getAnnualTimeConstant();
@@ -2141,8 +2141,6 @@ namespace GroundHeatExchangers {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataEnvironment::MaxNumberSimYears;
-
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -2279,7 +2277,7 @@ namespace GroundHeatExchangers {
                 thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
                 thisRF->gRefRatio = DataIPShortCuts::rNumericArgs(2);
 
-                thisRF->maxSimYears = MaxNumberSimYears;
+                thisRF->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
                 int numPreviousFields = 2;
                 int numFields = 0;
@@ -2563,7 +2561,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.myRespFactors->gRefRatio = thisGLHE.bhRadius / thisGLHE.bhLength;
 
                 // Number of simulation years from RunPeriod
-                thisGLHE.myRespFactors->maxSimYears = MaxNumberSimYears;
+                thisGLHE.myRespFactors->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
                 // total tube length
                 thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->bhLength;
@@ -2745,7 +2743,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.numCoils = thisGLHE.trenchLength / thisGLHE.coilPitch;
 
                 // Total tube length
-                thisGLHE.totalTubeLength = DataGlobalConstants::Pi() * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
+                thisGLHE.totalTubeLength = DataGlobalConstants::Pi * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
 
                 // Get g function data
                 thisGLHE.SubAGG = 15;
@@ -2838,7 +2836,7 @@ namespace GroundHeatExchangers {
 
         // Equation 13
 
-        Real64 const beta = 2 * DataGlobalConstants::Pi() * grout.k * calcPipeResistance(state);
+        Real64 const beta = 2 * DataGlobalConstants::Pi * grout.k * calcPipeResistance(state);
 
         Real64 const final_term_1 = log(theta_2 / (2 * theta_1 * pow(1 - pow_4(theta_1), sigma)));
         Real64 const num_final_term_2 = pow_2(theta_3) * pow_2(1 - (4 * sigma * pow_4(theta_1)) / (1 - pow_4(theta_1)));
@@ -2847,7 +2845,7 @@ namespace GroundHeatExchangers {
         Real64 const den_final_term_2 = den_final_term_2_pt_1 + den_final_term_2_pt_2;
         Real64 const final_term_2 = num_final_term_2 / den_final_term_2;
 
-        return (1 / (4 * DataGlobalConstants::Pi() * grout.k)) * (beta + final_term_1 - final_term_2);
+        return (1 / (4 * DataGlobalConstants::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
 
     //******************************************************************************
@@ -2861,7 +2859,7 @@ namespace GroundHeatExchangers {
 
         // Equation 26
 
-        Real64 beta = 2 * DataGlobalConstants::Pi() * grout.k * calcPipeResistance(state);
+        Real64 beta = 2 * DataGlobalConstants::Pi * grout.k * calcPipeResistance(state);
 
         Real64 final_term_1 = log(pow(1 + pow_2(theta_1), sigma) / (theta_3 * pow(1 - pow_2(theta_1), sigma)));
         Real64 num_term_2 = pow_2(theta_3) * pow_2(1 - pow_4(theta_1) + 4 * sigma * pow_2(theta_1));
@@ -2871,7 +2869,7 @@ namespace GroundHeatExchangers {
         Real64 den_term_2 = den_term_2_pt_1 - den_term_2_pt_2 + den_term_2_pt_3;
         Real64 final_term_2 = num_term_2 / den_term_2;
 
-        return (1 / (DataGlobalConstants::Pi() * grout.k)) * (beta + final_term_1 - final_term_2);
+        return (1 / (DataGlobalConstants::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
 
     //******************************************************************************
@@ -2922,7 +2920,7 @@ namespace GroundHeatExchangers {
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
         // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
-        return log(pipe.outDia / pipe.innerDia) / (2 * DataGlobalConstants::Pi() * pipe.k);
+        return log(pipe.outDia / pipe.innerDia) / (2 * DataGlobalConstants::Pi * pipe.k);
     }
 
     //******************************************************************************
@@ -2955,7 +2953,7 @@ namespace GroundHeatExchangers {
 
         Real64 const bhMassFlowRate = massFlowRate / myRespFactors->numBoreholes;
 
-        Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi() * pipe.innerDia);
+        Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi * pipe.innerDia);
 
         Real64 nusseltNum = 0.0;
         if (reynoldsNum < lower_limit) {
@@ -2975,7 +2973,7 @@ namespace GroundHeatExchangers {
 
         Real64 h = nusseltNum * kFluid / pipe.innerDia;
 
-        return 1 / (h * DataGlobalConstants::Pi() * pipe.innerDia);
+        return 1 / (h * DataGlobalConstants::Pi * pipe.innerDia);
     }
 
     //******************************************************************************
@@ -3081,7 +3079,7 @@ namespace GroundHeatExchangers {
             Rconv = 0.0;
         } else {
             // Re=Rho*V*D/Mu
-            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi() * pow_2(pipeInnerRad))) / fluidViscosity;
+            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
             prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
             //   Convection Resistance
             if (reynoldsNum <= 2300) {
@@ -3094,11 +3092,11 @@ namespace GroundHeatExchangers {
                 nusseltNum = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
             }
             hci = nusseltNum * kFluid / pipeInnerDia;
-            Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi() * pipeInnerDia * hci);
+            Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi * pipeInnerDia * hci);
         }
 
         //   Conduction Resistance
-        Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi() * pipe.k) / 2.0; // pipe in parallel so /2
+        Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi * pipe.k) / 2.0; // pipe in parallel so /2
 
         return Rcond + Rconv;
     }
@@ -3313,7 +3311,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
         // Init more variables
         if (myFlag) {
@@ -3422,7 +3420,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
         // Init more variables
         if (myFlag) {

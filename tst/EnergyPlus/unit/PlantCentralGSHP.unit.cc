@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).WrapperPerformanceObjectType = "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR";
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).WrapperIdenticalObjectNum = 2;
-    PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     PlantCentralGSHP::Wrapper(1).ChillerHeaterNums = 2;
     PlantCentralGSHP::Wrapper(1).ChillerHeater.allocate(2);
     // First test in SizeWrapper, so need to set that
@@ -140,17 +140,17 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // Calculate expected values
     Real64 rho_evap = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp(),
+                                                        DataGlobalConstants::CWInitConvTemp,
                                                         DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp(),
+                                                            DataGlobalConstants::CWInitConvTemp,
                                                             DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
     Real64 rho_cond = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp(),
+                                                        DataGlobalConstants::CWInitConvTemp,
                                                         DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 

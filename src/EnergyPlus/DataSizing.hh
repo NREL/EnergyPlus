@@ -53,10 +53,14 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSizing {
 
@@ -1132,7 +1136,7 @@ namespace DataSizing {
         // Default Constructor
         OARequirementsData()
             : OAFlowMethod(0), OAFlowPerPerson(0.0), OAFlowPerArea(0.0), OAFlowPerZone(0.0), OAFlowACH(0.0),
-              OAFlowFracSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), OAPropCtlMinRateSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), CO2MaxMinLimitErrorCount(0),
+              OAFlowFracSchPtr(DataGlobalConstants::ScheduleAlwaysOn), OAPropCtlMinRateSchPtr(DataGlobalConstants::ScheduleAlwaysOn), CO2MaxMinLimitErrorCount(0),
               CO2MaxMinLimitErrorIndex(0), CO2GainErrorCount(0), CO2GainErrorIndex(0)
         {
         }
@@ -1249,6 +1253,14 @@ namespace DataSizing {
     );
 
 } // namespace DataSizing
+
+struct SizingData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

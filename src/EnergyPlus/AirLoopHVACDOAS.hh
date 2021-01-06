@@ -48,10 +48,13 @@
 #ifndef ENERGYPLUS_AIRLOOPHVACDOAS_HH
 #define ENERGYPLUS_AIRLOOPHVACDOAS_HH
 
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/BaseData.hh>
+// C++ Headers
 #include <string>
 #include <vector>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
