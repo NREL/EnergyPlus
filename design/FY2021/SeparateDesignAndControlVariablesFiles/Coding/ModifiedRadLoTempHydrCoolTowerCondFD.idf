@@ -1384,7 +1384,7 @@
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    JermyDesignObject1;                        !- Design Object
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject1, !- Name
@@ -1428,7 +1428,7 @@
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    JermyDesignObject1;                        !- Design Object
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     North Zone Radiant Floor,!- Name
@@ -1464,7 +1464,7 @@
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    JermyDesignObject1;                        !- Design Object
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
   ZoneHVAC:EquipmentList,

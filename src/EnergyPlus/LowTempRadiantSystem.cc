@@ -418,6 +418,8 @@ namespace LowTempRadiantSystem {
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
 
+        Array1D_string RadDesignNames;
+
         MaxAlphas = 0;
         MaxNumbers = 0;
 
@@ -483,6 +485,7 @@ namespace LowTempRadiantSystem {
         ElecRadSysNumericFields.allocate(NumOfElecLowTempRadSys);
         HydronicRadiantSysNumericFields.allocate(NumOfHydrLowTempRadSys);
         HydronicRadiantSysDesign.allocate(NumOfHydrLowTempRadSysDes);
+        RadDesignNames.allocate(NumOfHydrLowTempRadSysDes);
 
         // make sure data is gotten for surface lists
         GetNumberOfSurfaceLists(state);
@@ -518,7 +521,10 @@ namespace LowTempRadiantSystem {
             // General user input data
             thisRadSysDesign.designName         = Alphas(1);
             thisRadSysDesign.HotThrottlRange    = Numbers(1);
+
+            RadDesignNames(Item) =  Alphas(1);
         }
+
 
         // Obtain all of the user data related to hydronic low temperature radiant systems...
         BaseNum = 0;
@@ -827,8 +833,8 @@ namespace LowTempRadiantSystem {
             thisRadSys.CircLength = Numbers(16);
 
             thisRadSys.designObjectName = Alphas(18);
-            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList(Alphas(18), HydronicRadiantSysDesign);
 
+            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, RadDesignNames);
 
             thisRadSys.schedNameChangeoverDelay = Alphas(19);
             if (!lAlphaBlanks(18)) {
@@ -3281,7 +3287,7 @@ namespace LowTempRadiantSystem {
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
-        RadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(2)}; // Contains the data for variable flow hydronic systems
+        RadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
         ControlNode = 0;
         MaxWaterFlow = 0.0;
@@ -3317,7 +3323,11 @@ namespace LowTempRadiantSystem {
 
             if (this->HotSetptSchedPtr > 0) {
 //                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, this->HotThrottlRange);
-                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, variableFlowDesignDataObject.HotThrottlRange );
+                Real64 a;
+                a = variableFlowDesignDataObject.HotThrottlRange;
+                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state,
+                                                                                 this->HotSetptSchedPtr,
+                                                                                 variableFlowDesignDataObject.HotThrottlRange );
             } else { // This system is not capable of heating, set OffTempHeat to something really low
                 OffTempHeat = LowTempHeating;
             }
