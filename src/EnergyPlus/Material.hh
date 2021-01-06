@@ -293,8 +293,6 @@ struct MaterialData : BaseGlobalStruct
     }
 };
 
-extern MaterialData dataMaterial;
-
 }   // namespace EnergyPlus
 
 #endif

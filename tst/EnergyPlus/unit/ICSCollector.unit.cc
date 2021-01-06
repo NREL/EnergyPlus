@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -63,6 +62,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataEnvironment;
-using DataGlobals::BeginEnvrnFlag;
 
 TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest)
 {
@@ -89,10 +88,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     InitializePsychRoutines();
 
-    BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
-    SkyTemp = 24.0;
-    IsRain = false;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->SkyTemp = 24.0;
+    state->dataEnvrn->IsRain = false;
     MatNum = 1;
     ZoneNum = 1;
     SurfNum = 1;
@@ -110,11 +109,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface(SurfNum).ExtConvCoeff = 0;
     Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
-    dataConstruction.Construct.allocate(ConstrNum);
-    dataConstruction.Construct(ConstrNum).LayerPoint.allocate(MatNum);
-    dataConstruction.Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    dataMaterial.Material.allocate(MatNum);
-    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
+    state->dataConstruction->Construct.allocate(ConstrNum);
+    state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
+    state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
+    state->dataMaterial->Material.allocate(MatNum);
+    state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -126,15 +125,15 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    QRadSWOutIncident.allocate(1);
-    QRadSWOutIncident(1) = 0.0;
+    SurfQRadSWOutIncident.allocate(1);
+    SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    state.dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
+    state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
-    Real64 const Cv(0.1);        // Oriface coefficient for volume-based discharge, wind-driven [--]
-    Real64 const Cd(0.5);        // oriface coefficient for discharge,  bouyancy-driven [--]
+    Real64 const Cv(0.1);        // Orifice coefficient for volume-based discharge, wind-driven [--]
+    Real64 const Cd(0.5);        // Orifice coefficient for discharge,  buoyancy-driven [--]
     Real64 const HdeltaNPL(3.0); // Height difference from neutral pressure level [m]
     Real64 const SolAbs(0.75);   // solar absorptivity of baffle [--]
     Real64 const AbsExt(0.8);    // thermal absorptance/emittance of baffle material [--]
@@ -150,10 +149,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 IscRpt;               //
     Real64 MdotVentRpt;          // gap air mass flow rate [kg/s]
     Real64 VdotWindRpt;          // gap wind driven air volume flow rate [m3/s]
-    Real64 VdotBouyRpt;          // gap bouyancy driven volume flow rate [m3/s]
+    Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(state.dataConvectionCoefficients, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+    CalcPassiveExteriorBaffleGap(*state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
                                  AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
                                  MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
@@ -164,12 +163,12 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // deallocated variables
     Surface.deallocate();
-    dataConstruction.Construct(ConstrNum).LayerPoint.deallocate();
-    dataConstruction.Construct.deallocate();
-    dataMaterial.Material.deallocate();
+    state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
+    state->dataConstruction->Construct.deallocate();
+    state->dataMaterial->Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();
     TH.deallocate();
-    QRadSWOutIncident.deallocate();
+    SurfQRadSWOutIncident.deallocate();
 }

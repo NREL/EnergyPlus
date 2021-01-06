@@ -52,12 +52,14 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct DataGlobal;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSystemVariables {
 
@@ -69,8 +71,6 @@ namespace DataSystemVariables {
     extern int const iASCII_CR;    // endline value when just CR instead of CR/LF
     extern int const iUnicode_end; // endline value when Unicode file
     extern char const tabchar;
-    extern int const GoodIOStatValue;       // good value for IOStat during reads/writes
-    extern int const MaxTimingStringLength; // string length for timing string array
 
     extern std::string const DDOnlyEnvVar;             // Only run design days
     extern std::string const ReverseDDEnvVar;          // Reverse DD during run
@@ -170,18 +170,27 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(OutputFiles &outputFiles,
+    void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName              // Blank if not found.
+                                std::string &foundFileName,             // Blank if not found.
+                                const std::string contextString = std::string()
     );
 
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void processEnvironmentVariables(DataGlobal const &dataGlobals);
+    void processEnvironmentVariables(EnergyPlusData &state);
 
 } // namespace DataSystemVariables
+
+struct SystemVarsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

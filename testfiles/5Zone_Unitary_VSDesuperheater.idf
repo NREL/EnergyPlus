@@ -198,7 +198,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     yes,                     !- Run Simulation for Sizing Periods
-    no;                      !- Run Simulation for Weather File Run Periods
+    no,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -2754,7 +2756,7 @@
     ,                        !- Basin Heater Operating Schedule Name
     36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -2828,7 +2830,7 @@
     autosize,                !- Nominal Capacity {W}
     Main Heating Coil 1 Inlet Node,  !- Air Inlet Node Name
     Reheat Coil Air Inlet Node,  !- Air Outlet Node Name
-    ;                        !- Temperature Setpoint Node Name
+    Reheat Coil Air Inlet Node;  !- Temperature Setpoint Node Name
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
@@ -2906,25 +2908,25 @@
 
   Output:Variable,*,Cooling Coil Part Load Ratio,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
   Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,People Occupant Count,hourly;
 
@@ -2992,7 +2994,7 @@
 
   Output:Variable,*,Unitary System Latent Heating Rate,hourly;
 
-  Output:Variable,*,Unitary System Ancillary Electric Power,hourly;
+  Output:Variable,*,Unitary System Ancillary Electricity Rate,hourly;
 
   Output:Variable,*,Unitary System Dehumidification Induced Heating Demand Rate,hourly;
 
@@ -3002,7 +3004,7 @@
 
   Output:Variable,*,Unitary System Frost Control Status,hourly;
 
-  Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly;
+  Output:Variable,*,Unitary System Heating Ancillary Electricity Energy,hourly;
 
   Output:Variable,*,Unitary System Cycling Ratio,hourly;
 

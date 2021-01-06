@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -61,9 +62,10 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -72,7 +74,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -1094,24 +1095,24 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetZoneData(localErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetConstructData(localErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, localErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;
@@ -1128,25 +1129,27 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
     surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
-    DataHeatBalFanSys::MAT.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataHeatBalFanSys::MCPThermChim.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ThermChimAMFL.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::MCPTThermChim.allocate(DataGlobals::NumOfZones);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+
+    DataHeatBalFanSys::MCPThermChim.allocate(state->dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::ZnAirRpt.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
-    ThermalChimney::GetThermalChimney(localErrorsFound);
+    ThermalChimney::GetThermalChimney(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
+    ThermalChimney::CalcThermalChimney(*state);
+    EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
-    ThermalChimney::ThermalChimneySys(1).EMSOverrideOn = true;
-    ThermalChimney::ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
+    state->dataThermalChimneys->ThermalChimneySys(1).EMSOverrideOn = true;
+    state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
+    ThermalChimney::CalcThermalChimney(*state);
+    EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
 
 }

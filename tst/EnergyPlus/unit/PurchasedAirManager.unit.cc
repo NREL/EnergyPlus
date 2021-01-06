@@ -58,21 +58,23 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -147,7 +149,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
@@ -159,7 +161,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
 
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 60.0;
@@ -167,32 +169,32 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
 
-    PurchAir.allocate(10);
-    PurchAirNumericFields.allocate(10);
-    PurchAirNumericFields(PurchAirNum).FieldNames.allocate(8);
-    PurchAirNumericFields(PurchAirNum).FieldNames(5) = "Maximum Heating Air Flow Rate";
-    PurchAirNumericFields(PurchAirNum).FieldNames(6) = "Maximum Sensible Heating Capacity";
-    PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
-    PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
+    state->dataPurchasedAirMgr->PurchAir.allocate(10);
+    state->dataPurchasedAirMgr->PurchAirNumericFields.allocate(10);
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames.allocate(8);
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(5) = "Maximum Heating Air Flow Rate";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(6) = "Maximum Sensible Heating Capacity";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
 
     ZoneSizingRunDone = true;
 
-    PurchAir(PurchAirNum).HeatingLimit = LimitFlowRateAndCapacity;
-    PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
-    PurchAir(PurchAirNum).MaxHeatSensCap = AutoSize;
-    PurchAir(PurchAirNum).CoolingLimit = LimitFlowRateAndCapacity;
-    PurchAir(PurchAirNum).MaxCoolVolFlowRate = AutoSize;
-    PurchAir(PurchAirNum).MaxCoolTotCap = AutoSize;
-    PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
-    PurchAir(PurchAirNum).Name = "Ideal Loads 1";
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRateAndCapacity;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRateAndCapacity;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolTotCap = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(state, PurchAirNum);
-    EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
-    EXPECT_NEAR(50985.58, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
-    EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
-    EXPECT_NEAR(30844.14, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1);
+    SizePurchasedAir(*state, PurchAirNum);
+    EXPECT_DOUBLE_EQ(1.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate);
+    EXPECT_NEAR(50985.58, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
+    EXPECT_DOUBLE_EQ(2.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate);
+    EXPECT_NEAR(30844.14, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolTotCap, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
@@ -201,7 +203,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
@@ -213,7 +215,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
 
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 65.0; // this is used, so make it higher
@@ -221,32 +223,32 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
 
-    PurchAir.allocate(10);
-    PurchAirNumericFields.allocate(10);
-    PurchAirNumericFields(PurchAirNum).FieldNames.allocate(8);
-    PurchAirNumericFields(PurchAirNum).FieldNames(5) = "Maximum Heating Air Flow Rate";
-    PurchAirNumericFields(PurchAirNum).FieldNames(6) = "Maximum Sensible Heating Capacity";
-    PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
-    PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
+    state->dataPurchasedAirMgr->PurchAir.allocate(10);
+    state->dataPurchasedAirMgr->PurchAirNumericFields.allocate(10);
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames.allocate(8);
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(5) = "Maximum Heating Air Flow Rate";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(6) = "Maximum Sensible Heating Capacity";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
+    state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
 
     ZoneSizingRunDone = true;
 
-    PurchAir(PurchAirNum).HeatingLimit = LimitFlowRateAndCapacity;
-    PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
-    PurchAir(PurchAirNum).MaxHeatSensCap = AutoSize;
-    PurchAir(PurchAirNum).CoolingLimit = LimitFlowRateAndCapacity;
-    PurchAir(PurchAirNum).MaxCoolVolFlowRate = AutoSize;
-    PurchAir(PurchAirNum).MaxCoolTotCap = AutoSize;
-    PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
-    PurchAir(PurchAirNum).Name = "Ideal Loads 1";
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRateAndCapacity;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRateAndCapacity;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolTotCap = AutoSize;
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
+    state->dataPurchasedAirMgr->PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(state, PurchAirNum);
-    EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
-    EXPECT_NEAR(63731.97, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
-    EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
-    EXPECT_NEAR(41078.43, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1); // larger than test1 above
+    SizePurchasedAir(*state, PurchAirNum);
+    EXPECT_DOUBLE_EQ(1.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate);
+    EXPECT_NEAR(63731.97, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
+    EXPECT_DOUBLE_EQ(2.0, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolVolFlowRate);
+    EXPECT_NEAR(41078.43, state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxCoolTotCap, 0.1); // larger than test1 above
 }
 
 TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
@@ -284,20 +286,21 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
-    GetPurchasedAir();
+    GetPurchasedAir(*state);
 
-    EXPECT_EQ(PurchasedAirManager::PurchAir.size(), 1u);
+    auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
+    EXPECT_EQ(PurchAir.size(), 1u);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     EXPECT_EQ(PurchAir(1).MaxHeatSuppAirTemp, 50.0);
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirTemp, 13.0);
     EXPECT_EQ(PurchAir(1).MaxHeatSuppAirHumRat, 0.015);
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirHumRat, 0.009);
-    EXPECT_EQ(PurchAir(1).HeatingLimit, NoLimit);
-    EXPECT_EQ(PurchAir(1).CoolingLimit, NoLimit);
-    EXPECT_EQ(PurchAir(1).DehumidCtrlType, ConstantSupplyHumidityRatio);
-    EXPECT_EQ(PurchAir(1).HumidCtrlType, ConstantSupplyHumidityRatio);
+    EXPECT_EQ(PurchAir(1).HeatingLimit, LimitType::NoLimit);
+    EXPECT_EQ(PurchAir(1).CoolingLimit, LimitType::NoLimit);
+    EXPECT_EQ(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
+    EXPECT_EQ(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
@@ -384,33 +387,35 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
-
+    auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).ReturnPlenumIndex, 1);
     // The ideal loads air system inlet air node is equal to the zone return plenum outlet node
-    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state.dataZonePlenum.ZoneRetPlenCond(1).OutletNode);
+    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state->dataZonePlenum->ZoneRetPlenCond(1).OutletNode);
     // The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
     EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, ZoneEquipConfig(1).InletNode(1));
     // The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
     EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, ZoneEquipConfig(1).ExhaustNode(1));
     // The zone exhaust air node is equal to the zone return plenum inlet air node
-    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state.dataZonePlenum.ZoneRetPlenCond(1).InletNode(1));
+    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(1));
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
@@ -492,24 +497,279 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state->dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
+    auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+}
+
+TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  EAST ZONE,                      !- Name",
+        "  0,                              !- Direction of Relative North{ deg }",
+        "  0,                              !- X Origin{ m }",
+        "  0,                              !- Y Origin{ m }",
+        "  0,                              !- Z Origin{ m }",
+        "  1,                              !- Type",
+        "  1,                              !- Multiplier",
+        "  autocalculate,                  !- Ceiling Height{ m }",
+        "  autocalculate;                  !- Volume{ m3 }",
+
+        "ZoneHVAC:IdealLoadsAirSystem,",
+        "  ZONE 1 IDEAL LOADS,             !- Name",
+        "  ,                               !- Availability Schedule Name",
+        "  Zone Inlet Node,                !- Zone Supply Air Node Name",
+        "  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+        "  ,             !- System Inlet Air Node Name",
+        "  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+        "  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+        "  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+        "  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+        "  NoLimit,                        !- Heating Limit",
+        "  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+        "  ,                               !- Maximum Sensible Heating Capacity{ W }",
+        "  NoLimit,                        !- Cooling Limit",
+        "  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+        "  ,                               !- Maximum Total Cooling Capacity{ W }",
+        "  ,                               !- Heating Availability Schedule Name",
+        "  ,                               !- Cooling Availability Schedule Name",
+        "  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+        "  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+        "  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+        "  ,                               !- Design Specification Outdoor Air Object Name",
+        "  ,                               !- Outdoor Air Inlet Node Name",
+        "  ,                               !- Demand Controlled Ventilation Type",
+        "  ,                               !- Outdoor Air Economizer Type",
+        "  ,                               !- Heat Recovery Type",
+        "  ,                               !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+        "  ;                               !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,                      !- Zone Name",
+        "  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+        "  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+        "  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone Node,                      !- Zone Air Node Name",
+        "  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentList,",
+        "  ZoneEquipment,                  !- Name",
+        "  SequentialLoad,                 !- Load Distribution Scheme",
+        "  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+        "  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+        "  1,                              !- Zone Equipment 1 Cooling Sequence",
+        "  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  Output:EnergyManagementSystem,                                                                ",
+        "    Verbose,                 !- Actuator Availability Dictionary Reporting                      ",
+        "    Verbose,                 !- Internal Variable Availability Dictionary Reporting             ",
+        "    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
+
+        "EnergyManagementSystem:Actuator,",
+        "Mdot,",
+        "ZONE 1 IDEAL LOADS,",
+        "Ideal Loads Air System,",
+        "Air Mass Flow Rate;",
+
+        "EnergyManagementSystem:Actuator,",
+        "Tsupply,",
+        "ZONE 1 IDEAL LOADS,",
+        "Ideal Loads Air System,",
+        "Air TEMPERATURE;",
+
+        "EnergyManagementSystem:Sensor,",
+        "ZoneAirTemp,",
+        "EAST ZONE,",
+        "Zone Mean Air Temperature;",
+
+        "EnergyManagementSystem:OutputVariable,",
+        "MassstromIdealLoad_EMS, ! - Name",
+        "Mdot, ! - EMS Variable Name",
+        "Averaged, ! - Type of Data in Variable",
+        "SystemTimeStep; ! - Update Frequency",
+
+        "EnergyManagementSystem:OutputVariable,",
+        "SupplyTempIdealLoad_EMS, ! - Name",
+        "Tsupply, ! - EMS Variable Name",
+        "Averaged, ! - Type of Data in Variable",
+        "SystemTimeStep; ! - Update Frequency",
+
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Test inside HVAC system iteration Loop,",
+        "InsideHVACSystemIterationLoop,",
+        "Test_InsideHVACSystemIterationLoop;",
+
+        "EnergyManagementSystem:Program,",
+        "Test_InsideHVACSystemIterationLoop,",
+        "set Mdot = 0.1;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataGlobal->DoWeathSim = true;
+
+    bool ErrorsFound = false;
+    GetZoneData(*state, ErrorsFound);
+    Zone(1).SurfaceFirst = 1;
+    Zone(1).SurfaceLast = 1;
+    ScheduleManager::Schedule.allocate(1);
+    AllocateHeatBalArrays(*state);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    ZoneEquipConfig.allocate(1);
+
+    ZoneEquipConfig(1).IsControlled = true;
+    ZoneEquipConfig(1).NumInletNodes = 1;
+    ZoneEquipConfig(1).InletNode.allocate(1);
+    ZoneEquipConfig(1).InletNode(1) = 1;
+
+    ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    ZoneEquipConfig(1).NumExhaustNodes = 1;
+    ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataGlobal->TimeStepZone = 0.25;
+
+    EMSManager::CheckIfAnyEMS(*state); // get EMS input
+    EMSManager::GetEMSInput(*state);
+    state->dataEMSMgr->FinishProcessingUserInput = true;
+
+    bool FirstHVACIteration(true);
+
+    if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
+        GetPurchasedAir(*state);
+        state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+    }
+
+    state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideMdotOn = true;
+    state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
+    DataLoopNode::Node(2).Temp = 25.0;
+    DataLoopNode::Node(2).HumRat = 0.001;
+
+    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    Real64 SysOutputProvided;
+    Real64 MoistOutputProvided;
+
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 0.0);
+}
+
+TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  EAST ZONE,                      !- Name",
+        "  0,                              !- Direction of Relative North{ deg }",
+        "  0,                              !- X Origin{ m }",
+        "  0,                              !- Y Origin{ m }",
+        "  0,                              !- Z Origin{ m }",
+        "  1,                              !- Type",
+        "  1,                              !- Multiplier",
+        "  autocalculate,                  !- Ceiling Height{ m }",
+        "  autocalculate;                  !- Volume{ m3 }",
+
+        "ZoneHVAC:IdealLoadsAirSystem,",
+        "  ZONE 1 IDEAL LOADS,             !- Name",
+        "  ,                               !- Availability Schedule Name",
+        "  Zone Inlet Node,                !- Zone Supply Air Node Name",
+        "  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+        "  ,                               !- System Inlet Air Node Name",
+        "  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+        "  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+        "  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+        "  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+        "  LimitCapacity,                  !- Heating Limit",
+        "  ,                               !- Maximum Heating Air Flow Rate{ m3 / s }",
+        "  0,                              !- Maximum Sensible Heating Capacity{ W }",
+        "  NoLimit,                        !- Cooling Limit",
+        "  ,                               !- Maximum Cooling Air Flow Rate{ m3 / s }",
+        "  ,                               !- Maximum Total Cooling Capacity{ W }",
+        "  ,                               !- Heating Availability Schedule Name",
+        "  ,                               !- Cooling Availability Schedule Name",
+        "  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+        "  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+        "  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+        "  ,                               !- Design Specification Outdoor Air Object Name",
+        "  ,                               !- Outdoor Air Inlet Node Name",
+        "  ,                               !- Demand Controlled Ventilation Type",
+        "  ,                               !- Outdoor Air Economizer Type",
+        "  ,                               !- Heat Recovery Type",
+        "  ,                               !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+        "  ;                               !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,                      !- Zone Name",
+        "  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+        "  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+        "  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone Node,                      !- Zone Air Node Name",
+        "  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentList,",
+        "  ZoneEquipment,                  !- Name",
+        "  SequentialLoad,                 !- Load Distribution Scheme",
+        "  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+        "  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+        "  1,                              !- Zone Equipment 1 Cooling Sequence",
+        "  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataGlobal->DoWeathSim = true;
+
+    bool ErrorsFound = false;
+    GetZoneData(*state, ErrorsFound);
+    Zone(1).SurfaceFirst = 1;
+    Zone(1).SurfaceLast = 1;
+    ScheduleManager::Schedule.allocate(1);
+    AllocateHeatBalArrays(*state);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    bool FirstHVACIteration(true);
+    bool SimZone(true);
+    bool SimAir(false);
+
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
+                        SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
+
+
+    if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
+        GetPurchasedAir(*state);
+        state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+    }
+
+    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    Real64 SysOutputProvided;
+    Real64 MoistOutputProvided;
+
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+
+    EXPECT_EQ(SysOutputProvided, 0.0);
+    // #8365 Supply air mass flow rate should be zero during heating mode when capacity is limited to zero
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).SupplyAirMassFlowRate, 0.0);
 }

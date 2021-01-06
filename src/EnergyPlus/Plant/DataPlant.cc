@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 
 namespace EnergyPlus {
@@ -62,8 +61,6 @@ namespace DataPlant {
     // Condenser Loops.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::DoingSizing;
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 
@@ -105,11 +102,6 @@ namespace DataPlant {
     // Parameters for tolerance
     Real64 const LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     Real64 const DeltaTempTol(0.0001); // minimum significant loop temperature difference
-
-    // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    int const LoopType_Plant(1);
-    int const LoopType_Condenser(2);
-    int const LoopType_Both(3);
 
     // Parameters for FlowLock standardization
     int const FlowPumpQuery(-1); // Used to ask the pumps for their min/max avail based on no constraints
@@ -327,20 +319,20 @@ namespace DataPlant {
                                                "HeatPump:PlantLoop:EIR:Cooling",
                                                "HeatPump:PlantLoop:EIR:Heating"});
 
-    Array1D_int const ValidLoopEquipTypes(
+    Array1D<LoopType> const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,
-        {LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant,
-         LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant,
-         LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant,
-         LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant,
-         LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant,
-         LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both});
+        {LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
+         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant,
+         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
+         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
+         LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both});
 
     int const TypeOf_Other(-1);
     int const TypeOf_Boiler_Simple(1);

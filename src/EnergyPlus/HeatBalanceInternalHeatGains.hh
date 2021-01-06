@@ -49,11 +49,13 @@
 #define HeatBalanceInternalHeatGains_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-void SetupZoneInternalGain(int ZoneNum,
+void SetupZoneInternalGain(EnergyPlusData &state,
+                           int ZoneNum,
                            std::string const &cComponentObject, // object class name for device contributing internal gain
                            std::string const &cComponentName,   // user unique name for device
                            int IntGainComp_TypeOfNum,
@@ -66,6 +68,14 @@ void SetupZoneInternalGain(int ZoneNum,
                            Real64 *GenericContamGainRate = nullptr,
                            int RetNodeNum = 0 // for return air heat gains
 );
+
+struct HeatBalInternalHeatGainsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

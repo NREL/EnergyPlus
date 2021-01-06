@@ -49,10 +49,14 @@
 #define GeneratorFuelSupply_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GeneratorFuelSupply {
 
     // Data
@@ -71,13 +75,23 @@ namespace GeneratorFuelSupply {
 
     // Functions
 
-    void GetGeneratorFuelSupplyInput();
+    void clear_state();
+
+    void GetGeneratorFuelSupplyInput(EnergyPlusData &state);
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(EnergyPlus::OutputFiles &outputFiles, int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
+
+struct GeneratorFuelSupplyData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

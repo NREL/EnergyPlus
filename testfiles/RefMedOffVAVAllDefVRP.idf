@@ -79,7 +79,9 @@
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     NO,                      !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Building,
     Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name
@@ -5957,7 +5959,7 @@
     VAV_1 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_1_OA-VAV_1_CoolCNode,!- Mixed Air Node Name
     VAV_1_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -5968,7 +5970,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_1_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6001,7 +6003,7 @@
     VAV_2 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_2_OA-VAV_2_CoolCNode,!- Mixed Air Node Name
     VAV_2_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -6012,7 +6014,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_2_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6045,7 +6047,7 @@
     VAV_3 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_3_OA-VAV_3_CoolCNode,!- Mixed Air Node Name
     VAV_3_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -6056,7 +6058,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_3_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -7003,21 +7005,6 @@
     Until: 24:00,0.0;        !- Field 17
 
   Schedule:Compact,
-    MinOA_MotorizedDamper_Sched,  !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 07:00,0.0,        !- Field 3
-    Until: 22:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 07:00,0.0,        !- Field 10
-    Until: 18:00,1.0,        !- Field 12
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0;        !- Field 17
-
-  Schedule:Compact,
     Seasonal-Reset-Supply-Air-Temp-Sch,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -7715,7 +7702,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7793,13 +7780,13 @@
 
   Output:Meter,InteriorEquipment:Electricity,HOURLY;
 
-  Output:Meter,Gas:Facility,HOURLY;
+  Output:Meter,NaturalGas:Facility,HOURLY;
 
-  Output:Meter,Heating:Gas,HOURLY;
+  Output:Meter,Heating:NaturalGas,HOURLY;
 
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
+  Output:Meter,InteriorEquipment:NaturalGas,HOURLY;
 
-  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
+  Output:Meter,Water Heater:WaterSystems:NaturalGas,HOURLY;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
 
@@ -7807,7 +7794,7 @@
 
   Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
 
-  Output:Variable,*,Boiler Gas Energy,HOURLY;
+  Output:Variable,*,Boiler NaturalGas Energy,HOURLY;
 
   Output:Variable,*,Boiler Inlet Temperature,HOURLY;
 
@@ -7839,7 +7826,7 @@
 
   Output:Variable,*,Air System Total Cooling Energy,HOURLY;
 
-  Output:Variable,*,Air System Fan Electric Energy,HOURLY;
+  Output:Variable,*,Air System Fan Electricity Energy,HOURLY;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
@@ -7925,25 +7912,25 @@
   Output:Table:Monthly,
     Heating Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Heating Coil Gas Rate,   !- Variable or Meter 1 Name
+    Heating Coil NaturalGas Rate,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating Coil Gas Rate,   !- Variable or Meter 2 Name
+    Heating Coil NaturalGas Rate,  !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     Cooling Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Cooling Coil Electric Power,  !- Variable or Meter 1 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Coil Electric Power,  !- Variable or Meter 2 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     Fan Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Fan Electric Power,      !- Variable or Meter 1 Name
+    Fan Electricity Rate,    !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Fan Electric Power,      !- Variable or Meter 2 Name
+    Fan Electricity Rate,    !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:TimeBins,
@@ -8063,4 +8050,3 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-

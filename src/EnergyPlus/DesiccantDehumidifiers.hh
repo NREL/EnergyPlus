@@ -53,12 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DesiccantDehumidifiers {
 
@@ -254,7 +256,8 @@ namespace DesiccantDehumidifiers {
                                    bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void ControlDesiccantDehumidifier(int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void ControlDesiccantDehumidifier(EnergyPlusData &state,
+                                      int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                       Real64 &HumRatNeeded,         // process air leaving humidity ratio set by controller [kg water/kg air]
                                       bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     );
@@ -326,6 +329,14 @@ namespace DesiccantDehumidifiers {
     //         any information disclosed therein.
 
 } // namespace DesiccantDehumidifiers
+
+struct DesiccantDehumidifiersData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -53,17 +53,17 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BoilersData;
-struct BranchInputManagerData;
 
 namespace Boilers {
 
@@ -79,7 +79,7 @@ namespace Boilers {
     {
         // Members
         std::string Name;             // user identifier
-        int FuelType;                 // resource type assignment
+        DataGlobalConstants::ResourceType FuelType;  // resource type assignment
         int TypeNum;                  // plant loop type identifier
         int LoopNum;                  // plant loop connection
         int LoopSideNum;              // plant loop side connection
@@ -91,7 +91,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 NomEffic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        DataPlant::FlowMode FlowMode;       // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode; // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -139,7 +139,8 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
+            : FuelType(DataGlobalConstants::ResourceType::None), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false),
+              ON(false), NomCap(0.0),
               NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
@@ -151,33 +152,34 @@ namespace Boilers {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void SetupOutputVars();
+        void SetupOutputVars(EnergyPlusData &state);
 
-        void InitBoiler(BranchInputManagerData &dataBranchInputManager); // number of the current boiler being simulated
+        void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
-        void SizeBoiler();
+        void SizeBoiler(EnergyPlusData &state);
 
-        void CalcBoilerModel(Real64 MyLoad,    // W - hot water demand to be met by boiler
+        void CalcBoilerModel(EnergyPlusData &state,
+                             Real64 MyLoad,    // W - hot water demand to be met by boiler
                              bool RunFlag,     // TRUE if boiler operating
-                             int EquipFlowCtrl // Flow control mode for the equipment
+                             DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
                                  bool RunFlag   // boiler on when TRUE
         );
 
-        static PlantComponent *factory(BoilersData &boilers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetBoilerInput(BoilersData &boilers);
+    void GetBoilerInput(EnergyPlusData &state);
 
 } // namespace Boilers
 
@@ -185,11 +187,12 @@ namespace Boilers {
         int numBoilers = 0;
         bool getBoilerInputFlag = true;
         Array1D<Boilers::BoilerSpecs> Boiler;
+
         void clear_state() override
         {
-            numBoilers = 0;
-            getBoilerInputFlag = true;
-            Boiler.deallocate();
+            this->numBoilers = 0;
+            this->getBoilerInputFlag = true;
+            this->Boiler.deallocate();
         }
     };
 

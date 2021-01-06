@@ -49,44 +49,43 @@
 #define ZoneContaminantPredictorCorrector_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    //forward declarations
-    struct ZonePlenumData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct ZoneContaminantPredictorCorrectorData;
-    struct ZonePlenumData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZoneContaminantPredictorCorrector {
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state, int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(EnergyPlusData &state,
+                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneContaminanInputs(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
+    void GetZoneContaminanInputs(EnergyPlusData &state);
 
-    void GetZoneContaminanSetPoints();
+    void GetZoneContaminanSetPoints(EnergyPlusData &state);
 
-    void InitZoneContSetPoints(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
+    void InitZoneContSetPoints(EnergyPlusData &state);
 
-    void PredictZoneContaminants(bool const ShortenTimeStepSys,
+    void PredictZoneContaminants(EnergyPlusData &state,
+                                 bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void PushZoneTimestepHistories();
+    void PushZoneTimestepHistories(EnergyPlusData &state);
 
-    void PushSystemTimestepHistories();
+    void PushSystemTimestepHistories(EnergyPlusData &state);
 
-    void RevertZoneTimestepHistories();
+    void RevertZoneTimestepHistories(EnergyPlusData &state);
 
-    void InverseModelCO2(int const ZoneNum,           // Zone number
+    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -94,7 +93,8 @@ namespace ZoneContaminantPredictorCorrector {
                          Real64 &RhoAir               // Air density
     );
 
-    void CorrectZoneContaminants(ZonePlenumData &dataZonePlenum, bool const ShortenTimeStepSys,
+    void CorrectZoneContaminants(EnergyPlusData &state,
+                                 bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
@@ -111,18 +111,25 @@ namespace ZoneContaminantPredictorCorrector {
         int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
         int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
         int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
+        bool MyOneTimeFlag = true;
+        bool MyEnvrnFlag = true;
+        bool MyDayFlag = true;
+        bool MyConfigOneTimeFlag = true;
 
-        void clear_state() override {
-            GetZoneAirContamInputFlag = true;
-            TotGCGenConstant = 0;
-            TotGCGenPDriven = 0;
-            TotGCGenCutoff = 0;
-            TotGCGenDecay = 0;
-            TotGCBLDiff = 0;
-            TotGCDVS = 0;
-            TotGCDRS = 0;
-            DataContaminantBalance::Contaminant.CO2Simulation = false;
-            DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+        void clear_state() override
+        {
+            this->GetZoneAirContamInputFlag = true;
+            this->TotGCGenConstant = 0;
+            this->TotGCGenPDriven = 0;
+            this->TotGCGenCutoff = 0;
+            this->TotGCGenDecay = 0;
+            this->TotGCBLDiff = 0;
+            this->TotGCDVS = 0;
+            this->TotGCDRS = 0;
+            this->MyOneTimeFlag = true;
+            this->MyEnvrnFlag = true;
+            this->MyDayFlag = true;
+            this->MyConfigOneTimeFlag = true;
         }
 
         // Default Constructor

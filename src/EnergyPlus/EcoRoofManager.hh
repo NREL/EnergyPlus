@@ -49,9 +49,13 @@
 #define EcoRoofManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace EcoRoofManager {
 
@@ -70,14 +74,15 @@ namespace EcoRoofManager {
 
     // Functions
 
-    void CalcEcoRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
                      int &ConstrNum,    // Indicator for construction index for the current surface
                      Real64 &TempExt    // Exterior temperature boundary condition
     );
 
-    void UpdateSoilProps(Real64 &Moisture,
+    void UpdateSoilProps(EnergyPlusData &state,
+                         Real64 &Moisture,
                          Real64 &MeanRootMoisture,
                          Real64 const MoistureMax,
                          Real64 const MoistureResidual,
@@ -93,6 +98,14 @@ namespace EcoRoofManager {
     );
 
 } // namespace EcoRoofManager
+
+struct EcoRoofManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

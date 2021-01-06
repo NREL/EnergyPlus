@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSurfaceLists {
 
@@ -127,13 +131,21 @@ namespace DataSurfaceLists {
 
     void clear_state();
 
-    void GetSurfaceListsInputs();
+    void GetSurfaceListsInputs(EnergyPlusData &state);
 
-    int GetNumberOfSurfaceLists();
+    int GetNumberOfSurfaceLists(EnergyPlusData &state);
 
-    int GetNumberOfSurfListVentSlab();
+    int GetNumberOfSurfListVentSlab(EnergyPlusData &state);
 
 } // namespace DataSurfaceLists
+
+struct SurfaceListsData : BaseGlobalStruct
+{
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -40,7 +40,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:GroundTemperature:BuildingSurface,19.96,19.94,19.99,20.04,20.09,20.17,20.21,20.24,20.23,20.20,20.17,20.12;
 
@@ -180,7 +182,7 @@
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.0,                     !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
     PVModule(glass),         !- Outside Layer
     PVModule(glass),         !- Layer 2
     B4 - 3 IN INSULATION,    !- Layer 3
@@ -1108,13 +1110,13 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Power,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Rate,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Power,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Rate,hourly;
 
   Output:Variable,*,Generator PV Array Efficiency,hourly;
 

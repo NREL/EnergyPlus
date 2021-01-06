@@ -58,9 +58,6 @@
 
 #include <EnergyPlus/api/TypeDefs.h>
 
-// macro to suppress unused parameter
-// UNUSED( foo );
-#define EP_UNUSED(expr)
 // macro to guarantee array sizing in debug builds
 #define EP_SIZE_CHECK(array, min_size) assert(min_size >= 0);assert(array.size() >= (size_t)min_size)
 
@@ -80,7 +77,6 @@ typedef std::int64_t Int64;
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/Array6D.fwd.hh>
-#include <ObjexxFCL/IOFlags.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
 #include <ObjexxFCL/Omit.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
@@ -130,7 +126,6 @@ using ObjexxFCL::Array4D;
 using ObjexxFCL::Array4D_int;
 using ObjexxFCL::Array5D;
 using ObjexxFCL::Array6D;
-using ObjexxFCL::IOFlags;
 using ObjexxFCL::MArray1;
 using ObjexxFCL::Optional;
 using ObjexxFCL::Optional_bool;

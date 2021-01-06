@@ -59,6 +59,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
@@ -66,8 +67,6 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 {
-    ShowMessage("Begin Test: SortAndStringUtilitiesTest, Basic");
-
     Array1D_string Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
     Array1D_int iAlphas(5);
     SetupAndSort(Alphas, iAlphas);

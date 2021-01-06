@@ -49,11 +49,13 @@
 #define ReturnAirPathManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ReturnAirPathManager {
 
@@ -75,7 +77,7 @@ namespace ReturnAirPathManager {
 
     void SimReturnAirPath(EnergyPlusData &state);
 
-    void GetReturnAirPathInput();
+    void GetReturnAirPathInput(EnergyPlusData &state);
 
     void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
 
@@ -84,6 +86,14 @@ namespace ReturnAirPathManager {
     void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
 
 } // namespace ReturnAirPathManager
+
+struct ReturnAirPathMgr : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

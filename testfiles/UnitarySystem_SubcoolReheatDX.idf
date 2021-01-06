@@ -9,7 +9,7 @@
 !                          air-to-air heat pump (single and multi-speed) and single-speed water to
 !                          air heat pump.
 !
-! Highlights:              A system serving SPACE1-1specifies a subcool reheat DX cooling coil to provide space cooling 
+! Highlights:              A system serving SPACE1-1specifies a subcool reheat DX cooling coil to provide space cooling
 !                          and dehumification simultaneously.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -108,7 +108,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -201,9 +201,11 @@
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
-    No,                     !- Do Plant Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C
 
@@ -1701,7 +1703,6 @@
     HVACTemplate Any Number, !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-!    Until: 24:00,55;         !- Field 3
     Until: 24:00,60;         !- Field 3
 
 ! For cooling, recover 1 hr early
@@ -2295,9 +2296,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2307,9 +2306,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -2346,7 +2343,7 @@
     All Zones Dual SP Control;  !- Control 1 Name
 
   ZoneControl:Humidistat,
-    SPACE1-1 Humidistat,  !- Name
+    SPACE1-1 Humidistat,     !- Name
     SPACE1-1,                !- Zone Name
     HVACTemplate-Always 4,   !- Humidifying Relative Humidity Setpoint Schedule Name
     HVACTemplate-Always 60;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
@@ -2381,7 +2378,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD SPACE1-1;       !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD SPACE1-1,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD SPACE1-1,       !- Name
@@ -2400,7 +2401,7 @@
     SPACE1-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE1-1 DirectAir ADU,   !- Zone Equipment 1 Name
+    SPACE1-1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2414,91 +2415,91 @@
     All Zones Dual SP Control;  !- Control 1 Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE1-1 Air Terminal,          !- Name
-    ,    !- Availability Schedule Name
+    SPACE1-1 Air Terminal,   !- Name
+    ,                        !- Availability Schedule Name
     SPACE1-1 Inlet Node ATInlet,  !- Air Inlet Node Name
-    SPACE1-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    SPACE1-1 Zone Equip Inlet,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
     ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE1-1 DirectAir ADU,      !- Name
-    SPACE1-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE1-1 DirectAir ADU,  !- Name
+    SPACE1-1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    SPACE1-1 Air Terminal,          !- Air Terminal Name
+    SPACE1-1 Air Terminal,   !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
     ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE2-1 Air Terminal,          !- Name
-    ,    !- Availability Schedule Name
+    SPACE2-1 Air Terminal,   !- Name
+    ,                        !- Availability Schedule Name
     SPACE2-1 Inlet Node ATInlet,  !- Air Inlet Node Name
-    SPACE2-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    SPACE2-1 Zone Equip Inlet,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
     ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE2-1 DirectAir ADU,      !- Name
-    SPACE2-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE2-1 DirectAir ADU,  !- Name
+    SPACE2-1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    SPACE2-1 Air Terminal,          !- Air Terminal Name
+    SPACE2-1 Air Terminal,   !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
     ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE3-1 Air Terminal,          !- Name
-    ,    !- Availability Schedule Name
+    SPACE3-1 Air Terminal,   !- Name
+    ,                        !- Availability Schedule Name
     SPACE3-1 Inlet Node ATInlet,  !- Air Inlet Node Name
-    SPACE3-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    SPACE3-1 Zone Equip Inlet,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
     ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE3-1 DirectAir ADU,      !- Name
-    SPACE3-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE3-1 DirectAir ADU,  !- Name
+    SPACE3-1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    SPACE3-1 Air Terminal,          !- Air Terminal Name
+    SPACE3-1 Air Terminal,   !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
     ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE4-1 Air Terminal,          !- Name
-    ,    !- Availability Schedule Name
+    SPACE4-1 Air Terminal,   !- Name
+    ,                        !- Availability Schedule Name
     SPACE4-1 Inlet Node ATInlet,  !- Air Inlet Node Name
-    SPACE4-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    SPACE4-1 Zone Equip Inlet,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
     ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE4-1 DirectAir ADU,      !- Name
-    SPACE4-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE4-1 DirectAir ADU,  !- Name
+    SPACE4-1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    SPACE4-1 Air Terminal,          !- Air Terminal Name
+    SPACE4-1 Air Terminal,   !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
     ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE5-1 Air Terminal,          !- Name
-    ,    !- Availability Schedule Name
+    SPACE5-1 Air Terminal,   !- Name
+    ,                        !- Availability Schedule Name
     SPACE5-1 Inlet Node ATInlet,  !- Air Inlet Node Name
-    SPACE5-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    SPACE5-1 Zone Equip Inlet,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
     ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE5-1 DirectAir ADU,      !- Name
-    SPACE5-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE5-1 DirectAir ADU,  !- Name
+    SPACE5-1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    SPACE5-1 Air Terminal,          !- Air Terminal Name
+    SPACE5-1 Air Terminal,   !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
     ;                        !- Design Specification Air Terminal Sizing Object Name
@@ -2533,7 +2534,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD SPACE2-1;       !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD SPACE2-1,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD SPACE2-1,       !- Name
@@ -2552,7 +2557,7 @@
     SPACE2-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE2-1 DirectAir ADU,   !- Zone Equipment 1 Name
+    SPACE2-1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2595,7 +2600,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD SPACE3-1;       !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD SPACE3-1,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD SPACE3-1,       !- Name
@@ -2614,7 +2623,7 @@
     SPACE3-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE3-1 DirectAir ADU,   !- Zone Equipment 1 Name
+    SPACE3-1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2657,7 +2666,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD SPACE4-1;       !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD SPACE4-1,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD SPACE4-1,       !- Name
@@ -2676,7 +2689,7 @@
     SPACE4-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE4-1 DirectAir ADU,   !- Zone Equipment 1 Name
+    SPACE4-1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2719,7 +2732,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD SPACE5-1;       !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD SPACE5-1,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD SPACE5-1,       !- Name
@@ -2738,7 +2755,7 @@
     SPACE5-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE5-1 DirectAir ADU,   !- Zone Equipment 1 Name
+    SPACE5-1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2904,7 +2921,6 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
-
   Coil:Cooling:DX,
     Sys 1 Furnace DX Cool Cooling Coil,  !- Name
     Sys 1 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
@@ -2959,105 +2975,106 @@
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     0,                       !- Evaporative Condenser Effectiveness {dimensionless}
     NormalTempCoolingCAPFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    NormalFlowCoolingCAPFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    NormalFlowCoolingCAPFFF, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
     NormalTempCoolingEIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    NormalFlowCoolingEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    NormalFlowCoolingEIRFFF, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
     Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    NormalSHRTempCoolingFFF,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    NormalSHRFlowCoolingFFF;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    NormalSHRTempCoolingFFF, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    NormalSHRFlowCoolingFFF; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   ! 0.9995,  R Squared
-  Curve:Biquadratic,  
-  NormalTempCoolingCAPFTemp,  !- Name
-  1.2047763641,  !- Coefficient1 Constant
-  -0.0319503564,  !- Coefficient2 x
-  0.0020745905,  !- Coefficient3 x**2
-  -0.000310579,  !- Coefficient4 y
-  -0.0000344954,  !- Coefficient5 y**2
-  -0.0004608937,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  18.33,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.7491,  !- Minimum Curve Output
-  1.3089,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
 
   Curve:Biquadratic,
-  NormalTempCoolingEIRFTemp,  !- Name
-  -0.0439174307,  !- Coefficient1 Constant
-  0.0620812106,  !- Coefficient2 x
-  -0.0014354652,  !- Coefficient3 x**2
-  0.0048739692,  !- Coefficient4 y
-  0.0007105116,  !- Coefficient5 y**2
-  -0.000974921,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  18.33,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.5453,  !- Minimum Curve Output
-  1.9105,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
-
-  Curve:Quadratic,
-  NormalFlowCoolingCAPFFF,  !- Name
-  0.7333333334,  !- Coefficient1 Constant
-  0.3733333333,  !- Coefficient2 x
-  -0.1066666667,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9533,  !- Minimum Curve Output
-  1.0333,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
-
-  Curve:Quadratic,
-  NormalFlowCoolingEIRFFF,  !- Name
-  1.1970044563,  !- Coefficient1 Constant
-  -0.2513822149,  !- Coefficient2 x
-  0.0543777586,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9677,  !- Minimum Curve Output
-  1.0391,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+    NormalTempCoolingCAPFTemp,  !- Name
+    1.2047763641,            !- Coefficient1 Constant
+    -0.0319503564,           !- Coefficient2 x
+    0.0020745905,            !- Coefficient3 x**2
+    -0.000310579,            !- Coefficient4 y
+    -0.0000344954,           !- Coefficient5 y**2
+    -0.0004608937,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.7491,                  !- Minimum Curve Output
+    1.3089,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
-  NormalSHRTempCoolingFFF,    !- Name
-  3.9903739056,   !- Coefficient1 Constant
-  -0.2158168778,  !- Coefficient2 x
-  0.0034746418,   !- Coefficient3 x**2
-  0.0310505116,   !- Coefficient4 y
-  -0.0000360698,  !- Coefficient5 y**2
-  -0.0016903602,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  23.89,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.4786, !- Minimum Curve Output
-  1.4194, !- Maximum Curve Output
-  Temperature,    !- Input Unit Type for X
-  Temperature,    !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
+    NormalTempCoolingEIRFTemp,  !- Name
+    -0.0439174307,           !- Coefficient1 Constant
+    0.0620812106,            !- Coefficient2 x
+    -0.0014354652,           !- Coefficient3 x**2
+    0.0048739692,            !- Coefficient4 y
+    0.0007105116,            !- Coefficient5 y**2
+    -0.000974921,            !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.5453,                  !- Minimum Curve Output
+    1.9105,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   Curve:Quadratic,
-  NormalSHRFlowCoolingFFF,    !- Name
-  0.5620186265,   !- Coefficient1 Constant
-  0.4708409870,   !- Coefficient2 x
-  -0.0285306092,  !- Coefficient3 x**2
-  0.7500000000,   !- Minimum Value of x
-  1.2500000000,   !- Maximum Value of x
-  0.8991000000,   !- Minimum Curve Output
-  1.11,   !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+    NormalFlowCoolingCAPFFF, !- Name
+    0.7333333334,            !- Coefficient1 Constant
+    0.3733333333,            !- Coefficient2 x
+    -0.1066666667,           !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9533,                  !- Minimum Curve Output
+    1.0333,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    NormalFlowCoolingEIRFFF, !- Name
+    1.1970044563,            !- Coefficient1 Constant
+    -0.2513822149,           !- Coefficient2 x
+    0.0543777586,            !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9677,                  !- Minimum Curve Output
+    1.0391,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    NormalSHRTempCoolingFFF, !- Name
+    3.9903739056,            !- Coefficient1 Constant
+    -0.2158168778,           !- Coefficient2 x
+    0.0034746418,            !- Coefficient3 x**2
+    0.0310505116,            !- Coefficient4 y
+    -0.0000360698,           !- Coefficient5 y**2
+    -0.0016903602,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.4786,                  !- Minimum Curve Output
+    1.4194,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    NormalSHRFlowCoolingFFF, !- Name
+    0.5620186265,            !- Coefficient1 Constant
+    0.4708409870,            !- Coefficient2 x
+    -0.0285306092,           !- Coefficient3 x**2
+    0.7500000000,            !- Minimum Value of x
+    1.2500000000,            !- Maximum Value of x
+    0.8991000000,            !- Minimum Curve Output
+    1.11,                    !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Alternative Mode 1,  !- Name
@@ -3086,111 +3103,116 @@
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     0,                       !- Evaporative Condenser Effectiveness {dimensionless}
     SubcoolTempCoolingCAPFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    SubcoolFlowCoolingCAPFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    SubcoolFlowCoolingCAPFFF,!- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
     SubcoolTempCoolingEIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    SubcoolFlowCoolingEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    SubcoolFlowCoolingEIRFFF,!- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
     Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    SubcoolSHRTempCoolingCAPFTemp,   !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    SubcoolSHRFlowCoolingCAPFFF;     !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SubcoolSHRTempCoolingCAPFTemp,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    SubcoolSHRFlowCoolingCAPFFF;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   ! 0.9995,  R Squared
-  Curve:Biquadratic,  
-  SubcoolTempCoolingCAPFTemp,  !- Name
-  1.0162460317,  !- Coefficient1 Constant
-  -0.0108091429,  !- Coefficient2 x
-  0.001296,  !- Coefficient3 x**2
-  -0.0040457143,  !- Coefficient4 y
-  -0.0000154286,  !- Coefficient5 y**2
-  -0.0002962286,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  23.89,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.6933,  !- Minimum Curve Output
-  1.1533,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
 
+  Curve:Biquadratic,
+    SubcoolTempCoolingCAPFTemp,  !- Name
+    1.0162460317,            !- Coefficient1 Constant
+    -0.0108091429,           !- Coefficient2 x
+    0.001296,                !- Coefficient3 x**2
+    -0.0040457143,           !- Coefficient4 y
+    -0.0000154286,           !- Coefficient5 y**2
+    -0.0002962286,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.6933,                  !- Minimum Curve Output
+    1.1533,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 0.9997,  R Squared
-  Curve:Biquadratic,  
-  SubcoolTempCoolingEIRFTemp,  !- Name
-  0.2634289781,  !- Coefficient1 Constant
-  0.0311157806,  !- Coefficient2 x
-  -0.0004774101,  !- Coefficient3 x**2
-  0.006660679,  !- Coefficient4 y
-  0.0006632907,  !- Coefficient5 y**2
-  -0.0010671286,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  23.89,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.6811,  !- Minimum Curve Output
-  1.8512,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Biquadratic,
+    SubcoolTempCoolingEIRFTemp,  !- Name
+    0.2634289781,            !- Coefficient1 Constant
+    0.0311157806,            !- Coefficient2 x
+    -0.0004774101,           !- Coefficient3 x**2
+    0.006660679,             !- Coefficient4 y
+    0.0006632907,            !- Coefficient5 y**2
+    -0.0010671286,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.6811,                  !- Minimum Curve Output
+    1.8512,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  SubcoolFlowCoolingCAPFFF,  !- Name
-  0.6,  !- Coefficient1 Constant
-  0.6285714286,  !- Coefficient2 x
-  -0.2285714286,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9429,  !- Minimum Curve Output
-  1.0286,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Quadratic,
+    SubcoolFlowCoolingCAPFFF,!- Name
+    0.6,                     !- Coefficient1 Constant
+    0.6285714286,            !- Coefficient2 x
+    -0.2285714286,           !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9429,                  !- Minimum Curve Output
+    1.0286,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  SubcoolFlowCoolingEIRFFF,  !- Name
-  1.2856060606,  !- Coefficient1 Constant
-  -0.4563131313,  !- Coefficient2 x
-  0.1707070707,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9819,  !- Minimum Curve Output
-  1.0394,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Quadratic,
+    SubcoolFlowCoolingEIRFFF,!- Name
+    1.2856060606,            !- Coefficient1 Constant
+    -0.4563131313,           !- Coefficient2 x
+    0.1707070707,            !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9819,                  !- Minimum Curve Output
+    1.0394,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   ! 0.9998,  R Squared
-  Curve:Biquadratic,  
-  SubcoolSHRTempCoolingCAPFTemp,  !- Name
-  3.9903739056,  !- Coefficient1 Constant
-  -0.2158168778,  !- Coefficient2 x
-  0.0034746418,  !- Coefficient3 x**2
-  0.0310505116,  !- Coefficient4 y
-  -0.0000360698,  !- Coefficient5 y**2
-  -0.0016903602,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  23.89,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.4786,  !- Minimum Curve Output
-  1.4194,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Biquadratic,
+    SubcoolSHRTempCoolingCAPFTemp,  !- Name
+    3.9903739056,            !- Coefficient1 Constant
+    -0.2158168778,           !- Coefficient2 x
+    0.0034746418,            !- Coefficient3 x**2
+    0.0310505116,            !- Coefficient4 y
+    -0.0000360698,           !- Coefficient5 y**2
+    -0.0016903602,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.4786,                  !- Minimum Curve Output
+    1.4194,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  SubcoolSHRFlowCoolingCAPFFF,  !- Name
-  0.4306934378,  !- Coefficient1 Constant
-  0.606484437,  !- Coefficient2 x
-  -0.0371126532,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.8647,  !- Minimum Curve Output
-  1.1308,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Quadratic,
+    SubcoolSHRFlowCoolingCAPFFF,  !- Name
+    0.4306934378,            !- Coefficient1 Constant
+    0.606484437,             !- Coefficient2 x
+    -0.0371126532,           !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.8647,                  !- Minimum Curve Output
+    1.1308,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Alternative Mode 2,  !- Name
@@ -3212,121 +3234,123 @@
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
-    0.16,                !- Gross Sensible Heat Ratio
-    1.41,                       !- Gross Cooling COP {W/W}
+    0.16,                    !- Gross Sensible Heat Ratio
+    1.41,                    !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     0,                       !- Evaporative Condenser Effectiveness {dimensionless}
     ReheatTempCoolingCAPFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ReheatFlowCoolingCAPFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    ReheatFlowCoolingCAPFFF, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
     ReheatTempCoolingEIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ReheatFlowCoolingEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    ReheatFlowCoolingEIRFFF, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
     Sys 1 Furnace DX Cool Cool Coil PLF,  !- Part Load Fraction Correlation Curve Name
     ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ReheatSHRTempCoolingCAPFTemp,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ReheatSHRFlowCoolingCAPFFF;    !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
+    ReheatSHRFlowCoolingCAPFFF;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   ! 0.9988,  R Squared
-  Curve:Biquadratic,  
-  ReheatTempCoolingCAPFTemp,  !- Name
-  1.5813223182,  !- Coefficient1 Constant
-  -0.0633198089,  !- Coefficient2 x
-  0.0032367633,  !- Coefficient3 x**2
-  -0.0007595651,  !- Coefficient4 y
-  0.0000014718,  !- Coefficient5 y**2
-  -0.0009643593,  !- Coefficient6 x*y
-  16.94,  !- Minimum Value of x
-  18.5,  !- Maximum Value of x
-  4.44,  !- Minimum Value of y
-  26.67,  !- Maximum Value of y
-  0.9818,  !- Minimum Curve Output
-  1.4364,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
 
+  Curve:Biquadratic,
+    ReheatTempCoolingCAPFTemp,  !- Name
+    1.5813223182,            !- Coefficient1 Constant
+    -0.0633198089,           !- Coefficient2 x
+    0.0032367633,            !- Coefficient3 x**2
+    -0.0007595651,           !- Coefficient4 y
+    0.0000014718,            !- Coefficient5 y**2
+    -0.0009643593,           !- Coefficient6 x*y
+    16.94,                   !- Minimum Value of x
+    18.5,                    !- Maximum Value of x
+    4.44,                    !- Minimum Value of y
+    26.67,                   !- Maximum Value of y
+    0.9818,                  !- Minimum Curve Output
+    1.4364,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 0.9993,  R Squared
-  Curve:Biquadratic,  
-  ReheatTempCoolingEIRFTemp,  !- Name
-  0.4050271551,  !- Coefficient1 Constant
-  0.0140945368,  !- Coefficient2 x
-  -0.0005979622,  !- Coefficient3 x**2
-  0.0093711466,  !- Coefficient4 y
-  0.0004496998,  !- Coefficient5 y**2
-  -0.0000795439,  !- Coefficient6 x*y
-  16.94,  !- Minimum Value of x
-  18.5,  !- Maximum Value of x
-  4.44,  !- Minimum Value of y
-  26.67,  !- Maximum Value of y
-  0.5036,  !- Minimum Curve Output
-  1.0084,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Biquadratic,
+    ReheatTempCoolingEIRFTemp,  !- Name
+    0.4050271551,            !- Coefficient1 Constant
+    0.0140945368,            !- Coefficient2 x
+    -0.0005979622,           !- Coefficient3 x**2
+    0.0093711466,            !- Coefficient4 y
+    0.0004496998,            !- Coefficient5 y**2
+    -0.0000795439,           !- Coefficient6 x*y
+    16.94,                   !- Minimum Value of x
+    18.5,                    !- Maximum Value of x
+    4.44,                    !- Minimum Value of y
+    26.67,                   !- Maximum Value of y
+    0.5036,                  !- Minimum Curve Output
+    1.0084,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  ReheatFlowCoolingCAPFFF,  !- Name
-  0.7454545455,  !- Coefficient1 Constant
-  0.4,  !- Coefficient2 x
-  -0.1454545455,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9636,  !- Minimum Curve Output
-  1.0182,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
 
+  Curve:Quadratic,
+    ReheatFlowCoolingCAPFFF, !- Name
+    0.7454545455,            !- Coefficient1 Constant
+    0.4,                     !- Coefficient2 x
+    -0.1454545455,           !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9636,                  !- Minimum Curve Output
+    1.0182,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  ReheatFlowCoolingEIRFFF,  !- Name
-  1.3219073627,  !- Coefficient1 Constant
-  -0.5498593181,  !- Coefficient2 x
-  0.2279519554,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.9908,  !- Minimum Curve Output
-  1.0377,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Quadratic,
+    ReheatFlowCoolingEIRFFF, !- Name
+    1.3219073627,            !- Coefficient1 Constant
+    -0.5498593181,           !- Coefficient2 x
+    0.2279519554,            !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.9908,                  !- Minimum Curve Output
+    1.0377,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   ! 0.9988,  R Squared
-  Curve:Biquadratic,  
-  ReheatSHRTempCoolingCAPFTemp,  !- Name
-  3.9903739056,  !- Coefficient1 Constant
-  -0.2158168778,  !- Coefficient2 x
-  0.0034746418,  !- Coefficient3 x**2
-  0.0310505116,  !- Coefficient4 y
-  -0.0000360698,  !- Coefficient5 y**2
-  -0.0016903602,  !- Coefficient6 x*y
-  16.67,  !- Minimum Value of x
-  22.22,  !- Maximum Value of x
-  23.89,  !- Minimum Value of y
-  51.67,  !- Maximum Value of y
-  0.4786,  !- Minimum Curve Output
-  1.4194,  !- Maximum Curve Output
-  Temperature,  !- Input Unit Type for X
-  Temperature,  !- Input Unit Type for Y
-  Dimensionless;  !- Output Unit Type
+
+  Curve:Biquadratic,
+    ReheatSHRTempCoolingCAPFTemp,  !- Name
+    3.9903739056,            !- Coefficient1 Constant
+    -0.2158168778,           !- Coefficient2 x
+    0.0034746418,            !- Coefficient3 x**2
+    0.0310505116,            !- Coefficient4 y
+    -0.0000360698,           !- Coefficient5 y**2
+    -0.0016903602,           !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    0.4786,                  !- Minimum Curve Output
+    1.4194,                  !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   ! 1,  R Squared
-  Curve:Quadratic,  
-  ReheatSHRFlowCoolingCAPFFF,  !- Name
-  -1.4384495222,  !- Coefficient1 Constant
-  0.9171312178,  !- Coefficient2 x
-  1.5440455771,  !- Coefficient3 x**2
-  0.75,  !- Minimum Value of x
-  1.25,  !- Maximum Value of x
-  0.1179,  !- Minimum Curve Output
-  2.1205,  !- Maximum Curve Output
-  Dimensionless,  !- Input Unit Type for X
-  Dimensionless;  !- Output Unit Type
 
+  Curve:Quadratic,
+    ReheatSHRFlowCoolingCAPFFF,  !- Name
+    -1.4384495222,           !- Coefficient1 Constant
+    0.9171312178,            !- Coefficient2 x
+    1.5440455771,            !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25,                    !- Maximum Value of x
+    0.1179,                  !- Minimum Curve Output
+    2.1205,                  !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
 
@@ -5123,3 +5147,4 @@
     ;                        !- Mechanical Ventilation Controller Name
 
   Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
+

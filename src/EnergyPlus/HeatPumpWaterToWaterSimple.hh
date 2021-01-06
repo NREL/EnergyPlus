@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -60,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace HeatPumpWaterToWaterSimple {
 
@@ -196,32 +196,32 @@ namespace HeatPumpWaterToWaterSimple {
 
         virtual ~GshpSpecs() = default;
 
-        static PlantComponent *factory(int wwhp_type, std::string eir_wwhp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
 
         static void clear_state();
 
-        static void GetWatertoWaterHPInput();
+        static void GetWatertoWaterHPInput(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
-        void InitWatertoWaterHP(BranchInputManagerData &dataBranchInputManager,
+        void InitWatertoWaterHP(EnergyPlusData &state,
                                 int const GSHPTypeNum,       // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
                                 bool const FirstHVACIteration,
                                 Real64 const MyLoad // Demand Load
         );
 
-        void sizeCoolingWaterToWaterHP();
+        void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
 
-        void sizeHeatingWaterToWaterHP();
+        void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
 
-        void CalcWatertoWaterHPCooling(Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
 
-        void CalcWatertoWaterHPHeating(Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
 
@@ -232,6 +232,14 @@ namespace HeatPumpWaterToWaterSimple {
     extern Array1D<GshpSpecs> GSHP;
 
 } // namespace HeatPumpWaterToWaterSimple
+
+struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

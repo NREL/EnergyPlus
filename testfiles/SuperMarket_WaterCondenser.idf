@@ -137,7 +137,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2881,7 +2883,7 @@
 
   Output:Variable,*,Zone Air Relative Humidity,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Water Heater Tank Temperature,timestep;
 
@@ -2923,7 +2925,7 @@
 
   Output:Variable,*,Cooling Tower Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water Heater Electric Power,timestep;
+  Output:Variable,*,Water Heater Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Condenser Mass Flow Rate,timestep;
 

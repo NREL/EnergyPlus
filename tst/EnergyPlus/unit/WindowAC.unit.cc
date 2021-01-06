@@ -48,14 +48,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -430,45 +430,53 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedule data
+    state->dataGlobal->NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state, state.outputFiles);
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    SimulationManager::GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
 
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing(state);
+    SizingManager::ManageSizing(*state);
 
-    SimulationManager::SetupSimulation(state, errorsFound);
+    SimulationManager::SetupSimulation(*state, errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap
     Real64 lDotProvid(0.0); // latent removal kg/s
     int compIndex(0);
-    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(*state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(state.dataWindowAC.WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataWindowAC->WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(state.dataWindowAC.WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state->dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
 
-    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(*state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
+
+    // #8124 Retrieve zero value data without heating loads
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesLd, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtUserDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtDesDay, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtPkTime, "WEST ZONE"));
+
 }

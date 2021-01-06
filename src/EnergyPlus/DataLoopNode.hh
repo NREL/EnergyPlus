@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -292,17 +293,50 @@ namespace DataLoopNode {
         }
     };
 
+    // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
+    struct NodeSetpointCheckData
+    {
+        bool needsSetpointChecking;
+        bool checkTemperatureSetPoint;
+        bool checkTemperatureMinSetPoint;
+        bool checkTemperatureMaxSetPoint;
+        bool checkHumidityRatioSetPoint;
+        bool checkHumidityRatioMinSetPoint;
+        bool checkHumidityRatioMaxSetPoint;
+        bool checkMassFlowRateSetPoint;
+        bool checkMassFlowRateMinSetPoint;
+        bool checkMassFlowRateMaxSetPoint;
+
+        NodeSetpointCheckData():
+            needsSetpointChecking(false),
+            checkTemperatureSetPoint(false), checkTemperatureMinSetPoint(false),  checkTemperatureMaxSetPoint(false),
+            checkHumidityRatioSetPoint(false), checkHumidityRatioMinSetPoint(false), checkHumidityRatioMaxSetPoint(false),
+            checkMassFlowRateSetPoint(false), checkMassFlowRateMinSetPoint(false), checkMassFlowRateMaxSetPoint(false)
+        {
+        }
+
+    };
+
     // Object Data
     extern Array1D<NodeData> Node; // dim to num nodes in SimHVAC
     extern NodeData DefaultNodeValues;
     extern Array1D<MoreNodeData> MoreNodeInfo;
     extern Array1D<MarkedNodeData> MarkedNode;
+    extern Array1D<NodeSetpointCheckData> NodeSetpointCheck;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
 } // namespace DataLoopNode
+
+struct LoopNodeData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

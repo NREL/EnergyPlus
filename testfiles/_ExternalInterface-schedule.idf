@@ -98,7 +98,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Timestep,4;
 
@@ -3311,7 +3313,7 @@
 
   Output:Meter,Cooling:Electricity,Monthly;
 
-  Output:Meter,Heating:Gas,Monthly;
+  Output:Meter,Heating:NaturalGas,Monthly;
 
   Output:Meter,Fans:Electricity,Monthly;
 
@@ -3325,7 +3327,7 @@
 
   Output:Meter,Cooling:Electricity,RunPeriod;
 
-  Output:Meter,Heating:Gas,RunPeriod;
+  Output:Meter,Heating:NaturalGas,RunPeriod;
 
   Output:Meter,Fans:Electricity,RunPeriod;
 
@@ -3347,9 +3349,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,Monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,Monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,Monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,RunPeriod;
 
@@ -3357,9 +3359,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,RunPeriod;
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting

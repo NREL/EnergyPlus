@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -63,9 +64,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -86,8 +86,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::TranspiredCollector;
 using namespace EnergyPlus::HeatBalanceManager;
-
-using DataGlobals::BeginEnvrnFlag;
 
 TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 {
@@ -202,54 +200,54 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
 
-    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
-    GetZoneData(ErrorsFound);
-    GetZoneEquipmentData(state);
+    GetZoneData(*state, ErrorsFound);
+    GetZoneEquipmentData(*state);
 
-    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(ErrorsFound); // read construction data
+    GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(*state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    DataEnvironment::OutDryBulbTemp = 20.0;
-    DataEnvironment::OutWetBulbTemp = 15.0;
+    state->dataEnvrn->OutDryBulbTemp = 20.0;
+    state->dataEnvrn->OutWetBulbTemp = 15.0;
 
-    SetSurfaceOutBulbTempAt();
+    SetSurfaceOutBulbTempAt(*state);
 
     InitializePsychRoutines();
 
-    GetTranspiredCollectorInput();
+    GetTranspiredCollectorInput(*state);
     EXPECT_FALSE(ErrorsFound);
 
-    BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
-    SkyTemp = 24.0;
-    IsRain = false;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->SkyTemp = 24.0;
+    state->dataEnvrn->IsRain = false;
 
-    InitTranspiredCollector(UTSCNum);
+    InitTranspiredCollector(*state, UTSCNum);
 
-    EXPECT_DOUBLE_EQ(22.0, UTSC(UTSCNum).Tcoll);
-    EXPECT_DOUBLE_EQ(22.5, UTSC(UTSCNum).Tplen);
-    EXPECT_NEAR(19.990, UTSC(UTSCNum).TairHX, 0.001);
+    EXPECT_DOUBLE_EQ(22.0, state->dataTranspiredCollector->UTSC(UTSCNum).Tcoll);
+    EXPECT_DOUBLE_EQ(22.5, state->dataTranspiredCollector->UTSC(UTSCNum).Tplen);
+    EXPECT_NEAR(19.990, state->dataTranspiredCollector->UTSC(UTSCNum).TairHX, 0.001);
 }

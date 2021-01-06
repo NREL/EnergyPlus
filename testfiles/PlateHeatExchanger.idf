@@ -144,7 +144,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! Following Design Days used for Reverse DD testing.
 ! TAMPA_FL_USA Annual Heating Design Conditions Wind Speed=3.1m/s Wind Dir=10
@@ -2557,9 +2559,9 @@
 
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -2577,7 +2579,7 @@
 
   Output:Variable,*,Heat Pump Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
@@ -2591,7 +2593,7 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,Chilled Water Loop,Plant Supply Side Cooling Demand Rate,timestep;
 

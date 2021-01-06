@@ -190,7 +190,7 @@
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -203,7 +203,7 @@
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -216,7 +216,7 @@
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -229,7 +229,7 @@
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -242,7 +242,7 @@
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -255,7 +255,7 @@
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -268,7 +268,7 @@
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -281,7 +281,7 @@
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -294,7 +294,7 @@
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -307,7 +307,7 @@
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -332,7 +332,7 @@
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
@@ -344,7 +344,7 @@
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -356,7 +356,7 @@
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -368,7 +368,7 @@
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -380,7 +380,7 @@
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -392,7 +392,7 @@
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -404,7 +404,7 @@
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -416,7 +416,7 @@
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -428,7 +428,7 @@
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -440,7 +440,7 @@
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -498,7 +498,7 @@
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -511,7 +511,7 @@
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -524,7 +524,7 @@
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -537,7 +537,7 @@
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -550,7 +550,7 @@
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -563,7 +563,7 @@
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -576,7 +576,7 @@
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -589,7 +589,7 @@
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -602,7 +602,7 @@
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -615,7 +615,7 @@
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -640,7 +640,7 @@
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
@@ -652,7 +652,7 @@
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -664,7 +664,7 @@
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -676,7 +676,7 @@
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -688,7 +688,7 @@
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -700,7 +700,7 @@
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -712,7 +712,7 @@
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -724,7 +724,7 @@
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -736,7 +736,7 @@
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -748,7 +748,7 @@
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -806,7 +806,7 @@
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -819,7 +819,7 @@
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -832,7 +832,7 @@
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -845,7 +845,7 @@
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -858,7 +858,7 @@
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -871,7 +871,7 @@
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -884,7 +884,7 @@
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -897,7 +897,7 @@
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -910,7 +910,7 @@
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -923,7 +923,7 @@
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -948,7 +948,7 @@
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
@@ -960,7 +960,7 @@
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -972,7 +972,7 @@
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -984,7 +984,7 @@
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -996,7 +996,7 @@
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -1008,7 +1008,7 @@
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -1020,7 +1020,7 @@
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -1032,7 +1032,7 @@
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -1044,7 +1044,7 @@
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -1056,7 +1056,7 @@
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -1114,7 +1114,7 @@
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -1127,7 +1127,7 @@
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -1140,7 +1140,7 @@
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -1153,7 +1153,7 @@
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -1166,7 +1166,7 @@
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -1179,7 +1179,7 @@
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -1192,7 +1192,7 @@
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -1205,7 +1205,7 @@
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -1218,7 +1218,7 @@
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -1231,7 +1231,7 @@
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -1256,7 +1256,7 @@
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
@@ -1268,7 +1268,7 @@
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -1280,7 +1280,7 @@
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -1292,7 +1292,7 @@
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -1304,7 +1304,7 @@
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -1316,7 +1316,7 @@
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -1328,7 +1328,7 @@
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -1340,7 +1340,7 @@
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -1352,7 +1352,7 @@
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -1364,7 +1364,7 @@
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -1422,7 +1422,7 @@
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -1435,7 +1435,7 @@
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -1448,7 +1448,7 @@
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -1461,7 +1461,7 @@
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -1474,7 +1474,7 @@
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -1487,7 +1487,7 @@
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -1500,7 +1500,7 @@
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -1513,7 +1513,7 @@
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -1526,7 +1526,7 @@
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -1539,7 +1539,7 @@
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -1564,7 +1564,7 @@
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
@@ -1576,7 +1576,7 @@
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -1588,7 +1588,7 @@
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -1600,7 +1600,7 @@
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -1612,7 +1612,7 @@
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -1624,7 +1624,7 @@
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -1636,7 +1636,7 @@
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -1648,7 +1648,7 @@
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -1660,7 +1660,7 @@
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -1672,7 +1672,7 @@
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -1834,7 +1834,7 @@
     10.0,                    !- Minimum Value of y
     30.0;                    !- Maximum Value of y
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
@@ -1956,7 +1956,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -5152,15 +5154,15 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,Sys 1 Mixed Air Node,System Node Mass Flow Rate,timestep;
 
@@ -5198,7 +5200,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -5210,7 +5212,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

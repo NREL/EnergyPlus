@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceHAMTManager {
 
@@ -156,20 +159,20 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
-    void GetHeatBalHAMTInput();
+    void GetHeatBalHAMTInput(EnergyPlusData &state);
 
-    void InitHeatBalHAMT(EnergyPlus::OutputFiles &outputFiles);
+    void InitHeatBalHAMT(EnergyPlusData &state);
 
-    void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
-    void UpdateHeatBalHAMT(int const sid);
+    void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
     void
     interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
-    Real64 RHtoVP(Real64 const RH, Real64 const Temperature);
+    Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 
     Real64 WVDC(Real64 const Temperature, Real64 const ambp);
 
@@ -194,6 +197,14 @@ namespace HeatBalanceHAMTManager {
     //        thereof or any information disclosed therein.
 
 } // namespace HeatBalanceHAMTManager
+
+struct HeatBalHAMTMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

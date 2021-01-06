@@ -52,16 +52,18 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -69,7 +71,9 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -81,7 +85,7 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators)
 {
-    EMSActuatorAvailable.allocate(100);
+    state->dataRuntimeLang->EMSActuatorAvailable.allocate(100);
 
     std::string componentTypeName1("Chiller1");
     std::string componentTypeName2("Chiller2");
@@ -94,32 +98,32 @@ TEST_F(EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators)
     bool testBoolean3(true);
 
     // calling three times but twice with same names should still result in only two item in the resulting list
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean3);
-    EXPECT_EQ(2, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean3);
+    EXPECT_EQ(2, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
     // repeat with integers
     std::string controlTypeName2("ModeOfSomething");
     int testInt1(7);
     int testInt2(9);
     int testInt3(11);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt3);
-    EXPECT_EQ(4, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt3);
+    EXPECT_EQ(4, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
     // repeat with reals
     std::string controlTypeName3("ValueOfResults");
     Real64 testReal1(0.123);
     Real64 testReal2(0.456);
     Real64 testReal3(0.789);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal3);
-    EXPECT_EQ(6, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal3);
+    EXPECT_EQ(6, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
-    EMSActuatorAvailable.deallocate();
+    state->dataRuntimeLang->EMSActuatorAvailable.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
@@ -155,16 +159,16 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(*state);
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001);
 
@@ -196,11 +200,11 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput();
+    OutAirNodeManager::SetOutAirNodes(*state);
+    EMSManager::GetEMSInput(*state);
 
     // now check that Erl variable is Null
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
 }
 
 TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlowRate)
@@ -230,10 +234,10 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(*state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
@@ -260,7 +264,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
-    PlantCondLoopOperation::SetupPlantEMSActuators();
+    PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
     Node.allocate(3);
@@ -280,20 +284,20 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     bool anyRan;
     // set up EMS
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
     // set dummy EMS value
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
-    // SetActuatedBranchFlowRate( CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    // SetActuatedBranchFlowRate(*state, CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -302,7 +306,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -316,11 +320,11 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -329,7 +333,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -341,13 +345,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     // dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     // override flag should also be true
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -356,7 +360,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, 0.0);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -394,10 +398,10 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(*state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
@@ -424,7 +428,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
-    PlantCondLoopOperation::SetupPlantEMSActuators();
+    PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
     Node.allocate(3);
@@ -444,19 +448,19 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     bool anyRan;
     // set up EMS
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // set dummy EMS value
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
-    // SetComponentFlowRate( CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
-    SetComponentFlowRate(NodeMdot, 1, 2, 1, 1, 1, 1);
+    // SetComponentFlowRate(*state, CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
+    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -465,7 +469,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -479,13 +483,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
 
     // expect node data to represent full flow
-    SetComponentFlowRate(NodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -494,7 +498,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -506,14 +510,14 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     // dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     // override flag should also be true
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
     Real64 tempNodeMdot(NodeMdot);
 
     // expect node data to represent no flow. Max, MaxAvail, and Request are not changed
-    SetComponentFlowRate(tempNodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, tempNodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -523,7 +527,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
     tempNodeMdot = NodeMdot;
-    SetComponentFlowRate(tempNodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, tempNodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -699,13 +703,13 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(*state);
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
-    EMSManager::FinishProcessingUserInput = true;
+    EMSManager::CheckIfAnyEMS(*state);
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 11.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(2).TempSetPoint, 12.0, 0.0000001);
@@ -715,7 +719,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
     EXPECT_NEAR(DataLoopNode::Node(6).TempSetPoint, 16.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 17.0, 0.0000001);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 21.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(2).TempSetPoint, 22.0, 0.0000001);
@@ -767,13 +771,13 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(*state);
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
-    EMSManager::FinishProcessingUserInput = true;
+    EMSManager::CheckIfAnyEMS(*state);
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 1.0, 0.0000001);
 }
@@ -805,20 +809,20 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    OutAirNodeManager::SetOutAirNodes(*state);
+    NodeInputManager::SetupNodeVarsForReporting(*state);
+    EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_FALSE(anyRan);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_FALSE(anyRan);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
 }
 
@@ -844,18 +848,21 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
-    EMSManager::FinishProcessingUserInput = true;
+    EMSManager::CheckIfAnyEMS(*state);
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    // Find the variable in the list
+    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TempSetpoint1", 0);
+    ASSERT_GT(internalVarNum, 0);
     // Expect the variable to not yet be initialized
-    EXPECT_FALSE(ErlVariable(25).Value.initialized);
+    EXPECT_FALSE(state->dataRuntimeLang->ErlVariable(internalVarNum).Value.initialized);
     // next run a small program that sets the value
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
     // check that it worked and the value came thru
-    EXPECT_NEAR(ErlVariable(25).Value.Number, 21.0, 0.0000001);
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 21.0, 0.0000001);
     // check of state to see if now initialized
-    EXPECT_TRUE(ErlVariable(25).Value.initialized);
+    EXPECT_TRUE(state->dataRuntimeLang->ErlVariable(internalVarNum).Value.initialized);
 }
 
 TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
@@ -897,35 +904,33 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(*state);
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
-    EMSManager::FinishProcessingUserInput = true;
+    EMSManager::CheckIfAnyEMS(*state);
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Expect the variable to not yet be initialized, call EvaluateExpresssion and check argument
 
     ErlValueType ReturnValue;
     bool seriousErrorFound = false;
-    EMSManager::FinishProcessingUserInput = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
-        ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2,
+    state->dataEMSMgr->FinishProcessingUserInput = false;
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(*state,
+        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack)).Instruction(1).Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
     EXPECT_TRUE(seriousErrorFound);
 
     // next run a small program that sets the global variable value
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     // now check that it worked, should stay false
     seriousErrorFound = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
-        ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2, seriousErrorFound);
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(*state,
+        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack)).Instruction(1).Argument2, seriousErrorFound);
     EXPECT_FALSE(seriousErrorFound);
 }
 
 TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 {
-
-    using DataGlobals::AnyEnergyManagementSystemInModel;
 
     std::string const idf_objects = delimited_string({
         "  Output:EnergyManagementSystem,                                                                ",
@@ -936,8 +941,8 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CheckIfAnyEMS(state.outputFiles);
-    EXPECT_TRUE(AnyEnergyManagementSystemInModel);
+    CheckIfAnyEMS(*state);
+    EXPECT_TRUE(state->dataGlobal->AnyEnergyManagementSystemInModel);
 }
 
 TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
@@ -1076,459 +1081,462 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles); // get EMS input
-    EMSManager::FinishProcessingUserInput = true;
+    EMSManager::CheckIfAnyEMS(*state); // get EMS input
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool ErrorsFound(false);
-    CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
+    CurveManager::GetCurveInputData(*state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan);
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
 
     for (int i = 1; i <= 6; ++i) {
-        DataRuntimeLanguage::TrendVariable(i).TrendValARR(1) = 1.1; // initialize history for trend variables
-        DataRuntimeLanguage::TrendVariable(i).TrendValARR(2) = 2.2;
-        DataRuntimeLanguage::TrendVariable(i).TrendValARR(3) = 3.3;
-        DataRuntimeLanguage::TrendVariable(i).TrendValARR(4) = 4.4;
+        state->dataRuntimeLang->TrendVariable(i).TrendValARR(1) = 1.1; // initialize history for trend variables
+        state->dataRuntimeLang->TrendVariable(i).TrendValARR(2) = 2.2;
+        state->dataRuntimeLang->TrendVariable(i).TrendValARR(3) = 3.3;
+        state->dataRuntimeLang->TrendVariable(i).TrendValARR(4) = 4.4;
     }
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan); // process trend functions again using above data
+    EMSManager::ManageEMS(*state,
+                          EMSManager::EMSCallFrom::HVACIterationLoop,
+                          anyRan,
+                          ObjexxFCL::Optional_int_const()); // process trend functions again using above data
     EXPECT_TRUE(anyRan);
 
     int index(0);
-    int offset(25); // first 24 values in ErlExpression() are key words + 1 EMS global variable
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).Operator, FuncRound);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).Operand.size(), 1u);
+    int offset(27); // first 26 values in ErlExpression() are key words + 1 EMS global variable
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).Operator, FuncRound);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).Operand.size(), 1u);
     index = 1 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR1");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 2.0); // round(2.1)
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR1");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2.0); // round(2.1)
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(2).Operator, FuncMod);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(2).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(2).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(2).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(2).Operator, FuncMod);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(2).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(2).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(2).Operand(2).Type, 1); // argument was passed to EMS function
     index = 2 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR2");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.0); // mod( 7, 3 )
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR2");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.0); // mod( 7, 3 )
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(3).Operator, FuncSin);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(3).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(3).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(3).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(3).Operator, FuncSin);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(3).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(3).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(3).Operand(1).Type, 1); // argument was passed to EMS function
     index = 3 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR3");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.70710678, 0.00000001); // Sin(45) or Sin(0.7854) = 0.707107
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR3");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.70710678, 0.00000001); // Sin(45) or Sin(0.7854) = 0.707107
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(4).Operator, FuncCos);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(4).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(4).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(4).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(4).Operator, FuncCos);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(4).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(4).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(4).Operand(1).Type, 1); // argument was passed to EMS function
     index = 4 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR4");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.70710678, 0.00000001); // Cos(45) or Cos(0.7854) = 0.707107
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR4");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.70710678, 0.00000001); // Cos(45) or Cos(0.7854) = 0.707107
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(5).Operator, FuncArcCos);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(5).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(5).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(5).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(5).Operator, FuncArcCos);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(5).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(5).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(5).Operand(1).Type, 1); // argument was passed to EMS function
     index = 5 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR5");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // ArcCos(Cos(45)) = 0.7854 rad
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR5");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // ArcCos(Cos(45)) = 0.7854 rad
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(6).Operator, FuncArcSin);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(6).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(6).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(6).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(6).Operator, FuncArcSin);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(6).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(6).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(6).Operand(1).Type, 1); // argument was passed to EMS function
     index = 6 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR6");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // ArcSin(Sin(45)) = 0.7854 rad
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR6");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // ArcSin(Sin(45)) = 0.7854 rad
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(7).Operator, FuncDegToRad);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(7).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(7).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(7).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(7).Operator, FuncDegToRad);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(7).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(7).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(7).Operand(1).Type, 1); // argument was passed to EMS function
     index = 7 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR7");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // DegToRad(45) = 0.7854 rad
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR7");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.78539816, 0.00000001); // DegToRad(45) = 0.7854 rad
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(8).Operator, FuncRadToDeg);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(8).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(8).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(8).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(8).Operator, FuncRadToDeg);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(8).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(8).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(8).Operand(1).Type, 1); // argument was passed to EMS function
     index = 8 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR8");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 45.0, 0.0000001); // RadToDeg(0.7854 rad) = 45 deg
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR8");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 45.0, 0.0000001); // RadToDeg(0.7854 rad) = 45 deg
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(9).Operator, FuncExp);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(9).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(9).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(9).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(9).Operator, FuncExp);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(9).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(9).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(9).Operand(1).Type, 1); // argument was passed to EMS function
     index = 9 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR9");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 2.718281828, 0.00000001); // e^1 = 2.71828
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR9");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2.718281828, 0.00000001); // e^1 = 2.71828
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(10).Operator, FuncLn);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(10).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(10).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(10).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(10).Operator, FuncLn);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(10).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(10).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(10).Operand(1).Type, 1); // argument was passed to EMS function
     index = 10 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR10");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.69314718, 0.00000001); // e^1 = 0.693147
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR10");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.69314718, 0.00000001); // e^1 = 0.693147
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(11).Operator, FuncMax);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(11).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(11).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(11).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(11).Operator, FuncMax);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(11).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(11).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(11).Operand(2).Type, 1); // argument was passed to EMS function
     index = 11 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR11");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.5); // max(0.5, 1.5) = 1.5
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR11");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.5); // max(0.5, 1.5) = 1.5
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(12).Operator, FuncMin);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(12).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(12).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(12).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(12).Operator, FuncMin);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(12).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(12).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(12).Operand(2).Type, 1); // argument was passed to EMS function
     index = 12 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR12");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.5); // min(0.5, 1.5) = 0.5
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR12");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.5); // min(0.5, 1.5) = 0.5
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(13).Operator, FuncABS);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(13).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(13).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(13).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(13).Operator, FuncABS);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(13).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(13).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(13).Operand(1).Type, 1); // argument was passed to EMS function
     index = 13 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR13");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.3); // abs(1.3) = 1.3
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR13");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.3); // abs(1.3) = 1.3
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(14).Operator, FuncRandSeed);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(14).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(14).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(14).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(14).Operator, FuncRandSeed);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(14).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(14).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(14).Operand(1).Type, 1); // argument was passed to EMS function
     index = 14 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR14");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR14");
     // seed may differ by processor, don't test seed generator
     // EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.0 ); // @SeedRandom( 2.65 )
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(15).Operator, FuncRandU);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(15).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(15).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(15).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(15).Operator, FuncRandU);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(15).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(15).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(15).Operand(2).Type, 1); // argument was passed to EMS function
     index = 15 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR15");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR15");
     // don't test random number generator
     // EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.148876574, 0.00000001 ); // @RANDOMUNIFORM 0.0 1.0
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(16).Operator, FuncRandG);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(16).NumOperands, 4);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(16).Operand.size(), 4u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(16).Operand(4).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(16).Operator, FuncRandG);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(16).NumOperands, 4);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(16).Operand.size(), 4u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(16).Operand(4).Type, 1); // argument was passed to EMS function
     index = 16 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR16");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR16");
     // don't test random number generator
     // EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.30797328, 0.00000001 ); // @RANDOMNORMAL 1.5 0.5 0.75 2.25 (mean, std,
     // min, max)
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(17).Operator, FuncRhoAirFnPbTdbW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(17).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(17).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(17).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(17).Operator, FuncRhoAirFnPbTdbW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(17).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(17).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(17).Operand(3).Type, 1); // argument was passed to EMS function
     index = 17 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR17");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.146173145, 0.00000001); // RhoAirFnPbTdbW 101325.0 30.0 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR17");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.146173145, 0.00000001); // RhoAirFnPbTdbW 101325.0 30.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operator, FuncCpAirFnW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(18).Operator, FuncCpAirFnW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(18).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(18).Operand.size(), 1u);
     index = 18 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR18");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1023.42949999999, 0.00000001); // CpAirFnW 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR18");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1023.42949999999, 0.00000001); // CpAirFnW 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).Operator, FuncHfgAirFnWTdb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(19).Operator, FuncHfgAirFnWTdb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(19).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(19).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(19).Operand(2).Type, 1); // argument was passed to EMS function
     index = 19 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR19");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 2431308.50000000, 0.00000001); // HfgAirFnWTdb 0.01 30.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR19");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2431308.50000000, 0.00000001); // HfgAirFnWTdb 0.01 30.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(20).Operator, FuncHgAirFnWTdb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(20).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(20).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(20).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(20).Operator, FuncHgAirFnWTdb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(20).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(20).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(20).Operand(2).Type, 1); // argument was passed to EMS function
     index = 20 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR20");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 2556708.50000000, 0.00000001); // HgAirFnWTdb 0.01 30.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR20");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2556708.50000000, 0.00000001); // HgAirFnWTdb 0.01 30.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(21).Operator, FuncTdpFnTdbTwbPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(21).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(21).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(21).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).Operator, FuncTdpFnTdbTwbPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).Operand(3).Type, 1); // argument was passed to EMS function
     index = 21 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR21");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 5.573987554, 0.00000001); // TdpFnTdbTwbPb 30.0 16.0 101325 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR21");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 5.573987554, 0.00000001); // TdpFnTdbTwbPb 30.0 16.0 101325 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(22).Operator, FuncTdpFnWPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(22).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(22).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(22).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operator, FuncTdpFnWPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operand(2).Type, 1); // argument was passed to EMS function
     index = 22 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR22");                            // verified at sugartech site as 14.0439
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 14.044515576, 0.00000001); // TdpFnWPb 0.01 101325 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR22");                            // verified at sugartech site as 14.0439
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 14.044515576, 0.00000001); // TdpFnWPb 0.01 101325 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(23).Operator, FuncHFnTdbW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(23).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(23).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(23).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).Operator, FuncHFnTdbW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).Operand(2).Type, 1); // argument was passed to EMS function
     index = 23 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR23");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 55712.28500000, 0.00000001); // HFnTdbW 30.0 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR23");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 55712.28500000, 0.00000001); // HFnTdbW 30.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(24).Operator, FuncHFnTdbRhPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(24).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(24).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(24).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(24).Operator, FuncHFnTdbRhPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(24).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(24).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(24).Operand(3).Type, 1); // argument was passed to EMS function
     index = 24 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR24");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 64177.426349195, 0.00000001); // HFnTdbRhPb 30.0 0.5 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR24");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 64177.426349195, 0.00000001); // HFnTdbRhPb 30.0 0.5 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(25).Operator, FuncTdbFnHW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(25).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(25).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(25).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).Operator, FuncTdbFnHW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).Operand(2).Type, 1); // argument was passed to EMS function
     index = 25 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR25");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 4.876349567, 0.00000001); // TdbFnHW 30000.0 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR25");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4.876349567, 0.00000001); // TdbFnHW 30000.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(26).Operator, FuncRhovFnTdbRh);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(26).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(26).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(26).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(26).Operator, FuncRhovFnTdbRh);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(26).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(26).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(26).Operand(2).Type, 1); // argument was passed to EMS function
     index = 26 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR26");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.015174171, 0.00000001); // RhovFnTdbRh 30.0 0.5 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR26");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.015174171, 0.00000001); // RhovFnTdbRh 30.0 0.5 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(27).Operator, FuncRhovFnTdbRhLBnd0C); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(27).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(27).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(27).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).Operator, FuncRhovFnTdbRhLBnd0C); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).Operand(2).Type, 1); // argument was passed to EMS function
     index = 27 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR27");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.015156240, 0.00000001); // RhovFnTdbRhLBnd0C 30.0 0.5 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR27");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.015156240, 0.00000001); // RhovFnTdbRhLBnd0C 30.0 0.5 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(28).Operator, FuncRhovFnTdbWPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(28).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(28).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(28).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(28).Operator, FuncRhovFnTdbWPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(28).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(28).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(28).Operand(2).Type, 1); // argument was passed to EMS function
     index = 28 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name,
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
               "VAR28"); // http://www.gribble.org/cycling/air_density.html 30 C db, 1013.25 hPa, 16 C dp = 0.011565 g/m3
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number,
                 0.011459487,
                 0.00000001); // RhovFnTdbWPb 30.0 0.01 101325.0 = ** this and previous 2 numbers seem very different **
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).Operator, FuncRhFnTdbRhov);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(29).Operator, FuncRhFnTdbRhov);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(29).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(29).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(29).Operand(2).Type, 1); // argument was passed to EMS function
     index = 29 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR29");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.3295072808, 0.00000001); // RhFnTdbRhov 30.0 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR29");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3295072808, 0.00000001); // RhFnTdbRhov 30.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(30).Operator, FuncRhFnTdbRhovLBnd0C); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(30).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(30).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(30).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operator, FuncRhFnTdbRhovLBnd0C); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operand(2).Type, 1); // argument was passed to EMS function
     index = 30 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR30");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.3298971165, 0.00000001); // RhFnTdbRhovLBnd0C 30.0 0.01 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR30");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3298971165, 0.00000001); // RhFnTdbRhovLBnd0C 30.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(31).Operator, FuncRhFnTdbWPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(31).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(31).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(31).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(31).Operator, FuncRhFnTdbWPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(31).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(31).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(31).Operand(3).Type, 1); // argument was passed to EMS function
     index = 31 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR31");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.377598442, 0.00000001); // RhFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR31");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.377598442, 0.00000001); // RhFnTdbWPb 30.0 0.01 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operator, FuncTwbFnTdbWPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operator, FuncTwbFnTdbWPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operator, FuncVFnTdbWPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operator, FuncVFnTdbWPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operand(3).Type, 1); // argument was passed to EMS function
     index = 33 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR33"); // http://www.sugartech.co.za/psychro/ 30 C db, 14.043895 dp = 0.8432375 m3/kg
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.873152783, 0.00000001); // VFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR33"); // http://www.sugartech.co.za/psychro/ 30 C db, 14.043895 dp = 0.8432375 m3/kg
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.873152783, 0.00000001); // VFnTdbWPb 30.0 0.01 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(34).Operator, FuncWFnTdpPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(34).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(34).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(34).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).Operator, FuncWFnTdpPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).Operand(2).Type, 1); // argument was passed to EMS function
     index = 34 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR34");                            // verified at sugartech site as 0.011366881 kg/kg
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.0113664167, 0.00000001); // WFnTdpPb 16.0 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR34");                            // verified at sugartech site as 0.011366881 kg/kg
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0113664167, 0.00000001); // WFnTdpPb 16.0 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(35).Operator, FuncWFnTdbH);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(35).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(35).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(35).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).Operator, FuncWFnTdbH);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).Operand(2).Type, 1); // argument was passed to EMS function
     index = 35 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name,
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
               "VAR35"); // http://www.sugartech.co.za/psychro/ 20 C db, 0.42830288 C dp, 30000 H = 0.00389466 kg/kg
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.00390178711, 0.00000001); // WFnTdbH 20.0 30000.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.00390178711, 0.00000001); // WFnTdbH 20.0 30000.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(36).Operator, FuncWFnTdbTwbPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(36).NumOperands, 3);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(36).Operand.size(), 3u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(36).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(36).Operator, FuncWFnTdbTwbPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(36).NumOperands, 3);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(36).Operand.size(), 3u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(36).Operand(3).Type, 1); // argument was passed to EMS function
     index = 36 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR36"); // http://www.sugartech.co.za/psychro/ 30 C db, 16 C wb = 0.00559757 kg/kg
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.005624362, 0.00000001); // WFnTdbTwbPb 30.0 16.0 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR36"); // http://www.sugartech.co.za/psychro/ 30 C db, 16 C wb = 0.00559757 kg/kg
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.005624362, 0.00000001); // WFnTdbTwbPb 30.0 16.0 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(37).Operator, FuncWFnTdbRhPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(37).NumOperands, 4); // why is this 4?
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(37).Operand.size(), 4u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(37).Operand(3).Type, 1); // argument was passed to EMS function
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(37).Operand(4).Type, 0); // 4th argument not passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operator, FuncWFnTdbRhPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).NumOperands, 4); // why is this 4?
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operand.size(), 4u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operand(3).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operand(4).Type, 0); // 4th argument not passed to EMS function
     index = 37 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR37"); // http://www.sugartech.co.za/psychro/ 30 C db, 50% rh = 0.01331149 kg/kg
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.0133109528, 0.00000001); // WFnTdbRhPb 30.0 0.5 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR37"); // http://www.sugartech.co.za/psychro/ 30 C db, 50% rh = 0.01331149 kg/kg
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0133109528, 0.00000001); // WFnTdbRhPb 30.0 0.5 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(38).Operator, FuncPsatFnTemp);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(38).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(38).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(38).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).Operator, FuncPsatFnTemp);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).Operand(1).Type, 1); // argument was passed to EMS function
     index = 38 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name,
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
               "VAR38"); // http://www.sugartech.co.za/psychro/ 30 C db, 100% rh = 42.46019 mbar = 4246.019 Pa
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 4246.030243592, 0.00000001); // PsatFnTemp 30.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4246.030243592, 0.00000001); // PsatFnTemp 30.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(39).Operator, FuncTsatFnHPb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(39).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(39).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(39).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).Operator, FuncTsatFnHPb);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).Operand(2).Type, 1); // argument was passed to EMS function
     index = 39 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR39"); // http://www.sugartech.co.za/psychro/ 10.303 C db gives H = 29999.9999
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 10.318382617, 0.00000001); // TsatFnHPb 30000.0 101325.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR39"); // http://www.sugartech.co.za/psychro/ 10.303 C db gives H = 29999.9999
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 10.318382617, 0.00000001); // TsatFnHPb 30000.0 101325.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(40).Operator, FuncCpCW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(40).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(40).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(40).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(40).Operator, FuncCpCW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(40).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(40).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(40).Operand(1).Type, 1); // argument was passed to EMS function
     index = 40 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR40");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 4180.0, 0.00000001); // CpCW 30.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR40");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4180.0, 0.00000001); // CpCW 30.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(41).Operator, FuncCpHW);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(41).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(41).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(41).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(41).Operator, FuncCpHW);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(41).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(41).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(41).Operand(1).Type, 1); // argument was passed to EMS function
     index = 41 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR41");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 4180.0, 0.00000001); // CpHW 60.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR41");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4180.0, 0.00000001); // CpHW 60.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(42).Operator, FuncRhoH2O);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(42).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(42).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(42).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(42).Operator, FuncRhoH2O);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(42).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(42).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(42).Operand(1).Type, 1); // argument was passed to EMS function
     index = 42 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR42");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 998.2331862652, 0.00000001); // RhoH2O 60.0 =
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR42");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 998.2331862652, 0.00000001); // RhoH2O 60.0 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(43).Operator, FuncSevereWarnEp);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(43).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(43).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(43).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(43).Operator, FuncSevereWarnEp);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(43).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(43).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(43).Operand(1).Type, 1); // argument was passed to EMS function
     index = 43 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR43");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR43");
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(44).Operator, FuncWarnEp);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(44).NumOperands, 1);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(44).Operand.size(), 1u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(44).Operand(1).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(44).Operator, FuncWarnEp);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(44).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(44).Operand.size(), 1u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(44).Operand(1).Type, 1); // argument was passed to EMS function
     index = 44 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR44");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR44");
 
     // all trend variables hold 4 values: 1.1, 2.2, 3.3, 4.4
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(45).Operator, FuncTrendValue);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(45).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(45).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(45).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(45).Operator, FuncTrendValue);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(45).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(45).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(45).Operand(2).Type, 1); // argument was passed to EMS function
     index = 45 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR45");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.1, 0.00000001); // TrendValue Variable_Trend1 1
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR45");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.1, 0.00000001); // TrendValue Variable_Trend1 1
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(46).Operator, FuncTrendAverage);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(46).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(46).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(46).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(46).Operator, FuncTrendAverage);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(46).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(46).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(46).Operand(2).Type, 1); // argument was passed to EMS function
     index = 46 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR46");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 2.75, 0.00000001); // TrendAverage Variable_Trend2 4
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR46");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2.75, 0.00000001); // TrendAverage Variable_Trend2 4
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(47).Operator, FuncTrendMax);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(47).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(47).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(47).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(47).Operator, FuncTrendMax);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(47).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(47).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(47).Operand(2).Type, 1); // argument was passed to EMS function
     index = 47 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR47");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 4.4, 0.00000001); // TrendMax Variable_Trend3 4
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR47");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4.4, 0.00000001); // TrendMax Variable_Trend3 4
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(48).Operator, FuncTrendMin);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(48).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(48).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(48).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(48).Operator, FuncTrendMin);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(48).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(48).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(48).Operand(2).Type, 1); // argument was passed to EMS function
     index = 48 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR48");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.1, 0.00000001); // TrendMin Variable_Trend4 4
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR48");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 1.1, 0.00000001); // TrendMin Variable_Trend4 4
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).Operator, FuncTrendDirection);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(49).Operator, FuncTrendDirection);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(49).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(49).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(49).Operand(2).Type, 1); // argument was passed to EMS function
     index = 49 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR49");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR49");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number,
                 -4.4,
                 0.00000001); // TrendDirection Variable_Trend5 4 (-1.1 per 0.25 hrs = -4.4/hr)
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).Operator, FuncTrendSum);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(50).Operator, FuncTrendSum);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(50).NumOperands, 2);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(50).Operand.size(), 2u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(50).Operand(2).Type, 1); // argument was passed to EMS function
     index = 50 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR50");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 11.0, 0.00000001); // TrendSum Variable_Trend6 4
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR50");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 11.0, 0.00000001); // TrendSum Variable_Trend6 4
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operator, FuncCurveValue);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).NumOperands, 6);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand.size(), 6u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand(2).Type, 1); // argument was passed to EMS function
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand(3).Type, 0); // 3rd argument not passed to EMS function
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand(4).Type, 0); // 4th argument not passed to EMS function
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand(5).Type, 0); // 5th argument not passed to EMS function
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(51).Operand(6).Type, 0); // 6th argument not passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operator, FuncCurveValue);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).NumOperands, 6);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand.size(), 6u);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand(3).Type, 0); // 3rd argument not passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand(4).Type, 0); // 4th argument not passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand(5).Type, 0); // 5th argument not passed to EMS function
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(51).Operand(6).Type, 0); // 6th argument not passed to EMS function
     index = 51 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR51");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.95, 0.00000001); // CurveValue 0.75 = 0.95
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR51");
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.95, 0.00000001); // CurveValue 0.75 = 0.95
 
     // test these functions as needed to verify results
 
     // test ABS using negative number
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(53).Operator, FuncABS);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(53).NumOperands, 1);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(53).Operator, FuncABS);
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(53).NumOperands, 1);
     index = 53 + offset;
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR53");
-    EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Value.Number, 3.1); // set absNum = -3.1, abs(absNum) = 3.1
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR53");
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 3.1); // set absNum = -3.1, abs(absNum) = 3.1
 
     //		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 54 ).Operator, FuncTsatFnPb ); // not public in PsycRoutines so not available to EMS
     //(commented out at line 2397 of RuntimeLanguageProcessor.cc) 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 55 ).Operator,
@@ -1539,10 +1547,10 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 {
     //    EMSActuatorAvailable.allocate(100);
     NumOfNodes = 3;
-    numActuatorsUsed = 3;
+    state->dataRuntimeLang->numActuatorsUsed = 3;
     Node.allocate(3);
     NodeID.allocate(3);
-    EMSActuatorUsed.allocate(3);
+    state->dataRuntimeLang->EMSActuatorUsed.allocate(3);
     OutAirNodeManager::NumOutsideAirNodes = 3;
     OutAirNodeManager::OutsideAirNodeList.allocate(3);
 
@@ -1561,14 +1569,14 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     OutAirNodeManager::OutsideAirNodeList(1) = 1;
     OutAirNodeManager::OutsideAirNodeList(2) = 2;
     OutAirNodeManager::OutsideAirNodeList(3) = 3;
-    EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
-    EMSActuatorUsed(2).ComponentTypeName = "";
-    EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";
-    EMSActuatorUsed(1).UniqueIDName = NodeID(1);
-    EMSActuatorUsed(2).UniqueIDName = NodeID(2);
-    EMSActuatorUsed(3).UniqueIDName = NodeID(3);
+    state->dataRuntimeLang->EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
+    state->dataRuntimeLang->EMSActuatorUsed(2).ComponentTypeName = "";
+    state->dataRuntimeLang->EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";
+    state->dataRuntimeLang->EMSActuatorUsed(1).UniqueIDName = NodeID(1);
+    state->dataRuntimeLang->EMSActuatorUsed(2).UniqueIDName = NodeID(2);
+    state->dataRuntimeLang->EMSActuatorUsed(3).UniqueIDName = NodeID(3);
 
-    SetupNodeSetPointsAsActuators();
+    SetupNodeSetPointsAsActuators(*state);
 
     EXPECT_TRUE(Node(1).IsLocalNode);
     EXPECT_FALSE(Node(2).IsLocalNode);
@@ -1578,43 +1586,421 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
-    DataSurfaces::SurfaceWindow.allocate(2);
-    dataConstruction.Construct.allocate(1);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
+    state->dataConstruction->Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
-    DataDaylighting::ZoneDaylight.allocate(1);
+    state->dataDaylightingData->ZoneDaylight.allocate(1);
     DataSurfaces::Surface(1).Name = "Surface1";
     DataSurfaces::Surface(2).Name = "Surface2";
     DataSurfaces::Surface(1).Zone = 1;
     DataSurfaces::Surface(2).Zone = 1;
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Window;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(1).WindowShadingControlPtr = 1;
-    DataSurfaces::Surface(2).WindowShadingControlPtr = 2;
+    DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
+    DataSurfaces::Surface(2).windowShadingControlList.push_back(2);
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
-    DataSurfaces::SurfaceWindow(1).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(2).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
-    DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
+    DataSurfaces::Surface(1).activeShadedConstruction = 1;
+    DataSurfaces::Surface(2).activeShadedConstruction = 1;
 
-    dataConstruction.Construct(1).Name = "Construction1";
+    state->dataConstruction->Construct(1).Name = "Construction1";
 
     DataSurfaces::WindowShadingControl(1).ShadingType = 0;
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
 
     DataSurfaces::TotSurfaces = 2;
 
-    SetupWindowShadingControlActuators();
+    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
-    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+    SetupWindowShadingControlActuators(*state);
 
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
-    SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
+    EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
 
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceLast = 2;
+    state->dataGlobal->NumOfZones = 1;
+    DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
+    DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
+    SolarShading::WindowShadingManager(*state);
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
+
+}
+TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
+{
+
+    // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
+    std::string const idf_objects = delimited_string({
+
+        "Site:Location,",
+        "   Atlanta Hartsfield Intl Ap_GA_USA Design_Conditions, !- Location Name",
+        "     33.63,    !- Latitude {N + S - }",
+        "    -84.43,    !- Longitude {W - E + }",
+        "     -5.00,    !- Time Zone Relative to GMT {GMT + / -}",
+        "    308.00;    !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Made Up Day,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    34.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    5.0,                     !- Wind Speed {m/s}",
+        "    180.0,                   !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+        "EnergyManagementSystem:Actuator,",
+        "OutDryBulb,              !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Dry Bulb;        !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "OutDewPoint,             !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Dew Point;       !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "OutRH,                   !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Relative Humidity;  !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "DiffuseSolar,            !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Diffuse Solar;           !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "DirectSolar,              !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Direct Solar;        !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "WindSpeed,               !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Wind Speed;              !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "WindDirection,           !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Wind Direction;          !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Dual Setpoint Test Manager,  !- Name",
+        "BeginZoneTimestepBeforeSetCurrentWeather,  !- EnergyPlus Model Calling Point",
+        "OverrideWeather;  !- Program Name 1",
+
+        "EnergyManagementSystem:Program,",
+        "OverrideWeather,",
+        "Set OutDryBulb = 50.0,",
+        "Set OutDewPoint = 25.0,",
+        "Set OutRH = 50.0,",
+        "Set DiffuseSolar = 500.0,",
+        "Set DirectSolar = 1000.0,",
+        "Set WindSpeed = 5.5,",
+        "Set WindDirection = 32.1;",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->LocationGathered = false;
+
+    EMSManager::CheckIfAnyEMS(*state);
+    bool available = false;
+    bool errorsFound = false;
+    WeatherManager::GetNextEnvironment(*state, available, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    state->dataEMSMgr->FinishProcessingUserInput = true;
+
+    // Initialize all sorts of weather stuff
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->BeginDayFlag = true;
+    WeatherManager::ManageWeather(*state);
+
+    EXPECT_NEAR(state->dataEnvrn->OutDryBulbTemp, 50.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 0.0, 0.000001);  // Sun is down
+    EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 0.0, 0.000001); // Sun is down
+    EXPECT_NEAR(state->dataEnvrn->WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindDir, 32.1, 0.000001);
+
+    state->dataGlobal->TimeStep = 3;
+    state->dataGlobal->HourOfDay = 8;
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataGlobal->BeginDayFlag = false;
+    WeatherManager::ManageWeather(*state);
+
+    EXPECT_NEAR(state->dataEnvrn->OutDryBulbTemp, 50.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 500.0, 0.000001);   // Sun is up
+    EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 1000.0, 0.000001); // Sun is up
+    EXPECT_NEAR(state->dataEnvrn->WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindDir, 32.1, 0.000001);
+}
+TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
+{
+
+    // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
+    std::string const idf_objects = delimited_string({
+
+        "Site:Location,",
+        "   Atlanta Hartsfield Intl Ap_GA_USA Design_Conditions, !- Location Name",
+        "     33.63,    !- Latitude {N + S - }",
+        "    -84.43,    !- Longitude {W - E + }",
+        "     -5.00,    !- Time Zone Relative to GMT {GMT + / -}",
+        "    308.00;    !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Made Up Day,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    34.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    5.0,                     !- Wind Speed {m/s}",
+        "    180.0,                   !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Dual Setpoint Test Manager,  !- Name",
+        "BeginZoneTimestepBeforeSetCurrentWeather,  !- EnergyPlus Model Calling Point",
+        "QueryWeather;  !- Program Name 1",
+
+        "EnergyManagementSystem:GlobalVariable,",
+        "TodayDryBulb;",
+
+        "EnergyManagementSystem:Program,",
+        "QueryWeather,",
+        "Set iHour = 5,",
+        "Set iTimeStep = 3,",
+        "Set TodayRain = @TodayIsRain iHour iTimeStep,",
+        "Set TodaySnow = @TodayIsSnow iHour iTimeStep,",
+        "Set TodayDryBulb = @TodayOutDryBulbTemp iHour iTimeStep,",
+        "Set TodayDewPoint = @TodayOutDewPointTemp iHour iTimeStep,",
+        "Set TodayBaroPress = @TodayOutBaroPress iHour iTimeStep,",
+        "Set TodayRelHum = @TodayOutRelHum iHour iTimeStep,",
+        "Set TodayWindSpd = @TodayWindSpeed iHour iTimeStep,",
+        "Set TodayWindDirect = @TodayWindDir iHour iTimeStep,",
+        "Set TodaySkyT = @TodaySkyTemp iHour iTimeStep,",
+        "Set TodayHorIR = @TodayHorizIRSky iHour iTimeStep,",
+        "Set TodayBeamSol = @TodayBeamSolarRad iHour iTimeStep,",
+        "Set TodayDifSol = @TodayDifSolarRad iHour iTimeStep,",
+        "Set TodayAlb = @TodayAlbedo iHour iTimeStep,",
+        "Set TodayPrecip = @TodayLiquidPrecip iHour iTimeStep,",
+        "Set TomorrowRain = @TomorrowIsRain iHour iTimeStep,",
+        "Set TomorrowSnow = @TomorrowIsSnow iHour iTimeStep,",
+        "Set TomorrowDryBulb = @TomorrowOutDryBulbTemp iHour iTimeStep,",
+        "Set TomorrowDewPoint = @TomorrowOutDewPointTemp iHour iTimeStep,",
+        "Set TomorrowBaroPress = @TomorrowOutBaroPress iHour iTimeStep,",
+        "Set TomorrowRelHum = @TomorrowOutRelHum iHour iTimeStep,",
+        "Set TomorrowWindSpd = @TomorrowWindSpeed iHour iTimeStep,",
+        "Set TomorrowWindDirect = @TomorrowWindDir iHour iTimeStep,",
+        "Set TomorrowSkyT = @TomorrowSkyTemp iHour iTimeStep,",
+        "Set TomorrowHorIR = @TomorrowHorizIRSky iHour iTimeStep,",
+        "Set TomorrowBeamSol = @TomorrowBeamSolarRad iHour iTimeStep,",
+        "Set TomorrowDifSol = @TomorrowDifSolarRad iHour iTimeStep,",
+        "Set TomorrowAlb = @TomorrowAlbedo iHour iTimeStep,",
+        "Set TomorrowPrecip = @TomorrowLiquidPrecip iHour iTimeStep;",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->LocationGathered = false;
+
+    EMSManager::CheckIfAnyEMS(*state);
+    bool available = false;
+    bool errorsFound = false;
+    WeatherManager::GetNextEnvironment(*state, available, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    state->dataEMSMgr->FinishProcessingUserInput = true;
+
+    // Initialize all sorts of weather stuff
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->BeginDayFlag = true;
+    WeatherManager::ManageWeather(*state);
+
+    // Note that operands for these functions are Hour (0:23) then Timestep
+    // In the EMS code above, they are all using Hour = 5 and Timestep=3
+    // But the arrays are stored as TodayXyz(timestep, hour) where hour is 1:24
+
+    // TodayIsRain and TodayIsSnow are logicals, but the ems functions returns 0 or 1
+    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayRain", 1);
+    ASSERT_GT(internalVarNum, 0);
+    bool rainTrueFalse = (state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number > 0.0);
+    EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3,5+1), rainTrueFalse);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodaySnow", 1);
+    ASSERT_GT(internalVarNum, 0);
+    bool snowTrueFalse = (state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number > 0.0);
+    EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3, 5 + 1), snowTrueFalse);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDryBulb", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayOutDryBulbTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDewPoint", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayBaroPress", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayOutBaroPress(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayRelHum", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayOutRelHum(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayWindSpd", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayWindSpeed(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayWindDirect", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayWindDir(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodaySkyT", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodaySkyTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayHorIR", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayHorizIRSky(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayBeamSol", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayBeamSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDifSol", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayDifSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayAlb", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayAlbedo(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayPrecip", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TodayLiquidPrecip(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    // TodayIsRain and TodayIsSnow are logicals, but the ems functions returns 0 or 1
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowRain", 1);
+    ASSERT_GT(internalVarNum, 0);
+    rainTrueFalse = (state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number > 0.0);
+    EXPECT_EQ(state->dataWeatherManager->TomorrowIsRain(3, 5 + 1), rainTrueFalse);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowSnow", 1);
+    ASSERT_GT(internalVarNum, 0);
+    snowTrueFalse = (state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number > 0.0);
+    EXPECT_EQ(state->dataWeatherManager->TomorrowIsRain(3, 5 + 1), snowTrueFalse);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDryBulb", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDewPoint", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBaroPress", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowRelHum", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowWindSpd", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowWindDirect", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowSkyT", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowHorIR", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowHorizIRSky(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBeamSol", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowBeamSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDifSol", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowDifSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowAlb", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowAlbedo(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowPrecip", 1);
+    ASSERT_GT(internalVarNum, 0);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowLiquidPrecip(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 }

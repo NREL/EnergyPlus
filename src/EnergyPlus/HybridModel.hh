@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HybridModel {
 
@@ -128,11 +132,19 @@ namespace HybridModel {
 
     // Functions
 
-    void GetHybridModelZone();
+    void GetHybridModelZone(EnergyPlusData &state);
 
     void clear_state();
 
 } // namespace HybridModel
+
+struct HybridModelData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

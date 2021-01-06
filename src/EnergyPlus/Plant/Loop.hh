@@ -51,7 +51,14 @@
 #include <EnergyPlus/Plant/LoopSide.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataPlant {
+
+    // "Both" is used as a special flag and is never assigned to the loop's TypeOfLoop member
+    enum class LoopType {Unassigned, Plant, Condenser, Both};
 
     struct PlantLoopData
     {
@@ -99,7 +106,7 @@ namespace DataPlant {
         int EconComp;                            // DSU review, should move these out of here
         Real64 EconControlTempDiff;              // DSU review, should move these out of here
         bool LoopHasConnectionComp;
-        int TypeOfLoop;
+        LoopType TypeOfLoop;
         int PressureSimType;
         bool HasPressureComponents;
         Real64 PressureDrop;
@@ -125,7 +132,7 @@ namespace DataPlant {
               MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), // true if Volume was set to autocalculate
               CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0), NumOpSchemes(0), LoadDistribution(0), PlantSizNum(0),
               LoopDemandCalcScheme(0), CommonPipeType(0), EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0),
-              EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false), TypeOfLoop(0), PressureSimType(1),
+              EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(1),
               HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0),
               CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0),
               InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
@@ -133,11 +140,11 @@ namespace DataPlant {
         }
 
 
-        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+        void UpdateLoopSideReportVars(EnergyPlusData &state, Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 
-        void CheckLoopExitNode(bool FirstHVACIteration);
+        void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CalcUnmetPlantDemand();
+        void CalcUnmetPlantDemand(EnergyPlusData &state);
 
     };
 } // namespace DataPlant

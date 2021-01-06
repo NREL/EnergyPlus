@@ -52,13 +52,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatPumpWaterToWaterCOOLING {
 
@@ -102,8 +104,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         //  that is supposed to be proportional to the theoretical power
         Real64 HighPressCutoff; // Maximum Design Pressure on the Load Side
         Real64 LowPressCutoff;  // Minimum Design Pressure on the Source Side
-        // Added by Arun 6-27-02
-        // to implement cycletime - removed 9/10/2013 LKL
         bool IsOn;
         bool MustRun;
         // loop topology variables
@@ -152,21 +152,22 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         virtual ~GshpPeCoolingSpecs() = default;
 
-        static PlantComponent *factory(const std::string& objectName);
+        static PlantComponent *factory(EnergyPlusData &state, const std::string& objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation,
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void initialize();
+        void initialize(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad);
 
         void update();
     };
@@ -176,9 +177,17 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void clear_state();
 
-    void GetGshpInput();
+    void GetGshpInput(EnergyPlusData &state);
 
 } // namespace HeatPumpWaterToWaterCOOLING
+
+struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

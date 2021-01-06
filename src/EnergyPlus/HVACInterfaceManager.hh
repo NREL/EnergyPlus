@@ -52,9 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACInterfaceManager {
 
@@ -118,8 +123,9 @@ namespace HVACInterfaceManager {
 
     // Functions
 
-    void UpdateHVACInterface(int const AirLoopNum, // airloop number for which air loop this is
-                             int const CalledFrom,
+    void UpdateHVACInterface(EnergyPlusData &state,
+                             int const AirLoopNum, // airloop number for which air loop this is
+                             DataConvergParams::iCalledFrom const CalledFrom,
                              int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                              int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
@@ -127,7 +133,8 @@ namespace HVACInterfaceManager {
 
     //***************
 
-    void UpdatePlantLoopInterface(int const LoopNum,                // The 'inlet/outlet node' loop number
+    void UpdatePlantLoopInterface(EnergyPlusData &state,
+                                  int const LoopNum,                // The 'inlet/outlet node' loop number
                                   int const ThisLoopSideNum,        // The 'outlet node' LoopSide number
                                   int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
@@ -136,21 +143,30 @@ namespace HVACInterfaceManager {
 
     //***************
 
-    void UpdateHalfLoopInletTemp(int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp);
+    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp);
 
-    void UpdateCommonPipe(int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp);
+    void UpdateCommonPipe(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp);
 
-    void ManageSingleCommonPipe(int const LoopNum,           // plant loop number
+    void ManageSingleCommonPipe(EnergyPlusData &state,
+                                int const LoopNum,           // plant loop number
                                 int const LoopSide,          // plant loop side number
                                 Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
                                 Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
     );
 
-    void ManageTwoWayCommonPipe(int const LoopNum, int const LoopSide, Real64 const TankOutletTemp);
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp);
 
-    void SetupCommonPipes();
+    void SetupCommonPipes(EnergyPlusData &state);
 
 } // namespace HVACInterfaceManager
+
+struct HVACInterfaceManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -42,18 +42,16 @@ Exterior:Lights,
 
 Output for exterior lights appears in three possible places. It will appear on two meters (Electricity:Facility and ExteriorLights:Electricity) as well as in its own designated value in the standard output file.
 
-Output for exterior lights appears in three possible places. It will appear on two meters (Electricity:Facility and ExteriorLights:Electricity) as well as in its own designated value in the standard output file.
-
 \begin{itemize}
 \item
-  Zone,Average,Exterior Lights Electric Power {[}W{]}
+  Zone,Average,Exterior Lights Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Exterior Lights Electric Energy {[}J{]}
+  Zone,Sum,Exterior Lights Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Exterior Lights Electric Power {[}W{]}}\label{exterior-lights-electric-power-w}
+\paragraph{Exterior Lights Electricity Rate {[}W{]}}\label{exterior-lights-electric-power-w}
 
-\paragraph{Exterior Lights Electric Energy {[}J{]}}\label{exterior-lights-electric-energy-j}
+\paragraph{Exterior Lights Electricity Energy {[}J{]}}\label{exterior-lights-electric-energy-j}
 
 These are the electric power and energy consumed by the exterior lights.
 
@@ -87,8 +85,8 @@ IDF Examples:
 
 Exterior:FuelEquipment,OutsideGasEq,NaturalGas,ON,1000;
   Exterior:FuelEquipment,OutsideCoalEq,Coal,ON,1000;
-  Exterior:FuelEquipment,OutsideFuelOilNo1Eq,FuelOil#1,ON,1000;
-  Exterior:FuelEquipment,OutsideFuelOilNo2Eq,FuelOil#2,ON,1000;
+  Exterior:FuelEquipment,OutsideFuelOilNo1Eq,FuelOilNo1,ON,1000;
+  Exterior:FuelEquipment,OutsideFuelOilNo2Eq,FuelOilNo2,ON,1000;
   Exterior:FuelEquipment,OutsideLPGEq,Propane,ON,1000;
 \end{lstlisting}
 
@@ -137,7 +135,7 @@ Output for exterior equipment consumption appears in three possible places. It w
 \item
   Zone, Average, Exterior Equipment Fuel Rate {[}W{]}
 \item
-  Zone,Sum, Exterior Equipment Electric Energy {[}J{]}
+  Zone,Sum, Exterior Equipment Electricity Energy {[}J{]}
 \item
   Zone,Sum, Exterior Equipment Gas Energy {[}J{]}
 \item
@@ -149,9 +147,9 @@ Output for exterior equipment consumption appears in three possible places. It w
 \item
   Zone,Sum, Exterior Equipment Coal Energy {[}J{]}
 \item
-  Zone,Sum, Exterior Equipment FuelOil\#1 Energy {[}J{]}
+  Zone,Sum, Exterior Equipment FuelOilNo1 Energy {[}J{]}
 \item
-  Zone,Sum, Exterior Equipment FuelOil\#2 Energy {[}J{]}
+  Zone,Sum, Exterior Equipment FuelOilNo2 Energy {[}J{]}
 \item
   Zone,Sum, Exterior Equipment Propane Energy {[}J{]}
 \item

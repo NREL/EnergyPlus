@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -73,8 +72,6 @@ namespace DataLoopNode {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // Valid Fluid Types for Nodes
@@ -205,6 +202,7 @@ namespace DataLoopNode {
                                        // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
     Array1D<MoreNodeData> MoreNodeInfo;
     Array1D<MarkedNodeData> MarkedNode;
+    Array1D<NodeSetpointCheckData> NodeSetpointCheck;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.
@@ -265,6 +263,7 @@ namespace DataLoopNode {
                                      false);
         MoreNodeInfo.deallocate();
         MarkedNode.deallocate();
+        NodeSetpointCheck.deallocate();
     }
 
 } // namespace DataLoopNode

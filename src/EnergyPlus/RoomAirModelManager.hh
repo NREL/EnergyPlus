@@ -49,53 +49,38 @@
 #define RoomAirModelManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern bool GetUCSDDVDataFlag; // UCSD
     extern bool GetAirModelData;   // Used to "get" all air model data
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
 
     void clear_state();
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
 
-    //*****************************************************************************************
-
     void GetAirModelDatas(EnergyPlusData &state);
 
-    void GetUserDefinedPatternData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetAirNodeData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    //*****************************************************************************************
+    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetMundtData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetDisplacementVentData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetCrossVentData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetUFADZoneData(bool &ErrorsFound); // True if errors found during this get input routine
-
-    void SharedDVCVUFDataInit(int &ZoneNum);
+    void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum);
 
     void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
@@ -111,9 +96,15 @@ namespace RoomAirModelManager {
                         int TotNumEquip,              // how many of this equipment type
                         int TypeNum);                 // equipment type number
 
-    //*****************************************************************************************
-
 } // namespace RoomAirModelManager
+
+struct RoomAirModelManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

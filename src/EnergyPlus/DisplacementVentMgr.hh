@@ -49,10 +49,14 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DisplacementVentMgr {
 
@@ -76,17 +80,17 @@ namespace DisplacementVentMgr {
 
     // SUBROUTINE SPECIFICATIONS:
 
-    // Functions
+    void clear_state();
 
-    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
-
-    //**************************************************************************************************
-
-    void InitUCSDDV(int const ZoneNum);
+    void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
-    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
+    void InitUCSDDV(EnergyPlusData &state, int const ZoneNum);
+
+    //**************************************************************************************************
+
+    void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
 
     //**************************************************************************************************
 
@@ -100,9 +104,17 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
+
+struct DisplacementVentMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

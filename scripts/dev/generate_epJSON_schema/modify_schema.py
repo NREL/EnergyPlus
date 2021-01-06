@@ -122,6 +122,7 @@ extension_renaming = {
     'AirLoopHVAC:Splitter': 'nodes',
     'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
     'PythonPlugin:Variables': 'global_py_vars',
+    'PythonPlugin:SearchPaths': 'py_search_paths',
     'Output:Diagnostics': 'diagnostics',
 }
 remaining_objects = [

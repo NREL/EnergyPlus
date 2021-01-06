@@ -51,18 +51,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -75,7 +75,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 
@@ -105,10 +104,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
-    NumOfZones = 1;
+    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -166,13 +165,12 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();
-    SurfaceWindow.deallocate();
     People.deallocate();
 }
 
@@ -200,10 +198,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
-    NumOfZones = 1;
+    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
+    state->dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -263,13 +261,12 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();
-    SurfaceWindow.deallocate();
     People.deallocate();
 }
 

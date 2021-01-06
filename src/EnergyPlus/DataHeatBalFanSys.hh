@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -232,6 +233,24 @@ namespace DataHeatBalFanSys {
     extern Array1D_int TempControlType;
     extern Array1D_int ComfortControlType;
 
+    extern Array1D<Real64> ZoneHeatIndex;
+    extern Array1D<Real64> ZoneHumidex;
+    extern Array1D_int ZoneNumOcc;
+
+    extern Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
+    extern Array1D<std::vector<Real64>> ZoneHumidexHourBins;
+    extern Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
+    extern Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
+    extern Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
+    extern Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
+    extern Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
+    extern Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
+
+    extern Array1D<Real64> ZoneOccPierceSET;
+    extern Array1D<Real64> ZoneOccPierceSETLastStep;
+    extern Array1D<std::vector<Real64>> ZoneLowSETHours;
+    extern Array1D<std::vector<Real64>> ZoneHighSETHours;
+
     // Types
 
     struct ZoneComfortControlsFangerData
@@ -255,6 +274,14 @@ namespace DataHeatBalFanSys {
     void clear_state();
 
 } // namespace DataHeatBalFanSys
+
+struct HeatBalFanSysData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

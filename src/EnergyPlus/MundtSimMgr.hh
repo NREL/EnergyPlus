@@ -53,10 +53,14 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace MundtSimMgr {
 
@@ -155,45 +159,54 @@ namespace MundtSimMgr {
 
     // Functions
 
-    void ManageMundtModel(int const ZoneNum); // index number for the specified zone
+    void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void InitMundtModel();
+    void InitMundtModel(EnergyPlusData &state);
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetupMundtModel(int const ZoneNum, // index number for the specified zone
+    void SetupMundtModel(EnergyPlusData &state,
+                         int ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
     );
 
     //*****************************************************************************************
 
-    void CalcMundtModel(int const ZoneNum); // index number for the specified zone
+    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetNodeResult(int const NodeID,       // node ID
-                       Real64 const TempResult // temperature for the specified air node
+    void SetNodeResult(int NodeID,       // node ID
+                       Real64 TempResult // temperature for the specified air node
     );
 
     //*****************************************************************************************
 
-    void SetSurfTmeanAir(int const SurfID,    // surface ID
-                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
+    void SetSurfTmeanAir(int SurfID,    // surface ID
+                         Real64 TeffAir // temperature of air node adjacent to the specified surface
     );
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
 } // namespace MundtSimMgr
+
+struct MundtSimMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

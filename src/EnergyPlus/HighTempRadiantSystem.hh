@@ -52,15 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HighTempRadiantSystem {
 
@@ -177,7 +176,7 @@ namespace HighTempRadiantSystem {
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex);
 
-    void GetHighTempRadiantSystem(bool &ErrorsFound); // Error flag if problems encountered on reading user input
+    void GetHighTempRadiantSystem(EnergyPlusData &state, bool &ErrorsFound); // Error flag if problems encountered on reading user input
 
     void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
@@ -185,26 +184,35 @@ namespace HighTempRadiantSystem {
 
     void SizeHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum);
 
-    void CalcHighTempRadiantSystem(int const RadSysNum); // name of the low temperature radiant system
+    void CalcHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum); // name of the low temperature radiant system
 
     void CalcHighTempRadiantSystemSP(EnergyPlusData &state, bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
                                      int const RadSysNum            // name of the low temperature radiant system
     );
 
-    void UpdateHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(EnergyPlusData &state,
+                                     int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     );
 
-    void UpdateHTRadSourceValAvg(bool &HighTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateHTRadSourceValAvg(EnergyPlusData &state, bool &HighTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeHTRadGains();
+    void DistributeHTRadGains(EnergyPlusData &state);
 
     void
-    ReportHighTempRadiantSystem(int const RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
+    ReportHighTempRadiantSystem(EnergyPlusData &state, int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
 } // namespace HighTempRadiantSystem
+
+struct HighTempRadiantSystemData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

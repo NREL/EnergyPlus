@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -59,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace MicroCHPElectricGenerator {
 
@@ -101,7 +101,7 @@ namespace MicroCHPElectricGenerator {
         // calculated and from elsewhere
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        int OpMode;
+        DataGenerators::OperatingMode OpMode;
         Real64 OffModeTime;      // amount of time generator spent in Off mode
         Real64 StandyByModeTime; // amount of time generator spent in standby mode
         Real64 WarmUpModeTime;   // amount of time generator spent in warm up mode
@@ -148,7 +148,7 @@ namespace MicroCHPElectricGenerator {
               InternalFlowControl(false), PlantFlowControl(true), WaterFlowCurveID(0), AirFlowCurveID(0), DeltaPelMax(0.0), DeltaFuelMdotMax(0.0),
               UAhx(0.0), UAskin(0.0), RadiativeFraction(0.0), MCeng(0.0), MCcw(0.0), Pstandby(0.0), WarmUpByTimeDelay(false),
               WarmUpByEngineTemp(true), kf(0.0), TnomEngOp(0.0), kp(0.0), Rfuelwarmup(0.0), WarmUpDelay(0.0), PcoolDown(0.0), CoolDownDelay(0.0),
-              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
+              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(DataGenerators::OperatingMode::Unassigned), OffModeTime(0.0), StandyByModeTime(0.0),
               WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
               Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
               QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
@@ -201,30 +201,31 @@ namespace MicroCHPElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
+        void InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state);
 
-        void CalcUpdateHeatRecovery();
+        void CalcUpdateHeatRecovery(EnergyPlusData &state);
 
-        void CalcMicroCHPNoNormalizeGeneratorModel(bool RunFlagElectCenter, // TRUE when Generator operating
+        void CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &state,
+                                                   bool RunFlagElectCenter, // TRUE when Generator operating
                                                    bool RunFlagPlant,
                                                    Real64 MyElectricLoad, // Generator demand
                                                    Real64 MyThermalLoad,
                                                    bool FirstHVACIteration);
 
-        void UpdateMicroCHPGeneratorRecords();
+        void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput();
+    void GetMicroCHPGeneratorInput(EnergyPlusData &state);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine
@@ -258,7 +259,7 @@ namespace MicroCHPElectricGenerator {
                                      Real64 MdotCpcw    // mass flow and specific heat of coolant water
     );
 
-    void FigureMicroCHPZoneGains();
+    void FigureMicroCHPZoneGains(EnergyPlusData &state);
 
     void clear_state();
 
@@ -266,6 +267,14 @@ namespace MicroCHPElectricGenerator {
     extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
 } // namespace MicroCHPElectricGenerator
+
+struct MicroCHPElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

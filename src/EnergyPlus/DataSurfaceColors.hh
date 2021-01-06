@@ -53,9 +53,13 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSurfaceColors {
 
@@ -101,9 +105,17 @@ namespace DataSurfaceColors {
                                     Optional_string_const ColorType = _ // for now, must be DXF
     );
 
-    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType = _);
+    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
 
 } // namespace DataSurfaceColors
+
+struct SurfaceColorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

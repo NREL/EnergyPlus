@@ -60,14 +60,13 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
-    struct FansData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Fans {
 
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
-    using DataHVACGlobals::SystemAirflowSizing;
 
     struct FanEquipConditions
     {
@@ -105,8 +104,6 @@ namespace Fans {
         Real64 PowerLossToAir;         // Fan heat gain to air stream [W]
         bool EMSFanPressureOverrideOn; // if true, then EMS is calling to override
         Real64 EMSFanPressureValue;    // EMS value for Delta Pressure Across the Fan [Pa]
-        // cpw22Aug2010 Clarify meaning of "fan efficiency"
-        //  REAL(r64)    :: FanEff                   =0.0d0  !Fan total efficiency; motor and mechanical
         Real64 FanEff;            // Fan total system efficiency (fan*belt*motor*VFD)
         bool EMSFanEffOverrideOn; // if true, then EMS is calling to override
         Real64 EMSFanEffValue;    // EMS value for total efficiency of the Fan, fraction on 0..1
@@ -127,14 +124,13 @@ namespace Fans {
         std::string EndUseSubcategoryName;
         bool OneTimePowerRatioCheck; // one time flag used for error message
         bool OneTimeEffRatioCheck;   // one time flag used for error message
-        // cpw22Aug2010 Following added to support Fan Component Model input
         Real64 FanWheelDia;          // Fan wheel outer diameter [m]
         Real64 FanOutletArea;        // Fan outlet area [m2]
         Real64 FanMaxEff;            // Fan maximum static efficiency [-]
         Real64 EuMaxEff;             // Euler number at fan maximum static efficiency [-]
         Real64 FanMaxDimFlow;        // Fan maximum dimensionless airflow [-]
         Real64 FanShaftPwrMax;       // Fan shaft maximum input power [W]
-        Real64 FanSizingFactor;      // Fan sizing factor [-] cpw31Aug2010
+        Real64 FanSizingFactor;      // Fan sizing factor [-]
         Real64 PulleyDiaRatio;       // Motor/fan pulley diameter ratio [-]
         Real64 BeltMaxTorque;        // Belt maximum torque [N-m]
         Real64 BeltSizingFactor;     // Belt sizing factor [-]
@@ -144,7 +140,7 @@ namespace Fans {
         Real64 MotorSizingFactor;    // Motor sizing factor [-]
         std::string VFDEffType;      // VFD efficiency type [Speed or Power]
         Real64 VFDMaxOutPwr;         // VFD maximum output power [W]
-        Real64 VFDSizingFactor;      // VFD sizing factor [-] cpw31Aug2010
+        Real64 VFDSizingFactor;      // VFD sizing factor [-]
         int PressRiseCurveIndex;     // Fan pressure rise curve index
         int PressResetCurveIndex;    // Duct static pressure reset curve index
         int PLFanEffNormCurveIndex;  // Fan part-load efficiency (normal) curve index
@@ -158,17 +154,16 @@ namespace Fans {
         int MotorMaxEffCurveIndex;   // Motor maximum efficiency curve index
         int PLMotorEffCurveIndex;    // Motor part-load efficiency curve index
         int VFDEffCurveIndex;        // VFD efficiency curve index
-        // cpw22Aug2010 Following added to support Fan Component Model calculated values
         Real64 DeltaPressTot;          // Total pressure rise across fan [N/m2]
         Real64 FanAirPower;            // Air power for fan being Simulated [W]
         Real64 FanSpd;                 // Fan shaft rotational speed [rpm]
         Real64 FanTrq;                 // Fan shaft torque [N-m]
         Real64 FanWheelEff;            // Fan efficiency (mechanical)
         Real64 FanShaftPower;          // Shaft input power for fan being Simulated [W]
-        Real64 BeltMaxEff;             // Belt maximum efficiency (mechanical) cpw31Aug2010
+        Real64 BeltMaxEff;             // Belt maximum efficiency (mechanical)
         Real64 BeltEff;                // Belt efficiency (mechanical)
         Real64 BeltInputPower;         // Belt input power for fan being Simulated [W]
-        Real64 MotorMaxEff;            // Motor maximum efficiency (electrical) cpw31Aug2010
+        Real64 MotorMaxEff;            // Motor maximum efficiency (electrical)
         Real64 MotorInputPower;        // Motor input power for fan being Simulated [W]
         Real64 VFDEff;                 // VFD efficiency (electrical)
         Real64 VFDInputPower;          // VFD input power for fan being Simulated [W]
@@ -255,7 +250,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput(FansData &fans);
+    void GetFanInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -275,17 +270,15 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(FansData &fans, int const FanNum);
+    void SimSimpleFan(EnergyPlusData &state, int const FanNum);
 
-    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(FansData &fans, int const FanNum);
+    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
 
-    // cpw22Aug2010 Added Component Model fan algorithm
-
-    void SimComponentModelFan(FansData &fans, int const FanNum);
+    void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -293,7 +286,7 @@ namespace Fans {
     // Beginning of Update subroutines for the Fan Module
     // *****************************************************************************
 
-    void UpdateFan(int const FanNum);
+    void UpdateFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Update subroutines for the Fan Module
     // *****************************************************************************
@@ -301,7 +294,7 @@ namespace Fans {
     // Beginning of Reporting subroutines for the Fan Module
     // *****************************************************************************
 
-    void ReportFan(int const FanNum);
+    void ReportFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Reporting subroutines for the Fan Module
     // *****************************************************************************
@@ -309,61 +302,71 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(FansData &fans, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
 
     void GetFanVolFlow(int const FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(int const FanIndex);
 
-    void GetFanType(FansData &fans, std::string const &FanName,               // Fan name
+    void GetFanType(EnergyPlusData &state,
+                    std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
                     Optional_string_const ThisObjectType = _, // parent object type (for error message)
                     Optional_string_const ThisObjectName = _  // parent object name (for error message)
     );
 
-    Real64 GetFanDesignVolumeFlowRate(FansData &fans, std::string const &FanType,     // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
+                                      std::string const &FanType,     // must match fan types in this module
                                       std::string const &FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
-    int GetFanInletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(EnergyPlusData &state,
+                        std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     );
 
-    int getFanInNodeIndex(FansData &fans, int const &FanIndex, // fan index
+    int getFanInNodeIndex(EnergyPlusData &state,
+                          int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     );
 
-    int GetFanOutletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanOutletNode(EnergyPlusData &state,
+                         std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanAvailSchPtr(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(EnergyPlusData &state,
+                          std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanSpeedRatioCurveIndex(FansData &fans, std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
+                                   std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName,    // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );
 
-    void SetFanData(FansData &fans, int const FanNum,                         // Index of fan
+    void SetFanData(EnergyPlusData &state,
+                    int const FanNum,                         // Index of fan
                     bool &ErrorsFound,                        // Set to true if certain errors found
                     std::string const &FanName,               // Name of fan
                     Optional<Real64 const> MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
                     Optional<Real64 const> MinAirVolFlow = _  // Fan air volumetric flow rate    [m3/s]
     );
 
-    Real64 FanDesDT(int const FanNum,       // index of fan in Fan array
+    Real64 FanDesDT(EnergyPlusData &state,
+                    int const FanNum,       // index of fan in Fan array
                     Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
-    Real64 CalFaultyFanAirFlowReduction(std::string const &FanName,          // Name of the Fan
+    Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
+                                        std::string const &FanName,          // Name of the Fan
                                         Real64 const FanDesignAirFlowRate,   // Fan Design Volume Flow Rate [m3/s]
                                         Real64 const FanDesignDeltaPress,    // Fan Design Delta Pressure [Pa]
                                         Real64 const FanFaultyDeltaPressInc, // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -375,6 +378,16 @@ namespace Fans {
     );
 
     void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum);
+
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel);
 
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.

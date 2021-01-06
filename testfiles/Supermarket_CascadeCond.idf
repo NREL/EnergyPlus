@@ -138,7 +138,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -5233,7 +5235,7 @@
 
   Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
@@ -5261,13 +5263,13 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Evaporator Total Cooling Rate,timestep;
 
@@ -5281,25 +5283,25 @@
 
   Output:Variable,*,Refrigeration Walk In Evaporator Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Ancillary Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Ancillary Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Ancillary Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Ancillary Electricity Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Fan Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Fan Electricity Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Lighting Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Lighting Electricity Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Heater Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Heater Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Heater Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Heater Electricity Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Defrost Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Defrost Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Zone Sensible Cooling Rate,timestep;
 
@@ -5313,9 +5315,9 @@
 
   Output:Variable,*,Refrigeration Walk In Zone Latent Energy,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Total Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Total Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Total Compressor Heat Transfer Rate,timestep;
 
@@ -5327,17 +5329,17 @@
 
   Output:Variable,*,Refrigeration System Evaporating Temperature,timestep;
 
-  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 
   Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Zone Lights Electric Energy,timestep;
+  Output:Variable,*,Zone Lights Electricity Energy,timestep;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,timestep;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,SALESFLOOR OUTLET NODE,System Node Temperature,timestep;
 
@@ -5367,11 +5369,11 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Refrigeration:Electricity,monthly;
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 

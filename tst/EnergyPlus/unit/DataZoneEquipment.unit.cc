@@ -56,9 +56,9 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -69,8 +69,8 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {
 
-    NumOfZones = 2;
-    ZoneEquipConfig.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 2;
+    ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -82,8 +82,8 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 
     ZoneEquipInputsFilled = true;
 
-    EXPECT_EQ(0, GetSystemNodeNumberForZone(state, "NonExistingZone"));
-    EXPECT_EQ(1, GetSystemNodeNumberForZone(state, "Zone1"));
+    EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, "NonExistingZone"));
+    EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, "Zone1"));
 
     ZoneEquipConfig.deallocate();
 }
@@ -97,11 +97,11 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::ZoneIntGain.allocate(1);
     DataHeatBalance::People.allocate(1);
     ScheduleManager::Schedule.allocate(2);
-    DataContaminantBalance::ZoneCO2GainFromPeople.allocate(1);
-    DataContaminantBalance::ZoneAirCO2.allocate(1);
-    DataContaminantBalance::ZoneSysContDemand.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
 
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     DataHeatBalance::Zone(1).FloorArea = 10.0;
     DataHeatBalance::Zone(1).TotOccupants = 5.0;
@@ -112,9 +112,9 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::People(1).CO2RateFactor = 3.82e-8;
     DataHeatBalance::People(1).NumberOfPeople = DataHeatBalance::Zone(1).TotOccupants;
 
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::OutdoorCO2 = 400.0;
-    DataContaminantBalance::ZoneCO2GainFromPeople(1) = 3.82E-8 * 5.0;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8 * 5.0;
 
     DataSizing::NumOARequirements = 1;
     DataSizing::OARequirements(1).Name = "ZONE OA";
@@ -127,24 +127,24 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
 
     Real64 OAVolumeFlowRate;
     // Test ZOAM_ProportionalControlSchOcc
-    DataContaminantBalance::ZoneAirCO2(1) = 500.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.031, OAVolumeFlowRate, 0.00001);
 
-    DataContaminantBalance::ZoneAirCO2(1) = 405.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 405.0;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.0308115, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_ProportionalControlDesOcc
-    DataContaminantBalance::ZoneAirCO2(1) = 500.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_IAQP
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
-    DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * DataEnvironment::StdRhoAir;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * state->dataEnvrn->StdRhoAir;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);
 
     // Cleanup
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::ZoneIntGain.deallocate();
     ScheduleManager::Schedule.deallocate();
     DataHeatBalance::People.deallocate();
-    DataContaminantBalance::ZoneCO2GainFromPeople.deallocate();
-    DataContaminantBalance::ZoneAirCO2.deallocate();
-    DataContaminantBalance::ZoneSysContDemand.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneSysContDemand.deallocate();
 }

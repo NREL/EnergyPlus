@@ -51,9 +51,13 @@
 #include <string>
 #include <vector>
 
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HysteresisPhaseChange {
 
@@ -114,7 +118,7 @@ namespace HysteresisPhaseChange {
         Real64 specHeatTransition;
 
         // the factory for this class
-        static HysteresisPhaseChange *factory(const std::string &objectName);
+        static HysteresisPhaseChange *factory(EnergyPlusData &state, const std::string &objectName);
 
         // the Cp calculation function for this class
         Real64 getCurrentSpecificHeat(
@@ -134,11 +138,19 @@ namespace HysteresisPhaseChange {
 
     extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-    void readAllHysteresisModels();
+    void readAllHysteresisModels(EnergyPlusData &state);
 
     void clear_state();
 
 } // namespace HysteresisPhaseChange
+
+struct HysteresisPhaseChangeData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -47,20 +47,18 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-ConstructionData dataConstruction;
-
 namespace Construction {
 
-    void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
+    void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -197,7 +195,7 @@ namespace Construction {
 
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
 
-        this->CTFTimeStep = DataGlobals::TimeStepZone;
+        this->CTFTimeStep = state.dataGlobal->TimeStepZone;
         Real64 rs = 0.0;
         int LayersInConstruct = 0;
         int NumResLayers = 0;
@@ -216,43 +214,46 @@ namespace Construction {
 
             // Obtain thermal properties from the Material derived type
 
-            dl(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
-            rk(Layer) = dataMaterial.Material(CurrentLayer).Conductivity;
-            rho(Layer) = dataMaterial.Material(CurrentLayer).Density;
-            cp(Layer) = dataMaterial.Material(CurrentLayer).SpecHeat; // Must convert
+            dl(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
+            rk(Layer) = state.dataMaterial->Material(CurrentLayer).Conductivity;
+            rho(Layer) = state.dataMaterial->Material(CurrentLayer).Density;
+            cp(Layer) = state.dataMaterial->Material(CurrentLayer).SpecHeat; // Must convert
             // from kJ/kg-K to J/kg-k due to rk units
 
-            if (this->SourceSinkPresent && !dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity) {
+            if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity) {
                 // check for materials that are too conductive or thin
                 if ((rho(Layer) * cp(Layer)) > 0.0) {
                     Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                     if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
-                        DeltaTimestep = DataGlobals::TimeStepZoneSec;
+                        DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                        if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
-                            ShowSevereError("InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
+                        if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
+                            ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                             "material name = " +
-                                            dataMaterial.Material(CurrentLayer).Name);
-                            ShowContinueError("High conductivity Material layers are not well supported for internal source constructions, "
-                                              "material conductivity = " +
-                                              General::RoundSigDigits(dataMaterial.Material(CurrentLayer).Conductivity, 3) + " [W/m-K]");
-                            ShowContinueError("Material thermal diffusivity = " + General::RoundSigDigits(Alpha, 3) + " [m2/s]");
-                            ShowContinueError("Material with this thermal diffusivity should have thickness > " +
-                                                      General::RoundSigDigits(ThicknessThreshold, 5) + " [m]");
-                            if (dataMaterial.Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
-                                ShowContinueError("Material may be too thin to be modeled well, thickness = " +
-                                                          General::RoundSigDigits(dataMaterial.Material(CurrentLayer).Thickness, 5) + " [m]");
-                                ShowContinueError("Material with this thermal diffusivity should have thickness > " +
-                                                  General::RoundSigDigits(DataHeatBalance::ThinMaterialLayerThreshold, 5) + " [m]");
+                                            state.dataMaterial->Material(CurrentLayer).Name);
+                            ShowContinueError(state,
+                                              format("High conductivity Material layers are not well supported for internal source constructions, "
+                                                     "material conductivity = {:.3R} [W/m-K]",
+                                                     state.dataMaterial->Material(CurrentLayer).Conductivity));
+                            ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
+                            ShowContinueError(
+                                state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
+                            if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                                ShowContinueError(state,
+                                                  format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
+                                                         state.dataMaterial->Material(CurrentLayer).Thickness));
+                                ShowContinueError(state,
+                                                  format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
+                                                         DataHeatBalance::ThinMaterialLayerThreshold));
                             }
-                            dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity = true;
+                            state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity = true;
                         }
                     }
                 }
             }
-            if (dataMaterial.Material(CurrentLayer).Thickness > 3.0) {
-                ShowSevereError("InitConductionTransferFunctions: Material too thick for CTF calculation");
-                ShowContinueError("material name = " + dataMaterial.Material(CurrentLayer).Name);
+            if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
+                ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
+                ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
                 ErrorsFound = true;
             }
 
@@ -269,15 +270,14 @@ namespace Construction {
 
             if (ResLayer(Layer)) {                             // Resistive layer-check for R-value, etc.
                 ++NumResLayers;                                // Increment number of resistive layers
-                lr(Layer) = dataMaterial.Material(CurrentLayer).Resistance; // User defined thermal resistivity
+                lr(Layer) = state.dataMaterial->Material(CurrentLayer).Resistance; // User defined thermal resistivity
                 if (lr(Layer) < RValueLowLimit) {              // User didn't define enough
                     // parameters to calculate CTFs for a building element
                     // containing this layer.
 
-                    ShowSevereError("InitConductionTransferFunctions: Material=" + dataMaterial.Material(CurrentLayer).Name +
+                    ShowSevereError(state, "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
                                     "R Value below lowest allowed value");
-                    ShowContinueError("Lowest allowed value=[" + General::RoundSigDigits(RValueLowLimit, 3) + "], Material R Value=[" +
-                                      General::RoundSigDigits(lr(Layer), 3) + "].");
+                    ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                     ErrorsFound = true;
 
                 } else { // A valid user defined R-value is available.
@@ -290,7 +290,7 @@ namespace Construction {
                     // then use the "exact" approach to model a massless layer
                     // based on the node equations for the state space method.
 
-                    if ((Layer == 1) || (Layer == this->TotLayers) || (!dataMaterial.Material(this->LayerPoint(Layer)).ROnly)) {
+                    if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer)).ROnly)) {
                         cp(Layer) = 1.007;
                         rho(Layer) = 1.1614;
                         rk(Layer) = 0.0263;
@@ -360,8 +360,8 @@ namespace Construction {
                         --this->TempAfterLayer;
                     }
                 } else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-                    ShowFatalError("Combining resistance layers failed for " + this->Name);
-                    ShowContinueError("This should never happen.  Contact EnergyPlus Support for further assistance.");
+                    ShowFatalError(state, "Combining resistance layers failed for " + this->Name);
+                    ShowContinueError(state, "This should never happen.  Contact EnergyPlus Support for further assistance.");
                 }
             }
         }
@@ -409,7 +409,7 @@ namespace Construction {
             // previously this loop would go from 1..currentConstructionIndex-1
             // instead of that, we'll loop through the list and stop when we get to the current construction
             // should be the same behavior, we're just checking it by address
-            for (auto & otherConstruction : dataConstruction.Construct) {
+            for (auto & otherConstruction : state.dataConstruction->Construct) {
                 if (&otherConstruction == this) break;
 
                 // If a source or sink is present in this construction, do not allow any
@@ -589,19 +589,19 @@ namespace Construction {
                 // calculated time step for this construct, then CTFTimeStep must be
                 // revised.
 
-                if (std::abs((DataGlobals::TimeStepZone - this->CTFTimeStep) / DataGlobals::TimeStepZone) > 0.1) {
+                if (std::abs((state.dataGlobal->TimeStepZone - this->CTFTimeStep) / state.dataGlobal->TimeStepZone) > 0.1) {
 
-                    if (this->CTFTimeStep > DataGlobals::TimeStepZone) {
+                    if (this->CTFTimeStep > state.dataGlobal->TimeStepZone) {
 
                         // CTFTimeStep larger than TimeStepZone:  Make sure TimeStepZone
                         // divides evenly into CTFTimeStep
-                        this->NumHistories = int((this->CTFTimeStep / DataGlobals::TimeStepZone) + 0.5);
-                        this->CTFTimeStep = DataGlobals::TimeStepZone * double(this->NumHistories);
+                        this->NumHistories = int((this->CTFTimeStep / state.dataGlobal->TimeStepZone) + 0.5);
+                        this->CTFTimeStep = state.dataGlobal->TimeStepZone * double(this->NumHistories);
 
                     } else {
 
                         // CTFTimeStep smaller than TimeStepZone:  Set to TimeStepZone
-                        this->CTFTimeStep = DataGlobals::TimeStepZone;
+                        this->CTFTimeStep = state.dataGlobal->TimeStepZone;
                         this->NumHistories = 1;
                     }
                 }
@@ -862,7 +862,7 @@ namespace Construction {
                     // determine the CTFs.  The Gammas are an intermediate
                     // calculations which are necessary before the CTFs can
                     // be computed in TransFuncCoeffs.
-                    DisplayString("Calculating CTFs for \"" + this->Name + "\"");
+                    DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                     this->calculateExponentialMatrix(); // Compute exponential of AMat
@@ -891,7 +891,7 @@ namespace Construction {
                     // the DO loop.
                     if (this->NumCTFTerms > (Construction::MaxCTFTerms - 1)) {
                         ++this->NumHistories;
-                        this->CTFTimeStep += DataGlobals::TimeStepZone;
+                        this->CTFTimeStep += state.dataGlobal->TimeStepZone;
                         CTFConvrg = false;
                     }
 
@@ -916,11 +916,11 @@ namespace Construction {
                             if (((std::abs(SumXi - SumYi) / BiggestSum) > MaxAllowedCTFSumError) ||
                                 ((std::abs(SumZi - SumYi) / BiggestSum) > MaxAllowedCTFSumError)) {
                                 ++this->NumHistories;
-                                this->CTFTimeStep += DataGlobals::TimeStepZone;
+                                this->CTFTimeStep += state.dataGlobal->TimeStepZone;
                                 CTFConvrg = false;
                             }
                         } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-                            ShowFatalError("Illegal construction definition, no CTFs calculated for " + this->Name);
+                            ShowFatalError(state, "Illegal construction definition, no CTFs calculated for " + this->Name);
                         }
                     }
 
@@ -930,34 +930,34 @@ namespace Construction {
                     // Thus, if the time step reaches a certain point, error out and let the
                     // user know that something needs to be checked in the input file.
                     if (this->CTFTimeStep >= MaxAllowedTimeStep) {
-                        ShowSevereError("CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
-                        ShowContinueError("...with Materials (outside layer to inside)");
-                        ShowContinueError("(outside)=\"" + dataMaterial.Material(this->LayerPoint(1)).Name + "\"");
+                        ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
+                        ShowContinueError(state, "...with Materials (outside layer to inside)");
+                        ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
                         for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                             if (Layer != this->TotLayers) {
-                                ShowContinueError("(next)=\"" + dataMaterial.Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             } else {
-                                ShowContinueError("(inside)=\"" + dataMaterial.Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             }
                         }
-                        ShowContinueError(
+                        ShowContinueError(state,
                                 "The Construction report will be produced. This will show more details on Constructions and their materials.");
-                        ShowContinueError("Attempts will be made to complete the CTF process but the report may be incomplete.");
-                        ShowContinueError("Constructs reported after this construction may appear to have all 0 CTFs.");
-                        ShowContinueError("The potential causes of this problem are related to the input for the construction");
-                        ShowContinueError("listed in the severe error above.  The CTF calculate routine is unable to come up");
-                        ShowContinueError("with a series of CTF terms that have a reasonable time step and this indicates an");
-                        ShowContinueError("error.  Check the definition of this construction and the materials that make up");
-                        ShowContinueError("the this->  Very thin, highly conductive materials may cause problems.");
-                        ShowContinueError("This may be avoided by ignoring the presence of those materials since they probably");
-                        ShowContinueError("do not effect the heat transfer characteristics of the this->  Highly");
-                        ShowContinueError("conductive or highly resistive layers that are alternated with high mass layers");
-                        ShowContinueError("may also result in problems.  After confirming that the input is correct and");
-                        ShowContinueError("realistic, the user should contact the EnergyPlus support team.");
+                        ShowContinueError(state, "Attempts will be made to complete the CTF process but the report may be incomplete.");
+                        ShowContinueError(state, "Constructs reported after this construction may appear to have all 0 CTFs.");
+                        ShowContinueError(state, "The potential causes of this problem are related to the input for the construction");
+                        ShowContinueError(state, "listed in the severe error above.  The CTF calculate routine is unable to come up");
+                        ShowContinueError(state, "with a series of CTF terms that have a reasonable time step and this indicates an");
+                        ShowContinueError(state, "error.  Check the definition of this construction and the materials that make up");
+                        ShowContinueError(state, "the this->  Very thin, highly conductive materials may cause problems.");
+                        ShowContinueError(state, "This may be avoided by ignoring the presence of those materials since they probably");
+                        ShowContinueError(state, "do not effect the heat transfer characteristics of the this->  Highly");
+                        ShowContinueError(state, "conductive or highly resistive layers that are alternated with high mass layers");
+                        ShowContinueError(state, "may also result in problems.  After confirming that the input is correct and");
+                        ShowContinueError(state, "realistic, the user should contact the EnergyPlus support team.");
                         DoCTFErrorReport = true;
                         ErrorsFound = true;
                         break;
-                        //            CALL ShowFatalError('Program terminated for reasons listed (InitConductionTransferFunctions) ')
+                        //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
                     }
 
                 } // ... end of CTF calculation loop.
@@ -970,7 +970,7 @@ namespace Construction {
 
             // Set time step for construct to user time step and the number of
             // inter-time step interpolations to 1
-            this->CTFTimeStep = DataGlobals::TimeStepZone;
+            this->CTFTimeStep = state.dataGlobal->TimeStepZone;
             this->NumHistories = 1;
             this->NumCTFTerms = 1;
 
@@ -990,7 +990,7 @@ namespace Construction {
             this->e(1) = 0.0;       // zero.
 
             if (this->SourceSinkPresent) {
-                ShowSevereError("Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
+                ShowSevereError(state, "Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
                 ErrorsFound = true;
             }
 
@@ -1236,8 +1236,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to AMatN anyway.
-                        if (std::abs(AMat1(ic, ict)) > DataGlobals::rTinyValue) {
-                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobals::rTinyValue / AMat1(ic, ict)))
+                        if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue) {
+                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue / AMat1(ic, ict)))
                                 AMatN(ic, ir) += AMato(ict, ir) * AMat1(ic, ict) / double(i);
                         }
                     }
@@ -1253,7 +1253,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     // Test of limit criteria:
-                    if (std::abs(this->AExp(ic, ir)) > DataGlobals::rTinyValue) { // Next line divides by AExp entry so it
+                    if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue) { // Next line divides by AExp entry so it
                         // must be checked to avoid dividing by zero.
                         // If the ratio between any current element in the power
                         // of AMat and its corresponding element in AExp is
@@ -1301,7 +1301,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     for (idm = 1; idm <= this->rcmax; ++idm) {
-                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobals::rTinyValue) {
+                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue) {
                             this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                             Backup = false;
                         }
@@ -1725,8 +1725,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to PhiR0 anyway.
-                        if (std::abs(Rnew(ic, is)) > DataGlobals::rTinyValue) {
-                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobals::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
+                        if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue) {
+                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                         }
                     }
                 }
@@ -1896,10 +1896,10 @@ namespace Construction {
         Rold.deallocate();
     }
 
-    void ConstructionProps::reportTransferFunction(OutputFiles &outputFiles, int const cCounter) {
+    void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter) {
 
         static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
-        print(outputFiles.eio,
+        print(state.files.eio,
               Format_700,
               this->Name,
               cCounter,
@@ -1916,20 +1916,20 @@ namespace Construction {
         for (int I = 1; I <= this->TotLayers; ++I) {
             int Layer = this->LayerPoint(I);
             {
-                auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
+                auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
                 if (SELECT_CASE_var == DataHeatBalance::Air) {
                     static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                    print(outputFiles.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
+                    print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
                 } else {
                     static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-                    print(outputFiles.eio,
+                    print(state.files.eio,
                           Format_701,
-                          dataMaterial.Material(Layer).Name,
-                          dataMaterial.Material(Layer).Thickness,
-                          dataMaterial.Material(Layer).Conductivity,
-                          dataMaterial.Material(Layer).Density,
-                          dataMaterial.Material(Layer).SpecHeat,
-                          dataMaterial.Material(Layer).Resistance);
+                          state.dataMaterial->Material(Layer).Name,
+                          state.dataMaterial->Material(Layer).Thickness,
+                          state.dataMaterial->Material(Layer).Conductivity,
+                          state.dataMaterial->Material(Layer).Density,
+                          state.dataMaterial->Material(Layer).SpecHeat,
+                          state.dataMaterial->Material(Layer).Resistance);
                 }
             }
         }
@@ -1937,7 +1937,7 @@ namespace Construction {
         for (int I = this->NumCTFTerms; I >= 0; --I) {
             if (I != 0) {
                 static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(outputFiles.eio,
+                print(state.files.eio,
                       Format_703,
                       I,
                       this->CTFOutside(I),
@@ -1946,7 +1946,7 @@ namespace Construction {
                       this->CTFFlux(I));
             } else {
                 static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(outputFiles.eio,
+                print(state.files.eio,
                       Format_704,
                       I,
                       this->CTFOutside(I),
@@ -1959,12 +1959,12 @@ namespace Construction {
             // QTFs...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
                 static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-                print(outputFiles.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
+                print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
             }
             // QTFs for source/sink location temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
                 static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(outputFiles.eio,
+                print(state.files.eio,
                       Format_706,
                       I,
                       this->CTFTSourceOut(I),
@@ -1975,7 +1975,7 @@ namespace Construction {
                 // QTFs for user specified interior temperature calculation...
                 for (int I = this->NumCTFTerms; I >= 0; --I) {
                     static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                    print(outputFiles.eio,
+                    print(state.files.eio,
                           Format_707,
                           I,
                           this->CTFTUserOut(I),
@@ -1985,8 +1985,8 @@ namespace Construction {
             }
         }
     }
-    
-    bool ConstructionProps::isGlazingConstruction() const
+
+    bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -1997,7 +1997,7 @@ namespace Construction {
         // PURPOSE OF THIS SUBROUTINE:
         // Commonly used routine in several places in EnergyPlus which examines if current
         // construction is glazing construction
-        auto const MaterialGroup = dataMaterial.Material(LayerPoint(1)).Group;
+        auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
         return MaterialGroup == DataHeatBalance::WindowGlass ||
                MaterialGroup == DataHeatBalance::Shade ||
                MaterialGroup == DataHeatBalance::Screen ||
@@ -2005,15 +2005,15 @@ namespace Construction {
                MaterialGroup == DataHeatBalance::WindowSimpleGlazing;
     }
 
-    Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(Real64 userValue)
+    Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
     {
         if (userValue < 0.0) {
-            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
-            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
+            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
+            ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
             return 0.0;
         } else if (userValue > 1.0) {
-            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
-            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
+            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
+            ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
             return 1.0;
         } else {    // Valid value between 0 and 1
             return userValue;

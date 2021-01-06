@@ -117,7 +117,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2808,7 +2810,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep;
 
-  !Output:Variable,*,Cooling Coil Electric Power,timestep;
+  !Output:Variable,*,Cooling Coil Electricity Rate,timestep;
   !Output:Variable,*,Heating Coil Air Heating Rate,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
@@ -2847,7 +2849,7 @@
 
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,timestep;
 
@@ -2863,7 +2865,7 @@
 
   Output:Variable,*,Unitary System Water Coil Speed Level,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 

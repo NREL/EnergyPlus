@@ -51,12 +51,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HybridUnitaryAirConditioners {
 
@@ -67,20 +71,23 @@ namespace HybridUnitaryAirConditioners {
     void clear_state();
 
     // MODULE PARAMETER DEFINITIONS
-    void SimZoneHybridUnitaryAirConditioners(std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                             std::string const &CompName,    // name of the packaged terminal heat pump
                                              int const ZoneNum,              // number of zone being served
                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                              Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                              int &CompIndex                  // index to zone hvac unit
     );
 
-    void GetInputZoneHybridUnitaryAirConditioners(bool &Errors);
+    void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors);
 
-    void InitZoneHybridUnitaryAirConditioners(int const UnitNum, // unit number
+    void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                              int const UnitNum, // unit number
                                               int const ZoneNum  // number of zone being served
     );
 
-    void CalcZoneHybridUnitaryAirConditioners(int const UnitNum,              // unit number
+    void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                              int const UnitNum,              // unit number
                                               int const ZoneNum,              // number of zone being served
                                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                               Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
@@ -88,12 +95,21 @@ namespace HybridUnitaryAirConditioners {
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 
-    int GetHybridUnitaryACOutAirNode(int const UnitNum);
+    int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const UnitNum);
 
-    int GetHybridUnitaryACZoneInletNode(int const UnitNum);
+    int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const UnitNum);
 
-    int GetHybridUnitaryACReturnAirNode(int const UnitNum);
+    int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
+
+struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 #endif

@@ -86,7 +86,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     July,                    !- Name
@@ -5667,7 +5669,7 @@
 
   UtilityCost:Tariff,
     NV_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -6092,7 +6094,6 @@
 !  EnergyManagementSystem:ConstructionIndexVariable,
 !    TCwindow_85,             !- Name
 !    TCwindow_85;             !- Construction Object Name
-
 !  EnergyManagementSystem:Sensor,
 !    Win1_Tout,               !- Name
 !    Perimeter_ZN_1_wall_south_Window_1,  !- Output:Variable or Output:Meter Index Key Name
@@ -6107,7 +6108,6 @@
 !    Perimeter_ZN_1_wall_south_Window_1,  !- Actuated Component Unique Name
 !    Surface,                 !- Actuated Component Type
 !    Construction State;      !- Actuated Component Control Type
-
 !  EnergyManagementSystem:ProgramCallingManager,
 !    My thermochromic window emulator,  !- Name
 !    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
@@ -6116,8 +6116,8 @@
   PythonPlugin:Instance,
     My thermochromic window emulator,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginThermochromicWindow, !- Python Module Name
-    ZN_1_wall_south_Window_1_Control;   !- Plugin Class Name
+    PythonPluginThermochromicWindow,  !- Python Module Name
+    ZN_1_wall_south_Window_1_Control;  !- Plugin Class Name
 
 !  EnergyManagementSystem:Program,
 !    ZN_1_wall_south_Window_1_Control,  !- Name

@@ -148,6 +148,8 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/engineering-reference/src/special-modules-reporting/environmental-impacts.tex
   ${PROJECT_SOURCE_DIR}/engineering-reference/src/special-modules-reporting/zone-component-loads-summary.tex
   ${PROJECT_SOURCE_DIR}/engineering-reference/src/special-modules-reporting/output-table-annual.tex
+  ${PROJECT_SOURCE_DIR}/engineering-reference/src/special-modules-reporting/heat-emissions.tex
+  ${PROJECT_SOURCE_DIR}/engineering-reference/src/special-modules-reporting/resilience-metrics.tex
   ${PROJECT_SOURCE_DIR}/title.tex
 )
 
@@ -531,6 +533,9 @@ SET( INCLUDED_IMAGES
   ${PROJECT_SOURCE_DIR}/engineering-reference/media/ss-figure6.png
   ${PROJECT_SOURCE_DIR}/engineering-reference/media/PCMModel.png
   ${PROJECT_SOURCE_DIR}/engineering-reference/media/IdealLoadsSchematic.png
+  ${PROJECT_SOURCE_DIR}/engineering-reference/media/humidex_chart.jpg
+  ${PROJECT_SOURCE_DIR}/engineering-reference/media/heat_index_chart.png
+  ${PROJECT_SOURCE_DIR}/engineering-reference/media/heatemission.png
 )
 
 CREATE_DOC_TARGET("engineering-reference" "EngineeringReference")

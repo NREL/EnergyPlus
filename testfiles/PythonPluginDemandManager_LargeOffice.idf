@@ -68,7 +68,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -10586,7 +10588,7 @@
 
   UtilityCost:Tariff,
     NJ_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -10866,7 +10868,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -10998,13 +11000,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11028,9 +11030,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11068,17 +11070,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -11103,9 +11105,9 @@
 
   Output:Meter,Electricity:Facility,Timestep;
 
-  Output:Meter,Gas:Facility,Timestep;
+  Output:Meter,NaturalGas:Facility,Timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 
@@ -11121,306 +11123,194 @@
 
   PythonPlugin:TrendVariable,
     Demand_Mgr_State_Trend,  !- Name
-    argDmndMngrState,        !- EMS Variable Name
+    argDmndMngrState,        !- Name of a Python Plugin Variable
     48;                      !- Number of Timesteps to be Logged
 
   PythonPlugin:TrendVariable,
     FacilityElectTrend,      !- Name
-    CurntFacilityElectDemand,!- EMS Variable Name
+    CurntFacilityElectDemand,!- Name of a Python Plugin Variable
     144;                     !- Number of Timesteps to be Logged
 
   PythonPlugin:Variables,
-    Python Globals,
-    argTargetDemand,
-    argCrntDmnd,
-    argTrendDirection,
-    argDmndMngrState,
-    CURNTFACILITYELECTDEMAND;
-    !Set_Cooling_Setpoint_Sched;
+    Python Globals,          !- Name
+    argTargetDemand,         !- Variable Name 1
+    argCrntDmnd,             !- Variable Name 2
+    argTrendDirection,       !- Variable Name 3
+    argDmndMngrState,        !- Variable Name 4
+    CURNTFACILITYELECTDEMAND;!- Variable Name 5
 
+    !Set_Cooling_Setpoint_Sched;
 !  PythonPlugin:OutputVariable,
 !    Py Cooling Setpoint,    !- Name
 !    Set_Cooling_Setpoint_Sched,  !- Plugin Variable Name
 !    Averaged,                !- Type of Data in Variable
 !    ZoneTimestep,            !- Update Frequency
 !    C;                       !- Units
-
 !  Output:Variable,Py Cooling Setpoint,PythonPlugin:OutputVariable,Timestep;
 
   PythonPlugin:Instance,
-    DetermineCurrentDemandManageState,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    DetermineCurrentDemandManageState;
+    DetermineCurrentDemandManageState,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    DetermineCurrentDemandManageState;  !- Plugin Class Name
 
   PythonPlugin:Instance,
-    DispatchDemandControlsByState,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    DispatchDemandControlsByState;
+    DispatchDemandControlsByState,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    DispatchDemandControlsByState;  !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav5Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav5Schedsetpoint;
+    Vav5Schedsetpoint,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav5Schedsetpoint;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav5Mixedairmanagers,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav5Mixedairmanagers;
+    Vav5Mixedairmanagers,    !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav5Mixedairmanagers;    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav1Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav1Schedsetpoint;
+    Vav1Schedsetpoint,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav1Schedsetpoint;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav1Mixedairmanagers,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav1Mixedairmanagers;
+    Vav1Mixedairmanagers,    !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav1Mixedairmanagers;    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav3Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav3Schedsetpoint;
+    Vav3Schedsetpoint,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav3Schedsetpoint;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav3Mixedairmanagers,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav3Mixedairmanagers;
+    Vav3Mixedairmanagers,    !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav3Mixedairmanagers;    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav2Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav2Schedsetpoint;
+    Vav2Schedsetpoint,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav2Schedsetpoint;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav2Mixedairmanagers,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav2Mixedairmanagers;
+    Vav2Mixedairmanagers,    !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav2Mixedairmanagers;    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Coolsys1Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Coolsys1Schedsetpoint;
+    Coolsys1Schedsetpoint,   !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Coolsys1Schedsetpoint;   !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Heatsys1Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Heatsys1Schedsetpoint;
+    Heatsys1Schedsetpoint,   !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Heatsys1Schedsetpoint;   !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Shwsys1Schedsetpoint,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Shwsys1Schedsetpoint;
+    Shwsys1Schedsetpoint,    !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Shwsys1Schedsetpoint;    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav5Nightcyclemgr,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav5Nightcyclemgr;
+    Vav5Nightcyclemgr,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav5Nightcyclemgr;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav1Nightcyclemgr,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav1Nightcyclemgr;
+    Vav1Nightcyclemgr,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav1Nightcyclemgr;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav2Nightcyclemgr,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav2Nightcyclemgr;
+    Vav2Nightcyclemgr,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav2Nightcyclemgr;       !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Vav3Nightcyclemgr,
-    Yes,
-    PythonPluginDemandManager_LargeOffice,
-    Vav3Nightcyclemgr;
+    Vav3Nightcyclemgr,       !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginDemandManager_LargeOffice,  !- Python Module Name
+    Vav3Nightcyclemgr;       !- Plugin Class Name
 
-  Output:Variable,
-    Seasonal-Reset-Supply-Air-Temp-Sch,  !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,Seasonal-Reset-Supply-Air-Temp-Sch,Schedule Value,hourly;
 
-  Output:Variable,
-    BLDG_LIGHT_SCH,          !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,BLDG_LIGHT_SCH,Schedule Value,hourly;
 
-  Output:Variable,
-    CLGSETP_SCH_Copy,        !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,CLGSETP_SCH_Copy,Schedule Value,hourly;
 
-  Output:Variable,
-    VAV_5_HeatC-VAV_5_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_5_HeatC-VAV_5_FanNode,System Node Temperature,hourly;
 
-  Output:Variable,
-    VAV_5 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Temperature,hourly;
 
-  Output:Variable,
-    Basement,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Basement,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    HTGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,HTGSETP_SCH,Schedule Value,hourly;
 
-  Output:Variable,
-    CLGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,CLGSETP_SCH,Schedule Value,hourly;
 
-  Output:Variable,
-    VAV_1_HeatC-VAV_1_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_1_HeatC-VAV_1_FanNode,System Node Temperature,hourly;
 
-  Output:Variable,
-    VAV_1 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_1 Supply Equipment Outlet Node,System Node Temperature,hourly;
 
-  Output:Variable,
-    Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Core_bottom,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_bot_ZN_3,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_bot_ZN_2,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_bot_ZN_1,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_bot_ZN_4,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    VAV_2_HeatC-VAV_2_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_2_HeatC-VAV_2_FanNode,System Node Temperature,hourly;
 
-  Output:Variable,
-    VAV_2 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_2 Supply Equipment Outlet Node,System Node Temperature,hourly;
 
-  Output:Variable,
-    Core_mid,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Core_mid,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_mid_ZN_3,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_mid_ZN_2,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_mid_ZN_1,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_mid_ZN_4,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    VAV_3_HeatC-VAV_3_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_3_HeatC-VAV_3_FanNode,System Node Temperature,hourly;
 
-  Output:Variable,
-    VAV_3 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature,hourly; !- Output:Variable or Output:Meter Name
+  Output:Variable,VAV_3 Supply Equipment Outlet Node,System Node Temperature,hourly;
 
-  Output:Variable,
-    Core_top,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Core_top,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_top_ZN_3,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_top_ZN_2,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_top_ZN_1,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature,hourly;  !- Output:Variable or Output:Meter Name
+  Output:Variable,Perimeter_top_ZN_4,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,
-    SHWSys1-Loop-Temp-Schedule,  !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,SHWSys1-Loop-Temp-Schedule,Schedule Value,hourly;
 
-  Output:Variable,
-    HW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,HW-Loop-Temp-Schedule,Schedule Value,hourly;
 
-  Output:Variable,
-    CW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value,hourly;          !- Output:Variable or Output:Meter Name
+  Output:Variable,CW-Loop-Temp-Schedule,Schedule Value,hourly;
 
-  EnergyManagementSystem:Actuator,
-    a, CoolSys1 Supply Outlet Node, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    b, HeatSys1 Supply Equipment Outlet Node, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    c, HeatSys1 Supply Outlet Node, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    d, SHWSys1 Supply Outlet Node, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    e, VAV_1_CoolC-VAV_1_HeatCNode, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    f, VAV_1_HEATC-VAV_1_FANNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    g, VAV_2_CoolC-VAV_2_HeatCNode, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    h, VAV_2_HEATC-VAV_2_FANNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    i, VAV_3_CoolC-VAV_3_HeatCNode, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    j, VAV_3_HEATC-VAV_3_FANNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    k, VAV_5_CoolC-VAV_5_HeatCNode, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    l, VAV_5_HEATC-VAV_5_FANNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    m, VAV_1_OA-VAV_1_COOLCNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    n, VAV_2_OA-VAV_2_COOLCNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    o, VAV_3_OA-VAV_3_COOLCNODE, System Node Setpoint,  Temperature Setpoint;
-
-  EnergyManagementSystem:Actuator,
-    p, VAV_5_OA-VAV_5_COOLCNODE, System Node Setpoint,  Temperature Setpoint;

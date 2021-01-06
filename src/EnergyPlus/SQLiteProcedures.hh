@@ -48,6 +48,13 @@
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <sqlite3.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
@@ -55,19 +62,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 
-#include <sqlite3.h>
-
-#include <fstream>
-#include <iosfwd>
-#include <map>
-#include <memory>
-
 namespace EnergyPlus {
+
+// Forward
+struct EnergyPlusData;
 
 class SQLiteProcedures
 {
@@ -148,6 +152,9 @@ public:
 
     // Commit a transaction
     void sqliteCommit();
+
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
 
     // Within a current transaction
     bool sqliteWithinTransaction();
@@ -256,7 +263,7 @@ public:
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                              const std::string &environmentName,
-                                             const int kindOfSim,
+                                             const DataGlobalConstants::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
     void sqliteWriteMessage(const std::string &message);
@@ -967,8 +974,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        int const &airModelType;
-        int const &tempCoupleScheme;
+        DataRoomAirModel::RoomAirModel const &airModelType;
+        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -994,9 +1001,17 @@ private:
 
 extern std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase();
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
-void CreateSQLiteZoneExtendedOutput();
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
+
+struct SQLiteProceduresData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
