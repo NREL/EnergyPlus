@@ -52,14 +52,13 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataLoopNode;
@@ -68,7 +67,7 @@ using namespace EnergyPlus::PlantChillers;
 TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 {
 
-    DataPlant::TotNumLoops = 4;
+    state->dataPlnt->TotNumLoops = 4;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -108,9 +107,9 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -150,9 +149,9 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.001;
     DataSizing::PlantSizData(2).DeltaT = 5.0;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
@@ -194,7 +193,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 {
 
-    DataPlant::TotNumLoops = 4;
+    state->dataPlnt->TotNumLoops = 4;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -235,9 +234,9 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -277,9 +276,9 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.001;
     DataSizing::PlantSizData(2).DeltaT = 5.0;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);

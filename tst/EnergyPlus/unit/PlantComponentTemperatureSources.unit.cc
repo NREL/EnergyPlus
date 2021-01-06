@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -73,7 +73,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Setup the plant itself manually
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     bool firstHVACIteration;
     bool runFlag = false;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     PlantComponentTemperatureSources::GetWaterSourceInput(*state);
 
     // We can check that GetInput happened properly here

@@ -93,7 +93,6 @@ void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &
 void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state, std::string const &PlantLoopName, int const PlantSizingIndex)
 {
     using DataPlant::SupplySide;
-    using DataPlant::TotNumLoops;
     using namespace FluidProperties;
     using DataSizing::PlantSizData;
 
@@ -101,7 +100,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
     Real64 cp;
 
     // find plant loop number
-    for (int i = 1; i <= TotNumLoops; ++i) {
+    for (int i = 1; i <= state.dataPlnt->TotNumLoops; ++i) {
         if (PlantLoopName == state.dataPlnt->PlantLoop(i).Name) { // found it
 
             density = GetDensityGlycol(

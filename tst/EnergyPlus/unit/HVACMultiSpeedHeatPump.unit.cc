@@ -48,17 +48,14 @@
 // EnergyPlus::MultiSpeedAirToAirHeatPump Unit Tests
 
 // Google Test Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <gtest/gtest.h>
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
-// ObjexxFCL Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneControls.hh>

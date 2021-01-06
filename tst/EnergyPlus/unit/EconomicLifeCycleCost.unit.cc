@@ -54,10 +54,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/EconomicTariff.hh>
-#include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/EconomicTariff.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -240,10 +240,10 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "MyPlant";
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -404,10 +404,10 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "MyPlant";
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));

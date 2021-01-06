@@ -51,10 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -64,9 +63,9 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {
-    TotNumLoops = 3;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    state->dataPlnt->TotNumLoops = 3;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
     }
@@ -81,7 +80,7 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
 
     // not using the DataPlantTest base class because of how specific this one is and that one is very general
     if (state->dataPlnt->PlantLoop.allocated()) state->dataPlnt->PlantLoop.deallocate();
-    TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -122,7 +121,7 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
     EXPECT_FALSE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(*state, nodeNumA, nodeNumB));
 
-    TotNumLoops = 0;
+    state->dataPlnt->TotNumLoops = 0;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.deallocate();
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.deallocate();
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.deallocate();

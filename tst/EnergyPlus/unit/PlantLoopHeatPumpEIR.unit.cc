@@ -57,15 +57,13 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -429,7 +427,7 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
@@ -481,7 +479,7 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // now call for initialization again, for begin environment
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // validate that plant sizing went ok
@@ -558,8 +556,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -620,9 +618,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
@@ -745,8 +743,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -804,9 +802,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // The values really should just come out all as the hard-sized values, this just makes sure that function didn't
     // botch something up.
@@ -882,8 +880,8 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -934,9 +932,9 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // let's just fake that the companion coil already got autosized properly
     thisHeatingPLHP->loadSideDesignVolFlowRate = 0.1;
@@ -993,8 +991,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -1035,9 +1033,9 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // with no plant sizing available and no companion coil to size from, it should throw a fatal
     EXPECT_THROW(thisHeatingPLHP->sizeLoadSide(*state), std::runtime_error);
@@ -1082,8 +1080,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -1124,9 +1122,9 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // this should report out to the sizing output, but just the user defined stuff
     thisHeatingPLHP->sizeLoadSide(*state);
@@ -1164,7 +1162,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
@@ -1243,7 +1241,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
@@ -1281,7 +1279,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // call with run flag off, loose limits on node min/max
@@ -1375,8 +1373,8 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up a couple simple plant loops with one branch per loop-side and one component per branch
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
@@ -1420,7 +1418,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // test the case where the heat pump is connected to both the supply and demand sides of the same loop
     PLHPPlantSupplySideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
@@ -1493,7 +1491,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -1534,7 +1532,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
@@ -1627,7 +1625,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -1667,7 +1665,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
@@ -1856,7 +1854,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -1886,7 +1884,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
@@ -1973,7 +1971,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -2003,7 +2001,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
@@ -2189,7 +2187,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
@@ -2217,7 +2215,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // call with run flag off, loose limits on node min/max
@@ -2331,8 +2329,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -2379,9 +2377,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
@@ -2495,8 +2493,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -2539,9 +2537,9 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
@@ -2647,7 +2645,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
@@ -2744,7 +2742,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -2784,7 +2782,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     int NumFound;
@@ -2844,7 +2842,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
@@ -2884,7 +2882,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     int NumFound;

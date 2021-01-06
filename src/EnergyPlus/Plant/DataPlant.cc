@@ -282,18 +282,6 @@ namespace EnergyPlus::DataPlant {
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
 
-    int TotNumLoops(0);     // number of plant and condenser loops
-    int TotNumHalfLoops(0); // number of half loops (2 * TotNumLoops)
-    bool PlantFirstSizeCompleted(false);
-    bool PlantFirstSizesOkayToFinalize(false); // true if plant sizing is finishing and can save results
-    bool PlantReSizingCompleted(false);
-    bool PlantFirstSizesOkayToReport(false);
-    bool PlantFinalSizesOkayToReport(false);
-    bool AnyEMSPlantOpSchemesInModel(false);
-
-    int PlantManageSubIterations(0); // tracks plant iterations to characterize solver
-    int PlantManageHalfLoopCalls(0); // tracks number of half loop calls
-
     // Object Data
     Array1D<PlantAvailMgrData> PlantAvailMgr;
     Array1D<ReportLoopData> VentRepPlantSupplySide;
@@ -306,16 +294,6 @@ namespace EnergyPlus::DataPlant {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TotNumLoops = 0;
-        TotNumHalfLoops = 0;
-        PlantFirstSizeCompleted = false;
-        PlantFirstSizesOkayToFinalize = false;
-        PlantReSizingCompleted = false;
-        PlantFirstSizesOkayToReport = false;
-        PlantFinalSizesOkayToReport = false;
-        AnyEMSPlantOpSchemesInModel = false;
-        PlantManageSubIterations = 0;
-        PlantManageHalfLoopCalls = 0;
         PlantAvailMgr.deallocate();
         VentRepPlantSupplySide.deallocate();
         VentRepPlantDemandSide.deallocate();

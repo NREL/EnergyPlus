@@ -50,14 +50,11 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
-#include <EnergyPlus/RootFinder.hh>
-#include <EnergyPlus/DataRootFinder.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/RootFinder.hh>
 
 using namespace EnergyPlus;
 

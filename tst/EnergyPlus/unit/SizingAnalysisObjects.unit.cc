@@ -51,7 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -61,8 +62,6 @@
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace OutputProcessor;
@@ -119,9 +118,9 @@ protected:
         PlantSizData(1).DesVolFlowRate = 0.002;
         PlantSizData(1).DeltaT = 10;
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
         }

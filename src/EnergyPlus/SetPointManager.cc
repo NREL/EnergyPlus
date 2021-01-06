@@ -7302,7 +7302,7 @@ namespace EnergyPlus::SetPointManager {
         // if plant isn't initialized, assume index=1 (water)
         int fluidIndex = 1;
         if (this->plantLoopIndex == 0) {
-            for (int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++) {
+            for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
                 if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
                     this->plantLoopIndex = plantIndex;
                     this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;
@@ -7407,7 +7407,7 @@ namespace EnergyPlus::SetPointManager {
         // if plant isn't initialized, assume index=1 (water)
         int fluidIndex = 1;
         if (this->plantLoopIndex == 0) {
-            for (int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++) {
+            for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
                 if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
                     this->plantLoopIndex = plantIndex;
                     this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;

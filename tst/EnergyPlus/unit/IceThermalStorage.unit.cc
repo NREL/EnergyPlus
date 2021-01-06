@@ -53,11 +53,9 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/IceThermalStorage.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::IceThermalStorage;

@@ -52,13 +52,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     bool RunFlag(true);
     Real64 MyLoad(1000000.0);
 
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -148,8 +148,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -177,9 +177,9 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;
     DataSizing::PlantSizData(1).DeltaT = 10;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.initialize(*state);

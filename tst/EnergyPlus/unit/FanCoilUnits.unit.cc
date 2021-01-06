@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -67,18 +67,15 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -274,8 +271,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -341,7 +338,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -587,8 +584,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -655,7 +652,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -898,8 +895,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -972,7 +969,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -1276,8 +1273,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", FanCoil(1).HCoilType);
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1340,7 +1337,7 @@ namespace EnergyPlus {
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -1595,8 +1592,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1670,7 +1667,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -1951,8 +1948,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -2019,7 +2016,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -2214,7 +2211,7 @@ namespace EnergyPlus {
         bool FirstHVACIteration(false);
         bool ErrorsFound(false);
         Real64 QZnReq(-1000.0);
-        DataPlant::TotNumLoops = 2;
+        state->dataPlnt->TotNumLoops = 2;
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
@@ -2281,8 +2278,8 @@ namespace EnergyPlus {
         GetFanInput(*state);
         GetFanCoilUnits(*state);
 
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -2661,8 +2658,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -2728,7 +2725,7 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -3081,8 +3078,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -3148,7 +3145,7 @@ namespace EnergyPlus {
         HWCoil.WaterLoopBranchNum = 1;
         HWCoil.WaterLoopCompNum = 1;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -3480,8 +3477,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3529,7 +3526,7 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -3847,8 +3844,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3896,7 +3893,7 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -4214,8 +4211,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -4263,7 +4260,7 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
@@ -4535,8 +4532,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
 
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -4575,7 +4572,7 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));

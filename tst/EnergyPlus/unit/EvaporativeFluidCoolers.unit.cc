@@ -51,17 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -143,7 +141,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = false;
     thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantFinalSizesOkayToReport = false;
+    state->dataPlnt->PlantFinalSizesOkayToReport = false;
     DataSizing::SaveNumPlantComps = 0;
     thisEFC.DesignWaterFlowRate = 0.001;
     DataSizing::PlantSizData.allocate(1);

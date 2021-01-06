@@ -655,13 +655,10 @@ namespace HVACManager {
         using DataPlant::ConvergenceHistoryARR;
         using DataPlant::DemandSide;
         using DataPlant::NumConvergenceHistoryTerms;
-        using DataPlant::PlantManageHalfLoopCalls;
-        using DataPlant::PlantManageSubIterations;
         using DataPlant::square_sum_ConvergenceHistoryARR;
         using DataPlant::sum_ConvergenceHistoryARR;
         using DataPlant::sum_square_ConvergenceHistoryARR;
         using DataPlant::SupplySide;
-        using DataPlant::TotNumLoops;
         using EMSManager::ManageEMS;
         using General::CreateSysTimeIntervalString;
 
@@ -757,8 +754,8 @@ namespace HVACManager {
         // The plant loop 'get inputs' and initialization are also done here in order to allow plant loop connected components
         // simulated by managers other than the plant manager to run correctly.
         HVACManageIteration = 0;
-        PlantManageSubIterations = 0;
-        PlantManageHalfLoopCalls = 0;
+        state.dataPlnt->PlantManageSubIterations = 0;
+        state.dataPlnt->PlantManageHalfLoopCalls = 0;
         SetAllPlantSimFlagsToValue(state, true);
         if (!SimHVACIterSetup) {
             SetupOutputVariable(state, "HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
@@ -778,7 +775,7 @@ namespace HVACManager {
             ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
             GetPlantLoopData(state);
             GetPlantInput(state);
-            SetupInitialPlantCallingOrder();
+            SetupInitialPlantCallingOrder(state);
             SetupBranchControlTypes(state); // new routine to do away with input for branch control type
             //    CALL CheckPlantLoopData
             SetupReports(state);
@@ -786,12 +783,12 @@ namespace HVACManager {
                 SetupPlantEMSActuators(state);
             }
 
-            if (TotNumLoops > 0) {
+            if (state.dataPlnt->TotNumLoops > 0) {
                 SetupOutputVariable(state,
-                    "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC");
+                    "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, state.dataPlnt->PlantManageSubIterations, "HVAC", "Sum", "SimHVAC");
                 SetupOutputVariable(state,
-                    "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC");
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                    "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, state.dataPlnt->PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC");
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     // init plant sizing numbers in main plant data structure
                     InitOneTimePlantSizingInfo(state, LoopNum);
                 }
@@ -947,7 +944,7 @@ namespace HVACManager {
         }
 
         // DSU  Test plant loop for errors
-        for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
                 CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
                 CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
@@ -1327,7 +1324,7 @@ namespace HVACManager {
                         } // loop over zone inlet nodes
                     }     // loop over zones
 
-                    for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
                         if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
                             ShowContinueError(state, "Plant System Named = " + state.dataPlnt->PlantLoop(LoopNum).Name + " did not converge for mass flow rate");

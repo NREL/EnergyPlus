@@ -50,15 +50,15 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::PlantUtilities;
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, TestAnyPlantSplitterMixerLacksContinuity)
     // This test captures all code paths through the AnyPlantSplitterMixerLacksContinuity function
 
     // We need to set up a two sided plant loop, we'll have one side not have a splitter for convenience
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Splitter.Exists = false;
@@ -440,7 +440,7 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
 TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
 
     // test out some stuff on the scan plant loops function, for now just verifying errFlag is passed by reference
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     DataLoopNode::Node.allocate(2);

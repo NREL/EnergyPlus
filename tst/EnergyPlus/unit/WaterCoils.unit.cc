@@ -63,17 +63,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -82,6 +79,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -139,8 +137,8 @@ public:
         state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
         state->dataWaterCoils->WaterCoilNumericFields.allocate(state->dataWaterCoils->NumWaterCoils);
         state->dataWaterCoils->WaterCoilNumericFields(state->dataWaterCoils->NumWaterCoils).FieldNames.allocate(17); // max N fields for water coil
-        TotNumLoops = 1;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         PlantSizData.allocate(1);
         ZoneEqSizing.allocate(1);
         UnitarySysEqSizing.allocate(1);
@@ -197,7 +195,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     PlantSizData(1).PlantLoopName = "WaterLoop";
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -433,7 +431,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     PlantSizData(1).DeltaT = 10.0;
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -585,7 +583,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     PlantSizData(1).DeltaT = 10.0;
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -741,7 +739,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     PlantSizData(1).DeltaT = 10.0;
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -856,7 +854,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     PlantSizData(1).PlantLoopName = "WaterLoop";
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -957,7 +955,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     PlantSizData(1).PlantLoopName = "WaterLoop";
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -1070,7 +1068,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     PlantSizData(1).PlantLoopName = "WaterLoop";
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -1253,7 +1251,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     PlantSizData(1).PlantLoopName = "WaterLoop";
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -1351,7 +1349,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     PlantSizData(1).DeltaT = 10.0;
 
     // set up plant loop
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -1613,8 +1611,8 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
     EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-    TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     AirMassFlow = 0.60;
     MaxAirMassFlow = 0.60;
@@ -1688,7 +1686,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));

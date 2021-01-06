@@ -61,6 +61,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -89,7 +90,6 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -317,13 +317,13 @@ protected:
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
 
         // set up plant loop for water equipment
-        DataPlant::TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
-        DataSizing::PlantSizData.allocate(DataPlant::TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        DataSizing::PlantSizData.allocate(state->dataPlnt->TotNumLoops);
         // int NumPltSizInput = DataPlant::TotNumLoops;
         DataSizing::NumPltSizInput = 2;
 
-        for (int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex) {
+        for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
             auto &loop(state->dataPlnt->PlantLoop(loopindex));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
@@ -8103,9 +8103,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     PlantSizData(NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
 
     // set up plant loop
-    TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));
@@ -8219,9 +8219,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     PlantSizData.allocate(NumPltSizInput);
     PlantSizData(NumPltSizInput).PlantLoopName = "SteamLoop";
     // set up plant loop
-    TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(1));

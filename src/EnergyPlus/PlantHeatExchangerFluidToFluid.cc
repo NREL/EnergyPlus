@@ -783,7 +783,7 @@ namespace PlantHeatExchangerFluidToFluid {
             this->MyFlag = false;
         } // plant setup
 
-        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
@@ -863,25 +863,25 @@ namespace PlantHeatExchangerFluidToFluid {
             if (PltSizNumSupSide > 0) {
                 if (DataSizing::PlantSizData(PltSizNumSupSide).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     tmpSupSideDesignVolFlowRate = DataSizing::PlantSizData(PltSizNumSupSide).DesVolFlowRate * this->SizingFactor;
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
                 } else {
                     tmpSupSideDesignVolFlowRate = 0.0;
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
                 }
-                if (DataPlant::PlantFinalSizesOkayToReport) {
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                                  this->Name,
                                                  "Loop Supply Side Design Fluid Flow Rate [m3/s]",
                                                  this->SupplySideLoop.DesignVolumeFlowRate);
                 }
-                if (DataPlant::PlantFirstSizesOkayToReport) {
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                                  this->Name,
                                                  "Initial Loop Supply Side Design Fluid Flow Rate [m3/s]",
                                                  this->SupplySideLoop.DesignVolumeFlowRate);
                 }
             } else {
-                if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object");
                     ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
                 }
@@ -894,18 +894,18 @@ namespace PlantHeatExchangerFluidToFluid {
         if (this->DemandSideLoop.DesignVolumeFlowRateWasAutoSized) {
             if (tmpSupSideDesignVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
                 tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
-                if (DataPlant::PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+                if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
             } else {
                 tmpDmdSideDesignVolFlowRate = 0.0;
-                if (DataPlant::PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+                if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
             }
-            if (DataPlant::PlantFinalSizesOkayToReport) {
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                              this->Name,
                                              "Loop Demand Side Design Fluid Flow Rate [m3/s]",
                                              this->DemandSideLoop.DesignVolumeFlowRate);
             }
-            if (DataPlant::PlantFirstSizesOkayToReport) {
+            if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                              this->Name,
                                              "Initial Loop Demand Side Design Fluid Flow Rate [m3/s]",
@@ -954,11 +954,11 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                    RoutineName);
 
                     Real64 tmpDesCap = Cp * rho * tmpDeltaTSupLoop * tmpSupSideDesignVolFlowRate;
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) this->UA = tmpDesCap / tmpDeltaTloopToLoop;
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->UA = tmpDesCap / tmpDeltaTloopToLoop;
                 } else {
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) this->UA = 0.0;
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->UA = 0.0;
                 }
-                if (DataPlant::PlantFinalSizesOkayToReport) {
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                         "HeatExchanger:FluidToFluid", this->Name, "Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
                     BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
@@ -966,7 +966,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                  "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",
                                                  tmpDeltaTloopToLoop);
                 }
-                if (DataPlant::PlantFirstSizesOkayToReport) {
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                         "HeatExchanger:FluidToFluid", this->Name, "Initial Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
                     BaseSizer::reportSizerOutput(state,
@@ -976,7 +976,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         tmpDeltaTloopToLoop);
                 }
             } else {
-                if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops");
                     ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
                 }
@@ -984,7 +984,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
 
         // size capacities for load range based op schemes
-        if (DataPlant::PlantFirstSizesOkayToFinalize) {
+        if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
 
             if (PltSizNumSupSide > 0) {
                 {
@@ -1042,7 +1042,7 @@ namespace PlantHeatExchangerFluidToFluid {
             this->calculate(state, SupSideMdot, DmdSideMdot);
             this->SupplySideLoop.MaxLoad = std::abs(this->HeatTransferRate);
         }
-        if (DataPlant::PlantFinalSizesOkayToReport) {
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "HeatExchanger:FluidToFluid");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->SupplySideLoop.MaxLoad);
         }

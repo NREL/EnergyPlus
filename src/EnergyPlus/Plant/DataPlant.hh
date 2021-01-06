@@ -200,21 +200,6 @@ namespace DataPlant {
     extern Real64 const square_sum_ConvergenceHistoryARR;
     extern Real64 const sum_square_ConvergenceHistoryARR;
 
-    extern int TotNumLoops;                    // number of plant and condenser loops
-    extern int TotNumHalfLoops;                // number of half loops (2 * TotNumLoops)
-    extern bool PlantFirstSizeCompleted;       // true if first-pass sizing is still going on and not finished
-    extern bool PlantFirstSizesOkayToFinalize; // true if first-pass plant sizing is finish and can save results for simulation
-    extern bool PlantFirstSizesOkayToReport;   // true if initial first pass size can be reported
-    extern bool PlantFinalSizesOkayToReport;   // true if plant sizing is really all done and final results reported
-    extern bool PlantReSizingCompleted;
-
-    extern bool AnyEMSPlantOpSchemesInModel;
-
-    extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
-    extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
-
-    // Enum classes
-
     // Object Data
     extern Array1D<PlantAvailMgrData> PlantAvailMgr;
     extern Array1D<ReportLoopData> VentRepPlantSupplySide;
@@ -231,16 +216,16 @@ namespace DataPlant {
 
 struct DataPlantData : BaseGlobalStruct {
 
-//    int TotNumLoops = 0;   // number of plant and condenser loops
-//    int TotNumHalfLoops = 0; // number of half loops (2 * TotNumLoops)
-//    bool PlantFirstSizeCompleted = false;
-//    bool PlantFirstSizesOkayToFinalize = false; // true if plant sizing is finishing and can save results
-//    bool PlantReSizingCompleted = false;
-//    bool PlantFirstSizesOkayToReport = false;
-//    bool PlantFinalSizesOkayToReport = false;
-//    bool AnyEMSPlantOpSchemesInModel = false;
-//    int PlantManageSubIterations = 0; // tracks plant iterations to characterize solver
-//    int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
+    int TotNumLoops = 0;   // number of plant and condenser loops
+    int TotNumHalfLoops = 0; // number of half loops (2 * TotNumLoops)
+    bool PlantFirstSizeCompleted = false;
+    bool PlantFirstSizesOkayToFinalize = false; // true if plant sizing is finishing and can save results
+    bool PlantReSizingCompleted = false;
+    bool PlantFirstSizesOkayToReport = false;
+    bool PlantFinalSizesOkayToReport = false;
+    bool AnyEMSPlantOpSchemesInModel = false;
+    int PlantManageSubIterations = 0; // tracks plant iterations to characterize solver
+    int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
 //    Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
 //    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
@@ -251,16 +236,16 @@ struct DataPlantData : BaseGlobalStruct {
 
     void clear_state() override
     {
-//        this->TotNumLoops = 0;
-//        this->TotNumHalfLoops = 0;
-//        this->PlantFirstSizeCompleted = false;
-//        this->PlantFirstSizesOkayToFinalize = false;
-//        this->PlantReSizingCompleted = false;
-//        this->PlantFirstSizesOkayToReport = false;
-//        this->PlantFinalSizesOkayToReport = false;
-//        this->AnyEMSPlantOpSchemesInModel = false;
-//        this->PlantManageSubIterations = 0;
-//        this->PlantManageHalfLoopCalls = 0;
+        this->TotNumLoops = 0;
+        this->TotNumHalfLoops = 0;
+        this->PlantFirstSizeCompleted = false;
+        this->PlantFirstSizesOkayToFinalize = false;
+        this->PlantReSizingCompleted = false;
+        this->PlantFirstSizesOkayToReport = false;
+        this->PlantFinalSizesOkayToReport = false;
+        this->AnyEMSPlantOpSchemesInModel = false;
+        this->PlantManageSubIterations = 0;
+        this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
 //        this->PlantAvailMgr.deallocate();
 //        this->VentRepPlantSupplySide.deallocate();

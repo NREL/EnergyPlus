@@ -51,10 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/FluidProperties.hh>
 
-#include <cmath>
 #include <ctgmath>
 
 #include "Fixtures/EnergyPlusFixture.hh"

@@ -51,31 +51,29 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/LowTempRadiantSystem.hh>
-
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::LowTempRadiantSystem;
@@ -133,12 +131,12 @@ protected:
         HydrRadSys(RadSysNum).NumCircuits.allocate(1);
         CFloRadSys(RadSysNum).NumCircuits.allocate(1);
         // set up plant loop
-        TotNumLoops = 2;
-        state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-        PlantSizData.allocate(TotNumLoops);
-        NumPltSizInput = TotNumLoops;
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        PlantSizData.allocate(state->dataPlnt->TotNumLoops);
+        NumPltSizInput = state->dataPlnt->TotNumLoops;
 
-        for (int loopindex = 1; loopindex <= TotNumLoops; ++loopindex) {
+        for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
             auto &loop(state->dataPlnt->PlantLoop(loopindex));
             loop.LoopSide.allocate(2);
             auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
@@ -1127,7 +1125,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     GetPlantSizingInput(*state);
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
     DataSurfaces::WorldCoordSystem = true;
     GetSurfaceListsInputs(*state);

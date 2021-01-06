@@ -55,11 +55,11 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
@@ -69,9 +69,9 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     using namespace DataHVACGlobals;
     Real64 TankOutletTemp;
     TimeStepSys = 1;
-    TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    for (int i = 1; i <= TotNumLoops; ++i) {
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int i = 1; i <= state->dataPlnt->TotNumLoops; ++i) {
         auto &loop(state->dataPlnt->PlantLoop(i));
         loop.LoopSide.allocate(2);
     }
@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
-    DataLoopNode::Node.allocate(TotNumLoops);
+    DataLoopNode::Node.allocate(state->dataPlnt->TotNumLoops);
     DataLoopNode::Node(1).Temp = 100;
     DataLoopNode::Node(1).MassFlowRate = 10;
 

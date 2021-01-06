@@ -68,7 +68,6 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -209,7 +208,7 @@ namespace EnergyPlus::PlantManager {
                 CurntMinPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations;
             }
 
-            if (TotNumLoops <= 0) { // quick return if no plant in model
+            if (state.dataPlnt->TotNumLoops <= 0) { // quick return if no plant in model
                 SimPlantLoops = false;
                 return;
             }
@@ -219,7 +218,7 @@ namespace EnergyPlus::PlantManager {
 
             while ((SimPlantLoops) && (IterPlant <= state.dataConvergeParams->MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
                     LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSide = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
@@ -248,14 +247,14 @@ namespace EnergyPlus::PlantManager {
                         // Update the report variable
                         this_loop.LastLoopSideSimulated = LoopSide;
 
-                        ++PlantManageHalfLoopCalls;
+                        ++state.dataPlnt->PlantManageHalfLoopCalls;
                     }
 
                 } // half loop based calling order...
 
                 // decide new status for SimPlantLoops flag
                 SimPlantLoops = false;
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum) {
                         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).SimLoopSideNeeded) {
                             SimPlantLoops = true;
@@ -267,12 +266,12 @@ namespace EnergyPlus::PlantManager {
 
                 ++IterPlant; // Increment the iteration counter
                 if (IterPlant < CurntMinPlantSubIterations) SimPlantLoops = true;
-                ++PlantManageSubIterations; // these are summed across all half loops for reporting
+                ++state.dataPlnt->PlantManageSubIterations; // these are summed across all half loops for reporting
             }                               // while
 
             // add check for non-plant system sim flag updates
             //  could set SimAirLoops, SimElecCircuits, SimZoneEquipment flags for now
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
                     auto &this_loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide));
                     if (this_loop_side.SimAirLoopsNeeded) SimAirLoops = true;
@@ -340,19 +339,19 @@ namespace EnergyPlus::PlantManager {
                     CurrentModuleObject); // Get the number of primary plant loops
             CurrentModuleObject = "CondenserLoop";
             NumCondLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
-            TotNumLoops = NumPlantLoops + NumCondLoops;
+            state.dataPlnt->TotNumLoops = NumPlantLoops + NumCondLoops;
 
-            if (TotNumLoops > 0) {
-                state.dataPlnt->PlantLoop.allocate(TotNumLoops);
-                state.dataConvergeParams->PlantConvergence.allocate(TotNumLoops);
+            if (state.dataPlnt->TotNumLoops > 0) {
+                state.dataPlnt->PlantLoop.allocate(state.dataPlnt->TotNumLoops);
+                state.dataConvergeParams->PlantConvergence.allocate(state.dataPlnt->TotNumLoops);
                 if (!allocated(PlantAvailMgr)) {
-                    PlantAvailMgr.allocate(TotNumLoops);
+                    PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
                 }
             } else {
                 return;
             }
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 Alpha = "";
                 Num = 0.0;
 
@@ -646,7 +645,7 @@ namespace EnergyPlus::PlantManager {
                 ErrFound = false;
 
                 if (this_loop.TypeOfLoop == LoopType::Plant) {
-                    GetPlantAvailabilityManager(state, Alpha(15), LoopNum, TotNumLoops, ErrFound);
+                    GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
                 }
 
                 if (ErrFound) {
@@ -723,7 +722,7 @@ namespace EnergyPlus::PlantManager {
             // set up loop status (set by system availability managers) report variables
             // Condenser loop does not have availability manager yet. Once implemented, move the setup output variable to
             // outside the IF statement.
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
                 SetupOutputVariable(state,
                                     "Plant System Cycle On Off Status",
@@ -800,7 +799,7 @@ namespace EnergyPlus::PlantManager {
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             HalfLoopNum = 0;
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
                 plantLoop.LoopHasConnectionComp = false;
 
@@ -1906,7 +1905,7 @@ namespace EnergyPlus::PlantManager {
                 loop.OutletNodeFlowrate = 0.0;
             }
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &loop = state.dataPlnt->PlantLoop(LoopNum);
                 if (LoopNum <= NumPlantLoops) {
                     CurrentModuleObject = "Plant Loop";
@@ -1975,7 +1974,7 @@ namespace EnergyPlus::PlantManager {
             // setup more variables inside plant data structure
             // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
             if (state.dataGlobal->DisplayAdvancedReportVariables) {
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
@@ -2049,7 +2048,7 @@ namespace EnergyPlus::PlantManager {
             }
 
             // now traverse plant loops and set fluid type index in all nodes on the loop
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 FluidIndex = state.dataPlnt->PlantLoop(LoopNum).FluidIndex;
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).FluidIndex = FluidIndex;
@@ -2089,7 +2088,6 @@ namespace EnergyPlus::PlantManager {
             using namespace DataSizing;
             using DataHVACGlobals::NumCondLoops;
             using DataHVACGlobals::NumPlantLoops;
-            using DataPlant::PlantFirstSizesOkayToReport;
             using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
             using PlantUtilities::SetAllFlowLocks;
@@ -2113,7 +2111,7 @@ namespace EnergyPlus::PlantManager {
             int passNum;
 
             if (!allocated(PlantLoopSetPointInitFlag)) {
-                PlantLoopSetPointInitFlag.allocate(TotNumLoops);
+                PlantLoopSetPointInitFlag.allocate(state.dataPlnt->TotNumLoops);
             }
 
             // Initialize the setpoints  for Load range based schemes only as determined by the init flag
@@ -2140,7 +2138,7 @@ namespace EnergyPlus::PlantManager {
             if (MySetPointCheckFlag && DoSetPointTest) {
 
                 // check for missing setpoints
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
                     SensedNode = state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum;
                     if (SensedNode > 0) {
@@ -2176,20 +2174,20 @@ namespace EnergyPlus::PlantManager {
             //*****************************************************************
             // First Pass PUMP AND SIZING INIT
             //*****************************************************************
-            if (!PlantFirstSizeCompleted) {
+            if (!state.dataPlnt->PlantFirstSizeCompleted) {
 
                 SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
                 FinishSizingFlag = false;
-                PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
-                PlantFirstSizesOkayToReport = false;
-                PlantFinalSizesOkayToReport = false;
+                state.dataPlnt->PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
+                state.dataPlnt->PlantFirstSizesOkayToReport = false;
+                state.dataPlnt->PlantFinalSizesOkayToReport = false;
                 GetCompSizFac = true;
                 for (passNum = 1;
                      passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
                     InitLoopEquip = true;
 
                     // Step 2, call component models it  using PlantCallingOrderInfo for sizing
-                    for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                    for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                         LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
@@ -2210,7 +2208,7 @@ namespace EnergyPlus::PlantManager {
 
                     // Step 4: Simulate plant loop components so their design flows are included
 
-                    for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                    for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
                         LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
@@ -2223,17 +2221,17 @@ namespace EnergyPlus::PlantManager {
                 } // iterative passes thru sizing related routines.  end while?
 
                 // Step 5 now one more time for the final
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     if (state.dataGlobal->DoHVACSizingSimulation) {
-                        PlantFirstSizesOkayToFinalize = true;
+                        state.dataPlnt->PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
-                        PlantFirstSizesOkayToReport = true;
-                        PlantFinalSizesOkayToReport = false;
+                        state.dataPlnt->PlantFirstSizesOkayToReport = true;
+                        state.dataPlnt->PlantFinalSizesOkayToReport = false;
                     } else {
-                        PlantFirstSizesOkayToFinalize = true;
+                        state.dataPlnt->PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
-                        PlantFirstSizesOkayToReport = false;
-                        PlantFinalSizesOkayToReport = true;
+                        state.dataPlnt->PlantFirstSizesOkayToReport = false;
+                        state.dataPlnt->PlantFinalSizesOkayToReport = true;
                     }
                     LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
@@ -2254,8 +2252,8 @@ namespace EnergyPlus::PlantManager {
                     //).VolFlowSizingDone = true;
                 }
 
-                PlantFirstSizeCompleted = true;
-                PlantFirstSizesOkayToReport = false;
+                state.dataPlnt->PlantFirstSizeCompleted = true;
+                state.dataPlnt->PlantFirstSizesOkayToReport = false;
             }
             //*****************************************************************
             // END First Pass SIZING INIT
@@ -2263,12 +2261,12 @@ namespace EnergyPlus::PlantManager {
             //*****************************************************************
             // BEGIN Resizing Pass for HVAC Sizing Simultion Adjustments
             //*****************************************************************
-            if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+            if (state.dataGlobal->RedoSizesHVACSimulation && !state.dataPlnt->PlantReSizingCompleted) {
 
                 // cycle through plant equipment calling with InitLoopEquip true
                 InitLoopEquip = true;
                 GetCompSizFac = false;
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
@@ -2283,15 +2281,15 @@ namespace EnergyPlus::PlantManager {
                 }
 
                 // reset loop level
-                PlantFinalSizesOkayToReport = true;
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                state.dataPlnt->PlantFinalSizesOkayToReport = true;
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     ResizePlantLoopLevelSizes(state, LoopNum);
                 }
 
                 InitLoopEquip = true;
 
                 // now call everything again to reporting turned on
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
@@ -2307,8 +2305,8 @@ namespace EnergyPlus::PlantManager {
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
                 }
 
-                PlantReSizingCompleted = true;
-                PlantFinalSizesOkayToReport = false;
+                state.dataPlnt->PlantReSizingCompleted = true;
+                state.dataPlnt->PlantFinalSizesOkayToReport = false;
             }
             //*****************************************************************
             // END Resizing Pass for HVAC Sizing Simultion Adjustments
@@ -2318,7 +2316,7 @@ namespace EnergyPlus::PlantManager {
             //*****************************************************************
             if (SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         // check if setpoints being placed on node properly
                         if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
@@ -2377,7 +2375,7 @@ namespace EnergyPlus::PlantManager {
                 // Any per-environment load distribution init should be OK here
                 // Just clear away any trailing MyLoad for now...
                 // This could likely be moved into InitLoadDistribution also...
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         for (BranchNum = 1;
                              BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2460,7 +2458,7 @@ namespace EnergyPlus::PlantManager {
 
             if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
 
                         {
@@ -2624,7 +2622,7 @@ namespace EnergyPlus::PlantManager {
             if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
             // FirstHVACiteration inits
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // UPDATE LOOP FLOW SETPOINT
                 //    Node(LoopIn)%MassFlowRateSetPoint =  LoopMaxMassFlowRate !DSU? this is suspect, may not be set?
                 // UPDATE LOOP TEMPERATURE SETPOINTS
@@ -2795,10 +2793,10 @@ namespace EnergyPlus::PlantManager {
                 return;
             }
 
-            if (TotNumLoops <= 0) return;
+            if (state.dataPlnt->TotNumLoops <= 0) return;
             if (!(allocated(state.dataPlnt->PlantLoop))) return;
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 numLoopSides = 2;
                 for (SideNum = 1; SideNum <= numLoopSides; ++SideNum) {
                     if (!(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
@@ -3121,7 +3119,7 @@ namespace EnergyPlus::PlantManager {
                                 PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizData(PlantSizNum).PlantSizFac;
                     } else {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
-                        if (PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
@@ -3130,7 +3128,7 @@ namespace EnergyPlus::PlantManager {
                         }
                     }
                     if (Finalize) {
-                        if (PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
@@ -3141,7 +3139,7 @@ namespace EnergyPlus::PlantManager {
                                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                             }
                         }
-                        if (PlantFirstSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
@@ -3155,7 +3153,7 @@ namespace EnergyPlus::PlantManager {
                     }
 
                 } else {
-                    if (PlantFirstSizesOkayToFinalize) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         ShowFatalError(state, "Autosizing of plant loop requires a loop Sizing:Plant object");
                         ShowContinueError(state, "Occurs in PlantLoop object=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
@@ -3169,7 +3167,7 @@ namespace EnergyPlus::PlantManager {
                 // Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate
                 state.dataPlnt->PlantLoop(LoopNum).Volume =
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * state.dataPlnt->PlantLoop(LoopNum).CirculationTime * 60.0;
-                if (PlantFinalSizesOkayToReport) {
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
                         BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
@@ -3179,7 +3177,7 @@ namespace EnergyPlus::PlantManager {
                                            state.dataPlnt->PlantLoop(LoopNum).Volume);
                     }
                 }
-                if (PlantFirstSizesOkayToReport) {
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
                         BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
@@ -3283,7 +3281,7 @@ namespace EnergyPlus::PlantManager {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
                     } else {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
-                        if (PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
@@ -3291,7 +3289,7 @@ namespace EnergyPlus::PlantManager {
                             ShowContinueError(state, "..occurs for PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         }
                     }
-                    if (PlantFinalSizesOkayToReport) {
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                             BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                                state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
@@ -3341,7 +3339,7 @@ namespace EnergyPlus::PlantManager {
             }
         }
 
-        void SetupInitialPlantCallingOrder() {
+        void SetupInitialPlantCallingOrder(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -3383,13 +3381,13 @@ namespace EnergyPlus::PlantManager {
             int OrderIndex; // local
             int I;          // local loop
 
-            TotNumHalfLoops = 2 * TotNumLoops;
+            state.dataPlnt->TotNumHalfLoops = 2 * state.dataPlnt->TotNumLoops;
 
-            if (TotNumHalfLoops <= 0) return;
+            if (state.dataPlnt->TotNumHalfLoops <= 0) return;
 
             // first allocate to total number of plant half loops
 
-            if (!allocated(PlantCallingOrderInfo)) PlantCallingOrderInfo.allocate(TotNumHalfLoops);
+            if (!allocated(PlantCallingOrderInfo)) PlantCallingOrderInfo.allocate(state.dataPlnt->TotNumHalfLoops);
 
             // set plant loop demand sides
             for (I = 1; I <= NumPlantLoops; ++I) {
@@ -3467,7 +3465,7 @@ namespace EnergyPlus::PlantManager {
             bool thisLoopPutsDemandOnAnother;
             int ConnctNum;
 
-            for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
                 LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                 LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
@@ -3477,13 +3475,13 @@ namespace EnergyPlus::PlantManager {
                          ConnctNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
                         OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
                         OtherLoopSideNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
-                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum, OtherLoopSideNum);
+                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
 
                         thisLoopPutsDemandOnAnother = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(
                                 ConnctNum).LoopDemandsOnRemote;
                         if (thisLoopPutsDemandOnAnother) {             // make sure this loop side is called before the other loop side
                             if (OtherLoopCallingIndex < HalfLoopNum) { // rearrange
-                                newCallingIndex = min(HalfLoopNum + 1, TotNumHalfLoops);
+                                newCallingIndex = min(HalfLoopNum + 1, state.dataPlnt->TotNumHalfLoops);
                                 ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                             }
 
@@ -3493,19 +3491,19 @@ namespace EnergyPlus::PlantManager {
 
                                 if (OtherLoopSideNum ==
                                     SupplySide) { // if this is a supplyside, don't push it before its own demand side
-                                    OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum,
+                                    OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                                  DemandSide);
                                     if (OtherLoopDemandSideCallingIndex <
                                         HalfLoopNum) {                             // good to go
                                         newCallingIndex = min(OtherLoopDemandSideCallingIndex + 1,
-                                                              TotNumHalfLoops); // put it right after its demand side
+                                                              state.dataPlnt->TotNumHalfLoops); // put it right after its demand side
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                                     } else { // move both sides of other loop before this, keeping demand side in front
                                         NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopDemandSideCallingIndex,
                                                                        NewOtherDemandSideCallingIndex);
                                         // get fresh pointer after it has changed in previous call
-                                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum,
+                                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                            OtherLoopSideNum);
                                         newCallingIndex = NewOtherDemandSideCallingIndex + 1;
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
@@ -3520,7 +3518,7 @@ namespace EnergyPlus::PlantManager {
             }
         }
 
-        int FindLoopSideInCallingOrder(int const LoopNum, int const LoopSide) {
+        int FindLoopSideInCallingOrder(EnergyPlusData &state, int const LoopNum, int const LoopSide) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         B. Griffith
@@ -3560,7 +3558,7 @@ namespace EnergyPlus::PlantManager {
 
             CallingIndex = 0;
 
-            for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                 if ((LoopNum == PlantCallingOrderInfo(HalfLoopNum).LoopIndex) &&
                     (LoopSide == PlantCallingOrderInfo(HalfLoopNum).LoopSide)) {
 
@@ -4328,7 +4326,7 @@ namespace EnergyPlus::PlantManager {
 
         void CheckOngoingPlantWarnings(EnergyPlusData &state) {
             int LoopNum;
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {

@@ -937,7 +937,7 @@ namespace HVACInterfaceManager {
         // One time call to set up report variables and set common pipe 'type' flag
         if (OneTimeData) {
             if (!CommonPipeSetupFinished) SetupCommonPipes(state);
-            MyEnvrnFlag.dimension(TotNumLoops, true);
+            MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
             OneTimeData = false;
         }
 
@@ -1048,7 +1048,6 @@ namespace HVACInterfaceManager {
         using DataPlant::DeltaTempTol;
         using DataPlant::DemandSide;
         using DataPlant::SupplySide;
-        using DataPlant::TotNumLoops;
         using PlantUtilities::SetActuatedBranchFlowRate;
 
         // Locals
@@ -1097,7 +1096,7 @@ namespace HVACInterfaceManager {
         // one time setups
         if (OneTimeData) {
             if (!CommonPipeSetupFinished) SetupCommonPipes(state);
-            MyEnvrnFlag.dimension(TotNumLoops, true);
+            MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
             OneTimeData = false;
         }
 
@@ -1318,9 +1317,9 @@ namespace HVACInterfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurLoopNum; // local do loop counter
 
-        PlantCommonPipe.allocate(TotNumLoops);
+        PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
 
-        for (CurLoopNum = 1; CurLoopNum <= TotNumLoops; ++CurLoopNum) {
+        for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
             // reference to easily lookup the first item once
             auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).TypeOf_Num);

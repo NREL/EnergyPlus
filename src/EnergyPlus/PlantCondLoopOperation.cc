@@ -418,7 +418,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
         }
 
         // Load the Plant data structure
-        for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             PlantOpSchemeName = state.dataPlnt->PlantLoop(LoopNum).OperationScheme;
             if (LoopNum <= NumPlantLoops) {
                 CurrentModuleObject = "PlantEquipmentOperationSchemes";
@@ -462,7 +462,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
                             } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED") {
                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = EMSOpSchemeType;
-                                AnyEMSPlantOpSchemesInModel = true;
+                                state.dataPlnt->AnyEMSPlantOpSchemesInModel = true;
                             } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") {
                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbRBOpSchemeType;
                             } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") {
@@ -674,7 +674,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
         // extend number of equipment lists to include one for each CSPBO
         NumSchemeLists += CSPBO + TESSPBO + NumUserDefOpSchemes;
-        for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (SchemeNum = 1; SchemeNum <= state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes; ++SchemeNum) {
 
                 {
@@ -1863,7 +1863,7 @@ CurrentModuleObject, PlantOpSchemeName);
             // and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
 
             // first loop over main operation scheme data and finish filling out indexes to plant topology for the components in the lists
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
@@ -1927,7 +1927,7 @@ CurrentModuleObject, PlantOpSchemeName);
             }             // loop
 
             // second loop, fill op schemes info at each component.
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
@@ -1991,7 +1991,7 @@ CurrentModuleObject, PlantOpSchemeName);
             }             // loop
 
             // check the pointers to see if a single component is attached to more than one type of control scheme
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto const &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     auto const &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
@@ -2025,7 +2025,7 @@ CurrentModuleObject, PlantOpSchemeName);
             }
 
             // fill out information on which equipment list is the "last" meaning it has the highest upper limit for load range
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
@@ -2046,8 +2046,8 @@ CurrentModuleObject, PlantOpSchemeName);
             InitLoadDistributionOneTimeFlag = false;
         }
 
-        if (AnyEMSPlantOpSchemesInModel) { // Execute any Initialization EMS program calling managers for User-Defined operation.
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+        if (state.dataPlnt->AnyEMSPlantOpSchemesInModel) { // Execute any Initialization EMS program calling managers for User-Defined operation.
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
@@ -2069,7 +2069,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
         // FIRST HVAC INITS
         if (FirstHVACIteration) {
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     auto &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
@@ -2093,7 +2093,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
             }
             // Update the OpScheme schedules
-            for (int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 FoundScheme = false;
                 auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
                 for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
@@ -3305,7 +3305,7 @@ CurrentModuleObject, PlantOpSchemeName);
         int BranchNum;
         int CompNum;
 
-        for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             ActuatorName = "Plant Loop Overall";
             UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";

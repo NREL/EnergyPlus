@@ -51,13 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/PlantCentralGSHP.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 
 using namespace EnergyPlus;
 
@@ -172,7 +171,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
         (rho_cond * Cp_cond * DataSizing::PlantSizData(PltSizCondNum).DeltaT);
 
     // now call sizing routine
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     PlantCentralGSHP::Wrapper(1).SizeWrapper(*state);
 
     // Careful of actually using PlantCentralGSHP::Wrapper(1).ChillerHeater(1) and not PlantCentralGSHP::ChillerHeater since this array isn't used

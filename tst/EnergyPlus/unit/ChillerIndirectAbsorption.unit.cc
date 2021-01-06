@@ -49,12 +49,9 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

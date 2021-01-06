@@ -51,15 +51,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SwimmingPool.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
@@ -135,14 +134,14 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     DataPlant::clear_state();
 
     state->dataSwimmingPools->NumSwimmingPools = 2;
-    TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
     MyPlantScanFlagPool = true;
     state->dataSwimmingPools->Pool(1).Name = "FirstPool";
     state->dataSwimmingPools->Pool(2).Name = "SecondPool";
     state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
     state->dataSwimmingPools->Pool(2).WaterInletNode = 11;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
@@ -199,7 +198,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     DataLoopNode::clear_state();
 
     state->dataSwimmingPools->NumSwimmingPools = 1;
-    TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
     MyPlantScanFlagPool = false;
 
@@ -211,7 +210,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).HWBranchNum = 1;
     state->dataSwimmingPools->Pool(1).HWCompNum = 1;
 
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);

@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -67,7 +67,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -291,10 +290,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
 
     // set up plant loop
-    DataPlant::TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for ( int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex ) {
+    for ( int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex ) {
         auto &loop(state->dataPlnt->PlantLoop(loopindex));
         loop.LoopSide.allocate(2);
         auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));

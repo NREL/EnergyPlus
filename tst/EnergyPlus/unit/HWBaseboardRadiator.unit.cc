@@ -51,18 +51,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
@@ -163,9 +161,9 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     Node(HWBaseboard(1).WaterOutletNode).MassFlowRate = 0.2;
     Node(HWBaseboard(1).WaterOutletNode).MassFlowRateMax = 0.4;
 
-    TotNumLoops = 1;
-    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    for (int l = 1; l <= TotNumLoops; ++l) {
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(1);
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));

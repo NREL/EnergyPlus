@@ -266,7 +266,7 @@ namespace PlantUtilities {
         if (DataLoopNode::Node(InletNode).MassFlowRateMax >= 0.0) {
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
         } else {
-            if (!state.dataGlobal->SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 // throw error for developers, need to change a component model to set hardware limits on inlet
                 if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError(state, "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
@@ -584,7 +584,7 @@ namespace PlantUtilities {
 
         // PURPOSE OF THIS FUNCTION:
         // Similar to CheckPlantMixerSplitterConsistency, but used to decide if plant needs to iterate again
-        for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (int LoopSide = DataPlant::DemandSide; LoopSide <= DataPlant::SupplySide; ++LoopSide) {
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.Exists) {
                     int const SplitterInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.NodeNumIn;
@@ -911,7 +911,7 @@ namespace PlantUtilities {
         // Initially this routine is used as a quick replacement for the FlowLock=0 and FlowLock=1 statements
         //  in order to provide the same behavior through phase I of the demand side rewrite
         // Eventually this routine may be employed again to quickly initialize all loops once phase III is complete
-        for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (int LoopSideNum = 1; LoopSideNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide); ++LoopSideNum) {
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = Value;
             }
@@ -930,7 +930,7 @@ namespace PlantUtilities {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine will reset all interconnected (air, zone, etc.) sim flags for both loopsides of all loops
 
-        for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (auto &e : state.dataPlnt->PlantLoop(LoopNum).LoopSide) {
                 e.SimAirLoopsNeeded = false;
                 e.SimZoneEquipNeeded = false;
@@ -1386,28 +1386,28 @@ namespace PlantUtilities {
 
         if (OldIndex == NewIndex) {
             // do nothing, no shift needed.
-        } else if ((OldIndex == 1) && (NewIndex > OldIndex) && (NewIndex < TotNumHalfLoops)) {
+        } else if ((OldIndex == 1) && (NewIndex > OldIndex) && (NewIndex < state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 1, NI = 5)
             // example shifted:  2  3  4  5  1  6  7  8
 
             PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
             PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, TotNumHalfLoops});
+            PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
-        } else if ((OldIndex == 1) && (NewIndex > OldIndex) && (NewIndex == TotNumHalfLoops)) {
+        } else if ((OldIndex == 1) && (NewIndex > OldIndex) && (NewIndex == state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 1, NI = 8)
             // example shifted:  2  3  4  5  6  7  8  1
 
             PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({2, NewIndex});
             PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-        } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex < TotNumHalfLoops)) {
+        } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex < state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 6)
             // example shifted:  1  2  4  5  6  3  7  8
             PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
             PlantCallingOrderInfo({OldIndex, NewIndex - 1}) = TempPlantCallingOrderInfo({OldIndex + 1, NewIndex});
             PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
-            PlantCallingOrderInfo({NewIndex + 1, TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, TotNumHalfLoops});
-        } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex == TotNumHalfLoops)) {
+            PlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({NewIndex + 1, state.dataPlnt->TotNumHalfLoops});
+        } else if ((OldIndex > 1) && (NewIndex > OldIndex) && (NewIndex == state.dataPlnt->TotNumHalfLoops)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 8)
             // example shifted:  1  2  4  5  6  7  8  3
             PlantCallingOrderInfo({1, OldIndex - 1}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
@@ -1418,7 +1418,7 @@ namespace PlantUtilities {
             // example shifted:  3  1  2  4  5  6  7  8
             PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
             PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({1, OldIndex - 1});
-            PlantCallingOrderInfo({OldIndex + 1, TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, TotNumHalfLoops});
+            PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
         } else if ((OldIndex > 1) && (NewIndex < OldIndex) && (NewIndex > 1)) {
             // example was:      1  2  3  4  5  6  7  8 (with OI = 3, NI = 2)
@@ -1426,7 +1426,7 @@ namespace PlantUtilities {
             PlantCallingOrderInfo({1, NewIndex - 1}) = TempPlantCallingOrderInfo({1, NewIndex - 1});
             PlantCallingOrderInfo(NewIndex) = RecordToMoveInPlantCallingOrderInfo;
             PlantCallingOrderInfo({NewIndex + 1, OldIndex}) = TempPlantCallingOrderInfo({NewIndex, NewIndex + (OldIndex - NewIndex) - 1});
-            PlantCallingOrderInfo({OldIndex + 1, TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, TotNumHalfLoops});
+            PlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops}) = TempPlantCallingOrderInfo({OldIndex + 1, state.dataPlnt->TotNumHalfLoops});
 
         } else {
             ShowSevereError(state, "ShiftPlantLoopSideCallingOrder: developer error notice, caught unexpected logical case in "
@@ -1768,7 +1768,7 @@ namespace PlantUtilities {
         FoundComponent = false;
         FoundCompName = false;
         StartingLoopNum = 1;
-        EndingLoopNum = DataPlant::TotNumLoops;
+        EndingLoopNum = state.dataPlnt->TotNumLoops;
         if (present(SingleLoopSearch)) {
             StartingLoopNum = SingleLoopSearch;
             EndingLoopNum = SingleLoopSearch;
@@ -1888,7 +1888,7 @@ namespace PlantUtilities {
         }
         FoundNode = false;
 
-        for (LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr) {
+        for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
             auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
             for (LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr) {
                 auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
@@ -1973,7 +1973,7 @@ namespace PlantUtilities {
         AnyPlantLoopSidesNeedSim = false;
 
         // Then check if there are any
-        for (LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr) {
+        for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
             for (LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr) {
                 if (state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).SimLoopSideNeeded) {
                     AnyPlantLoopSidesNeedSim = true;
@@ -2005,7 +2005,7 @@ namespace PlantUtilities {
         int LoopCtr;
 
         // Loop over all loops
-        for (LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr) {
+        for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
             auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
             this_loop.LoopSide(DataPlant::DemandSide).SimLoopSideNeeded = Value;
             this_loop.LoopSide(DataPlant::SupplySide).SimLoopSideNeeded = Value;
@@ -2138,7 +2138,7 @@ namespace PlantUtilities {
         // because this is a nested loop, there's no reason it should be called except in one-time fashion
         int matchedIndexA = 0;
         int matchedIndexB = 0;
-        for (int loopNum = 1; loopNum <= DataPlant::TotNumLoops; loopNum++) {
+        for (int loopNum = 1; loopNum <= state.dataPlnt->TotNumLoops; loopNum++) {
             for (auto &loopSide : state.dataPlnt->PlantLoop(loopNum).LoopSide) {
                 for (auto &branch : loopSide.Branch) {
                     for (auto &comp : branch.Comp) {
