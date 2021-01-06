@@ -58,6 +58,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <CoolProp-IF97/IF97.h>
 
 namespace EnergyPlus {
 
@@ -100,6 +101,8 @@ namespace Psychrometrics {
 #ifdef EP_psych_errors
     using namespace DataEnvironment;
 #endif
+
+    using namespace IF97;
 
     // Use Statements for other routines
 #ifdef EP_psych_errors
@@ -1312,162 +1315,23 @@ namespace Psychrometrics {
     )
 #endif
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         George Shih
-        //       DATE WRITTEN   May 1976
-        //       RE-ENGINEERED  Dec 2003; Rahul Chillar
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function provides the saturation temperature from barometric pressure.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // 1989 ASHRAE Handbook - Fundamentals
-        // Checked against 2005 HOF, Chap 6, Table 3 (using pressure in, temperature out) with
-        // good correlation from -60C to 160C
-
-        // Using/Aliasing
-        using General::Iterate;
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        int const itmax(50); // Maximum number of iterations
-        Real64 const convTol(0.0001);
-        static std::string const RoutineName("PsyTsatFnPb");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        bool FlagError; // set when errors should be flagged
-        static Real64 Press_Save(-99999.0);
-        static Real64 tSat_Save(-99999.0);
-        Real64 tSat; // Water temperature guess
-        int iter;    // Iteration counter
-
-#ifdef EP_psych_stats
-        ++NumTimesCalled(iPsyTsatFnPb);
-#endif
-
-        // Check press in range.
-        FlagError = false;
-#ifdef EP_psych_errors
-        if (!state.dataGlobal->WarmupFlag) {
-            if (Press <= 0.0017 || Press >= 1555000.0) {
-                if (iPsyErrIndex(iPsyTsatFnPb) == 0) {
-                    ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
-                    if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
-                    } else {
-                        ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
-                    }
-                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
-                    FlagError = true;
-                }
-                ShowRecurringWarningErrorAtEnd(state, "Pressure out of range (PsyTsatFnPb)", iPsyErrIndex(iPsyTsatFnPb), Press, Press, _, "Pa", "Pa");
-            }
-        }
-#endif
-        if (Press == Press_Save) {
-            return tSat_Save;
-        }
-        Press_Save = Press;
-
-        // Uses an iterative process to determine the saturation temperature at a given
-        // pressure by correlating saturated water vapor as a function of temperature.
-
-        // Initial guess of boiling temperature
-        tSat = 100.0;
-        iter = 0;
-
-        // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-        if (Press >= 1555000.0) {
-            tSat = 200.0;
-            // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
-        } else if (Press <= 0.0017) {
-            tSat = -100.0;
-
-            // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
-        } else if ((Press > 611.000) && (Press < 611.25)) {
-            tSat = 0.0;
-
+        // This function provides the saturation temperature from barometric pressure based on CoolProp implementation of IF 97 
+        // https://github.com/CoolProp/IF97
+        // http://www.iapws.org/relguide/IF97-Rev.html Section 8.2 The Saturation-Temperature Equation (Backward Equation)
+        double if97_temperature = -100.0;
+        if (Press > 611.213) {
+            if97_temperature = Tsat97(double(Press)) - 273.15;
         } else {
-            // Iterate to find the saturation temperature
-            // of water given the total pressure
-
-            // Set iteration loop parameters
-            // make sure these are initialized
-            Real64 pSat;    // Pressure corresponding to temp. guess
-            Real64 error;   // Deviation of dependent variable in iteration
-            Real64 X1;      // Previous value of independent variable in ITERATE
-            Real64 Y1;      // Previous value of dependent variable in ITERATE
-            Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
-            bool const CalledFrom_empty(CalledFrom.empty());
-            int icvg; // Iteration convergence flag
-            for (iter = 1; iter <= itmax; ++iter) {
-
-                // Calculate saturation pressure for estimated boiling temperature
-                pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
-
-                // Compare with specified pressure and update estimate of temperature
-                error = Press - pSat;
-                Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
-                tSat = ResultX;
-                // If converged leave loop iteration
-                if (icvg == 1) break;
-
-                // Water temperature not converged, repeat calculations with new
-                // estimate of water temperature
-            }
-
-            // Saturation temperature has not converged after maximum specified
-            // iterations. Print error message, set return error flag, and RETURN
-
-        } // End If for the Pressure Range Checking
-
-#ifdef EP_psych_stats
-        NumIterations(iPsyTsatFnPb) += iter;
-#endif
-
-#ifdef EP_psych_errors
-        if (iter > itmax) {
-            if (!state.dataGlobal->WarmupFlag) {
-                if (iPsyErrIndex(iPsyTsatFnPb2) == 0) {
-                    ShowWarningMessage(state, format("Saturation Temperature not converged after {} iterations (PsyTsatFnPb)", iter));
-                    if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
-                    } else {
-                        ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
-                    }
-                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
-                    FlagError = true;
+            ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
+                if (!CalledFrom.empty()) {
+                    ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
+                } else {
+                    ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                 }
-                ShowRecurringWarningErrorAtEnd(state,
-                    "Saturation Temperature not converged after max iterations (PsyTsatFnPb)", iPsyErrIndex(iPsyTsatFnPb2), tSat, tSat, _, "C", "C");
-            }
         }
-#endif
+        return if97_temperature;
+        // removed old EP_cache_PsyTsatFnPb CPP preprocessor flag
 
-        // Result is SatTemperature
-        Real64 const Temp = tSat_Save = tSat; // result=> saturation temperature {C}
-
-#ifdef EP_psych_errors
-        if (FlagError) {
-            ShowContinueError(state, format(" Resultant Temperature= {:.2T}", Temp));
-        }
-#endif
-
-        return Temp;
     }
 
 } // namespace Psychrometrics

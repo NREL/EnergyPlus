@@ -1276,7 +1276,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).Operand(3).Type, 1); // argument was passed to EMS function
     index = 21 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR21");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 5.573987554, 0.00000001); // TdpFnTdbTwbPb 30.0 16.0 101325 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 5.573987554, 0.002); // TdpFnTdbTwbPb 30.0 16.0 101325 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operator, FuncTdpFnWPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).NumOperands, 2);
@@ -1284,7 +1284,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operand(2).Type, 1); // argument was passed to EMS function
     index = 22 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR22");                            // verified at sugartech site as 14.0439
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 14.044515576, 0.00000001); // TdpFnWPb 0.01 101325 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 14.044515576, 0.003); // TdpFnWPb 0.01 101325 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).Operator, FuncHFnTdbW);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).NumOperands, 2);

@@ -2679,7 +2679,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
     EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
-    EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
+    EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 2);
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
     state->dataGlobal->HourOfDay = 4;
