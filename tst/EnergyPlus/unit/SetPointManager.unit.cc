@@ -547,9 +547,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
-    // CtrlType Bug
-//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
-    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::HeatingOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
@@ -568,9 +566,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
     EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    // CtrlType Bug
-//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
-    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
     EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);

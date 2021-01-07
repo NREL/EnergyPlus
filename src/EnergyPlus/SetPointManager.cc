@@ -5049,9 +5049,7 @@ namespace EnergyPlus::SetPointManager {
         CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
         CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
 
-        // CtrlType bug
-//        if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of chiller
-        if (this->CompOpType == DataPlant::iCtrlType::HeatingOp) { // this is some sort of chiller
+        if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of chiller
             if (CurSchValOnPeak >= OnVal) {
                 this->SetPt = this->NonChargeCHWTemp;
             } else if (CurSchValCharge < OnVal) {
@@ -5059,9 +5057,7 @@ namespace EnergyPlus::SetPointManager {
             } else {
                 this->SetPt = this->ChargeCHWTemp;
             }
-            // CtrlType Bug
-//        } else if (this->CompOpType == DataPlant::iCtrlType::DualOp) { // this is some sort of ice storage system
-        } else if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of ice storage system
+        } else if (this->CompOpType == DataPlant::iCtrlType::DualOp) { // this is some sort of ice storage system
             this->SetPt = this->NonChargeCHWTemp;
         }
     }
