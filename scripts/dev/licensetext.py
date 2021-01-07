@@ -342,7 +342,7 @@ class FileVisitor:
 
 class Checker(FileVisitor):
     def __init__(self, boilerplate, offset=3, toolname='unspecified',
-                 extensions=None, shebang=False):
+                 extensions=None, shebang=False, empty_passes=False):
         super().__init__(extensions=extensions)
         lines = boilerplate.splitlines()
         self.n = len(lines)
@@ -350,6 +350,7 @@ class Checker(FileVisitor):
         self.toolname = toolname
         self.offset = offset
         self.shebang = shebang
+        self.empty_passes = empty_passes
 
     def error(self, file, line_number, mesg):
         dictionary = {'tool': self.toolname,
@@ -362,6 +363,9 @@ class Checker(FileVisitor):
 
     def visit_file(self, filepath):
         txt = self.readtext(filepath)
+        if self.empty_passes:
+            if txt.strip() == '':
+                return True
         if txt is not None:
             n = txt.count(self.text)
             if n == 0:

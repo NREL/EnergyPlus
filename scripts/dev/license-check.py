@@ -65,7 +65,8 @@ TOOL_NAME = 'license-check'
 cpp_dirs = ["./src/EnergyPlus/",
             "./tst/EnergyPlus/unit/"]
 
-python_dirs = ["./scripts/dev/",
+python_dirs = ["./src/EnergyPlus/",
+               "./scripts/dev/",
                "./workflows/"]
 
 current = licensetext.current()
@@ -96,7 +97,7 @@ for base in cpp_dirs:
 # Create Python Checker object
 checker = licensetext.Checker(licensetext.current_python(), offset=2,
                               extensions=['py'], toolname=TOOL_NAME,
-                              shebang=True)
+                              shebang=True, empty_passes=True)
 
 # Check files
 python_file_license_success = True
