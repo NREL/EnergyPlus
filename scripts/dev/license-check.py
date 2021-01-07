@@ -65,7 +65,8 @@ TOOL_NAME = 'license-check'
 cpp_dirs = ["./src/EnergyPlus/",
             "./tst/EnergyPlus/unit/"]
 
-python_dirs = ["./scripts/dev/"]
+python_dirs = ["./scripts/dev/",
+               "./workflows/"]
 
 current = licensetext.current()
 
