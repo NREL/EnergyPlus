@@ -239,7 +239,7 @@ set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
 ADD_SUBDIRECTORY(third_party/CoolProp-IF97 )
-set_target_properties(CoolProp-IF97 PROPERTIES FOLDER ThirdParty/CoolProp-IF97)
+### maybe this line is not needed -- set_target_properties(CoolProp-IF97 PROPERTIES FOLDER ThirdParty/CoolProp-IF97)
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
