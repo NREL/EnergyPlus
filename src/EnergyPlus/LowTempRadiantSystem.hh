@@ -157,7 +157,6 @@ namespace LowTempRadiantSystem {
         int SchedPtr;                    // index to schedule
         std::string ZoneName;            // Name of zone the system is serving
         int ZonePtr;                     // Point to this zone in the Zone derived type
-        int DesignObjectPtr;
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
@@ -240,13 +239,11 @@ namespace LowTempRadiantSystem {
         int GlycolIndex;          // Index to Glycol (Water) Properties
         int CondErrIndex;         // Error index for recurring warning messages
         int CondCtrlType;         // Condensation control type (initialize to simple off)
-        Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
         Real64 CondCausedTimeOff; // Amount of time condensation did or could have turned system off
         bool CondCausedShutDown;  // .TRUE. when condensation predicted at surface
         int NumCircCalcMethod;    // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;        // Circuit length {m}
         std::string schedNameChangeoverDelay;   // changeover delay schedule
-        std::string designObjectName;   // Design Object
         int schedPtrChangeoverDelay;    // Pointer to the schedule for the changeover delay in hours
         int lastOperatingMode; // Last mode of operation (heating or cooling)
         int lastDayOfSim;   // Last day of simulation radiant system operated in lastOperatingMode
@@ -268,7 +265,7 @@ namespace LowTempRadiantSystem {
         : TubeDiameterInner(0.0), TubeDiameterOuter(0.0), TubeLength(0.0), TubeConductivity(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly),
               HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0),CoolingSystem(false), ColdWaterInNode(0), ColdWaterOutNode(0), CWLoopNum(0), CWLoopSide(0),
-              CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCtrlType(1), CondDewPtDeltaT(1.0), CondCausedTimeOff(0.0),
+              CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCtrlType(1), CondCausedTimeOff(0.0),
               CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), schedPtrChangeoverDelay(0), lastOperatingMode(NotOperating),
               lastDayOfSim(1), lastHourOfDay(1),lastTimeStep(1), EMSOverrideOnWaterMdot(false), EMSWaterMdotOverrideValue(0.0),
               WaterInletTemp(0.0), WaterOutletTemp(0.0), CoolPower(0.0), CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
@@ -300,11 +297,12 @@ namespace LowTempRadiantSystem {
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
     {
         // Members
-//        RadDesignData MyDesignData;
         Real64 WaterVolFlowMaxHeat;      // maximum water flow rate for heating, m3/s
         Real64 WaterFlowMaxHeat;         // maximum water flow rate for heating, kg/s
         Real64 HotThrottlRange;          // Throttling range for heating [C]
         std::string HotSetptSched;       // Schedule name for the zone setpoint temperature
+        std::string designObjectName;   // Design Object
+        int DesignObjectPtr;
         int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
@@ -339,19 +337,19 @@ namespace LowTempRadiantSystem {
 
     };
 
-    struct RadDesignData : VariableFlowRadiantSystemData
+    struct VarFlowRadDesignData : VariableFlowRadiantSystemData
     {
-
         // Members
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
         Real64 HotThrottlRange;          // Throttling range for heating [C]
         Array1D_string FieldNames;
+        Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
 
         // Default Constructor
-        RadDesignData()
+        VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0)
+                HotThrottlRange(0.0), CondDewPtDeltaT(1.0)
         {
         }
     };
@@ -366,6 +364,8 @@ namespace LowTempRadiantSystem {
         Real64 HotWaterMassFlowRate;     // current hot water flow rate through heating side of system (calculated)
         Real64 ChWaterMassFlowRate;      // current chilled water flow rate through cooling side of system (calculated)
         std::string VolFlowSched;        // schedule of maximum flow at the current time
+        std::string designObjectName;   // Design Object
+        int DesignObjectPtr;
         int VolFlowSchedPtr;             // index to the volumetric flow schedule
         Real64 NomPumpHead;              // nominal head of the constant flow pump
         Real64 NomPowerUse;              // nominal power use of the constant flow pump
@@ -432,6 +432,24 @@ namespace LowTempRadiantSystem {
 
         void reportLowTemperatureRadiantSystem(EnergyPlusData &state);
 
+    };
+
+    struct ConstantFlowRadDesignData : ConstantFlowRadiantSystemData
+    {
+
+        // Members
+        // This data could be shared between multiple Var flow LowTempRad Systems
+        std::string designName;           // name of the design object+
+        Real64 HotThrottlRange;          // Throttling range for heating [C]
+        Array1D_string FieldNames;
+        Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
+
+        // Default Constructor
+        ConstantFlowRadDesignData()
+                :
+                HotThrottlRange(0.0), CondDewPtDeltaT(1.0)
+        {
+        }
     };
 
     struct ElectricRadiantSystemData : RadiantSystemBaseData
@@ -509,7 +527,8 @@ namespace LowTempRadiantSystem {
     extern Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
     extern Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
 
-    extern Array1D<RadDesignData> HydronicRadiantSysDesign;
+    extern Array1D<VarFlowRadDesignData> HydronicRadiantSysDesign;
+    extern Array1D<ConstantFlowRadDesignData> CflowRadiantSysDesign;
 
     // Functions
 

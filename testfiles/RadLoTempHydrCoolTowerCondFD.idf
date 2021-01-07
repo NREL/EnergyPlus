@@ -9,7 +9,6 @@
 !                          No ground contact with floor.
 !
 ! Highlights:              Hydronic low temperature radiant system heats and cools
-!                          "Chilled" water provided only by a cooling tower
 !
 ! Simulation Location/Run: CHICAGO_IL_USA_WMO_725300, 2 design days, 1 run period,
 !                          Run Control executes the design days only.
@@ -1350,6 +1349,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW ===========
 
+  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+   JermyDesignObject1, !- Name
+   2.0,                     !- Heating Control Throttling Range {deltaC}
+       ;                        !- Condensation Control Dewpoint Offset {C}
+
+  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+   JermyDesignObject2, !- Name
+   3.0,                     !- Heating Control Throttling Range {deltaC}
+       ;                        !- Condensation Control Dewpoint Offset {C}
+
+
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     West Zone Radiant Floor, !- Name
     RadiantSysAvailSched,    !- Availability Schedule Name
@@ -1369,7 +1379,7 @@
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    2.0,                     !- Heating Control Throttling Range {deltaC}
+    ,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     Autosize,                !- Cooling Design Capacity {W}
@@ -1381,9 +1391,10 @@
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
-    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
-    ;                        !- Circuit Length {m}
+    ,                   !- Circuit Length {m}
+    JermyDesignObject2;                        !- Design Object
+
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     East Zone Radiant Floor, !- Name
@@ -1416,9 +1427,9 @@
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
-    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
-    ;                        !- Circuit Length {m}
+    ,                   !- Circuit Length {m}
+    JermyDesignObject2;                        !- Design Object
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     North Zone Radiant Floor,!- Name
@@ -1451,9 +1462,9 @@
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
-    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
-    ;                        !- Circuit Length {m}
+    ,                   !- Circuit Length {m}
+    JermyDesignObject2;                        !- Design Object
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
