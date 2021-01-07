@@ -525,9 +525,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_setupSetPointAndFlags)
 
 TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
 {
-    int const CoolOpComp(1); // a component that cools only (chillers)
-    int const DualOpComp(2); // a component that heats or cools (ice storage tank)
-
     int schManNum = 1;
     state->dataSetPointManager->SchTESSetPtMgr.allocate(schManNum);
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
@@ -550,7 +547,9 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
-    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
+    // CtrlType Bug
+//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::HeatingOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
@@ -569,7 +568,9 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
     EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
+    // CtrlType Bug
+//    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
 
     state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
     EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);

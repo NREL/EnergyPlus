@@ -5045,13 +5045,13 @@ namespace EnergyPlus::SetPointManager {
         Real64 CurSchValOnPeak;
         Real64 CurSchValCharge;
         Real64 const OnVal(0.5);
-        int const CoolOpComp(1); // a component that cools only (chillers)
-        int const DualOpComp(2); // a component that heats or cools (ice storage tank)
 
         CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
         CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
 
-        if (this->CompOpType == CoolOpComp) { // this is some sort of chiller
+        // CtrlType bug
+//        if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of chiller
+        if (this->CompOpType == DataPlant::iCtrlType::HeatingOp) { // this is some sort of chiller
             if (CurSchValOnPeak >= OnVal) {
                 this->SetPt = this->NonChargeCHWTemp;
             } else if (CurSchValCharge < OnVal) {
@@ -5059,7 +5059,9 @@ namespace EnergyPlus::SetPointManager {
             } else {
                 this->SetPt = this->ChargeCHWTemp;
             }
-        } else if (this->CompOpType == DualOpComp) { // this is some sort of ice storage system
+            // CtrlType Bug
+//        } else if (this->CompOpType == DataPlant::iCtrlType::DualOp) { // this is some sort of ice storage system
+        } else if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of ice storage system
             this->SetPt = this->NonChargeCHWTemp;
         }
     }
@@ -8551,7 +8553,12 @@ namespace EnergyPlus::SetPointManager {
     }
 
     void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
-        int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum)
+                                      int const SchedPtr,
+                                      int const SchedPtrCharge,
+                                      Real64 NonChargeCHWTemp,
+                                      Real64 ChargeCHWTemp,
+                                      DataPlant::iCtrlType const &CompOpType,
+                                      int const ControlNodeNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand

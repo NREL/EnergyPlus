@@ -865,8 +865,8 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
         int CompNum = 1;
         std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
-        int CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
-        EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::CoolingOp);
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        EXPECT_EQ(CtrlTypeNum, DataPlant::iCtrlType::CoolingOp);
     }
 
     {
@@ -875,17 +875,17 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
         // Ensure we have the right component (the TES tank)
         EXPECT_EQ(compName, "ICE THERMAL STORAGE");
 
-        int CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
 
         // Could just test this, but want to improve reporting
         // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
 
         std::string ctrlType = "Unknown";
-        if (CtrlTypeNum == PlantCondLoopOperation::CoolingOp) {
+        if (CtrlTypeNum == DataPlant::iCtrlType::CoolingOp) {
             ctrlType = "CoolingOp";
-        } else if (CtrlTypeNum == PlantCondLoopOperation::HeatingOp) {
+        } else if (CtrlTypeNum == DataPlant::iCtrlType::HeatingOp) {
             ctrlType = "HeatingOp";
-        } else if (CtrlTypeNum == PlantCondLoopOperation::DualOp) {
+        } else if (CtrlTypeNum == DataPlant::iCtrlType::DualOp) {
             ctrlType = "DualOp";
         }
 

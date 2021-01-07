@@ -181,6 +181,14 @@ namespace EnergyPlus::DataPlant {
         FlowSimulation,      // Full pressure network simulation
     };
 
+    enum class iCtrlType
+    {
+        Unassigned,
+        HeatingOp, // Constant for Heating Operation
+        CoolingOp, // Constant for Cooling Operation
+        DualOp,    // Constant for Cooling or Heating Operation
+    };
+
     } // namespace EnergyPlus
 
 #endif
