@@ -106,39 +106,6 @@ namespace EnergyPlus::PlantCondLoopOperation {
     using DataHVACGlobals::SmallLoad;
     using FluidProperties::GetSpecificHeatGlycol;
 
-    bool const TurnItemOn(true);   // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-    bool const TurnItemOff(false); // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-
-    namespace {
-        bool GetPlantOpInput(true); // operation Get Input flag
-        bool InitLoadDistributionOneTimeFlag(true);
-        bool LoadEquipListOneTimeFlag(true);
-    } // namespace
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
-    // Driver Routines
-    // Get Input Routines
-    // Initialization Routines
-    // Load Distribution/Calculation Routines
-
-    // ON/OFF Utility Routines
-
-    // PLANT EMS Utility Routines
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
-    void clear_state()
-    {
-        GetPlantOpInput = true;
-        InitLoadDistributionOneTimeFlag = true;
-        LoadEquipListOneTimeFlag = true;
-    }
-
     void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
@@ -1111,7 +1078,7 @@ CurrentModuleObject, PlantOpSchemeName);
         int iIndex;
         bool firstblank;
 
-        if (LoadEquipListOneTimeFlag) {
+        if (state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag) {
             // assemble mapping between list names and indices one time
             PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
             CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
@@ -1220,7 +1187,7 @@ CurrentModuleObject, PlantOpSchemeName);
             if (ErrorsFound) {
                 ShowFatalError(state, "LoadEquipList/GetEquipmentLists: Failed due to preceding errors.");
             }
-            LoadEquipListOneTimeFlag = false;
+            state.dataPlantCondLoopOp->LoadEquipListOneTimeFlag = false;
         }
 
         FoundIntendedList = false;
@@ -1849,18 +1816,18 @@ CurrentModuleObject, PlantOpSchemeName);
 
         errFlag2 = false;
         // Get Input
-        if (GetPlantOpInput) {
+        if (state.dataPlantCondLoopOp->GetPlantOpInput) {
             GetPlantOperationInput(state, GetInputOK);
             if (GetInputOK) {
                 GetOperationSchemeInput(state);
-                GetPlantOpInput = false;
+                state.dataPlantCondLoopOp->GetPlantOpInput = false;
             } else {
                 return;
             }
         }
 
         // ONE TIME INITS
-        if (InitLoadDistributionOneTimeFlag) {
+        if (state.dataPlantCondLoopOp->InitLoadDistributionOneTimeFlag) {
             // Set up 'component' to 'op scheme' pointers in Plant data structure
             // We're looking for matches between a component on a PlantLoop.OpScheme.List()
             // and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
@@ -2046,7 +2013,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 } // operation scheme
             }     // loop
 
-            InitLoadDistributionOneTimeFlag = false;
+            state.dataPlantCondLoopOp->InitLoadDistributionOneTimeFlag = false;
         }
 
         if (state.dataPlnt->AnyEMSPlantOpSchemesInModel) { // Execute any Initialization EMS program calling managers for User-Defined operation.

@@ -145,7 +145,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -265,7 +264,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
     PlantManager::clear_state();

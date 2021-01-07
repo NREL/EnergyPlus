@@ -59,24 +59,6 @@ namespace EnergyPlus {
 
 namespace PlantCondLoopOperation {
 
-    extern bool const TurnItemOn;  // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-    extern bool const TurnItemOff; // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
-    // Driver Routines
-    // Get Input Routines
-    // Initialization Routines
-    // Load Distribution/Calculation Routines
-
-    // ON/OFF Utility Routines
-
-    // PLANT EMS Utility Routines
-
-    // Functions
-    void clear_state();
-
     void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
@@ -229,16 +211,19 @@ namespace PlantCondLoopOperation {
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 
-    //*END PLANT EMS CONTROL ROUTINES!
-    //******************************************************************************
-
 } // namespace PlantCondLoopOperation
 
 struct PlantCondLoopOperationData : BaseGlobalStruct {
 
+    bool GetPlantOpInput = true;
+    bool InitLoadDistributionOneTimeFlag = true;
+    bool LoadEquipListOneTimeFlag = true;
+
     void clear_state() override
     {
-
+        this->GetPlantOpInput = true;
+        this->InitLoadDistributionOneTimeFlag = true;
+        this->LoadEquipListOneTimeFlag = true;
     }
 };
 
