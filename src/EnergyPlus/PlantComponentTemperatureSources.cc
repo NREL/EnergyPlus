@@ -89,33 +89,15 @@ namespace PlantComponentTemperatureSources {
     // Called by PlantLoopEquipment, model accepts inputs, and calculates a
     // thermal response using new plant routines such as SetComponentFlowRate
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const modTempSpecType_Constant(-1);
-    int const modTempSpecType_Schedule(-2);
-
-    // MODULE VARIABLES
-    int NumSources(0);
-    bool getWaterSourceInput(true); // then TRUE, calls subroutine to read input file.
-
-    // Object Data
-    Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
-
-    void clear_state()
-    {
-        NumSources = 0;
-        getWaterSourceInput = true;
-        WaterSource.deallocate();
-    }
-
     PlantComponent *WaterSourceSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
-        if (getWaterSourceInput) {
+        if (state.dataPlantCompTempSrc->getWaterSourceInput) {
             GetWaterSourceInput(state);
-            getWaterSourceInput = false;
+            state.dataPlantCompTempSrc->getWaterSourceInput = false;
         }
 
         // Now look for this particular pipe in the list
-        for (auto &waterSource : WaterSource) {
+        for (auto &waterSource : state.dataPlantCompTempSrc->WaterSource) {
             if (waterSource.Name == objectName) {
                 return &waterSource;
             }
@@ -195,7 +177,7 @@ namespace PlantComponentTemperatureSources {
 
         // OK, so we can set up the inlet and boundary temperatures now
         this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
-        if (this->TempSpecType == modTempSpecType_Schedule) {
+        if (this->TempSpecType == iTempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
 
@@ -297,8 +279,8 @@ namespace PlantComponentTemperatureSources {
         // Obtains flow rate from the plant sizing array.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false);        // If errors detected in input
-        Real64 DesVolFlowRateUser(0.0); // Hardsized design volume flow rate for reporting
+        bool ErrorsFound(false);   // If errors detected in input
+        Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
         Real64 tmpVolFlowRate = this->DesVolFlowRate;
         int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
 
@@ -464,19 +446,19 @@ namespace PlantComponentTemperatureSources {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         cCurrentModuleObject = "PlantComponent:TemperatureSource";
-        NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataPlantCompTempSrc->NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumSources <= 0) {
+        if (state.dataPlantCompTempSrc->NumSources <= 0) {
             ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(WaterSource)) return; // probably not possible, and probably should throw error
-        WaterSource.allocate(NumSources);
+        if (allocated(state.dataPlantCompTempSrc->WaterSource)) return; // probably not possible, and probably should throw error
+        state.dataPlantCompTempSrc->WaterSource.allocate(state.dataPlantCompTempSrc->NumSources);
 
         // fill arrays
-        for (int SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
+        for (int SourceNum = 1; SourceNum <= state.dataPlantCompTempSrc->NumSources; ++SourceNum) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SourceNum,
@@ -491,9 +473,9 @@ namespace PlantComponentTemperatureSources {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            WaterSource(SourceNum).Name = cAlphaArgs(1);
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).Name = cAlphaArgs(1);
 
-            WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(2),
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(2),
                                                                                       ErrorsFound,
                                                                                       cCurrentModuleObject,
                                                                                       cAlphaArgs(1),
@@ -501,7 +483,7 @@ namespace PlantComponentTemperatureSources {
                                                                                       DataLoopNode::NodeConnectionType_Inlet,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
-            WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
                                                                                        ErrorsFound,
                                                                                        cCurrentModuleObject,
                                                                                        cAlphaArgs(1),
@@ -511,19 +493,19 @@ namespace PlantComponentTemperatureSources {
                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
 
-            WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
-            if (WaterSource(SourceNum).DesVolFlowRate == DataSizing::AutoSize) {
-                WaterSource(SourceNum).DesVolFlowRateWasAutoSized = true;
+            state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
+            if (state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRate == DataSizing::AutoSize) {
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).DesVolFlowRateWasAutoSized = true;
             }
 
             if (cAlphaArgs(4) == "CONSTANT") {
-                WaterSource(SourceNum).TempSpecType = modTempSpecType_Constant;
-                WaterSource(SourceNum).BoundaryTemp = rNumericArgs(2);
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Constant;
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = rNumericArgs(2);
             } else if (cAlphaArgs(4) == "SCHEDULED") {
-                WaterSource(SourceNum).TempSpecType = modTempSpecType_Schedule;
-                WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
-                WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
-                if (WaterSource(SourceNum).TempSpecScheduleNum == 0) {
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Schedule;
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
+                if (state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum == 0) {
                     ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     ShowContinueError(state, "Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                     ErrorsFound = true;

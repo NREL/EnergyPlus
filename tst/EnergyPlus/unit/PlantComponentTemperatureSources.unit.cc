@@ -99,9 +99,9 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     PlantComponentTemperatureSources::GetWaterSourceInput(*state);
 
     // We can check that GetInput happened properly here
-    EXPECT_EQ(1u, PlantComponentTemperatureSources::WaterSource.size());
-    auto &waterSource1 = PlantComponentTemperatureSources::WaterSource(1);
-    EXPECT_EQ(PlantComponentTemperatureSources::modTempSpecType_Constant, waterSource1.TempSpecType);
+    EXPECT_EQ(1u, state->dataPlantCompTempSrc->WaterSource.size());
+    auto &waterSource1 = state->dataPlantCompTempSrc->WaterSource(1);
+    EXPECT_EQ(PlantComponentTemperatureSources::iTempSpecType::Constant, waterSource1.TempSpecType);
     EXPECT_EQ(1, waterSource1.InletNodeNum);
     EXPECT_EQ(2, waterSource1.OutletNodeNum);
 

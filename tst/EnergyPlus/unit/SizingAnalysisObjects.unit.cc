@@ -368,7 +368,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
     EXPECT_TRUE(TestAnalysisObj.anotherIterationDesired);
 }
 
-TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
+TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
 {
     ShowMessage(*state, "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour");
 
