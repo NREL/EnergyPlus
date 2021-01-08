@@ -164,6 +164,7 @@ namespace PVWatts {
         Real64 m_outputACEnergy;
         Real64 m_cellTemperature;
         Real64 m_planeOfArrayIrradiance;
+        Real64 m_shadedPercent;
 
     public:
         static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);

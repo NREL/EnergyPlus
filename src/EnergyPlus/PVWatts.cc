@@ -95,7 +95,8 @@ namespace PVWatts {
           m_inverterEfficiency(0.96),
           m_outputDCPower(1000.0),
           m_cellTemperature(-9999),
-          m_planeOfArrayIrradiance(-9999)
+          m_planeOfArrayIrradiance(-9999),
+          m_shadedPercent(0.0)
 
     {
 
@@ -172,6 +173,7 @@ namespace PVWatts {
                             "Plant");
         SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
         SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
+        SetupOutputVariable(state, "Shaded Percent", OutputProcessor::Unit::Perc, m_shadedPercent, "System", "Average", m_name);
     }
 
     PVWattsGenerator PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)
@@ -398,8 +400,9 @@ namespace PVWatts {
 
         // Get the shading from the geometry, if applicable
         if (m_geometryType == GeometryType::SURFACE) {
-            ssc_data_set_number(pvwattsData, "shaded_percent", DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum) * 100.0);
+            m_shadedPercent = (1.0 - DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum)) * 100.0;
         }
+        ssc_data_set_number(pvwattsData, "shaded_percent", m_shadedPercent);
 
         if ( ssc_module_exec(pvwattsModule, pvwattsData) == 0) {
             // Error
