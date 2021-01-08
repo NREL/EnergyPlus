@@ -168,10 +168,6 @@ namespace HVACMultiSpeedHeatPump {
         Cubic,       // Cubic curve type
     };
 
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
-
     static std::string const fluidNameSteam("STEAM");
 
     // DERIVED TYPE DEFINITIONS
@@ -1369,9 +1365,9 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(16), Alphas(17), "MSHP Heat receovery Nodes");
-                SetMSHPDXCoilHeatRecoveryFlag(MSHeatPump(MSHPNum).DXCoolCoilIndex);
+                SetMSHPDXCoilHeatRecoveryFlag(state, MSHeatPump(MSHPNum).DXCoolCoilIndex);
                 if (MSHeatPump(MSHPNum).DXHeatCoilIndex > 0) {
-                    SetMSHPDXCoilHeatRecoveryFlag(MSHeatPump(MSHPNum).DXHeatCoilIndex);
+                    SetMSHPDXCoilHeatRecoveryFlag(state, MSHeatPump(MSHPNum).DXHeatCoilIndex);
                 }
             } else {
                 MSHeatPump(MSHPNum).HeatRecActive = false;
@@ -1465,7 +1461,7 @@ namespace HVACMultiSpeedHeatPump {
             if (state.dataGlobal->DoCoilDirectSolutions) {
                 int MaxNumber = std::max(MSHeatPump(MSHPNum).NumOfSpeedCooling, MSHeatPump(MSHPNum).NumOfSpeedHeating);
                 MSHeatPump(MSHPNum).FullOutput.allocate(MaxNumber);
-                DXCoils::DisableLatentDegradation(MSHeatPump(MSHPNum).DXCoolCoilIndex);
+                DXCoils::DisableLatentDegradation(state, MSHeatPump(MSHPNum).DXCoolCoilIndex);
             }
             // Generate a dynamic array for cooling
             if (MSHeatPump(MSHPNum).NumOfSpeedCooling > 0) {
@@ -3464,8 +3460,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using DataHeatBalFanSys::ZT;
-        using DXCoils::DXCoil;
-        using DXCoils::DXCoilPartLoadRatio;
         using DXCoils::SimDXCoilMultiSpeed;
         using Fans::SimulateFanComponents;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -3500,14 +3494,14 @@ namespace HVACMultiSpeedHeatPump {
         OutletNode = MSHeatPump(MSHeatPumpNum).AirOutletNodeNum;
         InletNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         if (MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0) {
-            if (DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
+            if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
+                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
-            if (DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
+            if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
+                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
@@ -3550,7 +3544,7 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).OpMode,
                                         CompOp);
                 }
-                SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
+                SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
                 SimDXCoilMultiSpeed(state,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
@@ -3584,7 +3578,7 @@ namespace HVACMultiSpeedHeatPump {
                                             MSHeatPump(MSHeatPumpNum).OpMode,
                                             CompOp);
                     }
-                    SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
                     SimDXCoilMultiSpeed(state,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
@@ -3649,7 +3643,7 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).OpMode,
                                         CompOp);
                 }
-                SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
+                SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
                 SimDXCoilMultiSpeed(state,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
@@ -3683,7 +3677,7 @@ namespace HVACMultiSpeedHeatPump {
                                             MSHeatPump(MSHeatPumpNum).OpMode,
                                             CompOp);
                     }
-                    SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
                     SimDXCoilMultiSpeed(state,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
@@ -3751,7 +3745,7 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).OpMode,
                                         CompOp);
                 }
-                SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
+                SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
                 SimDXCoilMultiSpeed(state,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
@@ -3785,7 +3779,7 @@ namespace HVACMultiSpeedHeatPump {
                                             MSHeatPump(MSHeatPumpNum).OpMode,
                                             CompOp);
                     }
-                    SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
+                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
                     SimDXCoilMultiSpeed(state,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
