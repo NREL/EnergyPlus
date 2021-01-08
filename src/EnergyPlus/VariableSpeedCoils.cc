@@ -99,8 +99,6 @@ namespace VariableSpeedCoils {
     using DXCoils::AdjustCBF;
     using DXCoils::CalcCBF;
 
-    static std::string const BlankString;
-
     void SimVariableSpeedCoils(EnergyPlusData &state,
                                std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name

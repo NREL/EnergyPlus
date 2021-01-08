@@ -53,7 +53,6 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -81,7 +80,6 @@
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -112,7 +110,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -138,7 +135,6 @@
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -173,7 +169,6 @@
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -210,10 +205,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
-    DXCoils::clear_state();
     clearFacilityElectricPowerServiceObject();
     EarthTube::clear_state();
-    EconomicLifeCycleCost::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
@@ -255,7 +248,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
-    HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
@@ -272,7 +264,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
-    OutputProcessor::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
@@ -305,6 +296,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
-    SimAirServingZones::clear_state();
     ResultsFramework::clear_state();
 }

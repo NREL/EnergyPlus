@@ -132,10 +132,6 @@ namespace HighTempRadiantSystem {
     int const MRTSPControl(1005);
     int const OperativeSPControl(1006);
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables...
     int NumOfHighTempRadSys(0);           // Number of hydronic low tempererature radiant systems

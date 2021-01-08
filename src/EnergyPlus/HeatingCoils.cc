@@ -124,7 +124,6 @@ namespace HeatingCoils {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace ScheduleManager;
     using DXCoils::GetDXCoilIndex;
-    using DXCoils::NumDXCoils;
     using RefrigeratedCase::GetRefrigeratedRackIndex;
 
     // Data
@@ -135,8 +134,6 @@ namespace HeatingCoils {
     int NumElecCoilMultiStage;
     int NumFuelCoil;
     int NumGasCoilMultiStage;
-
-    static std::string const BlankString;
 
     // reclaim heat object types
     int const COMPRESSORRACK_REFRIGERATEDCASE(1);
@@ -1425,7 +1422,7 @@ namespace HeatingCoils {
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                for (DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum) {
+                for (DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
                     if (!UtilityRoutines::SameString(HeatReclaimDXCoil(DXCoilNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName)) continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = DXCoilNum;
                     if (allocated(HeatReclaimDXCoil)) {
@@ -2660,7 +2657,7 @@ namespace HeatingCoils {
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                HeatingCoil(CoilNum).RTF = DXCoil(SourceID).CoolingCoilRuntimeFraction;
+                HeatingCoil(CoilNum).RTF = state.dataDXCoils->DXCoil(SourceID).CoolingCoilRuntimeFraction;
                 HeatingCoil(CoilNum).NominalCapacity =
                     HeatReclaimDXCoil(SourceID).AvailCapacity * Effic - HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {

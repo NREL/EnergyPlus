@@ -119,12 +119,6 @@ namespace PipeHeatTransfer {
     using DataPlant::TypeOf_PipeInterior;
     using DataPlant::TypeOf_PipeUnderground;
 
-    // Use statements for access to subroutines in other modules
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
     int const None(0);
     int const ZoneEnv(1);
     int const ScheduleEnv(2);

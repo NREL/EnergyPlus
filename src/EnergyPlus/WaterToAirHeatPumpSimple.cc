@@ -129,9 +129,8 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
 
-    static std::string const BlankString;
-
-    void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimWatertoAirHPSimple(EnergyPlusData &state,
+                               std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]

@@ -144,7 +144,6 @@ namespace OutdoorAirUnit {
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
-    static std::string const BlankString;
 
     void SimOutdoorAirUnit(EnergyPlusData &state,
                            std::string const &CompName,   // name of the outdoor air unit

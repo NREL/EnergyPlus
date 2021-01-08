@@ -103,8 +103,6 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    static std::string const BlankString;
-
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
     bool MyOneTimeFlag(true);

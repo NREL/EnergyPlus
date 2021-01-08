@@ -134,7 +134,6 @@ namespace WaterThermalTanks {
     std::string const cHPWHWrappedCondenser = "WaterHeater:HeatPump:WrappedCondenser";
     std::string const cCoilDesuperheater = "Coil:WaterHeating:Desuperheater";
     std::string const fluidNameWater = "WATER";
-    std::string const blankString;
 
     PlantComponent *WaterThermalTankData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -1449,7 +1448,7 @@ namespace WaterThermalTanks {
                 }
             } else {
                 // this is a single speed coil
-                DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+                DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
                 if (!UtilityRoutines::SameString(HPWH.DXCoilType, Coil.DXCoilType)) {
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
                     ShowContinueError(state, "specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
@@ -1488,7 +1487,7 @@ namespace WaterThermalTanks {
 
             // Dummy condenser Inlet/Outlet Nodes for wrapped tanks
             if (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped) {
-                DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+                DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
 
                 HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
                 HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.InletNodeName1,
@@ -1650,17 +1649,17 @@ namespace WaterThermalTanks {
 
             if (HPWH.DXCoilNum > 0 && !bIsVScoil) {
                 // get HPWH capacity, air inlet node, and PLF curve info from DX coil object
-                HPWH.Capacity = DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2;
-                HPWH.DXCoilAirInletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
-                HPWH.DXCoilPLFFPLR = DXCoils::DXCoil(HPWH.DXCoilNum).PLFFPLR(1);
+                HPWH.Capacity = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).RatedTotCap2;
+                HPWH.DXCoilAirInletNode = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).AirInNode;
+                HPWH.DXCoilPLFFPLR = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).PLFFPLR(1);
                 // check the range of condenser pump power to be <= 5 gpm/ton
-                if (DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2 > 0.1422) {
+                if (state.dataDXCoils->DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / state.dataDXCoils->DXCoil(HPWH.DXCoilNum).RatedTotCap2 > 0.1422) {
                     ShowWarningError(
                         state,
-                        DXCoils::DXCoil(HPWH.DXCoilNum).DXCoilType + "= " + DXCoils::DXCoil(HPWH.DXCoilNum).Name +
+                        state.dataDXCoils->DXCoil(HPWH.DXCoilNum).DXCoilType + "= " + state.dataDXCoils->DXCoil(HPWH.DXCoilNum).Name +
                             format(": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 "
                                    "W/W (41.67 watt/MBH). Condenser pump power per watt = {:.4T}",
-                                   (DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2)));
+                                   (state.dataDXCoils->DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / state.dataDXCoils->DXCoil(HPWH.DXCoilNum).RatedTotCap2)));
                 }
             } else if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
 
@@ -2012,7 +2011,7 @@ namespace WaterThermalTanks {
                         HPWH.FanOutletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     }
                 } else {
-                    HPWH.FanOutletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
+                    HPWH.FanOutletNode = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).AirInNode;
                 }
             }
 
@@ -2083,7 +2082,7 @@ namespace WaterThermalTanks {
                 }
 
             } else if (HPWH.DXCoilNum > 0) {
-                DXCoilAirOutletNodeNum = DXCoils::DXCoil(HPWH.DXCoilNum).AirOutNode;
+                DXCoilAirOutletNodeNum = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).AirOutNode;
             }
             if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
                 if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
@@ -6070,7 +6069,7 @@ namespace WaterThermalTanks {
                 Real64 EMP2 = 0.0;
                 Real64 EMP3 = 0.0;
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                          blankString,
+                                                          std::string(),
                                                           state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
                                                           0,
                                                           EMP1,
@@ -7131,7 +7130,7 @@ namespace WaterThermalTanks {
                 CoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
             } else {
                 // Single speed HPWH
-                DXCoils::DXCoilData const &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+                DXCoils::DXCoilData const &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
                 CoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
             }
             return CoilTotalHeatingEnergyRate * this->SourceEffectiveness;
@@ -8000,7 +7999,7 @@ namespace WaterThermalTanks {
                        DesupHtr.ReclaimHeatingSource == CoilObjEnum::DXMultiMode) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
-                DesupHtr.DXSysPLR = DXCoils::DXCoil(SourceID).PartLoadRatio;
+                DesupHtr.DXSysPLR = state.dataDXCoils->DXCoil(SourceID).PartLoadRatio;
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::DXVariableCooling) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
@@ -9596,7 +9595,7 @@ namespace WaterThermalTanks {
     void WaterThermalTankData::ConvergeSingleSpeedHPWHCoilAndTank(EnergyPlusData &state, Real64 const partLoadRatio)
     {
         HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
-        DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+        DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
 
         Real64 PrevTankTemp = this->SourceOutletTemp;
         for (int i = 1; i <= 10; ++i) {
@@ -9864,7 +9863,7 @@ namespace WaterThermalTanks {
                 else
                     CoilTotalHeatingEnergyRatePtr = &state.dataVariableSpeedCoils->VarSpeedCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             } else {
-                CoilTotalHeatingEnergyRatePtr = &DXCoils::DXCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
+                CoilTotalHeatingEnergyRatePtr = &state.dataDXCoils->DXCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             }
             // Copy the value of the total heating energy rate
             Real64 const CoilTotalHeatingEnergyRateBackup = *CoilTotalHeatingEnergyRatePtr;
@@ -11661,9 +11660,9 @@ namespace WaterThermalTanks {
                             }
                         }
 
-                        this->MaxCapacity = DXCoils::HPWHHeatingCapacity;
-                        this->MinCapacity = DXCoils::HPWHHeatingCapacity;
-                        this->Efficiency = DXCoils::HPWHHeatingCOP;
+                        this->MaxCapacity = state.dataDXCoils->HPWHHeatingCapacity;
+                        this->MinCapacity = state.dataDXCoils->HPWHHeatingCapacity;
+                        this->Efficiency = state.dataDXCoils->HPWHHeatingCOP;
                     }
 
                     if (FirstTimeFlag) {
@@ -11754,7 +11753,7 @@ namespace WaterThermalTanks {
             if (bIsVSCoil) {
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, state.dataVariableSpeedCoils->VSHPWHHeatingCapacity);
             } else {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, DXCoils::HPWHHeatingCapacity);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, state.dataDXCoils->HPWHHeatingCapacity);
             }
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHRecEff, equipName, RecoveryEfficiency);
@@ -11783,7 +11782,7 @@ namespace WaterThermalTanks {
                   state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type,
                   state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name,
                   this->Volume,
-                  DXCoils::HPWHHeatingCapacity,
+                  state.dataDXCoils->HPWHHeatingCapacity,
                   RecoveryEfficiency,
                   EnergyFactor,
                   RatedDXCoilTotalCapacity);

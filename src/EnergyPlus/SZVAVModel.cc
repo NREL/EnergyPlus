@@ -81,7 +81,6 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
     int const HCoil_Water(1);
 
     // Functions
