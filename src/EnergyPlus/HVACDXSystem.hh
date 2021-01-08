@@ -76,8 +76,8 @@ namespace HVACDXSystem {
     // MODULE PARAMETER DEFINITIONS
     extern Real64 const MinAirMassFlow;
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
     // Dehumidification control modes (DehumidControlMode)
     extern int const DehumidControl_None;
     extern int const DehumidControl_Multimode;

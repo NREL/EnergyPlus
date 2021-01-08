@@ -102,9 +102,6 @@ namespace HVACDXHeatPumpSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS
     Real64 const MinAirMassFlow(0.001);
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
 
     bool GetInputFlag(true); // Flag to get input only once
 
@@ -659,7 +656,6 @@ namespace HVACDXHeatPumpSystem {
         // Using/Aliasing
         using namespace ScheduleManager;
         using DataHVACGlobals::TempControlTol;
-        using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using FaultsManager::FaultsCoilSATSensor;
 
@@ -793,7 +789,7 @@ namespace HVACDXHeatPumpSystem {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            OutletTempDXCoil = DXCoilOutletTemp(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
+                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
@@ -1292,7 +1288,6 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using DXCoils::CalcDXHeatingCoil;
-        using DXCoils::DXCoilOutletTemp;
 
         // Return value
         Real64 Residuum; // Residual to be minimized to zero
@@ -1322,7 +1317,7 @@ namespace HVACDXHeatPumpSystem {
 
         CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
 
-        OutletAirTemp = DXCoilOutletTemp(CoilIndex);
+        OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;

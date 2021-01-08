@@ -2586,8 +2586,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using DXCoils::DXCoilFanOpMode;
-        using DXCoils::DXCoilPartLoadRatio;
         using HeatRecovery::SimHeatRecovery;
 
         // Locals
@@ -2657,7 +2655,7 @@ namespace DesiccantDehumidifiers {
         if (DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide == Yes) {
             if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                 (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                if (DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) == 0.0) {
+                if (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) == 0.0) {
                     UnitOn = false;
                 }
             }
@@ -2703,7 +2701,7 @@ namespace DesiccantDehumidifiers {
                 if (CompanionCoilIndexNum > 0) {
                     if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                         (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        DDPartLoadRatio = DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
                     } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                     }
@@ -2713,7 +2711,7 @@ namespace DesiccantDehumidifiers {
                 if (CompanionCoilIndexNum > 0) {
                     if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                         (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        if (DXCoilFanOpMode(DesicDehum(DesicDehumNum).DXCoilIndex) == ContFanCycCoil) {
+                        if (state.dataDXCoils->DXCoilFanOpMode(DesicDehum(DesicDehumNum).DXCoilIndex) == ContFanCycCoil) {
                             NewRegenInTemp =
                                 Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp +
                                 CondenserWasteHeat / (CpAir * (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) * DDPartLoadRatio);
@@ -2898,7 +2896,7 @@ namespace DesiccantDehumidifiers {
                     } else {
                         if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                             (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                            DDPartLoadRatio = DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                            DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
                         } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                             DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                         }
@@ -2980,7 +2978,7 @@ namespace DesiccantDehumidifiers {
                     DesicDehum(DesicDehumNum).ExhaustFanPower +=
                         max(0.0,
                             (DesicDehum(DesicDehumNum).ExhaustFanMaxPower *
-                             (DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) - DDPartLoadRatio)));
+                             (state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex) - DDPartLoadRatio)));
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     DesicDehum(DesicDehumNum).ExhaustFanPower += max(0.0, (DesicDehum(DesicDehumNum).ExhaustFanMaxPower * (1.0 - DDPartLoadRatio)));
                 }
@@ -3032,7 +3030,7 @@ namespace DesiccantDehumidifiers {
                 if (DesicDehum(DesicDehumNum).DXCoilIndex > 0) {
                     if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                         (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                        DDPartLoadRatio = DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
+                        DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(DesicDehum(DesicDehumNum).DXCoilIndex);
                     } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                     }

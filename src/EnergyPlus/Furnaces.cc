@@ -187,9 +187,6 @@ namespace Furnaces {
     // Airflow control for contant fan mode
     int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
     int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
 
     // Dehumidification control modes (DehumidControlMode)
     int const DehumidControl_None(0);
@@ -6787,8 +6784,6 @@ namespace Furnaces {
         using namespace ScheduleManager;
         using namespace DataZoneEnergyDemands;
         using DataHeatBalFanSys::ZT;
-        using DXCoils::DXCoil;
-        using DXCoils::DXCoilPartLoadRatio;
 
         using TempSolveRoot::SolveRoot;
 
@@ -6858,10 +6853,10 @@ namespace Furnaces {
         PartLoadRatio = 0.0;
 
         if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
-            if (DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
-                OutdoorDryBulbTemp = ZT(DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
-            } else if (DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulbTemp = ZT(DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
+            if (state.dataDXCoils->DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
+                OutdoorDryBulbTemp = ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
+            } else if (state.dataDXCoils->DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
+                OutdoorDryBulbTemp = ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
             } else {
                 if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
                     OutdoorDryBulbTemp = Node(Furnace(FurnaceNum).CondenserNodeNum).Temp;
@@ -7978,7 +7973,7 @@ namespace Furnaces {
                         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
 
                             // VS coil issue here...
-                            if (DXCoilPartLoadRatio(Furnace(FurnaceNum).ActualDXCoilIndexForHXAssisted) > 0.0) {
+                            if (state.dataDXCoils->DXCoilPartLoadRatio(Furnace(FurnaceNum).ActualDXCoilIndexForHXAssisted) > 0.0) {
                                 Furnace(FurnaceNum).CoolPartLoadRatio = 1.0;
                                 Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
                             } else {
@@ -7986,7 +7981,7 @@ namespace Furnaces {
                                 Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
                             }
                         } else {
-                            if (DXCoilPartLoadRatio(Furnace(FurnaceNum).CoolingCoilIndex) > 0.0) {
+                            if (state.dataDXCoils->DXCoilPartLoadRatio(Furnace(FurnaceNum).CoolingCoilIndex) > 0.0) {
                                 Furnace(FurnaceNum).CoolPartLoadRatio = 1.0;
                                 Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
                             } else {

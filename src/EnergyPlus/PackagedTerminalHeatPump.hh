@@ -69,8 +69,8 @@ namespace PackagedTerminalHeatPump {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Last mode of operation
     extern int const CoolingMode; // last compressor operating mode was in cooling
