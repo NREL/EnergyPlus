@@ -11984,6 +11984,29 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayEioSummary) {
 
+            Array1D_string columnHead;
+            Array1D_int columnWidth;
+            Array1D_string rowHead;
+            Array2D_string tableBody; // in the format: (row, column)
+            Array1D_int colUnitConv;
+
+            // setting up  report header
+            WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+            std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
+            std::vector<std::string> bodyLines;   // holds the data records only
+            for (auto const &line : state.files.eio.getLines()) {
+                if (line.at(0) == '!') {
+                    headerLines.push_back(line);
+                } else {
+                    if (line.at(0) == ' ') {
+                        bodyLines.push_back(line.substr(1)); // remove leading space
+                    } else {
+                        bodyLines.push_back(line);
+                    }
+                }
+            }
+
             iUnitsStyle unitsStyle_temp = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
@@ -12003,30 +12026,6 @@ namespace EnergyPlus::OutputReportTabular {
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
-
-                Array1D_string columnHead;
-                Array1D_int columnWidth;
-                Array1D_string rowHead;
-                Array2D_string tableBody; // in the format: (row, column)
-                Array1D_int colUnitConv;
-
-                // setting up  report header
-                if (produceTabular == true) {
-                    WriteReportHeaders(state, "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                }
-                std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
-                std::vector<std::string> bodyLines;   // holds the data records only
-                for (auto const &line : state.files.eio.getLines()) {
-                    if (line.at(0) == '!') {
-                        headerLines.push_back(line);
-                    } else {
-                        if (line.at(0) == ' ') {
-                            bodyLines.push_back(line.substr(1)); // remove leading space
-                        } else {
-                            bodyLines.push_back(line);
-                        }
-                    }
                 }
 
                 // now go through each header and create a report for each one
