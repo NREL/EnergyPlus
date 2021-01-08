@@ -1352,12 +1352,14 @@
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject1, !- Name
    2.0,                     !- Heating Control Throttling Range {deltaC}
+    ,                        !- Condensation Control Type
        ;                        !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject2, !- Name
    3.0,                     !- Heating Control Throttling Range {deltaC}
-       ;                        !- Condensation Control Dewpoint Offset {C}
+   SimpleOff,                        !- Condensation Control Type
+   1;                        !- Condensation Control Dewpoint Offset {C}
 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
@@ -1390,7 +1392,6 @@
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object
@@ -1426,7 +1427,6 @@
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object
@@ -1461,7 +1461,6 @@
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object

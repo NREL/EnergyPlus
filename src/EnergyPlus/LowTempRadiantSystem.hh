@@ -238,7 +238,6 @@ namespace LowTempRadiantSystem {
         int CWCompNum;
         int GlycolIndex;          // Index to Glycol (Water) Properties
         int CondErrIndex;         // Error index for recurring warning messages
-        int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondCausedTimeOff; // Amount of time condensation did or could have turned system off
         bool CondCausedShutDown;  // .TRUE. when condensation predicted at surface
         int NumCircCalcMethod;    // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
@@ -265,7 +264,7 @@ namespace LowTempRadiantSystem {
         : TubeDiameterInner(0.0), TubeDiameterOuter(0.0), TubeLength(0.0), TubeConductivity(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly),
               HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0),CoolingSystem(false), ColdWaterInNode(0), ColdWaterOutNode(0), CWLoopNum(0), CWLoopSide(0),
-              CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCtrlType(1), CondCausedTimeOff(0.0),
+              CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCausedTimeOff(0.0),
               CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), schedPtrChangeoverDelay(0), lastOperatingMode(NotOperating),
               lastDayOfSim(1), lastHourOfDay(1),lastTimeStep(1), EMSOverrideOnWaterMdot(false), EMSWaterMdotOverrideValue(0.0),
               WaterInletTemp(0.0), WaterOutletTemp(0.0), CoolPower(0.0), CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
@@ -344,12 +343,13 @@ namespace LowTempRadiantSystem {
         std::string designName;           // name of the design object+
         Real64 HotThrottlRange;          // Throttling range for heating [C]
         Array1D_string FieldNames;
+        int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
 
         // Default Constructor
         VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0), CondDewPtDeltaT(1.0)
+                HotThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
         {
         }
     };
@@ -442,12 +442,13 @@ namespace LowTempRadiantSystem {
         std::string designName;           // name of the design object+
         Real64 HotThrottlRange;          // Throttling range for heating [C]
         Array1D_string FieldNames;
+        int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
 
         // Default Constructor
         ConstantFlowRadDesignData()
                 :
-                HotThrottlRange(0.0), CondDewPtDeltaT(1.0)
+                HotThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
         {
         }
     };

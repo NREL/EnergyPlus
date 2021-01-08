@@ -522,6 +522,18 @@ namespace LowTempRadiantSystem {
             // General user input data
             thisRadSysDesign.designName         = Alphas(1);
             thisRadSysDesign.HotThrottlRange    = Numbers(1);
+
+            if (UtilityRoutines::SameString(Alphas(2), Off)) {
+
+                thisRadSysDesign.CondCtrlType = CondCtrlNone;
+            } else if (UtilityRoutines::SameString(Alphas(2), SimpleOff)) {
+                thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
+            } else if (UtilityRoutines::SameString(Alphas(2), VariableOff)) {
+                thisRadSysDesign.CondCtrlType = CondCtrlVariedOff;
+            } else {
+                thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
+            }
+
             thisRadSysDesign.CondDewPtDeltaT    = Numbers(2);
 
             VarFlowRadDesignNames(Item) =  Alphas(1);
@@ -811,20 +823,9 @@ namespace LowTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(16), Off)) {
-                thisRadSys.CondCtrlType = CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(16), SimpleOff)) {
-                thisRadSys.CondCtrlType = CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(16), VariableOff)) {
-                thisRadSys.CondCtrlType = CondCtrlVariedOff;
-            } else {
-                thisRadSys.CondCtrlType = CondCtrlSimpleOff;
-            }
-
-
-            if (UtilityRoutines::SameString(Alphas(17), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(16), OnePerSurf)) {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(17), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(16), CalcFromLength)) {
                 thisRadSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
@@ -832,14 +833,14 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.CircLength = Numbers(15);
 
-            thisRadSys.designObjectName = Alphas(18);
+            thisRadSys.designObjectName = Alphas(17);
             thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, VarFlowRadDesignNames);
 
-            thisRadSys.schedNameChangeoverDelay = Alphas(19);
+            thisRadSys.schedNameChangeoverDelay = Alphas(18);
             if (!lAlphaBlanks(19)) {
-                thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(19));
+                thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(18));
                 if (thisRadSys.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(18) + " not found for " + Alphas(19));
+                    ShowWarningError(state, cAlphaFields(18) + " not found for " + Alphas(18));
                     ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
@@ -885,6 +886,17 @@ namespace LowTempRadiantSystem {
             // General user input data
             thisRadSysDesign.designName         = Alphas(1);
             thisRadSysDesign.HotThrottlRange    = Numbers(1);
+
+            if (UtilityRoutines::SameString(Alphas(2), Off)) {
+                thisRadSysDesign.CondCtrlType = CondCtrlNone;
+            } else if (UtilityRoutines::SameString(Alphas(2), SimpleOff)) {
+                thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
+            } else if (UtilityRoutines::SameString(Alphas(2), VariableOff)) {
+                thisRadSysDesign.CondCtrlType = CondCtrlVariedOff;
+            } else {
+                thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
+            }
+
             thisRadSysDesign.CondDewPtDeltaT    = Numbers(2);
 
             CFlowRadDesignNames(Item) =  Alphas(1);
@@ -1097,21 +1109,9 @@ namespace LowTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(20), Off)) {
-                thisCFloSys.CondCtrlType = CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(20), SimpleOff)) {
-                thisCFloSys.CondCtrlType = CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(20), VariableOff)) {
-                thisCFloSys.CondCtrlType = CondCtrlVariedOff;
-            } else {
-                thisCFloSys.CondCtrlType = CondCtrlSimpleOff;
-            }
-
-//            thisCFloSys.CondDewPtDeltaT = Numbers(11);
-
-            if (UtilityRoutines::SameString(Alphas(21), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(20), OnePerSurf)) {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(21), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(20), CalcFromLength)) {
                 thisCFloSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
@@ -1119,11 +1119,11 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.CircLength = Numbers(12);
 
-            thisCFloSys.schedNameChangeoverDelay = Alphas(22);
-            if (!lAlphaBlanks(22)) {
-                thisCFloSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(22));
+            thisCFloSys.schedNameChangeoverDelay = Alphas(21);
+            if (!lAlphaBlanks(21)) {
+                thisCFloSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(21));
                 if (thisCFloSys.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(22) + " not found for " + Alphas(22));
+                    ShowWarningError(state, cAlphaFields(21) + " not found for " + Alphas(21));
                     ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
@@ -3710,7 +3710,7 @@ namespace LowTempRadiantSystem {
             this->CondCausedShutDown = false;
             DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
-            if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlSimpleOff)) {
+            if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT )) {
@@ -3761,7 +3761,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlNone)) {
+            } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
@@ -3770,7 +3770,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlVariedOff)) {
+            } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondCtrlVariedOff)) {
 
                 LowestRadSurfTemp = 999.9;
                 CondSurfNum = 0;
@@ -4008,6 +4008,8 @@ namespace LowTempRadiantSystem {
         Real64 WaterTempLo;     // Current low point in water temperature range
         int ZoneNum;            // number of zone being served
         Real64 mdot;            // local temporary for water mass flow rate kg/s
+
+        ConstantFlowRadDesignData ConstantFlowDesignDataObject{CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
         // initialize local variables
         ZoneNum = this->ZonePtr;
@@ -4301,7 +4303,7 @@ namespace LowTempRadiantSystem {
                 LoopInNode = this->ColdWaterInNode;
                 SysWaterInTemp = Node(LoopInNode).Temp;
                 CFloCondIterNum = 1;
-                while ((CFloCondIterNum <= 1) || ((CFloCondIterNum <= 2) && (this->CondCtrlType == CondCtrlVariedOff) && (VarOffCond))) {
+                while ((CFloCondIterNum <= 1) || ((CFloCondIterNum <= 2) && (ConstantFlowDesignDataObject.CondCtrlType == CondCtrlVariedOff) && (VarOffCond))) {
                     Iteration = false;
 
                     if ((SysWaterInTemp <= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
@@ -4809,7 +4811,7 @@ namespace LowTempRadiantSystem {
             this->CondCausedShutDown = false;
             DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(this->ZonePtr), state.dataEnvrn->OutBaroPress);
 
-            if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlSimpleOff)) {
+            if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
@@ -4860,7 +4862,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlNone)) {
+            } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
@@ -4869,7 +4871,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlVariedOff)) {
+            } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondCtrlVariedOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
