@@ -96,9 +96,13 @@ namespace PVWatts {
           m_outputDCPower(1000.0),
           m_cellTemperature(-9999),
           m_planeOfArrayIrradiance(-9999),
-          m_shadedPercent(0.0)
+          m_shadedPercent(0.0),
+          m_pvwattsModule(ssc_module_create("pvwattsv5_1ts")),
+          m_pvwattsData(ssc_data_create())
 
     {
+
+        assert(m_pvwattsModule != nullptr);
 
         bool errorsFound(false);
 
@@ -153,6 +157,25 @@ namespace PVWatts {
         if (errorsFound) {
             ShowFatalError(state, "Errors found in getting PVWatts input");
         }
+
+        // Initialize m_pvwattsData
+        // Location
+        ssc_data_set_number(m_pvwattsData, "lat", state.dataWeatherManager->WeatherFileLatitude);
+        ssc_data_set_number(m_pvwattsData, "lon", state.dataWeatherManager->WeatherFileLongitude);
+        ssc_data_set_number(m_pvwattsData, "tz", state.dataWeatherManager->WeatherFileTimeZone);
+        // System Properties
+        ssc_data_set_number(m_pvwattsData, "time_step", state.dataGlobal->TimeStepZone);
+        ssc_data_set_number(m_pvwattsData, "system_capacity", m_dcSystemCapacity * 0.001);
+        ssc_data_set_number(m_pvwattsData, "module_type", static_cast<int>(m_moduleType));
+        ssc_data_set_number(m_pvwattsData, "dc_ac_ratio", m_DCtoACRatio);
+        ssc_data_set_number(m_pvwattsData, "inv_eff", m_inverterEfficiency * 100.0);
+        ssc_data_set_number(m_pvwattsData, "losses", m_systemLosses * 100.0);
+        ssc_data_set_number(m_pvwattsData, "array_type", static_cast<int>(m_arrayType));
+        ssc_data_set_number(m_pvwattsData, "tilt", m_tilt);
+        ssc_data_set_number(m_pvwattsData, "azimuth", m_azimuth);
+        ssc_data_set_number(m_pvwattsData, "gcr", m_groundCoverageRatio);
+        // Initialize shaded percent
+        ssc_data_set_number(m_pvwattsData, "shaded_percent", m_shadedPercent);
 
     }
 
@@ -356,61 +379,42 @@ namespace PVWatts {
             m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour;
             return;
         }
-        ssc_module_t pvwattsModule = ssc_module_create("pvwattsv5_1ts");
-        assert(pvwattsModule != nullptr);
-        ssc_data_t pvwattsData = ssc_data_create();
-
         // SSC Inputs
         // Time
-        ssc_data_set_number(pvwattsData, "year", state.dataEnvrn->Year);
-        ssc_data_set_number(pvwattsData, "month", state.dataEnvrn->Month);
-        ssc_data_set_number(pvwattsData, "day", state.dataEnvrn->DayOfMonth);
-        ssc_data_set_number(pvwattsData, "hour", state.dataGlobal->HourOfDay - 1);
-        ssc_data_set_number(pvwattsData, "minute", (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep);
-        ssc_data_set_number(pvwattsData, "lat", state.dataWeatherManager->WeatherFileLatitude);
-        ssc_data_set_number(pvwattsData, "lon", state.dataWeatherManager->WeatherFileLongitude);
-        ssc_data_set_number(pvwattsData, "tz", state.dataWeatherManager->WeatherFileTimeZone);
+        ssc_data_set_number(m_pvwattsData, "year", state.dataEnvrn->Year);
+        ssc_data_set_number(m_pvwattsData, "month", state.dataEnvrn->Month);
+        ssc_data_set_number(m_pvwattsData, "day", state.dataEnvrn->DayOfMonth);
+        ssc_data_set_number(m_pvwattsData, "hour", state.dataGlobal->HourOfDay - 1);
+        ssc_data_set_number(m_pvwattsData, "minute", (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep);
 
         // Weather Conditions
-        ssc_data_set_number(pvwattsData, "beam", state.dataEnvrn->BeamSolarRad);
-        ssc_data_set_number(pvwattsData, "diffuse", state.dataEnvrn->DifSolarRad);
-        ssc_data_set_number(pvwattsData, "tamb", state.dataEnvrn->OutDryBulbTemp);
-        ssc_data_set_number(pvwattsData, "wspd", state.dataEnvrn->WindSpeed);
+        ssc_data_set_number(m_pvwattsData, "beam", state.dataEnvrn->BeamSolarRad);
+        ssc_data_set_number(m_pvwattsData, "diffuse", state.dataEnvrn->DifSolarRad);
+        ssc_data_set_number(m_pvwattsData, "tamb", state.dataEnvrn->OutDryBulbTemp);
+        ssc_data_set_number(m_pvwattsData, "wspd", state.dataEnvrn->WindSpeed);
         Real64 albedo = state.dataWeatherManager->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
-        ssc_data_set_number(pvwattsData, "alb", albedo);
-
-        // System Properties
-        ssc_data_set_number(pvwattsData, "time_step", state.dataGlobal->TimeStepZone);
-        ssc_data_set_number(pvwattsData, "system_capacity", m_dcSystemCapacity * 0.001);
-        ssc_data_set_number(pvwattsData, "module_type", static_cast<int>(m_moduleType));
-        ssc_data_set_number(pvwattsData, "dc_ac_ratio", m_DCtoACRatio);
-        ssc_data_set_number(pvwattsData, "inv_eff", m_inverterEfficiency * 100.0);
-        ssc_data_set_number(pvwattsData, "losses", m_systemLosses * 100.0);
-        ssc_data_set_number(pvwattsData, "array_type", static_cast<int>(m_arrayType));
-        ssc_data_set_number(pvwattsData, "tilt", m_tilt);
-        ssc_data_set_number(pvwattsData, "azimuth", m_azimuth);
-        ssc_data_set_number(pvwattsData, "gcr", m_groundCoverageRatio);
+        ssc_data_set_number(m_pvwattsData, "alb", albedo);
 
         // In/Out Properties
-        ssc_data_set_number(pvwattsData, "tcell", m_cellTemperature);
-        ssc_data_set_number(pvwattsData, "poa", m_planeOfArrayIrradiance);
+        ssc_data_set_number(m_pvwattsData, "tcell", m_cellTemperature);
+        ssc_data_set_number(m_pvwattsData, "poa", m_planeOfArrayIrradiance);
 
         // Get the shading from the geometry, if applicable
         if (m_geometryType == GeometryType::SURFACE) {
             m_shadedPercent = (1.0 - DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum)) * 100.0;
+            ssc_data_set_number(m_pvwattsData, "shaded_percent", m_shadedPercent);
         }
-        ssc_data_set_number(pvwattsData, "shaded_percent", m_shadedPercent);
 
-        if ( ssc_module_exec(pvwattsModule, pvwattsData) == 0) {
+        if ( ssc_module_exec(m_pvwattsModule, m_pvwattsData) == 0) {
             // Error
             const char *errtext;
             int sscErrType;
             float time;
             int i = 0;
-            while( (errtext = ssc_module_log(pvwattsModule, i++, &sscErrType, &time)) ) {
+            while( (errtext = ssc_module_log(m_pvwattsModule, i++, &sscErrType, &time)) ) {
                 std::string err("PVWatts: ");
                 switch (sscErrType)
                 {
@@ -428,16 +432,14 @@ namespace PVWatts {
             }
         } else {
             // Report Out
-            ssc_data_get_number(pvwattsData, "dc", &m_outputDCPower);
+            ssc_data_get_number(m_pvwattsData, "dc", &m_outputDCPower);
             m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
-            ssc_data_get_number(pvwattsData, "ac", &m_outputACPower);
+            ssc_data_get_number(m_pvwattsData, "ac", &m_outputACPower);
             m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour;
-            ssc_data_get_number(pvwattsData, "tcell", &m_cellTemperature);
-            ssc_data_get_number(pvwattsData, "poa", &m_planeOfArrayIrradiance);
+            ssc_data_get_number(m_pvwattsData, "tcell", &m_cellTemperature);
+            ssc_data_get_number(m_pvwattsData, "poa", &m_planeOfArrayIrradiance);
         }
 
-        ssc_data_free(pvwattsData);
-        ssc_module_free(pvwattsModule);
     }
 
     void PVWattsGenerator::getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy)

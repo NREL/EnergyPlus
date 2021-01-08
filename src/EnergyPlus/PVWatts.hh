@@ -166,6 +166,9 @@ namespace PVWatts {
         Real64 m_planeOfArrayIrradiance;
         Real64 m_shadedPercent;
 
+        ssc_module_t m_pvwattsModule;
+        ssc_data_t m_pvwattsData;
+
     public:
         static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
