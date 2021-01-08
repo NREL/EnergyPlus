@@ -145,7 +145,7 @@ void resetErrorFlag(EnergyPlusState state) {
 }
 
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char* surfName, const char* matName) {
-    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     auto UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
     auto UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
