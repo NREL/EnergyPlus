@@ -49,11 +49,11 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

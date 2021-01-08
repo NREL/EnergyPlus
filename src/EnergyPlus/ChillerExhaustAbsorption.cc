@@ -1841,23 +1841,6 @@ namespace ChillerExhaustAbsorption {
                 } else if (SELECT_CASE_var == 1) { // mass flow rates may not be changed by loop components
                     lHotWaterSupplyTemp = HeatSupplySetPointTemp;
                     lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
-
-                    // DSU this "2" is not a real state for flowLock
-                } else if (SELECT_CASE_var ==
-                           2) { // chiller is underloaded and mass flow rates has changed to a small amount and Tout drops below Setpoint
-
-                    // MJW 07MAR01 Borrow logic from steam absorption module
-                    // The following conditional statements are made to avoid extremely small EvapMdot
-                    // & unreasonable EvapOutletTemp due to overloading.
-                    // Avoid 'divide by zero' due to small EvapMdot
-                    if (lHotWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-                        HeatDeltaTemp = 0.0;
-                    } else {
-                        HeatDeltaTemp = std::abs(MyLoad) / (Cp_HW * lHotWaterMassFlowRate);
-                    }
-                    lHotWaterSupplyTemp = lHotWaterReturnTemp + HeatDeltaTemp;
-
-                    lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
                 }
             }
 

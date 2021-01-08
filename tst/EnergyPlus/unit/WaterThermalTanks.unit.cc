@@ -728,7 +728,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HPWH = state->dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
-    DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+    DXCoils::DXCoilData &Coil = state->dataDXCoils->DXCoil(HPWH.DXCoilNum);
     Tank.Node(1).SavedTemp = 51.190278176501131;
     Tank.Node(2).SavedTemp = 51.190445301209223;
     Tank.Node(3).SavedTemp = 51.190593898651336;
@@ -1042,7 +1042,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     DataHeatBalFanSys::MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, DXCoils::DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1411,7 +1411,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataHVACGlobals::HPWHInletDBTemp = 30.0;
     state->dataEnvrn->WaterMainsTemp = 40.0;
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-    DXCoils::HPWHHeatingCapacity = 4000.0;
+    state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
     DataLoopNode::Node(3).Temp = 30.0;
     DataLoopNode::Node(3).HumRat = 0.01;
@@ -2177,7 +2177,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2410,7 +2409,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Desuperheater.SetPointTemp = 55;
     Desuperheater.Mode = 1;
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 0;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     Tank.Mode = 0;
     Tank.SetPointTemp = 50;
@@ -2721,7 +2720,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3022,25 +3020,25 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 
-    DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
-    DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
-    DXCoil(1).InletAirMassFlowRate = DXCoil(1).MSRatedAirMassFlowRate(2);
-    DataHVACGlobals::MSHPMassFlowRateLow = DXCoil(1).MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = DXCoil(1).MSRatedAirMassFlowRate(2);
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
+    state->dataDXCoils->DXCoil(1).InletAirMassFlowRate = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
+    DataHVACGlobals::MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
+    DataHVACGlobals::MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
 
-    DXCoil(1).InletAirTemp = 27.0;
-    DXCoil(1).InletAirHumRat = 0.005;
-    DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
-    DXCoil(1).SchedPtr = 1;
-    ScheduleManager::Schedule(DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
-    DXCoil(1).MSRatedCBF(1) = 0.1262;
-    DXCoil(1).MSRatedCBF(2) = 0.0408;
+    state->dataDXCoils->DXCoil(1).InletAirTemp = 27.0;
+    state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
+    state->dataDXCoils->DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
+    state->dataDXCoils->DXCoil(1).SchedPtr = 1;
+    ScheduleManager::Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, state->dataDXCoils->DXCoil(DXNum).TotalCoolingEnergyRate + state->dataDXCoils->DXCoil(DXNum).ElecCoolingPower);
 
     // Now move to the water thermal tank calculation
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
@@ -3068,7 +3066,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.FirstTimeThroughFlag = true;
     Tank.CalcDesuperheaterWaterHeater(*state, true);
 
-    EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
+    EXPECT_EQ(Desuperheater.DXSysPLR, state->dataDXCoils->DXCoil(DXNum).PartLoadRatio);
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
     // used desuperheater reclaim heat is successfully stored in HeatReclaimDXCoil data struct
@@ -3409,7 +3407,6 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3698,7 +3695,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     }
 
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     // first tank heat reclaim
     // Call desuperheater calculation function
@@ -4419,7 +4416,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
@@ -4443,7 +4440,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;

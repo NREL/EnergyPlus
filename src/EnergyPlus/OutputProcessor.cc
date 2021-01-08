@@ -5206,7 +5206,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
                          std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
-                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
+                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey,           // Meter End Use Key (Lights, Heating, Cooling, etc)
                          Optional_string_const EndUseSubKey,        // Meter End Use Sub Key (General Lights, Task Lights, etc)

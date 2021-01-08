@@ -4751,8 +4751,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = 30.0;
-    DXCoils::DXCoil(1).RatedCBF(1) = 0.1;                            // autosizing is disabled so initialize coil bypass factor
-    DXCoils::DXCoil(1).RatedAirMassFlowRate(1) = 1.9268939689375426; // autosizing is disabled so initialize cooling coil rated air mass flow rate
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.1;                            // autosizing is disabled so initialize coil bypass factor
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = 1.9268939689375426; // autosizing is disabled so initialize cooling coil rated air mass flow rate
 
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -7498,7 +7498,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
 
     EXPECT_EQ(thisSys->m_DesignHeatingCapacity * 0.00005, thisSys->m_MaxHeatAirVolFlow);
     EXPECT_EQ(thisSys->m_DesignCoolingCapacity * 0.00005, thisSys->m_MaxCoolAirVolFlow);
-    EXPECT_EQ(thisSys->m_DesignCoolingCapacity, DXCoils::DXCoil(thisSys->m_CoolingCoilIndex).MSRatedTotCap(thisSys->m_NumOfSpeedCooling));
+    EXPECT_EQ(thisSys->m_DesignCoolingCapacity, state->dataDXCoils->DXCoil(thisSys->m_CoolingCoilIndex).MSRatedTotCap(thisSys->m_NumOfSpeedCooling));
     // 64-bit MSVS shows these next variables as identical yet other compilers show diff's, changing ASSERT_EQ to EXPECT_NEAR
     EXPECT_NEAR(thisSys->m_DesignHeatingCapacity,
                 state->dataVariableSpeedCoils->VarSpeedCoil(thisSys->m_HeatingCoilIndex).MSRatedTotCap(thisSys->m_NumOfSpeedHeating),
@@ -7506,23 +7506,23 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
     EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.032774, 0.000001);
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1], 0.000001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1], 0.000001);
     EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.065549, 0.000001);
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2], 0.000001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2], 0.000001);
     EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.098323, 0.000001);
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3], 0.000001);
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3], 0.000001);
 
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0], 0.333333, 0.000001);
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[1], 0.666666, 0.000001);
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[2], 1.000000, 0.000001);
 
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(1),
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1),
                 thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0],
                 0.000001);
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(2),
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2),
                 thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[1],
                 0.000001);
-    EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(3),
+    EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3),
                 thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[2],
                 0.000001);
 
@@ -9170,18 +9170,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
 
     ASSERT_NEAR(thisSys->m_DesignHeatingCapacity, 1303.091, 0.001);
     ASSERT_EQ(thisSys->m_DesignCoolingCapacity, 0.0);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedTotCap(1), 325.773, 0.001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedTotCap(2), 651.545, 0.001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedTotCap(3), 977.318, 0.001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedTotCap(4), 1303.091, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 325.773, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 651.545, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(3), 977.318, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(4), 1303.091, 0.001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.0131, 0.0001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.0262, 0.0001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.0393, 0.0001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.0524, 0.0001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(1), 0.0131, 0.0001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(2), 0.0262, 0.0001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(3), 0.0393, 0.0001);
-    ASSERT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(4), 0.0524, 0.0001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), 0.0131, 0.0001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), 0.0262, 0.0001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), 0.0393, 0.0001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(4), 0.0524, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
@@ -9996,29 +9996,29 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * state->dataEnvrn->StdRhoAir;
     thisSys->m_MSCoolingSpeedRatio[Iter] =
         thisSys->m_CoolVolumeFlowRate[Iter] / thisSys->m_CoolVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedCooling];
-    DXCoils::DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
     Iter = 1;
     thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[Iter - 1];
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * state->dataEnvrn->StdRhoAir;
     thisSys->m_MSCoolingSpeedRatio[Iter] =
         thisSys->m_CoolVolumeFlowRate[Iter] / thisSys->m_CoolVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedCooling];
-    DXCoils::DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
     Iter = 2;
     thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[Iter - 1];
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * state->dataEnvrn->StdRhoAir;
     thisSys->m_MSCoolingSpeedRatio[Iter] =
         thisSys->m_CoolVolumeFlowRate[Iter] / thisSys->m_CoolVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedCooling];
-    DXCoils::DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
     Iter = 3;
     thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[Iter - 1];
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * state->dataEnvrn->StdRhoAir;
     thisSys->m_MSCoolingSpeedRatio[Iter] =
         thisSys->m_CoolVolumeFlowRate[Iter] / thisSys->m_CoolVolumeFlowRate[state->dataUnitarySystems->designSpecMSHP[0].numOfSpeedCooling];
-    DXCoils::DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
-    DXCoils::DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
+    state->dataDXCoils->DXCoil(2).MSRatedAirMassFlowRate(Iter) = state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(Iter) * state->dataEnvrn->StdRhoAir;
 
     Iter = 4;
     thisSys->m_HeatVolumeFlowRate[Iter] = thisSys->m_MaxHeatAirVolFlow * state->dataUnitarySystems->designSpecMSHP[0].heatingVolFlowRatio[Iter - 1];
@@ -11042,15 +11042,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
-    ASSERT_FALSE(DXCoils::DXCoil(1).MSHPHeatRecActive); // electricity
-    ASSERT_TRUE(DXCoils::DXCoil(2).MSHPHeatRecActive);  // natural gas
+    ASSERT_FALSE(state->dataDXCoils->DXCoil(1).MSHPHeatRecActive); // electricity
+    ASSERT_TRUE(state->dataDXCoils->DXCoil(2).MSHPHeatRecActive);  // natural gas
                                                         // Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
-    EXPECT_EQ(DXCoils::DXCoil(1).MinOATCompressor, -25.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).MinOATCompressor, -25.0);
     // Minimum Outdoor Temperature for Compressor read from input field as -8.0 C
-    EXPECT_EQ(DXCoils::DXCoil(2).MinOATCompressor, -8.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(2).MinOATCompressor, -8.0);
     // Unitary System mines data from coil objects
-    EXPECT_EQ(DXCoils::DXCoil(1).MinOATCompressor, thisSys->m_MinOATCompressorCooling);
-    EXPECT_EQ(DXCoils::DXCoil(2).MinOATCompressor, thisSys->m_MinOATCompressorHeating);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).MinOATCompressor, thisSys->m_MinOATCompressorCooling);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(2).MinOATCompressor, thisSys->m_MinOATCompressorHeating);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
@@ -12720,7 +12720,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_TRUE(thisSys->m_CoolCoilExists);
     EXPECT_TRUE(thisSys->m_HeatCoilExists);
 
-    auto &thisClgCoil = DXCoils::DXCoil(1);
+    auto &thisClgCoil = state->dataDXCoils->DXCoil(1);
     auto &thisHtgCoil = HeatingCoils::HeatingCoil(1);
 
     EXPECT_EQ(thisClgCoil.RatedTotCap(1), DataSizing::AutoSize);

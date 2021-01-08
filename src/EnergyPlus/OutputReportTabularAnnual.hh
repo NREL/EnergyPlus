@@ -122,7 +122,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(EnergyPlusData &state, int unitsStyle);
+        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle);
 
         void addTableOfContents(std::ostream &);
 
@@ -153,7 +153,7 @@ namespace OutputReportTabularAnnual {
 
         std::vector<std::string> setupAggString();
 
-        Real64 setEnergyUnitStringAndFactor(int const unitsStyle, std::string &unitString);
+        Real64 setEnergyUnitStringAndFactor(OutputReportTabular::iUnitsStyle const unitsStyle, std::string &unitString);
 
         int columnCountForAggregation(AnnualFieldSet::AggregationKind curAgg);
 
@@ -163,7 +163,9 @@ namespace OutputReportTabularAnnual {
 
         bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-        void convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
+        void convertUnitForDeferredResults(EnergyPlusData &state,
+                                           std::vector<AnnualFieldSet>::iterator fldStIt,
+                                           OutputReportTabular::iUnitsStyle const unitsStyle);
 
         std::vector<Real64> calculateBins(int const numberOfBins,
                                           std::vector<Real64> const valuesToBin,

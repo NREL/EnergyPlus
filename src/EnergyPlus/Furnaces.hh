@@ -77,8 +77,8 @@ namespace Furnaces {
     extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
     extern int const UseCompressorOffFlow; // set compressor OFF air flow rate equal to user defined value
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Dehumidification control modes (DehumidControlMode)
     extern int const DehumidControl_None;
