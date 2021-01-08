@@ -148,10 +148,6 @@ namespace FanCoilUnits {
 
     std::string const cMO_FanCoil("ZoneHVAC:FourPipeFanCoil");
 
-    // coil operation
-    int const On(1);  // normal coil operation
-    int const Off(0); // signal coil shouldn't run
-
     // coil type units supported in this module
     int const FanCoilUnit_4Pipe(1);
 

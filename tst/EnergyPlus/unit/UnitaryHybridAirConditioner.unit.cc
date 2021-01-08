@@ -411,6 +411,9 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataSysRpts->ZoneMechACH.allocate(state->dataGlobal->NumOfZones);
     MAT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->MaxHeatingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->MaxOverheatingByVent.allocate(state->dataGlobal->NumOfZones);
+    state->dataSysRpts->MaxCoolingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
     state->dataSysRpts->MaxOvercoolingByVent.allocate(state->dataGlobal->NumOfZones);
     ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     DeadBandOrSetback(1) = false;
