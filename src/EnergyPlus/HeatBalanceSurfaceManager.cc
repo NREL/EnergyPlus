@@ -2318,12 +2318,6 @@ namespace HeatBalanceSurfaceManager {
         Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
-        // Always initialize the shortwave quantities
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
-            SurfSWInAbsTotalReport(SurfNum) = 0.0;
-            SurfCosIncidenceAngle(SurfNum) = 0.0;
-        }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             InitialZoneDifSolReflW(zoneNum) = 0.0;
@@ -2421,7 +2415,7 @@ namespace HeatBalanceSurfaceManager {
         bool currSolRadPositive = state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0);
         bool sunset = (!currSolRadPositive) && state.dataEnvrn->PreviousSolRadPositive;
         bool sunIsUpNoRad = state.dataEnvrn->SunIsUp && (!currSolRadPositive);
-        bool resetSolar = state.dataGlobal->BeginDayFlag || sunIsUpNoRad || sunset; // Reset at (1) Beginning of simulation (2) sunset time, and SunIsUp but not solar time.
+        bool resetSolar = state.dataGlobal->BeginEnvrnFlag || sunIsUpNoRad || sunset; // Reset at (1) Beginning of simulation (2) sunset time, and SunIsUp but not solar time.
         state.dataEnvrn->PreviousSolRadPositive = currSolRadPositive;
 
         if (currSolRadPositive || resetSolar) {
@@ -2542,6 +2536,8 @@ namespace HeatBalanceSurfaceManager {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
             }
+
+            // TTD domes are currently not considered in the window list of a zone
             if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
                 for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
                     e.TransSolBeam = 0.0;
@@ -2565,6 +2561,11 @@ namespace HeatBalanceSurfaceManager {
                     SurfBmToDiffReflFacObs(SurfNum) = 0.0;
                     SurfBmToDiffReflFacGnd(SurfNum) = 0.0;
                 }
+            }
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
+                SurfCosIncidenceAngle(SurfNum) = 0.0;
+                SurfSWInAbsTotalReport(SurfNum) = 0.0;
             }
         }
 
