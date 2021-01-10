@@ -5970,8 +5970,8 @@ namespace SolarShading {
         static Array2D<Real64> AbsSolDiffEQL(2, CFSMAXNL + 1);     // absorbed exterior diffuse radiation by layers fraction
         static Array2D<Real64> AbsSolBeamBackEQL(2, CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
         // Array2D< Real64 > AbsSolDiffBackEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction from back //Unused
-        Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-        Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+        static Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+        static Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
 
         Array1D<Real64> CFBoverlap;    // Sum of boverlap for each back surface
         Array2D<Real64> CFDirBoverlap; // Directional boverlap (Direction, IBack)

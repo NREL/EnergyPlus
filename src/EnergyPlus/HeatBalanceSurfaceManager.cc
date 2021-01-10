@@ -2371,14 +2371,6 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                SurfWinProfileAngHor(SurfNum) = 0.0;
-                SurfWinProfileAngVert(SurfNum) = 0.0;
-                SurfWinHeatGain(SurfNum) = 0.0;
-                SurfWinHeatTransfer(SurfNum) = 0.0;
-                SurfWinHeatGainRep(SurfNum) = 0.0;
-                SurfWinHeatLossRep(SurfNum) = 0.0;
-            }
-            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinGainConvGlazToZoneRep(SurfNum) = 0.0;
                 SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
                 SurfWinLossSWZoneToOutWinRep(SurfNum) = 0.0;
@@ -2391,8 +2383,10 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinSysSolTransmittance(SurfNum) = 0.0;
             }
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                SurfWinSysSolReflectance(SurfNum) = 0.0;
-                SurfWinSysSolAbsorptance(SurfNum) = 0.0;
+                SurfWinHeatGain(SurfNum) = 0.0;
+                SurfWinHeatTransfer(SurfNum) = 0.0;
+                SurfWinHeatGainRep(SurfNum) = 0.0;
+                SurfWinHeatLossRep(SurfNum) = 0.0;
                 SurfWinHeatGainRepEnergy(SurfNum) = 0.0;
                 SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
                 SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
@@ -2566,6 +2560,10 @@ namespace HeatBalanceSurfaceManager {
                 SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
                 SurfCosIncidenceAngle(SurfNum) = 0.0;
                 SurfSWInAbsTotalReport(SurfNum) = 0.0;
+                SurfWinProfileAngHor(SurfNum) = 0.0;
+                SurfWinProfileAngVert(SurfNum) = 0.0;
+                SurfWinSysSolReflectance(SurfNum) = 0.0;
+                SurfWinSysSolAbsorptance(SurfNum) = 0.0;
             }
         }
 
