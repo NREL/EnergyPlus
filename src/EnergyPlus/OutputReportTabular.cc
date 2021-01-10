@@ -6339,303 +6339,347 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        // set the unit conversion
-        if (ort->unitsStyle == iUnitsStyle::None) {
-            energyUnitsString = "J";
-            energyUnitsConversionFactor = 1.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-            energyUnitsString = "kWh";
-            energyUnitsConversionFactor = 1.0 / 3600000.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoMJ) {
-            energyUnitsString = "MJ";
-            energyUnitsConversionFactor = 1.0 / 1000000.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoGJ) {
-            energyUnitsString = "GJ";
-            energyUnitsConversionFactor = 1.0 / 1000000000.0;
-        } else { // Should never happen but assures compilers of initialization
-            energyUnitsString = "J";
-            energyUnitsConversionFactor = 1.0;
-        }
+        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        bool produceTabular = true;
+        bool produceSQLite = false;
 
-        // loop through each input to get the name of the tables
-        for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
-            // loop through each report and
-            digitsShown = ort->MonthlyInput(iInput).showDigits;
-            for (jTable = 1; jTable <= ort->MonthlyInput(iInput).numTables; ++jTable) {
-                curTable = jTable + ort->MonthlyInput(iInput).firstTable - 1;
-                // first loop through and count how many 'columns' are defined
-                // since max and min actually define two columns (the value
-                // and the timestamp).
-                columnUsedCount = 0;
-                for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::ValueWhenMaxMin) ||
-                            (SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
-                            (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
-                            (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative) ||
-                            (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
-                            ++columnUsedCount;
-                        } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
-                                   (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) || (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
-                            columnUsedCount += 2;
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+
+            if (iUnitSystem == 0) {
+                unitsStyle_temp = ort->unitsStyle;
+                produceTabular = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                    produceSQLite = true;
+                } else {
+                    produceSQLite = false;
+                }
+            } else { // iUnitSystem == 1
+                unitsStyle_temp = ort->unitsStyle_SQLite;
+                produceTabular = false;
+                produceSQLite = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+            }
+
+            // set the unit conversion
+            // if (ort->unitsStyle == iUnitsStyle::None) {
+            if (unitsStyle_temp == iUnitsStyle::None) {
+                energyUnitsString = "J";
+                energyUnitsConversionFactor = 1.0;
+            // } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
+            } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                energyUnitsString = "kWh";
+                energyUnitsConversionFactor = 1.0 / 3600000.0;
+            // } else if (ort->unitsStyle == iUnitsStyle::JtoMJ) {
+            } else if (unitsStyle_temp == iUnitsStyle::JtoMJ) {
+                energyUnitsString = "MJ";
+                energyUnitsConversionFactor = 1.0 / 1000000.0;
+            // } else if (ort->unitsStyle == iUnitsStyle::JtoGJ) {
+            } else if (unitsStyle_temp == iUnitsStyle::JtoGJ) {
+                energyUnitsString = "GJ";
+                energyUnitsConversionFactor = 1.0 / 1000000000.0;
+            } else { // Should never happen but assures compilers of initialization
+                energyUnitsString = "J";
+                energyUnitsConversionFactor = 1.0;
+            }
+
+            // loop through each input to get the name of the tables
+            for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
+                // loop through each report and
+                digitsShown = ort->MonthlyInput(iInput).showDigits;
+                for (jTable = 1; jTable <= ort->MonthlyInput(iInput).numTables; ++jTable) {
+                    curTable = jTable + ort->MonthlyInput(iInput).firstTable - 1;
+                    // first loop through and count how many 'columns' are defined
+                    // since max and min actually define two columns (the value
+                    // and the timestamp).
+                    columnUsedCount = 0;
+                    for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
+                        curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
+                        {
+                            auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
+                            if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::ValueWhenMaxMin) ||
+                                (SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
+                                (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
+                                (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative) ||
+                                (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
+                                ++columnUsedCount;
+                            } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
+                                       (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) ||
+                                       (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
+                                columnUsedCount += 2;
+                            }
                         }
-                    }
-                } // jColumn
-                columnHead.allocate(columnUsedCount);
-                columnWidth.dimension(columnUsedCount, 14); // array assignment - same for all columns
-                tableBody.allocate(columnUsedCount, 16);
-                tableBody = ""; // set entire table to blank as default
-                columnRecount = 0;
-                for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
-                    curAggString = aggString.at(ort->MonthlyColumns(curCol).aggType);
-                    if (len(curAggString) > 0) {
-                        curAggString = " {" + stripped(curAggString) + '}';
-                    }
-                    // do the unit conversions
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
-                        LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-                        GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-                    } else { // just do the Joule conversion
-                        // if units is in Joules, convert if specified
-                        if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
-                            curUnits = energyUnitsString;
-                            curConversionFactor = energyUnitsConversionFactor;
-                            curConversionOffset = 0.0;
-                        } else { // if not joules don't perform conversion
-                            curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
-                            curConversionFactor = 1.0;
-                            curConversionOffset = 0.0;
+                    } // jColumn
+                    columnHead.allocate(columnUsedCount);
+                    columnWidth.dimension(columnUsedCount, 14); // array assignment - same for all columns
+                    tableBody.allocate(columnUsedCount, 16);
+                    tableBody = ""; // set entire table to blank as default
+                    columnRecount = 0;
+                    for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
+                        curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
+                        curAggString = aggString.at(ort->MonthlyColumns(curCol).aggType);
+                        if (len(curAggString) > 0) {
+                            curAggString = " {" + stripped(curAggString) + '}';
                         }
-                    }
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            sumVal = 0.0;
-                            sumDuration = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->MonthlyColumns(curCol).avgSum ==
-                                    OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                    if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
-                                        curVal =
-                                            ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) * curConversionFactor) +
-                                            curConversionOffset;
+                        // do the unit conversions
+                        // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                        if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                            varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
+                            LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
+                            GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+                        } else { // just do the Joule conversion
+                            // if units is in Joules, convert if specified
+                            if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
+                                curUnits = energyUnitsString;
+                                curConversionFactor = energyUnitsConversionFactor;
+                                curConversionOffset = 0.0;
+                            } else { // if not joules don't perform conversion
+                                curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
+                                curConversionFactor = 1.0;
+                                curConversionOffset = 0.0;
+                            }
+                        }
+                        {
+                            auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
+                            if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
+                                ++columnRecount;
+                                // put in the name of the variable for the column
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                                sumVal = 0.0;
+                                sumDuration = 0.0;
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    if (ort->MonthlyColumns(curCol).avgSum ==
+                                        OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                                        if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
+                                            curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
+                                                      curConversionFactor) +
+                                                     curConversionOffset;
+                                        } else {
+                                            curVal = 0.0;
+                                        }
+                                        sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
                                     } else {
-                                        curVal = 0.0;
+                                        curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        sumVal += curVal;
                                     }
-                                    sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
-                                    sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
-                                } else {
-                                    curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
-                                    sumVal += curVal;
-                                }
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            if (ort->MonthlyColumns(curCol).avgSum ==
-                                OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                if (sumDuration > 0) {
-                                    tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
-                                } else {
-                                    tableBody(columnRecount, 14) = "";
-                                }
-                            } else {
-                                tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
-                            }
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
-                                   (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
-                                   (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative)) {
-
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
-                            sumVal = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    sumVal += curVal;
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
-                            ++columnRecount;
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
-                                   (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) || (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
-                            columnRecount += 2;
-                            // put in the name of the variable for the column
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                    // CR7788 the conversion factors were causing an overflow for the InchPound case since the
-                                    // value was very small
-                                    // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
-                                    if ((curVal < veryLarge) && (curVal > verySmall)) {
-                                        curVal = curVal * curConversionFactor + curConversionOffset;
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                         if (curVal > maxVal) maxVal = curVal;
                                         if (curVal < minVal) minVal = curVal;
-                                        if (curVal < veryLarge && curVal > verySmall) {
-                                            tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                if (ort->MonthlyColumns(curCol).avgSum ==
+                                    OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                                    if (sumDuration > 0) {
+                                        tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
+                                    } else {
+                                        tableBody(columnRecount, 14) = "";
+                                    }
+                                } else {
+                                    tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                                }
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
+                                       (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
+                                       (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative)) {
+
+                                ++columnRecount;
+                                // put in the name of the variable for the column
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
+                                sumVal = 0.0;
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                        sumVal += curVal;
+                                        if (curVal > maxVal) maxVal = curVal;
+                                        if (curVal < minVal) minVal = curVal;
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
+                                ++columnRecount;
+                                if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
+                                    curUnits += "/s";
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                                    curUnits = "W";
+                                }
+                                // CR7783 fix
+                                if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                                    curUnits = "W";
+                                    curConversionFactor *= 3600000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 360000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                                    curUnits = "ton";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                        if (curVal > maxVal) maxVal = curVal;
+                                        if (curVal < minVal) minVal = curVal;
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
+                                       (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) ||
+                                       (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
+                                columnRecount += 2;
+                                // put in the name of the variable for the column
+                                if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    curUnits += "/s";
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                                    curUnits = "W";
+                                }
+                                // CR7783 fix
+                                if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                                    curUnits = "W";
+                                    curConversionFactor *= 3600000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 360000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                                    curUnits = "ton";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                                        // CR7788 the conversion factors were causing an overflow for the InchPound case since the
+                                        // value was very small
+                                        // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
+                                        if ((curVal < veryLarge) && (curVal > verySmall)) {
+                                            curVal = curVal * curConversionFactor + curConversionOffset;
+                                            if (curVal > maxVal) maxVal = curVal;
+                                            if (curVal < minVal) minVal = curVal;
+                                            if (curVal < veryLarge && curVal > verySmall) {
+                                                tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
+                                            } else {
+                                                tableBody(columnRecount - 1, lMonth) = "-";
+                                            }
+                                            tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
                                         } else {
                                             tableBody(columnRecount - 1, lMonth) = "-";
+                                            tableBody(columnRecount, lMonth) = "-";
                                         }
-                                        tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
                                     } else {
                                         tableBody(columnRecount - 1, lMonth) = "-";
                                         tableBody(columnRecount, lMonth) = "-";
                                     }
+                                } // lMonth
+                                // add the summary to bottom
+                                // Don't include if the original min and max values are still present
+                                if (minVal < veryLarge) {
+                                    tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
                                 } else {
-                                    tableBody(columnRecount - 1, lMonth) = "-";
-                                    tableBody(columnRecount, lMonth) = "-";
+                                    tableBody(columnRecount - 1, 15) = "-";
                                 }
-                            } // lMonth
-                            // add the summary to bottom
-                            // Don't include if the original min and max values are still present
-                            if (minVal < veryLarge) {
-                                tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
-                            } else {
-                                tableBody(columnRecount - 1, 15) = "-";
-                            }
-                            if (maxVal > verySmall) {
-                                tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
-                            } else {
-                                tableBody(columnRecount - 1, 15) = "-";
+                                if (maxVal > verySmall) {
+                                    tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
+                                } else {
+                                    tableBody(columnRecount - 1, 15) = "-";
+                                }
                             }
                         }
+                    } // KColumn
+                    if (produceTabular) {
+                        WriteReportHeaders(
+                            state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
+                        WriteSubtitle(state, "Custom Monthly Report");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                     }
-                } // KColumn
-                WriteReportHeaders(state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
-                WriteSubtitle(state, "Custom Monthly Report");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
-                }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
-                }
-            } // jTables
-        }     // iInput
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   ort->MonthlyInput(iInput).name,
+                                                                   ort->MonthlyTables(curTable).keyValue,
+                                                                   "Custom Monthly Report");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        ort->MonthlyInput(iInput).name,
+                                                                                                        ort->MonthlyTables(curTable).keyValue,
+                                                                                                        "Custom Monthly Report");
+                        }
+                    }
+                } // jTables
+            }     // iInput
+        }
     }
 
     void WriteTimeBinTables(EnergyPlusData &state)
@@ -11378,7 +11422,6 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 IPvalue;
         auto &ort(state.dataOutRptTab);
 
-        
         iUnitsStyle unitsStyle_temp = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
