@@ -6739,196 +6739,245 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        rowHead(1) = "Interval Start";
-        rowHead(2) = "Interval End";
-        rowHead(3) = "January";
-        rowHead(4) = "February";
-        rowHead(5) = "March";
-        rowHead(6) = "April";
-        rowHead(7) = "May";
-        rowHead(8) = "June";
-        rowHead(9) = "July";
-        rowHead(10) = "August";
-        rowHead(11) = "September";
-        rowHead(12) = "October";
-        rowHead(13) = "November";
-        rowHead(14) = "December";
-        rowHead(15) = "12:01 to  1:00 am";
-        rowHead(16) = " 1:01 to  2:00 am";
-        rowHead(17) = " 2:01 to  3:00 am";
-        rowHead(18) = " 3:01 to  4:00 am";
-        rowHead(19) = " 4:01 to  5:00 am";
-        rowHead(20) = " 5:01 to  6:00 am";
-        rowHead(21) = " 6:01 to  7:00 am";
-        rowHead(22) = " 7:01 to  8:00 am";
-        rowHead(23) = " 8:01 to  9:00 am";
-        rowHead(24) = " 9:01 to 10:00 am";
-        rowHead(25) = "10:01 to 11:00 am";
-        rowHead(26) = "11:01 to 12:00 pm";
-        rowHead(27) = "12:01 to  1:00 pm";
-        rowHead(28) = " 1:01 to  2:00 pm";
-        rowHead(29) = " 2:01 to  3:00 pm";
-        rowHead(30) = " 3:01 to  4:00 pm";
-        rowHead(31) = " 4:01 to  5:00 pm";
-        rowHead(32) = " 5:01 to  6:00 pm";
-        rowHead(33) = " 6:01 to  7:00 pm";
-        rowHead(34) = " 7:01 to  8:00 pm";
-        rowHead(35) = " 8:01 to  9:00 pm";
-        rowHead(36) = " 9:01 to 10:00 pm";
-        rowHead(37) = "10:01 to 11:00 pm";
-        rowHead(38) = "11:01 to 12:00 am";
-        rowHead(39) = "Total";
-        for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
-            firstReport = ort->OutputTableBinned(iInObj).resIndex;
-            curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
-                curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
-            } else {
-                curNameAndUnits = curNameWithSIUnits;
-                curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
-                curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
-            }
-            curIntervalCount = ort->OutputTableBinned(iInObj).intervalCount;
-            curResIndex = ort->OutputTableBinned(iInObj).resIndex;
-            curNumTables = ort->OutputTableBinned(iInObj).numTables;
-            topValue = curIntervalStart + curIntervalSize * curIntervalCount;
-            if (curIntervalSize < 1) {
-                numIntervalDigits = 4;
-            } else if (curIntervalSize >= 10) {
-                numIntervalDigits = 0;
-            } else {
-                numIntervalDigits = 2;
-            }
-            // make arrays two columns wider for below and above bin range
-            columnHead.allocate(curIntervalCount + 3);
-            columnWidth.allocate(curIntervalCount + 3);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(curIntervalCount + 3, 39);
-            tableBody = "";
-            columnHead = "- [hr]";
-            tableBody(1, 1) = "less than";
-            tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
-            for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = format("{} [hr]", nCol);
-                // beginning of interval
-                tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
-                // end of interval
-                tableBody(nCol + 1, 2) = RealToStr(curIntervalStart + nCol * curIntervalSize, numIntervalDigits) + '>';
-            }
-            tableBody(curIntervalCount + 2, 1) = "equal to or more than";
-            tableBody(curIntervalCount + 2, 2) = RealToStr(topValue, numIntervalDigits);
-            tableBody(curIntervalCount + 3, 1) = "Row";
-            tableBody(curIntervalCount + 3, 2) = "Total";
-            for (iTable = 1; iTable <= curNumTables; ++iTable) {
-                repIndex = firstReport + (iTable - 1);
-                if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    repNameWithUnitsandscheduleName = curNameAndUnits;
+        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        bool produceTabular = true;
+        bool produceSQLite = false;
+
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+
+            if (iUnitSystem == 0) {
+                unitsStyle_temp = ort->unitsStyle;
+                produceTabular = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                    produceSQLite = true;
                 } else {
-                    repNameWithUnitsandscheduleName = curNameAndUnits + " [" + ort->OutputTableBinned(iInObj).ScheduleName + ']';
+                    produceSQLite = false;
                 }
-                WriteReportHeaders(state, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, ort->OutputTableBinned(iInObj).avgSum);
-                for (kHour = 1; kHour <= 24; ++kHour) {
-                    tableBody(1, 14 + kHour) = RealToStr(ort->BinResultsBelow(repIndex).hrly(kHour), 2);
-                    tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(ort->BinResultsAbove(repIndex).hrly(kHour), 2);
-                    rowTotal = ort->BinResultsBelow(repIndex).hrly(kHour) + ort->BinResultsAbove(repIndex).hrly(kHour);
-                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 14 + kHour) = RealToStr(ort->BinResults(nCol, repIndex).hrly(kHour), 2);
-                        // sum the total for all columns
-                        rowTotal += ort->BinResults(nCol, repIndex).hrly(kHour);
-                    }
-                    tableBody(nCol + 2, 14 + kHour) = RealToStr(rowTotal, 2);
+            } else { // iUnitSystem == 1
+                unitsStyle_temp = ort->unitsStyle_SQLite;
+                produceTabular = false;
+                produceSQLite = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+            }
+
+            rowHead(1) = "Interval Start";
+            rowHead(2) = "Interval End";
+            rowHead(3) = "January";
+            rowHead(4) = "February";
+            rowHead(5) = "March";
+            rowHead(6) = "April";
+            rowHead(7) = "May";
+            rowHead(8) = "June";
+            rowHead(9) = "July";
+            rowHead(10) = "August";
+            rowHead(11) = "September";
+            rowHead(12) = "October";
+            rowHead(13) = "November";
+            rowHead(14) = "December";
+            rowHead(15) = "12:01 to  1:00 am";
+            rowHead(16) = " 1:01 to  2:00 am";
+            rowHead(17) = " 2:01 to  3:00 am";
+            rowHead(18) = " 3:01 to  4:00 am";
+            rowHead(19) = " 4:01 to  5:00 am";
+            rowHead(20) = " 5:01 to  6:00 am";
+            rowHead(21) = " 6:01 to  7:00 am";
+            rowHead(22) = " 7:01 to  8:00 am";
+            rowHead(23) = " 8:01 to  9:00 am";
+            rowHead(24) = " 9:01 to 10:00 am";
+            rowHead(25) = "10:01 to 11:00 am";
+            rowHead(26) = "11:01 to 12:00 pm";
+            rowHead(27) = "12:01 to  1:00 pm";
+            rowHead(28) = " 1:01 to  2:00 pm";
+            rowHead(29) = " 2:01 to  3:00 pm";
+            rowHead(30) = " 3:01 to  4:00 pm";
+            rowHead(31) = " 4:01 to  5:00 pm";
+            rowHead(32) = " 5:01 to  6:00 pm";
+            rowHead(33) = " 6:01 to  7:00 pm";
+            rowHead(34) = " 7:01 to  8:00 pm";
+            rowHead(35) = " 8:01 to  9:00 pm";
+            rowHead(36) = " 9:01 to 10:00 pm";
+            rowHead(37) = "10:01 to 11:00 pm";
+            rowHead(38) = "11:01 to 12:00 am";
+            rowHead(39) = "Total";
+
+            for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
+                firstReport = ort->OutputTableBinned(iInObj).resIndex;
+                curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
+                // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
+                    curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
+                } else {
+                    curNameAndUnits = curNameWithSIUnits;
+                    curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
+                    curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
                 }
-                tableTotal = 0.0;
-                for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    tableBody(1, 2 + kMonth) = RealToStr(ort->BinResultsBelow(repIndex).mnth(kMonth), 2);
-                    tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(ort->BinResultsAbove(repIndex).mnth(kMonth), 2);
-                    rowTotal = ort->BinResultsBelow(repIndex).mnth(kMonth) + ort->BinResultsAbove(repIndex).mnth(kMonth);
-                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 2 + kMonth) = RealToStr(ort->BinResults(nCol, repIndex).mnth(kMonth), 2);
-                        // sum the total for all columns
-                        rowTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
-                    }
-                    tableBody(nCol + 2, 2 + kMonth) = RealToStr(rowTotal, 2);
-                    tableTotal += rowTotal;
+                curIntervalCount = ort->OutputTableBinned(iInObj).intervalCount;
+                curResIndex = ort->OutputTableBinned(iInObj).resIndex;
+                curNumTables = ort->OutputTableBinned(iInObj).numTables;
+                topValue = curIntervalStart + curIntervalSize * curIntervalCount;
+                if (curIntervalSize < 1) {
+                    numIntervalDigits = 4;
+                } else if (curIntervalSize >= 10) {
+                    numIntervalDigits = 0;
+                } else {
+                    numIntervalDigits = 2;
                 }
-                // compute total row
+                // make arrays two columns wider for below and above bin range
+                columnHead.allocate(curIntervalCount + 3);
+                columnWidth.allocate(curIntervalCount + 3);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(curIntervalCount + 3, 39);
+                tableBody = "";
+                columnHead = "- [hr]";
+                tableBody(1, 1) = "less than";
+                tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
                 for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                    colTotal = 0.0;
-                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                        colTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                    columnHead(nCol + 1) = format("{} [hr]", nCol);
+                    // beginning of interval
+                    tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
+                    // end of interval
+                    tableBody(nCol + 1, 2) = RealToStr(curIntervalStart + nCol * curIntervalSize, numIntervalDigits) + '>';
+                }
+                tableBody(curIntervalCount + 2, 1) = "equal to or more than";
+                tableBody(curIntervalCount + 2, 2) = RealToStr(topValue, numIntervalDigits);
+                tableBody(curIntervalCount + 3, 1) = "Row";
+                tableBody(curIntervalCount + 3, 2) = "Total";
+                for (iTable = 1; iTable <= curNumTables; ++iTable) {
+                    repIndex = firstReport + (iTable - 1);
+                    if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
+                        repNameWithUnitsandscheduleName = curNameAndUnits;
+                    } else {
+                        repNameWithUnitsandscheduleName = curNameAndUnits + " [" + ort->OutputTableBinned(iInObj).ScheduleName + ']';
                     }
-                    tableBody(nCol + 1, 39) = RealToStr(colTotal, 2);
-                }
-                aboveTotal = 0.0;
-                belowTotal = 0.0;
-                for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    aboveTotal += ort->BinResultsAbove(repIndex).mnth(kMonth);
-                    belowTotal += ort->BinResultsBelow(repIndex).mnth(kMonth);
-                }
-                tableBody(1, 39) = RealToStr(belowTotal, 2);
-                tableBody(curIntervalCount + 2, 39) = RealToStr(aboveTotal, 2);
-                tableBody(curIntervalCount + 3, 39) = RealToStr(tableTotal, 2);
-                WriteTextLine(state, "Values in table are in hours.");
-                WriteTextLine(state, "");
-                WriteSubtitle(state, "Time Bin Results");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
-                }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
-                }
-                // create statistics table
-                rowHeadStat(1) = "Minimum";
-                rowHeadStat(2) = "Mean minus two standard deviations";
-                rowHeadStat(3) = "Mean";
-                rowHeadStat(4) = "Mean plus two standard deviations";
-                rowHeadStat(5) = "Maximum";
-                rowHeadStat(6) = "Standard deviation";
-                columnHeadStat(1) = "Statistic";
-                columnWidthStat(1) = 14;
-                // per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
-                // first check if very large constant number has caused the second part to be larger than the first
-                if (ort->BinStatistics(repIndex).n > 1) {
-                    if (ort->BinStatistics(repIndex).sum2 > (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) {
-                        repStDev = std::sqrt((ort->BinStatistics(repIndex).sum2 - (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) /
-                                             (ort->BinStatistics(repIndex).n - 1));
+                    if (produceTabular) {
+                        WriteReportHeaders(
+                            state, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, ort->OutputTableBinned(iInObj).avgSum);
+                    }
+                    for (kHour = 1; kHour <= 24; ++kHour) {
+                        tableBody(1, 14 + kHour) = RealToStr(ort->BinResultsBelow(repIndex).hrly(kHour), 2);
+                        tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(ort->BinResultsAbove(repIndex).hrly(kHour), 2);
+                        rowTotal = ort->BinResultsBelow(repIndex).hrly(kHour) + ort->BinResultsAbove(repIndex).hrly(kHour);
+                        for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                            tableBody(nCol + 1, 14 + kHour) = RealToStr(ort->BinResults(nCol, repIndex).hrly(kHour), 2);
+                            // sum the total for all columns
+                            rowTotal += ort->BinResults(nCol, repIndex).hrly(kHour);
+                        }
+                        tableBody(nCol + 2, 14 + kHour) = RealToStr(rowTotal, 2);
+                    }
+                    tableTotal = 0.0;
+                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                        tableBody(1, 2 + kMonth) = RealToStr(ort->BinResultsBelow(repIndex).mnth(kMonth), 2);
+                        tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(ort->BinResultsAbove(repIndex).mnth(kMonth), 2);
+                        rowTotal = ort->BinResultsBelow(repIndex).mnth(kMonth) + ort->BinResultsAbove(repIndex).mnth(kMonth);
+                        for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                            tableBody(nCol + 1, 2 + kMonth) = RealToStr(ort->BinResults(nCol, repIndex).mnth(kMonth), 2);
+                            // sum the total for all columns
+                            rowTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                        }
+                        tableBody(nCol + 2, 2 + kMonth) = RealToStr(rowTotal, 2);
+                        tableTotal += rowTotal;
+                    }
+                    // compute total row
+                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                        colTotal = 0.0;
+                        for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                            colTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                        }
+                        tableBody(nCol + 1, 39) = RealToStr(colTotal, 2);
+                    }
+                    aboveTotal = 0.0;
+                    belowTotal = 0.0;
+                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                        aboveTotal += ort->BinResultsAbove(repIndex).mnth(kMonth);
+                        belowTotal += ort->BinResultsBelow(repIndex).mnth(kMonth);
+                    }
+                    tableBody(1, 39) = RealToStr(belowTotal, 2);
+                    tableBody(curIntervalCount + 2, 39) = RealToStr(aboveTotal, 2);
+                    tableBody(curIntervalCount + 3, 39) = RealToStr(tableTotal, 2);
+                    if (produceTabular) {
+                        WriteTextLine(state, "Values in table are in hours.");
+                        WriteTextLine(state, "");
+                        WriteSubtitle(state, "Time Bin Results");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   repNameWithUnitsandscheduleName,
+                                                                   ort->BinObjVarID(repIndex).namesOfObj,
+                                                                   "Time Bin Results");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        repNameWithUnitsandscheduleName,
+                                                                                                        ort->BinObjVarID(repIndex).namesOfObj,
+                                                                                                        "Time Bin Results");
+                        }
+                    }
+                    // create statistics table
+                    rowHeadStat(1) = "Minimum";
+                    rowHeadStat(2) = "Mean minus two standard deviations";
+                    rowHeadStat(3) = "Mean";
+                    rowHeadStat(4) = "Mean plus two standard deviations";
+                    rowHeadStat(5) = "Maximum";
+                    rowHeadStat(6) = "Standard deviation";
+                    columnHeadStat(1) = "Statistic";
+                    columnWidthStat(1) = 14;
+                    // per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
+                    // first check if very large constant number has caused the second part to be larger than the first
+                    if (ort->BinStatistics(repIndex).n > 1) {
+                        if (ort->BinStatistics(repIndex).sum2 > (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) {
+                            repStDev = std::sqrt(
+                                (ort->BinStatistics(repIndex).sum2 - (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) /
+                                (ort->BinStatistics(repIndex).n - 1));
+                        } else {
+                            repStDev = 0.0;
+                        }
+                        repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
                     } else {
                         repStDev = 0.0;
+                        repMean = 0.0;
                     }
-                    repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
-                } else {
-                    repStDev = 0.0;
-                    repMean = 0.0;
-                }
-                if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
-                    tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
-                    tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
-                    tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
-                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
-                    tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
-                } else {
-                    tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
-                    tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
-                    tableBodyStat(1, 3) = RealToStr(repMean, 2);
-                    tableBodyStat(1, 4) = RealToStr(repMean + 2 * repStDev, 2);
-                    tableBodyStat(1, 5) = RealToStr(ort->BinStatistics(repIndex).maximum, 2);
-                    tableBodyStat(1, 6) = RealToStr(repStDev, 2);
-                }
-                WriteSubtitle(state, "Statistics");
-                WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
-                }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                    // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                        tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
+                        tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
+                        tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
+                        tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
+                        tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
+                        tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
+                    } else {
+                        tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
+                        tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
+                        tableBodyStat(1, 3) = RealToStr(repMean, 2);
+                        tableBodyStat(1, 4) = RealToStr(repMean + 2 * repStDev, 2);
+                        tableBodyStat(1, 5) = RealToStr(ort->BinStatistics(repIndex).maximum, 2);
+                        tableBodyStat(1, 6) = RealToStr(repStDev, 2);
+                    }
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Statistics");
+                        WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        }
+                    }
                 }
             }
         }
