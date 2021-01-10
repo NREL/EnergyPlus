@@ -245,6 +245,7 @@ namespace VariableSpeedCoils {
         Real64 CondensateVdot;         // rate of water condensation from air stream [m3/s]
         Real64 CondensateVol;          // amount of water condensed from air stream [m3]
         Real64 CondInletTemp;          // Evap condenser inlet temperature [C], report variable
+        Real64 CondOutletTemp;          // condenser outlet temperature [C], report variable
         int SupplyFanIndex;            // index of this fan in fan array or vector
         int SupplyFan_TypeNum;         // type of fan, in DataHVACGlobals
         std::string SupplyFanName;     // name of fan associated with this dx coil
@@ -323,7 +324,7 @@ namespace VariableSpeedCoils {
             MSRatedEvapCondVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
             EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
             CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0),
-            InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
+            InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0), CondOutletTemp(0.0), 
             // begin varibles for HPWH
             RatedCapWH(0.0),                  // Rated water heating Capacity [W]
             InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects

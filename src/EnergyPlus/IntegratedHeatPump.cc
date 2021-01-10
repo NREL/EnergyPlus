@@ -1765,7 +1765,7 @@ namespace IntegratedHeatPump {
             {
                 InitializeIHP(state, DXCoilNum);
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -1857,7 +1857,7 @@ namespace IntegratedHeatPump {
 
                 if (true == IsGridResponsiveMode(state, IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex)) {
                     if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                        (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                        (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                         
                         iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                         iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -1969,7 +1969,7 @@ namespace IntegratedHeatPump {
                     }
 
                     if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                        (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                        (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                         iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                         iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
 
@@ -1980,8 +1980,11 @@ namespace IntegratedHeatPump {
                         Node(iWNod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
                         Node(iWNod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
 
-                        Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate;                        
-                        Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate; 
+                        if(IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::OUTDOOR)
+                        {
+                            Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate;
+                            Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate;                         
+                        }
 
                         DehumLDTin = Node(iWNod).Temp;
                         DehumTin = Node(iANod).Temp;
@@ -2037,7 +2040,7 @@ namespace IntegratedHeatPump {
                     }
                 } else {
                     if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                        (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                        (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                         state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                         iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                         iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2107,7 +2110,7 @@ namespace IntegratedHeatPump {
             {
                 InitializeIHP(state, DXCoilNum);
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2215,7 +2218,7 @@ namespace IntegratedHeatPump {
                                           OnOffAirFlowRat);
 
                  if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2311,7 +2314,7 @@ namespace IntegratedHeatPump {
             {
                 InitializeIHP(state, DXCoilNum);
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2420,7 +2423,7 @@ namespace IntegratedHeatPump {
                                           OnOffAirFlowRat);
 
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2554,7 +2557,7 @@ namespace IntegratedHeatPump {
             {
                 InitializeIHP(state, DXCoilNum);
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2734,7 +2737,7 @@ namespace IntegratedHeatPump {
                 }
 
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2802,7 +2805,7 @@ namespace IntegratedHeatPump {
             {
                 InitializeIHP(state, DXCoilNum);
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -2958,7 +2961,7 @@ namespace IntegratedHeatPump {
                 }
 
                 if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                    (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                     int iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                     iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -3024,7 +3027,7 @@ namespace IntegratedHeatPump {
         default: // clear up
             InitializeIHP(state, DXCoilNum);
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) &&
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                 state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                 iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                 iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -3134,7 +3137,7 @@ namespace IntegratedHeatPump {
                                       OnOffAirFlowRat);
 
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                 state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
                 int iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
                 iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -4579,7 +4582,7 @@ namespace IntegratedHeatPump {
 
             if (UtilityRoutines::SameString(AlphArray(13), "UPSTREAM"))
             {
-                IntegratedHeatPumps(DXCoilNum).DehumPlace = DehumPlacement::UPSTRREAM;
+                IntegratedHeatPumps(DXCoilNum).DehumPlace = DehumPlacement::UPSTREAM;
             } else if (UtilityRoutines::SameString(AlphArray(13), "DOWNSTREAM")) {
                 IntegratedHeatPumps(DXCoilNum).DehumPlace = DehumPlacement::DOWNSTREAM;
             } else {
@@ -4709,7 +4712,7 @@ namespace IntegratedHeatPump {
             //     using OverrideNodeConnectionType
 
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
                 ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
                 InNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirInletNodeNum;
                 OutNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirOutletNodeNum;
@@ -4799,7 +4802,7 @@ namespace IntegratedHeatPump {
                     EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
                 IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = 
                     EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode; 
-            } else if ((IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM) &&
+            } else if ((IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM) &&
                        (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex > 0)) {
                 IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = 
                     state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
@@ -5434,7 +5437,7 @@ namespace IntegratedHeatPump {
             
 
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
                 ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
                 InNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirInletNodeNum;
                 OutNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirOutletNodeNum;
@@ -6630,7 +6633,7 @@ namespace IntegratedHeatPump {
 
         // clear up
         if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-            (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
+            (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
             state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).ExtOn = false; 
 
             SimulateWaterCoilComponents(state,
@@ -6680,7 +6683,7 @@ namespace IntegratedHeatPump {
         }
 
         if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) 
-            && (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM))
+            && (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM))
         {
             state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).ExtOn = false; 
             SimulateWaterCoilComponents(

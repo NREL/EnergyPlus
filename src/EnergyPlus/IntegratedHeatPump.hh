@@ -89,7 +89,7 @@ namespace IntegratedHeatPump {
     enum class DehumPlacement : int
     {
         OUTDOOR,
-        UPSTRREAM,
+        UPSTREAM,
         DOWNSTREAM,
     };
 
