@@ -11378,161 +11378,220 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 IPvalue;
         auto &ort(state.dataOutRptTab);
 
-        // loop through the entries and associate them with the subtable and create
-        // list of unique object names
-        // Much of this code is to allow for integer compares instead of string
-        // compares that are nested three levels in a loop.
-        uniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
-        useUniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
-        numUnqObjName = 0;
-        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-            // associate the subtable with each column
-            curColumn = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
-            if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
-                state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex = state.dataOutRptPredefined->columnTag(curColumn).indexSubTable;
+        
+        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        bool produceTabular = true;
+        bool produceSQLite = false;
+
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+
+            if (iUnitSystem == 0) {
+                unitsStyle_temp = ort->unitsStyle;
+                produceTabular = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                    produceSQLite = true;
+                } else {
+                    produceSQLite = false;
+                }
+            } else { // iUnitSystem == 1
+                unitsStyle_temp = ort->unitsStyle_SQLite;
+                produceTabular = false;
+                produceSQLite = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
             }
-            // make a list of unique object names
-            curObjectName = state.dataOutRptPredefined->tableEntry(lTableEntry).objectName;
-            found = 0;
-            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                if (curObjectName == uniqueObjectName(mUnqObjNames)) {
-                    found = mUnqObjNames;
+
+            // loop through the entries and associate them with the subtable and create
+            // list of unique object names
+            // Much of this code is to allow for integer compares instead of string
+            // compares that are nested three levels in a loop.
+            uniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
+            useUniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
+            numUnqObjName = 0;
+            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                // associate the subtable with each column
+                curColumn = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
+                if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex =
+                        state.dataOutRptPredefined->columnTag(curColumn).indexSubTable;
+                }
+                // make a list of unique object names
+                curObjectName = state.dataOutRptPredefined->tableEntry(lTableEntry).objectName;
+                found = 0;
+                for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                    if (curObjectName == uniqueObjectName(mUnqObjNames)) {
+                        found = mUnqObjNames;
+                    }
+                }
+                // if found then point to the unique object
+                if (found > 0) {
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = found;
+                    // if not found add to the unique object list
+                } else {
+                    ++numUnqObjName;
+                    uniqueObjectName(numUnqObjName) = curObjectName;
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
                 }
             }
-            // if found then point to the unique object
-            if (found > 0) {
-                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = found;
-                // if not found add to the unique object list
-            } else {
-                ++numUnqObjName;
-                uniqueObjectName(numUnqObjName) = curObjectName;
-                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
-            }
-        }
-        // loop through all reports and include those that have been flagged as 'show'
-        for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
-            if (state.dataOutRptPredefined->reportName(iReportName).show) {
-                WriteReportHeaders(state, state.dataOutRptPredefined->reportName(iReportName).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged);
-                // loop through the subtables and include those that are associated with this report
-                for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
-                    if (state.dataOutRptPredefined->subTable(jSubTable).indexReportName == iReportName) {
-                        // determine how many columns
-                        curNumColumns = 0;
-                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
-                                ++curNumColumns;
-                            }
-                        }
-                        // determine how many rows by going through table entries and setting
-                        // flag in useUniqueObjectName to true, then count number of true's.
-                        useUniqueObjectName = false; // array assignment
-                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
-                                useUniqueObjectName(state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName) = true;
-                            }
-                        }
-                        curNumRows = 0;
-                        for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                            if (useUniqueObjectName(mUnqObjNames)) {
-                                ++curNumRows;
-                            }
-                        }
-                        if (curNumRows == 0) curNumRows = 1;
-                        // now create the arrays that are filled with values
-                        rowHead.allocate(curNumRows);
-                        columnHead.allocate(curNumColumns);
-                        columnWidth.dimension(curNumColumns, 14); // array assignment - same for all columns
-                        tableBody.allocate(curNumColumns, curNumRows);
-                        rowHead = "";
-                        columnHead = "";
-                        tableBody = "";
-                        // this array stores the unique object name index for each row
-                        rowToUnqObjName.allocate(curNumRows);
-                        // this array stores the columnHead index for each column
-                        colHeadToColTag.allocate(curNumColumns);
-                        colUnitConv.allocate(curNumColumns);
-                        // set row headings
-                        countRow = 0;
-                        rowHead(1) = "None";
-                        for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                            if (useUniqueObjectName(mUnqObjNames)) {
-                                ++countRow;
-                                rowHead(countRow) = uniqueObjectName(mUnqObjNames);
-                                rowToUnqObjName(countRow) = mUnqObjNames;
-                            }
-                        }
-                        // set column headings
-                        countColumn = 0;
-                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
-                                ++countColumn;
-                                // do the unit conversions
-                                colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
-                                if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                    LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
-                                    colUnitConv(countColumn) = indexUnitConv;
-                                } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
-                                    colUnitConv(countColumn) = indexUnitConv;
-                                } else {
-                                    curColTag = colTagWithSI;
-                                    colUnitConv(countColumn) = 0;
+            // loop through all reports and include those that have been flagged as 'show'
+            for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
+                if (state.dataOutRptPredefined->reportName(iReportName).show) {
+                    if (produceTabular) {
+                        WriteReportHeaders(state,
+                                           state.dataOutRptPredefined->reportName(iReportName).namewithspaces,
+                                           "Entire Facility",
+                                           OutputProcessor::StoreType::Averaged);
+                    }
+                    // loop through the subtables and include those that are associated with this report
+                    for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
+                        if (state.dataOutRptPredefined->subTable(jSubTable).indexReportName == iReportName) {
+                            // determine how many columns
+                            curNumColumns = 0;
+                            for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
+                                if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
+                                    ++curNumColumns;
                                 }
-                                columnHead(countColumn) = curColTag;
-                                colHeadToColTag(countColumn) = kColumnTag;
                             }
-                        }
-                        // fill the body of the table from the entries
-                        // find the entries associated with the current subtable
-                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
-                                // determine what column the current entry is in
-                                curColTagIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
-                                for (nColHead = 1; nColHead <= curNumColumns; ++nColHead) {
-                                    if (curColTagIndex == colHeadToColTag(nColHead)) {
-                                        colCurrent = nColHead;
-                                        break;
+                            // determine how many rows by going through table entries and setting
+                            // flag in useUniqueObjectName to true, then count number of true's.
+                            useUniqueObjectName = false; // array assignment
+                            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                                if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                                    useUniqueObjectName(state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName) = true;
+                                }
+                            }
+                            curNumRows = 0;
+                            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                                if (useUniqueObjectName(mUnqObjNames)) {
+                                    ++curNumRows;
+                                }
+                            }
+                            if (curNumRows == 0) curNumRows = 1;
+                            // now create the arrays that are filled with values
+                            rowHead.allocate(curNumRows);
+                            columnHead.allocate(curNumColumns);
+                            columnWidth.dimension(curNumColumns, 14); // array assignment - same for all columns
+                            tableBody.allocate(curNumColumns, curNumRows);
+                            rowHead = "";
+                            columnHead = "";
+                            tableBody = "";
+                            // this array stores the unique object name index for each row
+                            rowToUnqObjName.allocate(curNumRows);
+                            // this array stores the columnHead index for each column
+                            colHeadToColTag.allocate(curNumColumns);
+                            colUnitConv.allocate(curNumColumns);
+                            // set row headings
+                            countRow = 0;
+                            rowHead(1) = "None";
+                            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                                if (useUniqueObjectName(mUnqObjNames)) {
+                                    ++countRow;
+                                    rowHead(countRow) = uniqueObjectName(mUnqObjNames);
+                                    rowToUnqObjName(countRow) = mUnqObjNames;
+                                }
+                            }
+                            // set column headings
+                            countColumn = 0;
+                            for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
+                                if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
+                                    ++countColumn;
+                                    // do the unit conversions
+                                    colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
+                                    // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                                            LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
+                                        colUnitConv(countColumn) = indexUnitConv;
+                                    // } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
+                                    } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                                        LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
+                                        colUnitConv(countColumn) = indexUnitConv;
+                                    } else {
+                                        curColTag = colTagWithSI;
+                                        colUnitConv(countColumn) = 0;
                                     }
+                                    columnHead(countColumn) = curColTag;
+                                    colHeadToColTag(countColumn) = kColumnTag;
                                 }
-                                // determine what row the current entry is in
-                                curRowUnqObjIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName;
-                                for (oRowHead = 1; oRowHead <= curNumRows; ++oRowHead) {
-                                    if (curRowUnqObjIndex == rowToUnqObjName(oRowHead)) {
-                                        rowCurrent = oRowHead;
-                                        break;
-                                    }
-                                }
-                                // finally assign the entry to the place in the table body
-                                if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    columnUnitConv = colUnitConv(colCurrent);
-                                    if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        ort->unitsStyle == iUnitsStyle::InchPound) {
-                                        if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
-                                            LookupSItoIP(state, state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
-                                            state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
+                            }
+                            // fill the body of the table from the entries
+                            // find the entries associated with the current subtable
+                            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                                if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                                    // determine what column the current entry is in
+                                    curColTagIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
+                                    for (nColHead = 1; nColHead <= curNumColumns; ++nColHead) {
+                                        if (curColTagIndex == colHeadToColTag(nColHead)) {
+                                            colCurrent = nColHead;
+                                            break;
                                         }
                                     }
-                                    if (state.dataOutRptPredefined->tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
-                                        IPvalue = ConvertIP(state, columnUnitConv, state.dataOutRptPredefined->tableEntry(lTableEntry).origRealEntry);
-                                        tableBody(colCurrent, rowCurrent) = RealToStr(IPvalue, state.dataOutRptPredefined->tableEntry(lTableEntry).significantDigits);
+                                    // determine what row the current entry is in
+                                    curRowUnqObjIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName;
+                                    for (oRowHead = 1; oRowHead <= curNumRows; ++oRowHead) {
+                                        if (curRowUnqObjIndex == rowToUnqObjName(oRowHead)) {
+                                            rowCurrent = oRowHead;
+                                            break;
+                                        }
+                                    }
+                                    // finally assign the entry to the place in the table body
+                                    // if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
+                                    if (unitsStyle_temp == iUnitsStyle::InchPound || unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                                            columnUnitConv = colUnitConv(colCurrent);
+                                        if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name,
+                                                                        "SizingPeriod:DesignDay") &&
+                                                unitsStyle_temp == iUnitsStyle::InchPound) { // ort->unitsStyle == iUnitsStyle::InchPound)
+                                            if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
+                                                LookupSItoIP(state,
+                                                             state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry,
+                                                             columnUnitConv,
+                                                             repTableTag);
+                                                state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
+                                            }
+                                        }
+                                        if (state.dataOutRptPredefined->tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
+                                            IPvalue =
+                                                ConvertIP(state, columnUnitConv, state.dataOutRptPredefined->tableEntry(lTableEntry).origRealEntry);
+                                            tableBody(colCurrent, rowCurrent) =
+                                                RealToStr(IPvalue, state.dataOutRptPredefined->tableEntry(lTableEntry).significantDigits);
+                                        } else {
+                                            tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
+                                        }
                                     } else {
                                         tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                     }
-                                } else {
-                                    tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                 }
                             }
-                        }
-                        // create the actual output table
-                        WriteSubtitle(state, state.dataOutRptPredefined->subTable(jSubTable).name);
-                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptPredefined->subTable(jSubTable).footnote);
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
-                        }
-                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
+                            // create the actual output table
+                            if (produceTabular) {
+                                WriteSubtitle(state, state.dataOutRptPredefined->subTable(jSubTable).name);
+                                WriteTable(state,
+                                           tableBody,
+                                           rowHead,
+                                           columnHead,
+                                           columnWidth,
+                                           false,
+                                           state.dataOutRptPredefined->subTable(jSubTable).footnote);
+                            }
+                            if (produceSQLite) {
+                                if (sqlite) {
+                                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                           rowHead,
+                                                                           columnHead,
+                                                                           state.dataOutRptPredefined->reportName(iReportName).name,
+                                                                           "Entire Facility",
+                                                                           state.dataOutRptPredefined->subTable(jSubTable).name);
+                                }
+                            }
+                            if (produceTabular) {
+                                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                        tableBody,
+                                        rowHead,
+                                        columnHead,
+                                        state.dataOutRptPredefined->reportName(iReportName).name,
+                                        "Entire Facility",
+                                        state.dataOutRptPredefined->subTable(jSubTable).name);
+                                }
+                            }
                         }
                     }
                 }
