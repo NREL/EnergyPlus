@@ -6090,10 +6090,14 @@ namespace SolarShading {
                 // Somewhat of a kludge
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser)
                     SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not allow
+                int FenSolAbsPtr = 0;
+                if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
+                    FenSolAbsPtr = WindowScheduledSolarAbs(SurfNum, ConstrNum);
+                }
 
                 if (SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) > 0.0) {
 
-                    if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                    if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
 
                         // For bare glazing or switchable glazing, the following includes the effects of
                         // (1) diffuse solar produced by beam solar incident on the outside and inside reveal
@@ -6301,7 +6305,7 @@ namespace SolarShading {
                     } else if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                         // Do not read from schedule file here since this will be called only if direct beam is hitting the window and schedule
                         // will not be loaded in that case even if diffuse part of solar radiation is entering through the window
-                        if (WindowScheduledSolarAbs(SurfNum, ConstrNum) == 0) {
+                        if (FenSolAbsPtr == 0) {
                             // Put in the equivalent layer absorptions
                             // Simon: This should not be multiplied with CosInc since Abs coefficient already includes angular
                             // factor
@@ -6369,7 +6373,6 @@ namespace SolarShading {
                 Real64 NomDiffTrans = 0.0;
 
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // complex fenestration
-                    int FenSolAbsPtr = WindowScheduledSolarAbs(SurfNum, ConstrNum);
                     if (FenSolAbsPtr == 0) {
                         // Sky diffuse solar transmittance for glazing with blind with horiz. slats or complex fen
                         DiffTransSky = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState).WinSkyTrans;
@@ -6397,7 +6400,7 @@ namespace SolarShading {
                     DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
                 }
 
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
                     if (ShadeFlag > 0 && ShadeFlag < 10) {
                         if (ShadeFlag != SwitchableGlazing) {
                             // Shade or blind
@@ -6438,8 +6441,7 @@ namespace SolarShading {
                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                         TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarBeam);
                         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam = TBmDif; // Report variable
-                    } else if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                               SurfWinWindowModelType(SurfNum) != WindowEQLModel) { // Regular window
+                    } else if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) { // Regular window
                         if (!SurfWinSolarDiffusing(SurfNum)) {                      // Clear glazing
                             TBmBm = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);  //[-]
                         } else {                                                           // Diffusing glazing
@@ -6481,7 +6483,7 @@ namespace SolarShading {
                 //-----------------------------------------------------------------
 
 
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                         DiffTrans = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso);
                     } else {
@@ -6511,7 +6513,7 @@ namespace SolarShading {
                         }
                     }
                 } else if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // complex fenestration
-                    if (WindowScheduledSolarAbs(SurfNum, ConstrNum) == 0) {
+                    if (FenSolAbsPtr == 0) {
                         // Sky diffuse solar transmittance for glazing with blind with horiz. slats or complex fen
                         DiffTransSky = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState).WinSkyTrans;
                         // Ground diffuse solar transmittance for glazing with blind with horiz. slats or complex fen
@@ -6718,7 +6720,7 @@ namespace SolarShading {
 
                 // Add diffuse transmitted by window from beam reflected from outside reveal
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // Complex Fenestration
-                    if (WindowScheduledSolarAbs(SurfNum, ConstrNum) == 0) {
+                    if (FenSolAbsPtr == 0) {
                         WinTransBmSolar(SurfNum) = (TBmBm + TBmDif) * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
                         WinTransBmBmSolar(SurfNum) = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
                         WinTransBmDifSolar(SurfNum) = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
@@ -6740,7 +6742,7 @@ namespace SolarShading {
                 // Increment factor for total exterior beam solar entering zone through window as beam or diffuse
                 if (SunLitFract > 0.0 && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
                     // Window is schedule surface gained. Do not make addition to what enters into zone since that information is not available
-                    if (WindowScheduledSolarAbs(SurfNum, ConstrNum) == 0) {
+                    if (FenSolAbsPtr == 0) {
                         Real64 TBmAll; // Window beam-to-(beam+diffuse) transmittance
                         if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
                             (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
@@ -6837,7 +6839,7 @@ namespace SolarShading {
                     }
 
                     if (SolarDistribution == FullInteriorExterior) { // Full interior solar distribution
-                        if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                        if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
                             // Loop over back surfaces irradiated by beam from this exterior window
                             for (int IBack = 1; IBack <= state.dataBSDFWindow->MaxBkSurf; ++IBack) {
                                 int BackSurfNum = BackSurfaces(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, IBack, SurfNum);

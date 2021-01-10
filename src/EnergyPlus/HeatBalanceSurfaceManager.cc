@@ -2878,8 +2878,7 @@ namespace HeatBalanceSurfaceManager {
 
                             int ShadeFlag = SurfWinShadingFlag(SurfNum);
 
-                            if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                                SurfWinWindowModelType(SurfNum) != WindowEQLModel &&
+                            if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel &&
                                 !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                 int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
                                 for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
@@ -3738,7 +3737,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
 
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
                     int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
