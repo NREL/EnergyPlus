@@ -698,7 +698,7 @@ namespace LowTempRadiantSystem {
                 }
             } else if (UtilityRoutines::SameString(Alphas(12), "CapacityPerFloorArea")) {
                 thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
-                if (!lNumericBlanks(11) {
+                if (!lNumericBlanks(11)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(11);
                     if (thisRadSys.CoolingCapMethod <= 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
