@@ -12905,6 +12905,22 @@ namespace EnergyPlus::OutputReportTabular {
         Array2D<Real64> surfDelaySeqHeat;
         Array2D<Real64> surfDelaySeqCool;
 
+        Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
+        Array1D<CompLoadTablesType> ZoneCoolCompLoadTables;
+
+        Array1D<CompLoadTablesType> AirLoopHeatCompLoadTables; // for airloop level component load summary output tables
+        Array1D<CompLoadTablesType> AirLoopCoolCompLoadTables;
+        Array1D<CompLoadTablesType> AirLoopZonesHeatCompLoadTables; // zone results used for airloop report - never directly output
+        Array1D<CompLoadTablesType> AirLoopZonesCoolCompLoadTables;
+
+        CompLoadTablesType FacilityHeatCompLoadTables; // for facility level component load summary output tables
+        CompLoadTablesType FacilityCoolCompLoadTables;
+        Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
+        Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
+
+        CompLoadTablesType curCompLoadTable; // active component load table
+
+        //adjusted initilization location to after variable declaration for loops 2020-01-11
         peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
         peopleDelaySeqHeat = 0.0;
         peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -12933,21 +12949,6 @@ namespace EnergyPlus::OutputReportTabular {
         surfDelaySeqHeat = 0.0;
         surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
         surfDelaySeqCool = 0.0;
-
-        Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
-        Array1D<CompLoadTablesType> ZoneCoolCompLoadTables;
-
-        Array1D<CompLoadTablesType> AirLoopHeatCompLoadTables; // for airloop level component load summary output tables
-        Array1D<CompLoadTablesType> AirLoopCoolCompLoadTables;
-        Array1D<CompLoadTablesType> AirLoopZonesHeatCompLoadTables; // zone results used for airloop report - never directly output
-        Array1D<CompLoadTablesType> AirLoopZonesCoolCompLoadTables;
-
-        CompLoadTablesType FacilityHeatCompLoadTables; // for facility level component load summary output tables
-        CompLoadTablesType FacilityCoolCompLoadTables;
-        Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
-        Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
-
-        CompLoadTablesType curCompLoadTable; // active component load table
 
         // initialize arrays
         if (ort->displayZoneComponentLoadSummary) {
