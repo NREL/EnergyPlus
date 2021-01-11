@@ -2583,6 +2583,7 @@ CurrentModuleObject, PlantOpSchemeName);
 
                     if (std::abs(RemLoopDemand) < SmallLoad) RemLoopDemand = 0.0;
                 }
+                break;
             default:
                 assert(false);
             }
