@@ -523,6 +523,8 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.designName         = Alphas(1);
             thisRadSysDesign.HotThrottlRange    = Numbers(1);
 
+            thisRadSysDesign.ColdThrottlRange = Numbers(2);
+
             if (UtilityRoutines::SameString(Alphas(2), Off)) {
 
                 thisRadSysDesign.CondCtrlType = CondCtrlNone;
@@ -534,7 +536,7 @@ namespace LowTempRadiantSystem {
                 thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
             }
 
-            thisRadSysDesign.CondDewPtDeltaT    = Numbers(2);
+            thisRadSysDesign.CondDewPtDeltaT    = Numbers(3);
 
             VarFlowRadDesignNames(Item) =  Alphas(1);
         }
@@ -813,8 +815,6 @@ namespace LowTempRadiantSystem {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(13), Alphas(14), "Chilled Water Nodes");
             }
 
-            thisRadSys.ColdThrottlRange = Numbers(14);
-
             thisRadSys.ColdSetptSched = Alphas(15);
             thisRadSys.ColdSetptSchedPtr = GetScheduleIndex(state, Alphas(15));
             if ((thisRadSys.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(15))) {
@@ -831,7 +831,7 @@ namespace LowTempRadiantSystem {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
             }
 
-            thisRadSys.CircLength = Numbers(15);
+            thisRadSys.CircLength = Numbers(14);
 
             thisRadSys.designObjectName = Alphas(17);
             thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, VarFlowRadDesignNames);
@@ -3369,7 +3369,7 @@ namespace LowTempRadiantSystem {
                 OffTempHeat = LowTempHeating;
             }
             if (this->ColdSetptSchedPtr > 0) {
-                OffTempCool = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->ColdSetptSchedPtr, -this->ColdThrottlRange);
+                OffTempCool = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->ColdSetptSchedPtr, -variableFlowDesignDataObject.ColdThrottlRange);
             } else { // This system is not capable of cooling, set OffTempCool to something really high
                 OffTempCool = HighTempCooling;
             }
@@ -3398,7 +3398,7 @@ namespace LowTempRadiantSystem {
                 } else if (this->OperatingMode == CoolingMode) {
                     ControlNode = this->ColdWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxCool;
-                    MassFlowFrac = this->calculateOperationalFraction(OffTempCool, ControlTemp, this->ColdThrottlRange);
+                    MassFlowFrac = this->calculateOperationalFraction(OffTempCool, ControlTemp, variableFlowDesignDataObject.ColdThrottlRange);
                 } else {
                     MassFlowFrac = 0.0;
                 }

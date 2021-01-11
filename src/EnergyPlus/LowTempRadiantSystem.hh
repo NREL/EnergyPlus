@@ -305,7 +305,6 @@ namespace LowTempRadiantSystem {
         int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
-        Real64 ColdThrottlRange;    // Throttling range for cooling [C]
         std::string ColdSetptSched; // Schedule name for the zone setpoint temperature
         int ColdSetptSchedPtr;      // Schedule index for the zone setpoint temperature
         Real64 WaterMassFlowRate;     // water mass flow rate
@@ -321,7 +320,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
             VariableFlowRadiantSystemData()
                 : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), HotSetptSchedPtr(0), WaterVolFlowMaxCool(0.0),
-                  WaterFlowMaxCool(0.0), ColdThrottlRange(0.0), ColdSetptSchedPtr(0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
+                  WaterFlowMaxCool(0.0), ColdSetptSchedPtr(0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
                   ScaledHeatingCapacity(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
             {
             }
@@ -342,6 +341,7 @@ namespace LowTempRadiantSystem {
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
         Real64 HotThrottlRange;          // Throttling range for heating [C]
+        Real64 ColdThrottlRange;    // Throttling range for cooling [C]
         Array1D_string FieldNames;
         int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
@@ -349,7 +349,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
+                HotThrottlRange(0.0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
         {
         }
     };
