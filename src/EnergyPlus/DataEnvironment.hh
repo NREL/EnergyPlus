@@ -134,6 +134,7 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 SkyTempKelvin = 0.0;                         // Current sky temperature {K}
     Real64 LiquidPrecipitation = 0.0;                   // Current liquid precipitation amount (rain) {m}
     bool SunIsUp = false;                               // True when Sun is over horizon, False when not
+    bool PreviousSolRadPositive = false;                // True when Sun is over horizon at the previous timestep, and BeamSolarRad + GndSolarRad + DifSolarRad > 0.0
     Real64 WindDir = 0.0;                               // Current outdoor air wind direction
     bool EMSWindDirOverrideOn = false;                  // EMS flag for outdoor air wind direction
     Real64 EMSWindDirOverrideValue = 0.0;               // EMS override value for outdoor air wind direction
