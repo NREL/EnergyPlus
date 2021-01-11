@@ -1756,43 +1756,6 @@ namespace ChillerGasAbsorption {
                 } else if (SELECT_CASE_var == 1) { // mass flow rates may not be changed by loop components
                     lHotWaterSupplyTemp = HeatSupplySetPointTemp;
                     lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
-
-                    // DSU this "2" is not a real state for flowLock
-                } else if (SELECT_CASE_var ==
-                           2) { // chiller is underloaded and mass flow rates has changed to a small amount and Tout drops below Setpoint
-
-                    // DSU? this component model needs a lot of work, does not honor limits, incomplete ...
-
-                    // MJW Not sure what to do with this now
-                    // Must make adjustment to supply temperature since load is greater than available capacity
-                    // this also affects the available capacity itself since it is a function of supply temperature
-                    // Since these curves are generally fairly flat just use an estimate (done above) and correction
-                    // approach instead of iterating to a solution.
-                    // MJW 07MAR01 Logic seems wrong here, because of misunderstanding of what "overload" means
-                    //  "overload" means the chiller is overcooling the branch.  See SUBROUTINE DistributeLoad
-                    //      IF (lChillWaterMassFlowRate > MassFlowTol) THEN
-                    //        ChillDeltaTemp = MyLoad / (CPCW(lChillReturnTemp) * lChillWaterMassFlowRate)
-                    //        lChillSupplyTemp = lChillReturnTemp - ChillDeltaTemp
-                    //        lAvailableCoolingCapacity = lNomCoolingCap * CurveValue(lCoolCapFTCurve,lChillSupplyTemp,calcCondTemp)
-                    //      ELSE
-                    //        ErrCount = ErrCount + 1
-                    //        IF (ErrCount < 10) THEN
-                    //          CALL ShowWarningError(state, 'GasAbsorberModel:lChillWaterMassFlowRate near 0 in available capacity calculation')
-                    //        END IF
-                    //      END IF
-
-                    // MJW 07MAR01 Borrow logic from steam absorption module
-                    // The following conditional statements are made to avoid extremely small EvapMdot
-                    // & unreasonable EvapOutletTemp due to overloading.
-                    // Avoid 'divide by zero' due to small EvapMdot
-                    if (lHotWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-                        HeatDeltaTemp = 0.0;
-                    } else {
-                        HeatDeltaTemp = std::abs(MyLoad) / (Cp_HW * lHotWaterMassFlowRate);
-                    }
-                    lHotWaterSupplyTemp = lHotWaterReturnTemp + HeatDeltaTemp;
-
-                    lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
                 }
             }
 

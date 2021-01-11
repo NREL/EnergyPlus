@@ -5195,24 +5195,6 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-//    void SetSolarParameterAt(EnergyPlusData &state)
-//    {
-//        // Pre-calculate commonly used solar arrays to avoid duplicate data reference during calculated
-//        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-//            int SurfNum2 = SurfNum;
-//            int PipeNum = DataSurfaces::SurfWinTDDPipeNum(SurfNum);
-//            if (DataSurfaces::SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
-//                SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
-//            }
-//            SurfCosIncTimestep(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-//            SurfSunlitFracTimestep(SurfNum) = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-//            ProfAngHourly(SurfNum) = 0;
-//            if (SurfWinShadingFlag(SurfNum) != ExtScreenOn && SurfWinBlindNumber(SurfNum) > 0)
-//                ProfileAngle(SurfNum, SOLCOS, Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation, ProfAngHourly(SurfNum));
-//        }
-//
-//    }
-
     void InitHeatBalance(EnergyPlusData &state)
     {
 
@@ -5353,9 +5335,6 @@ namespace HeatBalanceManager {
             }
         }
 
-        // Initialize timestep-wise solar parameters
-//        SetSolarParameterAt(state);
-
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed
         // using the zone, modify the zone  Dry/Wet BulbTemps
@@ -5409,6 +5388,19 @@ namespace HeatBalanceManager {
                 }
                 if (Zone(ZoneNum).WindDirEMSOverrideOn) {
                     Zone(ZoneNum).WindDir = Zone(ZoneNum).WindDirEMSOverrideValue;
+                }
+            }
+        }
+
+        if (state.dataGlobal->BeginSimFlag) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
+                        DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
+                        DataSurfaces::SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                    }
                 }
             }
         }

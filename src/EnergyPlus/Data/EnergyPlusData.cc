@@ -193,7 +193,7 @@ namespace EnergyPlus {
         this->dataOutdoorAirUnit = std::make_unique<OutdoorAirUnitData>();
         this->dataOutput = std::make_unique<OutputsData>();
         this->dataOutputProcessor = std::make_unique<OutputProcessorData>();
-        this->dataOutputReportTabular = std::make_unique<OutputReportTabularData>();
+        this->dataOutRptTab = std::make_unique<OutputReportTabularData>();
         this->dataOutputReportTabularAnnual = std::make_unique<OutputReportTabularAnnualData>();
         this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
         this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
@@ -389,6 +389,7 @@ namespace EnergyPlus {
         this->dataHVACDuct->clear_state();
         this->dataHVACFan->clear_state();
         this->dataHVACGlobal->clear_state();
+        this->dataHVACInterfaceMgr->clear_state();
         this->dataHVACMgr->clear_state();
         this->dataHVACMultiSpdHP->clear_state();
         this->dataHVACSingleDuctInduc->clear_state();
@@ -437,7 +438,7 @@ namespace EnergyPlus {
         this->dataOutdoorAirUnit->clear_state();
         this->dataOutput->clear_state();
         this->dataOutputProcessor->clear_state();
-        this->dataOutputReportTabular->clear_state();
+        this->dataOutRptTab->clear_state();
         this->dataOutputReportTabularAnnual->clear_state();
         this->dataOutsideEnergySrcs->clear_state();
         this->dataPTHP->clear_state();

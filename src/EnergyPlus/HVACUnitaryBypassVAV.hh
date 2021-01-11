@@ -68,8 +68,8 @@ namespace HVACUnitaryBypassVAV {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation
-    extern int const On;  // Normal compressor operation
-    extern int const Off; // Signal DXCoil that compressor should not run
+    constexpr int On(1);  // Normal compressor operation
+    constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Dehumidification control modes (DehumidControlMode) for Multimode units only
     extern int const DehumidControl_None;
