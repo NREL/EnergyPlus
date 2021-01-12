@@ -14226,6 +14226,66 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
+    // JY 2020-01-11 Do a Reload on this function for Dual Units
+    // apply unit conversions to the load components summary tables
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para)
+    {
+        // auto &ort(state.dataOutRptTab);
+
+        // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+        if (unitsStyle_para == iUnitsStyle::InchPound) {
+            Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
+            Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
+            Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
+            Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
+            Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
+            Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
+            for (int row = 1; row <= rGrdTot; ++row) {
+                for (int col = 1; col <= cTotal; ++col) {
+                    if (compLoadTotal.cellUsed(col, row)) {
+                        compLoadTotal.cells(col, row) *= powerConversion;
+                    }
+                }
+                if (compLoadTotal.cellUsed(cPerArea, row)) {
+                    compLoadTotal.cells(cPerArea, row) *= powerConversion;
+                }
+                if (compLoadTotal.cellUsed(cArea, row)) {
+                    compLoadTotal.cells(cArea, row) *= areaConversion;
+                }
+                if (compLoadTotal.cellUsed(cPerArea, row)) {
+                    compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+                }
+            }
+            int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
+            compLoadTotal.outsideDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideDryBulb);
+            compLoadTotal.outsideWetBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideWetBulb);
+            compLoadTotal.zoneDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.zoneDryBulb);
+            compLoadTotal.peakDesSensLoad *= powerConversion;
+
+            compLoadTotal.supAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.supAirTemp);
+            compLoadTotal.mixAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.mixAirTemp);
+            compLoadTotal.mainFanAirFlow *= airFlowConversion;
+            compLoadTotal.outsideAirFlow *= airFlowConversion;
+            compLoadTotal.designPeakLoad *= powerConversion;
+            compLoadTotal.diffDesignPeak *= powerConversion;
+
+            compLoadTotal.estInstDelSensLoad *= powerConversion;
+            compLoadTotal.diffPeakEst *= powerConversion;
+
+            compLoadTotal.airflowPerFlrArea *= airFlowPerAreaConversion;
+            if (powerConversion != 0.) {
+                compLoadTotal.airflowPerTotCap = compLoadTotal.airflowPerTotCap * airFlowPerAreaConversion / powerConversion;
+                compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
+            }
+            if (areaConversion != 0.) {
+                compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
+            }
+            compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
+            compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
+        }
+    }
+
+
     // make a list of the zones for the airloop component loads report
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop)
     {
