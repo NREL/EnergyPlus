@@ -301,8 +301,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using namespace DataSystemVariables;
-        using DataPlant::FlowLocked;
-        using DataPlant::PlantLoop;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -368,9 +366,9 @@ namespace HVACControllers {
         // detect if plant is locked and flow cannot change
         if (ControllerProps(ControlNum).ActuatedNodePlantLoopNum > 0) {
 
-            if (PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
+            if (state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
                     .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoopSide)
-                    .FlowLock == FlowLocked) {
+                    .FlowLock == DataPlant::iFlowLock::Locked) {
                 // plant is rigid so controller cannot change anything.
                 // Update the current Controller to the outlet nodes
                 UpdateController(state, ControlNum);
@@ -932,7 +930,6 @@ namespace HVACControllers {
         // Uses the status flags to trigger events.
 
         using DataHVACGlobals::DoSetPointTest;
-        using DataPlant::PlantLoop;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using FaultsManager::FaultsCoilSATSensor;
         using FluidProperties::GetDensityGlycol;
@@ -1118,7 +1115,7 @@ namespace HVACControllers {
             InitControllerSetPointCheckFlag = false;
         }
 
-        if (allocated(PlantLoop) && MyPlantIndexsFlag(ControlNum)) {
+        if (allocated(state.dataPlnt->PlantLoop) && MyPlantIndexsFlag(ControlNum)) {
             ScanPlantLoopsForNodeNum(state,
                                      ControllerProps(ControlNum).ControllerName,
                                      ControllerProps(ControlNum).ActuatedNode,
@@ -1180,9 +1177,9 @@ namespace HVACControllers {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
             rho = GetDensityGlycol(state,
-                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
                                    DataGlobalConstants::CWInitConvTemp,
-                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
                                    RoutineName);
 
             ControllerProps(ControlNum).MinActuated = rho * ControllerProps(ControlNum).MinVolFlowActuated;

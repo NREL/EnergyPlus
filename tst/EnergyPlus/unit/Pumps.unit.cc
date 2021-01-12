@@ -50,12 +50,13 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

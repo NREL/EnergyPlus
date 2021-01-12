@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -62,7 +62,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;

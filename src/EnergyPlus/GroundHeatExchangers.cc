@@ -655,7 +655,6 @@ namespace GroundHeatExchangers {
 
     void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     {
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -730,8 +729,8 @@ namespace GroundHeatExchangers {
         Real64 bh_equivalent_resistance_convection = bhResistance - bh_equivalent_resistance_tube_grout;
 
         Real64 initial_temperature = inletTemp;
-        Real64 cpFluid_init = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, initial_temperature, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 fluidDensity_init = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, initial_temperature, PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 cpFluid_init = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, initial_temperature, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 fluidDensity_init = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, initial_temperature, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // initialize the fluid cells
         for (int i = 0; i < num_fluid_cells; ++i) {
@@ -1727,7 +1726,6 @@ namespace GroundHeatExchangers {
         //   for Vertical Ground Loop Heat Exchangers.' ASHRAE Transactions. 105(2): 475-485.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -1775,8 +1773,8 @@ namespace GroundHeatExchangers {
 
         inletTemp = Node(inletNodeNum).Temp;
 
-        cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         kGroundFactor = 2.0 * DataGlobalConstants::Pi * soil.k;
 
@@ -2015,7 +2013,6 @@ namespace GroundHeatExchangers {
         // Updates the outlet node and check for out of bounds temperatures
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2028,16 +2025,16 @@ namespace GroundHeatExchangers {
         Real64 const deltaTempLimit(100.0); // temp limit for warnings
         Real64 GLHEdeltaTemp;               // ABS(Outlet temp -inlet temp)
 
-        SafeCopyPlantNode(inletNodeNum, outletNodeNum);
+        SafeCopyPlantNode(state, inletNodeNum, outletNodeNum);
 
         Node(outletNodeNum).Temp = outletTemp;
         Node(outletNodeNum).Enthalpy =
-            outletTemp * GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, outletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            outletTemp * GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, outletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
         if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !state.dataGlobal->WarmupFlag) {
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
             ShowContinueError(state, "For GroundHeatExchanger: " + name + "GLHE delta Temp > 100C.");
@@ -2897,8 +2894,7 @@ namespace GroundHeatExchangers {
 
         // Eq: 3-67
 
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetSpecificHeatGlycol;
+                using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("calcBHResistance");
@@ -2906,7 +2902,7 @@ namespace GroundHeatExchangers {
         if (massFlowRate <= 0.0) {
             return 0;
         } else {
-            Real64 const cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            Real64 const cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             return calcBHAverageResistance(state) + 1 / (3 * calcBHTotalInternalResistance(state)) * pow_2(bhLength / (massFlowRate * cpFluid));
         }
     }
@@ -2932,8 +2928,7 @@ namespace GroundHeatExchangers {
         // Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         // International Chemical Engineering 16(1976), pp. 359-368.
 
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetConductivityGlycol;
+                using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetViscosityGlycol;
 
@@ -2943,9 +2938,9 @@ namespace GroundHeatExchangers {
         // Get fluid props
         inletTemp = Node(inletNodeNum).Temp;
 
-        Real64 const cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const kFluid = GetConductivityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const fluidViscosity = GetViscosityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const kFluid = GetConductivityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const fluidViscosity = GetViscosityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // Smoothing fit limits
         Real64 const lower_limit = 2000;
@@ -3033,8 +3028,7 @@ namespace GroundHeatExchangers {
         //	  outer tube wall.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetConductivityGlycol;
+                using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetViscosityGlycol;
@@ -3063,10 +3057,10 @@ namespace GroundHeatExchangers {
         Real64 laminarNusseltNo(4.364);
         Real64 turbulentNusseltNo;
 
-        cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        kFluid = GetConductivityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidViscosity = GetViscosityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        kFluid = GetConductivityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidViscosity = GetViscosityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // calculate mass flow rate
         singleSlinkyMassFlowRate = massFlowRate / numTrenches;
@@ -3287,8 +3281,7 @@ namespace GroundHeatExchangers {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_GrndHtExchgSystem;
+                using DataPlant::TypeOf_GrndHtExchgSystem;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
@@ -3328,7 +3321,7 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, 20.0, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3366,7 +3359,7 @@ namespace GroundHeatExchangers {
 
         tempGround /= 5;
 
-        massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
+        massFlowRate = RegulateCondenserCompFlowReqOp(state, loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
         SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3394,8 +3387,7 @@ namespace GroundHeatExchangers {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_GrndHtExchgSlinky;
+                using DataPlant::TypeOf_GrndHtExchgSlinky;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
@@ -3437,7 +3429,7 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, 20.0, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3459,7 +3451,7 @@ namespace GroundHeatExchangers {
 
         tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, coilDepth, CurTime);
 
-        massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
+        massFlowRate = RegulateCondenserCompFlowReqOp(state, loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
         SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 

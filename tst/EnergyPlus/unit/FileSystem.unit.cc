@@ -50,13 +50,13 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <iostream>
+// C++ Headers
 #include <fstream>
+#include <iostream>
+
+// EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 
 TEST(FileSystem, movefile_test)
 {
