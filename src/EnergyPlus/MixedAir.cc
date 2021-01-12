@@ -105,9 +105,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
-namespace EnergyPlus {
-
-namespace MixedAir {
+namespace EnergyPlus::MixedAir {
 
     // Module containing the routines dealing with the mixed air portion
     // of the HVAC air loop.
@@ -134,12 +132,6 @@ namespace MixedAir {
     // will sense various node conditions and set some node flow rates.  Mixed
     // air components will operate with predetermined flow rates.
 
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
@@ -148,74 +140,6 @@ namespace MixedAir {
     using namespace ScheduleManager;
     using namespace DataSizing;
     using namespace FaultsManager;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const NoLockoutPossible(0);
-    int const LockoutWithHeatingPossible(1);
-    int const LockoutWithCompressorPossible(2);
-
-    int const NoEconomizer(0);
-    // Changed by Amit as a part on New Feature Proposal
-    int const FixedDryBulb(1);
-    int const FixedEnthalpy(2);
-    int const DifferentialDryBulb(3);
-    int const DifferentialEnthalpy(4);
-    int const FixedDewPointAndDryBulb(5);
-    int const ElectronicEnthalpy(6);
-    int const DifferentialDryBulbAndEnthalpy(7);
-
-    // component types addressed by this module
-    int const OAMixer_Num(1);
-    int const Fan_Simple_CV(2);
-    int const Fan_Simple_VAV(3);
-    int const WaterCoil_SimpleCool(4);
-    int const WaterCoil_Cooling(5);
-    int const WaterCoil_SimpleHeat(6);
-    int const SteamCoil_AirHeat(7);
-    int const WaterCoil_DetailedCool(8);
-    int const Coil_ElectricHeat(9);
-    int const Coil_GasHeat(10);
-    int const WaterCoil_CoolingHXAsst(11);
-    int const DXSystem(12);
-    int const HeatXchngr(13);
-    int const Desiccant(14);
-    int const Unglazed_SolarCollector(15);
-    int const EvapCooler(16);
-    int const PVT_AirBased(17);
-    int const Fan_ComponentModel(18);
-    int const DXHeatPumpSystem(19);
-    int const Coil_UserDefined(20);
-    int const Humidifier(21);
-    int const Fan_System_Object(22);
-    int const UnitarySystemModel(23);
-    int const VRFTerminalUnit(24);
-
-    int const ControllerOutsideAir(2);
-    int const ControllerStandAloneERV(3);
-
-    // Zone Outdoor Air Method
-    // INTEGER, PARAMETER :: ZOAM_FlowPerPerson = 1  ! set the outdoor air flow rate based on number of people in the zone
-    // INTEGER, PARAMETER :: ZOAM_FlowPerZone = 2    ! sum the outdoor air flow rate per zone based on user input
-    // INTEGER, PARAMETER :: ZOAM_FlowPerArea = 3    ! sum the outdoor air flow rate based on zone area
-    // INTEGER, PARAMETER :: ZOAM_FlowPerACH = 4     ! sum the outdoor air flow rate based on number of air changes for the zone
-    // INTEGER, PARAMETER :: ZOAM_Sum = 5            ! sum the outdoor air flow rate of the people component and the space floor area component
-    // INTEGER, PARAMETER :: ZOAM_Max = 6            ! use the maximum of the outdoor air flow rate of the people component and
-    //                                              ! the space floor area component
-    // System Outdoor Air Method
-    // INTEGER, PARAMETER :: SOAM_ZoneSum = 1  ! Sum the outdoor air flow rates of all zones
-    // INTEGER, PARAMETER :: SOAM_VRP = 2      ! Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
-    //                                        !  considering the zone air distribution effectiveness and the system ventilation efficiency
-    // INTEGER, PARAMETER :: SOAM_IAQP = 3     ! Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
-    //                                        ! based on the CO2 setpoint
-    // INTEGER, PARAMETER :: SOAM_ProportionalControl = 4     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    //                                                       ! to calculate the system level outdoor air flow rates
-    // INTEGER, PARAMETER :: SOAM_IAQPGC = 5   ! Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
-    //                                        ! based on the generic contaminant setpoint
-    // INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
-    //                                        ! based on the generic contaminant setpoint
-    // INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    //                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
 
     Array1D_string const CurrentModuleObjects(8,
                                               {"AirLoopHVAC:OutdoorAirSystem",
@@ -226,19 +150,6 @@ namespace MixedAir {
                                                "ZoneHVAC:EnergyRecoveryVentilator:Controller",
                                                "Controller:MechanicalVentilation",
                                                "OutdoorAir:Mixer"});
-
-    // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
-    // Multiple Get Input routines in this module or these would be in individual routines.
-    int const CMO_OASystem(1);
-    int const CMO_AirLoopEqList(2);
-    int const CMO_ControllerList(3);
-    int const CMO_SysAvailMgrList(4);
-    int const CMO_OAController(5);
-    int const CMO_ERVController(6);
-    int const CMO_MechVentilation(7);
-    int const CMO_OAMixer(8);
-
-    // Type declarations in MixedAir module
 
     // MODULE VARIABLE DECLARATIONS:
     int NumControllerLists(0);     // Number of Controller Lists
@@ -1123,8 +1034,7 @@ namespace MixedAir {
             TestCompSet(state, CurrentModuleObject, AlphArray(1), "UNDEFINED", "UNDEFINED", "Air Nodes");
 
             if (!lAlphaBlanks(3)) {
-                ListNum = inputProcessor->getObjectItemNum(state,
-CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
+                ListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
                 if (ListNum > 0) {
                     inputProcessor->getObjectItem(state, CurrentModuleObjects(CMO_AirLoopEqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2;
@@ -1161,8 +1071,7 @@ CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
             ListNum = 0;
             NumSimpControllers = 0;
             if (!lAlphaBlanks(2)) {
-                ListNum = inputProcessor->getObjectItemNum(state,
-CurrentModuleObjects(CMO_ControllerList), ControllerListName);
+                ListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObjects(CMO_ControllerList), ControllerListName);
                 if (ListNum > 0) {
                     inputProcessor->getObjectItem(state, CurrentModuleObjects(CMO_ControllerList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2;
@@ -1196,11 +1105,11 @@ CurrentModuleObjects(CMO_ControllerList), ControllerListName);
             state.dataAirLoop->OutsideAirSys(OASysNum).NumSimpleControllers = NumSimpControllers;
 
             if (!lAlphaBlanks(4)) {
-                ListNum = inputProcessor->getObjectItemNum(state,
-CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
+                ListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 if (ListNum <= 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) +
-                                    "\" not found.");
+                    ShowSevereError(state,
+                                    CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) +
+                                        "\" not found.");
                     ErrorsFound = true;
                 }
             }
@@ -2275,7 +2184,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         OAController(OutAirNum).Name = AlphArray(1);
         OAController(OutAirNum).ControllerType = CurrentModuleObject;
-        OAController(OutAirNum).ControllerType_Num = ControllerOutsideAir;
+        OAController(OutAirNum).ControllerType_Num = iControllerType::ControllerOutsideAir;
         OAController(OutAirNum).MaxOA = NumArray(2);
         OAController(OutAirNum).MinOA = NumArray(1);
         OAController(OutAirNum).MixNode = GetOnlySingleNode(state,
@@ -2288,21 +2197,21 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             ShowContinueError(state, "Confirm that this is the intended source for the outdoor air stream.");
         }
         if (UtilityRoutines::SameString(AlphArray(6), "NoEconomizer")) {
-            OAController(OutAirNum).Econo = NoEconomizer;
+            OAController(OutAirNum).Econo = iEconoOp::NoEconomizer;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedDryBulb")) {
-            OAController(OutAirNum).Econo = FixedDryBulb;
+            OAController(OutAirNum).Econo = iEconoOp::FixedDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedEnthalpy")) {
-            OAController(OutAirNum).Econo = FixedEnthalpy;
+            OAController(OutAirNum).Econo = iEconoOp::FixedEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedDewPointAndDryBulb")) {
-            OAController(OutAirNum).Econo = FixedDewPointAndDryBulb;
+            OAController(OutAirNum).Econo = iEconoOp::FixedDewPointAndDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialDryBulb")) {
-            OAController(OutAirNum).Econo = DifferentialDryBulb;
+            OAController(OutAirNum).Econo = iEconoOp::DifferentialDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialEnthalpy")) {
-            OAController(OutAirNum).Econo = DifferentialEnthalpy;
+            OAController(OutAirNum).Econo = iEconoOp::DifferentialEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialDryBulbAndEnthalpy")) {
-            OAController(OutAirNum).Econo = DifferentialDryBulbAndEnthalpy;
+            OAController(OutAirNum).Econo = iEconoOp::DifferentialDryBulbAndEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "ElectronicEnthalpy")) {
-            OAController(OutAirNum).Econo = ElectronicEnthalpy;
+            OAController(OutAirNum).Econo = iEconoOp::ElectronicEnthalpy;
         } else {
             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\" value.");
             ErrorsFound = true;
@@ -2317,18 +2226,12 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             ErrorsFound = true;
         }
 
-        //    IF((OAController(OutAirNum)%Econo > NoEconomizer) .AND. OAController(OutAirNum)%EconBypass) THEN
-        //      CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//TRIM(AlphArray(1))//'" invalid '//  &
-        //         TRIM(cAlphaFields(6))//'="'//TRIM(AlphArray(6))//'" and ')
-        //      CALL ShowContinueError(TRIM(cAlphaFields(7))//'="'//TRIM(AlphArray(7))//'" incompatible specifications.')
-        //      ErrorsFound = .TRUE.
-        //    END IF
         if (UtilityRoutines::SameString(AlphArray(9), "NoLockout")) {
-            OAController(OutAirNum).Lockout = NoLockoutPossible;
+            OAController(OutAirNum).Lockout = iLockoutType::NoLockoutPossible;
         } else if (UtilityRoutines::SameString(AlphArray(9), "LockoutWithHeating")) {
-            OAController(OutAirNum).Lockout = LockoutWithHeatingPossible;
+            OAController(OutAirNum).Lockout = iLockoutType::LockoutWithHeatingPossible;
         } else if (UtilityRoutines::SameString(AlphArray(9), "LockoutWithCompressor")) {
-            OAController(OutAirNum).Lockout = LockoutWithCompressorPossible;
+            OAController(OutAirNum).Lockout = iLockoutType::LockoutWithCompressorPossible;
         } else {
             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(9) + "=\"" + AlphArray(9) + "\" value.");
             ErrorsFound = true;
@@ -2523,7 +2426,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     ErrorsFound = true;
                 }
             } else {
-                if (OAController(OutAirNum).Econo == NoEconomizer) {
+                if (OAController(OutAirNum).Econo == iEconoOp::NoEconomizer) {
                     OAController(OutAirNum).ModifyDuringHighOAMoisture = true;
                 } else {
                     OAController(OutAirNum).ModifyDuringHighOAMoisture = false;
@@ -2567,7 +2470,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
         }
 
-        if (UtilityRoutines::SameString(AlphArray(16), "Yes") && OAController(OutAirNum).Econo == NoEconomizer) {
+        if (UtilityRoutines::SameString(AlphArray(16), "Yes") && OAController(OutAirNum).Econo == iEconoOp::NoEconomizer) {
             ShowWarningError(state, OAController(OutAirNum).ControllerType + " \"" + OAController(OutAirNum).Name + "\"");
             ShowContinueError(state, "...Economizer operation must be enabled when " + cAlphaFields(16) + " is set to YES.");
             ShowContinueError(state, "...The high humidity control option will be disabled and the simulation continues.");
@@ -2696,7 +2599,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Real64 rSchVal;
         Real64 rOffset;
         int i;
-        int iEco;
+        iEconoOp iEco;
 
         ErrorsFound = false;
         OANode = 0;
@@ -2716,7 +2619,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             {
                 auto const SELECT_CASE_var(thisOAController.ControllerType_Num);
 
-                if (SELECT_CASE_var == ControllerOutsideAir) {
+                if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
                     thisOASys = 0;
                     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                         // find which OAsys has this controller
@@ -2757,7 +2660,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         ErrorsFound = true;
                     }
 
-                } else if (SELECT_CASE_var == ControllerStandAloneERV) {
+                } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
                     // set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
                     // with the assumption that equipment is bypassed....
 
@@ -2776,7 +2679,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             MixedAirNode = thisOAController.MixNode;
             if (MixedAirNode > 0) {
                 //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
-                if (thisOAController.Econo > NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
+                if (thisOAController.Econo > iEconoOp::NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
                     if (Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
@@ -2807,11 +2710,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             if (AirLoopNum > 0) {
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlNum = OAControllerNum;
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlName = thisOAController.Name;
-                if (thisOAController.Lockout == LockoutWithHeatingPossible) {
+                if (thisOAController.Lockout == iLockoutType::LockoutWithHeatingPossible) {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithHeating = true;
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor = false;
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanNotLockoutEcono = false;
-                } else if (thisOAController.Lockout == LockoutWithCompressorPossible) {
+                } else if (thisOAController.Lockout == iLockoutType::LockoutWithCompressorPossible) {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithHeating = false;
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor = true;
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanNotLockoutEcono = false;
@@ -2872,17 +2775,17 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             Node(OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
             // predefined reporting
-            if (thisOAController.Econo > NoEconomizer) {
+            if (thisOAController.Econo > iEconoOp::NoEconomizer) {
                 equipName = thisOAController.Name;
                 // 90.1 descriptor for economizer controls
                 // Changed by Amit for New Feature implementation
-                if (thisOAController.Econo == DifferentialEnthalpy) {
+                if (thisOAController.Econo == iEconoOp::DifferentialEnthalpy) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialEnthalpy");
-                } else if (thisOAController.Econo == DifferentialDryBulb) {
+                } else if (thisOAController.Econo == iEconoOp::DifferentialDryBulb) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialDryBulb");
-                } else if (thisOAController.Econo == FixedEnthalpy) {
+                } else if (thisOAController.Econo == iEconoOp::FixedEnthalpy) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedEnthalpy");
-                } else if (thisOAController.Econo == FixedDryBulb) {
+                } else if (thisOAController.Econo == iEconoOp::FixedDryBulb) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedDryBulb");
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "Other");
@@ -2892,22 +2795,22 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMaxOA, equipName, thisOAController.MaxOA);
                 // EnergyPlus input echos for economizer controls
                 // Chnged by Amit for new feature implementation
-                if (thisOAController.Econo == DifferentialDryBulb) {
+                if (thisOAController.Econo == iEconoOp::DifferentialDryBulb) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
-                if (thisOAController.Econo == DifferentialEnthalpy) {
+                if (thisOAController.Econo == iEconoOp::DifferentialEnthalpy) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
-                if (thisOAController.Econo == FixedDryBulb) {
+                if (thisOAController.Econo == iEconoOp::FixedDryBulb) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.TempLim);
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
-                if (thisOAController.Econo == FixedEnthalpy) {
+                if (thisOAController.Econo == iEconoOp::FixedEnthalpy) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.EnthLim);
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
@@ -3096,7 +2999,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     auto &loopOAController(OAController(OAControllerLoop));
 
                     // Find the outside air system that has the OA controller
-                    if (loopOAController.ControllerType_Num == ControllerStandAloneERV) continue; // ERV controller not on airloop
+                    if (loopOAController.ControllerType_Num == iControllerType::ControllerStandAloneERV) continue; // ERV controller not on airloop
                     OASysFound = false;
                     thisOASys = 0;
                     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
@@ -3269,7 +3172,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // Each time step
         if (FirstHVACIteration) {
             // Mixed air setpoint. Set by a setpoint manager.
-            if (thisOAController.ControllerType_Num == ControllerOutsideAir) {
+            if (thisOAController.ControllerType_Num == iControllerType::ControllerOutsideAir) {
                 if (Node(thisOAController.MixNode).TempSetPoint > SensedNodeFlagValue) {
                     thisOAController.MixSetTemp = Node(thisOAController.MixNode).TempSetPoint;
                 } else {
@@ -3299,7 +3202,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Each iteration
 
-        if (thisOAController.ControllerType_Num == ControllerOutsideAir) {
+        if (thisOAController.ControllerType_Num == iControllerType::ControllerOutsideAir) {
             // zone exhaust mass flow is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaust
             // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaustBalanced
             if (AirLoopNum > 0) {
@@ -3351,7 +3254,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Check sensors faults for the air economizer
         iEco = thisOAController.Econo;
-        if (AnyFaultsInModel && (iEco > NoEconomizer)) {
+        if (AnyFaultsInModel && (iEco != iEconoOp::NoEconomizer)) {
             int j; // index to economizer faults
             for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
                 j = thisOAController.EconmizerFaultNum(i);
@@ -3372,9 +3275,9 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air dry-bulb temperature sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == FixedDryBulb) || (SELECT_CASE_var == DifferentialDryBulb) ||
-                        (SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy) ||
-                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == iEconoOp::FixedDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulb) ||
+                        (SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
                             // FaultModel:TemperatureSensorOffset:OutdoorAir
                             thisOAController.OATemp += rOffset;
@@ -3387,7 +3290,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy)) {
+                    if ((SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
                             // FaultModel:HumiditySensorOffset:OutdoorAir
                             thisOAController.OAHumRat += rOffset;
@@ -3400,8 +3303,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air enthalpy sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == FixedEnthalpy) || (SELECT_CASE_var == ElectronicEnthalpy) ||
-                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == iEconoOp::FixedEnthalpy) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
                             // FaultModel:EnthalpySensorOffset:OutdoorAir
                             thisOAController.OAEnth += rOffset;
@@ -3414,7 +3317,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - return air dry-bulb temperature sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == DifferentialDryBulb) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == iEconoOp::DifferentialDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
                             // FaultModel:TemperatureSensorOffset:ReturnAir
                             thisOAController.RetTemp += rOffset;
@@ -3426,7 +3329,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - return air enthalpy sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == ElectronicEnthalpy) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
                             // FaultModel:EnthalpySensorOffset:ReturnAir
                             thisOAController.RetEnth += rOffset;
@@ -3715,7 +3618,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
 
         // Do not allow OA to be below Exh for controller:outside air
-        if (this->ControllerType_Num == ControllerOutsideAir) {
+        if (this->ControllerType_Num == iControllerType::ControllerOutsideAir) {
             this->OAMassFlow = max(this->ExhMassFlow, this->OAMassFlow);
         }
 
@@ -4459,7 +4362,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (AirLoopNum > 0) {
             // Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
-            if (this->Lockout == LockoutWithHeatingPossible) {
+            if (this->Lockout == iLockoutType::LockoutWithHeatingPossible) {
                 // For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
                 if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated) {
 
@@ -4517,7 +4420,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         OutAirSignal = min(max(OutAirSignal, OutAirMinFrac), 1.0);
 
         // If no economizer, set to minimum and disable economizer and high humidity control
-        if (this->Econo == NoEconomizer) {
+        if (this->Econo == iEconoOp::NoEconomizer) {
             OutAirSignal = OutAirMinFrac;
             EconomizerOperationFlag = false;
             EconomizerAirFlowScheduleValue = 0.0;
@@ -4541,7 +4444,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 OutAirSignal = 1.0;
             }
             // Return air temp limit
-            if (this->Econo == DifferentialDryBulb) {
+            if (this->Econo == iEconoOp::DifferentialDryBulb) {
                 if (this->InletTemp > this->RetTemp) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4549,7 +4452,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Return air enthalpy limit
-            if (this->Econo == DifferentialEnthalpy) {
+            if (this->Econo == iEconoOp::DifferentialEnthalpy) {
                 if (this->InletEnth > this->RetEnth) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4557,23 +4460,23 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Outside air temperature limit
-            if (this->Econo == FixedDryBulb) {
+            if (this->Econo == iEconoOp::FixedDryBulb) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Fixed Enthalpy limit
-            if (this->Econo == FixedEnthalpy) {
+            if (this->Econo == iEconoOp::FixedEnthalpy) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // FIXED DEW POINT AND DRY BULB TEMPERATURE STRATEGY
-            if (this->Econo == FixedDewPointAndDryBulb) {
+            if (this->Econo == iEconoOp::FixedDewPointAndDryBulb) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // ELECRONIC ENTHALPY, HUMIDITY RATIO CURVE
-            if (this->Econo == ElectronicEnthalpy) {
+            if (this->Econo == iEconoOp::ElectronicEnthalpy) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Differential dry bulb and enthalpy strategy
-            if (this->Econo == DifferentialDryBulbAndEnthalpy) {
+            if (this->Econo == iEconoOp::DifferentialDryBulbAndEnthalpy) {
                 if (this->InletTemp > this->RetTemp) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4624,7 +4527,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // it was calculated using the approximate method of sensible energy balance. Now we have to get the
         // accurate result using a full mass, enthalpy and moisture balance and iteration.
         if (OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow &&
-            this->ControllerType_Num == ControllerOutsideAir && !AirLoopNightVent) {
+            this->ControllerType_Num == iControllerType::ControllerOutsideAir && !AirLoopNightVent) {
 
             if (AirLoopNum > 0) {
 
@@ -4761,7 +4664,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         if (AirLoopNightVent) OASignal = 1.0;
 
         // Set economizer report variable and status flag
-        if (this->Econo == NoEconomizer) {
+        if (this->Econo == iEconoOp::NoEconomizer) {
             // No economizer
             this->EconomizerStatus = 0;
             this->EconoActive = false;
@@ -4912,7 +4815,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
 
-                    if (SELECT_CASE_var == ControllerOutsideAir) {
+                    if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckSysSizing(state, CurrentModuleObject, this->Name);
 
@@ -4931,7 +4834,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             }
                         }
 
-                    } else if (SELECT_CASE_var == ControllerStandAloneERV) {
+                    } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 
                     } else {
                     }
@@ -4942,12 +4845,12 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
 
-                    if (SELECT_CASE_var == ControllerOutsideAir) {
+                    if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckZoneSizing(state, CurrentModuleObject, this->Name);
                         this->MaxOA = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
 
-                    } else if (SELECT_CASE_var == ControllerStandAloneERV) {
+                    } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 
                     } else {
                     }
@@ -5062,7 +4965,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         RelAirNodeNum = this->RelNode;
         RetAirNodeNum = this->RetNode;
 
-        if (this->ControllerType_Num == ControllerOutsideAir) {
+        if (this->ControllerType_Num == iControllerType::ControllerOutsideAir) {
             // The outside air controller sets the outside air flow rate and the relief air flow rate
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
                 Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
@@ -6555,7 +6458,5 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
     }
     // End of Utility Section of the Module
     //******************************************************************************
-
-} // namespace MixedAir
 
 } // namespace EnergyPlus

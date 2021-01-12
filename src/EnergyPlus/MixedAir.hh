@@ -70,86 +70,76 @@ namespace MixedAir {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern int const NoLockoutPossible;
-    extern int const LockoutWithHeatingPossible;
-    extern int const LockoutWithCompressorPossible;
 
-    extern int const NoEconomizer;
-    // Changed by Amit as a part on New Feature Proposal
-    extern int const FixedDryBulb;
-    extern int const FixedEnthalpy;
-    extern int const DifferentialDryBulb;
-    extern int const DifferentialEnthalpy;
-    extern int const FixedDewPointAndDryBulb;
-    extern int const ElectronicEnthalpy;
-    extern int const DifferentialDryBulbAndEnthalpy;
+    enum class iLockoutType
+    {
+        NoLockoutPossible,
+        LockoutWithHeatingPossible,
+        LockoutWithCompressorPossible,
+    };
+
+    enum class iEconoOp
+    {
+        NoEconomizer,
+        FixedDryBulb,
+        FixedEnthalpy,
+        DifferentialDryBulb,
+        DifferentialEnthalpy,
+        FixedDewPointAndDryBulb,
+        ElectronicEnthalpy,
+        DifferentialDryBulbAndEnthalpy,
+    };
+
     // coil operation
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
+
     // component types addressed by this module
-    extern int const OAMixer_Num;
-    extern int const Fan_Simple_CV;
-    extern int const Fan_Simple_VAV;
-    extern int const WaterCoil_SimpleCool;
-    extern int const WaterCoil_Cooling;
-    extern int const WaterCoil_SimpleHeat;
-    extern int const SteamCoil_AirHeat;
-    extern int const WaterCoil_DetailedCool;
-    extern int const Coil_ElectricHeat;
-    extern int const Coil_GasHeat;
-    extern int const WaterCoil_CoolingHXAsst;
-    extern int const DXSystem;
-    extern int const HeatXchngr;
-    extern int const Desiccant;
-    extern int const Unglazed_SolarCollector;
-    extern int const EvapCooler;
-    extern int const PVT_AirBased;
-    extern int const Fan_ComponentModel;
-    extern int const DXHeatPumpSystem;
-    extern int const Coil_UserDefined;
-    extern int const Humidifier;
-    extern int const Fan_System_Object;
-    extern int const UnitarySystem;
-    extern int const VRFTerminalUnit;
+    constexpr int OAMixer_Num(1);
+    constexpr int Fan_Simple_CV(2);
+    constexpr int Fan_Simple_VAV(3);
+    constexpr int WaterCoil_SimpleCool(4);
+    constexpr int WaterCoil_Cooling(5);
+    constexpr int WaterCoil_SimpleHeat(6);
+    constexpr int SteamCoil_AirHeat(7);
+    constexpr int WaterCoil_DetailedCool(8);
+    constexpr int Coil_ElectricHeat(9);
+    constexpr int Coil_GasHeat(10);
+    constexpr int WaterCoil_CoolingHXAsst(11);
+    constexpr int DXSystem(12);
+    constexpr int HeatXchngr(13);
+    constexpr int Desiccant(14);
+    constexpr int Unglazed_SolarCollector(15);
+    constexpr int EvapCooler(16);
+    constexpr int PVT_AirBased(17);
+    constexpr int Fan_ComponentModel(18);
+    constexpr int DXHeatPumpSystem(19);
+    constexpr int Coil_UserDefined(20);
+    constexpr int Humidifier(21);
+    constexpr int Fan_System_Object(22);
+    constexpr int UnitarySystemModel(23);
+    constexpr int VRFTerminalUnit(24);
 
-    extern int const ControllerOutsideAir;
-    extern int const ControllerStandAloneERV;
-
-    // Zone Outdoor Air Method
-    // INTEGER, PARAMETER :: ZOAM_FlowPerPerson = 1  ! set the outdoor air flow rate based on number of people in the zone
-    // INTEGER, PARAMETER :: ZOAM_FlowPerZone = 2    ! sum the outdoor air flow rate per zone based on user input
-    // INTEGER, PARAMETER :: ZOAM_FlowPerArea = 3    ! sum the outdoor air flow rate based on zone area
-    // INTEGER, PARAMETER :: ZOAM_FlowPerACH = 4     ! sum the outdoor air flow rate based on number of air changes for the zone
-    // INTEGER, PARAMETER :: ZOAM_Sum = 5            ! sum the outdoor air flow rate of the people component and the space floor area component
-    // INTEGER, PARAMETER :: ZOAM_Max = 6            ! use the maximum of the outdoor air flow rate of the people component and
-    //                                              ! the space floor area component
-    // System Outdoor Air Method
-    // INTEGER, PARAMETER :: SOAM_ZoneSum = 1  ! Sum the outdoor air flow rates of all zones
-    // INTEGER, PARAMETER :: SOAM_VRP = 2      ! Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
-    //                                        !  considering the zone air distribution effectiveness and the system ventilation efficiency
-    // INTEGER, PARAMETER :: SOAM_IAQP = 3     ! Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
-    //                                        ! based on the CO2 setpoint
-    // INTEGER, PARAMETER :: SOAM_ProportionalControlSchOcc = 4     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    //                                                       ! to calculate the system level outdoor air flow rates based on scheduled occupancy
-    // INTEGER, PARAMETER :: SOAM_IAQPGC = 5   ! Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
-    //                                        ! based on the generic contaminant setpoint
-    // INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
-    //                                        ! based on the generic contaminant setpoint
-    // INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    //                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
-
-    extern Array1D_string const CurrentModuleObjects;
+    enum class iControllerType
+    {
+        None,
+        ControllerSimple,
+        ControllerOutsideAir,
+        ControllerStandAloneERV,
+    };
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
-    extern int const CMO_OASystem;
-    extern int const CMO_AirLoopEqList;
-    extern int const CMO_ControllerList;
-    extern int const CMO_SysAvailMgrList;
-    extern int const CMO_OAController;
-    extern int const CMO_ERVController;
-    extern int const CMO_MechVentilation;
-    extern int const CMO_OAMixer;
+    constexpr int CMO_OASystem(1);
+    constexpr int CMO_AirLoopEqList(2);
+    constexpr int CMO_ControllerList(3);
+    constexpr int CMO_SysAvailMgrList(4);
+    constexpr int CMO_OAController(5);
+    constexpr int CMO_ERVController(6);
+    constexpr int CMO_MechVentilation(7);
+    constexpr int CMO_OAMixer(8);
+
+    extern Array1D_string const CurrentModuleObjects;
 
     // Type declarations in MixedAir module
 
@@ -203,9 +193,9 @@ namespace MixedAir {
         // Members
         std::string Name;
         std::string ControllerType;
-        int ControllerType_Num; // Parameter equivalent of controller type
+        iControllerType ControllerType_Num; // Parameter equivalent of controller type
         int OACtrlIndex;
-        int Lockout; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
+        iLockoutType Lockout; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
         // 2=LockoutWithCompressorPossible;
         bool FixedMin;        // Fixed Minimum or Proportional Minimum
         Real64 TempLim;       // Temperature Limit
@@ -215,7 +205,7 @@ namespace MixedAir {
         int EnthalpyCurvePtr; // Electronic Enthalpy Curve Index (max HumRat = f[OAT])
         Real64 MinOA;         // Minimum outside air flow (m3/sec)
         Real64 MaxOA;         // Maximum outside air flow (m3/sec)
-        int Econo;            // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
+        iEconoOp Econo;            // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
         // 4=DifferentialEnthalpy, 5=FixedDewPointAndDryBulb, 6 = ElectronicEnthalpy,
         // 7 =DifferentialDryBulbAndEnthalpy
         bool EconBypass;      // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
@@ -293,18 +283,18 @@ namespace MixedAir {
 
         // Default Constructor
         OAControllerProps()
-            : ControllerType_Num(0), OACtrlIndex(0), Lockout(0), FixedMin(true), TempLim(0.0), TempLowLim(0.0), EnthLim(0.0), DPTempLim(0.0),
-              EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(0), EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0),
-              MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0), ExhMassFlow(0.0), MixMassFlow(0.0), InletTemp(0.0), InletEnth(0.0), InletPress(0.0),
-              InletHumRat(0.0), OATemp(0.0), OAEnth(0.0), OAPress(0.0), OAHumRat(0.0), RetTemp(0.0), RetEnth(0.0), MixSetTemp(0.0),
-              MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0), RelEnth(0.0), RelSensiLossRate(0.0), RelLatentLossRate(0.0),
-              RelTotalLossRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0), HumidistatZoneNum(0), NodeNumofHumidistatZone(0),
-              HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0), MinOAflowSchPtr(0), MaxOAflowSchPtr(0),
-              EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0), HighHumCtrlStatus(0),
-              OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false), EMSOARateValue(0.0),
-              HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0), MaxOAFracBySetPoint(0),
-              MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false), EconmizerFaultNum(0),
-              NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
+            : ControllerType_Num(iControllerType::None), OACtrlIndex(0), Lockout(iLockoutType::NoLockoutPossible), FixedMin(true), TempLim(0.0), TempLowLim(0.0),
+              EnthLim(0.0), DPTempLim(0.0), EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(iEconoOp::NoEconomizer), EconBypass(false), MixNode(0),
+              OANode(0), InletNode(0), RelNode(0), RetNode(0), MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0), ExhMassFlow(0.0), MixMassFlow(0.0),
+              InletTemp(0.0), InletEnth(0.0), InletPress(0.0), InletHumRat(0.0), OATemp(0.0), OAEnth(0.0), OAPress(0.0), OAHumRat(0.0), RetTemp(0.0),
+              RetEnth(0.0), MixSetTemp(0.0), MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0), RelEnth(0.0), RelSensiLossRate(0.0),
+              RelLatentLossRate(0.0), RelTotalLossRate(0.0), ZoneEquipZoneNum(0), VentMechObjectNum(0), HumidistatZoneNum(0),
+              NodeNumofHumidistatZone(0), HighRHOAFlowRatio(1.0), ModifyDuringHighOAMoisture(false), EconomizerOASchedPtr(0), MinOAflowSchPtr(0),
+              MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0),
+              HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
+              EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
+              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false),
+              EconmizerFaultNum(0), NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
         {
         }
 

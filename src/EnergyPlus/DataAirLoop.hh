@@ -241,8 +241,8 @@ namespace DataAirLoop {
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;    // component inelt node number
-        Array1D_int OutletNodeNum;   // component outelt node number
+        Array1D_int InletNodeNum;    // component inlet node number
+        Array1D_int OutletNodeNum;   // component outlet node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
         bool DXCoolingCoilFlag;      // True with DX cooling coil

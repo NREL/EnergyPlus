@@ -63,40 +63,11 @@ struct EnergyPlusData;
 
 namespace HVACStandAloneERV {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    extern int const ControllerSimple;
-    extern int const ControllerOutsideAir;
-    extern int const ControllerStandAloneERV;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
     extern bool GetERVInputFlag; // First time, input is "gotten"
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routine
-
-    // Algorithms/Calculation routine for the module
-
-    // Get Input routine for module
-
-    // Sizing routine for the module
-
-    // Initialization routine for module
-
-    // Utility routines for module
-
-    // Types
 
     struct StandAloneERVData
     {
