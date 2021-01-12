@@ -12920,284 +12920,149 @@ namespace EnergyPlus::OutputReportTabular {
 
         CompLoadTablesType curCompLoadTable; // active component load table
 
-        //adjusted initilization location to after variable declaration for loops 2020-01-11
-        peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        peopleDelaySeqHeat = 0.0;
-        peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        peopleDelaySeqCool = 0.0;
-        lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqHeat = 0.0;
-        lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqCool = 0.0;
-        equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqHeat = 0.0;
-        equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqCool = 0.0;
-        hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqHeat = 0.0;
-        hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqCool = 0.0;
-        powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqHeat = 0.0;
-        powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqCool = 0.0;
-        feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqHeat = 0.0;
-        feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqCool = 0.0;
-        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
-        surfDelaySeqHeat = 0.0;
-        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
-        surfDelaySeqCool = 0.0;
+        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        bool produceTabular = true;
+        bool produceSQLite = false;
 
-        // initialize arrays
-        if (ort->displayZoneComponentLoadSummary) {
-            ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : ZoneHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : ZoneCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-        if (ort->displayAirLoopComponentLoadSummary) {
-            AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
-            for (auto &e : AirLoopHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-                e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
-                e.zoneIndices = 0;
-            }
-            AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
-            for (auto &e : AirLoopCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-                e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
-                e.zoneIndices = 0;
-            }
-            AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : AirLoopZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : AirLoopZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-        if (ort->displayFacilityComponentLoadSummary) {
-            FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
-            FacilityHeatCompLoadTables.cells = 0.;
-            FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
-            FacilityHeatCompLoadTables.cellUsed = false;
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
-            FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
-            FacilityCoolCompLoadTables.cells = 0.;
-            FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
-            FacilityCoolCompLoadTables.cellUsed = false;
-
-            FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : FacilityZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : FacilityZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-
-        // get the zone areas needed later
-        Array1D<ZompComponentAreasType> ZoneComponentAreas;
-        ZoneComponentAreas.allocate(state.dataGlobal->NumOfZones);
-        GetZoneComponentAreas(state, ZoneComponentAreas);
-
-        // ZoneComponentLoadSummary
-        if (ort->displayZoneComponentLoadSummary) {
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
-                if (allocated(CalcFinalZoneSizing)) {
-                    coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
-                    ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                    timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
-                    ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
-
-                    GetDelaySequences(state,
-                                      coolDesSelected,
-                                      true,
-                                      iZone,
-                                      peopleDelaySeqCool,
-                                      equipDelaySeqCool,
-                                      hvacLossDelaySeqCool,
-                                      powerGenDelaySeqCool,
-                                      lightDelaySeqCool,
-                                      feneSolarDelaySeqCool,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   ZoneCoolCompLoadTables(iZone).cells,
-                                                   ZoneCoolCompLoadTables(iZone).cellUsed,
-                                                   coolDesSelected,
-                                                   timeCoolMax,
-                                                   iZone,
-                                                   peopleDelaySeqCool,
-                                                   equipDelaySeqCool,
-                                                   hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool,
-                                                   lightDelaySeqCool,
-                                                   feneSolarDelaySeqCool,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqCool);
-                    CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                    // send latent load info to coil summary report
-                    coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
-
-                    heatDesSelected = CalcFinalZoneSizing(iZone).HeatDDNum;
-                    ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                    timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
-                    ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
-
-                    GetDelaySequences(state,
-                                      heatDesSelected,
-                                      false,
-                                      iZone,
-                                      peopleDelaySeqHeat,
-                                      equipDelaySeqHeat,
-                                      hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat,
-                                      lightDelaySeqHeat,
-                                      feneSolarDelaySeqHeat,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   ZoneHeatCompLoadTables(iZone).cells,
-                                                   ZoneHeatCompLoadTables(iZone).cellUsed,
-                                                   heatDesSelected,
-                                                   timeHeatMax,
-                                                   iZone,
-                                                   peopleDelaySeqHeat,
-                                                   equipDelaySeqHeat,
-                                                   hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat,
-                                                   lightDelaySeqHeat,
-                                                   feneSolarDelaySeqHeat,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqHeat);
-                    CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-
-                    // send latent load info to coil summary report
-                    coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
-
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
-
-                    AddTotalRowsForLoadSummary(ZoneCoolCompLoadTables(iZone));
-                    AddTotalRowsForLoadSummary(ZoneHeatCompLoadTables(iZone));
-
-                    ComputePeakDifference(ZoneCoolCompLoadTables(iZone));
-                    ComputePeakDifference(ZoneHeatCompLoadTables(iZone));
-
-                    // We delay the potential application of SI to IP conversion and actual output until after both the AirLoopComponentLoadSummary
-                    // and FacilityComponentLoadSummary have been processed because below we try to retrieve the info directly when the timestamp
-                    // would match (cf #7356), and if we converted right now, we would apply the conversion twice
-                }
-            }
-        }
-
-        // AirLoopComponentLoadSummary
-        if (ort->displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
-            Array1D_int zoneToAirLoopCool;
-            zoneToAirLoopCool.dimension(state.dataGlobal->NumOfZones);
-            Array1D_int zoneToAirLoopHeat;
-            zoneToAirLoopHeat.dimension(state.dataGlobal->NumOfZones);
-            // set the peak day and time for each zone used by the airloops - use all zones connected to the airloop for both heating and cooling
-            // (regardless of "heated" or "cooled" zone status)
-            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
-                zoneToAirLoopCool = 0;
-                zoneToAirLoopHeat = 0;
-                if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
-                } else if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
+            if (iUnitSystem == 0) {
+                unitsStyle_temp = ort->unitsStyle;
+                produceTabular = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
+                    produceSQLite = true;
                 } else {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).TotCoolPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtTotCoolPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
+                    produceSQLite = false;
                 }
-                heatDesSelected = SysSizPeakDDNum(iAirLoop).HeatPeakDD;
-                if (heatDesSelected != 0) {
-                    timeHeatMax = SysSizPeakDDNum(iAirLoop).TimeStepAtHeatPk(heatDesSelected);
-                } else {
-                    timeHeatMax = 0;
-                }
+            } else { // iUnitSystem == 1
+                unitsStyle_temp = ort->unitsStyle_SQLite;
+                produceTabular = false;
+                produceSQLite = true;
+                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
+            }
 
-                int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
-                for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
-                    zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
-                    zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
-                }
-                int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
-                for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
-                    zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
-                    zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
-                }
+            // adjusted initilization location to after variable declaration for loops 2020-01-11
+            peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+            peopleDelaySeqHeat = 0.0;
+            peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            peopleDelaySeqCool = 0.0;
+            lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            lightDelaySeqHeat = 0.0;
+            lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            lightDelaySeqCool = 0.0;
+            equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            equipDelaySeqHeat = 0.0;
+            equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            equipDelaySeqCool = 0.0;
+            hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            hvacLossDelaySeqHeat = 0.0;
+            hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            hvacLossDelaySeqCool = 0.0;
+            powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            powerGenDelaySeqHeat = 0.0;
+            powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            powerGenDelaySeqCool = 0.0;
+            feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            feneSolarDelaySeqHeat = 0.0;
+            feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            feneSolarDelaySeqCool = 0.0;
+            surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqHeat = 0.0;
+            surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqCool = 0.0;
 
-                // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute
-                // them for specific design day and time of max
+            // initialize arrays
+            if (ort->displayZoneComponentLoadSummary) {
+                ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : ZoneHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+                ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : ZoneCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+            }
+            if (ort->displayAirLoopComponentLoadSummary) {
+                AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
+                for (auto &e : AirLoopHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                    e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
+                    e.zoneIndices = 0;
+                }
+                AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
+                for (auto &e : AirLoopCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                    e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
+                    e.zoneIndices = 0;
+                }
+                AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : AirLoopZonesHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+                AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : AirLoopZonesCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+            }
+            if (ort->displayFacilityComponentLoadSummary) {
+                FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+                FacilityHeatCompLoadTables.cells = 0.;
+                FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+                FacilityHeatCompLoadTables.cellUsed = false;
+
+                FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+                FacilityCoolCompLoadTables.cells = 0.;
+                FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+                FacilityCoolCompLoadTables.cellUsed = false;
+
+                FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : FacilityZonesHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+                FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : FacilityZonesCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+            }
+
+            // get the zone areas needed later
+            Array1D<ZompComponentAreasType> ZoneComponentAreas;
+            ZoneComponentAreas.allocate(state.dataGlobal->NumOfZones);
+            GetZoneComponentAreas(state, ZoneComponentAreas);
+
+            // ZoneComponentLoadSummary
+            if (ort->displayZoneComponentLoadSummary) {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
-                    // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                    if (ort->displayZoneComponentLoadSummary &&
-                        (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
-                        AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
-                    } else {
-                        coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
-                        timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
+                    if (allocated(CalcFinalZoneSizing)) {
+                        coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
+                        ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
+                        timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
+                        ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
                         GetDelaySequences(state,
                                           coolDesSelected,
@@ -13212,8 +13077,8 @@ namespace EnergyPlus::OutputReportTabular {
                                           ort->feneCondInstantSeq,
                                           surfDelaySeqCool);
                         ComputeTableBodyUsingMovingAvg(state,
-                                                       AirLoopZonesCoolCompLoadTables(iZone).cells,
-                                                       AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
+                                                       ZoneCoolCompLoadTables(iZone).cells,
+                                                       ZoneCoolCompLoadTables(iZone).cellUsed,
                                                        coolDesSelected,
                                                        timeCoolMax,
                                                        iZone,
@@ -13225,16 +13090,14 @@ namespace EnergyPlus::OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        ort->feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                        AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
-                    }
-                    if (ort->displayZoneComponentLoadSummary &&
-                        (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
-                        AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
-                    } else {
-                        heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
-                        timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
+                        CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        // send latent load info to coil summary report
+                        coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+
+                        heatDesSelected = CalcFinalZoneSizing(iZone).HeatDDNum;
+                        ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
+                        timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
+                        ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
                         GetDelaySequences(state,
                                           heatDesSelected,
@@ -13249,8 +13112,8 @@ namespace EnergyPlus::OutputReportTabular {
                                           ort->feneCondInstantSeq,
                                           surfDelaySeqHeat);
                         ComputeTableBodyUsingMovingAvg(state,
-                                                       AirLoopZonesHeatCompLoadTables(iZone).cells,
-                                                       AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
+                                                       ZoneHeatCompLoadTables(iZone).cells,
+                                                       ZoneHeatCompLoadTables(iZone).cellUsed,
                                                        heatDesSelected,
                                                        timeHeatMax,
                                                        iZone,
@@ -13262,184 +13125,344 @@ namespace EnergyPlus::OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        ort->feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-                        AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
+                        CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+
+                        // send latent load info to coil summary report
+                        coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
+
+                        AddTotalRowsForLoadSummary(ZoneCoolCompLoadTables(iZone));
+                        AddTotalRowsForLoadSummary(ZoneHeatCompLoadTables(iZone));
+
+                        ComputePeakDifference(ZoneCoolCompLoadTables(iZone));
+                        ComputePeakDifference(ZoneHeatCompLoadTables(iZone));
+
+                        // We delay the potential application of SI to IP conversion and actual output until after both the
+                        // AirLoopComponentLoadSummary and FacilityComponentLoadSummary have been processed because below we try to retrieve the info
+                        // directly when the timestamp would match (cf #7356), and if we converted right now, we would apply the conversion twice
                     }
                 }
-                // combine the zones for each air loop
+            }
+
+            // AirLoopComponentLoadSummary
+            if (ort->displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
+                Array1D_int zoneToAirLoopCool;
+                zoneToAirLoopCool.dimension(state.dataGlobal->NumOfZones);
+                Array1D_int zoneToAirLoopHeat;
+                zoneToAirLoopHeat.dimension(state.dataGlobal->NumOfZones);
+                // set the peak day and time for each zone used by the airloops - use all zones connected to the airloop for both heating and cooling
+                // (regardless of "heated" or "cooled" zone status)
+                for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                    zoneToAirLoopCool = 0;
+                    zoneToAirLoopHeat = 0;
+                    if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    } else if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    } else {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).TotCoolPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtTotCoolPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    }
+                    heatDesSelected = SysSizPeakDDNum(iAirLoop).HeatPeakDD;
+                    if (heatDesSelected != 0) {
+                        timeHeatMax = SysSizPeakDDNum(iAirLoop).TimeStepAtHeatPk(heatDesSelected);
+                    } else {
+                        timeHeatMax = 0;
+                    }
+
+                    int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
+                    for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
+                        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
+                        zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
+                        zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                    }
+                    int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
+                    for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
+                        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
+                        zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
+                        zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                    }
+
+                    // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise
+                    // compute them for specific design day and time of max
+                    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                        // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
+                        if (ort->displayZoneComponentLoadSummary &&
+                            (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                            (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                            AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
+                        } else {
+                            coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
+                            timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
+
+                            GetDelaySequences(state,
+                                              coolDesSelected,
+                                              true,
+                                              iZone,
+                                              peopleDelaySeqCool,
+                                              equipDelaySeqCool,
+                                              hvacLossDelaySeqCool,
+                                              powerGenDelaySeqCool,
+                                              lightDelaySeqCool,
+                                              feneSolarDelaySeqCool,
+                                              ort->feneCondInstantSeq,
+                                              surfDelaySeqCool);
+                            ComputeTableBodyUsingMovingAvg(state,
+                                                           AirLoopZonesCoolCompLoadTables(iZone).cells,
+                                                           AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
+                                                           coolDesSelected,
+                                                           timeCoolMax,
+                                                           iZone,
+                                                           peopleDelaySeqCool,
+                                                           equipDelaySeqCool,
+                                                           hvacLossDelaySeqCool,
+                                                           powerGenDelaySeqCool,
+                                                           lightDelaySeqCool,
+                                                           feneSolarDelaySeqCool,
+                                                           ort->feneCondInstantSeq,
+                                                           surfDelaySeqCool);
+                            CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                            AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
+                        }
+                        if (ort->displayZoneComponentLoadSummary &&
+                            (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                            (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                            AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
+                        } else {
+                            heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
+                            timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
+
+                            GetDelaySequences(state,
+                                              heatDesSelected,
+                                              false,
+                                              iZone,
+                                              peopleDelaySeqHeat,
+                                              equipDelaySeqHeat,
+                                              hvacLossDelaySeqHeat,
+                                              powerGenDelaySeqHeat,
+                                              lightDelaySeqHeat,
+                                              feneSolarDelaySeqHeat,
+                                              ort->feneCondInstantSeq,
+                                              surfDelaySeqHeat);
+                            ComputeTableBodyUsingMovingAvg(state,
+                                                           AirLoopZonesHeatCompLoadTables(iZone).cells,
+                                                           AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
+                                                           heatDesSelected,
+                                                           timeHeatMax,
+                                                           iZone,
+                                                           peopleDelaySeqHeat,
+                                                           equipDelaySeqHeat,
+                                                           hvacLossDelaySeqHeat,
+                                                           powerGenDelaySeqHeat,
+                                                           lightDelaySeqHeat,
+                                                           feneSolarDelaySeqHeat,
+                                                           ort->feneCondInstantSeq,
+                                                           surfDelaySeqHeat);
+                            CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                            AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
+                        }
+                    }
+                    // combine the zones for each air loop
+
+                    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        if (zoneToAirLoopCool(iZone) == iAirLoop) {
+                            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                            if (mult == 0.0) mult = 1.0;
+                            CombineLoadCompResults(AirLoopCoolCompLoadTables(iAirLoop), AirLoopZonesCoolCompLoadTables(iZone), mult);
+                        }
+                        if (zoneToAirLoopHeat(iZone) == iAirLoop) {
+                            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                            if (mult == 0.0) mult = 1.0;
+                            CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
+                        }
+                    }
+
+                    ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
+                    ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
+                    AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
+                    ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
+                    CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
+
+                    LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
+                    LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
+
+                    OutputCompLoadSummary(
+                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
+                }
+            }
+
+            // FacilityComponentLoadSummary
+            if (ort->displayFacilityComponentLoadSummary) {
+
+                coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
+                timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
+
+                heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
+                timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
 
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (zoneToAirLoopCool(iZone) == iAirLoop) {
-                        mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                        if (mult == 0.0) mult = 1.0;
-                        CombineLoadCompResults(AirLoopCoolCompLoadTables(iAirLoop), AirLoopZonesCoolCompLoadTables(iZone), mult);
+                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                    if (mult == 0.0) mult = 1.0;
+                    // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
+                    if (ort->displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                        (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                        FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
+                    } else {
+                        GetDelaySequences(state,
+                                          coolDesSelected,
+                                          true,
+                                          iZone,
+                                          peopleDelaySeqCool,
+                                          equipDelaySeqCool,
+                                          hvacLossDelaySeqCool,
+                                          powerGenDelaySeqCool,
+                                          lightDelaySeqCool,
+                                          feneSolarDelaySeqCool,
+                                          ort->feneCondInstantSeq,
+                                          surfDelaySeqCool);
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       FacilityZonesCoolCompLoadTables(iZone).cells,
+                                                       FacilityZonesCoolCompLoadTables(iZone).cellUsed,
+                                                       coolDesSelected,
+                                                       timeCoolMax,
+                                                       iZone,
+                                                       peopleDelaySeqCool,
+                                                       equipDelaySeqCool,
+                                                       hvacLossDelaySeqCool,
+                                                       powerGenDelaySeqCool,
+                                                       lightDelaySeqCool,
+                                                       feneSolarDelaySeqCool,
+                                                       ort->feneCondInstantSeq,
+                                                       surfDelaySeqCool);
+                        CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
                     }
-                    if (zoneToAirLoopHeat(iZone) == iAirLoop) {
-                        mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                        if (mult == 0.0) mult = 1.0;
-                        CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
+                    FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
+                    FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
+                    CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
+
+                    if (ort->displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                        (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                        FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
+                    } else {
+                        GetDelaySequences(state,
+                                          heatDesSelected,
+                                          false,
+                                          iZone,
+                                          peopleDelaySeqHeat,
+                                          equipDelaySeqHeat,
+                                          hvacLossDelaySeqHeat,
+                                          powerGenDelaySeqHeat,
+                                          lightDelaySeqHeat,
+                                          feneSolarDelaySeqHeat,
+                                          ort->feneCondInstantSeq,
+                                          surfDelaySeqHeat);
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       FacilityZonesHeatCompLoadTables(iZone).cells,
+                                                       FacilityZonesHeatCompLoadTables(iZone).cellUsed,
+                                                       heatDesSelected,
+                                                       timeHeatMax,
+                                                       iZone,
+                                                       peopleDelaySeqHeat,
+                                                       equipDelaySeqHeat,
+                                                       hvacLossDelaySeqHeat,
+                                                       powerGenDelaySeqHeat,
+                                                       lightDelaySeqHeat,
+                                                       feneSolarDelaySeqHeat,
+                                                       ort->feneCondInstantSeq,
+                                                       surfDelaySeqHeat);
+                        CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
+                    }
+                    FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
+                    FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
+                    CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
+                }
+
+                ComputeEngineeringChecks(FacilityCoolCompLoadTables);
+                ComputeEngineeringChecks(FacilityHeatCompLoadTables);
+
+                AddTotalRowsForLoadSummary(FacilityCoolCompLoadTables);
+                AddTotalRowsForLoadSummary(FacilityHeatCompLoadTables);
+
+                ComputePeakDifference(FacilityCoolCompLoadTables);
+                ComputePeakDifference(FacilityHeatCompLoadTables);
+
+                LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
+                LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
+
+                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+            }
+
+            // ZoneComponentLoadSummary: Now we convert and Display
+            if (ort->displayZoneComponentLoadSummary) {
+                for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (allocated(CalcFinalZoneSizing)) {
+                        LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
+                        LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
+
+                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                     }
                 }
-
-                ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
-
-                AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
-                AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
-
-                ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
-
-                CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
-                CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
-
-                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
-                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
-
-                OutputCompLoadSummary(state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
-            }
-        }
-
-        // FacilityComponentLoadSummary
-        if (ort->displayFacilityComponentLoadSummary) {
-
-            coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
-            timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
-
-            heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
-            timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
-
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                if (mult == 0.0) mult = 1.0;
-                // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                if (ort->displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                    (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
-                    FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
-                } else {
-                    GetDelaySequences(state,
-                                      coolDesSelected,
-                                      true,
-                                      iZone,
-                                      peopleDelaySeqCool,
-                                      equipDelaySeqCool,
-                                      hvacLossDelaySeqCool,
-                                      powerGenDelaySeqCool,
-                                      lightDelaySeqCool,
-                                      feneSolarDelaySeqCool,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   FacilityZonesCoolCompLoadTables(iZone).cells,
-                                                   FacilityZonesCoolCompLoadTables(iZone).cellUsed,
-                                                   coolDesSelected,
-                                                   timeCoolMax,
-                                                   iZone,
-                                                   peopleDelaySeqCool,
-                                                   equipDelaySeqCool,
-                                                   hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool,
-                                                   lightDelaySeqCool,
-                                                   feneSolarDelaySeqCool,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqCool);
-                    CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
-                }
-                FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
-                FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
-
-                if (ort->displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                    (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
-                    FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
-                } else {
-                    GetDelaySequences(state,
-                                      heatDesSelected,
-                                      false,
-                                      iZone,
-                                      peopleDelaySeqHeat,
-                                      equipDelaySeqHeat,
-                                      hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat,
-                                      lightDelaySeqHeat,
-                                      feneSolarDelaySeqHeat,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   FacilityZonesHeatCompLoadTables(iZone).cells,
-                                                   FacilityZonesHeatCompLoadTables(iZone).cellUsed,
-                                                   heatDesSelected,
-                                                   timeHeatMax,
-                                                   iZone,
-                                                   peopleDelaySeqHeat,
-                                                   equipDelaySeqHeat,
-                                                   hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat,
-                                                   lightDelaySeqHeat,
-                                                   feneSolarDelaySeqHeat,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqHeat);
-                    CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
-                }
-                FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
-                FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
             }
 
-            ComputeEngineeringChecks(FacilityCoolCompLoadTables);
-            ComputeEngineeringChecks(FacilityHeatCompLoadTables);
+            ZoneHeatCompLoadTables.deallocate();
+            ZoneCoolCompLoadTables.deallocate();
+            AirLoopHeatCompLoadTables.deallocate();
+            AirLoopCoolCompLoadTables.deallocate();
+            AirLoopZonesHeatCompLoadTables.deallocate();
+            AirLoopZonesCoolCompLoadTables.deallocate();
+            FacilityZonesHeatCompLoadTables.deallocate();
+            FacilityZonesCoolCompLoadTables.deallocate();
 
-            AddTotalRowsForLoadSummary(FacilityCoolCompLoadTables);
-            AddTotalRowsForLoadSummary(FacilityHeatCompLoadTables);
-
-            ComputePeakDifference(FacilityCoolCompLoadTables);
-            ComputePeakDifference(FacilityHeatCompLoadTables);
-
-            LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
-            LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
-
-            OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+            peopleDelaySeqHeat.deallocate();
+            peopleDelaySeqCool.deallocate();
+            lightDelaySeqHeat.deallocate();
+            lightDelaySeqCool.deallocate();
+            equipDelaySeqHeat.deallocate();
+            equipDelaySeqCool.deallocate();
+            hvacLossDelaySeqHeat.deallocate();
+            hvacLossDelaySeqCool.deallocate();
+            powerGenDelaySeqHeat.deallocate();
+            powerGenDelaySeqCool.deallocate();
+            feneSolarDelaySeqHeat.deallocate();
+            feneSolarDelaySeqCool.deallocate();
+            surfDelaySeqHeat.deallocate();
+            surfDelaySeqCool.deallocate();
         }
-
-        // ZoneComponentLoadSummary: Now we convert and Display
-        if (ort->displayZoneComponentLoadSummary) {
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
-                if (allocated(CalcFinalZoneSizing)) {
-                    LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
-                    LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
-
-                    OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
-                }
-            }
-        }
-
-        ZoneHeatCompLoadTables.deallocate();
-        ZoneCoolCompLoadTables.deallocate();
-        AirLoopHeatCompLoadTables.deallocate();
-        AirLoopCoolCompLoadTables.deallocate();
-        AirLoopZonesHeatCompLoadTables.deallocate();
-        AirLoopZonesCoolCompLoadTables.deallocate();
-        FacilityZonesHeatCompLoadTables.deallocate();
-        FacilityZonesCoolCompLoadTables.deallocate();
-
-        peopleDelaySeqHeat.deallocate();
-        peopleDelaySeqCool.deallocate();
-        lightDelaySeqHeat.deallocate();
-        lightDelaySeqCool.deallocate();
-        equipDelaySeqHeat.deallocate();
-        equipDelaySeqCool.deallocate();
-        hvacLossDelaySeqHeat.deallocate();
-        hvacLossDelaySeqCool.deallocate();
-        powerGenDelaySeqHeat.deallocate();
-        powerGenDelaySeqCool.deallocate();
-        feneSolarDelaySeqHeat.deallocate();
-        feneSolarDelaySeqCool.deallocate();
-        surfDelaySeqHeat.deallocate();
-        surfDelaySeqCool.deallocate();
     }
 
     // populate the delay sequence arrays for the component load summary table output
