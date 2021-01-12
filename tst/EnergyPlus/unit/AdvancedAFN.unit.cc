@@ -53,11 +53,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;

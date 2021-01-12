@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;

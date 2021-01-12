@@ -48,17 +48,14 @@
 // EnergyPlus::MultiSpeedAirToAirHeatPump Unit Tests
 
 // Google Test Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <gtest/gtest.h>
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
-// ObjexxFCL Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -1416,9 +1413,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     DataLoopNode::Node(HeatRecInNode).Temp = 50.0;
     DataHVACGlobals::MSHPWasteHeat = 1000.0;
 
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(*state, 1);

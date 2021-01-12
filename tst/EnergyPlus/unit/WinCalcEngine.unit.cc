@@ -54,15 +54,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "Windows-CalcEngine/src/Common/src/FenestrationCommon.hpp"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include "Windows-CalcEngine/src/Common/src/FenestrationCommon.hpp"
 
 using namespace EnergyPlus;
 

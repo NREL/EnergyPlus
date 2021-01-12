@@ -546,7 +546,6 @@ namespace EnergyPlus {
 
         this->files.debug.close();
         this->files.err_stream.reset();
-        this->files.err_stream.reset();
         this->files.eso.close();
         this->files.mtr.close();
         this->files.mtr.close();

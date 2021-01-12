@@ -55,12 +55,12 @@
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -249,7 +249,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "Air Cooled Chiller";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000; // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AIRCOOLED;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;

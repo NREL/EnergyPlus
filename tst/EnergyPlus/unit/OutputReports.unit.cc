@@ -49,21 +49,21 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-// using namespace OutputProcessor;
 
 TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
 {

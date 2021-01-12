@@ -58,10 +58,11 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -70,9 +71,6 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/EMSManager.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::DataDefineEquip;

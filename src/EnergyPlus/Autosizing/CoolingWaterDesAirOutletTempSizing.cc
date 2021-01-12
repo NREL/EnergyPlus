@@ -67,14 +67,14 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
         } else {
             if (this->termUnitIU) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 Real64 DesCoilLoad = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizCoolDeltaT * Cp * rho;
                 Real64 T1Out =
