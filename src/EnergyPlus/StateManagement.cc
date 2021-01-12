@@ -130,7 +130,6 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
-#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -252,7 +251,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     LowTempRadiantSystem::clear_state();
     MicroCHPElectricGenerator::clear_state();
     MicroturbineElectricGenerator::clear_state();
-    MixedAir::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();

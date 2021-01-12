@@ -924,7 +924,7 @@ namespace AirLoopHVACDOAS {
             this->m_OACtrlNum.push_back(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlNum);
 
             if (this->m_OACtrlNum[AirLoop - 1] > 0) {
-                sizingMassFlow += MixedAir::OAController(this->m_OACtrlNum[AirLoop - 1]).MaxOA;
+                sizingMassFlow += state.dataMixedAir->OAController(this->m_OACtrlNum[AirLoop - 1]).MaxOA;
             }
         }
         this->SizingMassFlow = sizingMassFlow;

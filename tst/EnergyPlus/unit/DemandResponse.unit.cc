@@ -74,9 +74,9 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOAControllers = 1;
-    OAController.allocate(NumOAControllers);
-    OAController(1).Name = "OA CONTROLLER 1";
+    state->dataMixedAir->NumOAControllers = 1;
+    state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
+    state->dataMixedAir->OAController(1).Name = "OA CONTROLLER 1";
 
     GetDemandManagerInput(*state);
     auto & DemandMgr(state->dataDemandManager->DemandMgr);

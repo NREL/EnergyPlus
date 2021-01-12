@@ -4321,8 +4321,6 @@ namespace EnergyPlus::OutputReportTabular {
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
-        using MixedAir::NumOAControllers;
-        using MixedAir::OAController;
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
 
@@ -4341,8 +4339,8 @@ namespace EnergyPlus::OutputReportTabular {
         SysTotalHVACRejectHeatLoss = 0;
 
         // HVAC relief air
-        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
+        for (iOACtrl = 1; iOACtrl <= state.dataMixedAir->NumOAControllers; ++iOACtrl) {
+            SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
 
         // Condenser water loop

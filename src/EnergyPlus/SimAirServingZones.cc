@@ -7553,12 +7553,11 @@ namespace EnergyPlus::SimAirServingZones {
 
         // USE STATEMENTS:
         using MixedAir::GetNumOASystems;
-        using MixedAir::GetOASysInputFlag;
         using MixedAir::GetOutsideAirSysInputs;
 
-        if (GetOASysInputFlag) {
+        if (state.dataMixedAir->GetOASysInputFlag) {
             GetOutsideAirSysInputs(state);
-            GetOASysInputFlag = false;
+            state.dataMixedAir->GetOASysInputFlag = false;
         }
         int NumOASys = GetNumOASystems(state);
         if (NumOASys > 0) {

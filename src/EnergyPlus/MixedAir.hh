@@ -48,6 +48,9 @@
 #ifndef MixedAir_hh_INCLUDED
 #define MixedAir_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -140,39 +143,6 @@ namespace MixedAir {
     constexpr int CMO_OAMixer(8);
 
     extern Array1D_string const CurrentModuleObjects;
-
-    // Type declarations in MixedAir module
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumControllerLists;     // Number of Controller Lists
-    extern int NumOAControllers;       // Number of OA Controllers (includes ERV controllers)
-    extern int NumERVControllers;      // Number of ERV Controllers
-    extern int NumOAMixers;            // Number of Outdoor Air Mixers
-    extern int NumVentMechControllers; // Number of Controller:MechanicalVentilation objects in input deck
-
-    extern Array1D_bool MyOneTimeErrorFlag;
-    extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
-    extern Array1D_bool initOASysFlag;
-    extern bool GetOASysInputFlag;        // Flag set to make sure you get input once
-    extern bool GetOAMixerInputFlag;      // Flag set to make sure you get input once
-    extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms/Calculation routines for the module
-
-    // Sizing routine for the module
-
-    // Update routines to check convergence and update nodes
-
-    // Utility routines for the module
-
-    // Types
 
     struct ControllerListProps
     {
@@ -407,27 +377,17 @@ namespace MixedAir {
         }
     };
 
-    // Object Data
-    extern Array1D<ControllerListProps> ControllerLists;
-    extern Array1D<OAControllerProps> OAController;
-    extern Array1D<OAMixerProps> OAMixer;
-    extern Array1D<VentilationMechanicalProps> VentilationMechanical;
-
     // Functions
 
     Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr);
 
-    Real64 OAGetMinFlowRate(int OAPtr);
+    Real64 OAGetMinFlowRate(EnergyPlusData &state, int OAPtr);
 
-    void OASetDemandManagerVentilationState(int OAPtr, bool aState);
+    void OASetDemandManagerVentilationState(EnergyPlusData &state, int OAPtr, bool aState);
 
     void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow);
 
-    int GetOAController(std::string const &OAName);
-
-    // Clears the global data in MixedAir.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
+    int GetOAController(EnergyPlusData &state, std::string const &OAName);
 
     void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
 
@@ -494,7 +454,7 @@ namespace MixedAir {
     // Beginning Calculation Section of the Module
     //******************************************************************************
 
-    void CalcOAMixer(int const OAMixerNum);
+    void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum);
 
     // End of Calculation/Simulation Section of the Module
     //******************************************************************************
@@ -592,9 +552,61 @@ namespace MixedAir {
 
 struct MixedAirData : BaseGlobalStruct {
 
+    int NumControllerLists = 0;     // Number of Controller Lists
+    int NumOAControllers = 0;       // Number of OA Controllers (includes ERV controllers)
+    int NumERVControllers = 0;      // Number of ERV Controllers
+    int NumOAMixers = 0;            // Number of Outdoor Air Mixers
+    int NumVentMechControllers = 0; // Number of Controller:MechanicalVentilation objects in input deck
+    Array1D_bool MyOneTimeErrorFlag;
+    Array1D_bool MyOneTimeCheckUnitarySysFlag;
+    Array1D_bool initOASysFlag;
+    bool GetOASysInputFlag = true;
+    bool GetOAMixerInputFlag = true;
+    bool GetOAControllerInputFlag = true;
+    bool InitOAControllerOneTimeFlag = true;
+    Array1D_bool InitOAControllerSetPointCheckFlag;
+    bool InitOAControllerSetUpAirLoopHVACVariables = true;
+    bool AllocateOAControllersFlag = true;
+    Array1D_string DesignSpecOAObjName;     // name of the design specification outdoor air object
+    Array1D_int DesignSpecOAObjIndex;       // index of the design specification outdoor air object
+    Array1D_string VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
+    Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air distribution object
+    Array1D_int DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
+    Array1D<MixedAir::ControllerListProps> ControllerLists;
+    Array1D<MixedAir::OAControllerProps> OAController;
+    Array1D<MixedAir::OAMixerProps> OAMixer;
+    Array1D<MixedAir::VentilationMechanicalProps> VentilationMechanical;
+    std::unordered_set<std::string> ControllerListUniqueNames;
+    std::unordered_map<std::string, std::string> OAControllerUniqueNames;
+
     void clear_state() override
     {
-
+        this->NumControllerLists = 0;
+        this->NumOAControllers = 0;
+        this->NumERVControllers = 0;
+        this->NumOAMixers = 0;
+        this->NumVentMechControllers = 0;
+        this->MyOneTimeErrorFlag.deallocate();
+        this->MyOneTimeCheckUnitarySysFlag.deallocate();
+        this->initOASysFlag.deallocate();
+        this->GetOASysInputFlag = true;
+        this->GetOAMixerInputFlag = true;
+        this->GetOAControllerInputFlag = true;
+        this->InitOAControllerOneTimeFlag = true;
+        this->InitOAControllerSetPointCheckFlag.deallocate();
+        this->InitOAControllerSetUpAirLoopHVACVariables = true;
+        this->AllocateOAControllersFlag = true;
+        this->DesignSpecOAObjName.deallocate();
+        this->DesignSpecOAObjIndex.deallocate();
+        this->VentMechZoneOrListName.deallocate();
+        this->DesignSpecZoneADObjName.deallocate();
+        this->DesignSpecZoneADObjIndex.deallocate();
+        this->ControllerLists.deallocate();
+        this->OAController.deallocate();
+        this->OAMixer.deallocate();
+        this->VentilationMechanical.deallocate();
+        this->ControllerListUniqueNames.clear();
+        this->OAControllerUniqueNames.clear();
     }
 };
 

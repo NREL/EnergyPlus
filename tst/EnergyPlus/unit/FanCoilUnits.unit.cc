@@ -104,8 +104,6 @@ using DataHeatBalFanSys::TempControlType;
 using DataZoneEnergyDemands::CurDeadBandOrSetback;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-using MixedAir::OAMixer;
-
 namespace EnergyPlus {
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     {
@@ -280,16 +278,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -594,16 +592,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -904,16 +902,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1094,8 +1092,8 @@ namespace EnergyPlus {
 
         // Coil Off Capacity Test #2 - lock plant flow after previous call
         state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-        Node(OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
-        Node(OAMixer(1).RetNode).Enthalpy = 39000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC does not hit the 80 W target load since flow is locked at a low value
         EXPECT_NEAR(52.0, QUnitOut, 1.0);
@@ -1282,16 +1280,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1602,16 +1600,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1957,16 +1955,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2667,16 +2665,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -3097,7 +3095,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3491,7 +3489,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3858,7 +3856,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -4225,7 +4223,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -4540,7 +4538,7 @@ namespace EnergyPlus {
         thisFanCoil.OutAirMassFlow = 0.0;
         thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 20.0;

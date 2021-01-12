@@ -187,7 +187,7 @@ protected:
         state->dataDXCoils->DXCoilNumericFields.allocate(10);
         DataHeatBalance::HeatReclaimDXCoil.allocate(10);
         state->dataDXCoils->NumDXCoils = 10;
-        MixedAir::OAMixer.allocate(5);
+        state->dataMixedAir->OAMixer.allocate(5);
         DataSizing::NumSysSizInput = 1;
         DataSizing::SysSizInput.allocate(1);
         DataSizing::SysSizInput(1).AirLoopNum = 1;
@@ -429,10 +429,10 @@ protected:
         int heatCoilAirInNode = coolCoilAirOutNode;
         int heatCoilAirOutNode = VRFTUOutletNodeNum;
 
-        MixedAir::OAMixer(1).RetNode = VRFTUOAMixerRetNodeNum;
-        MixedAir::OAMixer(1).InletNode = VRFTUOAMixerOANodeNum;
-        MixedAir::OAMixer(1).RelNode = VRFTUOAMixerRelNodeNum;
-        MixedAir::OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
+        state->dataMixedAir->OAMixer(1).RetNode = VRFTUOAMixerRetNodeNum;
+        state->dataMixedAir->OAMixer(1).InletNode = VRFTUOAMixerOANodeNum;
+        state->dataMixedAir->OAMixer(1).RelNode = VRFTUOAMixerRelNodeNum;
+        state->dataMixedAir->OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
 
         VRFTU.Name = "VRFTU1";
         VRFTU.VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;

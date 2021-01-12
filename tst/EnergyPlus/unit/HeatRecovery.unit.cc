@@ -4047,14 +4047,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     // get OA Controller
     MixedAir::GetOAControllerInputs(*state);
     int OAContrllerNum = 1;
-    auto &thisOAController(MixedAir::OAController(OAContrllerNum));
-    EXPECT_EQ(1, MixedAir::NumOAControllers);
+    auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
+    EXPECT_EQ(1, state->dataMixedAir->NumOAControllers);
     EXPECT_EQ("VAV WITH REHEAT_OA_CONTROLLER", thisOAController.Name);
     // get OA System
     MixedAir::GetOutsideAirSysInputs(*state);
     int OASysNum = 1;
     auto &thisOASys = state->dataAirLoop->OutsideAirSys(OASysNum);
-    thisOASys.OAControllerIndex = MixedAir::GetOAController(thisOAController.Name);
+    thisOASys.OAControllerIndex = MixedAir::GetOAController(*state, thisOAController.Name);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
     EXPECT_EQ("VAV WITH REHEAT_OA", thisOASys.Name);
     // get HR HX generic
@@ -4067,8 +4067,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 1;
     // check user-inputs
-    EXPECT_EQ(thisOAController.Econo, MixedAir::NoEconomizer);
-    EXPECT_EQ(thisOAController.Lockout, MixedAir::NoLockoutPossible); // no lockout
+    EXPECT_EQ(thisOAController.Econo, MixedAir::iEconoOp::NoEconomizer);
+    EXPECT_EQ(thisOAController.Lockout, MixedAir::iLockoutType::NoLockoutPossible); // no lockout
     EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
 
@@ -4177,10 +4177,10 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     FinalSysSizing.allocate(1);
 
     int OAContrllerNum = 1;
-    MixedAir::OAController.allocate(OAContrllerNum);
-    auto &thisOAController(MixedAir::OAController(OAContrllerNum));
+    state->dataMixedAir->OAController.allocate(OAContrllerNum);
+    auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
     // initialize OA controller
-    thisOAController.ControllerType_Num = MixedAir::ControllerOutsideAir;
+    thisOAController.ControllerType_Num = MixedAir::iControllerType::ControllerOutsideAir;
 
     int OASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(OASysNum);
@@ -4194,8 +4194,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     DataSizing::CurDuctType = Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
-    thisOAController.Econo = MixedAir::NoEconomizer;
-    thisOAController.Lockout = MixedAir::NoLockoutPossible; // no lockout
+    thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
+    thisOAController.Lockout = MixedAir::iLockoutType::NoLockoutPossible; // no lockout
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum;
     thisOAController.EconBypass = false; // economizer control action type, no bypass
     // run HX sizing calculation
@@ -4204,7 +4204,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 2: the HX is on OA system but with economizer, and no-bypass
-    thisOAController.Econo = MixedAir::DifferentialDryBulb; // with economizer
+    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb; // with economizer
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4212,7 +4212,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20); // minimum flow
     ;
     // test 3: the HX is on OA system but with economizer, and no-bypass
-    thisOAController.Econo = MixedAir::DifferentialDryBulb; // with economizer
+    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb; // with economizer
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
@@ -4221,8 +4221,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.2); // maximum flow
 
     // test 4: the HX is on OA system, with economizer and lockout
-    thisOAController.Econo = MixedAir::DifferentialDryBulb;
-    thisOAController.Lockout = MixedAir::LockoutWithHeatingPossible; // lockout
+    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::iLockoutType::LockoutWithHeatingPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4230,8 +4230,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 5: the HX is on OA system, with economizer and lockout
-    thisOAController.Econo = MixedAir::DifferentialDryBulb;
-    thisOAController.Lockout = MixedAir::LockoutWithCompressorPossible; // lockout
+    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::iLockoutType::LockoutWithCompressorPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4239,7 +4239,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 6: the HX is on OA system but with economizer and bypass
-    thisOAController.Econo = MixedAir::DifferentialDryBulb;
+    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
     thisOAController.EconBypass = true; // with bypass
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation

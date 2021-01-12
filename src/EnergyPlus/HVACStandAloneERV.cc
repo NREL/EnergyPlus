@@ -240,7 +240,6 @@ namespace HVACStandAloneERV {
         using Fans::GetFanOutletNode;
         using Fans::GetFanType;
 
-        using MixedAir::OAController;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetGenericSupplyAirFlowRate(HeatRecovery::GetSupplyAirFlowRate);
         using HeatRecovery::GetHeatExchangerObjectTypeNum;
@@ -802,7 +801,7 @@ namespace HVACStandAloneERV {
                                           cNumericFields);
             MixedAir::CheckOAControllerName(state, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++OutAirNum;
-            auto &thisOAController(OAController(OutAirNum));
+            auto &thisOAController(state.dataMixedAir->OAController(OutAirNum));
 
             thisOAController.Name = Alphas(1);
             thisOAController.ControllerType = CurrentModuleObject;
@@ -1192,7 +1191,6 @@ namespace HVACStandAloneERV {
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ERVStandAlone_Num;
         using DataZoneEquipment::ZoneEquipInputsFilled;
-        using MixedAir::OAController;
         using MixedAir::SimOAController;
 
         // Locals
@@ -1308,7 +1306,7 @@ namespace HVACStandAloneERV {
 
             if (GetCurrentScheduleValue(state, StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 || (ZoneCompTurnFansOn && !ZoneCompTurnFansOff)) {
                 if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-                    if (OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive) {
+                    if (state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive) {
                         Node(SupInletNode).MassFlowRate =
                             min(StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
                                 StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
@@ -1328,7 +1326,7 @@ namespace HVACStandAloneERV {
 
             if (GetCurrentScheduleValue(state, StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr) > 0) {
                 if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-                    if (OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive) {
+                    if (state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive) {
                         Node(ExhInNode).MassFlowRate =
                             min(StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
                                 StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
@@ -1384,7 +1382,6 @@ namespace HVACStandAloneERV {
         using Fans::SimulateFanComponents;
 
         using HeatRecovery::SetHeatExchangerData;
-        using MixedAir::OAController;
         using ScheduleManager::GetScheduleMaxValue;
 
         static std::string const RoutineName("SizeStandAloneERV: ");
@@ -1464,9 +1461,9 @@ namespace HVACStandAloneERV {
                 DataSizing::DataFractionUsedForSizing = 1.0;
                 TempSize = SupplyAirVolFlowDes;
                 if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-                    OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MaxOA =
+                    state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MaxOA =
                         SupplyAirVolFlowDes * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
-                    OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MinOA = SupplyAirVolFlowDes;
+                    state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MinOA = SupplyAirVolFlowDes;
                 }
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
@@ -1598,19 +1595,6 @@ namespace HVACStandAloneERV {
         using Fans::SimulateFanComponents;
 
         using HeatRecovery::SimHeatRecovery;
-        using MixedAir::OAController;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SupOutletNode;    // unit supply air outlet node
@@ -1639,8 +1623,8 @@ namespace HVACStandAloneERV {
 
         // Get stand alone ERV's controller economizer and high humidity control status
         if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-            EconomizerFlag = OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).EconoActive;
-            HighHumCtrlFlag = OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive;
+            EconomizerFlag = state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).EconoActive;
+            HighHumCtrlFlag = state.dataMixedAir->OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).HighHumCtrlActive;
         } else {
             EconomizerFlag = false;
             HighHumCtrlFlag = false;

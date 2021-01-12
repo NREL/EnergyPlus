@@ -3719,10 +3719,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
-    MixedAir::NumOAControllers = 2;
-    MixedAir::OAController.allocate(2);
-    MixedAir::OAController(1).RelTotalLossRate = 1.0;
-    MixedAir::OAController(2).RelTotalLossRate = 1.0;
+    state->dataMixedAir->NumOAControllers = 2;
+    state->dataMixedAir->OAController.allocate(2);
+    state->dataMixedAir->OAController(1).RelTotalLossRate = 1.0;
+    state->dataMixedAir->OAController(2).RelTotalLossRate = 1.0;
     state->dataCondenserLoopTowers->NumSimpleTowers = 1;
     state->dataCondenserLoopTowers->towers.allocate(1);
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;

@@ -12262,7 +12262,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using DXCoils::ControlVRFIUCoil;
         using Fans::Fan;
         using Fans::SimulateFanComponents;
-        using MixedAir::OAMixer;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
@@ -12327,7 +12326,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Simulation the OAMixer if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
-            OAMixNode = OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
+            OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = DataLoopNode::Node(OAMixNode).Temp;
             Win = DataLoopNode::Node(OAMixNode).HumRat;
         }

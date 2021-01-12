@@ -443,8 +443,8 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
         // see if there is an OA controller
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -505,8 +505,8 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     if (c->airloopNum > 0) {
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }

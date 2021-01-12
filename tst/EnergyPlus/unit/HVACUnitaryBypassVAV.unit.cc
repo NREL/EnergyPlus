@@ -263,12 +263,12 @@ protected:
         cbvav.ZoneSequenceCoolingNum = 1;
         cbvav.ZoneSequenceHeatingNum = 1;
         cbvav.OAMixName = "MyOAMixer";
-        MixedAir::OAMixer.allocate(1);
-        MixedAir::OAMixer(1).Name = "MyOAMixer";
-        MixedAir::OAMixer(1).InletNode = 3;
-        MixedAir::OAMixer(1).RelNode = 4;
-        MixedAir::OAMixer(1).RetNode = 6;
-        MixedAir::OAMixer(1).MixNode = 7;
+        state->dataMixedAir->OAMixer.allocate(1);
+        state->dataMixedAir->OAMixer(1).Name = "MyOAMixer";
+        state->dataMixedAir->OAMixer(1).InletNode = 3;
+        state->dataMixedAir->OAMixer(1).RelNode = 4;
+        state->dataMixedAir->OAMixer(1).RetNode = 6;
+        state->dataMixedAir->OAMixer(1).MixNode = 7;
         state->dataDXCoils->DXCoil(1).AirInNode = 7;
         cbvav.DXCoilInletNode = state->dataDXCoils->DXCoil(1).AirInNode;
         state->dataDXCoils->DXCoil(1).AirOutNode = 8;
@@ -776,9 +776,9 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
@@ -871,9 +871,9 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
@@ -960,9 +960,9 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
+    DataLoopNode::Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;

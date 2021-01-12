@@ -1283,7 +1283,7 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to air controllers
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                    LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
+                    LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
                     if (LoadPtr > 0) {
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
@@ -1296,7 +1296,7 @@ namespace EnergyPlus::DemandManager {
                 if (DemandMgr(MgrNum).NumOfLoads > 0) {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                        LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
+                        LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
                         if (LoadPtr > 0) {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
                         }
@@ -1789,7 +1789,7 @@ namespace EnergyPlus::DemandManager {
                 if (Action == DemandAction::CheckCanReduce) {
                     CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    OASetDemandManagerVentilationState(LoadPtr, true);
+                    OASetDemandManagerVentilationState(state, LoadPtr, true);
                     if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitFixed) {
                         OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
                     } else if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitReductionRatio) {
@@ -1798,7 +1798,7 @@ namespace EnergyPlus::DemandManager {
                         OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
                     }
                 } else if (Action == DemandAction::ClearLimit) {
-                    OASetDemandManagerVentilationState(LoadPtr, false);
+                    OASetDemandManagerVentilationState(state, LoadPtr, false);
                 }
             }
         }
