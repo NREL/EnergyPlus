@@ -8103,7 +8103,7 @@ namespace EnergyPlus::OutputReportTabular {
                         WriteSubtitle(state, "End Uses");
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                     }
-                    if (produceTabular) {
+                    if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
@@ -8190,7 +8190,8 @@ namespace EnergyPlus::OutputReportTabular {
                 columnHead(1) = "Subcategory";
 
                 {
-                    auto const SELECT_CASE_var(ort->unitsStyle);
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(2) = "Electricity [kWh]";
                         columnHead(3) = "Natural Gas [kWh]";
@@ -8258,9 +8259,10 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "End Uses By Subcategory");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-
+                    if (produceTabular) {
+                        WriteSubtitle(state, "End Uses By Subcategory");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
                     Array1D_string rowHeadTemp(rowHead);
                     // Before outputing to SQL, we forward fill the End use column (rowHead)
                     // for better sql queries
@@ -8273,22 +8275,25 @@ namespace EnergyPlus::OutputReportTabular {
                     // Erase the SubCategory (first column), using slicing
                     Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                     Array1D_string columnHeadTemp(columnHead({2, _, _}));
-
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
-                                                               rowHeadTemp,
-                                                               columnHeadTemp,
-                                                               "AnnualBuildingUtilityPerformanceSummary",
-                                                               "Entire Facility",
-                                                               "End Uses By Subcategory");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                                                                   rowHeadTemp,
+                                                                   columnHeadTemp,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "End Uses By Subcategory");
+                        }
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                                    rowHeadTemp,
-                                                                                                    columnHeadTemp,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "End Uses By Subcategory");
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                        rowHeadTemp,
+                                                                                                        columnHeadTemp,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "End Uses By Subcategory");
+                        }
                     }
                     rowHeadTemp.deallocate();
                     tableBodyTemp.deallocate();
@@ -8318,26 +8323,32 @@ namespace EnergyPlus::OutputReportTabular {
                     for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                         if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                             for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                                PreDefTableEntry(state,
-                                                 resource_entry_map(iResource),
-                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                                 unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
+                                if (produceTabular) {
+                                    PreDefTableEntry(state,
+                                                     resource_entry_map(iResource),
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                                         state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                                     unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
+                                }
                                 ++i;
                             }
                             // put other
                             if (ort->needOtherRowLEED45(jEndUse)) {
-                                PreDefTableEntry(state,
-                                                 resource_entry_map(iResource),
-                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                                 unconvert * endUseSubOther(iResource, jEndUse));
+                                if (produceTabular) {
+                                    PreDefTableEntry(state,
+                                                     resource_entry_map(iResource),
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                                     unconvert * endUseSubOther(iResource, jEndUse));
+                                }
                                 ++i;
                             }
                         } else {
-                            PreDefTableEntry(state,
-                                             resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
-                                             unconvert * collapsedEndUse(iResource, jEndUse));
+                            if (produceTabular) {
+                                PreDefTableEntry(state,
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                                 unconvert * collapsedEndUse(iResource, jEndUse));
+                            }
                             ++i;
                         }
                     }
