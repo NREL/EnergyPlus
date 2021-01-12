@@ -7111,7 +7111,9 @@ namespace VariableSpeedCoils {
 
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QWasteHeat = QWasteHeat;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondOutletTemp = 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp + QWasteHeat/CpSource/state.dataVariableSpeedCoils->SourceSideMassFlowRate ;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp +
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource / CpSource / state.dataVariableSpeedCoils->SourceSideMassFlowRate;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SourceAirMassFlowRate = state.dataVariableSpeedCoils->SourceSideMassFlowRate;
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectMode ==  state.dataVariableSpeedCoils->CondensateToTank) {
             // calculate and report condensation rates  (how much water extracted from the air stream)

@@ -5744,11 +5744,21 @@ namespace WaterCoils {
             ShowWarningError(state, "Capacitance ratio is over 1.0, a max value of 0.99 is used");
             m_star = 0.99;
         }
+     
+ //       Temp = max(0.1, (1 - DesEffectNom) / (1 - DesEffectNom * m_star));
+//        Ntu = min(0.1, -logf(Temp) / (1 - m_star));
 
-       
+        double NTUhigh = 2000.0; 
+        double NTUlow = 0.1; 
+        double dEffect = 0.0; 
+        while (fabs(NTUhigh - NTUlow) > 0.1) {
+            Ntu = (NTUhigh + NTUlow) / 2.0; 
 
-        Temp = max(0.1, (1 - DesEffectNom) / (1 - DesEffectNom * m_star));
-        Ntu = min(0.1, -logf(Temp) / (1 - m_star));
+            dEffect = (1 - exp(-Ntu * (1 - m_star))) / (1 - m_star * (exp(-Ntu * (1 - m_star)))); // p31 (3.26) 
+
+            if (dEffect > DesEffectNom) NTUhigh = Ntu ; 
+            else NTUlow = Ntu; 
+        }
 
         DesHdAvVt = ma *Ntu; 
         return (DesHdAvVt);

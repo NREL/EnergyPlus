@@ -4712,7 +4712,7 @@ namespace IntegratedHeatPump {
             //     using OverrideNodeConnectionType
 
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::OUTDOOR)) {
                 ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
                 InNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirInletNodeNum;
                 OutNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirOutletNodeNum;
@@ -5437,7 +5437,7 @@ namespace IntegratedHeatPump {
             
 
             if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
-                (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTREAM)) {
+                (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::OUTDOOR)) {
                 ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
                 InNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirInletNodeNum;
                 OutNode = state.dataWaterCoils->WaterCoil(ChildCoilIndex).AirOutletNodeNum;
@@ -6478,7 +6478,7 @@ namespace IntegratedHeatPump {
                     if (Node(state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).WaterInletNodeNum).MassFlowRate > 0.0) {
                         tank.SourceMassFlowRate =
                             Node(state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).WaterInletNodeNum).MassFlowRate;
-                        tank.HeatPumpNum = 0; 
+                        //tank.HeatPumpNum = 0; 
                     } else {
                         tank.SourceMassFlowRate = 0.0; 
                     }
