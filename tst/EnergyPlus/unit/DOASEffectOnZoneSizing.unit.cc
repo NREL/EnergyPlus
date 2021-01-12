@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -64,10 +65,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;

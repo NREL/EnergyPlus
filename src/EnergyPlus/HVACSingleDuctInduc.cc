@@ -507,7 +507,6 @@ namespace HVACSingleDuctInduc {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -550,7 +549,7 @@ namespace HVACSingleDuctInduc {
             MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(IUNum) && allocated(state.dataPlnt->PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -652,14 +651,14 @@ namespace HVACSingleDuctInduc {
             if (HotConNode > 0 && !MyPlantScanFlag(IUNum)) {
 
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxHotWaterFlow = rho * IndUnit(IUNum).MaxVolHotWaterFlow;
                 IndUnit(IUNum).MinHotWaterFlow = rho * IndUnit(IUNum).MinVolHotWaterFlow;
                 // get component outlet node from plant structure
-                HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+                HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                                    .LoopSide(IndUnit(IUNum).HWLoopSide)
                                    .Branch(IndUnit(IUNum).HWBranchNum)
                                    .Comp(IndUnit(IUNum).HWCompNum)
@@ -677,14 +676,14 @@ namespace HVACSingleDuctInduc {
             ColdConNode = IndUnit(IUNum).CWControlNode;
             if (ColdConNode > 0) {
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
                                        DataGlobalConstants::CWInitConvTemp,
-                                       PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxColdWaterFlow = rho * IndUnit(IUNum).MaxVolColdWaterFlow;
                 IndUnit(IUNum).MinColdWaterFlow = rho * IndUnit(IUNum).MinVolColdWaterFlow;
 
-                CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+                CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                                    .LoopSide(IndUnit(IUNum).CWLoopSide)
                                    .Branch(IndUnit(IUNum).CWBranchNum)
                                    .Comp(IndUnit(IUNum).CWCompNum)
@@ -757,7 +756,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -895,15 +893,15 @@ namespace HVACSingleDuctInduc {
                                         (ZoneSizThermSetPtLo(CurZoneEqNum) - TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
                                 }
                                 IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
-                                Cp = GetSpecificHeatGlycol(state, PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 rho = GetDensityGlycol(state,
-                                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
 
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1001,10 +999,10 @@ namespace HVACSingleDuctInduc {
                                 }
                                 IndUnit(IUNum).DesCoolingLoad = DesCoilLoad;
                                 Cp = GetSpecificHeatGlycol(
-                                    state, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
+                                    state, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
 
                                 rho = GetDensityGlycol(
-                                    state, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
+                                    state, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
 
                                 MaxVolColdWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                                 MaxVolColdWaterFlowDes = max(MaxVolColdWaterFlowDes, 0.0);
@@ -1104,7 +1102,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataPlant::PlantLoop;
 
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
@@ -1156,13 +1153,13 @@ namespace HVACSingleDuctInduc {
         SecNode = IndUnit(IUNum).SecAirInNode;
         OutletNode = IndUnit(IUNum).OutAirNode;
         HotControlNode = IndUnit(IUNum).HWControlNode;
-        HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+        HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                            .LoopSide(IndUnit(IUNum).HWLoopSide)
                            .Branch(IndUnit(IUNum).HWBranchNum)
                            .Comp(IndUnit(IUNum).HWCompNum)
                            .NodeNumOut;
         ColdControlNode = IndUnit(IUNum).CWControlNode;
-        CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+        CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                            .LoopSide(IndUnit(IUNum).CWLoopSide)
                            .Branch(IndUnit(IUNum).CWBranchNum)
                            .Comp(IndUnit(IUNum).CWCompNum)
@@ -1365,7 +1362,6 @@ namespace HVACSingleDuctInduc {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using MixerComponent::SimAirMixer;
         using PlantUtilities::SetComponentFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -1405,14 +1401,14 @@ namespace HVACSingleDuctInduc {
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;
-        HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+        HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                            .LoopSide(IndUnit(IUNum).HWLoopSide)
                            .Branch(IndUnit(IUNum).HWBranchNum)
                            .Comp(IndUnit(IUNum).HWCompNum)
                            .NodeNumOut;
 
         ColdControlNode = IndUnit(IUNum).CWControlNode;
-        CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+        CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                            .LoopSide(IndUnit(IUNum).CWLoopSide)
                            .Branch(IndUnit(IUNum).CWBranchNum)
                            .Comp(IndUnit(IUNum).CWCompNum)

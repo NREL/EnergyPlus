@@ -116,7 +116,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    EnergyPlus::DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     EnergyPlus::DataSizing::PlantSizData.allocate(1);
     EnergyPlus::DataSizing::PlantSizData(1).ExitTemp = 7.0;
     EnergyPlus::DataSizing::DataPltSizCoolNum = 1;

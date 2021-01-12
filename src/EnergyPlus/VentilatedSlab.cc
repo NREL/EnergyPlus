@@ -1292,7 +1292,6 @@ namespace VentilatedSlab {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneComp;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -1379,7 +1378,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).AvailStatus = ZoneComp(VentilatedSlab_Num).ZoneCompAvailMgrs(Item).AvailStatus;
         }
 
-        if (MyPlantScanFlag(Item) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataVentilatedSlab->VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (state.dataVentilatedSlab->VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
@@ -1401,7 +1400,7 @@ namespace VentilatedSlab {
                     ShowFatalError(state, "InitVentilatedSlab: Program terminated due to previous condition(s).");
                 }
 
-                state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum = PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum)
+                state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum = state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum)
                                                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).HWLoopSide)
                                                        .Branch(state.dataVentilatedSlab->VentSlab(Item).HWBranchNum)
                                                        .Comp(state.dataVentilatedSlab->VentSlab(Item).HWCompNum)
@@ -1422,7 +1421,7 @@ namespace VentilatedSlab {
                     ShowContinueError(state, "Reference Unit=\"" + state.dataVentilatedSlab->VentSlab(Item).Name + "\", type=ZoneHVAC:VentilatedSlab");
                     ShowFatalError(state, "InitVentilatedSlab: Program terminated due to previous condition(s).");
                 }
-                state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum = PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum)
+                state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum = state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum)
                                                         .LoopSide(state.dataVentilatedSlab->VentSlab(Item).CWLoopSide)
                                                         .Branch(state.dataVentilatedSlab->VentSlab(Item).CWBranchNum)
                                                         .Comp(state.dataVentilatedSlab->VentSlab(Item).CWCompNum)
@@ -1505,7 +1504,7 @@ namespace VentilatedSlab {
 
                 if (state.dataVentilatedSlab->VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && !MyPlantScanFlag(Item)) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
+                        state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
 
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolHotWaterFlow;
@@ -1540,9 +1539,9 @@ namespace VentilatedSlab {
                 // Only initialize these if a cooling coil is actually present
                 if ((state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                     (state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
-                    rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
+                    rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
                                            DataGlobalConstants::CWInitConvTemp,
-                                           PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolColdWaterFlow;
@@ -1646,7 +1645,6 @@ namespace VentilatedSlab {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2045,13 +2043,13 @@ namespace VentilatedSlab {
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
-                                rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
+                                rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                        RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
+                                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                             } else {
@@ -2295,9 +2293,9 @@ namespace VentilatedSlab {
                                 DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                             }
                             rho = GetDensityGlycol(
-                                state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName, 5., PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex, RoutineName);
+                                state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName, 5., state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex, RoutineName);
                             Cp = GetSpecificHeatGlycol(
-                                state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName, 5., PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex, RoutineName);
+                                state, state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName, 5., state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex, RoutineName);
                             MaxVolColdWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                         } else {
                             MaxVolColdWaterFlowDes = 0.0;

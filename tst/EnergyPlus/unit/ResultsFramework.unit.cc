@@ -51,13 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // Fixture
 #include "Fixtures/ResultsFrameworkFixture.hh"

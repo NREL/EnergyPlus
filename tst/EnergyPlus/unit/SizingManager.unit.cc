@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -60,8 +61,6 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HeatBalanceManager;

@@ -99,7 +99,6 @@ namespace SteamCoils {
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using PlantUtilities::MyPlantSizingIndex;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -474,7 +473,7 @@ namespace SteamCoils {
             state.dataSteamCoils->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
@@ -1416,7 +1415,7 @@ namespace SteamCoils {
         Node(AirOutletNode).HumRat = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat;
         Node(AirOutletNode).Enthalpy = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy;
 
-        SafeCopyPlantNode(SteamInletNode, SteamOutletNode);
+        SafeCopyPlantNode(state, SteamInletNode, SteamOutletNode);
 
         // Set the outlet Steam nodes for the Coil
         //   Node(SteamOutletNode)%MassFlowRate = SteamCoil(CoilNum)%OutletSteamMassFlowRate

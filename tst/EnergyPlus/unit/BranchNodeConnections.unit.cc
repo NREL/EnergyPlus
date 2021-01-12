@@ -54,9 +54,11 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -74,7 +76,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchNodeConnections;

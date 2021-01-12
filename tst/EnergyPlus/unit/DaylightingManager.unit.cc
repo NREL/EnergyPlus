@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;

@@ -2159,9 +2159,9 @@ namespace EnergyPlus {
 
                 // Once we find ourselves on the plant loop, we can do other things
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                                DataGlobalConstants::InitConvTemp,
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
                 thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
                 thisCircuit->NeedToFindOnPlantLoop = false;
@@ -5802,26 +5802,26 @@ namespace EnergyPlus {
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
             FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidConductivity = FluidProperties::GetConductivityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
             FluidViscosity = FluidProperties::GetViscosityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
 
             // Doesn't anyone care about poor Ludwig Prandtl?

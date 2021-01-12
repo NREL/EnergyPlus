@@ -583,7 +583,7 @@ namespace UnitarySystems {
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
-        if (this->m_MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
+        if (this->m_MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (this->m_HeatRecActive) {
                 state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -650,14 +650,14 @@ namespace UnitarySystems {
                 this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                 if (this->MaxCoolCoilFluidFlow > 0.0) {
-                    Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
+                    Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
                                                                    routineName);
                     this->MaxCoolCoilFluidFlow *= rho;
                 }
                 // fill outlet node for coil
-                this->CoolCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->CoolCoilLoopNum)
+                this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilLoopNum)
                                                        .LoopSide(this->CoolCoilLoopSide)
                                                        .Branch(this->CoolCoilBranchNum)
                                                        .Comp(this->CoolCoilCompNum)
@@ -700,9 +700,9 @@ namespace UnitarySystems {
                         WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                     if (this->MaxHeatCoilFluidFlow > 0.0) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                        DataGlobalConstants::HWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                        routineName);
                         this->MaxHeatCoilFluidFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) * rho;
@@ -717,7 +717,7 @@ namespace UnitarySystems {
                     }
                 }
                 // fill outlet node for coil
-                this->HeatCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->HeatCoilLoopNum)
+                this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilLoopNum)
                                                        .LoopSide(this->HeatCoilLoopSide)
                                                        .Branch(this->HeatCoilBranchNum)
                                                        .Comp(this->HeatCoilCompNum)
@@ -731,7 +731,7 @@ namespace UnitarySystems {
         }
 
         // Scan Supplemental hot water and steam heating coil plant components for one time initializations
-        if (this->m_MySuppCoilPlantScanFlag && allocated(DataPlant::PlantLoop)) {
+        if (this->m_MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -759,15 +759,15 @@ namespace UnitarySystems {
                     WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                 if (this->m_MaxSuppCoilFluidFlow > 0.0) {
-                    Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                    Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                    routineName);
                     this->m_MaxSuppCoilFluidFlow =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->m_SuppCoilLoopNum)
+                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
                                                          .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
@@ -800,7 +800,7 @@ namespace UnitarySystems {
                 }
 
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->m_SuppCoilLoopNum)
+                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
                                                          .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
@@ -831,9 +831,9 @@ namespace UnitarySystems {
 
             if ((this->m_HeatRecActive) && (!this->m_MyPlantScanFlag)) {
 
-                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_HRLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidName,
                                                                DataGlobalConstants::HWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->m_HRLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidIndex,
                                                                routineName);
 
                 this->m_DesignHeatRecMassFlowRate = this->m_DesignHRWaterVolumeFlow * rho;
@@ -862,9 +862,9 @@ namespace UnitarySystems {
                     Real64 CoilMaxVolFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, this->m_CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                     if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
                                                                        routineName);
                         this->MaxCoolCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
@@ -888,9 +888,9 @@ namespace UnitarySystems {
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -930,9 +930,9 @@ namespace UnitarySystems {
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -9470,9 +9470,9 @@ namespace UnitarySystems {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex);
                         Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -9511,9 +9511,9 @@ namespace UnitarySystems {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex);
                         Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -14117,7 +14117,7 @@ namespace UnitarySystems {
         if (HeatRecMassFlowRate > 0.0) {
 
             Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
-                state, DataPlant::PlantLoop(this->m_HRLoopNum).FluidName, HeatRecInletTemp, DataPlant::PlantLoop(this->m_HRLoopNum).FluidIndex, routineName);
+                state, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidName, HeatRecInletTemp, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidIndex, routineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
             // coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the
@@ -14131,7 +14131,7 @@ namespace UnitarySystems {
             QHeatRec = 0.0;
         }
 
-        PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
+        PlantUtilities::SafeCopyPlantNode(state, HeatRecInNode, HeatRecOutNode);
 
         DataLoopNode::Node(HeatRecOutNode).Temp = HeatRecOutletTemp;
 

@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

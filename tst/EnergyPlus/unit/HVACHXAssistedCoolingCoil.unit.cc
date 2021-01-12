@@ -49,8 +49,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -61,14 +61,12 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 

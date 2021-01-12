@@ -694,7 +694,6 @@ namespace UnitHeater {
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -748,7 +747,7 @@ namespace UnitHeater {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
         }
 
-        if (MyPlantScanFlag(UnitHeatNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
@@ -770,7 +769,7 @@ namespace UnitHeater {
                     ShowFatalError(state, "InitUnitHeater: Program terminated due to previous condition(s).");
                 }
 
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum = PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum)
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum = state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum)
                                                               .LoopSide(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide)
                                                               .Branch(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum)
                                                               .Comp(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum)
@@ -814,9 +813,9 @@ namespace UnitHeater {
             Node(InNode).MassFlowRateMin = 0.0;
 
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
-                rho = GetDensityGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow = rho * state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
@@ -931,7 +930,6 @@ namespace UnitHeater {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataPlant::PlantLoop;
 
         using PlantUtilities::MyPlantSizingIndex;
         using Psychrometrics::CPHW;
@@ -1174,13 +1172,13 @@ namespace UnitHeater {
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
-                                rho = GetDensityGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                             } else {

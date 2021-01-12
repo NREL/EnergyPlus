@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -65,7 +64,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

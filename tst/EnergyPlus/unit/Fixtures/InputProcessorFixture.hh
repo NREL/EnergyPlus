@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 namespace EnergyPlus {
 

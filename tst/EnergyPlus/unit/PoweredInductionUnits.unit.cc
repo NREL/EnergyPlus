@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -68,14 +69,11 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;

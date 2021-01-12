@@ -51,12 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::CoolingPanelSimple;
 

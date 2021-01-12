@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -93,27 +94,28 @@ namespace PlantUtilities {
     );
 
     Real64 RegulateCondenserCompFlowReqOp(
-        int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest);
+        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest);
 
-    bool AnyPlantSplitterMixerLacksContinuity();
+    bool AnyPlantSplitterMixerLacksContinuity(EnergyPlusData &state);
 
     void
     CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
 
     void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    void SetAllFlowLocks(int const Value);
+    void SetAllFlowLocks(EnergyPlusData &state, DataPlant::iFlowLock const Value);
 
-    void ResetAllPlantInterConnectFlags();
+    void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
-    void PullCompInterconnectTrigger(int const LoopNum,             // component's loop index
+    void PullCompInterconnectTrigger(EnergyPlusData &state,
+                                     int const LoopNum,             // component's loop index
                                      int const LoopSide,            // component's loop side number
                                      int const BranchNum,           // Component's branch number
                                      int const CompNum,             // Component's comp number
                                      int &UniqueCriteriaCheckIndex, // An integer given to this particular check
                                      int const ConnectedLoopNum,    // Component's interconnected loop number
                                      int const ConnectedLoopSide,   // Component's interconnected loop side number
-                                     int const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     DataPlant::iCriteriaType const CriteriaType,        // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      Real64 const CriteriaValue     // The value of the criteria check to evaluate
     );
 
@@ -141,7 +143,8 @@ namespace PlantUtilities {
                                          Real64 const ModelMassFlowRate,     // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration);
 
-    void UpdateAbsorberChillerComponentGeneratorSide(int const LoopNum,                   // component's loop index
+    void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
+                                                     int const LoopNum,                   // component's loop index
                                                      int const LoopSide,                  // component's loop side number
                                                      int const TypeOfNum,                 // Component's type index
                                                      int const InletNodeNum,              // Component's inlet node pointer
@@ -151,7 +154,8 @@ namespace PlantUtilities {
                                                      Real64 const ModelMassFlowRate,      // model's generator mass flow rate (kg/s)
                                                      bool const FirstHVACIteration);
 
-    void InterConnectTwoPlantLoopSides(int const Loop1Num,
+    void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
+                                       int const Loop1Num,
                                        int const Loop1LoopSideNum,
                                        int const Loop2Num,
                                        int const Loop2LoopSideNum,
@@ -164,7 +168,8 @@ namespace PlantUtilities {
                                      Real64 const DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
     );
 
-    void SafeCopyPlantNode(int const InletNodeNum,
+    void SafeCopyPlantNode(EnergyPlusData &state,
+                           int const InletNodeNum,
                            int const OutletNodeNum,
                            Optional_int_const LoopNum = _,
                            Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
@@ -178,7 +183,7 @@ namespace PlantUtilities {
 
     bool IntegerIsWithinTwoValues(int const ValueToCheck, int const LowerBound, int const UpperBound);
 
-    void LogPlantConvergencePoints(bool const FirstHVACIteration);
+    void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIteration);
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string const &CompName,
@@ -202,9 +207,9 @@ namespace PlantUtilities {
                                   int &BranchNum,
                                   Optional_int CompNum = _);
 
-    bool AnyPlantLoopSidesNeedSim();
+    bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state);
 
-    void SetAllPlantSimFlagsToValue(bool const Value);
+    void SetAllPlantSimFlagsToValue(EnergyPlusData &state, bool const Value);
 
     void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum); // Loop number of loop
 
@@ -216,7 +221,7 @@ namespace PlantUtilities {
                            Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
     );
 
-    bool verifyTwoNodeNumsOnSamePlantLoop(int const nodeIndexA, int const nodeIndexB);
+    bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int const nodeIndexA, int const nodeIndexB);
 
 } // namespace PlantUtilities
 

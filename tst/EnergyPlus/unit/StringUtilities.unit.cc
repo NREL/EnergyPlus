@@ -47,10 +47,9 @@
 
 #include <gtest/gtest.h>
 
-#include <EnergyPlus/StringUtilities.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/StringUtilities.hh>
 
 using namespace EnergyPlus;
 

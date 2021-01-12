@@ -221,7 +221,8 @@ namespace SystemReports {
                        int const BranchNum   // counter for zone air distribution inlets
     );
 
-    void FindDemandSideMatch(std::string const &CompType, // Inlet node of the component to find the match of
+    void FindDemandSideMatch(EnergyPlusData &state,
+                             std::string const &CompType, // Inlet node of the component to find the match of
                              std::string const &CompName, // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match

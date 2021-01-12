@@ -136,7 +136,8 @@ namespace BoilerSteam {
                        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void update(Real64 MyLoad,          // boiler operating load
+        void update(EnergyPlusData &state,
+                    Real64 MyLoad,          // boiler operating load
                     bool RunFlag,           // boiler on when TRUE
                     bool FirstHVACIteration // TRUE if First iteration of simulation
         );

@@ -53,20 +53,17 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
-#include <cmath>
 #include <string>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
