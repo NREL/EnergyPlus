@@ -8407,7 +8407,8 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(4) = "Total";
 
                 {
-                    auto const SELECT_CASE_var(ort->unitsStyle);
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Electricity Intensity [kWh/m2]";
                         columnHead(2) = "Natural Gas Intensity [kWh/m2]";
@@ -8453,7 +8454,9 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                WriteTextLine(state, "Normalized Metrics", true);
+                if (produceTabular) {
+                    WriteTextLine(state, "Normalized Metrics", true);
+                }
 
                 // write the conditioned area based table
                 tableBody = "";
@@ -8466,23 +8469,29 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "Utility Use Per Conditioned Floor Area");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                               rowHead,
-                                                               columnHead,
-                                                               "AnnualBuildingUtilityPerformanceSummary",
-                                                               "Entire Facility",
-                                                               "Utility Use Per Conditioned Floor Area");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Utility Use Per Conditioned Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "Utility Use Per Conditioned Floor Area");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Utility Use Per Conditioned Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Utility Use Per Conditioned Floor Area");
+                        }
                     }
                 }
                 //---- Normalized by Total Area Sub-Table
@@ -8496,23 +8505,29 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "Utility Use Per Total Floor Area");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                               rowHead,
-                                                               columnHead,
-                                                               "AnnualBuildingUtilityPerformanceSummary",
-                                                               "Entire Facility",
-                                                               "Utility Use Per Total Floor Area");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Utility Use Per Total Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "Utility Use Per Total Floor Area");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Utility Use Per Total Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Utility Use Per Total Floor Area");
+                        }
                     }
                 }
 
@@ -8524,7 +8539,8 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(2, 14);
 
                 {
-                    auto const SELECT_CASE_var(ort->unitsStyle);
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Electricity [kWh]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8558,9 +8574,13 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 1) = RealToStr(ort->gatherPowerFuelFireGen, 3);
                 tableBody(1, 2) = RealToStr(ort->gatherPowerHTGeothermal, 3);
                 tableBody(1, 3) = RealToStr(ort->gatherPowerPV, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * ort->gatherPowerPV, 2);
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * ort->gatherPowerPV, 2);
+                }
                 tableBody(1, 4) = RealToStr(ort->gatherPowerWind, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * ort->gatherPowerWind, 2);
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * ort->gatherPowerWind, 2);
+                }
                 tableBody(1, 5) = RealToStr(ort->gatherPowerConversion, 3);
                 tableBody(1, 6) = RealToStr(ort->OverallNetEnergyFromStorage, 3);
                 tableBody(1, 7) = RealToStr(ort->gatherElecProduced, 3);
@@ -8589,19 +8609,29 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "Electric Loads Satisfied");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Electric Loads Satisfied");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "Electric Loads Satisfied");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Electric Loads Satisfied");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Electric Loads Satisfied");
+                        }
                     }
                 }
 
@@ -8613,7 +8643,8 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(2, 7);
 
                 {
-                    auto const SELECT_CASE_var(ort->unitsStyle);
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Heat [kWh]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8669,19 +8700,29 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "On-Site Thermal Sources");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "On-Site Thermal Sources");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "On-Site Thermal Sources");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "On-Site Thermal Sources");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "On-Site Thermal Sources");
+                        }
                     }
                 }
 
@@ -8699,7 +8740,8 @@ namespace EnergyPlus::OutputReportTabular {
                 columnWidth = 14; // array assignment - same for all columns
                 tableBody.allocate(2, 13);
                 {
-                    auto const SELECT_CASE_var(ort->unitsStyle);
+                    // auto const SELECT_CASE_var(ort->unitsStyle);
+                    auto const SELECT_CASE_var(unitsStyle_temp);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Water [m3]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8768,15 +8810,25 @@ namespace EnergyPlus::OutputReportTabular {
 
                 //  ! heading for the entire sub-table
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "Water Source Summary");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Water Source Summary");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Water Source Summary");
+                        }
                     }
                 }
 
@@ -8788,42 +8840,52 @@ namespace EnergyPlus::OutputReportTabular {
                     columnWidth = 14; // array assignment - same for all columns
                     tableBody.allocate(1, 2);
 
-                    WriteSubtitle(state, "Setpoint Not Met Criteria");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Setpoint Not Met Criteria");
+                    }
 
                     curNameWithSIUnits = "Degrees [deltaC]";
                     curNameAndUnits = curNameWithSIUnits;
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     }
                     columnHead(1) = curNameAndUnits;
 
                     rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
                     rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-                    if (ort->unitsStyle != iUnitsStyle::InchPound) {
-                        tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
+                    // if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                    if (unitsStyle_temp != iUnitsStyle::InchPound) {
+                            tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
                         tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
                     } else {
                         tableBody(1, 1) = RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(deviationFromSetPtThresholdHtg)), 2);
                         tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, deviationFromSetPtThresholdClg), 2);
                     }
 
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                               rowHead,
-                                                               columnHead,
-                                                               "AnnualBuildingUtilityPerformanceSummary",
-                                                               "Entire Facility",
-                                                               "Setpoint Not Met Criteria");
+                    if (produceTabular) {
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "Setpoint Not Met Criteria");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Setpoint Not Met Criteria");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Setpoint Not Met Criteria");
+                        }
                     }
                 }
 
@@ -8834,7 +8896,9 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(1, 3);
 
                 if (ort->displayTabularBEPS) {
-                    WriteSubtitle(state, "Comfort and Setpoint Not Met Summary");
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Comfort and Setpoint Not Met Summary");
+                    }
                 }
 
                 columnHead(1) = "Facility [Hours]";
@@ -8845,37 +8909,45 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody(1, 1) = RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2);
                 tableBody(1, 2) = RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchLeedAmData,
-                                 "Number of hours heating loads not met",
-                                 RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchLeedAmData,
-                                 "Number of hours cooling loads not met",
-                                 RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchLeedAmData,
-                                 "Number of hours not met",
-                                 RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
+                if (produceTabular) {
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours heating loads not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours cooling loads not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
+                }
                 tableBody(1, 3) = RealToStr(state.dataOutRptPredefined->TotalTimeNotSimpleASH55EitherForABUPS, 2);
 
                 if (ort->displayTabularBEPS) {
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                               rowHead,
-                                                               columnHead,
-                                                               "AnnualBuildingUtilityPerformanceSummary",
-                                                               "Entire Facility",
-                                                               "Comfort and Setpoint Not Met Summary");
+                    if (produceTabular) {
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                    rowHead,
-                                                                                                    columnHead,
-                                                                                                    "Annual Building Utility Performance Summary",
-                                                                                                    "Entire Facility",
-                                                                                                    "Comfort and Setpoint Not Met Summary");
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Comfort and Setpoint Not Met Summary");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Comfort and Setpoint Not Met Summary");
+                        }
                     }
                 }
             }
