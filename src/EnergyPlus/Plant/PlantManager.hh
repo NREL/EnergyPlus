@@ -99,18 +99,18 @@ namespace PlantManager {
 
     void CheckPlantOnAbort(EnergyPlusData &state);
 
-    void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
+    void InitOneTimePlantSizingInfo(EnergyPlusData &state, int LoopNum); // loop being initialized for sizing
 
     void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
 
-    void SetupInitialPlantCallingOrder();
+    void SetupInitialPlantCallingOrder(EnergyPlusData &state);
 
     void RevisePlantCallingOrder(EnergyPlusData &state);
 
-    int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
+    int FindLoopSideInCallingOrder(EnergyPlusData &state, int LoopNum, int LoopSide);
 
     void SetupBranchControlTypes(EnergyPlusData &state);
 

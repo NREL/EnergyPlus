@@ -51,10 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ICEngineElectricGenerator.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
 
 using namespace EnergyPlus::ICEngineElectricGenerator;
 

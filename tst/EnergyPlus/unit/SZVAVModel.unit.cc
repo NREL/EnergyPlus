@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -571,8 +571,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-    TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     AirMassFlow = 0.60;
     MaxAirMassFlow = 0.60;
     ColdWaterMassFlowRate = 1.0;
@@ -611,18 +611,18 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataLoopNode::Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
     DataLoopNode::Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // chilled water plant loop
-    auto &CWLoop(PlantLoop(1));
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
     CWLoop.Name = "ChilledWaterLoop";
     CWLoop.FluidName = "ChilledWater";
     CWLoop.FluidIndex = 1;

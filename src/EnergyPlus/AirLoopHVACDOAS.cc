@@ -814,9 +814,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                             DataGlobalConstants::HWInitConvTemp,
-                                                            DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,
@@ -831,9 +831,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,
@@ -848,9 +848,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,

@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
-#include "EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 

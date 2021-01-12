@@ -590,7 +590,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        void CalcUpdateHeatRecovery(bool FirstHVACIteration);
+        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration);
 
         void ManageElectStorInteractions(EnergyPlusData &state,
                                          Real64 Pdemand,
