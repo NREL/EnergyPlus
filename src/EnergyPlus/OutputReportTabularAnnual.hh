@@ -124,6 +124,8 @@ namespace OutputReportTabularAnnual {
 
         void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle);
 
+        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceSQLite_para);
+
         void addTableOfContents(std::ostream &);
 
         std::vector<std::string> inspectTable();
