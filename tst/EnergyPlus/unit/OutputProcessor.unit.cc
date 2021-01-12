@@ -46,12 +46,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus::OutputProcessor Unit Tests
+#include <map>
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -63,9 +65,6 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include <map>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
 using namespace EnergyPlus::WeatherManager;

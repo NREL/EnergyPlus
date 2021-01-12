@@ -934,7 +934,7 @@ namespace MicroturbineElectricGenerator {
             this->myFlag = false;
         }
 
-        if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
+        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -960,9 +960,9 @@ namespace MicroturbineElectricGenerator {
 
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 
             this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
@@ -1134,7 +1134,7 @@ namespace MicroturbineElectricGenerator {
         if (this->HeatRecActive) {
             HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
             HeatRecCp = FluidProperties::GetSpecificHeatGlycol(
-                state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+                state, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
             heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
         } else {
             HeatRecInTemp = 0.0;
@@ -1459,7 +1459,7 @@ namespace MicroturbineElectricGenerator {
             //     Calculate heat recovery rate modifier curve output (function of water [volumetric] flow rate)
             if (this->HeatRecRateFWaterFlowCurveNum > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(
-                    state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
 
                 // Heat recovery fluid flow rate (m3/s)
                 Real64 HeatRecVolFlowRate = heatRecMdot / rho;

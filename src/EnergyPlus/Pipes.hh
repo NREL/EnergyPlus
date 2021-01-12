@@ -89,29 +89,25 @@ namespace Pipes {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
         void simulate([[maybe_unused]] EnergyPlusData &states, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
-
-    // Object Data
-    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
-
-    // Functions
-    void clear_state();
 
     void GetPipeInput(EnergyPlusData &state);
 
 } // namespace Pipes
 
     struct PipesData : BaseGlobalStruct {
-        int NumLocalPipes;
-        bool GetPipeInputFlag;
-
-        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
+        int NumLocalPipes = 0;
+        bool GetPipeInputFlag = true;
+        Array1D<Pipes::LocalPipeData> LocalPipe;
+        std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
         void clear_state() override {
-            NumLocalPipes = 0;
-            GetPipeInputFlag = true;
+            this->NumLocalPipes = 0;
+            this->GetPipeInputFlag = true;
+            this->LocalPipe.deallocate();
+            this->LocalPipeUniqueNames.clear();
         }
     };
 

@@ -714,7 +714,6 @@ namespace CoolingPanelSimple {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -776,7 +775,7 @@ namespace CoolingPanelSimple {
         }
 
         if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
-            if (allocated(PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                     ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
@@ -796,7 +795,7 @@ namespace CoolingPanelSimple {
                 // set design mass flow rates
                 if (ThisCP.WaterInletNode > 0) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                        state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
                     InitComponentNodes(0.0,
                                        ThisCP.WaterMassFlowRateMax,
@@ -814,7 +813,7 @@ namespace CoolingPanelSimple {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
-            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
@@ -829,7 +828,7 @@ namespace CoolingPanelSimple {
 
             ThisInNode.Temp = 7.0;
 
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
             ThisInNode.Quality = 0.0;
@@ -888,7 +887,6 @@ namespace CoolingPanelSimple {
         using DataHVACGlobals::AutoCalculateSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::SmallLoad;
-        using DataPlant::PlantLoop;
         using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CapacityPerFloorArea;
@@ -1037,8 +1035,8 @@ namespace CoolingPanelSimple {
                     PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
-                            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5., state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
@@ -1179,7 +1177,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1308,7 +1305,7 @@ namespace CoolingPanelSimple {
 
             if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-                Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
@@ -1390,7 +1387,7 @@ namespace CoolingPanelSimple {
 
         if (CoolingPanelOn) {
             // Now simulate the system...
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
             if (Effectiveness <= 0.0) {
                 Effectiveness = 0.0;
@@ -1524,7 +1521,7 @@ namespace CoolingPanelSimple {
         auto &ThisOutNode(Node(WaterOutletNode));
 
         // Set the outlet water nodes for the panel
-        SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+        SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
         ThisOutNode.Temp = ThisCP.WaterOutletTemp;
         ThisOutNode.Enthalpy = ThisCP.WaterOutletEnthalpy;
         ThisInNode.MassFlowRate = ThisCP.WaterMassFlowRate;

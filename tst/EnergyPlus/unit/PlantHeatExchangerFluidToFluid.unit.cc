@@ -50,8 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -66,7 +68,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -2307,37 +2308,37 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     PlantHeatExchangerFluidToFluid::FluidHX(1).Name = "Test HX";
 
     // setup two plant loops, need for SetComponenetFlowRate
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    DataPlant::PlantLoop(1).Name = "HX supply side loop ";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HX supply side loop ";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.loopNum = 1;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.loopSideNum = 1;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.branchNum = 1;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.compNum = 1;
 
-    DataPlant::PlantLoop(2).Name = "HX demand side loop ";
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "HX demand side loop ";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.loopNum = 2;
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.loopSideNum = 1;
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.branchNum = 1;
@@ -2409,49 +2410,49 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     PlantHeatExchangerFluidToFluid::FluidHX(1).Name = "Test HX";
 
     // setup two plant loops, need for SetComponenetFlowRate
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
     }
     // loop 1 is like a chilled water loop, supply side of HX, two branches on supply side
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(2).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).NodeNumIn = 5;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).NodeNumIn = 5;
 
     // loop 2 is like a condenser loop, demand side of HX
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    DataPlant::PlantLoop(1).Name = "HX supply side loop ";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HX supply side loop ";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
 
-    DataPlant::PlantLoop(2).Name = "HX demand side loop ";
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "HX demand side loop ";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
 
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
     PlantHeatExchangerFluidToFluid::FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::DryBulbTemperature;
@@ -2463,7 +2464,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     PlantHeatExchangerFluidToFluid::NumberOfPlantFluidHXs = 1;
 
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet_ByNominalCap;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet_ByNominalCap;
     state->dataEnvrn->OutDryBulbTemp = 9.0;
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 0.0;
     DataLoopNode::Node(3).TempSetPoint = 11.0;
@@ -2472,7 +2473,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(*state);
 
     // check value in FreeCoolCntrlMinCntrlTemp
-    EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;

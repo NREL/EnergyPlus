@@ -52,8 +52,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -63,9 +64,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
@@ -367,21 +365,21 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     ZoneSizingInput(3).ZoneNum = 3;
 
     int TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(TotNumLoops);
     PlantSizData(1).DeltaT = 10.0;
     // unit test results are based on a low HW temp at 40 C. Baseboard does not have the capacity to meet the zone load.
     PlantSizData(1).ExitTemp = 40.0;
 
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.PlantSizNum = 1;
         loop.FluidName = "WATER";
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }

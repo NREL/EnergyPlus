@@ -48,17 +48,19 @@
 // EnergyPlus::HVACDXSystem and VariableSpeedCoils Unit Tests
 
 // Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

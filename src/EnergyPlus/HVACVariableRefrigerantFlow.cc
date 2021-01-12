@@ -1218,9 +1218,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
 
             CpCond = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
                                            state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInletTemp,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
                                            RoutineName);
             if (CondWaterMassFlow > 0.0) {
                 CondOutletTemp = state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser / (CondWaterMassFlow * CpCond) + CondInletTemp;
@@ -5293,7 +5293,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus = DataHVACGlobals::ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
         }
 
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(PlantLoop)) {
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 // hot water supplemental heating coil
                 errFlag = false;
@@ -5325,15 +5325,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
                 }
 
                 // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                                                                   .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
@@ -5368,7 +5368,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
 
                 // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                                                                   .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
@@ -6056,9 +6056,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
             if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
                                        DataGlobalConstants::CWInitConvTemp,
-                                       PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
                                        RoutineName);
                 state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow = state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho;
 
@@ -6088,9 +6088,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                                    RoutineName);
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -8310,18 +8310,18 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             PltSizCondNum = 0;
 
             if (this->WaterCondVolFlowRate == DataSizing::AutoSize) {
-                if (this->SourceLoopNum > 0) PltSizCondNum = PlantLoop(this->SourceLoopNum).PlantSizNum;
+                if (this->SourceLoopNum > 0) PltSizCondNum = state.dataPlnt->PlantLoop(this->SourceLoopNum).PlantSizNum;
                 if (PltSizCondNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            PlantLoop(this->SourceLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                             DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
-                                                            PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
 
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                PlantLoop(this->SourceLoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
-                                                                PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                                 RoutineName);
                     tmpCondVolFlowRate =
                         max(this->CoolingCapacity, this->HeatingCapacity) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
@@ -8334,9 +8334,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
 
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            PlantLoop(this->SourceLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
                     PlantUtilities::InitComponentNodes(0.0,

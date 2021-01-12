@@ -58,7 +58,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -7560,8 +7559,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
 
-    TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     NumPltSizInput = 2;
     PlantSizData.allocate(NumPltSizInput);
     // chilled water coil
@@ -7580,18 +7579,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWCoil.WaterLoopSide = 1;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // chilled water plant loop
-    auto &CWLoop(PlantLoop(2));
+    auto &CWLoop(state->dataPlnt->PlantLoop(2));
     CWLoop.Name = "ChilledWaterLoop";
     CWLoop.FluidName = "Water";
     CWLoop.FluidIndex = 1;
@@ -7606,9 +7605,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     CWLoopSizingData.PlantLoopName = CWLoop.Name;
     CWLoopSizingData.DesVolFlowRate = 1.0;
     CWLoopSizingData.DeltaT = 5.6;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     // hot water plant loop
-    auto &HWLoop(PlantLoop(1));
+    auto &HWLoop(state->dataPlnt->PlantLoop(1));
     HWLoop.Name = "HotWaterLoop";
     HWLoop.FluidName = "Water";
     HWLoop.FluidIndex = 1;
@@ -7623,7 +7622,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoopSizingData.PlantLoopName = HWLoop.Name;
     HWLoopSizingData.DesVolFlowRate = 1.0;
     HWLoopSizingData.DeltaT = 10.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->DoingSizing = true;
     state->dataFans->LocalTurnFansOff = false;
@@ -7991,8 +7990,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
     EXPECT_EQ(state->dataSystemAvailabilityManager->SysAvailMgr_NightCycle, thisAvaiManager.MgrType);
 
-    TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     NumPltSizInput = 2;
     PlantSizData.allocate(NumPltSizInput);
     // chilled water coil
@@ -8011,18 +8010,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWCoil.WaterLoopSide = 1;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // chilled water plant loop
-    auto &CWLoop(PlantLoop(2));
+    auto &CWLoop(state->dataPlnt->PlantLoop(2));
     CWLoop.Name = "ChilledWaterLoop";
     CWLoop.FluidName = "Water";
     CWLoop.FluidIndex = 1;
@@ -8037,9 +8036,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     CWLoopSizingData.PlantLoopName = CWLoop.Name;
     CWLoopSizingData.DesVolFlowRate = 1.0;
     CWLoopSizingData.DeltaT = 5.6;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     // hot water plant loop
-    auto &HWLoop(PlantLoop(1));
+    auto &HWLoop(state->dataPlnt->PlantLoop(1));
     HWLoop.Name = "HotWaterLoop";
     HWLoop.FluidName = "Water";
     HWLoop.FluidIndex = 1;
@@ -8054,7 +8053,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoopSizingData.PlantLoopName = HWLoop.Name;
     HWLoopSizingData.DesVolFlowRate = 1.0;
     HWLoopSizingData.DeltaT = 10.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->DoingSizing = true;
     state->dataFans->LocalTurnFansOff = false;

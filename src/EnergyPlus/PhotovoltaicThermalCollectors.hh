@@ -178,7 +178,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculate(EnergyPlusData &state);
 
-        void update();
+        void update(EnergyPlusData &state);
     };
 
     extern Array1D<PVTCollectorStruct> PVT;

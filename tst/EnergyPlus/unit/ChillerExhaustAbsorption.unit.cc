@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

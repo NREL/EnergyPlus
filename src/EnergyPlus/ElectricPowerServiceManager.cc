@@ -1959,7 +1959,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
     Real64 thermalLoad = 0.0;
     for (auto &g : elecGenCntrlObj) {
         if (g->plantInfoFound) {
-            thermalLoad += DataPlant::PlantLoop(g->cogenLocation.loopNum)
+            thermalLoad += state.dataPlnt->PlantLoop(g->cogenLocation.loopNum)
                                .LoopSide(g->cogenLocation.loopSideNum)
                                .Branch(g->cogenLocation.branchNum)
                                .Comp(g->cogenLocation.compNum)
@@ -2175,7 +2175,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state);
 
-        if (!DataPlant::PlantFirstSizeCompleted) break;
+        if (!state.dataPlnt->PlantFirstSizeCompleted) break;
 
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(state,
                                                                                                                        runFlag,
